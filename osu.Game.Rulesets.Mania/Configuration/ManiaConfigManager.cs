@@ -4,6 +4,7 @@
 using osu.Framework.Configuration.Tracking;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
+using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Configuration
 {
@@ -19,6 +20,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
             base.InitialiseDefaults();
 
             Set(ManiaSetting.ScrollTime, 1500.0, 50.0, 10000.0, 50.0);
+            Set(ManiaSetting.ScrollDirection, ManiaScrollingDirection.Down);
         }
 
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
@@ -29,6 +31,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
 
     public enum ManiaSetting
     {
-        ScrollTime
+        ScrollTime,
+        ScrollDirection
     }
 }

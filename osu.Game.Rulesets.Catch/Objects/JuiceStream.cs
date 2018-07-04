@@ -42,7 +42,6 @@ namespace osu.Game.Rulesets.Catch.Objects
         protected override void CreateNestedHitObjects()
         {
             base.CreateNestedHitObjects();
-
             createTicks();
         }
 
@@ -77,6 +76,13 @@ namespace osu.Game.Rulesets.Catch.Objects
                     var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
 
                     double time = spanStartTime + timeProgress * spanDuration;
+
+                    if (LegacyLastTickOffset != null)
+                    {
+                        // If we're the last tick, apply the legacy offset
+                        if (span == this.SpanCount() - 1 && d + tickDistance > length)
+                            time = Math.Max(StartTime + Duration / 2, time - LegacyLastTickOffset.Value);
+                    }
 
                     double tinyTickInterval = time - lastDropletTime;
                     while (tinyTickInterval > 100)
@@ -124,9 +130,6 @@ namespace osu.Game.Rulesets.Catch.Objects
                     X = X + Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
                 });
             }
-
-            if (NestedHitObjects.LastOrDefault() is IHasComboInformation lastNested)
-                lastNested.LastInCombo = LastInCombo;
         }
 
         public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
@@ -156,5 +159,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             get { return Curve.CurveType; }
             set { Curve.CurveType = value; }
         }
+
+        public double? LegacyLastTickOffset { get; set; }
     }
 }

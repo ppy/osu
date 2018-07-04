@@ -8,20 +8,36 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using OpenTK;
 using osu.Framework.Configuration;
+using osu.Framework.Input.Bindings;
+using osu.Game.Audio;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuFocusedOverlayContainer : FocusedOverlayContainer
+    public class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
     {
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
 
+        protected virtual bool PlaySamplesOnStateChange => true;
+
+        private PreviewTrackManager previewTrackManager;
+
         protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame osuGame, AudioManager audio)
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
         {
+            var dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+            dependencies.CacheAs<IPreviewTrackOwner>(this);
+            return dependencies;
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame osuGame, AudioManager audio, PreviewTrackManager previewTrackManager)
+        {
+            this.previewTrackManager = previewTrackManager;
+
             if (osuGame != null)
                 OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
 
@@ -51,20 +67,41 @@ namespace osu.Game.Graphics.Containers
             return base.OnClick(state);
         }
 
+        public bool OnPressed(GlobalAction action)
+        {
+            if (action == GlobalAction.Back)
+            {
+                State = Visibility.Hidden;
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => false;
+
         private void onStateChanged(Visibility visibility)
         {
             switch (visibility)
             {
                 case Visibility.Visible:
                     if (OverlayActivationMode != OverlayActivation.Disabled)
-                        samplePopIn?.Play();
+                    {
+                        if (PlaySamplesOnStateChange) samplePopIn?.Play();
+                    }
                     else
                         State = Visibility.Hidden;
                     break;
                 case Visibility.Hidden:
-                    samplePopOut?.Play();
+                    if (PlaySamplesOnStateChange) samplePopOut?.Play();
                     break;
             }
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+            previewTrackManager.StopAnyPlaying(this);
         }
     }
 }

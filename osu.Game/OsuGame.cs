@@ -85,7 +85,7 @@ namespace osu.Game
         private OnScreenDisplay onscreenDisplay;
 
         private Bindable<int> configRuleset;
-        public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private Bindable<int> configSkin;
 
@@ -101,6 +101,8 @@ namespace osu.Game
         public OsuGame(string[] args = null)
         {
             this.args = args;
+
+            forwardLoggedErrorsToNotifications();
         }
 
         public void ToggleSettings() => settings.ToggleVisibility();
@@ -145,10 +147,13 @@ namespace osu.Game
 
             dependencies.CacheAs(this);
 
+            dependencies.CacheAs(ruleset);
+            dependencies.CacheAs<IBindable<RulesetInfo>>(ruleset);
+
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
-            Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
-            Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
+            ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
+            ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
 
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
@@ -214,7 +219,7 @@ namespace osu.Game
                 return;
             }
 
-            Ruleset.Value = s.Ruleset;
+            ruleset.Value = s.Ruleset;
 
             Beatmap.Value = BeatmapManager.GetWorkingBeatmap(s.Beatmap);
             Beatmap.Value.Mods.Value = s.Mods;
@@ -305,8 +310,6 @@ namespace osu.Game
                 Depth = -6,
             }, overlayContent.Add);
 
-            forwardLoggedErrorsToNotifications();
-
             dependencies.Cache(settings);
             dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
@@ -394,31 +397,40 @@ namespace osu.Game
 
         private void forwardLoggedErrorsToNotifications()
         {
-            int recentErrorCount = 0;
+            int recentLogCount = 0;
 
             const double debounce = 5000;
 
             Logger.NewEntry += entry =>
             {
-                if (entry.Level < LogLevel.Error || entry.Target == null) return;
+                if (entry.Level < LogLevel.Important || entry.Target == null) return;
 
-                if (recentErrorCount < 2)
+                const int short_term_display_limit = 3;
+
+                if (recentLogCount < short_term_display_limit)
                 {
-                    notifications.Post(new SimpleNotification
+                    Schedule(() => notifications.Post(new SimpleNotification
                     {
-                        Icon = FontAwesome.fa_bomb,
-                        Text = (recentErrorCount == 0 ? entry.Message : "Subsequent errors occurred and have been logged.") + "\nClick to view log files.",
+                        Icon = entry.Level == LogLevel.Important ? FontAwesome.fa_exclamation_circle : FontAwesome.fa_bomb,
+                        Text = entry.Message,
+                    }));
+                }
+                else if (recentLogCount == short_term_display_limit)
+                {
+                    Schedule(() => notifications.Post(new SimpleNotification
+                    {
+                        Icon = FontAwesome.fa_ellipsis_h,
+                        Text = "Subsequent messages have been logged. Click to view log files.",
                         Activated = () =>
                         {
                             Host.Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
                             return true;
                         }
-                    });
+                    }));
                 }
 
-                Interlocked.Increment(ref recentErrorCount);
-
-                Scheduler.AddDelayed(() => Interlocked.Decrement(ref recentErrorCount), debounce);
+                Interlocked.Increment(ref recentLogCount);
+                Scheduler.AddDelayed(() => Interlocked.Decrement(ref recentLogCount), debounce);
             };
         }
 
@@ -541,7 +553,7 @@ namespace osu.Game
             // the use case for not applying is in visual/unit tests.
             bool applyBeatmapRulesetRestrictions = !currentScreen?.AllowBeatmapRulesetChange ?? false;
 
-            Ruleset.Disabled = applyBeatmapRulesetRestrictions;
+            ruleset.Disabled = applyBeatmapRulesetRestrictions;
             Beatmap.Disabled = applyBeatmapRulesetRestrictions;
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
