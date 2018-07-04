@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
 {
     public class Header : Screen
     {
-        public const float HEIGHT = 40;
+        public const float HEIGHT = 45;
 
         private readonly OsuSpriteText screenType;
         private readonly Container boxContainer;
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                         },
                         new Container
                         {
-                            Margin = new MarginPadding { Left = 25, Top = 5 },
+                            Margin = new MarginPadding { Left = 25, Top = 7.5f },
                             RelativeSizeAxes = Axes.X,
                             Height = HEIGHT,
                             Child = textContainer = new FillFlowContainer
