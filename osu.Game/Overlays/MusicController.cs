@@ -183,7 +183,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomCentre,
                                     Height = progress_height,
                                     FillColour = colours.Yellow,
-                                    OnSeek = conditionalSeek
+                                    OnSeek = attemptSeek
                                 }
                             },
                         },
@@ -198,9 +198,9 @@ namespace osu.Game.Overlays
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
-        private void conditionalSeek(double progress)
+        private void attemptSeek(double progress)
         {
-            if (enableSeek)
+            if (!beatmap.Disabled)
                 current?.Track.Seek(progress);
         }
 
@@ -220,8 +220,6 @@ namespace osu.Game.Overlays
             base.LoadComplete();
         }
 
-        private bool enableSeek { get; set; }
-
         private void beatmapDisabledChanged(bool disabled)
         {
             if (disabled)
@@ -231,7 +229,6 @@ namespace osu.Game.Overlays
             prevButton.Enabled.Value = !disabled;
             nextButton.Enabled.Value = !disabled;
             playlistButton.Enabled.Value = !disabled;
-            enableSeek = !disabled;
         }
 
         protected override void UpdateAfterChildren()
