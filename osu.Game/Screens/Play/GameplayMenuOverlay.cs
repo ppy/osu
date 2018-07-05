@@ -15,10 +15,13 @@ using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 using OpenTK.Input;
 using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
 {
-    public abstract class GameplayMenuOverlay : OverlayContainer
+    public abstract class GameplayMenuOverlay : OverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private const int transition_duration = 200;
         private const int button_height = 70;
@@ -30,6 +33,11 @@ namespace osu.Game.Screens.Play
 
         public Action OnRetry;
         public Action OnQuit;
+
+        /// <summary>
+        /// Action that is invoked when <see cref="GlobalAction.Back"/> is triggered.
+        /// </summary>
+        protected virtual Action BackAction => () => InternalButtons.Children.Last().TriggerOnClick();
 
         public abstract string Header { get; }
         public abstract string Description { get; }
@@ -218,6 +226,19 @@ namespace osu.Game.Screens.Play
 
             return base.OnKeyDown(state, args);
         }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            if (action == GlobalAction.Back)
+            {
+                BackAction.Invoke();
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => action == GlobalAction.Back;
 
         private void buttonSelectionChanged(DialogButton button, bool isSelected)
         {

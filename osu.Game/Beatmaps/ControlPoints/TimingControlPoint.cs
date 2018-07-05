@@ -24,8 +24,8 @@ namespace osu.Game.Beatmaps.ControlPoints
 
         private double beatLength = 1000;
 
-        public override bool ChangeEquals(ControlPoint other)
-            => base.ChangeEquals(other)
+        public override bool EquivalentTo(ControlPoint other)
+            => base.EquivalentTo(other)
                && other is TimingControlPoint timing
                && TimeSignature.Equals(timing.TimeSignature)
                && BeatLength.Equals(timing.BeatLength);
