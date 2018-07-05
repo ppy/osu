@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Mods
 
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
 
-        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private void rulesetChanged(RulesetInfo newRuleset)
         {
@@ -51,8 +51,8 @@ namespace osu.Game.Overlays.Mods
             refreshSelectedMods();
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu, RulesetStore rulesets, AudioManager audio)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset, AudioManager audio)
         {
             SelectedMods.ValueChanged += selectedModsChanged;
 
@@ -60,13 +60,8 @@ namespace osu.Game.Overlays.Mods
             HighMultiplierColour = colours.Green;
             UnrankedLabel.Colour = colours.Blue;
 
-            if (osu != null)
-                Ruleset.BindTo(osu.Ruleset);
-            else
-                Ruleset.Value = rulesets.AvailableRulesets.First();
-
-            Ruleset.ValueChanged += rulesetChanged;
-            Ruleset.TriggerChange();
+            Ruleset.BindTo(ruleset);
+            Ruleset.BindValueChanged(rulesetChanged, true);
 
             sampleOn = audio.Sample.Get(@"UI/check-on");
             sampleOff = audio.Sample.Get(@"UI/check-off");

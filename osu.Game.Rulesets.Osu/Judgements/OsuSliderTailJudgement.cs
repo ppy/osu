@@ -8,6 +8,7 @@ namespace osu.Game.Rulesets.Osu.Judgements
     public class OsuSliderTailJudgement : OsuJudgement
     {
         public override bool AffectsCombo => false;
+
         protected override int NumericResultFor(HitResult result) => 0;
     }
 }

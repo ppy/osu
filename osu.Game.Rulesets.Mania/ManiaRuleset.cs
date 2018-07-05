@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Replays.Types;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
+using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mania.Beatmaps;
@@ -154,6 +155,8 @@ namespace osu.Game.Rulesets.Mania
         public override IConvertibleReplayFrame CreateConvertibleReplayFrame() => new ManiaReplayFrame();
 
         public override IRulesetConfigManager CreateConfig(SettingsStore settings) => new ManiaConfigManager(settings, RulesetInfo);
+
+        public override RulesetSettingsSubsection CreateSettings() => new ManiaSettingsSubsection(this);
 
         public ManiaRuleset(RulesetInfo rulesetInfo = null)
             : base(rulesetInfo)

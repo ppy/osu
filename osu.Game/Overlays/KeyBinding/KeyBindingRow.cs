@@ -186,7 +186,7 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 if (bindTarget.IsHovered)
                 {
-                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
+                    bindTarget.UpdateKeyCombination(new KeyCombination(KeyCombination.FromInputState(state).Keys.Append(state.Mouse.ScrollDelta.Y > 0 ? InputKey.MouseWheelUp : InputKey.MouseWheelDown)));
                     finalise();
                     return true;
                 }
@@ -202,9 +202,6 @@ namespace osu.Game.Overlays.KeyBinding
 
             switch (args.Key)
             {
-                case Key.Escape:
-                    finalise();
-                    return true;
                 case Key.Delete:
                 {
                     if (state.Keyboard.ShiftPressed)

@@ -11,6 +11,7 @@ using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Beatmaps.Formats
@@ -210,6 +211,24 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(1285, hitObjects[1].StartTime);
                 Assert.IsTrue(hitObjects[1].Samples.Any(s => s.Name == SampleInfo.HIT_CLAP));
             }
+        }
+
+        [Test]
+        public void TestDecodeCustomSamples()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+            using (var resStream = Resource.OpenResource("custom-samples.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                Assert.AreEqual("hitnormal", getTestableSampleInfo(hitObjects[0]).Name);
+                Assert.AreEqual("hitnormal", getTestableSampleInfo(hitObjects[1]).Name);
+                Assert.AreEqual("hitnormal2", getTestableSampleInfo(hitObjects[2]).Name);
+                Assert.AreEqual("hitnormal", getTestableSampleInfo(hitObjects[3]).Name);
+            }
+
+            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(new SampleInfo { Name = "hitnormal" });
         }
     }
 }

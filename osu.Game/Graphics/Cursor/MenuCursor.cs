@@ -11,9 +11,9 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Game.Configuration;
 using System;
-using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Graphics.Textures;
+using OpenTK.Input;
 
 namespace osu.Game.Graphics.Cursor
 {
@@ -25,9 +25,8 @@ namespace osu.Game.Graphics.Cursor
         protected override Drawable CreateCursor() => new Cursor();
 
         private Bindable<bool> cursorRotate;
-        private bool dragging;
-
-        private bool startRotation;
+        private DragRotationState dragRotationState;
+        private Vector2 positionMouseDown;
 
         [BackgroundDependencyLoader(true)]
         private void load([NotNull] OsuConfigManager config, [CanBeNull] ScreenshotManager screenshotManager)
@@ -40,18 +39,18 @@ namespace osu.Game.Graphics.Cursor
 
         protected override bool OnMouseMove(InputState state)
         {
-            if (cursorRotate && dragging)
+            if (dragRotationState != DragRotationState.NotDragging)
             {
-                Debug.Assert(state.Mouse.PositionMouseDown != null);
-
+                var position = state.Mouse.Position;
+                var distance = Vector2Extensions.Distance(position, positionMouseDown);
                 // don't start rotating until we're moved a minimum distance away from the mouse down location,
                 // else it can have an annoying effect.
-                // ReSharper disable once PossibleInvalidOperationException
-                startRotation |= Vector2Extensions.Distance(state.Mouse.Position, state.Mouse.PositionMouseDown.Value) > 30;
-
-                if (startRotation)
+                if (dragRotationState == DragRotationState.DragStarted && distance > 30)
+                    dragRotationState = DragRotationState.Rotating;
+                // don't rotate when distance is zero to avoid NaN
+                if (dragRotationState == DragRotationState.Rotating && distance > 0)
                 {
-                    Vector2 offset = state.Mouse.Position - state.Mouse.PositionMouseDown.Value;
+                    Vector2 offset = state.Mouse.Position - positionMouseDown;
                     float degrees = (float)MathHelper.RadiansToDegrees(Math.Atan2(-offset.X, offset.Y)) + 24.3f;
 
                     // Always rotate in the direction of least distance
@@ -67,12 +66,6 @@ namespace osu.Game.Graphics.Cursor
             return base.OnMouseMove(state);
         }
 
-        protected override bool OnDragStart(InputState state)
-        {
-            dragging = true;
-            return base.OnDragStart(state);
-        }
-
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
             ActiveCursor.Scale = new Vector2(1);
@@ -80,6 +73,12 @@ namespace osu.Game.Graphics.Cursor
 
             ((Cursor)ActiveCursor).AdditiveLayer.Alpha = 0;
             ((Cursor)ActiveCursor).AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
+
+            if (args.Button == MouseButton.Left && cursorRotate)
+            {
+                dragRotationState = DragRotationState.DragStarted;
+                positionMouseDown = state.Mouse.Position;
+            }
             return base.OnMouseDown(state, args);
         }
 
@@ -87,14 +86,16 @@ namespace osu.Game.Graphics.Cursor
         {
             if (!state.Mouse.HasMainButtonPressed)
             {
-                dragging = false;
-                startRotation = false;
-
                 ((Cursor)ActiveCursor).AdditiveLayer.FadeOut(500, Easing.OutQuint);
-                ActiveCursor.RotateTo(0, 600 * (1 + Math.Abs(ActiveCursor.Rotation / 720)), Easing.OutElasticHalf);
                 ActiveCursor.ScaleTo(1, 500, Easing.OutElastic);
             }
 
+            if (args.Button == MouseButton.Left)
+            {
+                if (dragRotationState == DragRotationState.Rotating)
+                    ActiveCursor.RotateTo(0, 600 * (1 + Math.Abs(ActiveCursor.Rotation / 720)), Easing.OutElasticHalf);
+                dragRotationState = DragRotationState.NotDragging;
+            }
             return base.OnMouseUp(state, args);
         }
 
@@ -159,6 +160,13 @@ namespace osu.Game.Graphics.Cursor
                 cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2((float)newScale * base_scale);
                 cursorScale.TriggerChange();
             }
+        }
+
+        private enum DragRotationState
+        {
+            NotDragging,
+            DragStarted,
+            Rotating,
         }
     }
 }
