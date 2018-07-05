@@ -167,7 +167,7 @@ namespace osu.Game.Tests.Visual
             AddStep(@"set rooms", () => lounge.Rooms = rooms);
             selectAssert(1);
             AddStep(@"open room 1", () => clickRoom(1));
-            AddUntilStep(() => !lounge.IsCurrentScreen, "wait until room current");
+            AddUntilStep(() => lounge.ChildScreen?.IsCurrentScreen == true, "wait until room current");
             AddStep(@"make lounge current", lounge.MakeCurrent);
             filterAssert(@"THE FINAL", LoungeTab.Public, 1);
             filterAssert(string.Empty, LoungeTab.Public, 2);

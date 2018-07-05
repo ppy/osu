@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             var endTimeData = original as IHasEndTime;
             var positionData = original as IHasPosition;
             var comboData = original as IHasCombo;
+            var legacyOffset = original as IHasLegacyLastTickOffset;
 
             if (curveData != null)
             {
@@ -40,7 +41,8 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     RepeatSamples = curveData.RepeatSamples,
                     RepeatCount = curveData.RepeatCount,
                     Position = positionData?.Position ?? Vector2.Zero,
-                    NewCombo = comboData?.NewCombo ?? false
+                    NewCombo = comboData?.NewCombo ?? false,
+                    LegacyLastTickOffset = legacyOffset?.LegacyLastTickOffset
                 };
             }
             else if (endTimeData != null)

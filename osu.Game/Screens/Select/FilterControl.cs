@@ -29,6 +29,7 @@ namespace osu.Game.Screens.Select
         private readonly TabControl<GroupMode> groupTabs;
 
         private SortMode sort = SortMode.Title;
+
         public SortMode Sort
         {
             get { return sort; }
@@ -43,6 +44,7 @@ namespace osu.Game.Screens.Select
         }
 
         private GroupMode group = GroupMode.All;
+
         public GroupMode Group
         {
             get { return group; }
@@ -62,14 +64,15 @@ namespace osu.Game.Screens.Select
             Sort = sort,
             SearchText = searchTextBox.Text,
             AllowConvertedBeatmaps = showConverted,
-            Ruleset = ruleset
+            Ruleset = ruleset.Value
         };
 
         public Action Exit;
 
         private readonly SearchTextBox searchTextBox;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => base.ReceiveMouseInputAt(screenSpacePos) || groupTabs.ReceiveMouseInputAt(screenSpacePos) || sortTabs.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) =>
+            base.ReceiveMouseInputAt(screenSpacePos) || groupTabs.ReceiveMouseInputAt(screenSpacePos) || sortTabs.ReceiveMouseInputAt(screenSpacePos);
 
         public FilterControl()
         {
@@ -163,24 +166,22 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = true;
         }
 
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private Bindable<bool> showConverted;
 
         public readonly Box Background;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu, OsuConfigManager config)
+        private void load(OsuColour colours, IBindable<RulesetInfo> parentRuleset, OsuConfigManager config)
         {
             sortTabs.AccentColour = colours.GreenLight;
 
             showConverted = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
             showConverted.ValueChanged += val => updateCriteria();
 
-            if (osu != null)
-                ruleset.BindTo(osu.Ruleset);
-            ruleset.ValueChanged += val => updateCriteria();
-            ruleset.TriggerChange();
+            ruleset.BindTo(parentRuleset);
+            ruleset.BindValueChanged(val => updateCriteria(), true);
         }
 
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
