@@ -45,8 +45,8 @@ namespace osu.Game.Beatmaps.ControlPoints
             return newSampleInfo;
         }
 
-        public override bool ChangeEquals(ControlPoint other)
-            => base.ChangeEquals(other)
+        public override bool EquivalentTo(ControlPoint other)
+            => base.EquivalentTo(other)
                && other is SampleControlPoint sample
                && SampleBank.Equals(sample.SampleBank)
                && SampleVolume.Equals(sample.SampleVolume);
