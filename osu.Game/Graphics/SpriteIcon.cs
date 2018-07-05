@@ -10,6 +10,7 @@ using osu.Framework.IO.Stores;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Caching;
+// ReSharper disable IdentifierTypo
 
 namespace osu.Game.Graphics
 {
