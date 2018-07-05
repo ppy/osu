@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             RelativeSizeAxes = Axes.X;
 
             MaskingContainer.CornerRadius = 0;
-            ItemsContainer.Padding = new MarginPadding { Left = 100 };
+            ItemsContainer.Padding = new MarginPadding { Left = 60 };
             BackgroundColour = OsuColour.FromHex("1c2125");
 
             SetupScreenSelectionTabControl tabControl;
@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    X = 65
+                    X = 60
                 }
             });
 

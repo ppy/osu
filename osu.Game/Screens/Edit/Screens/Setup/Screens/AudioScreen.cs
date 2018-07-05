@@ -3,9 +3,11 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -15,7 +17,9 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Edit.Screens.Setup.BottomHeaders;
+using osu.Game.Screens.Edit.Screens.Setup.Components;
 using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -25,9 +29,29 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
     {
         private readonly Container content;
 
-        private readonly LabelledSwitchButton samples;
+        private readonly LabelledEnumDropdown<SampleBank> defaultSampleBank;
+        private readonly LabelledSliderBar defaultSampleVolume;
+        private readonly LabelledSwitchButton samplesMatchPlaybackRate;
+        private readonly LabelledSwitchButton enableCustomOverrides;
+
+        private readonly OsuCircularButton normalSample;
+        private readonly OsuCircularButton whistleSample;
+        private readonly OsuCircularButton finishSample;
+        private readonly OsuCircularButton clapSample;
+
+        private readonly Container resetDefaultSampleSetSettingsContainer;
+        private readonly Container resetDefaultSampleVolumeSettingsContainer;
+        private readonly OsuCircularButton resetDefaultSampleSetSettingsButton;
+        private readonly OsuCircularButton resetDefaultSampleVolumeSettingsButton;
+
+        private readonly Container sampleSetSettings;
+        private readonly Container sampleVolumeSettings;
+        private readonly FillFlowContainer sampleSetSettingsContainer;
+        private readonly FillFlowContainer sampleVolumeSettingsContainer;
 
         public string Title => "Audio";
+
+        public const float DEFAULT_LABEL_TEXT_SIZE = 12;
 
         public AudioScreen()
         {
@@ -40,7 +64,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     {
                         new FillFlowContainer
                         {
-                            Margin = new MarginPadding { Left = 65, Top = 180 },
+                            Margin = new MarginPadding { Left = Setup.SCREEN_LEFT_PADDING, Top = Setup.SCREEN_TOP_PADDING },
                             Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.CentreLeft,
@@ -55,6 +79,255 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 20,
                                     Font = @"Exo2.0-Bold",
                                 },
+                                sampleSetSettings = new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
+                                    Height = 83,
+                                    Children = new Drawable[]
+                                    {
+                                        sampleSetSettingsContainer = new FillFlowContainer
+                                        {
+                                            Direction = FillDirection.Vertical,
+                                            RelativeSizeAxes = Axes.X,
+                                            Spacing = new Vector2(3),
+                                            Children = new Drawable[]
+                                            {
+                                                defaultSampleBank = new LabelledEnumDropdown<SampleBank>
+                                                {
+                                                    LabelText = "Sample Bank",
+                                                },
+                                                enableCustomOverrides = new LabelledSwitchButton
+                                                {
+                                                    LabelText = "Custom Sample Banks",
+                                                },
+                                            }
+                                        },
+                                        resetDefaultSampleSetSettingsContainer = new Container
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = 60,
+                                            Alpha = 0,
+                                            Children = new Drawable[]
+                                            {
+                                                new Container
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    CornerRadius = 15,
+                                                    Masking = true,
+                                                    Height = 50,
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new Box
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Colour = OsuColour.FromHex("1c2125"),
+                                                        },
+                                                        new Container
+                                                        {
+                                                            RelativeSizeAxes = Axes.X,
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            Height = 50,
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new OsuSpriteText
+                                                                {
+                                                                    Anchor = Anchor.CentreLeft,
+                                                                    Origin = Anchor.CentreLeft,
+                                                                    Padding = new MarginPadding { Left = 15 },
+                                                                    Colour = Color4.White,
+                                                                    TextSize = DEFAULT_LABEL_TEXT_SIZE,
+                                                                    Text = "This beatmap has timing-section-dependent sample bank settings, therefore you cannot set beatmap-wide settings here.",
+                                                                    Font = @"Exo2.0-Bold",
+                                                                },
+                                                                resetDefaultSampleSetSettingsButton = new OsuCircularButton
+                                                                {
+                                                                    Anchor = Anchor.CentreRight,
+                                                                    Origin = Anchor.CentreRight,
+                                                                    Margin = new MarginPadding { Right = 15 },
+                                                                    LabelText = "Reset Settings",
+                                                                    Width = 125,
+                                                                },
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                    }
+                                },
+                                sampleVolumeSettings = new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 85,
+                                    Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
+                                    Children = new Drawable[]
+                                    {
+                                        sampleVolumeSettingsContainer = new FillFlowContainer
+                                        {
+                                            Direction = FillDirection.Vertical,
+                                            RelativeSizeAxes = Axes.X,
+                                            Padding = new MarginPadding { Top = 10 },
+                                            Spacing = new Vector2(3),
+                                            Children = new Drawable[]
+                                            {
+                                                defaultSampleVolume = new LabelledSliderBar
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
+                                                    LabelText = "Sample Volume",
+                                                    TooltipTextSuffix = "%",
+                                                    SliderMaxValue = 100,
+                                                    SliderMinValue = 0,
+                                                    SliderNormalPrecision = 10,
+                                                    SliderAlternatePrecision = 1,
+                                                },
+                                            }
+                                        },
+                                        resetDefaultSampleVolumeSettingsContainer = new Container
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = 60,
+                                            Padding = new MarginPadding { Top = 10 },
+                                            Alpha = 0,
+                                            Children = new Drawable[]
+                                            {
+                                                new Container
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    CornerRadius = 15,
+                                                    Masking = true,
+                                                    Height = 50,
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new Box
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Colour = OsuColour.FromHex("1c2125"),
+                                                        },
+                                                        new Container
+                                                        {
+                                                            RelativeSizeAxes = Axes.X,
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            Height = 50,
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new OsuSpriteText
+                                                                {
+                                                                    Anchor = Anchor.CentreLeft,
+                                                                    Origin = Anchor.CentreLeft,
+                                                                    Padding = new MarginPadding { Left = 15 },
+                                                                    Colour = Color4.White,
+                                                                    TextSize = DEFAULT_LABEL_TEXT_SIZE,
+                                                                    Text = "This beatmap has timing-section-dependent sample volume settings, therefore you cannot set beatmap-wide settings here.",
+                                                                    Font = @"Exo2.0-Bold",
+                                                                },
+                                                                resetDefaultSampleVolumeSettingsButton = new OsuCircularButton
+                                                                {
+                                                                    Anchor = Anchor.CentreRight,
+                                                                    Origin = Anchor.CentreRight,
+                                                                    Margin = new MarginPadding { Right = 15 },
+                                                                    LabelText = "Reset Settings",
+                                                                    Width = 125,
+                                                                },
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                    }
+                                },
+                                new Container
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
+                                    Height = 83,
+                                    Children = new Drawable[]
+                                    {
+                                        new Container
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Height = 50,
+                                            Padding = new MarginPadding { Top = 10 },
+                                            Children = new Drawable[]
+                                            {
+                                                new Container
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    CornerRadius = 15,
+                                                    Masking = true,
+                                                    Height = 50,
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new Box
+                                                        {
+                                                            RelativeSizeAxes = Axes.Both,
+                                                            Colour = OsuColour.FromHex("1c2125"),
+                                                        },
+                                                        new Container
+                                                        {
+                                                            RelativeSizeAxes = Axes.X,
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                            Height = 50,
+                                                            Children = new Drawable[]
+                                                            {
+                                                                new OsuSpriteText
+                                                                {
+                                                                    Anchor = Anchor.CentreLeft,
+                                                                    Origin = Anchor.CentreLeft,
+                                                                    Padding = new MarginPadding { Left = 15 },
+                                                                    Colour = Color4.White,
+                                                                    TextSize = 16,
+                                                                    Text = "Sample Playtest",
+                                                                    Font = @"Exo2.0-Bold",
+                                                                },
+                                                                new FillFlowContainer
+                                                                {
+                                                                    Anchor = Anchor.TopRight,
+                                                                    Origin = Anchor.TopRight,
+                                                                    Direction = FillDirection.Horizontal,
+                                                                    Spacing = new Vector2(5),
+                                                                    Margin = new MarginPadding { Right = 15, Top = 10 },
+                                                                    Children = new[]
+                                                                    {
+                                                                        clapSample = new OsuCircularButton
+                                                                        {
+                                                                            Anchor = Anchor.TopRight,
+                                                                            Origin = Anchor.TopRight,
+                                                                            LabelText = "Clap"
+                                                                        },
+                                                                        finishSample = new OsuCircularButton
+                                                                        {
+                                                                            Anchor = Anchor.TopRight,
+                                                                            Origin = Anchor.TopRight,
+                                                                            LabelText = "Finish"
+                                                                        },
+                                                                        whistleSample = new OsuCircularButton
+                                                                        {
+                                                                            Anchor = Anchor.TopRight,
+                                                                            Origin = Anchor.TopRight,
+                                                                            LabelText = "Whistle"
+                                                                        },
+                                                                        normalSample = new OsuCircularButton
+                                                                        {
+                                                                            Anchor = Anchor.TopRight,
+                                                                            Origin = Anchor.TopRight,
+                                                                            LabelText = "Normal"
+                                                                        },
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                    }
+                                },
                                 new OsuSpriteText
                                 {
                                     Padding = new MarginPadding { Top = 10 },
@@ -63,9 +336,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 20,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                samples = new LabelledSwitchButton
+                                samplesMatchPlaybackRate = new LabelledSwitchButton
                                 {
-                                    Padding = new MarginPadding { Top = 10, Right = 140 },
+                                    Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
                                     LabelText = "Samples Match Playback Rate",
                                     BottomLabelText = "This option is suitable for fully-hitsounded maps.",
                                 },
@@ -78,14 +351,97 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             updateInfo();
             Beatmap.ValueChanged += a => updateInfo();
 
-            samples.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.SamplesMatchPlaybackRate = a;
+            samplesMatchPlaybackRate.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.SamplesMatchPlaybackRate = a;
+            defaultSampleVolume.SliderBarValueChanged += a =>
+            {
+                foreach (var s in Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints)
+                    s.SampleVolume = (int)a;
+            };
+            defaultSampleBank.DropdownSelectionChanged += a =>
+            {
+                foreach (var s in Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints)
+                    s.SampleBank = a.ToString().ToLower();
+            };
         }
 
-        public void ChangeSamplesMatchPlaybackRate(bool newValue) => samples.CurrentValue = newValue;
+        [BackgroundDependencyLoader]
+        private void load(OsuColour osuColour)
+        {
+            normalSample.DefaultColour = osuColour.Purple;
+            whistleSample.DefaultColour = osuColour.Purple;
+            finishSample.DefaultColour = osuColour.Purple;
+            clapSample.DefaultColour = osuColour.Purple;
+            resetDefaultSampleSetSettingsButton.DefaultColour = osuColour.BlueDark;
+            resetDefaultSampleVolumeSettingsButton.DefaultColour = osuColour.BlueDark;
+        }
+
+        public void ChangeSamplesMatchPlaybackRate(bool newValue) => samplesMatchPlaybackRate.CurrentValue = newValue;
 
         private void updateInfo()
         {
-            samples.CurrentValue = Beatmap.Value?.BeatmapInfo.SamplesMatchPlaybackRate ?? false;
+            samplesMatchPlaybackRate.CurrentValue = Beatmap.Value?.BeatmapInfo.SamplesMatchPlaybackRate ?? false;
+
+            string commonBank = "";
+            int? commonVolume = -1;
+
+            if (Beatmap.Value != null)
+            {
+                foreach (var s in Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints)
+                {
+                    if (commonBank == "")
+                        commonBank = s.SampleBank;
+                    else if (commonBank != s.SampleBank)
+                    {
+                        commonBank = null;
+                        break;
+                    }
+                }
+                foreach (var s in Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints)
+                {
+                    if (commonVolume == -1)
+                        commonVolume = s.SampleVolume;
+                    else if (commonVolume != s.SampleVolume)
+                    {
+                        commonVolume = null;
+                        break;
+                    }
+                }
+            }
+
+            if (commonBank != null)
+            {
+                if (commonBank == "")
+                    defaultSampleBank.DropdownSelectedItem = SampleBank.Normal;
+                else
+                {
+                    Enum.TryParse<SampleBank>(commonBank, out var i);
+                    defaultSampleBank.DropdownSelectedItem = i;
+                }
+            }
+            sampleSetSettingsContainer.Alpha = Convert.ToInt32(commonBank != null);
+            resetDefaultSampleSetSettingsContainer.Alpha = Convert.ToInt32(commonBank == null);
+            sampleSetSettings.Height = commonBank != null ? 83 : 50;
+
+            if (commonVolume != null)
+            {
+                if (commonVolume == -1)
+                    defaultSampleVolume.CurrentValue = 100;
+                else
+                    defaultSampleVolume.CurrentValue = (float)commonVolume;
+            }
+            sampleVolumeSettingsContainer.Alpha = Convert.ToInt32(commonVolume != null);
+            resetDefaultSampleVolumeSettingsContainer.Alpha = Convert.ToInt32(commonVolume == null);
+            sampleVolumeSettings.Height = commonVolume != null ? 85 : 60;
         }
+    }
+
+    public enum SampleBank
+    {
+        [System.ComponentModel.Description("Normal")]
+        Normal = 0,
+        [System.ComponentModel.Description("Soft")]
+        Soft = 1,
+        [System.ComponentModel.Description("Drum")]
+        Drum = 2,
     }
 }

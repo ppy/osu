@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
     {
         public GeneralScreenBottomHeader()
         {
-            Width = Setup.SIZE_X - 70;
+            Width = Setup.SIZE_X - Setup.SCREEN_LEFT_PADDING;
 
             Children = new Drawable[]
             {

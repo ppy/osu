@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public const float DEFAULT_LABEL_TEXT_SIZE = 16;
         public const float DEFAULT_BOTTOM_LABEL_TEXT_SIZE = 12;
         public const float NORMAL_HEIGHT = 70;
-        public const float DEFAULT_LABEL_PADDING = 12;
+        public const float DEFAULT_LABEL_PADDING = 15;
         public const float DEFAULT_TOP_PADDING = 12;
         public const float DEFAULT_BOTTOM_PADDING = 12;
         public const float DEFAULT_SLIDER_BAR_PADDING = 20;
@@ -99,6 +99,17 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             {
                 sliderAlternatePrecision = value;
                 sliderBar.AlternatePrecision = value;
+            }
+        }
+
+        private string tooltipTextSuffix = "";
+        public string TooltipTextSuffix
+        {
+            get => tooltipTextSuffix;
+            set
+            {
+                tooltipTextSuffix = value;
+                sliderBar.TooltipTextSuffix = value;
             }
         }
 
@@ -240,6 +251,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                                 Y = DEFAULT_TOP_PADDING,
                                                 Padding = new MarginPadding { Right = DEFAULT_SLIDER_BAR_PADDING },
                                                 Colour = Color4.White,
+                                                TooltipTextSuffix = tooltipTextSuffix
                                             },
                                         },
                                     },

@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                             {
                                 AutoSizeAxes = Axes.X,
                                 Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(7.5f, 0f),
+                                Spacing = new Vector2(5, 0),
                                 Children = new Drawable[]
                                 {
                                     new SpriteIcon

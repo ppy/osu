@@ -147,6 +147,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private readonly OsuSpriteText rightTickCaption;
         private readonly Ticks ticks;
 
+        public string TooltipTextSuffix = "";
+
         public virtual string TooltipText
         {
             get
@@ -160,7 +162,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 // Find the number of significant digits (we could have less than 5 after normalize())
                 var significantDigits = findPrecision(decimalPrecision);
 
-                return floatValue.Value.ToString($"N{significantDigits}");
+                return $"{floatValue.Value.ToString($"N{significantDigits}")}{TooltipTextSuffix}";
             }
         }
 

@@ -31,6 +31,7 @@ namespace osu.Game.Tests.Visual
             typeof(LabelledSliderBar),
             typeof(OsuTickSliderBar),
             typeof(OsuSwitchButton),
+            typeof(OsuCircularButton),
             typeof(Header),
             typeof(GeneralScreen),
             typeof(DifficultyScreen),

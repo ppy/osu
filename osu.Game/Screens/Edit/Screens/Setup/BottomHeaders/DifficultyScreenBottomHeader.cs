@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
     {
         public DifficultyScreenBottomHeader()
         {
-            Width = Setup.SIZE_X;
+            Width = Setup.SIZE_X - Setup.SCREEN_LEFT_PADDING;
 
             Children = new Drawable[]
             {

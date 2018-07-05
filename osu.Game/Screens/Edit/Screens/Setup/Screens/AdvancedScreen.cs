@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     {
                         new FillFlowContainer
                         {
-                            Margin = new MarginPadding { Left = 65, Top = 180 },
+                            Margin = new MarginPadding { Left = Setup.SCREEN_LEFT_PADDING, Top = Setup.SCREEN_TOP_PADDING },
                             Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.CentreLeft,
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 stackLeniency = new LabelledSliderBar
                                 {
-                                    Padding = new MarginPadding { Top = 10, Right = 140 },
+                                    Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
                                     SliderMinValue = 2,
                                     SliderMaxValue = 10,
                                     SliderNormalPrecision = 1,
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 availableGamemodes = new LabelledEnumDropdown<AvailableGamemodes>
                                 {
-                                    Padding = new MarginPadding { Top = 10, Right = 140 },
+                                    Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
                                     LabelText = "Allowed Modes",
                                 },
                                 new OsuSpriteText
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 maniaSpecialStyle = new LabelledSwitchButton
                                 {
-                                    Padding = new MarginPadding { Top = 10, Right = 140 },
+                                    Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
                                     LabelText = "osu!mania Special Style",
                                     BottomLabelText = "Use N+1 key style for osu!mania maps.",
                                     Alpha = 0

@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public const float DEFAULT_HEADER_TEXT_SIZE = 20;
         public const float DEFAULT_HEIGHT = 40;
         public const float DEFAULT_LABEL_TEXT_SIZE = 16;
-        public const float DEFAULT_PADDING = 12;
+        public const float DEFAULT_PADDING = 15;
 
         public event Action<T> DropdownSelectionChanged;
 

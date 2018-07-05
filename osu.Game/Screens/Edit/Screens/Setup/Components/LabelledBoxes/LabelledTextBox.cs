@@ -31,7 +31,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public const float OUTER_CORNER_RADIUS = 15;
         public const float INNER_CORNER_RADIUS = 10;
         public const float DEFAULT_HEIGHT = 40;
-        public const float DEFAULT_LABEL_PADDING = 12;
+        public const float DEFAULT_LABEL_LEFT_PADDING = 15;
+        public const float DEFAULT_LABEL_TOP_PADDING = 12;
         public const float DEFAULT_LABEL_TEXT_SIZE = 16;
 
         public event Action<string> TextBoxTextChanged;
@@ -182,7 +183,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
-                                            Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Top = DEFAULT_LABEL_PADDING },
+                                            Padding = new MarginPadding { Left = DEFAULT_LABEL_LEFT_PADDING, Top = DEFAULT_LABEL_TOP_PADDING },
                                             Colour = Color4.White,
                                             TextSize = DEFAULT_LABEL_TEXT_SIZE,
                                             Text = LabelText,

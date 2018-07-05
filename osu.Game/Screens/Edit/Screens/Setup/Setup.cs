@@ -28,6 +28,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup
 
         public const float SIZE_X = 900;
         public const float SIZE_Y = 600;
+        public const float SCREEN_LEFT_PADDING = 60;
+        public const float SCREEN_RIGHT_PADDING = 120;
+        public const float SCREEN_TOP_PADDING = 180;
+        public const float SCREEN_BOTTOM_HEADER_TOP_PADDING = -60;
 
         public Setup()
         {

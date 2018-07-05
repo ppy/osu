@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         protected override void OnHoverLost(InputState state)
         {
-            this.FadeAccent((Current.Value ? enabledColour : disabledColour).Lighten(0), 500, Easing.OutQuint);
+            this.FadeAccent((Current.Value ? enabledColour : disabledColour), 500, Easing.OutQuint);
             base.OnHoverLost(state);
         }
 

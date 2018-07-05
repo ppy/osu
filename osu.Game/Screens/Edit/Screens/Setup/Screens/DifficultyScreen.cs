@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     {
                         new FillFlowContainer
                         {
-                            Margin = new MarginPadding { Left = 65, Top = 180 },
+                            Margin = new MarginPadding { Left = Setup.SCREEN_LEFT_PADDING, Top = Setup.SCREEN_TOP_PADDING },
                             Direction = FillDirection.Vertical,
                             RelativeSizeAxes = Axes.Both,
                             Anchor = Anchor.CentreLeft,
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 hpDrainRate = new LabelledSliderBar
                                 {
-                                    Padding = new MarginPadding { Top = 10, Right = 140 },
+                                    Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
                                     SliderMinValue = 0,
                                     SliderMaxValue = 10,
                                     SliderNormalPrecision = 1,
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 overallDifficulty = new LabelledSliderBar
                                 {
-                                    Padding = new MarginPadding { Right = 140 },
+                                    Padding = new MarginPadding { Right = Setup.SCREEN_RIGHT_PADDING },
                                     SliderMinValue = 0,
                                     SliderMaxValue = 10,
                                     SliderNormalPrecision = 1,
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 circleSize = new LabelledSliderBar
                                 {
-                                    Padding = new MarginPadding { Right = 140 },
+                                    Padding = new MarginPadding { Right = Setup.SCREEN_RIGHT_PADDING },
                                     SliderMinValue = 2,
                                     SliderMaxValue = 7,
                                     SliderNormalPrecision = 1,
@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 approachRate = new LabelledSliderBar
                                 {
-                                    Padding = new MarginPadding { Right = 140 },
+                                    Padding = new MarginPadding { Right = Setup.SCREEN_RIGHT_PADDING },
                                     SliderMinValue = 0,
                                     SliderMaxValue = 10,
                                     SliderNormalPrecision = 1,
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            Padding = new MarginPadding { Left = 65, Top = -60 },
+                            Padding = new MarginPadding { Left = Setup.SCREEN_LEFT_PADDING, Top = Setup.SCREEN_BOTTOM_HEADER_TOP_PADDING },
                         }
                     },
                 },
