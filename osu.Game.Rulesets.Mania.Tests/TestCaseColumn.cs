@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 var obj = new Note { Column = i, StartTime = Time.Current + 2000 };
                 obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-                columns[i].Add(new DrawableNote(obj, columns[i].Action));
+                columns[i].Add(new DrawableNote(obj));
             }
         }
 
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 var obj = new HoldNote { Column = i, StartTime = Time.Current + 2000, Duration = 500 };
                 obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-                columns[i].Add(new DrawableHoldNote(obj, columns[i].Action));
+                columns[i].Add(new DrawableHoldNote(obj));
             }
         }
 
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Origin = Anchor.Centre,
                 Height = 0.85f,
                 AccentColour = Color4.OrangeRed,
-                Action = action,
+                Action = { Value = action },
                 VisibleTimeRange = { Value = 2000 }
             };
 

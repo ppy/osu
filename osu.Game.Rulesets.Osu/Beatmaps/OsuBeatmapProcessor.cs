@@ -15,10 +15,10 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
         {
         }
 
-        public override void PostProcess()
+        public override void PreProcess()
         {
+            base.PreProcess();
             applyStacking((Beatmap<OsuHitObject>)Beatmap);
-            base.PostProcess();
         }
 
         private void applyStacking(Beatmap<OsuHitObject> beatmap)
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                         continue;
 
                     double endTime = (stackBaseObject as IHasEndTime)?.EndTime ?? stackBaseObject.StartTime;
-                    double stackThreshold = objectN.TimePreempt * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
+                    double stackThreshold = objectN.TimePreempt * beatmap.BeatmapInfo.StackLeniency;
 
                     if (objectN.StartTime - endTime > stackThreshold)
                         //We are no longer within stacking range of the next object.
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                 OsuHitObject objectI = beatmap.HitObjects[i];
                 if (objectI.StackHeight != 0 || objectI is Spinner) continue;
 
-                double stackThreshold = objectI.TimePreempt * beatmap.BeatmapInfo?.StackLeniency ?? 0.7f;
+                double stackThreshold = objectI.TimePreempt * beatmap.BeatmapInfo.StackLeniency;
 
                 /* If this object is a hitcircle, then we enter this "special" case.
                     * It either ends with a stack of hitcircles only, or a stack of hitcircles that are underneath a slider.

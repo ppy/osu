@@ -359,7 +359,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var existing = beatmap.ControlPointInfo.DifficultyPointAt(newPoint.Time);
 
-            if (newPoint.ChangeEquals(existing))
+            if (newPoint.EquivalentTo(existing))
                 return;
 
             beatmap.ControlPointInfo.DifficultyPoints.RemoveAll(x => x.Time == newPoint.Time);
@@ -370,7 +370,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var existing = beatmap.ControlPointInfo.EffectPointAt(newPoint.Time);
 
-            if (newPoint.ChangeEquals(existing))
+            if (newPoint.EquivalentTo(existing))
                 return;
 
             beatmap.ControlPointInfo.EffectPoints.Add(newPoint);
@@ -380,7 +380,7 @@ namespace osu.Game.Beatmaps.Formats
         {
             var existing = beatmap.ControlPointInfo.SamplePointAt(newPoint.Time);
 
-            if (newPoint.ChangeEquals(existing))
+            if (newPoint.EquivalentTo(existing))
                 return;
 
             beatmap.ControlPointInfo.SamplePoints.Add(newPoint);
