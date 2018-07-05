@@ -34,9 +34,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private readonly Slider slider;
         public readonly Box FollowCircle;
         private readonly Box ball;
+        private readonly DrawableSlider drawableSlider;
 
-        public SliderBall(Slider slider)
+        public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
         {
+            this.drawableSlider = drawableSlider;
             this.slider = slider;
             Masking = true;
             AutoSizeAxes = Axes.Both;
@@ -136,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 Tracking = canCurrentlyTrack
                            && lastState != null
                            && base.ReceiveMouseInputAt(lastState.Mouse.NativeState.Position)
-                           && ((Parent as DrawableSlider)?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+                           && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
             }
         }
 

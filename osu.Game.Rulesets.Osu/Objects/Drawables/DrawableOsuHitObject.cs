@@ -8,6 +8,7 @@ using System.Linq;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -15,11 +16,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     {
         public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Time.Current >= HitObject.StartTime - HitObject.TimePreempt;
 
+        private readonly ShakeContainer shakeContainer;
+
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
+            shakeContainer = new ShakeContainer
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+            base.AddInternal(shakeContainer);
             Alpha = 0;
         }
+
+        // Forward all internal management to shakeContainer
+        protected override void AddInternal(Drawable drawable) => shakeContainer.Add(drawable);
+        protected override void ClearInternal(bool disposeChildren = true) => shakeContainer.Clear(disposeChildren);
+        protected override bool RemoveInternal(Drawable drawable) => shakeContainer.Remove(drawable);
 
         protected sealed override void UpdateState(ArmedState state)
         {
@@ -61,15 +74,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected void Shake()
         {
-            const int shake_amount = 8;
-            const int shake_duration = 20;
-
-            this.MoveToX(Position.X + shake_amount, shake_duration).Then()
-                .MoveToX(Position.X - shake_amount, shake_duration).Then()
-                .MoveToX(Position.X + shake_amount, shake_duration).Then()
-                .MoveToX(Position.X - shake_amount, shake_duration).Then()
-                .MoveToX(Position.X + shake_amount, shake_duration).Then()
-                .MoveToX(Position.X, shake_duration);
+            shakeContainer.Shake();
         }
     }
 

@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
-                Ball = new SliderBall(s)
+                Ball = new SliderBall(s, this)
                 {
                     BypassAutoSizeAxes = Axes.Both,
                     Scale = new Vector2(s.Scale),
