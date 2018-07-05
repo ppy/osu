@@ -86,7 +86,11 @@ namespace osu.Game.Tests.Visual
         private readonly WeakList<WorkingBeatmap> workingWeakReferences = new WeakList<WorkingBeatmap>();
         private readonly WeakList<Player> playerWeakReferences = new WeakList<Player>();
 
-        private Player loadPlayerFor(RulesetInfo ri) => loadPlayerFor(ri.CreateInstance());
+        private Player loadPlayerFor(RulesetInfo ri)
+        {
+            Ruleset.Value = ri;
+            return loadPlayerFor(ri.CreateInstance());
+        }
 
         private Player loadPlayerFor(Ruleset r)
         {

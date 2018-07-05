@@ -21,15 +21,16 @@ namespace osu.Game.Rulesets.Mania.UI.Components
         private const float key_icon_size = 10;
         private const float key_icon_corner_radius = 3;
 
-        public ManiaAction Action;
-
+        private readonly IBindable<ManiaAction> action = new Bindable<ManiaAction>();
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         private Container keyIcon;
 
         [BackgroundDependencyLoader]
-        private void load(IScrollingInfo scrollingInfo)
+        private void load(IBindable<ManiaAction> action, IScrollingInfo scrollingInfo)
         {
+            this.action.BindTo(action);
+
             Drawable gradient;
 
             InternalChildren = new[]
@@ -107,14 +108,14 @@ namespace osu.Game.Rulesets.Mania.UI.Components
 
         public bool OnPressed(ManiaAction action)
         {
-            if (action == Action)
+            if (action == this.action.Value)
                 keyIcon.ScaleTo(1.4f, 50, Easing.OutQuint).Then().ScaleTo(1.3f, 250, Easing.OutQuint);
             return false;
         }
 
         public bool OnReleased(ManiaAction action)
         {
-            if (action == Action)
+            if (action == this.action.Value)
                 keyIcon.ScaleTo(1f, 125, Easing.OutQuint);
             return false;
         }
