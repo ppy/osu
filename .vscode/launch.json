@@ -11,7 +11,11 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build tests (Debug)",
-            "env": {},
+            "linux": {
+                "env": {
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp2.1:${env:LD_LIBRARY_PATH}"
+                }
+            },
             "console": "internalConsole"
         },
         {
@@ -24,7 +28,11 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build tests (Release)",
-            "env": {},
+            "linux": {
+                "env": {
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tests/bin/Release/netcoreapp2.1:${env:LD_LIBRARY_PATH}"
+                }
+            },
             "console": "internalConsole"
         },
         {
@@ -37,7 +45,11 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Debug)",
-            "env": {},
+            "linux": {
+                "env": {
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1:${env:LD_LIBRARY_PATH}"
+                }
+            },
             "console": "internalConsole"
         },
         {
@@ -50,7 +62,11 @@
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Release)",
-            "env": {},
+            "linux": {
+                "env": {
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.1:${env:LD_LIBRARY_PATH}"
+                }
+            },
             "console": "internalConsole"
         }
     ]

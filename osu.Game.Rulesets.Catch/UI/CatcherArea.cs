@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Catch.Replays;
@@ -78,12 +79,11 @@ namespace osu.Game.Rulesets.Catch.UI
 
                 if (!fruit.StaysOnPlate)
                     runAfterLoaded(() => MovableCatcher.Explode(caughtFruit));
-
             }
 
             if (fruit.HitObject.LastInCombo)
             {
-                if (judgement.IsHit)
+                if (((CatchJudgement)judgement).ShouldExplode)
                     runAfterLoaded(() => MovableCatcher.Explode());
                 else
                     MovableCatcher.Drop();

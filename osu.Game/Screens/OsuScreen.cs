@@ -8,7 +8,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -17,7 +16,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using OpenTK;
-using OpenTK.Input;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Containers;
 
@@ -82,22 +80,21 @@ namespace osu.Game.Screens
         private SampleChannel sampleExit;
 
         [BackgroundDependencyLoader(true)]
-        private void load(BindableBeatmap beatmap, OsuGame osuGame, AudioManager audio)
+        private void load(BindableBeatmap beatmap, OsuGame osu, AudioManager audio, Bindable<RulesetInfo> ruleset)
         {
-            if (beatmap != null)
-                Beatmap.BindTo(beatmap);
+            Beatmap.BindTo(beatmap);
+            Ruleset.BindTo(ruleset);
 
-            if (osuGame != null)
+            if (osu != null)
             {
-                Ruleset.BindTo(osuGame.Ruleset);
-                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+                OverlayActivationMode.BindTo(osu.OverlayActivationMode);
 
                 updateOverlayStates = () =>
                 {
                     if (HideOverlaysOnEnter)
-                        osuGame.CloseAllOverlays();
+                        osu.CloseAllOverlays();
                     else
-                        osuGame.Toolbar.State = Visibility.Visible;
+                        osu.Toolbar.State = Visibility.Visible;
                 };
             }
 
@@ -106,6 +103,8 @@ namespace osu.Game.Screens
 
         public bool OnPressed(GlobalAction action)
         {
+            if (!IsCurrentScreen) return false;
+
             if (action == GlobalAction.Back && AllowBackButton)
             {
                 Exit();
@@ -116,20 +115,6 @@ namespace osu.Game.Screens
         }
 
         public bool OnReleased(GlobalAction action) => action == GlobalAction.Back && AllowBackButton;
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (args.Repeat || !IsCurrentScreen) return false;
-
-            switch (args.Key)
-            {
-                case Key.Escape:
-                    Exit();
-                    return true;
-            }
-
-            return base.OnKeyDown(state, args);
-        }
 
         protected override void OnResuming(Screen last)
         {
@@ -195,11 +180,10 @@ namespace osu.Game.Screens
 
             if (Background != null && !Background.Equals(nextOsu?.Background))
             {
-                if (nextOsu != null)
-                    //We need to use MakeCurrent in case we are jumping up multiple game screens.
-                    nextOsu.Background?.MakeCurrent();
-                else
-                    Background.Exit();
+                Background.Exit();
+
+                //We need to use MakeCurrent in case we are jumping up multiple game screens.
+                nextOsu?.Background?.MakeCurrent();
             }
 
             if (base.OnExiting(next))

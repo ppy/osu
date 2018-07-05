@@ -49,7 +49,7 @@ namespace osu.Game.Online.API.Requests.Responses
         private DateTimeOffset submitted { get; set; }
 
         [JsonProperty(@"ranked_date")]
-        private DateTimeOffset ranked { get; set; }
+        private DateTimeOffset? ranked { get; set; }
 
         [JsonProperty(@"last_updated")]
         private DateTimeOffset lastUpdated { get; set; }

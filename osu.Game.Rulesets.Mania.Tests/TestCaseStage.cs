@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                     var obj = new Note { Column = i, StartTime = Time.Current + 2000 };
                     obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-                    stage.Add(new DrawableNote(obj, stage.Columns[i].Action));
+                    stage.Add(new DrawableNote(obj));
                 }
             }
         }
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                     var obj = new HoldNote { Column = i, StartTime = Time.Current + 2000, Duration = 500 };
                     obj.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-                    stage.Add(new DrawableHoldNote(obj, stage.Columns[i].Action));
+                    stage.Add(new DrawableHoldNote(obj));
                 }
             }
         }
