@@ -56,7 +56,13 @@ namespace osu.Game.Overlays.Settings.Sections
 
             reloadSkins();
 
-            skinDropdown.Bindable = config.GetBindable<int>(OsuSetting.Skin);
+            var skinBindable = config.GetBindable<int>(OsuSetting.Skin);
+
+            // Todo: This should not be necessary when OsuConfigManager is databased
+            if (skinDropdown.Items.All(s => s.Value != skinBindable.Value))
+                skinBindable.Value = 0;
+
+            skinDropdown.Bindable = skinBindable;
         }
 
         private void reloadSkins() => skinDropdown.Items = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, int>(s.ToString(), s.ID));
