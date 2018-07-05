@@ -13,9 +13,8 @@
             "preLaunchTask": "Build tests (Debug)",
             "linux": {
                 "env": {
-                    "LD_PRELOAD": "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1/libbass.so",
-                    "LD_LIBRARY_PATH" : "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1/",
-                },  
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tests/bin/Debug/netcoreapp2.1:${env:LD_LIBRARY_PATH}"
+                }
             },
             "console": "internalConsole"
         },
@@ -31,9 +30,8 @@
             "preLaunchTask": "Build tests (Release)",
             "linux": {
                 "env": {
-                    "LD_PRELOAD": "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1/libbass.so",
-                    "LD_LIBRARY_PATH" : "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1/",
-                },  
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Game.Tests/bin/Release/netcoreapp2.1:${env:LD_LIBRARY_PATH}"
+                }
             },
             "console": "internalConsole"
         },
@@ -49,9 +47,8 @@
             "preLaunchTask": "Build osu! (Debug)",
             "linux": {
                 "env": {
-                    "LD_PRELOAD": "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1/libbass.so",
-                    "LD_LIBRARY_PATH" : "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1/",
-                },  
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1:${env:LD_LIBRARY_PATH}"
+                }
             },
             "console": "internalConsole"
         },
@@ -67,9 +64,8 @@
             "preLaunchTask": "Build osu! (Release)",
             "linux": {
                 "env": {
-                    "LD_PRELOAD": "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.1/libbass.so",
-                    "LD_LIBRARY_PATH" : "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.1/",
-                },  
+                    "LD_LIBRARY_PATH": "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.1:${env:LD_LIBRARY_PATH}"
+                }
             },
             "console": "internalConsole"
         }
