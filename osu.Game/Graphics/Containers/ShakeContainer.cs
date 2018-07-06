@@ -10,15 +10,15 @@ namespace osu.Game.Graphics.Containers
     {
         public void Shake()
         {
-            const int shake_amount = 8;
-            const int shake_duration = 20;
+            const float shake_amount = 8;
+            const float shake_duration = 30;
 
-            this.MoveToX(shake_amount, shake_duration).Then()
-                .MoveToX(-shake_amount, shake_duration).Then()
-                .MoveToX(shake_amount, shake_duration).Then()
-                .MoveToX(-shake_amount, shake_duration).Then()
-                .MoveToX(shake_amount, shake_duration).Then()
-                .MoveToX(0, shake_duration);
+            this.MoveToX(shake_amount, shake_duration / 2, Easing.OutSine).Then()
+                .MoveToX(-shake_amount, shake_duration, Easing.InOutSine).Then()
+                .MoveToX(shake_amount, shake_duration, Easing.InOutSine).Then()
+                .MoveToX(-shake_amount, shake_duration, Easing.InOutSine).Then()
+                .MoveToX(shake_amount, shake_duration, Easing.InOutSine).Then()
+                .MoveToX(0, shake_duration / 2, Easing.InSine);
         }
     }
 }
