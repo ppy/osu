@@ -70,10 +70,10 @@ namespace osu.Game.Overlays.Dialog
                     {
                         if (actionInvoked) return;
 
-                        Hide();
-
                         actionInvoked = true;
                         action?.Invoke();
+
+                        Hide();
                     };
                 }
             }
