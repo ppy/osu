@@ -93,7 +93,7 @@ namespace osu.Game.Overlays
             muteButton.Current.ValueChanged += _ => Show();
         }
 
-        public bool Adjust(GlobalAction action)
+        public bool Adjust(GlobalAction action, float amount = 1, bool isPrecise = false)
         {
             if (!IsLoaded) return false;
 
@@ -103,13 +103,13 @@ namespace osu.Game.Overlays
                     if (State == Visibility.Hidden)
                         Show();
                     else
-                        volumeMeterMaster.Decrease();
+                        volumeMeterMaster.Decrease(amount, isPrecise);
                     return true;
                 case GlobalAction.IncreaseVolume:
                     if (State == Visibility.Hidden)
                         Show();
                     else
-                        volumeMeterMaster.Increase();
+                        volumeMeterMaster.Increase(amount, isPrecise);
                     return true;
                 case GlobalAction.ToggleMute:
                     Show();
