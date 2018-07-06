@@ -21,11 +21,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
-            shakeContainer = new ShakeContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-            };
-            base.AddInternal(shakeContainer);
+            base.AddInternal(shakeContainer = new ShakeContainer { RelativeSizeAxes = Axes.Both });
             Alpha = 0;
         }
 
@@ -72,10 +68,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
 
-        protected virtual void Shake()
-        {
-            shakeContainer.Shake();
-        }
+        protected virtual void Shake() => shakeContainer.Shake();
     }
 
     public enum ComboResult

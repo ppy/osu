@@ -6,8 +6,14 @@ using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Graphics.Containers
 {
+    /// <summary>
+    /// A container that adds the ability to shake its contents.
+    /// </summary>
     public class ShakeContainer : Container
     {
+        /// <summary>
+        /// Shake the contents of this container.
+        /// </summary>
         public void Shake()
         {
             const float shake_amount = 8;
