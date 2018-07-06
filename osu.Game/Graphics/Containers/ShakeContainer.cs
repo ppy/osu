@@ -23,7 +23,6 @@ namespace osu.Game.Graphics.Containers
                 .MoveToX(-shake_amount, shake_duration, Easing.InOutSine).Then()
                 .MoveToX(shake_amount, shake_duration, Easing.InOutSine).Then()
                 .MoveToX(-shake_amount, shake_duration, Easing.InOutSine).Then()
-                .MoveToX(shake_amount, shake_duration, Easing.InOutSine).Then()
                 .MoveToX(0, shake_duration / 2, Easing.InSine);
         }
     }
