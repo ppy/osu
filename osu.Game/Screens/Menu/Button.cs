@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Menu
         /// <summary>
         /// The menu state for which we are visible for.
         /// </summary>
-        public ButtonSystemState? VisibleState;
+        public ButtonSystemState VisibleState = ButtonSystemState.TopLevel;
 
         private readonly Action clickAction;
         private readonly Key triggerKey;
@@ -300,7 +300,7 @@ namespace osu.Game.Screens.Menu
                         State = ButtonState.Contracted;
                         break;
                     default:
-                        if (!VisibleState.HasValue || value == VisibleState)
+                        if (value == VisibleState)
                             State = ButtonState.Expanded;
                         else if (value < VisibleState)
                             State = ButtonState.Contracted;

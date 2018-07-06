@@ -73,10 +73,7 @@ namespace osu.Game.Screens.Menu
 
             buttonArea.AddRange(new[]
             {
-                new Button(@"settings", string.Empty, FontAwesome.fa_gear, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O)
-                {
-                    VisibleState = ButtonSystemState.TopLevel,
-                },
+                new Button(@"settings", string.Empty, FontAwesome.fa_gear, new Color4(85, 85, 85, 255), () => OnSettings?.Invoke(), -WEDGE_WIDTH, Key.O),
                 backButton = new Button(@"back", @"button-back-select", FontAwesome.fa_osu_left_o, new Color4(51, 58, 94, 255), () => State = ButtonSystemState.TopLevel, -WEDGE_WIDTH)
                 {
                     VisibleState = ButtonSystemState.Play,
@@ -98,7 +95,6 @@ namespace osu.Game.Screens.Menu
             buttonsTopLevel.Add(new Button(@"osu!editor", @"button-generic-select", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
             buttonsTopLevel.Add(new Button(@"osu!direct", @"button-direct-select", FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
             buttonsTopLevel.Add(new Button(@"exit", string.Empty, FontAwesome.fa_osu_cross_o, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
-            buttonsTopLevel.ForEach(b => b.VisibleState = ButtonSystemState.TopLevel);
 
             buttonArea.AddRange(buttonsPlay);
             buttonArea.AddRange(buttonsTopLevel);
