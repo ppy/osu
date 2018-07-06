@@ -53,6 +53,8 @@ namespace osu.Desktop
 
 #if NET_FRAMEWORK
                 Add(new SquirrelUpdateManager());
+#else
+                Add(new SimpleUpdateManager());
 #endif
             }
         }
