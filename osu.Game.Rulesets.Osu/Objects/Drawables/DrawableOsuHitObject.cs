@@ -25,7 +25,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Alpha = 0;
         }
 
-        // Forward all internal management to shakeContainer
+        // Forward all internal management to shakeContainer.
+        // This is a bit ugly but we don't have the concept of InternalContent so it'll have to do for now. (https://github.com/ppy/osu-framework/issues/1690)
         protected override void AddInternal(Drawable drawable) => shakeContainer.Add(drawable);
         protected override void ClearInternal(bool disposeChildren = true) => shakeContainer.Clear(disposeChildren);
         protected override bool RemoveInternal(Drawable drawable) => shakeContainer.Remove(drawable);
