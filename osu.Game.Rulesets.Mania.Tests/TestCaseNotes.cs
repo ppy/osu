@@ -153,9 +153,6 @@ namespace osu.Game.Rulesets.Mania.Tests
                     if (!(obj.HitObject is IHasEndTime endTime))
                         continue;
 
-                    if (!obj.HasNestedHitObjects)
-                        continue;
-
                     foreach (var nested in obj.NestedHitObjects)
                     {
                         double finalPosition = (nested.HitObject.StartTime - obj.HitObject.StartTime) / endTime.Duration;
