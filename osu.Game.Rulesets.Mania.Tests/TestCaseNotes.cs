@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -63,7 +64,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 AutoSizeAxes = Axes.Both,
                 Child = new NoteContainer(direction, $"note, scrolling {direction.ToString().ToLower()}")
                 {
-                    Child = new DrawableNote(note, ManiaAction.Key1) { AccentColour = Color4.OrangeRed }
+                    Child = new DrawableNote(note) { AccentColour = Color4.OrangeRed }
                 }
             };
         }
@@ -78,7 +79,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 AutoSizeAxes = Axes.Both,
                 Child = new NoteContainer(direction, $"hold note, scrolling {direction.ToString().ToLower()}")
                 {
-                    Child = new DrawableHoldNote(note, ManiaAction.Key1)
+                    Child = new DrawableHoldNote(note)
                     {
                         RelativeSizeAxes = Axes.Both,
                         AccentColour = Color4.OrangeRed,
@@ -136,6 +137,13 @@ namespace osu.Game.Rulesets.Mania.Tests
                 };
             }
 
+            protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            {
+                var dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+                dependencies.CacheAs<IBindable<ManiaAction>>(new Bindable<ManiaAction>());
+                return dependencies;
+            }
+
             protected override void Update()
             {
                 base.Update();
@@ -143,9 +151,6 @@ namespace osu.Game.Rulesets.Mania.Tests
                 foreach (var obj in content.OfType<DrawableHitObject>())
                 {
                     if (!(obj.HitObject is IHasEndTime endTime))
-                        continue;
-
-                    if (!obj.HasNestedHitObjects)
                         continue;
 
                     foreach (var nested in obj.NestedHitObjects)

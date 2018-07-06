@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
 using System.Linq;
@@ -196,9 +197,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
             var bank = (LegacyBeatmapDecoder.LegacySampleBank)Convert.ToInt32(split[0]);
             var addbank = (LegacyBeatmapDecoder.LegacySampleBank)Convert.ToInt32(split[1]);
 
-            // Let's not implement this for now, because this doesn't fit nicely into the bank structure
-            //string sampleFile = split2.Length > 4 ? split2[4] : string.Empty;
-
             string stringBank = bank.ToString().ToLower();
             if (stringBank == @"none")
                 stringBank = null;
@@ -211,6 +209,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             if (split.Length > 3)
                 bankInfo.Volume = int.Parse(split[3]);
+
+            bankInfo.Filename = split.Length > 4 ? split[4] : null;
         }
 
         /// <summary>
@@ -252,6 +252,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         private List<SampleInfo> convertSoundType(LegacySoundType type, SampleBankInfo bankInfo)
         {
+            // Todo: This should return the normal SampleInfos if the specified sample file isn't found, but that's a pretty edge-case scenario
+            if (!string.IsNullOrEmpty(bankInfo.Filename))
+                return new List<SampleInfo> { new FileSampleInfo { Filename = bankInfo.Filename } };
+
             var soundTypes = new List<SampleInfo>
             {
                 new SampleInfo
@@ -297,14 +301,24 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
         private class SampleBankInfo
         {
+            public string Filename;
+
             public string Normal;
             public string Add;
             public int Volume;
 
-            public SampleBankInfo Clone()
+            public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
+        }
+
+        private class FileSampleInfo : SampleInfo
+        {
+            public string Filename;
+
+            public override IEnumerable<string> LookupNames => new[]
             {
-                return (SampleBankInfo)MemberwiseClone();
-            }
+                Filename,
+                Path.ChangeExtension(Filename, null)
+            };
         }
 
         [Flags]
