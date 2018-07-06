@@ -52,7 +52,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                HeadCircle = new DrawableSliderHead(s, s.HeadCircle),
+                HeadCircle = new DrawableSliderHead(s, s.HeadCircle)
+                {
+                    OnShake = Shake
+                },
                 TailCircle = new DrawableSliderTail(s, s.TailCircle)
             };
 
