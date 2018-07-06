@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
             }
 
-            public void ToggleHyperDash(bool status) => MovableCatcher.HyperDashModifier = status ? 2 : 1;
+            public void ToggleHyperDash(bool status) => MovableCatcher.SetHyperdashState(status ? 2 : 1);
         }
     }
 }

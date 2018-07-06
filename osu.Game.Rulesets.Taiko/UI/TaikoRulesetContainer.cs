@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private void loadBarLines()
         {
             TaikoHitObject lastObject = Beatmap.HitObjects[Beatmap.HitObjects.Count - 1];
-            double lastHitTime = 1 + (lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime;
+            double lastHitTime = 1 + ((lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime);
 
             var timingPoints = Beatmap.ControlPointInfo.TimingPoints.ToList();
 
@@ -69,11 +69,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 bool isMajor = currentBeat % (int)currentPoint.TimeSignature == 0;
                 Playfield.Add(isMajor ? new DrawableBarLineMajor(barLine) : new DrawableBarLine(barLine));
 
-                double bl = currentPoint.BeatLength;
-                if (bl < 800)
-                    bl *= (int)currentPoint.TimeSignature;
-
-                time += bl;
+                time += currentPoint.BeatLength * (int)currentPoint.TimeSignature;
                 currentBeat++;
             }
         }
