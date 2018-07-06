@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
 
-        protected virtual void Shake() => shakeContainer.Shake();
+        protected virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
     }
 
     public enum ComboResult

@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Position = slider.CurvePositionAt(completionProgress);
         }
 
-        public Action OnShake;
+        public Action<double> OnShake;
 
-        protected override void Shake() => OnShake?.Invoke();
+        protected override void Shake(double maximumLength) => OnShake?.Invoke(maximumLength);
     }
 }
