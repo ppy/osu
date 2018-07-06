@@ -30,5 +30,25 @@ namespace osu.Game.Beatmaps.ControlPoints
             Name = sampleName,
             Volume = SampleVolume,
         };
+
+        /// <summary>
+        /// Applies <see cref="SampleBank"/> and <see cref="SampleVolume"/> to a <see cref="SampleInfo"/> if necessary, returning the modified <see cref="SampleInfo"/>.
+        /// </summary>
+        /// <param name="sampleInfo">The <see cref="SampleInfo"/>. This will not be modified.</param>
+        /// <returns>The modified <see cref="SampleInfo"/>. This does not share a reference with <paramref name="sampleInfo"/>.</returns>
+        public virtual SampleInfo ApplyTo(SampleInfo sampleInfo)
+        {
+            var newSampleInfo = sampleInfo.Clone();
+            newSampleInfo.Bank = sampleInfo.Bank ?? SampleBank;
+            newSampleInfo.Name = sampleInfo.Name;
+            newSampleInfo.Volume = sampleInfo.Volume > 0 ? sampleInfo.Volume : SampleVolume;
+            return newSampleInfo;
+        }
+
+        public override bool EquivalentTo(ControlPoint other)
+            => base.EquivalentTo(other)
+               && other is SampleControlPoint sample
+               && SampleBank.Equals(sample.SampleBank)
+               && SampleVolume.Equals(sample.SampleVolume);
     }
 }

@@ -57,8 +57,18 @@ namespace osu.Game.Rulesets
         /// <returns></returns>
         public abstract RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap);
 
+        /// <summary>
+        /// Creates a <see cref="IBeatmapConverter"/> to convert a <see cref="IBeatmap"/> to one that is applicable for this <see cref="Ruleset"/>.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> to be converted.</param>
+        /// <returns>The <see cref="IBeatmapConverter"/>.</returns>
         public abstract IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap);
 
+        /// <summary>
+        /// Optionally creates a <see cref="IBeatmapProcessor"/> to alter a <see cref="IBeatmap"/> after it has been converted.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> to be processed.</param>
+        /// <returns>The <see cref="IBeatmapProcessor"/>.</returns>
         public virtual IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => null;
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);

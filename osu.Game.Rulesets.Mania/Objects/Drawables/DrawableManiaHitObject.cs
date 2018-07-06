@@ -1,31 +1,55 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using JetBrains.Annotations;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
-    public abstract class DrawableManiaHitObject<TObject> : DrawableHitObject<ManiaHitObject>
-        where TObject : ManiaHitObject
+    public abstract class DrawableManiaHitObject : DrawableHitObject<ManiaHitObject>
     {
         /// <summary>
-        /// The key that will trigger input for this hit object.
+        /// The <see cref="ManiaAction"/> which causes this <see cref="DrawableManiaHitObject{TObject}"/> to be hit.
         /// </summary>
-        protected ManiaAction Action { get; }
+        protected readonly IBindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
-        public new TObject HitObject;
+        protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
-        protected DrawableManiaHitObject(TObject hitObject, ManiaAction? action = null)
+        protected DrawableManiaHitObject(ManiaHitObject hitObject)
             : base(hitObject)
         {
-            Anchor = Anchor.TopCentre;
-            Origin = Anchor.TopCentre;
+        }
 
-            HitObject = hitObject;
-
+        [BackgroundDependencyLoader(true)]
+        private void load([CanBeNull] IBindable<ManiaAction> action, [NotNull] IScrollingInfo scrollingInfo)
+        {
             if (action != null)
-                Action = action.Value;
+                Action.BindTo(action);
+
+            Direction.BindTo(scrollingInfo.Direction);
+            Direction.BindValueChanged(OnDirectionChanged, true);
+        }
+
+        protected virtual void OnDirectionChanged(ScrollingDirection direction)
+        {
+            Anchor = Origin = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+        }
+    }
+
+    public abstract class DrawableManiaHitObject<TObject> : DrawableManiaHitObject
+        where TObject : ManiaHitObject
+    {
+        public new readonly TObject HitObject;
+
+        protected DrawableManiaHitObject(TObject hitObject)
+            : base(hitObject)
+        {
+            HitObject = hitObject;
         }
 
         protected override void UpdateState(ArmedState state)

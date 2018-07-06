@@ -4,30 +4,33 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK.Input;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
     /// <summary>
     /// A type of <see cref="Playfield"/> specialized towards scrolling <see cref="DrawableHitObject"/>s.
     /// </summary>
-    public abstract class ScrollingPlayfield : Playfield
+    public abstract class ScrollingPlayfield : Playfield, IKeyBindingHandler<GlobalAction>
     {
         /// <summary>
         /// The default span of time visible by the length of the scrolling axes.
         /// This is clamped between <see cref="time_span_min"/> and <see cref="time_span_max"/>.
         /// </summary>
         private const double time_span_default = 1500;
+
         /// <summary>
         /// The minimum span of time that may be visible by the length of the scrolling axes.
         /// </summary>
         private const double time_span_min = 50;
+
         /// <summary>
         /// The maximum span of time that may be visible by the length of the scrolling axes.
         /// </summary>
         private const double time_span_max = 10000;
+
         /// <summary>
         /// The step increase/decrease of the span of time visible by the length of the scrolling axes.
         /// </summary>
@@ -54,7 +57,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)base.HitObjects;
 
-        private readonly ScrollingDirection direction;
+        protected readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
         /// <summary>
         /// Creates a new <see cref="ScrollingPlayfield"/>.
@@ -69,7 +72,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected ScrollingPlayfield(ScrollingDirection direction, float? customWidth = null, float? customHeight = null)
             : base(customWidth, customHeight)
         {
-            this.direction = direction;
+            Direction.Value = direction;
         }
 
         [BackgroundDependencyLoader]
@@ -78,27 +81,31 @@ namespace osu.Game.Rulesets.UI.Scrolling
             HitObjects.TimeRange.BindTo(VisibleTimeRange);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public bool OnPressed(GlobalAction action)
         {
             if (!UserScrollSpeedAdjustment)
                 return false;
 
-            if (state.Keyboard.ControlPressed)
+            switch (action)
             {
-                switch (args.Key)
-                {
-                    case Key.Minus:
-                        this.TransformBindableTo(VisibleTimeRange, VisibleTimeRange + time_span_step, 600, Easing.OutQuint);
-                        break;
-                    case Key.Plus:
-                        this.TransformBindableTo(VisibleTimeRange, VisibleTimeRange - time_span_step, 600, Easing.OutQuint);
-                        break;
-                }
+                case GlobalAction.IncreaseScrollSpeed:
+                    this.TransformBindableTo(VisibleTimeRange, VisibleTimeRange - time_span_step, 200, Easing.OutQuint);
+                    return true;
+                case GlobalAction.DecreaseScrollSpeed:
+                    this.TransformBindableTo(VisibleTimeRange, VisibleTimeRange + time_span_step, 200, Easing.OutQuint);
+                    return true;
             }
 
             return false;
         }
 
-        protected sealed override HitObjectContainer CreateHitObjectContainer() => new ScrollingHitObjectContainer(direction);
+        public bool OnReleased(GlobalAction action) => false;
+
+        protected sealed override HitObjectContainer CreateHitObjectContainer()
+        {
+            var container = new ScrollingHitObjectContainer();
+            container.Direction.BindTo(Direction);
+            return container;
+        }
     }
 }

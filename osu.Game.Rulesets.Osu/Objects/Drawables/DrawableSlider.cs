@@ -93,6 +93,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 base.AccentColour = value;
                 Body.AccentColour = AccentColour;
                 Ball.AccentColour = AccentColour;
+
+                foreach (var drawableHitObject in NestedHitObjects)
+                    drawableHitObject.AccentColour = AccentColour;
             }
         }
 
@@ -133,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             if (!userTriggered && Time.Current >= slider.EndTime)
             {
-                var judgementsCount = NestedHitObjects.Count;
+                var judgementsCount = NestedHitObjects.Count();
                 var judgementsHit = NestedHitObjects.Count(h => h.IsHit);
 
                 var hitFraction = (double)judgementsHit / judgementsCount;
