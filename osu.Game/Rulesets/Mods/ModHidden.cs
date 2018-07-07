@@ -27,8 +27,7 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            // todo: fix ordering of objects so we don't have to do this (#2740).
-            foreach (var d in drawables.Reverse().Skip(IncreaseFirstObjectVisibility ? 1 : 0))
+            foreach (var d in drawables.Skip(IncreaseFirstObjectVisibility ? 1 : 0))
                 d.ApplyCustomUpdateState += ApplyHiddenState;
         }
 

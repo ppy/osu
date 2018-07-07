@@ -3,13 +3,14 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Direct;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class SearchBeatmapSetsRequest : APIRequest<IEnumerable<APIResponseBeatmapSet>>
+    public class SearchBeatmapSetsRequest : APIRequest<IEnumerable<APIBeatmapSet>>
     {
         private readonly string query;
         private readonly RulesetInfo ruleset;

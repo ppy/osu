@@ -11,19 +11,20 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Bindings;
+using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Input.Bindings;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
+    public class VolumeMeter : Container
     {
         private CircularProgress volumeCircle;
+        private CircularProgress volumeCircleGlow;
+
         public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1 };
         private readonly float circleSize;
         private readonly Color4 meterColour;
@@ -44,90 +45,143 @@ namespace osu.Game.Overlays.Volume
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Add(new Container
-            {
-                Size = new Vector2(120, 20),
-                CornerRadius = 10,
-                Masking = true,
-                Margin = new MarginPadding { Left = circleSize + 10 },
-                Origin = Anchor.CentreLeft,
-                Anchor = Anchor.CentreLeft,
-                Children = new Drawable[]
-                {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colours.Gray1,
-                        Alpha = 0.9f,
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = "Exo2.0-Bold",
-                        Text = name
-                    }
-                }
-            });
+            Color4 backgroundColour = colours.Gray1;
 
             CircularProgress bgProgress;
 
-            Add(new CircularContainer
+            const float progress_start_radius = 0.75f;
+            const float progress_size = 0.03f;
+            const float progress_end_radius = progress_start_radius + progress_size;
+
+            const float blur_amount = 5;
+
+            Children = new Drawable[]
             {
-                Masking = true,
-                Size = new Vector2(circleSize),
-                Children = new Drawable[]
+                new Container
                 {
-                    new Box
+                    Size = new Vector2(circleSize),
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = colours.Gray1,
-                        Alpha = 0.9f,
-                    },
-                    bgProgress = new CircularProgress
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        InnerRadius = 0.05f,
-                        Rotation = 180,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Colour = colours.Gray2,
-                        Size = new Vector2(0.8f)
-                    },
-                    new Container
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Size = new Vector2(0.8f),
-                        Padding = new MarginPadding(-Blur.KernelSize(5)),
-                        Rotation = 180,
-                        Child = (volumeCircle = new CircularProgress
+                        new BufferedContainer
                         {
+                            Alpha = 0.9f,
                             RelativeSizeAxes = Axes.Both,
-                            InnerRadius = 0.05f,
+                            Children = new Drawable[]
+                            {
+                                new Circle
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = backgroundColour,
+                                },
+                                new CircularContainer
+                                {
+                                    Masking = true,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(progress_end_radius),
+                                    Children = new Drawable[]
+                                    {
+                                        bgProgress = new CircularProgress
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            RelativeSizeAxes = Axes.Both,
+                                            Rotation = 180,
+                                            Colour = backgroundColour,
+                                        },
+                                        new Container
+                                        {
+                                            Anchor = Anchor.Centre,
+                                            Origin = Anchor.Centre,
+                                            Name = "Progress under covers for smoothing",
+                                            RelativeSizeAxes = Axes.Both,
+                                            Rotation = 180,
+                                            Child = volumeCircle = new CircularProgress
+                                            {
+                                                RelativeSizeAxes = Axes.Both,
+                                            }
+                                        },
+                                    }
+                                },
+                                new Circle
+                                {
+                                    Name = "Inner Cover",
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = backgroundColour,
+                                    Size = new Vector2(progress_start_radius),
+                                },
+                                new Container
+                                {
+                                    Name = "Progress overlay for glow",
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new Vector2(progress_start_radius + progress_size / 1.5f),
+                                    Rotation = 180,
+                                    Padding = new MarginPadding(-Blur.KernelSize(blur_amount)),
+                                    Child = (volumeCircleGlow = new CircularProgress
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        InnerRadius = progress_size * 0.8f,
+                                    }).WithEffect(new GlowEffect
+                                    {
+                                        Colour = meterColour,
+                                        BlurSigma = new Vector2(blur_amount),
+                                        Strength = 5,
+                                        PadExtent = true
+                                    }),
+                                },
+                            },
+                        },
+                        maxGlow = (text = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = "Venera",
+                            TextSize = 0.16f * circleSize
                         }).WithEffect(new GlowEffect
                         {
-                            Colour = meterColour,
-                            Strength = 2,
-                            PadExtent = true
-                        }),
-                    },
-                    maxGlow = (text = new OsuSpriteText
+                            Colour = Color4.Transparent,
+                            PadExtent = true,
+                        })
+                    }
+                },
+                new Container
+                {
+                    Size = new Vector2(120, 20),
+                    CornerRadius = 10,
+                    Masking = true,
+                    Margin = new MarginPadding { Left = circleSize + 10 },
+                    Origin = Anchor.CentreLeft,
+                    Anchor = Anchor.CentreLeft,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = "Venera",
-                        TextSize = 0.16f * circleSize
-                    }).WithEffect(new GlowEffect
-                    {
-                        Colour = Color4.Transparent,
-                        PadExtent = true,
-                    })
+                        new Box
+                        {
+                            Alpha = 0.9f,
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = backgroundColour,
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Font = "Exo2.0-Bold",
+                            Text = name
+                        }
+                    }
                 }
-            });
-
-            Bindable.ValueChanged += newVolume => { this.TransformTo("DisplayVolume", newVolume, 400, Easing.OutQuint); };
+            };
+            Bindable.ValueChanged += newVolume =>
+            {
+                this.TransformTo("DisplayVolume",
+                    newVolume,
+                    400,
+                    Easing.OutQuint);
+            };
             bgProgress.Current.Value = 0.75f;
         }
 
@@ -158,6 +212,7 @@ namespace osu.Game.Overlays.Volume
                 }
 
                 volumeCircle.Current.Value = displayVolume * 0.75f;
+                volumeCircleGlow.Current.Value = displayVolume * 0.75f;
             }
         }
 
@@ -167,27 +222,40 @@ namespace osu.Game.Overlays.Volume
             private set => Bindable.Value = value;
         }
 
-        public void Increase() => Volume += 0.05f;
+        private const float adjust_step = 0.05f;
 
-        public void Decrease() => Volume -= 0.05f;
+        public void Increase(double amount = 1, bool isPrecise = false) => adjust(amount, isPrecise);
+        public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
 
-        public bool OnPressed(GlobalAction action)
+        // because volume precision is set to 0.01, this local is required to keep track of more precise adjustments and only apply when possible.
+        private double adjustAccumulator;
+
+        private void adjust(double delta, bool isPrecise)
         {
-            if (!IsHovered) return false;
+            adjustAccumulator += delta * adjust_step * (isPrecise ? 0.1 : 1);
+            if (Math.Abs(adjustAccumulator) < Bindable.Precision)
+                return;
+            Volume += adjustAccumulator;
+            adjustAccumulator = 0;
+        }
 
-            switch (action)
-            {
-                case GlobalAction.DecreaseVolume:
-                    Decrease();
-                    return true;
-                case GlobalAction.IncreaseVolume:
-                    Increase();
-                    return true;
-            }
+        protected override bool OnScroll(InputState state)
+        {
+            adjust(state.Mouse.ScrollDelta.Y, state.Mouse.HasPreciseScroll);
+            return true;
+        }
 
+        private const float transition_length = 500;
+
+        protected override bool OnHover(InputState state)
+        {
+            this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        protected override void OnHoverLost(InputState state)
+        {
+            this.ScaleTo(1f, transition_length, Easing.OutExpo);
+        }
     }
 }

@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.Direct
                                             {
                                                 new OsuSpriteText
                                                 {
-                                                    Text = $"{SetInfo.Metadata.Source}",
+                                                    Text = SetInfo.Metadata.Source,
                                                     TextSize = 14,
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
@@ -166,14 +166,13 @@ namespace osu.Game.Overlays.Direct
                                         },
                                     },
                                 },
-                                new DownloadButton
+                                new DownloadButton(SetInfo)
                                 {
                                     Size = new Vector2(30),
                                     Margin = new MarginPadding(horizontal_padding),
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
                                     Colour = colours.Gray5,
-                                    Action = StartDownload
                                 },
                             },
                         },

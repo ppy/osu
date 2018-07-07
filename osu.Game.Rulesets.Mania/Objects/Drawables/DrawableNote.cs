@@ -9,6 +9,7 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -19,8 +20,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         private readonly NotePiece headPiece;
 
-        public DrawableNote(Note hitObject, ManiaAction action)
-            : base(hitObject, action)
+        public DrawableNote(Note hitObject)
+            : base(hitObject)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -28,14 +29,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             CornerRadius = 5;
             Masking = true;
 
-            InternalChildren = new Drawable[]
-            {
-                headPiece = new NotePiece
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                }
-            };
+            InternalChild = headPiece = new NotePiece();
+        }
+
+        protected override void OnDirectionChanged(ScrollingDirection direction)
+        {
+            base.OnDirectionChanged(direction);
+
+            headPiece.Anchor = headPiece.Origin = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
         public override Color4 AccentColour
@@ -73,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public virtual bool OnPressed(ManiaAction action)
         {
-            if (action != Action)
+            if (action != Action.Value)
                 return false;
 
             return UpdateJudgement(true);
