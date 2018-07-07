@@ -15,13 +15,14 @@ namespace osu.Game.Rulesets.Mania.UI
 {
     internal class HitExplosion : CompositeDrawable
     {
+        public override bool RemoveWhenNotAlive => true;
+
         private readonly CircularContainer circle;
 
         public HitExplosion(DrawableHitObject judgedObject)
         {
             bool isTick = judgedObject is DrawableHoldNoteTick;
 
-            Anchor = Anchor.TopCentre;
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.X;

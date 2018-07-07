@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Audio
 {
@@ -32,5 +33,21 @@ namespace osu.Game.Audio
         /// The sample volume.
         /// </summary>
         public int Volume;
+
+        /// <summary>
+        /// Retrieve all possible filenames that can be used as a source, returned in order of preference (highest first).
+        /// </summary>
+        public virtual IEnumerable<string> LookupNames
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(Namespace))
+                    yield return $"{Namespace}/{Bank}-{Name}";
+
+                yield return $"{Bank}-{Name}"; // Without namespace as a fallback even when we have a namespace
+            }
+        }
+
+        public SampleInfo Clone() => (SampleInfo)MemberwiseClone();
     }
 }

@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Profile.Sections
         {
             Action = () =>
             {
-                if (beatmap.OnlineBeatmapSetID.HasValue) beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmap.OnlineBeatmapSetID.Value);
+                if (beatmap.BeatmapSet?.OnlineBeatmapSetID != null) beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmap.BeatmapSet.OnlineBeatmapSetID.Value);
             };
 
             Child = new FillFlowContainer
