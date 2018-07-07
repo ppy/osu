@@ -17,6 +17,7 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
@@ -67,6 +68,7 @@ namespace osu.Game.Screens.Select
         protected new readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private DependencyContainer dependencies;
+
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
@@ -464,7 +466,8 @@ namespace osu.Game.Screens.Select
 
         private void carouselBeatmapsLoaded()
         {
-            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false && Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
+            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false
+                && Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
                 return;
 
             if (Carousel.SelectedBeatmapSet == null && !Carousel.SelectNextRandom())
@@ -481,16 +484,26 @@ namespace osu.Game.Screens.Select
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
+        public override bool OnPressed(GlobalAction action)
+        {
+            if (!IsCurrentScreen) return false;
+
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    FinaliseSelection();
+                    return true;
+            }
+
+            return base.OnPressed(action);
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat) return false;
 
             switch (args.Key)
             {
-                case Key.KeypadEnter:
-                case Key.Enter:
-                    FinaliseSelection();
-                    return true;
                 case Key.Delete:
                     if (state.Keyboard.ShiftPressed)
                     {
