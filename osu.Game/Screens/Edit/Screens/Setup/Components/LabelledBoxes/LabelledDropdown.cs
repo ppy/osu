@@ -35,7 +35,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public const float DEFAULT_HEADER_TEXT_SIZE = 20;
         public const float DEFAULT_HEIGHT = 40;
         public const float DEFAULT_LABEL_TEXT_SIZE = 16;
-        public const float DEFAULT_PADDING = 15;
+        public const float DEFAULT_LEFT_PADDING = 15;
+        public const float DEFAULT_TOP_PADDING = 12;
+        public const float DEFAULT_HEADER_TEXT_PADDING = 10;
+        public const float DEFAULT_HEADER_ICON_PADDING = 10;
 
         public event Action<T> DropdownSelectionChanged;
 
@@ -169,7 +172,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
-                                            Padding = new MarginPadding { Left = DEFAULT_PADDING, Top = DEFAULT_PADDING },
+                                            Padding = new MarginPadding { Left = DEFAULT_LEFT_PADDING, Top = DEFAULT_TOP_PADDING },
                                             Colour = Color4.White,
                                             TextSize = DEFAULT_LABEL_TEXT_SIZE,
                                             Text = LabelText,
@@ -209,20 +212,17 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 
         public void RemoveDropdownItem(T value) => dropdown.RemoveDropdownItem(value);
 
-        protected virtual OsuDropdown<T> CreateDropdown()
+        protected virtual OsuDropdown<T> CreateDropdown() => new OsuDropdown<T>
         {
-            return new OsuDropdown<T>
-            {
-                Anchor = Anchor.TopLeft,
-                Origin = Anchor.TopLeft,
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                HeaderHeight = DEFAULT_HEIGHT,
-                HeaderCornerRadius = INNER_CORNER_RADIUS,
-                HeaderTextSize = DEFAULT_HEADER_TEXT_SIZE,
-                HeaderTextLeftPadding = DEFAULT_PADDING,
-                HeaderDownIconRightPadding = DEFAULT_PADDING,
-            };
-        }
+            Anchor = Anchor.TopLeft,
+            Origin = Anchor.TopLeft,
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            HeaderHeight = DEFAULT_HEIGHT,
+            HeaderCornerRadius = INNER_CORNER_RADIUS,
+            HeaderTextSize = DEFAULT_HEADER_TEXT_SIZE,
+            HeaderTextLeftPadding = DEFAULT_HEADER_TEXT_PADDING,
+            HeaderDownIconRightPadding = DEFAULT_HEADER_ICON_PADDING,
+        };
     }
 }

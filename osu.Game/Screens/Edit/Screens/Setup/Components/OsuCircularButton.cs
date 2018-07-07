@@ -14,6 +14,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using System;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
@@ -25,6 +26,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         public const float DEFAULT_LABEL_TEXT_SIZE = 14;
         public const float SIZE_X = 125;
         public const float SIZE_Y = 30;
+
+        public event Action ButtonClicked;
 
         private Color4 defaultColour;
         public Color4 DefaultColour
@@ -93,6 +96,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         protected override bool OnClick(InputState state)
         {
             // Effect to indicate the button has been clicked
+            ButtonClicked?.Invoke();
             return base.OnClick(state);
         }
 

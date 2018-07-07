@@ -32,7 +32,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly LabelledEnumDropdown<SampleBank> defaultSampleBank;
         private readonly LabelledSliderBar defaultSampleVolume;
         private readonly LabelledSwitchButton samplesMatchPlaybackRate;
-        private readonly LabelledSwitchButton enableCustomOverrides;
 
         private readonly OsuCircularButton normalSample;
         private readonly OsuCircularButton whistleSample;
@@ -41,7 +40,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         private readonly Container resetDefaultSampleSetSettingsContainer;
         private readonly Container resetDefaultSampleVolumeSettingsContainer;
-        private readonly OsuCircularButton resetDefaultSampleSetSettingsButton;
+        private readonly OsuCircularButton resetDefaultSampleBankSettingsButton;
         private readonly OsuCircularButton resetDefaultSampleVolumeSettingsButton;
 
         private readonly Container sampleSetSettings;
@@ -83,7 +82,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
-                                    Height = 83,
+                                    Height = 40,
                                     Children = new Drawable[]
                                     {
                                         sampleSetSettingsContainer = new FillFlowContainer
@@ -96,10 +95,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                                 defaultSampleBank = new LabelledEnumDropdown<SampleBank>
                                                 {
                                                     LabelText = "Sample Bank",
-                                                },
-                                                enableCustomOverrides = new LabelledSwitchButton
-                                                {
-                                                    LabelText = "Custom Sample Banks",
                                                 },
                                             }
                                         },
@@ -141,7 +136,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                                                     Text = "This beatmap has timing-section-dependent sample bank settings, therefore you cannot set beatmap-wide settings here.",
                                                                     Font = @"Exo2.0-Bold",
                                                                 },
-                                                                resetDefaultSampleSetSettingsButton = new OsuCircularButton
+                                                                resetDefaultSampleBankSettingsButton = new OsuCircularButton
                                                                 {
                                                                     Anchor = Anchor.CentreRight,
                                                                     Origin = Anchor.CentreRight,
@@ -160,7 +155,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 sampleVolumeSettings = new Container
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    Height = 85,
+                                    Height = LabelledSliderBar.NORMAL_HEIGHT + 10,
                                     Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
                                     Children = new Drawable[]
                                     {
@@ -175,7 +170,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                                 defaultSampleVolume = new LabelledSliderBar
                                                 {
                                                     RelativeSizeAxes = Axes.X,
-                                                    Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
+                                                    Padding = new MarginPadding { Top = 10 },
                                                     LabelText = "Sample Volume",
                                                     TooltipTextSuffix = "%",
                                                     SliderMaxValue = 100,
@@ -244,7 +239,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
-                                    Height = 83,
+                                    Height = 60,
                                     Children = new Drawable[]
                                     {
                                         new Container
@@ -291,7 +286,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                                                     Origin = Anchor.TopRight,
                                                                     Direction = FillDirection.Horizontal,
                                                                     Spacing = new Vector2(5),
-                                                                    Margin = new MarginPadding { Right = 15, Top = 10 },
+                                                                    Margin = new MarginPadding { Top = 10, Right = 15 },
                                                                     Children = new[]
                                                                     {
                                                                         clapSample = new OsuCircularButton
@@ -330,7 +325,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 },
                                 new OsuSpriteText
                                 {
-                                    Padding = new MarginPadding { Top = 10 },
+                                    Padding = new MarginPadding { Top = 20 },
                                     Colour = Color4.White,
                                     Text = "Misc. Toggles",
                                     TextSize = 20,
@@ -362,6 +357,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 foreach (var s in Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints)
                     s.SampleBank = a.ToString().ToLower();
             };
+
+            resetDefaultSampleBankSettingsButton.ButtonClicked += ResetDefaultSampleBanks;
+            resetDefaultSampleVolumeSettingsButton.ButtonClicked += ResetDefaultSampleVolumes;
         }
 
         [BackgroundDependencyLoader]
@@ -371,10 +369,34 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             whistleSample.DefaultColour = osuColour.Purple;
             finishSample.DefaultColour = osuColour.Purple;
             clapSample.DefaultColour = osuColour.Purple;
-            resetDefaultSampleSetSettingsButton.DefaultColour = osuColour.BlueDark;
+            resetDefaultSampleBankSettingsButton.DefaultColour = osuColour.BlueDark;
             resetDefaultSampleVolumeSettingsButton.DefaultColour = osuColour.BlueDark;
         }
 
+        // According to osu!stable's behaviour
+        public void ResetDefaultSampleBanks()
+        {
+            string defaultSampleBank = Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints.First().SampleBank;
+            foreach (var s in Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints)
+                s.SampleBank = defaultSampleBank;
+            updateInfo();
+        }
+        public void ResetDefaultSampleVolumes()
+        {
+            int defaultSampleVolume = Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints.First().SampleVolume;
+            foreach (var s in Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints)
+                s.SampleVolume = defaultSampleVolume;
+            updateInfo();
+        }
+        public void ChangeDefaultSampleBank(SampleBank newValue) => defaultSampleBank.DropdownSelectedItem = newValue;
+        public void ChangeDefaultSampleVolume(int newValue)
+        {
+            // For test purposes only
+            var normalPrecision = defaultSampleVolume.SliderNormalPrecision;
+            defaultSampleVolume.SliderNormalPrecision = defaultSampleVolume.SliderAlternatePrecision;
+            defaultSampleVolume.CurrentValue = newValue;
+            defaultSampleVolume.SliderNormalPrecision = normalPrecision;
+        }
         public void ChangeSamplesMatchPlaybackRate(bool newValue) => samplesMatchPlaybackRate.CurrentValue = newValue;
 
         private void updateInfo()
@@ -420,7 +442,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             }
             sampleSetSettingsContainer.Alpha = Convert.ToInt32(commonBank != null);
             resetDefaultSampleSetSettingsContainer.Alpha = Convert.ToInt32(commonBank == null);
-            sampleSetSettings.Height = commonBank != null ? 83 : 50;
+            sampleSetSettings.Height = commonBank != null ? 40 : 60;
 
             if (commonVolume != null)
             {
@@ -431,7 +453,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             }
             sampleVolumeSettingsContainer.Alpha = Convert.ToInt32(commonVolume != null);
             resetDefaultSampleVolumeSettingsContainer.Alpha = Convert.ToInt32(commonVolume == null);
-            sampleVolumeSettings.Height = commonVolume != null ? 85 : 60;
+            sampleVolumeSettings.Height = commonVolume != null ? LabelledSliderBar.NORMAL_HEIGHT + 10 : 60;
         }
     }
 

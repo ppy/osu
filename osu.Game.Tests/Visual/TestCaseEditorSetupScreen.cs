@@ -13,6 +13,7 @@ using osu.Game.Tests.Beatmaps;
 using osu.Game.Rulesets;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Tests.Visual
 {
@@ -83,6 +84,52 @@ namespace osu.Game.Tests.Visual
             AddAssert("Check new circle size value", () => setup.CurrentScreen.Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize == 4);
 
             AddStep("Select Audio tab", () => setup.MenuBar.Mode.Value = SetupScreenMode.Audio);
+            AddStep("Reset default sample volume settings", () => (setup.CurrentScreen as AudioScreen).ResetDefaultSampleVolumes());
+            AddAssert("Check new default sample volume settings", () =>
+            {
+                var beatmap = setup.CurrentScreen.Beatmap.Value.Beatmap;
+                int defaultVolume = beatmap.ControlPointInfo.SamplePoints.First().SampleVolume;
+                foreach (var s in beatmap.ControlPointInfo.SamplePoints)
+                    if (s.SampleVolume != defaultVolume)
+                        return false;
+                return true;
+            });
+            AddStep("Change default sample bank to normal", () => (setup.CurrentScreen as AudioScreen).ChangeDefaultSampleBank(SampleBank.Normal));
+            AddAssert("Check new default sample bank settings", () =>
+            {
+                var beatmap = setup.CurrentScreen.Beatmap.Value.Beatmap;
+                foreach (var s in beatmap.ControlPointInfo.SamplePoints)
+                    if (s.SampleBank != "normal")
+                        return false;
+                return true;
+            });
+            AddStep("Change default sample bank to soft", () => (setup.CurrentScreen as AudioScreen).ChangeDefaultSampleBank(SampleBank.Soft));
+            AddAssert("Check new default sample bank settings", () =>
+            {
+                var beatmap = setup.CurrentScreen.Beatmap.Value.Beatmap;
+                foreach (var s in beatmap.ControlPointInfo.SamplePoints)
+                    if (s.SampleBank != "soft")
+                        return false;
+                return true;
+            });
+            AddStep("Change default sample bank to drum", () => (setup.CurrentScreen as AudioScreen).ChangeDefaultSampleBank(SampleBank.Drum));
+            AddAssert("Check new default sample bank settings", () =>
+            {
+                var beatmap = setup.CurrentScreen.Beatmap.Value.Beatmap;
+                foreach (var s in beatmap.ControlPointInfo.SamplePoints)
+                    if (s.SampleBank != "drum")
+                        return false;
+                return true;
+            });
+            AddStep("Change default sample volume to 69", () => (setup.CurrentScreen as AudioScreen).ChangeDefaultSampleVolume(69));
+            AddAssert("Check new default sample volume settings", () =>
+            {
+                var beatmap = setup.CurrentScreen.Beatmap.Value.Beatmap;
+                foreach (var s in beatmap.ControlPointInfo.SamplePoints)
+                    if (s.SampleVolume != 69)
+                        return false;
+                return true;
+            });
             AddStep("Enable samples match playback rate", () => (setup.CurrentScreen as AudioScreen).ChangeSamplesMatchPlaybackRate(true));
             AddAssert("Check new samples match playback rate value", () => setup.CurrentScreen.Beatmap.Value.BeatmapInfo.SamplesMatchPlaybackRate);
             AddStep("Disable samples match playback rate", () => (setup.CurrentScreen as AudioScreen).ChangeSamplesMatchPlaybackRate(false));

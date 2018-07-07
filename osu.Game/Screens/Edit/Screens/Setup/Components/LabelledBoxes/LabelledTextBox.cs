@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             TextBoxTextChanged?.Invoke(newText);
         }
 
-        private bool readOnly = false;
+        private bool readOnly;
         public bool ReadOnly
         {
             get => readOnly;

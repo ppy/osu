@@ -25,20 +25,17 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
     public class LabelledEnumDropdown<T> : LabelledDropdown<T>
         //where T : Enum
     {
-        protected override OsuDropdown<T> CreateDropdown()
+        protected override OsuDropdown<T> CreateDropdown() => new OsuEnumDropdown<T>
         {
-            return new OsuEnumDropdown<T>
-            {
-                Anchor = Anchor.TopLeft,
-                Origin = Anchor.TopLeft,
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                HeaderHeight = DEFAULT_HEIGHT,
-                HeaderCornerRadius = INNER_CORNER_RADIUS,
-                HeaderTextSize = DEFAULT_HEADER_TEXT_SIZE,
-                HeaderTextLeftPadding = DEFAULT_PADDING,
-                HeaderDownIconRightPadding = DEFAULT_PADDING,
-            };
-        }
+            Anchor = Anchor.TopLeft,
+            Origin = Anchor.TopLeft,
+            RelativeSizeAxes = Axes.X,
+            AutoSizeAxes = Axes.Y,
+            HeaderHeight = DEFAULT_HEIGHT,
+            HeaderCornerRadius = INNER_CORNER_RADIUS,
+            HeaderTextSize = DEFAULT_HEADER_TEXT_SIZE,
+            HeaderTextLeftPadding = DEFAULT_HEADER_TEXT_PADDING,
+            HeaderDownIconRightPadding = DEFAULT_HEADER_ICON_PADDING,
+        };
     }
 }
