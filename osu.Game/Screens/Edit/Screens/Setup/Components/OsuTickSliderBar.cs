@@ -33,11 +33,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         /// <summary>
         /// Maximum number of decimal digits to be displayed in the tooltip.
         /// </summary>
-        private const int MAX_DECIMAL_DIGITS = 5;
-        private const float DEFAULT_HEIGHT = 20;
-        private const float DEFAULT_SLIDER_HEIGHT = 8;
-        private const float NUB_SIZE_X = 36;
-        private const float NUB_SIZE_Y = 20;
+        public const int MAX_DECIMAL_DIGITS = 5;
+        public const float DEFAULT_HEIGHT = 20;
+        public const float DEFAULT_SLIDER_HEIGHT = 8;
+        public const float NUB_SIZE_X = 36;
+        public const float NUB_SIZE_Y = 20;
+        public const float DEFAULT_CAPTION_TEXT_SIZE = 13;
 
         private bool leftShiftHeld;
         private bool rightShiftHeld;
@@ -246,6 +247,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                         ticks = new Ticks(minValue, maxValue, normalPrecision),
                         new Container
                         {
+                            RelativeSizeAxes = Axes.X,
                             Children = new[]
                             {
                                 new Container
@@ -253,23 +255,39 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                     RelativePositionAxes = Axes.X,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.CentreLeft,
-                                    Child = leftTickCaption = new OsuSpriteText { Alpha = 0.8f }
+                                    Child = leftTickCaption = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.TopLeft,
+                                        Origin = Anchor.TopLeft,
+                                        Alpha = 0.8f,
+                                        TextSize = DEFAULT_CAPTION_TEXT_SIZE,
+                                    }
                                 },
                                 new Container
                                 {
                                     RelativePositionAxes = Axes.X,
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    X = 0.5f,
-                                    Child = middleTickCaption = new OsuSpriteText { Alpha = 0.8f }
+                                    Child = middleTickCaption = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.TopCentre,
+                                        Origin = Anchor.TopCentre,
+                                        Alpha = 0.8f,
+                                        TextSize = DEFAULT_CAPTION_TEXT_SIZE,
+                                    }
                                 },
                                 new Container
                                 {
                                     RelativePositionAxes = Axes.X,
                                     Anchor = Anchor.CentreRight,
                                     Origin = Anchor.CentreRight,
-                                    X = 1,
-                                    Child = rightTickCaption = new OsuSpriteText { Alpha = 0.8f }
+                                    Child = rightTickCaption = new OsuSpriteText
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        Alpha = 0.8f,
+                                        TextSize = DEFAULT_CAPTION_TEXT_SIZE,
+                                    }
                                 }
                             },
                         }
