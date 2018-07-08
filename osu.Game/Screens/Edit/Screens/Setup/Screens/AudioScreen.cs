@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                 sampleVolumeSettings = new Container
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    Height = LabelledSliderBar.NORMAL_HEIGHT + 10,
+                                    Height = LabelledSliderBar.NORMAL_HEIGHT,
                                     Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
                                     Children = new Drawable[]
                                     {
@@ -169,7 +169,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                                 defaultSampleVolume = new LabelledSliderBar
                                                 {
                                                     RelativeSizeAxes = Axes.X,
-                                                    Padding = new MarginPadding { Top = 10 },
                                                     LabelText = "Sample Volume",
                                                     TooltipTextSuffix = "%",
                                                     SliderMaxValue = 100,
@@ -183,7 +182,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             Height = 60,
-                                            Padding = new MarginPadding { Top = 10 },
                                             Alpha = 0,
                                             Children = new Drawable[]
                                             {
@@ -452,7 +450,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             }
             sampleVolumeSettingsContainer.Alpha = Convert.ToInt32(commonVolume != null);
             resetDefaultSampleVolumeSettingsContainer.Alpha = Convert.ToInt32(commonVolume == null);
-            sampleVolumeSettings.Height = commonVolume != null ? LabelledSliderBar.NORMAL_HEIGHT + 10 : 60;
+            sampleVolumeSettings.Height = commonVolume != null ? LabelledSliderBar.NORMAL_HEIGHT : 50;
         }
     }
 
