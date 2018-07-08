@@ -163,7 +163,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                         {
                                             Direction = FillDirection.Vertical,
                                             RelativeSizeAxes = Axes.X,
-                                            //Padding = new MarginPadding { Top = 10 },
                                             Spacing = new Vector2(3),
                                             Children = new Drawable[]
                                             {
