@@ -94,15 +94,6 @@ namespace osu.Game.Tests.Visual
                         return false;
                 return true;
             });
-            AddStep("Change default sample bank to normal", () => (setup.CurrentScreen as AudioScreen).ChangeDefaultSampleBank(SampleBank.Normal));
-            AddAssert("Check new default sample bank settings", () =>
-            {
-                var beatmap = setup.CurrentScreen.Beatmap.Value.Beatmap;
-                foreach (var s in beatmap.ControlPointInfo.SamplePoints)
-                    if (s.SampleBank != "normal")
-                        return false;
-                return true;
-            });
             AddStep("Change default sample bank to soft", () => (setup.CurrentScreen as AudioScreen).ChangeDefaultSampleBank(SampleBank.Soft));
             AddAssert("Check new default sample bank settings", () =>
             {
@@ -118,6 +109,15 @@ namespace osu.Game.Tests.Visual
                 var beatmap = setup.CurrentScreen.Beatmap.Value.Beatmap;
                 foreach (var s in beatmap.ControlPointInfo.SamplePoints)
                     if (s.SampleBank != "drum")
+                        return false;
+                return true;
+            });
+            AddStep("Change default sample bank to normal", () => (setup.CurrentScreen as AudioScreen).ChangeDefaultSampleBank(SampleBank.Normal));
+            AddAssert("Check new default sample bank settings", () =>
+            {
+                var beatmap = setup.CurrentScreen.Beatmap.Value.Beatmap;
+                foreach (var s in beatmap.ControlPointInfo.SamplePoints)
+                    if (s.SampleBank != "normal")
                         return false;
                 return true;
             });

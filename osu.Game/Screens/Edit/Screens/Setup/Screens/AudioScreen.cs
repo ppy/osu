@@ -38,14 +38,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly OsuCircularButton finishSample;
         private readonly OsuCircularButton clapSample;
 
-        private readonly Container resetDefaultSampleSetSettingsContainer;
+        private readonly Container resetDefaultSampleBankSettingsContainer;
         private readonly Container resetDefaultSampleVolumeSettingsContainer;
         private readonly OsuCircularButton resetDefaultSampleBankSettingsButton;
         private readonly OsuCircularButton resetDefaultSampleVolumeSettingsButton;
 
-        private readonly Container sampleSetSettings;
+        private readonly Container sampleBankSettings;
         private readonly Container sampleVolumeSettings;
-        private readonly FillFlowContainer sampleSetSettingsContainer;
+        private readonly FillFlowContainer sampleBankSettingsContainer;
         private readonly FillFlowContainer sampleVolumeSettingsContainer;
 
         public string Title => "Audio";
@@ -78,14 +78,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     TextSize = 20,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                sampleSetSettings = new Container
+                                sampleBankSettings = new Container
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
                                     Height = 40,
                                     Children = new Drawable[]
                                     {
-                                        sampleSetSettingsContainer = new FillFlowContainer
+                                        sampleBankSettingsContainer = new FillFlowContainer
                                         {
                                             Direction = FillDirection.Vertical,
                                             RelativeSizeAxes = Axes.X,
@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                                 },
                                             }
                                         },
-                                        resetDefaultSampleSetSettingsContainer = new Container
+                                        resetDefaultSampleBankSettingsContainer = new Container
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             Height = 60,
@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                         {
                                             Direction = FillDirection.Vertical,
                                             RelativeSizeAxes = Axes.X,
-                                            Padding = new MarginPadding { Top = 10 },
+                                            //Padding = new MarginPadding { Top = 10 },
                                             Spacing = new Vector2(3),
                                             Children = new Drawable[]
                                             {
@@ -440,9 +440,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     defaultSampleBank.DropdownSelectedItem = i;
                 }
             }
-            sampleSetSettingsContainer.Alpha = Convert.ToInt32(commonBank != null);
-            resetDefaultSampleSetSettingsContainer.Alpha = Convert.ToInt32(commonBank == null);
-            sampleSetSettings.Height = commonBank != null ? 40 : 60;
+            sampleBankSettingsContainer.Alpha = Convert.ToInt32(commonBank != null);
+            resetDefaultSampleBankSettingsContainer.Alpha = Convert.ToInt32(commonBank == null);
+            sampleBankSettings.Height = commonBank != null ? 40 : 60;
 
             if (commonVolume != null)
             {
