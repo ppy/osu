@@ -12,17 +12,15 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
-using osu.Framework.Input.Bindings;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Input.Bindings;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
+    public class VolumeMeter : Container
     {
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
@@ -226,58 +224,26 @@ namespace osu.Game.Overlays.Volume
 
         private const float adjust_step = 0.05f;
 
-        public void Increase() => adjust(1);
-        public void Decrease() => adjust(-1);
-
-        private void adjust(int direction)
-        {
-            float amount = adjust_step * direction;
-
-            // handle the case where the OnPressed action was actually a mouse wheel.
-            // this allows for precise wheel handling.
-            var state = GetContainingInputManager().CurrentState;
-            if (state.Mouse?.ScrollDelta.Y != 0)
-            {
-                OnScroll(state);
-                return;
-            }
-
-            Volume += amount;
-        }
-
-        public bool OnPressed(GlobalAction action)
-        {
-            if (!IsHovered) return false;
-
-            switch (action)
-            {
-                case GlobalAction.DecreaseVolume:
-                    Decrease();
-                    return true;
-                case GlobalAction.IncreaseVolume:
-                    Increase();
-                    return true;
-            }
-
-            return false;
-        }
+        public void Increase(double amount = 1, bool isPrecise = false) => adjust(amount, isPrecise);
+        public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
 
         // because volume precision is set to 0.01, this local is required to keep track of more precise adjustments and only apply when possible.
-        private double scrollAmount;
+        private double adjustAccumulator;
+
+        private void adjust(double delta, bool isPrecise)
+        {
+            adjustAccumulator += delta * adjust_step * (isPrecise ? 0.1 : 1);
+            if (Math.Abs(adjustAccumulator) < Bindable.Precision)
+                return;
+            Volume += adjustAccumulator;
+            adjustAccumulator = 0;
+        }
 
         protected override bool OnScroll(InputState state)
         {
-            scrollAmount += adjust_step * state.Mouse.ScrollDelta.Y * (state.Mouse.HasPreciseScroll ? 0.1f : 1);
-
-            if (Math.Abs(scrollAmount) < Bindable.Precision)
-                return true;
-
-            Volume += scrollAmount;
-            scrollAmount = 0;
+            adjust(state.Mouse.ScrollDelta.Y, state.Mouse.HasPreciseScroll);
             return true;
         }
-
-        public bool OnReleased(GlobalAction action) => false;
 
         private const float transition_length = 500;
 
