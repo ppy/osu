@@ -289,9 +289,9 @@ namespace osu.Game.Beatmaps.Formats
                 if (split.Length >= 4)
                     sampleSet = (LegacySampleBank)int.Parse(split[3]);
 
-                //SampleBank sampleBank = SampleBank.Default;
-                //if (split.Length >= 5)
-                //    sampleBank = (SampleBank)int.Parse(split[4]);
+                int customSampleBank = 0;
+                if (split.Length >= 5)
+                    customSampleBank = int.Parse(split[4]);
 
                 int sampleVolume = defaultSampleVolume;
                 if (split.Length >= 6)
@@ -314,13 +314,9 @@ namespace osu.Game.Beatmaps.Formats
                 if (stringSampleSet == @"none")
                     stringSampleSet = @"normal";
 
-                DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(time);
-                SampleControlPoint samplePoint = beatmap.ControlPointInfo.SamplePointAt(time);
-                EffectControlPoint effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
-
                 if (timingChange)
                 {
-                    beatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint
+                    handleTimingControlPoint(new TimingControlPoint
                     {
                         Time = time,
                         BeatLength = beatLength,
@@ -328,39 +324,66 @@ namespace osu.Game.Beatmaps.Formats
                     });
                 }
 
-                if (speedMultiplier != difficultyPoint.SpeedMultiplier)
+                handleDifficultyControlPoint(new DifficultyControlPoint
                 {
-                    beatmap.ControlPointInfo.DifficultyPoints.RemoveAll(x => x.Time == time);
-                    beatmap.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint
-                    {
-                        Time = time,
-                        SpeedMultiplier = speedMultiplier
-                    });
-                }
+                    Time = time,
+                    SpeedMultiplier = speedMultiplier
+                });
 
-                if (stringSampleSet != samplePoint.SampleBank || sampleVolume != samplePoint.SampleVolume)
+                handleEffectControlPoint(new EffectControlPoint
                 {
-                    beatmap.ControlPointInfo.SamplePoints.Add(new SampleControlPoint
-                    {
-                        Time = time,
-                        SampleBank = stringSampleSet,
-                        SampleVolume = sampleVolume
-                    });
-                }
+                    Time = time,
+                    KiaiMode = kiaiMode,
+                    OmitFirstBarLine = omitFirstBarSignature
+                });
 
-                if (kiaiMode != effectPoint.KiaiMode || omitFirstBarSignature != effectPoint.OmitFirstBarLine)
+                handleSampleControlPoint(new LegacySampleControlPoint
                 {
-                    beatmap.ControlPointInfo.EffectPoints.Add(new EffectControlPoint
-                    {
-                        Time = time,
-                        KiaiMode = kiaiMode,
-                        OmitFirstBarLine = omitFirstBarSignature
-                    });
-                }
+                    Time = time,
+                    SampleBank = stringSampleSet,
+                    SampleVolume = sampleVolume,
+                    CustomSampleBank = customSampleBank
+                });
             }
             catch (FormatException e)
             {
             }
+        }
+
+        private void handleTimingControlPoint(TimingControlPoint newPoint)
+        {
+            beatmap.ControlPointInfo.TimingPoints.Add(newPoint);
+        }
+
+        private void handleDifficultyControlPoint(DifficultyControlPoint newPoint)
+        {
+            var existing = beatmap.ControlPointInfo.DifficultyPointAt(newPoint.Time);
+
+            if (newPoint.EquivalentTo(existing))
+                return;
+
+            beatmap.ControlPointInfo.DifficultyPoints.RemoveAll(x => x.Time == newPoint.Time);
+            beatmap.ControlPointInfo.DifficultyPoints.Add(newPoint);
+        }
+
+        private void handleEffectControlPoint(EffectControlPoint newPoint)
+        {
+            var existing = beatmap.ControlPointInfo.EffectPointAt(newPoint.Time);
+
+            if (newPoint.EquivalentTo(existing))
+                return;
+
+            beatmap.ControlPointInfo.EffectPoints.Add(newPoint);
+        }
+
+        private void handleSampleControlPoint(SampleControlPoint newPoint)
+        {
+            var existing = beatmap.ControlPointInfo.SamplePointAt(newPoint.Time);
+
+            if (newPoint.EquivalentTo(existing))
+                return;
+
+            beatmap.ControlPointInfo.SamplePoints.Add(newPoint);
         }
 
         private void handleHitObject(string line)
