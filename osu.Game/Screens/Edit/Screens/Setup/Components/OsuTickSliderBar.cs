@@ -364,26 +364,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             sample.Play();
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-        {
-            return base.OnMouseDown(state, args);
-        }
-
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-        {
-            return base.OnMouseUp(state, args);
-        }
-
-        protected override void UpdateAfterChildren()
-        {
-            base.UpdateAfterChildren();
-            leftBox.Scale = new Vector2(MathHelper.Clamp(Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
-            rightBox.Scale = new Vector2(MathHelper.Clamp(DrawWidth - Nub.DrawPosition.X - Nub.DrawWidth / 2, 0, DrawWidth), 1);
-        }
-
         protected override void UpdateValue(float value)
         {
-            Nub.MoveToX((UsableWidth + NUB_SIZE_X / 2) * value - NUB_SIZE_X / 2, 250, Easing.OutQuint);
+            float width = UsableWidth - Padding.Right;
+            // TODO: Change the way the X position is calculated for simpler calculations
+            Nub.MoveToX((width + NUB_SIZE_X / 2) * value - NUB_SIZE_X / 2, 250, Easing.OutQuint);
+            leftBox.ResizeWidthTo(value, 250, Easing.OutQuint);
+            rightBox.ResizeWidthTo(1 - value, 250, Easing.OutQuint);
         }
 
         /// <summary>

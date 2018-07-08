@@ -249,7 +249,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                                 Anchor = Anchor.TopLeft,
                                                 Origin = Anchor.TopLeft,
                                                 Y = DEFAULT_TOP_PADDING,
-                                                Padding = new MarginPadding { Right = DEFAULT_SLIDER_BAR_PADDING },
+                                                Padding = new MarginPadding { Left = DEFAULT_SLIDER_BAR_PADDING, Right = DEFAULT_SLIDER_BAR_PADDING * 2 },
                                                 Colour = Color4.White,
                                                 TooltipTextSuffix = tooltipTextSuffix
                                             },
