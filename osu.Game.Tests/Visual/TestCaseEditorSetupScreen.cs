@@ -3,7 +3,6 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Game.Screens.Edit.Screens.Setup;
 using osu.Game.Screens.Edit.Screens.Setup.Components;
 using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
@@ -30,6 +29,7 @@ namespace osu.Game.Tests.Visual
             typeof(LabelledTextBox),
             typeof(LabelledSwitchButton),
             typeof(LabelledSliderBar),
+            typeof(SetupOsuTextBox),
             typeof(OsuTickSliderBar),
             typeof(OsuSwitchButton),
             typeof(OsuCircularButton),

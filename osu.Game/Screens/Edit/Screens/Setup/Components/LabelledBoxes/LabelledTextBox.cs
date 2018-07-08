@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 {
     public class LabelledTextBox : CompositeDrawable
     {
-        private readonly OsuTextBox textBox;
+        private readonly SetupOsuTextBox textBox;
         private readonly Container content;
         private readonly OsuSpriteText label;
 
@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                             Text = LabelText,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        textBox = new OsuTextBox
+                                        textBox = new SetupOsuTextBox
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
