@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             Anchor = Anchor.BottomLeft;
             Origin = Anchor.BottomLeft;
 
-            Shear = new Vector2(ChannelTabControl.shear_width / ChatOverlay.TAB_AREA_HEIGHT, 0);
+            Shear = new Vector2(ChannelTabControl.SHEAR_WIDTH / ChatOverlay.TAB_AREA_HEIGHT, 0);
 
             Masking = true;
             EdgeEffect = new EdgeEffectParameters
@@ -143,7 +143,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                 },
                 new Container
                 {
-                    Shear = new Vector2(-ChannelTabControl.shear_width / ChatOverlay.TAB_AREA_HEIGHT, 0),
+                    Shear = new Vector2(-ChannelTabControl.SHEAR_WIDTH / ChatOverlay.TAB_AREA_HEIGHT, 0),
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
