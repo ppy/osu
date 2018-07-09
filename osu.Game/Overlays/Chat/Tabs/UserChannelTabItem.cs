@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                                 {
                                     new SpriteIcon
                                     {
-                                        Icon = FontAwesome.fa_eercast,
+                                        Icon = FontAwesome.fa_at,
                                         Origin = Anchor.Centre,
                                         Scale = new Vector2(1.2f),
                                         X = -5,
