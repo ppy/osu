@@ -254,7 +254,7 @@ namespace osu.Game.Overlays.Chat
             public MenuItem[] ContextMenuItems => new MenuItem[]
             {
                 new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action),
-                new OsuMenuItem("Start Chat", MenuItemType.Highlighted, startChatAction),
+                new OsuMenuItem("Start Chat", MenuItemType.Standard, startChatAction),
             };
         }
     }
