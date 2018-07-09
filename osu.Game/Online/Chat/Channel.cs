@@ -61,7 +61,7 @@ namespace osu.Game.Online.Chat
             Id = user.Id;
             JoinedUsers.Add(user);
         }
-        
+
         public void AddLocalEcho(LocalEchoMessage message)
         {
             pendingMessages.Add(message);
