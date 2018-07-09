@@ -138,7 +138,11 @@ namespace osu.Game.Screens.Select
                                 Height = filter_height,
                                 FilterChanged = c => Carousel.Filter(c),
                                 Background = { Width = 2 },
-                                Exit = Exit,
+                                Exit = () =>
+                                {
+                                    if (IsCurrentScreen)
+                                        Exit();
+                                },
                             },
                         }
                     },
