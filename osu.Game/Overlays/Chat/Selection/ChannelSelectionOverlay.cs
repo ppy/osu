@@ -35,23 +35,6 @@ namespace osu.Game.Overlays.Chat.Selection
         public Action<Channel> OnRequestJoin;
         public Action<Channel> OnRequestLeave;
 
-        public IEnumerable<ChannelSection> Sections
-        {
-            set
-            {
-                sectionsFlow.ChildrenEnumerable = value;
-
-                foreach (ChannelSection s in sectionsFlow.Children)
-                {
-                    foreach (ChannelListItem c in s.ChannelFlow.Children)
-                    {
-                        c.OnRequestJoin = channel => { OnRequestJoin?.Invoke(channel); };
-                        c.OnRequestLeave = channel => { OnRequestLeave?.Invoke(channel); };
-                    }
-                }
-            }
-        }
-
         public ChannelSelectionOverlay()
         {
             RelativeSizeAxes = Axes.X;
@@ -138,6 +121,27 @@ namespace osu.Game.Overlays.Chat.Selection
             };
 
             search.Current.ValueChanged += newValue => sectionsFlow.SearchTerm = newValue;
+        }
+
+        public void UpdateAvailableChannels(IEnumerable<Channel> channels)
+        {
+            sectionsFlow.ChildrenEnumerable = new[]
+            {
+                new ChannelSection
+                {
+                    Header = "All Channels",
+                    Channels = channels,
+                },
+            };
+
+            foreach (ChannelSection s in sectionsFlow.Children)
+            {
+                foreach (ChannelListItem c in s.ChannelFlow.Children)
+                {
+                    c.OnRequestJoin = channel => { OnRequestJoin?.Invoke(channel); };
+                    c.OnRequestLeave = channel => { OnRequestLeave?.Invoke(channel); };
+                }
+            }
         }
 
         [BackgroundDependencyLoader]
