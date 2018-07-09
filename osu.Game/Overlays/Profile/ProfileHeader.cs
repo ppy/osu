@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Diagnostics;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -10,13 +9,14 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Profile.Components;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Users;
 
@@ -105,11 +105,28 @@ namespace osu.Game.Overlays.Profile
                                             Y = -75,
                                             Size = new Vector2(25, 25)
                                         },
-                                        new ProfileLink(user)
+                                        new FillFlowContainer
                                         {
+                                            Direction = FillDirection.Horizontal,
+                                            AutoSizeAxes = Axes.Both,
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
                                             Y = -48,
+                                            Children = new Drawable[]
+                                            {
+                                                new OsuSpriteText
+                                                {
+                                                    Text = user.Username,
+                                                    Font = @"Exo2.0-RegularItalic",
+                                                    TextSize = 30,
+                                                },
+                                                new ExternalLinkButton($@"https://osu.ppy.sh/users/{user.Id}")
+                                                {
+                                                    Anchor = Anchor.BottomLeft,
+                                                    Origin = Anchor.BottomLeft,
+                                                    Margin = new MarginPadding { Left = 3, Bottom = 3 }, //To better lineup with the font
+                                                },
+                                            }
                                         },
                                         countryFlag = new DrawableFlag(user.Country)
                                         {
@@ -359,12 +376,12 @@ namespace osu.Game.Overlays.Profile
 
             if (user.JoinDate.ToUniversalTime().Year < 2008)
             {
-                infoTextLeft.AddText("Here since the beginning", boldItalic);
+                infoTextLeft.AddText(new DrawableJoinDate(user.JoinDate), lightText);
             }
             else
             {
                 infoTextLeft.AddText("Joined ", lightText);
-                infoTextLeft.AddText(new DrawableDate(user.JoinDate), boldItalic);
+                infoTextLeft.AddText(new DrawableJoinDate(user.JoinDate), boldItalic);
             }
 
             infoTextLeft.NewLine();
@@ -453,66 +470,6 @@ namespace osu.Game.Overlays.Profile
             }
 
             infoTextRight.NewLine();
-        }
-
-        private class ProfileLink : OsuHoverContainer, IHasTooltip
-        {
-            public string TooltipText => "View Profile in Browser";
-
-            public override bool HandleMouseInput => true;
-
-            public ProfileLink(User user)
-            {
-                Action = () => Process.Start($@"https://osu.ppy.sh/users/{user.Id}");
-
-                AutoSizeAxes = Axes.Both;
-
-                Child = new OsuSpriteText
-                {
-                    Text = user.Username,
-                    Font = @"Exo2.0-RegularItalic",
-                    TextSize = 30,
-                };
-            }
-        }
-
-
-        private class GradeBadge : Container
-        {
-            private const float width = 50;
-            private readonly string grade;
-            private readonly Sprite badge;
-            private readonly SpriteText numberText;
-
-            public int DisplayCount
-            {
-                set { numberText.Text = value.ToString(@"#,0"); }
-            }
-
-            public GradeBadge(string grade)
-            {
-                this.grade = grade;
-                Width = width;
-                Height = 41;
-                Add(badge = new Sprite
-                {
-                    Width = width,
-                    Height = 26
-                });
-                Add(numberText = new OsuSpriteText
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    TextSize = 14,
-                    Font = @"Exo2.0-Bold"
-                });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                badge.Texture = textures.Get($"Grades/{grade}");
-            }
         }
     }
 }

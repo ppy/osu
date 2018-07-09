@@ -1,18 +1,32 @@
 # osu! [![Build status](https://ci.appveyor.com/api/projects/status/u2p01nx7l6og8buh?svg=true)](https://ci.appveyor.com/project/peppy/osu)  [![CodeFactor](https://www.codefactor.io/repository/github/ppy/osu/badge)](https://www.codefactor.io/repository/github/ppy/osu) [![dev chat](https://discordapp.com/api/guilds/188630481301012481/widget.png?style=shield)](https://discord.gg/ppy)
 
-Rhythm is just a *click* away. The future of [osu!](https://osu.ppy.sh) and the beginning of an open era!
+Rhythm is just a *click* away. The future of [osu!](https://osu.ppy.sh) and the beginning of an open era! Commonly known by the codename "osu!lazer". Pew pew.
 
 # Status
 
-This is still heavily under development and is not intended for end-user use. This repository is intended for developer collaboration. You're welcome to try and use it but please do not submit bug reports without a patch. Please do not ask for help building or using this software.
+This project is still heavily under development, but is in a state where users are encouraged to try it out and keep it installed alongside the stable osu! client. It will continue to evolve over the coming months and hopefully bring some new unique features to the table.
+
+We are accepting bug reports (please report with as much detail as possible). Feature requests are welcome as long as you read and understand the contribution guidelines listed below.
 
 # Requirements
 
-- A desktop platform that can compile .NET 4.7.1. We recommend using [Visual Studio Community Edition](https://www.visualstudio.com/) (Windows), [Visual Studio for Mac](https://www.visualstudio.com/vs/visual-studio-mac/) (macOS) or [MonoDevelop](http://www.monodevelop.com/download/) (Linux), all of which are free. [Visual Studio Code](https://code.visualstudio.com/) may also be used but requires further setup steps which are not covered here.
+- A desktop platform with the [.NET Core SDK 2.1](https://www.microsoft.com/net/learn/get-started) or higher installed.
+- When working with the codebase, we recommend using an IDE with intellisense and syntax highlighting, such as [Visual Studio Community Edition](https://www.visualstudio.com/) (Windows), [Visual Studio Code](https://code.visualstudio.com/) (with the C# plugin installed) or [Jetbrains Rider](https://www.jetbrains.com/rider/) (commercial).
 
-# Getting Started
-- Clone the repository including submodules (`git clone --recurse-submodules https://github.com/ppy/osu`)
-- Build in your IDE of choice (recommended IDEs automatically restore nuget packages; if you are using an alternative make sure to `nuget restore`)
+# Building and running
+
+If you are not interested in developing the game, please head over to the [releases](https://github.com/ppy/osu/releases) to download a precompiled build with automatic updating enabled (download and run the install executable for your platform).
+
+Clone the repository including submodules
+
+`git clone --recurse-submodules https://github.com/ppy/osu`
+
+Build and run
+
+- Using Visual Studio 2017, Rider or Visual Studio Code (configurations are included)
+- From command line using `dotnet run --project osu.Desktop --framework netcoreapp2.1`
+
+The above methods should automatically do so, but if you run into issues building you may need to restore nuget packages (commonly via `dotnet restore`).
 
 # Contributing
 

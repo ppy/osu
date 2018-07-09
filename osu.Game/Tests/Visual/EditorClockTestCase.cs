@@ -20,29 +20,26 @@ namespace osu.Game.Tests.Visual
         protected readonly BindableBeatDivisor BeatDivisor = new BindableBeatDivisor();
         protected readonly EditorClock Clock;
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(parent);
-
-        private OsuGameBase osuGame;
-
         protected EditorClockTestCase()
         {
-            Clock = new EditorClock(new ControlPointInfo(), BeatDivisor) { IsCoupled = false };
+            Clock = new EditorClock(new ControlPointInfo(), 5000, BeatDivisor) { IsCoupled = false };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
         {
-            this.osuGame = osuGame;
+            var dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
             dependencies.Cache(BeatDivisor);
             dependencies.CacheAs<IFrameBasedClock>(Clock);
             dependencies.CacheAs<IAdjustableClock>(Clock);
 
-            osuGame.Beatmap.ValueChanged += beatmapChanged;
-            beatmapChanged(osuGame.Beatmap.Value);
+            return dependencies;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            Beatmap.BindValueChanged(beatmapChanged, true);
         }
 
         private void beatmapChanged(WorkingBeatmap working)
@@ -59,21 +56,14 @@ namespace osu.Game.Tests.Visual
             Clock.ProcessFrame();
         }
 
-        protected override bool OnWheel(InputState state)
+        protected override bool OnScroll(InputState state)
         {
-            if (state.Mouse.WheelDelta > 0)
+            if (state.Mouse.ScrollDelta.Y > 0)
                 Clock.SeekBackward(true);
             else
                 Clock.SeekForward(true);
 
             return true;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            osuGame.Beatmap.ValueChanged -= beatmapChanged;
-
-            base.Dispose(isDisposing);
         }
     }
 }

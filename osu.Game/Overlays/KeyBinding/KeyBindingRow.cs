@@ -180,19 +180,19 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnWheel(InputState state)
+        protected override bool OnScroll(InputState state)
         {
             if (HasFocus)
             {
                 if (bindTarget.IsHovered)
                 {
-                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
+                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state, state.Mouse.ScrollDelta));
                     finalise();
                     return true;
                 }
             }
 
-            return base.OnWheel(state);
+            return base.OnScroll(state);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -202,9 +202,6 @@ namespace osu.Game.Overlays.KeyBinding
 
             switch (args.Key)
             {
-                case Key.Escape:
-                    finalise();
-                    return true;
                 case Key.Delete:
                 {
                     if (state.Keyboard.ShiftPressed)
