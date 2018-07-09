@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Chat.Tabs
 {
     public class ChannelTabControl : OsuTabControl<Channel>
     {
-        public static readonly float shear_width = 10;
+        public static readonly float SHEAR_WIDTH = 10;
 
         public Action<Channel> OnRequestLeave;
 
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Chat.Tabs
         public ChannelTabControl()
         {
             TabContainer.Margin = new MarginPadding { Left = 50 };
-            TabContainer.Spacing = new Vector2(-shear_width, 0);
+            TabContainer.Spacing = new Vector2(-SHEAR_WIDTH, 0);
             TabContainer.Masking = false;
 
             AddInternal(new SpriteIcon
