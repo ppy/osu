@@ -17,7 +17,7 @@ namespace osu.Game.Online.Chat
         public readonly int MAX_HISTORY = 300;
 
         /// <summary>
-        /// Contains every joined user except yourself
+        /// Contains every joined user except the current logged in user.
         /// </summary>
         public readonly ObservableCollection<User> JoinedUsers = new ObservableCollection<User>();
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
@@ -52,7 +52,7 @@ namespace osu.Game.Online.Chat
 
         /// <summary>
         /// Contructs a private channel
-        /// TODO this class needs to be serialized from something like channels/private, instead of creating from a contructor
+        /// TODO this class needs to be serialized from something like channels/private, instead of creating from the contructor
         /// </summary>
         /// <param name="user">The user</param>
         public Channel(User user)
@@ -62,10 +62,7 @@ namespace osu.Game.Online.Chat
             Id = user.Id;
             JoinedUsers.Add(user);
         }
-
-       
-
-
+        
         public void AddLocalEcho(LocalEchoMessage message)
         {
             pendingMessages.Add(message);
