@@ -50,7 +50,7 @@ namespace osu.Game.Online.Chat
         private IAPIProvider api;
         private ScheduledDelegate fetchMessagesScheduleder;
         private GetMessagesRequest fetchMsgReq;
-        private GetPrivateMessagesRequest fetchPrivateMsgReq;
+        private GetPrivateMessagesRequest fetchUserMsgReq;
         private long? lastChannelMsgId;
         private long? lastUserMsgId;
 
@@ -170,16 +170,16 @@ namespace osu.Game.Online.Chat
                 );
 
 
-            if (fetchPrivateMsgReq == null)
+            if (fetchUserMsgReq == null)
                 fetchMessages(
-                    () => new GetPrivateMessagesRequest(lastChannelMsgId),
+                    () => new GetPrivateMessagesRequest(lastUserMsgId),
                     messages =>
                     {
                         if (messages == null)
                             return;
                         handleUserMessages(messages);
-                        lastUserMsgId = messages.LastOrDefault()?.Id ?? lastUserMsgId;
-                        fetchPrivateMsgReq = null;
+                        lastUserMsgId = messages.Max(m => m.Id) ?? lastUserMsgId;
+                        fetchUserMsgReq = null;
                     }
                 );
         }
