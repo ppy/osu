@@ -3,6 +3,7 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,6 +24,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
 {
     public class DifficultyScreenBottomHeader : Container
     {
+        private readonly OsuSpriteText textLine;
+
         public DifficultyScreenBottomHeader()
         {
             Width = Setup.SIZE_X - Setup.SCREEN_LEFT_PADDING;
@@ -42,11 +45,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
                             Origin = Anchor.TopLeft,
                             Children = new[]
                             {
-                                new OsuSpriteText
+                                textLine = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopLeft,
                                     Origin = Anchor.TopLeft,
-                                    Colour = Color4.Yellow,
                                     TextSize = 12,
                                     Font = @"Exo2.0-BoldItalic",
                                     Text = @"Hold the Shift key for precise value adjustment."
@@ -56,6 +58,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
                     }
                 },
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour osuColour)
+        {
+            textLine.Colour = osuColour.Yellow;
         }
     }
 }

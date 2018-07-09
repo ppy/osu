@@ -3,6 +3,7 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -23,6 +24,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
 {
     public class GeneralScreenBottomHeader : Container
     {
+        private readonly OsuSpriteText firstLine;
+        private readonly OsuSpriteText secondLine;
+
         public GeneralScreenBottomHeader()
         {
             Width = Setup.SIZE_X - Setup.SCREEN_LEFT_PADDING;
@@ -42,20 +46,18 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
                             Origin = Anchor.TopLeft,
                             Children = new[]
                             {
-                                new OsuSpriteText
+                                firstLine = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopLeft,
                                     Origin = Anchor.TopLeft,
-                                    Colour = Color4.Yellow,
                                     TextSize = 12,
                                     Font = @"Exo2.0-BoldItalic",
                                     Text = @"Due to large number of beatmap submissions, the standard of approval is relatively high."
                                 },
-                                new OsuSpriteText
+                                secondLine = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopLeft,
                                     Origin = Anchor.TopLeft,
-                                    Colour = Color4.Yellow,
                                     TextSize = 12,
                                     Font = @"Exo2.0-BoldItalic",
                                     Text = @"Please ensure your beatmap is at least timed properly, or it will likely be ignored."
@@ -97,6 +99,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.BottomHeaders
                     }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour osuColour)
+        {
+            firstLine.Colour = osuColour.Yellow;
+            secondLine.Colour = osuColour.Yellow;
         }
     }
 }

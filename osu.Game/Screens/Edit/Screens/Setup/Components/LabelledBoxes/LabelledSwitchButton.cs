@@ -3,6 +3,7 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -176,7 +177,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Colour = Color4.Yellow,
                                     Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Bottom = DEFAULT_BOTTOM_PADDING },
                                     TextSize = DEFAULT_BOTTOM_LABEL_TEXT_SIZE,
                                     Font = @"Exo2.0-BoldItalic",
@@ -189,6 +189,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             };
 
             switchButton.Current.ValueChanged += a => TriggerSwitchButtonValueChanged(a);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour osuColour)
+        {
+            bottomText.Colour = osuColour.Yellow;
         }
 
         private void changeHeight(float newHeight)

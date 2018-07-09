@@ -3,6 +3,7 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -24,6 +25,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
     public class AdvancedScreen : EditorScreen
     {
         private readonly Container content;
+
+        private readonly OsuSpriteText firstLine;
+        private readonly OsuSpriteText secondLine;
+        private readonly OsuSpriteText thirdLine;
 
         private readonly LabelledSliderBar stackLeniency;
         private readonly LabelledEnumDropdown<AvailableGamemodes> availableGamemodes;
@@ -82,24 +87,21 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
                                     LabelText = "Allowed Modes",
                                 },
-                                new OsuSpriteText
+                                firstLine = new OsuSpriteText
                                 {
                                     Padding = new MarginPadding { Top = 10 },
-                                    Colour = Color4.Yellow,
                                     Text = "Generally it is preferable to have multiple maps for all gamemodes.",
                                     TextSize = 12,
                                     Font = @"Exo2.0-BoldItalic",
                                 },
-                                new OsuSpriteText
+                                secondLine = new OsuSpriteText
                                 {
-                                    Colour = Color4.Yellow,
                                     Text = "It is often encouraged that you create mode-specific maps, since converted beatmaps often do not offer the desirable gameplay.",
                                     TextSize = 12,
                                     Font = @"Exo2.0-BoldItalic",
                                 },
-                                new OsuSpriteText
+                                thirdLine = new OsuSpriteText
                                 {
-                                    Colour = Color4.Yellow,
                                     Text = "Please take that into consideration before submitting your beatmap set.",
                                     TextSize = 12,
                                     Font = @"Exo2.0-BoldItalic",
@@ -127,6 +129,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 updateInfo();
             };
             maniaSpecialStyle.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.SpecialStyle = a;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour osuColour)
+        {
+            firstLine.Colour = osuColour.Yellow;
+            secondLine.Colour = osuColour.Yellow;
+            thirdLine.Colour = osuColour.Yellow;
         }
 
         public void ChangeManiaSpecialStyle(bool newValue) => maniaSpecialStyle.CurrentValue = newValue;
