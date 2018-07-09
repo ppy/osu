@@ -9,7 +9,6 @@ using osu.Game.Online.Chat;
 using OpenTK;
 using osu.Framework.Configuration;
 using System;
-using osu.Game.Overlays.Chat.Tabs;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
