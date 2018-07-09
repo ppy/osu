@@ -332,7 +332,6 @@ namespace osu.Game.Overlays
             channelManager.CurrentChannel.ValueChanged += currentChatChanged;
             channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
             channelManager.AvailableChannels.CollectionChanged += (sender, args) => channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
-            Add(channelManager);
         }
 
         private void postMessage(TextBox textbox, bool newText)

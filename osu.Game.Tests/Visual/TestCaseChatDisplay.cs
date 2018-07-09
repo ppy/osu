@@ -3,6 +3,7 @@
 
 using System.ComponentModel;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual

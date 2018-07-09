@@ -124,6 +124,7 @@ namespace osu.Game
             var channelManager = new ChannelManager();
             dependencies.Inject(channelManager);
             dependencies.Cache(channelManager);
+            AddInternal(channelManager);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
