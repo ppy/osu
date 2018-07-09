@@ -93,9 +93,11 @@ namespace osu.Game.Online.Chat
             if (CurrentChannel.Value == null)
                 return;
 
+            var currentChannel = CurrentChannel.Value;
+
             if (!api.IsLoggedIn)
             {
-                CurrentChannel.Value.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
+                currentChannel.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
                 return;
             }
 
@@ -109,15 +111,15 @@ namespace osu.Game.Online.Chat
                 Content = text
             };
 
-            CurrentChannel.Value.AddLocalEcho(message);
+            currentChannel.AddLocalEcho(message);
 
             var req = new PostMessageRequest(message);
             req.Failure += exception =>
             {
                 Logger.Error(exception, "Posting message failed.");
-                CurrentChannel.Value?.ReplaceMessage(message, null);
+                currentChannel.ReplaceMessage(message, null);
             };
-            req.Success += m => CurrentChannel.Value?.ReplaceMessage(message, m);
+            req.Success += m => currentChannel.ReplaceMessage(message, m);
             api.Queue(req);
         }
 

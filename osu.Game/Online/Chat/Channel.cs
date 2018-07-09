@@ -29,7 +29,7 @@ namespace osu.Game.Online.Chat
 
         public readonly Bindable<bool> Joined = new Bindable<bool>();
         public TargetType Target { get; }
-        public bool ReadOnly { get; set; }
+        public bool ReadOnly => false; //todo not yet used.
         public override string ToString() => Name;
 
         [JsonProperty(@"name")]
