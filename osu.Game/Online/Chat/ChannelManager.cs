@@ -158,7 +158,7 @@ namespace osu.Game.Online.Chat
         {
             if (fetchMsgReq == null)
                 fetchMessages(
-                    () => new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), lastChannelMsgId),
+                    () => fetchMsgReq = new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), lastChannelMsgId),
                     messages =>
                     {
                         if (messages == null)
@@ -172,7 +172,7 @@ namespace osu.Game.Online.Chat
 
             if (fetchUserMsgReq == null)
                 fetchMessages(
-                    () => new GetPrivateMessagesRequest(lastUserMsgId),
+                    () => fetchUserMsgReq = new GetPrivateMessagesRequest(lastUserMsgId),
                     messages =>
                     {
                         if (messages == null)
