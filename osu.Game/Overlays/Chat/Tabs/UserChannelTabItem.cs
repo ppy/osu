@@ -19,7 +19,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
-    public class UserTabItem : TabItem<Channel>
+    public class UserChannelTabItem : TabItem<Channel>
     {
         private static readonly Vector2 shear = new Vector2(1f / 5f, 0);
         public override bool IsRemovable => true;
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Chat.Tabs
         private readonly Avatar avatarContainer;
         private readonly TabCloseButton closeButton;
 
-        public UserTabItem(Channel value)
+        public UserChannelTabItem(Channel value)
             : base(value)
         {
             if (value.Target != TargetType.User)
@@ -160,7 +160,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             };
         }
 
-        public Action<UserTabItem> OnRequestClose;
+        public Action<UserChannelTabItem> OnRequestClose;
 
         private readonly EdgeEffectParameters activateEdgeEffect = new EdgeEffectParameters
         {
