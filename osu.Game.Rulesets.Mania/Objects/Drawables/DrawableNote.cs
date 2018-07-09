@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         private readonly NotePiece headPiece;
 
-        public DrawableNote(Note hitObject, ManiaAction action)
-            : base(hitObject, action)
+        public DrawableNote(Note hitObject)
+            : base(hitObject)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
         public virtual bool OnPressed(ManiaAction action)
         {
-            if (action != Action)
+            if (action != Action.Value)
                 return false;
 
             return UpdateJudgement(true);

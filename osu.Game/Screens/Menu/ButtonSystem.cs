@@ -11,7 +11,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
@@ -139,28 +138,15 @@ namespace osu.Game.Screens.Menu
             sampleBack = audio.Sample.Get(@"Menu/button-back-select");
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (args.Repeat) return false;
-
-            switch (args.Key)
-            {
-                case Key.Space:
-                    logo?.TriggerOnClick(state);
-                    return true;
-                case Key.Escape:
-                    return goBack();
-            }
-
-            return false;
-        }
-
         public bool OnPressed(GlobalAction action)
         {
             switch (action)
             {
                 case GlobalAction.Back:
                     return goBack();
+                case GlobalAction.Select:
+                    logo?.TriggerOnClick();
+                    return true;
                 default:
                     return false;
             }
@@ -181,16 +167,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public bool OnReleased(GlobalAction action)
-        {
-            switch (action)
-            {
-                case GlobalAction.Back:
-                    return true;
-                default:
-                    return false;
-            }
-        }
+        public bool OnReleased(GlobalAction action) => false;
 
         private void onPlay()
         {

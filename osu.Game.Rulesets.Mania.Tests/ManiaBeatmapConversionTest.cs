@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
@@ -13,11 +15,10 @@ using osu.Game.Tests.Beatmaps;
 namespace osu.Game.Rulesets.Mania.Tests
 {
     [TestFixture]
-    public class ManiaBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
+    public class ManiaBeatmapConversionTest : BeatmapConversionTest<ManiaConvertMapping, ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
-        [NonParallelizable]
         [TestCase("basic")]
         public new void Test(string name)
         {
@@ -34,8 +35,34 @@ namespace osu.Game.Rulesets.Mania.Tests
             };
         }
 
+        protected override ManiaConvertMapping CreateConvertMapping() => new ManiaConvertMapping(Converter);
+
         protected override Ruleset CreateRuleset() => new ManiaRuleset();
     }
+
+     public class ManiaConvertMapping : ConvertMapping<ConvertValue>, IEquatable<ManiaConvertMapping>
+     {
+         public uint RandomW;
+         public uint RandomX;
+         public uint RandomY;
+         public uint RandomZ;
+
+         public ManiaConvertMapping()
+         {
+         }
+
+         public ManiaConvertMapping(IBeatmapConverter converter)
+         {
+             var maniaConverter = (ManiaBeatmapConverter)converter;
+             RandomW = maniaConverter.Random.W;
+             RandomX = maniaConverter.Random.X;
+             RandomY = maniaConverter.Random.Y;
+             RandomZ = maniaConverter.Random.Z;
+         }
+
+         public bool Equals(ManiaConvertMapping other) => other != null && RandomW == other.RandomW && RandomX == other.RandomX && RandomY == other.RandomY && RandomZ == other.RandomZ;
+         public override bool Equals(ConvertMapping<ConvertValue> other) => base.Equals(other) && Equals(other as ManiaConvertMapping);
+     }
 
     public struct ConvertValue : IEquatable<ConvertValue>
     {
