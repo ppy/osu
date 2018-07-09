@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual
 
         private class TestOnScreenDisplay : OnScreenDisplay
         {
-            protected override void Display(Drawable toDisplay) => toDisplay.FadeIn().ResizeHeightTo(110);
+            protected override void DisplayTemporarily(Drawable toDisplay) => toDisplay.FadeIn().ResizeHeightTo(110);
         }
     }
 }
