@@ -30,7 +30,7 @@ namespace osu.Game.Overlays
 
         private ChannelManager channelManager;
 
-        private readonly Container<DrawableChannel> currentChatContainer;
+        private readonly Container<DrawableChannel> currentChannelContainer;
         private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
         private readonly LoadingAnimation loading;
@@ -102,7 +102,7 @@ namespace osu.Game.Overlays
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                currentChatContainer = new Container<DrawableChannel>
+                                currentChannelContainer = new Container<DrawableChannel>
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding
@@ -188,14 +188,8 @@ namespace osu.Game.Overlays
 
         private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
-            channelSelection.Sections = new[]
-            {
-                new ChannelSection
-                {
-                    Header = "All Channels",
-                    Channels = channelManager.AvailableChannels,
-                },
-            };
+            channelSelection.UpdateAvailableChannels(channelManager.);
+
         }
 
         private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
@@ -220,42 +214,42 @@ namespace osu.Game.Overlays
             }
         }
 
-        private void currentChatChanged(Channel chat)
+        private void currentChatChanged(Channel channel)
         {
-            if (chat == null)
+            if (channel == null)
             {
                 textbox.Current.Disabled = true;
-                currentChatContainer.Clear(false);
+                currentChannelContainer.Clear(false);
                 chatTabControl.Current.Value = null;
                 return;
             }
 
-            textbox.Current.Disabled = chat.ReadOnly;
+            textbox.Current.Disabled = channel.ReadOnly;
 
-            if (chatTabControl.Current.Value != chat)
-                Scheduler.Add(() => chatTabControl.Current.Value = chat);
+            if (chatTabControl.Current.Value != channel)
+                Scheduler.Add(() => chatTabControl.Current.Value = channel);
 
-            var loaded = loadedChannels.Find(d => d.Channel == chat);
+            var loaded = loadedChannels.Find(d => d.Channel == channel);
             if (loaded == null)
             {
-                currentChatContainer.FadeOut(500, Easing.OutQuint);
+                currentChannelContainer.FadeOut(500, Easing.OutQuint);
                 loading.Show();
 
-                loaded = new DrawableChannel(chat);
+                loaded = new DrawableChannel(channel);
                 loadedChannels.Add(loaded);
                 LoadComponentAsync(loaded, l =>
                 {
                     loading.Hide();
 
-                    currentChatContainer.Clear(false);
-                    currentChatContainer.Add(loaded);
-                    currentChatContainer.FadeIn(500, Easing.OutQuint);
+                    currentChannelContainer.Clear(false);
+                    currentChannelContainer.Add(loaded);
+                    currentChannelContainer.FadeIn(500, Easing.OutQuint);
                 });
             }
             else
             {
-                currentChatContainer.Clear(false);
-                currentChatContainer.Add(loaded);
+                currentChannelContainer.Clear(false);
+                currentChannelContainer.Add(loaded);
             }
         }
 
