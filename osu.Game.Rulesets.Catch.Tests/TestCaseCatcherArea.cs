@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                 Child = catcherArea = new TestCatcherArea(new BeatmapDifficulty { CircleSize = size })
                 {
                     Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.BottomLeft
+                    Origin = Anchor.TopLeft
                 },
             };
         }
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Tests
             {
             }
 
-            public void ToggleHyperDash(bool status) => MovableCatcher.HyperDashModifier = status ? 2 : 1;
+            public void ToggleHyperDash(bool status) => MovableCatcher.SetHyperdashState(status ? 2 : 1);
         }
     }
 }

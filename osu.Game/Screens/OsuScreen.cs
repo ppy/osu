@@ -2,12 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -16,13 +16,21 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using OpenTK;
-using OpenTK.Input;
+using osu.Game.Overlays;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens
 {
-    public abstract class OsuScreen : Screen, IKeyBindingHandler<GlobalAction>
+    public abstract class OsuScreen : Screen, IKeyBindingHandler<GlobalAction>, IHasDescription
     {
         public BackgroundScreen Background { get; private set; }
+
+        /// <summary>
+        /// A user-facing title for this screen.
+        /// </summary>
+        public virtual string Title => GetType().ShortDisplayName();
+
+        public string Description => Title;
 
         protected virtual bool AllowBackButton => true;
 
@@ -32,19 +40,19 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
 
-        private readonly BindableBool hideOverlaysOnEnter = new BindableBool();
+        private Action updateOverlayStates;
 
         /// <summary>
-        /// Whether overlays should be hidden when this screen is entered or resumed.
+        /// Whether all overlays should be hidden when this screen is entered or resumed.
         /// </summary>
-        protected virtual bool HideOverlaysOnEnter => hideOverlaysOnEnter;
+        protected virtual bool HideOverlaysOnEnter => false;
 
-        private readonly BindableBool allowOpeningOverlays = new BindableBool();
+        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         /// <summary>
-        /// Whether overlays should be able to be opened while this screen is active.
+        /// Whether overlays should be able to be opened once this screen is entered or resumed.
         /// </summary>
-        protected virtual bool AllowOpeningOverlays => allowOpeningOverlays;
+        protected virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
 
         /// <summary>
         /// Whether this <see cref="OsuScreen"/> allows the cursor to be displayed.
@@ -67,43 +75,36 @@ namespace osu.Game.Screens
 
         private ParallaxContainer backgroundParallaxContainer;
 
-        public WorkingBeatmap InitialBeatmap
-        {
-            set
-            {
-                if (IsLoaded) throw new InvalidOperationException($"Cannot set {nameof(InitialBeatmap)} post-load.");
-                Beatmap.Value = value;
-            }
-        }
-
         protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private SampleChannel sampleExit;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGameBase game, OsuGame osuGame, AudioManager audio)
+        [BackgroundDependencyLoader(true)]
+        private void load(BindableBeatmap beatmap, OsuGame osu, AudioManager audio, Bindable<RulesetInfo> ruleset)
         {
-            if (game != null)
-            {
-                //if we were given a beatmap at ctor time, we want to pass this on to the game-wide beatmap.
-                var localMap = Beatmap.Value;
-                Beatmap.BindTo(game.Beatmap);
-                if (localMap != null)
-                    Beatmap.Value = localMap;
-            }
+            Beatmap.BindTo(beatmap);
+            Ruleset.BindTo(ruleset);
 
-            if (osuGame != null)
+            if (osu != null)
             {
-                Ruleset.BindTo(osuGame.Ruleset);
-                hideOverlaysOnEnter.BindTo(osuGame.HideOverlaysOnEnter);
-                allowOpeningOverlays.BindTo(osuGame.AllowOpeningOverlays);
+                OverlayActivationMode.BindTo(osu.OverlayActivationMode);
+
+                updateOverlayStates = () =>
+                {
+                    if (HideOverlaysOnEnter)
+                        osu.CloseAllOverlays();
+                    else
+                        osu.Toolbar.State = Visibility.Visible;
+                };
             }
 
             sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
 
-        public bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(GlobalAction action)
         {
+            if (!IsCurrentScreen) return false;
+
             if (action == GlobalAction.Back && AllowBackButton)
             {
                 Exit();
@@ -114,20 +115,6 @@ namespace osu.Game.Screens
         }
 
         public bool OnReleased(GlobalAction action) => action == GlobalAction.Back && AllowBackButton;
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (args.Repeat || !IsCurrentScreen) return false;
-
-            switch (args.Key)
-            {
-                case Key.Escape:
-                    Exit();
-                    return true;
-            }
-
-            return base.OnKeyDown(state, args);
-        }
 
         protected override void OnResuming(Screen last)
         {
@@ -193,11 +180,10 @@ namespace osu.Game.Screens
 
             if (Background != null && !Background.Equals(nextOsu?.Background))
             {
-                if (nextOsu != null)
-                    //We need to use MakeCurrent in case we are jumping up multiple game screens.
-                    nextOsu.Background?.MakeCurrent();
-                else
-                    Background.Exit();
+                Background.Exit();
+
+                //We need to use MakeCurrent in case we are jumping up multiple game screens.
+                nextOsu?.Background?.MakeCurrent();
             }
 
             if (base.OnExiting(next))
@@ -217,19 +203,24 @@ namespace osu.Game.Screens
             logo.Anchor = Anchor.TopLeft;
             logo.Origin = Anchor.Centre;
             logo.RelativePositionAxes = Axes.None;
+            logo.BeatMatching = true;
             logo.Triangles = true;
             logo.Ripple = true;
         }
 
         private void applyArrivingDefaults(bool isResuming)
         {
-            logo.AppendAnimatingAction(() => LogoArriving(logo, isResuming), true);
+            logo.AppendAnimatingAction(() =>
+            {
+                if (IsCurrentScreen) LogoArriving(logo, isResuming);
+            }, true);
 
             if (backgroundParallaxContainer != null)
                 backgroundParallaxContainer.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * BackgroundParallaxAmount;
 
-            hideOverlaysOnEnter.Value = HideOverlaysOnEnter;
-            allowOpeningOverlays.Value = AllowOpeningOverlays;
+            OverlayActivationMode.Value = InitialOverlayActivationMode;
+
+            updateOverlayStates?.Invoke();
         }
 
         private void onExitingLogo()

@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Judgements;
 
@@ -44,6 +45,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             if (Math.Abs(firstHitTime - Time.Current) < second_hit_window)
                 AddJudgement(new TaikoStrongHitJudgement { Result = HitResult.Great });
+        }
+
+        protected override void UpdateState(ArmedState state)
+        {
+            base.UpdateState(state);
+
+            switch (state)
+            {
+                case ArmedState.Idle:
+                    firstHitTime = 0;
+                    firstKeyHeld = false;
+                    break;
+            }
         }
 
         public override bool OnReleased(TaikoAction action)
