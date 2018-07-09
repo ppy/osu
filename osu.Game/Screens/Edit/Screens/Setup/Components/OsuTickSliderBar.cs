@@ -375,7 +375,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         protected override void UpdateValue(float value)
         {
             float width = UsableWidth - Padding.Right;
-            // TODO: Change the way the X position is calculated for simpler calculations
             Nub.MoveToX(value, 250, Easing.OutQuint);
             leftBox.ResizeWidthTo(value, 250, Easing.OutQuint);
             rightBox.ResizeWidthTo(1 - value, 250, Easing.OutQuint);
