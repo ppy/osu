@@ -2,8 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
@@ -17,5 +19,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         {
             BorderColour = osuColour.Blue;
         }
+
+        protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), Colour = BorderColour, TextSize = CalculatedTextSize };
     }
 }
