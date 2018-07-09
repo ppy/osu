@@ -158,6 +158,9 @@ namespace osu.Game.Overlays.Chat.Tabs
                     }
                 }
             };
+
+            username.ScaleTo(new Vector2(0, 1));
+            closeButton.ScaleTo(new Vector2(0, 1));
         }
 
         public Action<UserChannelTabItem> OnRequestClose;
