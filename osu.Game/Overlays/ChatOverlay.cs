@@ -186,12 +186,6 @@ namespace osu.Game.Overlays
             channelSelection.OnRequestLeave = channel => channelManager.JoinedChannels.Remove(channel);
         }
 
-        private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
-        {
-            channelSelection.UpdateAvailableChannels(channelManager.);
-
-        }
-
         private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
         {
             switch (args.Action)
@@ -337,7 +331,7 @@ namespace osu.Game.Overlays
             this.channelManager = channelManager;
             channelManager.CurrentChannel.ValueChanged += currentChatChanged;
             channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
-            channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
+            channelManager.AvailableChannels.CollectionChanged += (sender, args) => channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
             Add(channelManager);
         }
 

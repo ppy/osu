@@ -14,13 +14,14 @@ namespace osu.Game.Online.Chat
 {
     public class Channel
     {
-        public readonly int MAX_HISTORY = 300;
+        public readonly int MaxHistory = 300;
 
         /// <summary>
         /// Contains every joined user except the current logged in user.
         /// </summary>
         public readonly ObservableCollection<User> JoinedUsers = new ObservableCollection<User>();
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
+        private readonly List<LocalEchoMessage> pendingMessages = new List<LocalEchoMessage>();
 
         public event Action<IEnumerable<Message>> NewMessagesArrived;
         public event Action<LocalEchoMessage, Message> PendingMessageResolved;
@@ -42,8 +43,6 @@ namespace osu.Game.Online.Chat
 
         [JsonProperty(@"channel_id")]
         public long Id;
-
-        private readonly List<LocalEchoMessage> pendingMessages = new List<LocalEchoMessage>();
 
         [JsonConstructor]
         public Channel()
@@ -101,12 +100,7 @@ namespace osu.Game.Online.Chat
             }
 
             if (Messages.Contains(final))
-            {
-                // message already inserted, so let's throw away this update.
-                // we may want to handle this better in the future, but for the time being api requests are single-threaded so order is assumed.
-                MessageRemoved?.Invoke(echo);
-                return;
-            }
+                throw new InvalidOperationException("Attempted to add the same message again");
 
             Messages.Add(final);
             PendingMessageResolved?.Invoke(echo, final);
@@ -116,8 +110,8 @@ namespace osu.Game.Online.Chat
         {
             // never purge local echos
             int messageCount = Messages.Count - pendingMessages.Count;
-            if (messageCount > MAX_HISTORY)
-                Messages.RemoveRange(0, messageCount - MAX_HISTORY);
+            if (messageCount > MaxHistory)
+                Messages.RemoveRange(0, messageCount - MaxHistory);
         }
 
 
