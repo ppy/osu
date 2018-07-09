@@ -14,7 +14,22 @@ namespace osu.Game.Online.Chat
 {
     public class Channel
     {
-        public const int MAX_HISTORY = 300;
+        public readonly int MAX_HISTORY = 300;
+
+        /// <summary>
+        /// Contains every joined user except yourself
+        /// </summary>
+        public readonly ObservableCollection<User> JoinedUsers = new ObservableCollection<User>();
+        public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
+
+        public event Action<IEnumerable<Message>> NewMessagesArrived;
+        public event Action<LocalEchoMessage, Message> PendingMessageResolved;
+        public event Action<Message> MessageRemoved;
+
+        public readonly Bindable<bool> Joined = new Bindable<bool>();
+        public TargetType Target { get; }
+        public bool ReadOnly { get; set; }
+        public override string ToString() => Name;
 
         [JsonProperty(@"name")]
         public string Name;
@@ -28,6 +43,8 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"channel_id")]
         public long Id;
 
+        private readonly List<LocalEchoMessage> pendingMessages = new List<LocalEchoMessage>();
+
         [JsonConstructor]
         public Channel()
         {
@@ -37,7 +54,7 @@ namespace osu.Game.Online.Chat
         /// Contructs a private channel
         /// TODO this class needs to be serialized from something like channels/private, instead of creating from a contructor
         /// </summary>
-        /// <param name="user">The user </param>
+        /// <param name="user">The user</param>
         public Channel(User user)
         {
             Target = TargetType.User;
@@ -46,20 +63,8 @@ namespace osu.Game.Online.Chat
             JoinedUsers.Add(user);
         }
 
-        /// <summary>
-        /// Contains every joined user except yourself
-        /// </summary>
-        public ObservableCollection<User> JoinedUsers = new ObservableCollection<User>();
-        public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
-        private readonly List<LocalEchoMessage> pendingMessages = new List<LocalEchoMessage>();
+       
 
-        public event Action<IEnumerable<Message>> NewMessagesArrived;
-        public event Action<LocalEchoMessage, Message> PendingMessageResolved;
-        public event Action<Message> MessageRemoved;
-
-        public Bindable<bool> Joined = new Bindable<bool>();
-        public TargetType Target { get; set; }
-        public bool ReadOnly { get; set; }
 
         public void AddLocalEcho(LocalEchoMessage message)
         {
@@ -118,6 +123,6 @@ namespace osu.Game.Online.Chat
                 Messages.RemoveRange(0, messageCount - MAX_HISTORY);
         }
 
-        public override string ToString() => Name;
+
     }
 }
