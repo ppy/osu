@@ -238,8 +238,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                 Nub = new Nub
                                 {
                                     Anchor = Anchor.TopLeft,
-                                    Origin = Anchor.TopLeft,
-                                    //RelativePositionAxes = Axes.X,
+                                    Origin = Anchor.TopCentre,
+                                    RelativePositionAxes = Axes.X,
                                     Size = new Vector2(NUB_SIZE_X, NUB_SIZE_Y)
                                 },
                             }
@@ -299,9 +299,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             Nub.Current.Value = true;
 
             ticks.TickClicked += a => Current.Value = a;
-
-            // Might remove since this control is not supposed to be disabled probably.
-            Current.DisabledChanged += d => Alpha = d ? 0.5f : 1;
         }
 
         [BackgroundDependencyLoader]
@@ -348,13 +345,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             return base.OnKeyUp(state, args);
         }
 
-        protected override void OnSizingChanged()
-        {
-            if (Nub != null)
-                Nub.MoveToX((UsableWidth + NUB_SIZE_X / 2) * Current.Value - NUB_SIZE_X / 2, 0);
-            base.OnSizingChanged();
-        }
-
         protected override void OnUserChange()
         {
             base.OnUserChange();
@@ -386,7 +376,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         {
             float width = UsableWidth - Padding.Right;
             // TODO: Change the way the X position is calculated for simpler calculations
-            Nub.MoveToX((width + NUB_SIZE_X / 2) * value - NUB_SIZE_X / 2, 250, Easing.OutQuint);
+            Nub.MoveToX(value, 250, Easing.OutQuint);
             leftBox.ResizeWidthTo(value, 250, Easing.OutQuint);
             rightBox.ResizeWidthTo(1 - value, 250, Easing.OutQuint);
         }
