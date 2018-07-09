@@ -112,7 +112,11 @@ namespace osu.Game.Online.Chat
             CurrentChannel.Value.AddLocalEcho(message);
 
             var req = new PostMessageRequest(message);
-            req.Failure += e => CurrentChannel.Value?.ReplaceMessage(message, null);
+            req.Failure += exception =>
+            {
+                Logger.Error(exception, "Posting message failed.");
+                CurrentChannel.Value?.ReplaceMessage(message, null);
+            };
             req.Success += m => CurrentChannel.Value?.ReplaceMessage(message, m);
             api.Queue(req);
         }
@@ -305,7 +309,6 @@ namespace osu.Game.Online.Chat
         public ChannelNotFoundException(string channelName)
             : base($"A channel with the name {channelName} could not be found.")
         {
-
         }
     }
 }
