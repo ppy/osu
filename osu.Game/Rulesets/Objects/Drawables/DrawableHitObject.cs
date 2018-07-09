@@ -33,8 +33,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual IEnumerable<SampleInfo> GetSamples() => HitObject.Samples;
 
         private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
-        public bool HasNestedHitObjects => nestedHitObjects.IsValueCreated;
-        public IReadOnlyList<DrawableHitObject> NestedHitObjects => nestedHitObjects.Value;
+        public IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : Enumerable.Empty<DrawableHitObject>();
 
         public event Action<DrawableHitObject, Judgement> OnJudgement;
         public event Action<DrawableHitObject, Judgement> OnJudgementRemoved;
@@ -50,12 +49,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been hit.
         /// </summary>
-        public bool IsHit => Judgements.Any(j => j.Final && j.IsHit) && (!HasNestedHitObjects || NestedHitObjects.All(n => n.IsHit));
+        public bool IsHit => Judgements.Any(j => j.Final && j.IsHit) && NestedHitObjects.All(n => n.IsHit);
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && (!HasNestedHitObjects || NestedHitObjects.All(h => h.AllJudged));
+        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && NestedHitObjects.All(h => h.AllJudged);
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> can be judged.
@@ -90,13 +89,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 if (HitObject.SampleControlPoint == null)
                     throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
                                                                                           + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
-                AddInternal(Samples = new SkinnableSound(samples.Select(s => new SampleInfo
-                {
-                    Bank = s.Bank ?? HitObject.SampleControlPoint.SampleBank,
-                    Name = s.Name,
-                    Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume,
-                    Namespace = SampleNamespace
-                }).ToArray()));
+
+                samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).ToArray();
+                foreach (var s in samples)
+                    s.Namespace = SampleNamespace;
+
+                AddInternal(Samples = new SkinnableSound(samples));
             }
         }
 
@@ -206,9 +204,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
             if (AllJudged)
                 return false;
 
-            if (HasNestedHitObjects)
-                foreach (var d in NestedHitObjects)
-                    judgementOccurred |= d.UpdateJudgement(userTriggered);
+            foreach (var d in NestedHitObjects)
+                judgementOccurred |= d.UpdateJudgement(userTriggered);
 
             if (!ProvidesJudgement || judgementFinalized || judgementOccurred)
                 return judgementOccurred;

@@ -11,17 +11,16 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Bindings;
+using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Input.Bindings;
 using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
-    public class VolumeMeter : Container, IKeyBindingHandler<GlobalAction>
+    public class VolumeMeter : Container
     {
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
@@ -225,41 +224,38 @@ namespace osu.Game.Overlays.Volume
 
         private const float adjust_step = 0.05f;
 
-        public void Increase() => adjust(1);
-        public void Decrease() => adjust(-1);
+        public void Increase(double amount = 1, bool isPrecise = false) => adjust(amount, isPrecise);
+        public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
 
-        private void adjust(int direction)
+        // because volume precision is set to 0.01, this local is required to keep track of more precise adjustments and only apply when possible.
+        private double adjustAccumulator;
+
+        private void adjust(double delta, bool isPrecise)
         {
-            float amount = adjust_step * direction;
-
-            var mouse = GetContainingInputManager().CurrentState.Mouse;
-            if (mouse.HasPreciseScroll)
-            {
-                float scrollDelta = mouse.ScrollDelta.Y;
-                if (scrollDelta != 0)
-                    amount *= Math.Abs(scrollDelta / 10);
-            }
-
-            Volume += amount;
+            adjustAccumulator += delta * adjust_step * (isPrecise ? 0.1 : 1);
+            if (Math.Abs(adjustAccumulator) < Bindable.Precision)
+                return;
+            Volume += adjustAccumulator;
+            adjustAccumulator = 0;
         }
 
-        public bool OnPressed(GlobalAction action)
+        protected override bool OnScroll(InputState state)
         {
-            if (!IsHovered) return false;
+            adjust(state.Mouse.ScrollDelta.Y, state.Mouse.HasPreciseScroll);
+            return true;
+        }
 
-            switch (action)
-            {
-                case GlobalAction.DecreaseVolume:
-                    Decrease();
-                    return true;
-                case GlobalAction.IncreaseVolume:
-                    Increase();
-                    return true;
-            }
+        private const float transition_length = 500;
 
+        protected override bool OnHover(InputState state)
+        {
+            this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
             return false;
         }
 
-        public bool OnReleased(GlobalAction action) => false;
+        protected override void OnHoverLost(InputState state)
+        {
+            this.ScaleTo(1f, transition_length, Easing.OutExpo);
+        }
     }
 }

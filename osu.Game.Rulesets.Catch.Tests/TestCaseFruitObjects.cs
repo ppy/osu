@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         private DrawableFruit createDrawable(int index)
         {
             Fruit fruit = index == 5
-                ? new BananaShower.Banana
+                ? new Banana
                 {
                     StartTime = 1000000000000,
                     IndexInBeatmap = index,

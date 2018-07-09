@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Select
         private readonly Box box;
         private readonly Box light;
 
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => box.ReceiveMouseInputAt(screenSpacePos);
+
         public FooterButton()
         {
             Children = new Drawable[]

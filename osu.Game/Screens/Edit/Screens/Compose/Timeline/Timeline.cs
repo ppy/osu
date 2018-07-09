@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Audio;
 using osu.Framework.Input;
@@ -25,36 +26,46 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             ZoomDuration = 200;
             ZoomEasing = Easing.OutQuint;
             Zoom = 10;
+            ScrollbarVisible = false;
         }
 
         private WaveformGraph waveform;
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, IAdjustableClock adjustableClock)
+        private void load(IBindableBeatmap beatmap, IAdjustableClock adjustableClock, OsuColour colours)
         {
             this.adjustableClock = adjustableClock;
 
             Child = waveform = new WaveformGraph
             {
                 RelativeSizeAxes = Axes.Both,
-                Colour = OsuColour.FromHex("222"),
+                Colour = colours.Blue.Opacity(0.2f),
+                LowColour = colours.BlueLighter,
+                MidColour = colours.BlueDark,
+                HighColour = colours.BlueDarker,
                 Depth = float.MaxValue
             };
+
+            // We don't want the centre marker to scroll
+            AddInternal(new CentreMarker());
 
             WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
 
             Beatmap.BindTo(beatmap);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            Beatmap.BindValueChanged(b => waveform.Waveform = b.Waveform);
-            waveform.Waveform = Beatmap.Value.Waveform;
+            Beatmap.BindValueChanged(b =>
+            {
+                waveform.Waveform = b.Waveform;
+                track = b.Track;
+            }, true);
         }
 
         /// <summary>
-        /// The track's time in the previous frame.
+        /// The timeline's scroll position in the last frame.
+        /// </summary>
+        private float lastScrollPosition;
+
+        /// <summary>
+        /// The track time in the last frame.
         /// </summary>
         private double lastTrackTime;
 
@@ -68,6 +79,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
         /// </summary>
         private bool trackWasPlaying;
 
+        private Track track;
+
         protected override void Update()
         {
             base.Update();
@@ -75,49 +88,48 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             // The extrema of track time should be positioned at the centre of the container when scrolled to the start or end
             Content.Margin = new MarginPadding { Horizontal = DrawWidth / 2 };
 
-            if (handlingDragInput)
-            {
-                // The user is dragging - the track should always follow the timeline
-                seekTrackToCurrent();
-            }
-            else if (adjustableClock.IsRunning)
-            {
-                // If the user hasn't provided mouse input but the track is running, always follow the track
+            // This needs to happen after transforms are updated, but before the scroll position is updated in base.UpdateAfterChildren
+            if (adjustableClock.IsRunning)
                 scrollToTrackTime();
-            }
-            else
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            if (handlingDragInput)
+                seekTrackToCurrent();
+            else if (!adjustableClock.IsRunning)
             {
-                // The track isn't playing, so we want to smooth-scroll once more, and re-enable wheel scrolling
-                // There are two cases we have to be wary of:
-                // 1) The user scrolls on this timeline: We want the track to follow us
+                // The track isn't running. There are two cases we have to be wary of:
+                // 1) The user flick-drags on this timeline: We want the track to follow us
                 // 2) The user changes the track time through some other means (scrolling in the editor or overview timeline): We want to follow the track time
 
-                // The simplest way to cover both cases is by checking that inter-frame track times are identical
-                if (adjustableClock.CurrentTime == lastTrackTime)
-                {
-                    // The track hasn't been seeked externally
+                // The simplest way to cover both cases is by checking whether the scroll position has changed and the audio hasn't been changed externally
+                if (Current != lastScrollPosition && adjustableClock.CurrentTime == lastTrackTime)
                     seekTrackToCurrent();
-                }
                 else
-                {
-                    // The track has been seeked externally
                     scrollToTrackTime();
-                }
             }
 
+            lastScrollPosition = Current;
             lastTrackTime = adjustableClock.CurrentTime;
+        }
 
-            void seekTrackToCurrent()
-            {
-                if (!(Beatmap.Value.Track is TrackVirtual))
-                    adjustableClock.Seek(Current / Content.DrawWidth * Beatmap.Value.Track.Length);
-            }
+        private void seekTrackToCurrent()
+        {
+            if (!track.IsLoaded)
+                return;
 
-            void scrollToTrackTime()
-            {
-                if (!(Beatmap.Value.Track is TrackVirtual))
-                    ScrollTo((float)(adjustableClock.CurrentTime / Beatmap.Value.Track.Length) * Content.DrawWidth, false);
-            }
+            adjustableClock.Seek(Current / Content.DrawWidth * track.Length);
+        }
+
+        private void scrollToTrackTime()
+        {
+            if (!track.IsLoaded)
+                return;
+
+            ScrollTo((float)(adjustableClock.CurrentTime / track.Length) * Content.DrawWidth, false);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -149,36 +161,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             handlingDragInput = false;
             if (trackWasPlaying)
                 adjustableClock.Start();
-        }
-
-        protected override ScrollbarContainer CreateScrollbar(Direction direction) => new TimelineScrollbar(this, direction);
-
-        private class TimelineScrollbar : ScrollbarContainer
-        {
-            private readonly Timeline timeline;
-
-            public TimelineScrollbar(Timeline timeline, Direction scrollDir)
-                : base(scrollDir)
-            {
-                this.timeline = timeline;
-            }
-
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-            {
-                if (base.OnMouseDown(state, args))
-                {
-                    timeline.beginUserDrag();
-                    return true;
-                }
-
-                return false;
-            }
-
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-            {
-                timeline.endUserDrag();
-                return base.OnMouseUp(state, args);
-            }
         }
     }
 }
