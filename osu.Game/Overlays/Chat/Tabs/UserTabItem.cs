@@ -17,7 +17,7 @@ using osu.Game.Users;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Overlays.Chat
+namespace osu.Game.Overlays.Chat.Tabs
 {
     public class UserTabItem : TabItem<Channel>
     {
@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Chat
         private readonly Box backgroundBox;
         private readonly OsuSpriteText username;
         private readonly Avatar avatarContainer;
-        private readonly ChatTabItemCloseButton closeButton;
+        private readonly TabCloseButton closeButton;
 
         public UserTabItem(Channel value)
             : base(value)
@@ -138,7 +138,7 @@ namespace osu.Game.Overlays.Chat
                                 TextSize = 18,
                                 Alpha = 0,
                             },
-                            closeButton = new ChatTabItemCloseButton
+                            closeButton = new TabCloseButton
                             {
                                 Height = 1,
                                 Origin = Anchor.BottomLeft,

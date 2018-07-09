@@ -19,6 +19,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
+using osu.Game.Overlays.Chat.Selection;
 
 namespace osu.Game.Overlays
 {
