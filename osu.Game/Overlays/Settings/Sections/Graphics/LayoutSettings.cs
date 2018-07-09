@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private List<KeyValuePair<string, int>> getResolutions()
         {
-            var availableDisplayResolutions = (game.Window as DesktopGameWindow)?.AvailableDisplayResolutions
+            var availableDisplayResolutions = (game.Window as DesktopGameWindow)?.GetCurrentDisplay().AvailableResolutions
                                                                                 .Where(r => r.Width >= 800 && r.Height >= 600)
                                                                                 .OrderByDescending(r => r.Width).ThenByDescending(r => r.Height);
 
