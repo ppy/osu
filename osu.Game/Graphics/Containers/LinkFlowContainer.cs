@@ -84,7 +84,7 @@ namespace osu.Game.Graphics.Containers
                             {
                                 channelManager.OpenChannel(linkArgument);
                             }
-                            catch (ArgumentException)
+                            catch (ChannelNotFoundException)
                             {
                                 //channel was not found
                             }

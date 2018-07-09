@@ -60,7 +60,7 @@ namespace osu.Game.Online.Chat
                 throw new ArgumentNullException(nameof(name));
 
             CurrentChannel.Value = AvailableChannels.FirstOrDefault(c => c.Name == name)
-                                   ?? throw new ArgumentException($"Channel {name} was not found.");
+                                   ?? throw new ChannelNotFoundException(name);
         }
 
         public void OpenUserChannel(User user)
@@ -296,6 +296,16 @@ namespace osu.Game.Online.Chat
         {
             this.api = api;
             api.Register(this);
+        }
+    }
+
+
+    public class ChannelNotFoundException : Exception
+    {
+        public ChannelNotFoundException(string channelName)
+            : base($"A channel with the name {channelName} could not be found.")
+        {
+
         }
     }
 }
