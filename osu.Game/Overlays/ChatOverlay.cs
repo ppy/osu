@@ -29,8 +29,8 @@ namespace osu.Game.Overlays
 
         private ChannelManager channelManager;
 
-        private readonly Container<DrawableChat> currentChatContainer;
-        private readonly List<DrawableChat> loadedChannels = new List<DrawableChat>();
+        private readonly Container<DrawableChannel> currentChatContainer;
+        private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
         private readonly LoadingAnimation loading;
 
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                currentChatContainer = new Container<DrawableChat>
+                                currentChatContainer = new Container<DrawableChannel>
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Padding = new MarginPadding
@@ -240,7 +240,7 @@ namespace osu.Game.Overlays
                 currentChatContainer.FadeOut(500, Easing.OutQuint);
                 loading.Show();
 
-                loaded = new DrawableChat(chat);
+                loaded = new DrawableChannel(chat);
                 loadedChannels.Add(loaded);
                 LoadComponentAsync(loaded, l =>
                 {
