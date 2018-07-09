@@ -102,8 +102,6 @@ namespace osu.Game.Overlays.BeatmapSet
             updateDisplay();
         }
 
-        public void StopPreview() => preview.Playing.Value = false;
-
         private class DetailBox : Container
         {
             private readonly Container content;

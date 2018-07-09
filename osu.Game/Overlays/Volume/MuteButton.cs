@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Volume
         protected override bool OnHover(InputState state)
         {
             this.TransformTo<MuteButton, SRGBColour>("BorderColour", hoveredColour, 500, Easing.OutQuint);
-            return true;
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)

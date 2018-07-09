@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -16,7 +17,9 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
@@ -62,7 +65,10 @@ namespace osu.Game.Screens.Select
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
 
+        protected new readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+
         private DependencyContainer dependencies;
+
         protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
@@ -123,7 +129,7 @@ namespace osu.Game.Screens.Select
                                 Size = new Vector2(carousel_width, 1),
                                 Anchor = Anchor.CentreRight,
                                 Origin = Anchor.CentreRight,
-                                SelectionChanged = carouselSelectionChanged,
+                                SelectionChanged = updateSelectedBeatmap,
                                 BeatmapSetsChanged = carouselBeatmapsLoaded,
                             },
                             FilterControl = new FilterControl
@@ -177,9 +183,13 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuGame osu, OsuColour colours)
+        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours)
         {
             dependencies.CacheAs(this);
+            dependencies.CacheAs(Ruleset);
+            dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
+
+            base.Ruleset.ValueChanged += r => updateSelectedBeatmap(beatmapNoDebounce);
 
             if (Footer != null)
             {
@@ -191,9 +201,6 @@ namespace osu.Game.Screens.Select
 
             if (this.beatmaps == null)
                 this.beatmaps = beatmaps;
-
-            if (osu != null)
-                Ruleset.BindTo(osu.Ruleset);
 
             this.beatmaps.ItemAdded += onBeatmapSetAdded;
             this.beatmaps.ItemRemoved += onBeatmapSetRemoved;
@@ -250,9 +257,6 @@ namespace osu.Game.Screens.Select
 
         private ScheduledDelegate selectionChangedDebounce;
 
-        // We need to keep track of the last selected beatmap ignoring debounce to play the correct selection sounds.
-        private BeatmapInfo beatmapNoDebounce;
-
         private void workingBeatmapChanged(WorkingBeatmap beatmap)
         {
             if (beatmap is DummyWorkingBeatmap) return;
@@ -266,11 +270,17 @@ namespace osu.Game.Screens.Select
                 }
         }
 
+        // We need to keep track of the last selected beatmap ignoring debounce to play the correct selection sounds.
+        private BeatmapInfo beatmapNoDebounce;
+        private RulesetInfo rulesetNoDebounce;
+
         /// <summary>
-        /// selection has been changed as the result of interaction with the carousel.
+        /// selection has been changed as the result of a user interaction.
         /// </summary>
-        private void carouselSelectionChanged(BeatmapInfo beatmap)
+        private void updateSelectedBeatmap(BeatmapInfo beatmap)
         {
+            var ruleset = base.Ruleset.Value;
+
             void performLoad()
             {
                 // We may be arriving here due to another component changing the bindable Beatmap.
@@ -283,15 +293,18 @@ namespace osu.Game.Screens.Select
                     ensurePlayingSelected(preview);
                 }
 
+                Ruleset.Value = ruleset;
+
                 UpdateBeatmap(Beatmap.Value);
             }
 
-            if (beatmap?.Equals(beatmapNoDebounce) == true)
+            if (beatmap?.Equals(beatmapNoDebounce) == true && ruleset?.Equals(rulesetNoDebounce) == true)
                 return;
 
             selectionChangedDebounce?.Cancel();
 
             beatmapNoDebounce = beatmap;
+            rulesetNoDebounce = ruleset;
 
             if (beatmap == null)
                 performLoad();
@@ -453,14 +466,15 @@ namespace osu.Game.Screens.Select
 
         private void carouselBeatmapsLoaded()
         {
-            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false && Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
+            if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false
+                && Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
                 return;
 
             if (Carousel.SelectedBeatmapSet == null && !Carousel.SelectNextRandom())
             {
                 // in the case random selection failed, we want to trigger selectionChanged
                 // to show the dummy beatmap (we have nothing else to display).
-                carouselSelectionChanged(null);
+                updateSelectedBeatmap(null);
             }
         }
 
@@ -470,16 +484,26 @@ namespace osu.Game.Screens.Select
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
+        public override bool OnPressed(GlobalAction action)
+        {
+            if (!IsCurrentScreen) return false;
+
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    FinaliseSelection();
+                    return true;
+            }
+
+            return base.OnPressed(action);
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat) return false;
 
             switch (args.Key)
             {
-                case Key.KeypadEnter:
-                case Key.Enter:
-                    FinaliseSelection();
-                    return true;
                 case Key.Delete:
                     if (state.Keyboard.ShiftPressed)
                     {
