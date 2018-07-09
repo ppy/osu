@@ -8,13 +8,13 @@ using osu.Game.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Overlays.Chat
+namespace osu.Game.Overlays.Chat.Tabs
 {
-    public class ChatTabItemCloseButton : OsuClickableContainer
+    public class TabCloseButton : OsuClickableContainer
     {
         private readonly SpriteIcon icon;
 
-        public ChatTabItemCloseButton()
+        public TabCloseButton()
         {
             Size = new Vector2(20);
 

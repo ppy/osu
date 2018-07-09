@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 
-namespace osu.Game.Overlays.Chat
+namespace osu.Game.Overlays.Chat.Selection
 {
     public class ChannelSection : Container, IHasFilterableChildren
     {

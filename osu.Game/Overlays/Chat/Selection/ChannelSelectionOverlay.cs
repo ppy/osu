@@ -18,7 +18,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osu.Game.Graphics.Containers;
 
-namespace osu.Game.Overlays.Chat
+namespace osu.Game.Overlays.Chat.Selection
 {
     public class ChannelSelectionOverlay : OsuFocusedOverlayContainer
     {
