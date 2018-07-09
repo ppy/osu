@@ -212,7 +212,7 @@ namespace osu.Game.Overlays
                     foreach (Channel removedChannel in args.OldItems)
                     {
                         chatTabControl.RemoveItem(removedChannel);
-                        loadedChannels.Remove(loadedChannels.Find(c => c.Chat == removedChannel ));
+                        loadedChannels.Remove(loadedChannels.Find(c => c.Channel == removedChannel ));
                         removedChannel.Joined.Value = false;
                     }
                     break;
@@ -234,7 +234,7 @@ namespace osu.Game.Overlays
             if (chatTabControl.Current.Value != chat)
                 Scheduler.Add(() => chatTabControl.Current.Value = chat);
 
-            var loaded = loadedChannels.Find(d => d.Chat == chat);
+            var loaded = loadedChannels.Find(d => d.Channel == chat);
             if (loaded == null)
             {
                 currentChatContainer.FadeOut(500, Easing.OutQuint);
