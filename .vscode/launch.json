@@ -41,7 +41,7 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1/osu!.dll",
+                "${workspaceRoot}/osu.Desktop/bin/Debug/netcoreapp2.1/osu!.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Debug)",
@@ -58,7 +58,7 @@
             "request": "launch",
             "program": "dotnet",
             "args": [
-                "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.1/osu!.dll",
+                "${workspaceRoot}/osu.Desktop/bin/Release/netcoreapp2.1/osu!.dll"
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Build osu! (Release)",

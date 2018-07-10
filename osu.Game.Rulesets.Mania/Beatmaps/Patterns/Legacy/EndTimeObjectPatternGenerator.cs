@@ -24,7 +24,12 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             endTime = endtimeData?.EndTime ?? 0;
         }
 
-        public override Pattern Generate()
+        public override IEnumerable<Pattern> Generate()
+        {
+            yield return generate();
+        }
+
+        private Pattern generate()
         {
             var pattern = new Pattern();
 
