@@ -92,7 +92,7 @@ namespace osu.Game.Beatmaps
                 // by setting the model here, we can update the noline set id below.
                 b.BeatmapSet = model;
 
-                fetchAndPopulateOnlineIDs(b);
+                fetchAndPopulateOnlineIDs(b, model.Beatmaps);
             }
 
             // check if a set already exists with the same online id, delete if it does.
@@ -396,9 +396,10 @@ namespace osu.Game.Beatmaps
         /// Query the API to populate mising OnlineBeatmapID / OnlineBeatmapSetID properties.
         /// </summary>
         /// <param name="beatmap">The beatmap to populate.</param>
+        /// <param name="otherBeatmaps">The other beatmaps contained within this set.</param>
         /// <param name="force">Whether to re-query if the provided beatmap already has populated values.</param>
         /// <returns>True if population was successful.</returns>
-        private bool fetchAndPopulateOnlineIDs(BeatmapInfo beatmap, bool force = false)
+        private bool fetchAndPopulateOnlineIDs(BeatmapInfo beatmap, IEnumerable<BeatmapInfo> otherBeatmaps, bool force = false)
         {
             if (!force && beatmap.OnlineBeatmapID != null && beatmap.BeatmapSet.OnlineBeatmapSetID != null)
                 return true;
@@ -417,6 +418,12 @@ namespace osu.Game.Beatmaps
                 var res = req.Result;
 
                 Logger.Log($"Successfully mapped to {res.OnlineBeatmapSetID} / {res.OnlineBeatmapID}.", LoggingTarget.Database);
+
+                if (otherBeatmaps.Any(b => b.OnlineBeatmapID == res.OnlineBeatmapID))
+                {
+                    Logger.Log("Another beatmap in the same set already mapped to this ID. We'll skip adding it this time.", LoggingTarget.Database);
+                    return false;
+                }
 
                 beatmap.BeatmapSet.OnlineBeatmapSetID = res.OnlineBeatmapSetID;
                 beatmap.OnlineBeatmapID = res.OnlineBeatmapID;
