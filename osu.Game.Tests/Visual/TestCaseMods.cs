@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Visual
             testMultiplierTextColour(noFailMod, modSelect.LowMultiplierColour);
             testMultiplierTextColour(hiddenMod, modSelect.HighMultiplierColour);
 
-            testUnimplmentedMod(autoPilotMod);
+            testUnimplementedMod(autoPilotMod);
         }
 
         private void testManiaMods(ManiaRuleset ruleset)
@@ -154,7 +154,7 @@ namespace osu.Game.Tests.Visual
                 checkNotSelected(mod);
         }
 
-        private void testUnimplmentedMod(Mod mod)
+        private void testUnimplementedMod(Mod mod)
         {
             selectNext(mod);
             checkNotSelected(mod);
