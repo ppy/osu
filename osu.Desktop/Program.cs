@@ -21,7 +21,7 @@ namespace osu.Desktop
             // required to initialise native SQLite libraries on some platforms.
 
             if (!RuntimeInfo.IsMono)
-                useMulticoreJit();
+                useMultiCoreJit();
 
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
@@ -54,7 +54,7 @@ namespace osu.Desktop
             }
         }
 
-        private static void useMulticoreJit()
+        private static void useMultiCoreJit()
         {
 #if NET_FRAMEWORK
             var directory = Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Profiles"));
