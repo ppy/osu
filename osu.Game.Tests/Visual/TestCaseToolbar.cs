@@ -16,8 +16,8 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(ToolbarButton),
-            typeof(ToolbarModeSelector),
-            typeof(ToolbarModeButton),
+            typeof(ToolbarRulesetSelector),
+            typeof(ToolbarRulesetButton),
             typeof(ToolbarNotificationButton),
         };
 
