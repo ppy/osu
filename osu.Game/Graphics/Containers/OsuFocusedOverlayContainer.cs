@@ -67,7 +67,7 @@ namespace osu.Game.Graphics.Containers
             return base.OnClick(state);
         }
 
-        public bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(GlobalAction action)
         {
             if (action == GlobalAction.Back)
             {
