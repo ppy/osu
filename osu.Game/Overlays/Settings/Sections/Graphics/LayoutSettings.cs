@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Platform;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
@@ -126,9 +125,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private List<KeyValuePair<string, int>> getResolutions()
         {
-            var availableDisplayResolutions = (game.Window as DesktopGameWindow)?.GetCurrentDisplay().AvailableResolutions
-                                                                                .Where(r => r.Width >= 800 && r.Height >= 600)
-                                                                                .OrderByDescending(r => r.Width).ThenByDescending(r => r.Height);
+            var availableDisplayResolutions = game.Window?.GetCurrentDisplay().AvailableResolutions
+                                                  .Where(r => r.Width >= 800 && r.Height >= 600)
+                                                  .OrderByDescending(r => r.Width).ThenByDescending(r => r.Height);
 
             if (availableDisplayResolutions == null)
                 return new List<KeyValuePair<string, int>>();
