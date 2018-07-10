@@ -46,16 +46,17 @@ namespace osu.Game.Audio
         {
             get
             {
-                if (!string.IsNullOrEmpty(Suffix))
+                if (!string.IsNullOrEmpty(Namespace))
                 {
-                    if (!string.IsNullOrEmpty(Namespace))
+                    if (!string.IsNullOrEmpty(Suffix))
                         yield return $"{Namespace}/{Bank}-{Name}{Suffix}";
-                    yield return $"{Bank}-{Name}{Suffix}"; // Without namespace as a fallback even when we have a namespace
+                    yield return $"{Namespace}/{Bank}-{Name}";
                 }
 
-                if (!string.IsNullOrEmpty(Namespace))
-                    yield return $"{Namespace}/{Bank}-{Name}";
-                yield return $"{Bank}-{Name}"; // Without namespace as a fallback even when we have a namespace
+                // check non-namespace as a fallback even when we have a namespace
+                if (!string.IsNullOrEmpty(Suffix))
+                    yield return $"{Bank}-{Name}{Suffix}";
+                yield return $"{Bank}-{Name}";
             }
         }
 
