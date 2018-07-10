@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Menu
                             OnChart = delegate { Push(new ChartListing()); },
                             OnDirect = delegate { Push(new OnlineListing()); },
                             OnEdit = delegate { Push(new Editor()); },
-                            OnSolo = delegate { Push(consumeSongSelect()); },
+                            OnSolo = onSolo,
                             OnMulti = delegate { Push(new Multiplayer()); },
                             OnExit = Exit,
                         }
@@ -84,6 +84,10 @@ namespace osu.Game.Screens.Menu
             if (songSelect == null)
                 LoadComponentAsync(songSelect = new PlaySongSelect());
         }
+
+        public void LoadToSolo() => Schedule(onSolo);
+
+        private void onSolo() => Push(consumeSongSelect());
 
         private Screen consumeSongSelect()
         {
