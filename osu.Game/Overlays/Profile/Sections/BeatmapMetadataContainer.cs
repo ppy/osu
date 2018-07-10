@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Profile.Sections
             Action = () =>
             {
                 if (beatmap.OnlineBeatmapID != null)
-                    beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmap.OnlineBeatmapID.Value);
+                    beatmapSetOverlay?.FetchAndShowBeatmap(beatmap.OnlineBeatmapID.Value);
                 else if (beatmap.BeatmapSet?.OnlineBeatmapSetID != null)
                     beatmapSetOverlay?.FetchAndShowBeatmapSet(beatmap.BeatmapSet.OnlineBeatmapSetID.Value);
             };
