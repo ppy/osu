@@ -91,10 +91,6 @@ namespace osu.Desktop.Overlays
                     }
                 }
             };
-
-#if NET_FRAMEWORK
-            Add(new SquirrelUpdateManager());
-#endif
         }
 
         protected override void LoadComplete()
