@@ -71,6 +71,7 @@ namespace osu.Game.Screens.Play
         private APIAccess api;
 
         private SampleChannel sampleRestart;
+        private SampleChannel sampleExit;
 
         protected ScoreProcessor ScoreProcessor;
         protected RulesetContainer RulesetContainer;
@@ -93,6 +94,7 @@ namespace osu.Game.Screens.Play
                 return;
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
+            sampleExit = audio.Sample.Get(@"UI/screen-back");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
@@ -224,6 +226,17 @@ namespace osu.Game.Screens.Play
                         RulesetContainer?.Hide();
                         Restart();
                     },
+                },
+                new QuickExit
+                {
+                    Action = () =>
+                    {
+                        if (!IsCurrentScreen) return;
+
+                        sampleExit?.Play();
+                        ValidForResume = false;
+                        Exit();
+                    }
                 }
             };
 
