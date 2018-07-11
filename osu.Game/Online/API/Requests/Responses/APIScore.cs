@@ -63,7 +63,14 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"beatmapset")]
         private BeatmapMetadata metadata
         {
-            set => Beatmap.Metadata = value;
+            set
+            {
+                // extract the set ID to its correct place.
+                Beatmap.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = value.ID };
+                value.ID = 0;
+
+                Beatmap.Metadata = value;
+            }
         }
 
         [JsonProperty(@"statistics")]
