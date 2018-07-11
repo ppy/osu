@@ -24,9 +24,9 @@ namespace osu.Game.Screens.Menu
     {
         private readonly ButtonSystem buttons;
 
-        protected override bool HideOverlaysOnEnter => buttons.State == MenuState.Initial;
+        protected override bool HideOverlaysOnEnter => buttons.State == ButtonSystemState.Initial;
 
-        protected override bool AllowBackButton => buttons.State != MenuState.Initial;
+        protected override bool AllowBackButton => buttons.State != ButtonSystemState.Initial;
 
         private readonly BackgroundScreenDefault background;
         private Screen songSelect;
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Menu
 
             if (resuming)
             {
-                buttons.State = MenuState.TopLevel;
+                buttons.State = ButtonSystemState.TopLevel;
 
                 const float length = 300;
 
@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Menu
 
             const float length = 400;
 
-            buttons.State = MenuState.EnteringMode;
+            buttons.State = ButtonSystemState.EnteringMode;
 
             Content.FadeOut(length, Easing.InSine);
             Content.MoveTo(new Vector2(-800, 0), length, Easing.InSine);
@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnExiting(Screen next)
         {
-            buttons.State = MenuState.Exit;
+            buttons.State = ButtonSystemState.Exit;
             Content.FadeOut(3000);
             return base.OnExiting(next);
         }
