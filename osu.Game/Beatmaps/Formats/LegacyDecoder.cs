@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Logging;
+using osu.Game.Audio;
+using osu.Game.Beatmaps.ControlPoints;
 using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
@@ -166,6 +168,26 @@ namespace osu.Game.Beatmaps.Formats
             Fail = 1,
             Pass = 2,
             Foreground = 3
+        }
+
+        internal class LegacySampleControlPoint : SampleControlPoint
+        {
+            public int CustomSampleBank;
+
+            public override SampleInfo ApplyTo(SampleInfo sampleInfo)
+            {
+                var baseInfo = base.ApplyTo(sampleInfo);
+
+                if (CustomSampleBank > 1)
+                    baseInfo.Suffix = CustomSampleBank.ToString();
+
+                return baseInfo;
+            }
+
+            public override bool EquivalentTo(ControlPoint other)
+                => base.EquivalentTo(other)
+                   && other is LegacySampleControlPoint legacy
+                   && CustomSampleBank == legacy.CustomSampleBank;
         }
     }
 }
