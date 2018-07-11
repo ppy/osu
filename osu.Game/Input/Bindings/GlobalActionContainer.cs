@@ -84,8 +84,6 @@ namespace osu.Game.Input.Bindings
         SkipCutscene,
         [Description("Quick Retry (Hold)")]
         QuickRetry,
-        [Description("Quick Exit (Hold)")]
-        QuickExit,
 
         [Description("Take screenshot")]
         TakeScreenshot,
@@ -103,5 +101,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("Select")]
         Select,
+
+        [Description("Quick Exit (Hold)")]
+        QuickExit,
     }
 }
