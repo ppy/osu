@@ -80,9 +80,9 @@ namespace osu.Game.Rulesets.Mania.UI
 
         private DependencyContainer dependencies;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
             dependencies.CacheAs<IScrollingInfo>(scrollingInfo = new ScrollingInfo());
             return dependencies;
         }
