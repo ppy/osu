@@ -70,11 +70,11 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(ManiaConfigManager config)
+        private void load()
         {
             BarLines.ForEach(Playfield.Add);
 
-            config.BindWith(ManiaSetting.ScrollDirection, configDirection);
+            ((ManiaConfigManager)Config).BindWith(ManiaSetting.ScrollDirection, configDirection);
             configDirection.BindValueChanged(d => scrollingInfo.Direction.Value = (ScrollingDirection)d, true);
         }
 

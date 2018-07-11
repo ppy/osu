@@ -70,7 +70,8 @@ namespace osu.Game.Rulesets.UI
 
         protected readonly Ruleset Ruleset;
 
-        private IRulesetConfigManager rulesetConfig;
+        protected IRulesetConfigManager Config { get; private set; }
+
         private OnScreenDisplay onScreenDisplay;
 
         /// <summary>
@@ -91,11 +92,11 @@ namespace osu.Game.Rulesets.UI
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
-            rulesetConfig = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
-            if (rulesetConfig != null)
+            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+            if (Config != null)
             {
-                dependencies.Cache(rulesetConfig);
-                onScreenDisplay?.BeginTracking(this, rulesetConfig);
+                dependencies.Cache(Config);
+                onScreenDisplay?.BeginTracking(this, Config);
             }
 
             return dependencies;
@@ -143,10 +144,10 @@ namespace osu.Game.Rulesets.UI
         {
             base.Dispose(isDisposing);
 
-            if (rulesetConfig != null)
+            if (Config != null)
             {
-                onScreenDisplay?.StopTracking(this, rulesetConfig);
-                rulesetConfig = null;
+                onScreenDisplay?.StopTracking(this, Config);
+                Config = null;
             }
         }
     }
