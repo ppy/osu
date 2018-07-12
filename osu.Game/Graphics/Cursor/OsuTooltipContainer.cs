@@ -33,14 +33,15 @@ namespace osu.Game.Graphics.Cursor
                 {
                     if (value == text.Text) return;
 
-                    text.Text = value;
-                    if (IsPresent)
+                    if (IsPresent && string.IsNullOrEmpty(text.Text) && string.IsNullOrEmpty(value))
                     {
                         AutoSizeDuration = 250;
                         background.FlashColour(OsuColour.Gray(0.4f), 1000, Easing.OutQuint);
                     }
                     else
                         AutoSizeDuration = 0;
+
+                    text.Text = value;
                 }
             }
 
@@ -70,6 +71,7 @@ namespace osu.Game.Graphics.Cursor
                         TextSize = text_size,
                         Padding = new MarginPadding(5),
                         Font = @"Exo2.0-Regular",
+                        Text = " ",
                     }
                 };
             }
