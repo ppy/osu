@@ -395,6 +395,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         private class Ticks : Container
         {
+            private bool canCreateTicks;
+
             public event Action<float> TickClicked;
 
             private float min;
@@ -404,7 +406,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 set
                 {
                     min = value;
-                    createTicks();
+                    if (canCreateTicks)
+                        createTicks();
                 }
             }
 
@@ -415,7 +418,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 set
                 {
                     max = value;
-                    createTicks();
+                    if (canCreateTicks)
+                        createTicks();
                 }
             }
 
@@ -426,7 +430,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 set
                 {
                     interval = value;
-                    createTicks();
+                    if (canCreateTicks)
+                        createTicks();
                 }
             }
 
@@ -439,7 +444,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 Anchor = Anchor.TopCentre;
                 Origin = Anchor.TopCentre;
                 RelativeSizeAxes = Axes.X;
-                
+
+                canCreateTicks = true;
                 createTicks();
             }
 
