@@ -27,6 +27,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public event Action<Color4> SelectedColourChanged;
 
+        public void TriggerSelectedColourChanged(Color4 newValue)
+        {
+            SelectedColourChanged?.Invoke(newValue);
+        }
+
         private Color4 activeColour;
         public Color4 ActiveColour
         {
@@ -131,11 +136,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             float s = x / SIZE_X;
             float v = (SIZE_Y - y) / SIZE_Y;
             return Color4.FromHsv(new Vector4(ActiveHue, s, v, 1));
-        }
-
-        public void TriggerSelectedColourChanged(Color4 newValue)
-        {
-            SelectedColourChanged?.Invoke(newValue);
         }
 
         private Vector2 selectedColourPosition = new Vector2(0);

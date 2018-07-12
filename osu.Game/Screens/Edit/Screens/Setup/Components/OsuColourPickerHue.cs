@@ -21,6 +21,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public event Action<Color4> HueChanged;
 
+        public void TriggerHueChanged(Color4 newValue)
+        {
+            HueChanged?.Invoke(newValue);
+        }
+
         public float Hue
         {
             get => Color4.ToHsv(Current.Value).X;
@@ -66,11 +71,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         }
 
         private Color4 calculateColour(float x) => Color4.FromHsv(new Vector4(x / SIZE_X, 1, 1, 1));
-
-        public void TriggerHueChanged(Color4 newValue)
-        {
-            HueChanged?.Invoke(newValue);
-        }
 
         private float selectedColourXPosition;
 

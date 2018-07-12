@@ -30,6 +30,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public event Action<Color4> ColourChanged;
 
+        public void TriggerColourChanged(Color4 newValue)
+        {
+            ColourChanged?.Invoke(newValue);
+        }
+
         public OsuColourPicker()
         {
             SetupOsuTextBox colourText;
@@ -186,11 +191,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         {
             this.ResizeHeightTo(OsuColourButton.SIZE_Y, 500, Easing.OutQuint);
             this.ResizeWidthTo(0, 500, Easing.OutQuint);
-        }
-
-        public void TriggerColourChanged(Color4 newValue)
-        {
-            ColourChanged?.Invoke(newValue);
         }
 
         public Bindable<Color4> Current { get; } = new Bindable<Color4>();

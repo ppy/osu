@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         {
             set => dropdown.Current.Value = dropdown.Items.ElementAt(value).Value;
         }
-        
+
         public IEnumerable<KeyValuePair<string, T>> Items
         {
             get => dropdown.Items;
