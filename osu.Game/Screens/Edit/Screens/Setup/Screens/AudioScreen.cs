@@ -37,8 +37,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly FillFlowContainer sampleBankSettingsContainer;
         private readonly FillFlowContainer sampleVolumeSettingsContainer;
 
-        public string Title => "Audio";
-
         public const float DEFAULT_LABEL_TEXT_SIZE = 12;
 
         public AudioScreen()

@@ -22,8 +22,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly LabelledEnumDropdown<AvailableGamemodes> availableGamemodes;
         private readonly LabelledSwitchButton maniaSpecialStyle;
 
-        public string Title => "Advanced";
-
         public AdvancedScreen()
         {
             Children = new Drawable[]

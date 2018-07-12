@@ -18,8 +18,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly LabelledSliderBar circleSize;
         private readonly LabelledSliderBar approachRate;
 
-        public string Title => "Difficulty";
-
         public DifficultyScreen()
         {
             Children = new Drawable[]

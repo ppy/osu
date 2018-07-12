@@ -23,8 +23,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
     public class ColoursScreen : EditorScreen
     {
-        public string Title => "Colours";
-
         public ColoursScreen()
         {
             Children = new Drawable[]

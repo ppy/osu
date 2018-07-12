@@ -22,8 +22,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly LabelledTextBox source;
         private readonly LabelledTextBox tags;
 
-        public string Title => "General";
-
         public GeneralScreen()
         {
             Children = new Drawable[]

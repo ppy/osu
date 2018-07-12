@@ -18,8 +18,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly LabelledSwitchButton letterbox;
         private readonly LabelledSwitchButton widescreenSupport;
 
-        public string Title => "Design";
-
         public DesignScreen()
         {
             Children = new Drawable[]
