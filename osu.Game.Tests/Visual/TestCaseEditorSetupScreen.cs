@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("Check new tags value", () => setup.CurrentScreen.Beatmap.Value.Beatmap.Metadata.Tags == "test tags");
 
             AddStep("Select Difficulty tab", () => setup.MenuBar.Mode.Value = SetupScreenMode.Difficulty);
-            AddStep("Change drain rate to 7.3", () => (setup.CurrentScreen as DifficultyScreen).ChangeHPDrainRate(7.3f));
+            AddStep("Change drain rate to 7.3", () => (setup.CurrentScreen as DifficultyScreen).ChangeHpDrainRate(7.3f));
             AddAssert("Check new drain rate value", () => setup.CurrentScreen.Beatmap.Value.BeatmapInfo.BaseDifficulty.DrainRate == 7.3f);
             AddStep("Change overall difficulty to 6.8", () => (setup.CurrentScreen as DifficultyScreen).ChangeOverallDifficulty(6.8f));
             AddAssert("Check new overall difficulty value", () => setup.CurrentScreen.Beatmap.Value.BeatmapInfo.BaseDifficulty.OverallDifficulty == 6.8f);

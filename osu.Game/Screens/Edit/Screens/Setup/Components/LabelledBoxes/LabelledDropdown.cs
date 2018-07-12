@@ -1,22 +1,15 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
-using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.SearchableList;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -79,8 +72,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         {
             set => dropdown.Current.Value = dropdown.Items.ElementAt(value).Value;
         }
-
-        // dropdown items should not be publicly exposed for setting, use the functions instead
+        
         public IEnumerable<KeyValuePair<string, T>> Items
         {
             get => dropdown.Items;

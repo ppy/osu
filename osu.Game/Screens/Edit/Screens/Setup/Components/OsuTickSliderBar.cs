@@ -8,23 +8,17 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
-using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.SearchableList;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
@@ -140,7 +134,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private float lastSampleValue;
 
         protected readonly Nub Nub;
-        private readonly Container sliderContainer;
         private readonly Box leftBox;
         private readonly Box rightBox;
         private readonly OsuSpriteText leftTickCaption;
@@ -154,16 +147,15 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         {
             get
             {
-                var bindableFloat = CurrentNumber as BindableNumber<float>;
-                var floatValue = bindableFloat?.Value;
-                var floatPrecision = bindableFloat?.Precision;
+                var floatValue = CurrentNumber.Value;
+                var floatPrecision = CurrentNumber.Precision;
 
                 var decimalPrecision = normalise((decimal)floatPrecision, MAX_DECIMAL_DIGITS);
 
                 // Find the number of significant digits (we could have less than 5 after normalize())
                 var significantDigits = findPrecision(decimalPrecision);
 
-                return $"{floatValue.Value.ToString($"N{significantDigits}")}{TooltipTextSuffix}";
+                return $"{floatValue.ToString($"N{significantDigits}")}{TooltipTextSuffix}";
             }
         }
 
@@ -194,8 +186,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             {
                 new FillFlowContainer
                 {
-                    //Anchor = Anchor.CentreLeft,
-                    //Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = DEFAULT_HEIGHT,
                     Direction = FillDirection.Vertical,
@@ -208,7 +198,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                             RelativeSizeAxes = Axes.X,
                             Children = new Drawable[]
                             {
-                                sliderContainer = new Container
+                                new Container
                                 {
                                     Height = DEFAULT_SLIDER_HEIGHT,
                                     RelativeSizeAxes = Axes.X,
@@ -374,7 +364,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         protected override void UpdateValue(float value)
         {
-            float width = UsableWidth - Padding.Right;
             Nub.MoveToX(value, 250, Easing.OutQuint);
             leftBox.ResizeWidthTo(value, 250, Easing.OutQuint);
             rightBox.ResizeWidthTo(1 - value, 250, Easing.OutQuint);
@@ -407,8 +396,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         private class Ticks : Container
         {
-            private bool canUpdateTicks;
-
             public event Action<float> TickClicked;
 
             private float min;
@@ -418,8 +405,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 set
                 {
                     min = value;
-                    if (canUpdateTicks)
-                        createTicks();
+                    createTicks();
                 }
             }
 
@@ -430,8 +416,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 set
                 {
                     max = value;
-                    if (canUpdateTicks)
-                        createTicks();
+                    createTicks();
                 }
             }
 
@@ -442,8 +427,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 set
                 {
                     interval = value;
-                    if (canUpdateTicks)
-                        createTicks();
+                    createTicks();
                 }
             }
 
@@ -456,8 +440,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 Anchor = Anchor.TopCentre;
                 Origin = Anchor.TopCentre;
                 RelativeSizeAxes = Axes.X;
-
-                canUpdateTicks = true;
+                
                 createTicks();
             }
 
@@ -469,8 +452,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
                 for (float i = MinValue; i <= MaxValue; i += ValueInterval)
                     AddInternal(new Tick(i) { X = getPosition(i), RelativePositionAxes = Axes.X });
-                foreach (Tick t in InternalChildren)
-                    t.TickClicked += OnTickClicked;
+                foreach (var c in InternalChildren)
+                    if (c is Tick t)
+                        t.TickClicked += OnTickClicked;
             }
 
             protected void OnTickClicked(float value)

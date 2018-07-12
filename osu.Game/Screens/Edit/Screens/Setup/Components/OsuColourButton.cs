@@ -3,14 +3,12 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
@@ -35,9 +33,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             }
         }
 
-        private readonly OsuSpriteText colourLabel;
         private readonly OsuColourPicker colourPicker;
-        private readonly Box fill;
 
         public const float COLLAPSED_SIZE = 75;
         public const float EXPANDED_SIZE = 160;
@@ -46,6 +42,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public OsuColourButton(bool expanded = false)
         {
+            OsuSpriteText colourLabel;
+            Box fill;
+
             Size = new Vector2(expanded ? EXPANDED_SIZE : COLLAPSED_SIZE, SIZE_Y);
 
             Children = new Drawable[]

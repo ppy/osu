@@ -4,18 +4,11 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
-using osu.Game.Graphics.Containers;
-using osu.Game.Screens.Menu;
 using osu.Game.Screens.Edit.Screens.Setup.Screens;
 using OpenTK;
-using osu.Framework.Configuration;
 using osu.Game.Screens.Edit.Screens.Setup.Components;
-using osu.Framework.Allocation;
-using OpenTK.Graphics;
-using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Edit.Screens.Setup
 {
@@ -23,7 +16,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
     {
         public SetupMenuBar MenuBar;
         public EditorScreen CurrentScreen;
-        private Header header;
+        private readonly Header header;
         private readonly Container screenContainer;
 
         public const float SIZE_X = 900;
@@ -97,7 +90,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                                 RelativeSizeAxes = Axes.Both,
                             }
                         },
-                        header = new Header(CurrentScreen),
+                        header = new Header(),
                         CurrentScreen,
                     }
                 },

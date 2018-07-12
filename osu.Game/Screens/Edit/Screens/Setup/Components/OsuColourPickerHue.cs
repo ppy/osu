@@ -3,16 +3,12 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using System;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
@@ -45,10 +41,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
             Current.Value = Color4.Red;
 
-            Current.ValueChanged += newValue =>
-            {
-                TriggerHueChanged(newValue);
-            };
+            Current.ValueChanged += TriggerHueChanged;
         }
 
         private void loadPicker()
@@ -79,7 +72,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             HueChanged?.Invoke(newValue);
         }
 
-        private float selectedColourXPosition = 0;
+        private float selectedColourXPosition;
 
         private void setMouseStateValue(InputState state) => Current.Value = calculateColour(selectedColourXPosition = MathHelper.Clamp(state.Mouse.Position.X - Position.X, 0, SIZE_X - 1));
 

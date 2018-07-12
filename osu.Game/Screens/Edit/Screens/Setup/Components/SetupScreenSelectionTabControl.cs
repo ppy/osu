@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Edit.Screens;
 using OpenTK;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components

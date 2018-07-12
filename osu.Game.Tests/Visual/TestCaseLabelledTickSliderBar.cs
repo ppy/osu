@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using NUnit.Framework;
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Edit.Screens.Setup.Components;
@@ -24,10 +23,9 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            LabelledSliderBar labelledTextBox;
             Children = new Drawable[]
             {
-                labelledTextBox = new LabelledSliderBar
+                new LabelledSliderBar
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

@@ -4,21 +4,12 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
-using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.SearchableList;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 {
@@ -188,7 +179,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                 }
             };
 
-            switchButton.Current.ValueChanged += a => TriggerSwitchButtonValueChanged(a);
+            switchButton.Current.ValueChanged += TriggerSwitchButtonValueChanged;
         }
 
         [BackgroundDependencyLoader]

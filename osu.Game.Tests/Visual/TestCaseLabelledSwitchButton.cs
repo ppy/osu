@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual
             typeof(OsuSwitchButton),
         };
 
-        int count = -1;
+        private int count = -1;
 
         [BackgroundDependencyLoader]
         private void load()

@@ -1,24 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
-using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.SearchableList;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 {
@@ -60,7 +50,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             }
         }
 
-        private float sliderMinValue = 0;
+        private float sliderMinValue;
         public float SliderMinValue
         {
             get => sliderMinValue;
@@ -171,7 +161,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             set
             {
                 base.Padding = value;
-                base.Height = Height + base.Padding.Top;
+                Height = NORMAL_HEIGHT + base.Padding.Top;
             }
         }
 
@@ -204,7 +194,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             Masking = true;
             CornerRadius = OUTER_CORNER_RADIUS;
             RelativeSizeAxes = Axes.X;
-            base.Height = NORMAL_HEIGHT + Padding.Top;
+            Height = NORMAL_HEIGHT + Padding.Top;
 
             InternalChildren = new Drawable[]
             {
@@ -278,7 +268,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                 }
             };
 
-            sliderBar.Current.ValueChanged += a => TriggerSliderBarValueChanged(a);
+            sliderBar.Current.ValueChanged += TriggerSliderBarValueChanged;
         }
 
         [BackgroundDependencyLoader]

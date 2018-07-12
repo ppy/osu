@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
@@ -19,7 +18,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
     public class OsuSwitchButton : CircularContainer, IHasCurrentValue<bool>, IHasAccentColour
     {
         private readonly Box fill;
-        private readonly Box innerSwitch;
         private readonly Container switchContainer;
 
         public const float BORDER_THICKNESS = 4.5f;
@@ -53,6 +51,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public OsuSwitchButton()
         {
+            Box innerSwitch;
+
             Size = new Vector2(SIZE_X, SIZE_Y);
 
             BorderColour = Color4.White;
@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         protected override void OnHoverLost(InputState state)
         {
-            this.FadeAccent((Current.Value ? enabledColour : disabledColour), 500, Easing.OutQuint);
+            this.FadeAccent(Current.Value ? enabledColour : disabledColour, 500, Easing.OutQuint);
             base.OnHoverLost(state);
         }
 

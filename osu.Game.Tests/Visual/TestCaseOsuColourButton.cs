@@ -24,10 +24,9 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            OsuColourButton osuColourButton;
             Children = new Drawable[]
             {
-                osuColourButton = new OsuColourButton
+                new OsuColourButton
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

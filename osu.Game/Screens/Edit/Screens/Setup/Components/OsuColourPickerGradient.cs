@@ -3,7 +3,6 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -11,8 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using System;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
@@ -23,7 +20,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private bool isColourChangedFromActiveColour;
 
         private readonly Container pickerContainer;
-        private readonly CircularContainer colourPickerButton;
         
         public const float SIZE_X = 180;
         public const float SIZE_Y = 180;
@@ -53,6 +49,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public OsuColourPickerGradient()
         {
+            CircularContainer colourPickerButton;
+
             Size = new Vector2(SIZE_X, SIZE_Y);
 
             Children = new Drawable[]
@@ -166,7 +164,5 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         }
 
         public Bindable<Color4> Current { get; } = new Bindable<Color4>();
-
-        private string toHexRGBString(Color4 colour) => $"#{colour.R.ToString("X2")}{colour.G.ToString("X2")}{colour.B.ToString("X2")}";
     }
 }

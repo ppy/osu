@@ -23,10 +23,10 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            LabelledDropdown<int> labelledTextBox;
+            LabelledDropdown<int> labelledDropdown;
             Children = new Drawable[]
             {
-                labelledTextBox = new LabelledDropdown<int>
+                labelledDropdown = new LabelledDropdown<int>
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual
                 }
             };
 
-            labelledTextBox.AddDropdownItems(new List<KeyValuePair<string, int>>
+            labelledDropdown.AddDropdownItems(new List<KeyValuePair<string, int>>
             {
                 new KeyValuePair<string, int>("First", 1),
                 new KeyValuePair<string, int>("Second", 2),
@@ -43,10 +43,10 @@ namespace osu.Game.Tests.Visual
                 new KeyValuePair<string, int>("Fourth", 4),
             });
 
-            AddStep("Select the first item", () => labelledTextBox.DropdownSelectedIndex = 0);
-            AddStep("Select the second item", () => labelledTextBox.DropdownSelectedIndex = 1);
-            AddStep("Select the third item", () => labelledTextBox.DropdownSelectedIndex = 2);
-            AddStep("Select the fourth item", () => labelledTextBox.DropdownSelectedIndex = 3);
+            AddStep("Select the first item", () => labelledDropdown.DropdownSelectedIndex = 0);
+            AddStep("Select the second item", () => labelledDropdown.DropdownSelectedIndex = 1);
+            AddStep("Select the third item", () => labelledDropdown.DropdownSelectedIndex = 2);
+            AddStep("Select the fourth item", () => labelledDropdown.DropdownSelectedIndex = 3);
         }
     }
 }

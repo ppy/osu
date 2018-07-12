@@ -21,10 +21,9 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            OsuColourPickerHue osuColourPickerHue;
             Children = new Drawable[]
             {
-                osuColourPickerHue = new OsuColourPickerHue
+                new OsuColourPickerHue
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

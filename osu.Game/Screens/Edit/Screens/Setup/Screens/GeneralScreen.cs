@@ -3,27 +3,16 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
-using osu.Framework.Screens;
-using osu.Game.Beatmaps;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.SearchableList;
-using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
 using osu.Game.Screens.Edit.Screens.Setup.BottomHeaders;
-using System.Collections.Generic;
-using System.Linq;
+using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
     public class GeneralScreen : EditorScreen
     {
-        private readonly Container content;
         private readonly LabelledTextBox artist;
         private readonly LabelledTextBox romanisedArtist;
         private readonly LabelledTextBox title;
@@ -39,7 +28,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         {
             Children = new Drawable[]
             {
-                content = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]

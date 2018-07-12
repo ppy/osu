@@ -21,10 +21,9 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            LabelledTextBox labelledTextBox;
             Children = new Drawable[]
             {
-                labelledTextBox = new LabelledTextBox
+                new LabelledTextBox
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

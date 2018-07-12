@@ -9,22 +9,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using System;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
     public class OsuColourPicker : Container, IHasCurrentValue<Color4>
     {
-        private readonly SetupOsuTextBox colourText;
-        private readonly Box fill;
         private readonly OsuCircularButton copyButton;
         private readonly OsuCircularButton pasteButton;
-        private readonly OsuColourPickerGradient colourPickerGradient;
-        private readonly OsuColourPickerHue colourPickerHue;
 
         private bool isColourChangedFromGradient;
 
@@ -39,6 +32,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public OsuColourPicker()
         {
+            SetupOsuTextBox colourText;
+            Box colourPreviewFill;
+            OsuColourPickerGradient colourPickerGradient;
+            OsuColourPickerHue colourPickerHue;
+
             Size = new Vector2(0, OsuColourButton.SIZE_Y);
             CornerRadius = 10;
             Masking = true;
@@ -82,7 +80,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                     Size = new Vector2(COLOUR_INFO_HEIGHT),
                                     Position = new Vector2(-DEFAULT_PADDING, DEFAULT_PADDING),
                                     Masking = true,
-                                    Child = fill = new Box
+                                    Child = colourPreviewFill = new Box
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Colour = Color4.White,
@@ -145,7 +143,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                     colourPickerGradient.Current.Value = newValue;
                     colourPickerHue.Hue = Color4.ToHsv(newValue).X;
                 }
-                fill.FadeColour(newValue, 200, Easing.OutQuint);
+                colourPreviewFill.FadeColour(newValue, 200, Easing.OutQuint);
                 colourText.Text = toHexRGBString(newValue);
                 TriggerColourChanged(newValue);
             };

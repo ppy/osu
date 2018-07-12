@@ -22,10 +22,9 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            OsuColourPickerGradient osuColourPickerGradient;
             Children = new Drawable[]
             {
-                osuColourPickerGradient = new OsuColourPickerGradient
+                new OsuColourPickerGradient
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

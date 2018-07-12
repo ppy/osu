@@ -23,15 +23,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
     public class ColoursScreen : EditorScreen
     {
-        private readonly Container content;
-
         public string Title => "Colours";
 
         public ColoursScreen()
         {
             Children = new Drawable[]
             {
-                content = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]

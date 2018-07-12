@@ -8,11 +8,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Overlays.SearchableList;
-using osu.Game.Screens.Multi.Screens;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Setup
 {
@@ -22,10 +18,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup
 
         private readonly OsuSpriteText screenType;
         private readonly Container boxContainer;
-        private readonly FillFlowContainer textContainer;
         private readonly FillFlowContainer childModeButtons;
 
-        public Header(Screen initialScreen)
+        public Header()
         {
             Children = new Drawable[]
             {
@@ -46,7 +41,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup
                             Margin = new MarginPadding { Left = 25, Top = 7.5f },
                             RelativeSizeAxes = Axes.X,
                             Height = HEIGHT,
-                            Child = textContainer = new FillFlowContainer
+                            Child = new FillFlowContainer
                             {
                                 AutoSizeAxes = Axes.X,
                                 Direction = FillDirection.Horizontal,

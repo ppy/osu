@@ -4,31 +4,20 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
-using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.SearchableList;
-using osu.Game.Screens.Edit.Screens.Setup.BottomHeaders;
 using osu.Game.Screens.Edit.Screens.Setup.Components;
 using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
     public class AudioScreen : EditorScreen
     {
-        private readonly Container content;
-
         private readonly LabelledEnumDropdown<SampleBank> defaultSampleBank;
         private readonly LabelledSliderBar defaultSampleVolume;
         private readonly LabelledSwitchButton samplesMatchPlaybackRate;
@@ -56,7 +45,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         {
             Children = new Drawable[]
             {
-                content = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -373,16 +362,16 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         // According to osu!stable's behaviour
         public void ResetDefaultSampleBanks()
         {
-            string defaultSampleBank = Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints.First().SampleBank;
+            string bank = Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints.First().SampleBank;
             foreach (var s in Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints)
-                s.SampleBank = defaultSampleBank;
+                s.SampleBank = bank;
             updateInfo();
         }
         public void ResetDefaultSampleVolumes()
         {
-            int defaultSampleVolume = Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints.First().SampleVolume;
+            int volume = Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints.First().SampleVolume;
             foreach (var s in Beatmap.Value.Beatmap.ControlPointInfo.SamplePoints)
-                s.SampleVolume = defaultSampleVolume;
+                s.SampleVolume = volume;
             updateInfo();
         }
         public void ChangeDefaultSampleBank(SampleBank newValue) => defaultSampleBank.DropdownSelectedItem = newValue;
