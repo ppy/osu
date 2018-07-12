@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
@@ -73,10 +74,12 @@ namespace osu.Game.Beatmaps.Formats
 
             bool isCombo = pair.Key.StartsWith(@"Combo");
 
-            string[] split = pair.Value.Split(',');
+            line = Regex.Replace(pair.Value, "[^0-9,]", "");
+
+            string[] split = line.Split(',');
 
             if (split.Length != 3)
-                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {pair.Value}");
+                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {line}");
 
             if (!byte.TryParse(split[0], out var r) || !byte.TryParse(split[1], out var g) || !byte.TryParse(split[2], out var b))
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
