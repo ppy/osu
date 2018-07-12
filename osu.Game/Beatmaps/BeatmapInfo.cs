@@ -83,7 +83,7 @@ namespace osu.Game.Beatmaps
         public int RulesetID { get; set; }
 
         public RulesetInfo Ruleset { get; set; }
-        
+
         public bool LetterboxInBreaks { get; set; }
         [NotMapped]
         public bool StoryFireInFront { get; set; }
