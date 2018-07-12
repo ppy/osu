@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
@@ -21,6 +22,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly LabelledSliderBar stackLeniency;
         private readonly LabelledEnumDropdown<AvailableGamemodes> availableGamemodes;
         private readonly LabelledSwitchButton maniaSpecialStyle;
+        private readonly LabelledSliderBar maniaKeyCount;
+        private readonly LabelledSwitchButton maniaCoOpMode;
 
         public AdvancedScreen()
         {
@@ -97,7 +100,25 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
                                     LabelText = "osu!mania Special Style",
                                     BottomLabelText = "Use N+1 key style for osu!mania maps.",
-                                    Alpha = 0
+                                    Alpha = 0,
+                                },
+                                maniaKeyCount = new LabelledSliderBar
+                                {
+                                    Padding = new MarginPadding { Right = Setup.SCREEN_RIGHT_PADDING },
+                                    CurrentValue = 4,
+                                    SliderMinValue = 1,
+                                    SliderMaxValue = 9,
+                                    SliderNormalPrecision = 1,
+                                    SliderAlternatePrecision = 1,
+                                    LabelText = "Key Count",
+                                    BottomLabelText = "The key count of the osu!mania beatmap.",
+                                    Alpha = 0,
+                                },
+                                maniaCoOpMode = new LabelledSwitchButton
+                                {
+                                    Padding = new MarginPadding { Right = Setup.SCREEN_RIGHT_PADDING },
+                                    LabelText = "Co-Op Mode",
+                                    Alpha = 0,
                                 },
                             }
                         },
@@ -115,6 +136,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 updateInfo();
             };
             maniaSpecialStyle.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.SpecialStyle = a;
+            maniaKeyCount.SliderBarValueChanged += a =>
+            {
+                // Change key count - requires reference to osu.Game.Rulesets.Mania for mania-specific beatmaps
+            };
+            maniaCoOpMode.SwitchButtonValueChanged += a =>
+            {
+                // Change co-op mode - same here
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -134,8 +163,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             stackLeniency.CurrentValue = Beatmap.Value?.BeatmapInfo.StackLeniency ?? 7;
             availableGamemodes.DropdownSelectedItem = (AvailableGamemodes?)Beatmap.Value?.BeatmapInfo.RulesetID ?? AvailableGamemodes.All;
             maniaSpecialStyle.CurrentValue = Beatmap.Value?.BeatmapInfo.SpecialStyle ?? false;
+            // 
 
-            maniaSpecialStyle.FadeTo(Beatmap.Value?.BeatmapInfo.RulesetID == 3 ? 1 : 0, 500, Easing.OutQuint);
+            float newAlpha = Beatmap.Value?.BeatmapInfo.RulesetID == 3 ? 1 : 0;
+            maniaSpecialStyle.FadeTo(newAlpha, 500, Easing.OutQuint);
+            maniaKeyCount.FadeTo(newAlpha, 500, Easing.OutQuint);
+            maniaCoOpMode.FadeTo(newAlpha, 500, Easing.OutQuint);
         }
     }
 
