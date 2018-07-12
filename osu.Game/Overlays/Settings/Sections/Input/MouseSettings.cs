@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -15,6 +17,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         protected override string Header => "Mouse";
 
         private readonly BindableBool rawInputToggle = new BindableBool();
+        private readonly BindableBool disableJoystickInputToggle = new BindableBool();
         private Bindable<string> ignoredInputHandler;
         private SensitivitySetting sensitivity;
 
@@ -53,26 +56,50 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                     LabelText = "Disable mouse buttons during gameplay",
                     Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
                 },
-            };
-
-            rawInputToggle.ValueChanged += enabled =>
-            {
-                // this is temporary until we support per-handler settings.
-                const string raw_mouse_handler = @"OpenTKRawMouseHandler";
-                const string standard_mouse_handler = @"OpenTKMouseHandler";
-
-                ignoredInputHandler.Value = enabled ? standard_mouse_handler : raw_mouse_handler;
+                new SettingsCheckbox
+                {
+                    LabelText = "Disable all joystick input",
+                    Bindable = disableJoystickInputToggle
+                },
             };
 
             ignoredInputHandler = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
-            ignoredInputHandler.ValueChanged += handler =>
+
+            setBindablesFromIgnoreInputHandler();
+            setIgnoreInputHandler();
+
+            rawInputToggle.BindValueChanged(_ => setIgnoreInputHandler());
+            disableJoystickInputToggle.BindValueChanged(_ => setIgnoreInputHandler());
+
+            ignoredInputHandler.BindValueChanged(_ => setBindablesFromIgnoreInputHandler());
+        }
+
+        // this is temporary until we support per-handler settings.
+        private const string standard_mouse_handler = @"OpenTKMouseHandler";
+        private const string raw_mouse_handler = @"OpenTKRawMouseHandler";
+        private const string joystick_handler = @"OpenTKJoystickHandler";
+
+        private void setIgnoreInputHandler()
+        {
+            var disableInputHandlerNames = new List<string>
             {
-                bool raw = !handler.Contains("Raw");
-                rawInputToggle.Value = raw;
-                sensitivity.Bindable.Disabled = !raw;
+                rawInputToggle.Value ? standard_mouse_handler : raw_mouse_handler
             };
 
-            ignoredInputHandler.TriggerChange();
+            if (disableJoystickInputToggle.Value)
+                disableInputHandlerNames.Add(joystick_handler);
+
+            ignoredInputHandler.Value = string.Join(" ", disableInputHandlerNames);
+        }
+
+        private void setBindablesFromIgnoreInputHandler()
+        {
+            var disableInputHandlerNames = ignoredInputHandler.Value.Split(' ');
+
+            rawInputToggle.Value = disableInputHandlerNames.Contains(standard_mouse_handler);
+            sensitivity.Bindable.Disabled = !rawInputToggle.Value;
+
+            disableJoystickInputToggle.Value = disableInputHandlerNames.Contains(joystick_handler);
         }
 
         private class SensitivitySetting : SettingsSlider<double, SensitivitySlider>
