@@ -14,8 +14,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
     public class AdvancedScreen : EditorScreen
     {
-        private readonly Container content;
-
         private readonly OsuSpriteText firstLine;
         private readonly OsuSpriteText secondLine;
         private readonly OsuSpriteText thirdLine;
@@ -30,7 +28,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         {
             Children = new Drawable[]
             {
-                content = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
