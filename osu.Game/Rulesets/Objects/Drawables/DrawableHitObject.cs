@@ -89,13 +89,12 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 if (HitObject.SampleControlPoint == null)
                     throw new ArgumentNullException(nameof(HitObject.SampleControlPoint), $"{nameof(HitObject)}s must always have an attached {nameof(HitObject.SampleControlPoint)}."
                                                                                           + $" This is an indication that {nameof(HitObject.ApplyDefaults)} has not been invoked on {this}.");
-                AddInternal(Samples = new SkinnableSound(samples.Select(s => new SampleInfo
-                {
-                    Bank = s.Bank ?? HitObject.SampleControlPoint.SampleBank,
-                    Name = s.Name,
-                    Volume = s.Volume > 0 ? s.Volume : HitObject.SampleControlPoint.SampleVolume,
-                    Namespace = SampleNamespace
-                }).ToArray()));
+
+                samples = samples.Select(s => HitObject.SampleControlPoint.ApplyTo(s)).ToArray();
+                foreach (var s in samples)
+                    s.Namespace = SampleNamespace;
+
+                AddInternal(Samples = new SkinnableSound(samples));
             }
         }
 

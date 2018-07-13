@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
-using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.UI;
 
@@ -27,7 +26,7 @@ namespace osu.Game.Rulesets.Mania
                 new SettingsEnumDropdown<ManiaScrollingDirection>
                 {
                     LabelText = "Scrolling direction",
-                    Bindable = (Config as RulesetConfigManager<ManiaSetting>)?.GetBindable<ManiaScrollingDirection>(ManiaSetting.ScrollDirection)
+                    Bindable = ((ManiaConfigManager)Config).GetBindable<ManiaScrollingDirection>(ManiaSetting.ScrollDirection)
                 }
             };
         }
