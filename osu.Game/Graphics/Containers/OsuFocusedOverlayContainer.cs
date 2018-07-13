@@ -69,10 +69,13 @@ namespace osu.Game.Graphics.Containers
 
         public virtual bool OnPressed(GlobalAction action)
         {
-            if (action == GlobalAction.Back)
+            switch (action)
             {
-                State = Visibility.Hidden;
-                return true;
+                case GlobalAction.Back:
+                    State = Visibility.Hidden;
+                    return true;
+                case GlobalAction.Select:
+                    return true;
             }
 
             return false;
