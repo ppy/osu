@@ -8,9 +8,9 @@ using osu.Game.Rulesets.Catch.Objects;
 namespace osu.Game.Rulesets.Catch.Tests
 {
     [TestFixture]
-    public class TestCaseHyperdash : Game.Tests.Visual.TestCasePlayer
+    public class TestCaseHyperDash : Game.Tests.Visual.TestCasePlayer
     {
-        public TestCaseHyperdash()
+        public TestCaseHyperDash()
             : base(new CatchRuleset())
         {
         }

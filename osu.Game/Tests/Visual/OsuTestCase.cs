@@ -20,9 +20,9 @@ namespace osu.Game.Tests.Visual
 
         protected DependencyContainer Dependencies { get; private set; }
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            Dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+            Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             Dependencies.CacheAs<BindableBeatmap>(beatmap);
             Dependencies.CacheAs<IBindableBeatmap>(beatmap);
