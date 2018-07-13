@@ -189,22 +189,31 @@ namespace osu.Game
         {
             CloseAllOverlays(false);
 
-            void setBeatmap() => Beatmap.Value = BeatmapManager.GetWorkingBeatmap(beatmap.Beatmaps.First());
+            void setBeatmap()
+            {
+                if (Beatmap.Disabled)
+                {
+                    Schedule(setBeatmap);
+                    return;
+                }
+
+                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(beatmap.Beatmaps.First());
+            };
 
             switch (currentScreen)
             {
                 case SongSelect _:
-                    setBeatmap();
                     break;
                 default:
                     // navigate to song select if we are not already there.
                     var menu = (MainMenu)intro.ChildScreen;
 
                     menu.MakeCurrent();
-                    setBeatmap();
                     menu.LoadToSolo();
                     break;
             }
+
+            setBeatmap();
         }
 
         /// <summary>
