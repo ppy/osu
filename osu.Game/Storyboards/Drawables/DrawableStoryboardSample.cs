@@ -41,6 +41,7 @@ namespace osu.Game.Storyboards.Drawables
         {
             base.Update();
 
+            // TODO: this logic will need to be consolidated with other game samples like hitsounds.
             if (Time.Current < sample.Time)
             {
                 // We've rewound before the start time of the sample
