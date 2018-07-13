@@ -85,7 +85,7 @@ namespace osu.Game
         private OnScreenDisplay onscreenDisplay;
 
         private Bindable<int> configRuleset;
-        public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private Bindable<int> configSkin;
 
@@ -122,8 +122,8 @@ namespace osu.Game
 
         private DependencyContainer dependencies;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
@@ -147,10 +147,13 @@ namespace osu.Game
 
             dependencies.CacheAs(this);
 
+            dependencies.CacheAs(ruleset);
+            dependencies.CacheAs<IBindable<RulesetInfo>>(ruleset);
+
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
-            Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
-            Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
+            ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
+            ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
 
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
@@ -216,7 +219,7 @@ namespace osu.Game
                 return;
             }
 
-            Ruleset.Value = s.Ruleset;
+            ruleset.Value = s.Ruleset;
 
             Beatmap.Value = BeatmapManager.GetWorkingBeatmap(s.Beatmap);
             Beatmap.Value.Mods.Value = s.Mods;
@@ -247,7 +250,8 @@ namespace osu.Game
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ActionRequested = action => volume.Adjust(action)
+                    ActionRequested = action => volume.Adjust(action),
+                    ScrollActionRequested = (action, amount, isPrecise) => volume.Adjust(action, amount, isPrecise),
                 },
                 mainContent = new Container { RelativeSizeAxes = Axes.Both },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
@@ -550,7 +554,7 @@ namespace osu.Game
             // the use case for not applying is in visual/unit tests.
             bool applyRestrictions = !currentScreen?.AllowBeatmapRulesetChange ?? false;
 
-            Ruleset.Disabled = applyRestrictions;
+            ruleset.Disabled = applyRestrictions;
             Beatmap.Disabled = applyRestrictions;
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
