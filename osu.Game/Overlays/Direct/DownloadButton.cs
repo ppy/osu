@@ -29,10 +29,9 @@ namespace osu.Game.Overlays.Direct
             Children = new Drawable[]
             {
                 downloader = new BeatmapSetDownloader(set, noVideo),
-                new Container
+                new CircularContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    CornerRadius = 17,
                     Masking = true,
                     Child = background = new Box
                     {
