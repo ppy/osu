@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Direct
 
         public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
-            Width = 400;
+            Width = 380;
             Height = 140 + vertical_padding; //full height of all the elements plus vertical padding (autosize uses the image)
         }
 
