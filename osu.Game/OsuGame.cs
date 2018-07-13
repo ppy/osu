@@ -186,7 +186,7 @@ namespace osu.Game
         /// <param name="beatmap">The beatmap to select.</param>
         public void PresentBeatmap(BeatmapSetInfo beatmap)
         {
-            CloseAllOverlays();
+            CloseAllOverlays(false);
 
             Beatmap.Value = BeatmapManager.GetWorkingBeatmap(beatmap.Beatmaps.First());
 
