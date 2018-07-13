@@ -93,7 +93,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AddJudgement(new OsuJudgement
             {
                 Result = result,
-                PositionOffset = Vector2.Zero //todo: set to correct value
             });
         }
 
@@ -101,7 +100,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdatePreemptState();
 
-            ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadein * 2, HitObject.TimePreempt));
+            ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
             ApproachCircle.ScaleTo(1.1f, HitObject.TimePreempt);
         }
 

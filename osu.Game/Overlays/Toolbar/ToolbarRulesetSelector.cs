@@ -16,18 +16,18 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Toolbar
 {
-    public class ToolbarModeSelector : Container
+    public class ToolbarRulesetSelector : Container
     {
         private const float padding = 10;
 
         private readonly FillFlowContainer modeButtons;
         private readonly Drawable modeButtonLine;
-        private ToolbarModeButton activeButton;
+        private ToolbarRulesetButton activeButton;
 
         private RulesetStore rulesets;
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
-        public ToolbarModeSelector()
+        public ToolbarRulesetSelector()
         {
             RelativeSizeAxes = Axes.Y;
 
@@ -67,13 +67,13 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(RulesetStore rulesets, OsuGame game)
+        [BackgroundDependencyLoader]
+        private void load(RulesetStore rulesets, Bindable<RulesetInfo> parentRuleset)
         {
             this.rulesets = rulesets;
             foreach (var r in rulesets.AvailableRulesets)
             {
-                modeButtons.Add(new ToolbarModeButton
+                modeButtons.Add(new ToolbarRulesetButton
                 {
                     Ruleset = r,
                     Action = delegate { ruleset.Value = r; }
@@ -82,11 +82,7 @@ namespace osu.Game.Overlays.Toolbar
 
             ruleset.ValueChanged += rulesetChanged;
             ruleset.DisabledChanged += disabledChanged;
-
-            if (game != null)
-                ruleset.BindTo(game.Ruleset);
-            else
-                ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault();
+            ruleset.BindTo(parentRuleset);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -119,7 +115,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private void rulesetChanged(RulesetInfo ruleset)
         {
-            foreach (ToolbarModeButton m in modeButtons.Children.Cast<ToolbarModeButton>())
+            foreach (ToolbarRulesetButton m in modeButtons.Children.Cast<ToolbarRulesetButton>())
             {
                 bool isActive = m.Ruleset.ID == ruleset.ID;
                 m.Active = isActive;

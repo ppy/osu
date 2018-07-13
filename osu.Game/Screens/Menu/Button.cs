@@ -35,6 +35,12 @@ namespace osu.Game.Screens.Menu
         private readonly Box boxHoverLayer;
         private readonly SpriteIcon icon;
         private readonly string sampleName;
+
+        /// <summary>
+        /// The menu state for which we are visible for.
+        /// </summary>
+        public ButtonSystemState VisibleState = ButtonSystemState.TopLevel;
+
         private readonly Action clickAction;
         private readonly Key triggerKey;
         private SampleChannel sampleClick;
@@ -51,7 +57,7 @@ namespace osu.Game.Screens.Menu
             AutoSizeAxes = Axes.Both;
             Alpha = 0;
 
-            Vector2 boxSize = new Vector2(ButtonSystem.BUTTON_WIDTH + Math.Abs(extraWidth), ButtonSystem.BUTTON_AREA_HEIGHT);
+            Vector2 boxSize = new Vector2(ButtonSystem.BUTTON_WIDTH + Math.Abs(extraWidth), ButtonArea.BUTTON_AREA_HEIGHT);
 
             Children = new Drawable[]
             {
@@ -260,6 +266,7 @@ namespace osu.Game.Screens.Menu
                                 this.FadeOut(800);
                                 break;
                         }
+
                         break;
                     case ButtonState.Expanded:
                         const int expand_duration = 500;
@@ -274,6 +281,33 @@ namespace osu.Game.Screens.Menu
                 }
 
                 StateChanged?.Invoke(State);
+            }
+        }
+
+        public ButtonSystemState ButtonSystemState
+        {
+            set
+            {
+                ContractStyle = 0;
+
+                switch (value)
+                {
+                    case ButtonSystemState.Initial:
+                        State = ButtonState.Contracted;
+                        break;
+                    case ButtonSystemState.EnteringMode:
+                        ContractStyle = 1;
+                        State = ButtonState.Contracted;
+                        break;
+                    default:
+                        if (value == VisibleState)
+                            State = ButtonState.Expanded;
+                        else if (value < VisibleState)
+                            State = ButtonState.Contracted;
+                        else
+                            State = ButtonState.Exploded;
+                        break;
+                }
             }
         }
     }

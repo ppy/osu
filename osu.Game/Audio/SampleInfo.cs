@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Audio
 {
@@ -29,8 +30,36 @@ namespace osu.Game.Audio
         public string Name;
 
         /// <summary>
+        /// An optional suffix to provide priority lookup. Falls back to non-suffixed <see cref="Name"/>.
+        /// </summary>
+        public string Suffix;
+
+        /// <summary>
         /// The sample volume.
         /// </summary>
         public int Volume;
+
+        /// <summary>
+        /// Retrieve all possible filenames that can be used as a source, returned in order of preference (highest first).
+        /// </summary>
+        public virtual IEnumerable<string> LookupNames
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(Namespace))
+                {
+                    if (!string.IsNullOrEmpty(Suffix))
+                        yield return $"{Namespace}/{Bank}-{Name}{Suffix}";
+                    yield return $"{Namespace}/{Bank}-{Name}";
+                }
+
+                // check non-namespace as a fallback even when we have a namespace
+                if (!string.IsNullOrEmpty(Suffix))
+                    yield return $"{Bank}-{Name}{Suffix}";
+                yield return $"{Bank}-{Name}";
+            }
+        }
+
+        public SampleInfo Clone() => (SampleInfo)MemberwiseClone();
     }
 }

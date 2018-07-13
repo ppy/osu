@@ -49,8 +49,6 @@ namespace osu.Game.Screens.Play
         public bool AllowLeadIn { get; set; } = true;
         public bool AllowResults { get; set; } = true;
 
-        protected override bool AllowBackButton => false;
-
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;
 
@@ -158,7 +156,8 @@ namespace osu.Game.Screens.Play
             userAudioOffset.TriggerChange();
 
             ScoreProcessor = RulesetContainer.CreateScoreProcessor();
-            config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
+            if (!ScoreProcessor.Mode.Disabled)
+                config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
             Children = new Drawable[]
             {

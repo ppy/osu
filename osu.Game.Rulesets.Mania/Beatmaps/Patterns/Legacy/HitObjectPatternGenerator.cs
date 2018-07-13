@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using OpenTK;
 using osu.Game.Audio;
@@ -82,127 +83,133 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && TotalColumns != 8)
                     convertType |= PatternType.Mirror;
-                else
+                else if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_CLAP))
                     convertType |= PatternType.Gathered;
             }
         }
 
-        public override Pattern Generate()
+        public override IEnumerable<Pattern> Generate()
         {
-            if (TotalColumns == 1)
+            yield return generate();
+        }
+
+        private Pattern generate()
+        {
+            var pattern = new Pattern();
+
+            try
             {
-                var pattern = new Pattern();
-                addToPattern(pattern, 0);
-                return pattern;
-            }
-
-            int lastColumn = PreviousPattern.HitObjects.FirstOrDefault()?.Column ?? 0;
-
-            if ((convertType & PatternType.Reverse) > 0 && PreviousPattern.HitObjects.Any())
-            {
-                // Generate a new pattern by copying the last hit objects in reverse-column order
-                var pattern = new Pattern();
-
-                for (int i = RandomStart; i < TotalColumns; i++)
-                    if (PreviousPattern.ColumnHasObject(i))
-                        addToPattern(pattern, RandomStart + TotalColumns - i - 1);
-
-                return pattern;
-            }
-
-            if ((convertType & PatternType.Cycle) > 0 && PreviousPattern.HitObjects.Count() == 1
-                // If we convert to 7K + 1, let's not overload the special key
-                && (TotalColumns != 8 || lastColumn != 0)
-                // Make sure the last column was not the centre column
-                && (TotalColumns % 2 == 0 || lastColumn != TotalColumns / 2))
-            {
-                // Generate a new pattern by cycling backwards (similar to Reverse but for only one hit object)
-                var pattern = new Pattern();
-
-                int column = RandomStart + TotalColumns - lastColumn - 1;
-                addToPattern(pattern, column);
-
-                return pattern;
-            }
-
-            if ((convertType & PatternType.ForceStack) > 0 && PreviousPattern.HitObjects.Any())
-            {
-                // Generate a new pattern by placing on the already filled columns
-                var pattern = new Pattern();
-
-                for (int i = RandomStart; i < TotalColumns; i++)
-                    if (PreviousPattern.ColumnHasObject(i))
-                        addToPattern(pattern, i);
-
-                return pattern;
-            }
-
-            if ((convertType & PatternType.Stair) > 0 && PreviousPattern.HitObjects.Count() == 1)
-            {
-                // Generate a new pattern by placing on the next column, cycling back to the start if there is no "next"
-                var pattern = new Pattern();
-
-                int targetColumn = lastColumn + 1;
-                if (targetColumn == TotalColumns)
+                if (TotalColumns == 1)
                 {
-                    targetColumn = RandomStart;
-                    StairType = PatternType.ReverseStair;
+                    addToPattern(pattern, 0);
+                    return pattern;
                 }
 
-                addToPattern(pattern, targetColumn);
-                return pattern;
-            }
+                int lastColumn = PreviousPattern.HitObjects.FirstOrDefault()?.Column ?? 0;
 
-            if ((convertType & PatternType.ReverseStair) > 0 && PreviousPattern.HitObjects.Count() == 1)
-            {
-                // Generate a new pattern by placing on the previous column, cycling back to the end if there is no "previous"
-                var pattern = new Pattern();
-
-                int targetColumn = lastColumn - 1;
-                if (targetColumn == RandomStart - 1)
+                if ((convertType & PatternType.Reverse) > 0 && PreviousPattern.HitObjects.Any())
                 {
-                    targetColumn = TotalColumns - 1;
-                    StairType = PatternType.Stair;
+                    // Generate a new pattern by copying the last hit objects in reverse-column order
+                    for (int i = RandomStart; i < TotalColumns; i++)
+                        if (PreviousPattern.ColumnHasObject(i))
+                            addToPattern(pattern, RandomStart + TotalColumns - i - 1);
+
+                    return pattern;
                 }
 
-                addToPattern(pattern, targetColumn);
-                return pattern;
-            }
+                if ((convertType & PatternType.Cycle) > 0 && PreviousPattern.HitObjects.Count() == 1
+                                                          // If we convert to 7K + 1, let's not overload the special key
+                                                          && (TotalColumns != 8 || lastColumn != 0)
+                                                          // Make sure the last column was not the centre column
+                                                          && (TotalColumns % 2 == 0 || lastColumn != TotalColumns / 2))
+                {
+                    // Generate a new pattern by cycling backwards (similar to Reverse but for only one hit object)
+                    int column = RandomStart + TotalColumns - lastColumn - 1;
+                    addToPattern(pattern, column);
 
-            if ((convertType & PatternType.KeepSingle) > 0)
-                return generateRandomNotes(1);
+                    return pattern;
+                }
 
-            if ((convertType & PatternType.Mirror) > 0)
-            {
+                if ((convertType & PatternType.ForceStack) > 0 && PreviousPattern.HitObjects.Any())
+                {
+                    // Generate a new pattern by placing on the already filled columns
+                    for (int i = RandomStart; i < TotalColumns; i++)
+                        if (PreviousPattern.ColumnHasObject(i))
+                            addToPattern(pattern, i);
+
+                    return pattern;
+                }
+
+                if (PreviousPattern.HitObjects.Count() == 1)
+                {
+                    if ((convertType & PatternType.Stair) > 0)
+                    {
+                        // Generate a new pattern by placing on the next column, cycling back to the start if there is no "next"
+                        int targetColumn = lastColumn + 1;
+                        if (targetColumn == TotalColumns)
+                            targetColumn = RandomStart;
+
+                        addToPattern(pattern, targetColumn);
+                        return pattern;
+                    }
+
+                    if ((convertType & PatternType.ReverseStair) > 0)
+                    {
+                        // Generate a new pattern by placing on the previous column, cycling back to the end if there is no "previous"
+                        int targetColumn = lastColumn - 1;
+                        if (targetColumn == RandomStart - 1)
+                            targetColumn = TotalColumns - 1;
+
+                        addToPattern(pattern, targetColumn);
+                        return pattern;
+                    }
+                }
+
+                if ((convertType & PatternType.KeepSingle) > 0)
+                    return pattern = generateRandomNotes(1);
+
+                if ((convertType & PatternType.Mirror) > 0)
+                {
+                    if (ConversionDifficulty > 6.5)
+                        return pattern = generateRandomPatternWithMirrored(0.12, 0.38, 0.12);
+                    if (ConversionDifficulty > 4)
+                        return pattern = generateRandomPatternWithMirrored(0.12, 0.17, 0);
+                    return pattern = generateRandomPatternWithMirrored(0.12, 0, 0);
+                }
+
                 if (ConversionDifficulty > 6.5)
-                    return generateRandomPatternWithMirrored(0.12, 0.38, 0.12);
+                {
+                    if ((convertType & PatternType.LowProbability) > 0)
+                        return pattern = generateRandomPattern(0.78, 0.42, 0, 0);
+                    return pattern = generateRandomPattern(1, 0.62, 0, 0);
+                }
+
                 if (ConversionDifficulty > 4)
-                    return generateRandomPatternWithMirrored(0.12, 0.17, 0);
-                return generateRandomPatternWithMirrored(0.12, 0, 0);
-            }
+                {
+                    if ((convertType & PatternType.LowProbability) > 0)
+                        return pattern = generateRandomPattern(0.35, 0.08, 0, 0);
+                    return pattern = generateRandomPattern(0.52, 0.15, 0, 0);
+                }
 
-            if (ConversionDifficulty > 6.5)
+                if (ConversionDifficulty > 2)
+                {
+                    if ((convertType & PatternType.LowProbability) > 0)
+                        return pattern = generateRandomPattern(0.18, 0, 0, 0);
+                    return pattern = generateRandomPattern(0.45, 0, 0, 0);
+                }
+
+                return pattern = generateRandomPattern(0, 0, 0, 0);
+            }
+            finally
             {
-                if ((convertType & PatternType.LowProbability) > 0)
-                    return generateRandomPattern(0.78, 0.42, 0, 0);
-                return generateRandomPattern(1, 0.62, 0, 0);
+                foreach (var obj in pattern.HitObjects)
+                {
+                    if ((convertType & PatternType.Stair) > 0 && obj.Column == TotalColumns - 1)
+                        StairType = PatternType.ReverseStair;
+                    if ((convertType & PatternType.ReverseStair) > 0 && obj.Column == RandomStart)
+                        StairType = PatternType.Stair;
+                }
             }
-
-            if (ConversionDifficulty > 4)
-            {
-                if ((convertType & PatternType.LowProbability) > 0)
-                    return generateRandomPattern(0.35, 0.08, 0, 0);
-                return generateRandomPattern(0.52, 0.15, 0, 0);
-            }
-
-            if (ConversionDifficulty > 2)
-            {
-                if ((convertType & PatternType.LowProbability) > 0)
-                    return generateRandomPattern(0.18, 0, 0, 0);
-                return generateRandomPattern(0.45, 0, 0, 0);
-            }
-
-            return generateRandomPattern(0, 0, 0, 0);
         }
 
         /// <summary>
