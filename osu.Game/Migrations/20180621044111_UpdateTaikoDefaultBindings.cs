@@ -8,7 +8,6 @@ namespace osu.Game.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql("DELETE FROM KeyBinding WHERE RulesetID = 1");
-            Logger.Log("osu!taiko bindings have been reset due to new defaults", LoggingTarget.Runtime, LogLevel.Important);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
