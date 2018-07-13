@@ -9,6 +9,8 @@ namespace osu.Game.Overlays.Notifications
 {
     public class ProgressCompletionNotification : SimpleNotification
     {
+        public override bool IsImportant => true;
+
         public ProgressCompletionNotification()
         {
             Icon = FontAwesome.fa_check;
