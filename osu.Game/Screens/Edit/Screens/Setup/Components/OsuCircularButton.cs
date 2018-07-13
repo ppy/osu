@@ -25,6 +25,17 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public event Action ButtonClicked;
 
+        private bool disabled;
+        public bool Disabled
+        {
+            get => disabled;
+            set
+            {
+                disabled = value;
+                fadeColour();
+            }
+        }
+
         private Color4 defaultColour;
         public Color4 DefaultColour
         {
@@ -32,7 +43,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             set
             {
                 defaultColour = value;
-                AccentColour = value.Lighten(IsHovered ? 0.3f : 0);
+                fadeColour();
             }
         }
 
@@ -91,20 +102,32 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         protected override bool OnClick(InputState state)
         {
             // Effect to indicate the button has been clicked
-            ButtonClicked?.Invoke();
+            if (!disabled)
+                ButtonClicked?.Invoke();
             return base.OnClick(state);
         }
 
         protected override bool OnHover(InputState state)
         {
-            this.FadeAccent(defaultColour.Lighten(0.3f), 500, Easing.OutQuint);
+            fadeColour();
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            this.FadeAccent(defaultColour, 500, Easing.OutQuint);
+            fadeColour();
             base.OnHoverLost(state);
+        }
+
+        private void fadeColour()
+        {
+            if (!disabled)
+            {
+                this.FadeAccent(defaultColour.Lighten(IsHovered ? 0.3f : 0), 500, Easing.OutQuint);
+                this.FadeTo(1, 500, Easing.OutQuint);
+            }
+            else
+                this.FadeTo(0.3f, 500, Easing.OutQuint);
         }
     }
 }

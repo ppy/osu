@@ -33,6 +33,8 @@ namespace osu.Game.Tests.Visual
             typeof(OsuTickSliderBar),
             typeof(OsuSwitchButton),
             typeof(OsuCircularButton),
+            typeof(OsuColourButton),
+            typeof(NewComboColourButton),
             typeof(Header),
             typeof(GeneralScreen),
             typeof(DifficultyScreen),

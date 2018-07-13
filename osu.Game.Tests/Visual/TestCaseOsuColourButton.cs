@@ -30,6 +30,7 @@ namespace osu.Game.Tests.Visual
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                    BottomLabelText = "Great Test"
                 }
             };
         }

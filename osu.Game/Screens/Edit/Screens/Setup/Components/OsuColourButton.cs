@@ -33,12 +33,31 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             }
         }
 
-        private readonly OsuColourPicker colourPicker;
+        public Anchor ColourPickerOrigin
+        {
+            get => colourPicker.Origin;
+            set => colourPicker.Origin = value;
+        }
 
+        private readonly OsuColourPicker colourPicker;
+        private readonly OsuSpriteText bottomLabel;
+        
         public const float COLLAPSED_SIZE = 75;
         public const float EXPANDED_SIZE = 160;
         public const float SIZE_Y = 75;
+        public const float BOTTOM_LABEL_TEXT_SIZE = 14;
         public const float COLOUR_LABEL_TEXT_SIZE = 11;
+
+        private string bottomLabelText;
+        public string BottomLabelText
+        {
+            get => bottomLabelText;
+            set
+            {
+                bottomLabelText = value;
+                bottomLabel.Text = value;
+            }
+        }
 
         public OsuColourButton(bool expanded = false)
         {
@@ -49,6 +68,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
             Children = new Drawable[]
             {
+                bottomLabel = new OsuSpriteText
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Margin = new MarginPadding { Top = SIZE_Y + 5 },
+                    Colour = Color4.White,
+                    TextSize = BOTTOM_LABEL_TEXT_SIZE
+                },
                 colourPicker = new OsuColourPicker
                 {
                     Origin = Anchor.TopLeft,
@@ -83,7 +110,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 fill.FadeColour(newValue, 200, Easing.OutQuint);
                 colourLabel.Text = toHexRGBString(newValue);
                 colourLabel.Colour = Color4.ToHsv(newValue).Z >= 0.5f ? Color4.Black : Color4.White;
-                // Do something to change the colour to black/white depending on the brightness of the currently used colour
+                colourPicker.Current.Value = newValue;
             };
         }
 
