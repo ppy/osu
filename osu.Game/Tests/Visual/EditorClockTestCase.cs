@@ -25,9 +25,9 @@ namespace osu.Game.Tests.Visual
             Clock = new EditorClock(new ControlPointInfo(), 5000, BeatDivisor) { IsCoupled = false };
         }
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             dependencies.Cache(BeatDivisor);
             dependencies.CacheAs<IFrameBasedClock>(Clock);
