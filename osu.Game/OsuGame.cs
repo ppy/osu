@@ -198,7 +198,7 @@ namespace osu.Game
                 }
 
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(beatmap.Beatmaps.First());
-            };
+            }
 
             switch (currentScreen)
             {
