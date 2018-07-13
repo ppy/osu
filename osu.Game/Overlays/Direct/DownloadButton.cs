@@ -72,8 +72,8 @@ namespace osu.Game.Overlays.Direct
         protected override void LoadComplete()
         {
             base.LoadComplete();
-
             downloader.DownloadState.BindValueChanged(updateState, true);
+            FinishTransforms(true);
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
