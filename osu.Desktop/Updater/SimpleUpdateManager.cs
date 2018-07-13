@@ -72,7 +72,7 @@ namespace osu.Desktop.Updater
                     bestAsset = release.Assets?.FirstOrDefault(f => f.Name.EndsWith(".exe"));
                     break;
                 case RuntimeInfo.Platform.MacOsx:
-                    bestAsset = release.Assets?.FirstOrDefault(f => f.Name.EndsWith(".dmg"));
+                    bestAsset = release.Assets?.FirstOrDefault(f => f.Name.EndsWith(".app.zip"));
                     break;
             }
 
