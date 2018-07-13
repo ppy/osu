@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
         }
 
-        protected virtual void UpdatePreemptState() => this.FadeIn(HitObject.TimeFadein);
+        protected virtual void UpdatePreemptState() => this.FadeIn(HitObject.TimeFadeIn);
 
         protected virtual void UpdateCurrentState(ArmedState state)
         {

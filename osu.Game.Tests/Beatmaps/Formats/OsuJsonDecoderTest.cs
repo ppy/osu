@@ -118,7 +118,11 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestParity(string beatmap)
         {
             var legacy = decode(beatmap, out Beatmap json);
-            json.WithDeepEqual(legacy).IgnoreProperty(r => r.DeclaringType == typeof(HitWindows)).Assert();
+            json.WithDeepEqual(legacy)
+                .IgnoreProperty(r => r.DeclaringType == typeof(HitWindows)
+                                     // Todo: CustomSampleBank shouldn't exist going forward, we need a conversion mechanism
+                                     || r.Name == nameof(LegacyDecoder<Beatmap>.LegacySampleControlPoint.CustomSampleBank))
+                .Assert();
         }
 
         /// <summary>

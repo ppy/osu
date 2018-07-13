@@ -102,6 +102,7 @@ namespace osu.Game.Overlays.KeyBinding
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Margin = new MarginPadding(padding),
+                    Padding = new MarginPadding { Top = height },
                     Alpha = 0,
                     Colour = colours.YellowDark
                 }
@@ -186,7 +187,7 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 if (bindTarget.IsHovered)
                 {
-                    bindTarget.UpdateKeyCombination(new KeyCombination(KeyCombination.FromInputState(state).Keys.Append(state.Mouse.ScrollDelta.Y > 0 ? InputKey.MouseWheelUp : InputKey.MouseWheelDown)));
+                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state, state.Mouse.ScrollDelta));
                     finalise();
                     return true;
                 }
@@ -267,7 +268,7 @@ namespace osu.Game.Overlays.KeyBinding
                 GetContainingInputManager().ChangeFocus(null);
 
             pressAKey.FadeOut(300, Easing.OutQuint);
-            pressAKey.Padding = new MarginPadding { Top = height, Bottom = -pressAKey.DrawHeight };
+            pressAKey.BypassAutoSizeAxes |= Axes.Y;
         }
 
         protected override void OnFocus(InputState state)
@@ -276,7 +277,7 @@ namespace osu.Game.Overlays.KeyBinding
             AutoSizeEasing = Easing.OutQuint;
 
             pressAKey.FadeIn(300, Easing.OutQuint);
-            pressAKey.Padding = new MarginPadding { Top = height };
+            pressAKey.BypassAutoSizeAxes &= ~Axes.Y;
 
             updateBindTarget();
             base.OnFocus(state);

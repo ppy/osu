@@ -18,6 +18,7 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -70,10 +71,9 @@ namespace osu.Game.Screens.Select
 
         private DependencyContainer dependencies;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
-
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
             dependencies.CacheAs(this);
             dependencies.CacheAs(Ruleset);
             dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
@@ -147,7 +147,11 @@ namespace osu.Game.Screens.Select
                                 Height = filter_height,
                                 FilterChanged = c => Carousel.Filter(c),
                                 Background = { Width = 2 },
-                                Exit = Exit,
+                                Exit = () =>
+                                {
+                                    if (IsCurrentScreen)
+                                        Exit();
+                                },
                             },
                         }
                     },
@@ -198,6 +202,10 @@ namespace osu.Game.Screens.Select
             base.Ruleset.ValueChanged += r => updateSelectedBeatmap(beatmapNoDebounce);
             Ruleset.ValueChanged += r => base.Ruleset.Value = r;
 
+            dependencies.CacheAs(this);
+            dependencies.CacheAs(Ruleset);
+            dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
+
             if (Footer != null)
             {
                 Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
@@ -225,6 +233,12 @@ namespace osu.Game.Screens.Select
             Beatmap.BindValueChanged(workingBeatmapChanged);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            base.Ruleset.ValueChanged += r => updateSelectedBeatmap(beatmapNoDebounce);
+        }
+
         public void Edit(BeatmapInfo beatmap)
         {
             Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
@@ -238,6 +252,10 @@ namespace osu.Game.Screens.Select
         /// <param name="performStartAction">Whether to trigger <see cref="OnStart"/>.</param>
         public void FinaliseSelection(BeatmapInfo beatmap = null, bool performStartAction = true)
         {
+            // avoid attempting to continue before a selection has been obtained.
+            // this could happen via a user interaction while the carousel is still in a loading state.
+            if (Carousel.SelectedBeatmap == null) return;
+
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
             Carousel.FlushPendingFilterOperations();
@@ -497,16 +515,26 @@ namespace osu.Game.Screens.Select
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
+        public override bool OnPressed(GlobalAction action)
+        {
+            if (!IsCurrentScreen) return false;
+
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    FinaliseSelection();
+                    return true;
+            }
+
+            return base.OnPressed(action);
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat) return false;
 
             switch (args.Key)
             {
-                case Key.KeypadEnter:
-                case Key.Enter:
-                    FinaliseSelection();
-                    return true;
                 case Key.Delete:
                     if (state.Keyboard.ShiftPressed)
                     {

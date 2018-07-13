@@ -24,9 +24,9 @@ namespace osu.Game.Overlays.Settings
 
         private DependencyContainer dependencies;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(ruleset);
             if (Config != null)

@@ -25,6 +25,8 @@ namespace osu.Game.Tests.Beatmaps
 
         protected abstract string ResourceAssembly { get; }
 
+        protected IBeatmapConverter Converter { get; private set; }
+
         protected void Test(string name)
         {
             var ourResult = convert(name);
@@ -41,14 +43,22 @@ namespace osu.Game.Tests.Beatmaps
                         Assert.Fail($"A conversion did not generate any hitobjects, but should have, for hitobject at time: {expectedResult.Mappings[mappingCounter].StartTime}\n");
                     else if (mappingCounter >= expectedResult.Mappings.Count)
                         Assert.Fail($"A conversion generated hitobjects, but should not have, for hitobject at time: {ourResult.Mappings[mappingCounter].StartTime}\n");
+                    else if (!expectedResult.Mappings[mappingCounter].Equals(ourResult.Mappings[mappingCounter]))
+                    {
+                        var expectedMapping = expectedResult.Mappings[mappingCounter];
+                        var ourMapping = ourResult.Mappings[mappingCounter];
+
+                        Assert.Fail($"The conversion mapping differed for object at time {expectedMapping.StartTime}:\n"
+                                    + $"Expected {JsonConvert.SerializeObject(expectedMapping)}\n"
+                                    + $"Received: {JsonConvert.SerializeObject(ourMapping)}\n");
+                    }
                     else
                     {
-                        var counter = mappingCounter;
+                        var ourMapping = ourResult.Mappings[mappingCounter];
+                        var expectedMapping = expectedResult.Mappings[mappingCounter];
+
                         Assert.Multiple(() =>
                         {
-                            var ourMapping = ourResult.Mappings[counter];
-                            var expectedMapping = expectedResult.Mappings[counter];
-
                             int objectCounter = 0;
                             while (true)
                             {
@@ -60,10 +70,6 @@ namespace osu.Game.Tests.Beatmaps
                                 else if (objectCounter >= expectedMapping.Objects.Count)
                                     Assert.Fail($"The conversion generated a hitobject, but should not have, for hitobject at time: {ourMapping.StartTime}:\n"
                                                 + $"Received: {JsonConvert.SerializeObject(ourMapping.Objects[objectCounter])}\n");
-                                else if (!expectedMapping.Equals(ourMapping))
-                                    Assert.Fail($"The conversion mapping differed for object at time {expectedMapping.StartTime}:\n"
-                                                + $"Expected {JsonConvert.SerializeObject(expectedMapping)}\n"
-                                                + $"Received: {JsonConvert.SerializeObject(ourMapping)}\n");
                                 else if (!expectedMapping.Objects[objectCounter].Equals(ourMapping.Objects[objectCounter]))
                                 {
                                     Assert.Fail($"The conversion generated differing hitobjects for object at time: {expectedMapping.StartTime}:\n"
@@ -88,10 +94,11 @@ namespace osu.Game.Tests.Beatmaps
             var rulesetInstance = CreateRuleset();
             beatmap.BeatmapInfo.Ruleset = beatmap.BeatmapInfo.RulesetID == rulesetInstance.RulesetInfo.ID ? rulesetInstance.RulesetInfo : new RulesetInfo();
 
-            var result = new ConvertResult();
-            var converter = rulesetInstance.CreateBeatmapConverter(beatmap);
+            Converter = rulesetInstance.CreateBeatmapConverter(beatmap);
 
-            converter.ObjectConverted += (orig, converted) =>
+            var result = new ConvertResult();
+
+            Converter.ObjectConverted += (orig, converted) =>
             {
                 converted.ForEach(h => h.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty));
 
@@ -103,7 +110,7 @@ namespace osu.Game.Tests.Beatmaps
                 result.Mappings.Add(mapping);
             };
 
-            IBeatmap convertedBeatmap = converter.Convert();
+            IBeatmap convertedBeatmap = Converter.Convert();
             rulesetInstance.CreateBeatmapProcessor(convertedBeatmap)?.PostProcess();
 
             return result;
