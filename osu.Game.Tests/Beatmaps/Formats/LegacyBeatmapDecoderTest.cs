@@ -222,10 +222,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
-                Assert.AreEqual("hitnormal", getTestableSampleInfo(hitObjects[0]).Name);
-                Assert.AreEqual("hitnormal", getTestableSampleInfo(hitObjects[1]).Name);
-                Assert.AreEqual("hitnormal2", getTestableSampleInfo(hitObjects[2]).Name);
-                Assert.AreEqual("hitnormal", getTestableSampleInfo(hitObjects[3]).Name);
+                Assert.AreEqual("normal-hitnormal", getTestableSampleInfo(hitObjects[0]).LookupNames.First());
+                Assert.AreEqual("normal-hitnormal", getTestableSampleInfo(hitObjects[1]).LookupNames.First());
+                Assert.AreEqual("normal-hitnormal2", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
+                Assert.AreEqual("normal-hitnormal", getTestableSampleInfo(hitObjects[3]).LookupNames.First());
             }
 
             SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(new SampleInfo { Name = "hitnormal" });
@@ -242,7 +242,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
                 Assert.AreEqual("hit_1.wav", hitObjects[0].Samples[0].LookupNames.First());
                 Assert.AreEqual("hit_2.wav", hitObjects[1].Samples[0].LookupNames.First());
-                Assert.AreEqual("hitnormal2", getTestableSampleInfo(hitObjects[2]).Name);
+                Assert.AreEqual("normal-hitnormal2", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
                 Assert.AreEqual("hit_1.wav", hitObjects[3].Samples[0].LookupNames.First());
             }
 

@@ -346,6 +346,8 @@ namespace osu.Game.Beatmaps
         {
             var beatmapInfos = new List<BeatmapInfo>();
 
+            bool invalidateOnlineIDs = false;
+
             foreach (var name in reader.Filenames.Where(f => f.EndsWith(".osu")))
             {
                 using (var raw = reader.GetStream(name))
@@ -362,9 +364,18 @@ namespace osu.Game.Beatmaps
                     beatmap.BeatmapInfo.Hash = ms.ComputeSHA2Hash();
                     beatmap.BeatmapInfo.MD5Hash = ms.ComputeMD5Hash();
 
-                    // check that no existing beatmap exists that is imported with the same online beatmap ID. if so, give it precedence.
-                    if (beatmap.BeatmapInfo.OnlineBeatmapID.HasValue && QueryBeatmap(b => b.OnlineBeatmapID.Value == beatmap.BeatmapInfo.OnlineBeatmapID.Value) != null)
-                        beatmap.BeatmapInfo.OnlineBeatmapID = null;
+                    if (beatmap.BeatmapInfo.OnlineBeatmapID.HasValue)
+                    {
+                        var ourId = beatmap.BeatmapInfo.OnlineBeatmapID;
+
+                        // check that no existing beatmap in database exists that is imported with the same online beatmap ID. if so, give it precedence.
+                        if (QueryBeatmap(b => b.OnlineBeatmapID.Value == ourId) != null)
+                            beatmap.BeatmapInfo.OnlineBeatmapID = null;
+
+                        // check that no other beatmap in this imported set has a conflicting online beatmap ID. If so, presume *all* are incorrect.
+                        if (beatmapInfos.Any(b => b.OnlineBeatmapID == ourId))
+                            invalidateOnlineIDs = true;
+                    }
 
                     RulesetInfo ruleset = rulesets.GetRuleset(beatmap.BeatmapInfo.RulesetID);
 
@@ -381,6 +392,9 @@ namespace osu.Game.Beatmaps
                     beatmapInfos.Add(beatmap.BeatmapInfo);
                 }
             }
+
+            if (invalidateOnlineIDs)
+                beatmapInfos.ForEach(b => b.OnlineBeatmapID = null);
 
             return beatmapInfos;
         }
