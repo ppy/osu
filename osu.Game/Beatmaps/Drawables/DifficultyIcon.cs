@@ -3,10 +3,14 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -14,7 +18,8 @@ namespace osu.Game.Beatmaps.Drawables
     {
         private readonly BeatmapInfo beatmap;
 
-        public DifficultyIcon(BeatmapInfo beatmap) : base(beatmap)
+        public DifficultyIcon(BeatmapInfo beatmap)
+            : base(beatmap)
         {
             if (beatmap == null)
                 throw new ArgumentNullException(nameof(beatmap));
@@ -28,16 +33,29 @@ namespace osu.Game.Beatmaps.Drawables
         {
             Children = new Drawable[]
             {
-                new SpriteIcon
+                new CircularContainer
                 {
+                    RelativeSizeAxes = Axes.Both,
+                    Scale = new Vector2(0.84f),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = AccentColour,
-                    Icon = FontAwesome.fa_circle
+                    Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Colour = Color4.Black.Opacity(0.08f),
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 5,
+                    },
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = AccentColour,
+                    },
                 },
                 new ConstrainedIconContainer
                 {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     // the null coalesce here is only present to make unit tests work (ruleset dlls aren't copied correctly for testing at the moment)
                     Icon = beatmap.Ruleset?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.fa_question_circle_o }
