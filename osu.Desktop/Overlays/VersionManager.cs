@@ -111,6 +111,8 @@ namespace osu.Desktop.Overlays
 
         private class UpdateCompleteNotification : SimpleNotification
         {
+            public override bool IsImportant => true;
+
             public UpdateCompleteNotification(string version, Action<string> openUrl = null)
             {
                 Text = $"You are now running osu!lazer {version}.\nClick to see what's new!";

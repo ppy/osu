@@ -128,7 +128,8 @@ namespace osu.Game.Overlays
             var section = sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)));
             section?.Add(notification, notification.DisplayOnTop ? -runningDepth : runningDepth);
 
-            State = Visibility.Visible;
+            if (notification.IsImportant)
+                State = Visibility.Visible;
 
             updateCounts();
         });
