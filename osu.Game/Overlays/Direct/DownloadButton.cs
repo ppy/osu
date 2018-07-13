@@ -3,19 +3,16 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class DownloadButton : OsuClickableContainer
+    public class DownloadButton : OsuAnimatedButton
     {
         private readonly SpriteIcon icon;
         private readonly SpriteIcon checkmark;
@@ -26,17 +23,13 @@ namespace osu.Game.Overlays.Direct
 
         public DownloadButton(BeatmapSetInfo set, bool noVideo = false)
         {
-            Children = new Drawable[]
+            AddRange(new Drawable[]
             {
                 downloader = new BeatmapSetDownloader(set, noVideo),
-                new CircularContainer
+                background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Child = background = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    },
+                    Depth = float.MaxValue
                 },
                 icon = new SpriteIcon
                 {
@@ -53,18 +46,19 @@ namespace osu.Game.Overlays.Direct
                     Size = Vector2.Zero,
                     Icon = FontAwesome.fa_check,
                 }
-            };
+            });
 
             Action = () =>
             {
-                if (downloader.DownloadState.Value == BeatmapSetDownloader.DownloadStatus.Downloading)
+                if (downloader.DownloadState == BeatmapSetDownloader.DownloadStatus.Downloading)
                 {
+                    // todo: replace with ShakeContainer after https://github.com/ppy/osu/pull/2909 is merged.
                     Content.MoveToX(-5, 50, Easing.OutSine).Then()
                            .MoveToX(5, 100, Easing.InOutSine).Then()
                            .MoveToX(-5, 100, Easing.InOutSine).Then()
                            .MoveToX(0, 50, Easing.InSine);
                 }
-                else if (downloader.DownloadState.Value == BeatmapSetDownloader.DownloadStatus.Downloaded)
+                else if (downloader.DownloadState == BeatmapSetDownloader.DownloadStatus.Downloaded)
                 {
                     // TODO: Jump to song select with this set when the capability is implemented
                 }
@@ -73,54 +67,24 @@ namespace osu.Game.Overlays.Direct
                     downloader.Download();
                 }
             };
-
-            downloader.DownloadState.ValueChanged += _ => updateState();
-
-            Colour = Color4.White;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            updateState();
+            downloader.DownloadState.BindValueChanged(updateState, true);
         }
 
-        [BackgroundDependencyLoader(permitNulls:true)]
+        [BackgroundDependencyLoader(permitNulls: true)]
         private void load(OsuColour colours)
         {
             this.colours = colours;
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        private void updateState(BeatmapSetDownloader.DownloadStatus state)
         {
-            Content.ScaleTo(0.9f, 1000, Easing.Out);
-            return base.OnMouseDown(state, args);
-        }
-
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-        {
-            Content.ScaleTo(1f, 500, Easing.OutElastic);
-            return base.OnMouseUp(state, args);
-        }
-
-        protected override bool OnHover(InputState state)
-        {
-            Content.ScaleTo(1.1f, 500, Easing.OutElastic);
-            return base.OnHover(state);
-        }
-
-        protected override void OnHoverLost(InputState state)
-        {
-            Content.ScaleTo(1f, 500, Easing.OutElastic);
-        }
-
-        private void updateState()
-        {
-            if (!IsLoaded)
-                return;
-
-            switch (downloader.DownloadState.Value)
+            switch (state)
             {
                 case BeatmapSetDownloader.DownloadStatus.NotDownloaded:
                     background.FadeColour(colours.Gray4, 500, Easing.InOutExpo);
