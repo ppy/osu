@@ -69,8 +69,8 @@ namespace osu.Game.Screens.Select
 
         private DependencyContainer dependencies;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         protected SongSelect()
         {
@@ -193,8 +193,6 @@ namespace osu.Game.Screens.Select
             dependencies.CacheAs(Ruleset);
             dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
 
-            base.Ruleset.ValueChanged += r => updateSelectedBeatmap(beatmapNoDebounce);
-
             if (Footer != null)
             {
                 Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
@@ -220,6 +218,12 @@ namespace osu.Game.Screens.Select
 
             Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
             Beatmap.BindValueChanged(workingBeatmapChanged);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            base.Ruleset.ValueChanged += r => updateSelectedBeatmap(beatmapNoDebounce);
         }
 
         public void Edit(BeatmapInfo beatmap)
