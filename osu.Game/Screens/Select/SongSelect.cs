@@ -315,12 +315,13 @@ namespace osu.Game.Screens.Select
                     working = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
                 }
 
-                ensurePlayingSelected(preview);
 
                 working.Mods.Value = Enumerable.Empty<Mod>();
 
                 Beatmap.Value = working;
                 Ruleset.Value = ruleset;
+
+                ensurePlayingSelected(preview);
 
                 UpdateBeatmap(Beatmap.Value);
             }
