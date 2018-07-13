@@ -202,10 +202,6 @@ namespace osu.Game.Screens.Select
             base.Ruleset.ValueChanged += r => updateSelectedBeatmap(beatmapNoDebounce);
             Ruleset.ValueChanged += r => base.Ruleset.Value = r;
 
-            dependencies.CacheAs(this);
-            dependencies.CacheAs(Ruleset);
-            dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
-
             if (Footer != null)
             {
                 Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
