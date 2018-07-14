@@ -235,8 +235,7 @@ namespace osu.Game.Screens.Play
 
                         sampleExit?.Play();
                         ValidForResume = false;
-                        RulesetContainer?.Hide();
-                        pauseContainer?.Hide();
+                        Content.Hide();
                         Exit();
                     }
                 }
