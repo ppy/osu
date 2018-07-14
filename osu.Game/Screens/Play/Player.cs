@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Play
                         //we want to hide the hitrenderer immediately (looks better).
                         //we may be able to remove this once the mouse cursor trail is improved.
                         RulesetContainer?.Hide();
-                        pauseContainer?.Hide();
+                        Content.Hide();
                         Restart();
                     },
                 }
