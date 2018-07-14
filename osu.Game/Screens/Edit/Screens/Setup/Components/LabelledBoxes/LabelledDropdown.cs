@@ -127,7 +127,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 
         public LabelledDropdown()
         {
-            //CornerRadius = OUTER_CORNER_RADIUS;
             RelativeSizeAxes = Axes.X;
             base.Height = DEFAULT_HEIGHT + Padding.Top;
 
@@ -198,17 +197,19 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 
         public void RemoveDropdownItem(T value) => dropdown.RemoveDropdownItem(value);
 
-        protected virtual OsuDropdown<T> CreateDropdown() => new OsuDropdown<T>
-        {
-            Anchor = Anchor.TopLeft,
-            Origin = Anchor.TopLeft,
-            RelativeSizeAxes = Axes.X,
-            AutoSizeAxes = Axes.Y,
-            HeaderHeight = DEFAULT_HEIGHT,
-            HeaderCornerRadius = INNER_CORNER_RADIUS,
-            HeaderTextSize = DEFAULT_HEADER_TEXT_SIZE,
-            HeaderTextLeftPadding = DEFAULT_HEADER_TEXT_PADDING,
-            HeaderDownIconRightPadding = DEFAULT_HEADER_ICON_PADDING,
-        };
+        //protected virtual OsuDropdown<T> CreateDropdown() => new OsuDropdown<T>
+        //{
+        //    Anchor = Anchor.TopLeft,
+        //    Origin = Anchor.TopLeft,
+        //    RelativeSizeAxes = Axes.X,
+        //    AutoSizeAxes = Axes.Y,
+        //    HeaderHeight = DEFAULT_HEIGHT,
+        //    HeaderCornerRadius = INNER_CORNER_RADIUS,
+        //    HeaderTextSize = DEFAULT_HEADER_TEXT_SIZE,
+        //    HeaderTextLeftPadding = DEFAULT_HEADER_TEXT_PADDING,
+        //    HeaderDownIconRightPadding = DEFAULT_HEADER_ICON_PADDING,
+        //};
+
+        protected virtual OsuDropdown<T> CreateDropdown() => new OsuSetupDropdown<T>();
     }
 }

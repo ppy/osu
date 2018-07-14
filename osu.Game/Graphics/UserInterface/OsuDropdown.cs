@@ -16,9 +16,6 @@ namespace osu.Game.Graphics.UserInterface
 {
     public class OsuDropdown<T> : Dropdown<T>, IHasAccentColour
     {
-        private OsuDropdownHeader header;
-        private OsuDropdownMenu menu;
-
         private Color4 accentColour;
         public Color4 AccentColour
         {
@@ -28,42 +25,6 @@ namespace osu.Game.Graphics.UserInterface
                 accentColour = value;
                 updateAccentColour();
             }
-        }
-        
-        public Color4 HeaderTextColour
-        {
-            get => header.TextColour;
-            set => header.TextColour = value;
-        }
-
-        public float HeaderTextSize
-        {
-            get => header.TextSize;
-            set => header.TextSize = value;
-        }
-
-        public float HeaderTextLeftPadding
-        {
-            get => header.TextLeftPadding;
-            set => header.TextLeftPadding = value;
-        }
-
-        public float HeaderDownIconRightPadding
-        {
-            get => header.DownIconRightPadding;
-            set => header.DownIconRightPadding = value;
-        }
-
-        public float HeaderCornerRadius
-        {
-            get => header.CornerRadius;
-            set => header.CornerRadius = value;
-        }
-
-        public float HeaderHeight
-        {
-            get => header.Height;
-            set => header.Height = value;
         }
 
         [BackgroundDependencyLoader]
@@ -83,9 +44,9 @@ namespace osu.Game.Graphics.UserInterface
             if (menu != null) menu.AccentColour = accentColour;
         }
 
-        protected override DropdownHeader CreateHeader() => header = new OsuDropdownHeader();
+        protected override DropdownHeader CreateHeader() => new OsuDropdownHeader();
 
-        protected override DropdownMenu CreateMenu() => menu = new OsuDropdownMenu();
+        protected override DropdownMenu CreateMenu() => new OsuDropdownMenu();
 
         #region OsuDropdownMenu
         protected class OsuDropdownMenu : DropdownMenu, IHasAccentColour
@@ -242,31 +203,7 @@ namespace osu.Game.Graphics.UserInterface
                 get { return Text.Text; }
                 set { Text.Text = value; }
             }
-
-            public Color4 TextColour
-            {
-                get => Text.Colour;
-                set => Text.Colour = value;
-            }
             
-            public float TextSize
-            {
-                get => Text.TextSize;
-                set => Text.TextSize = value;
-            }
-
-            public float TextLeftPadding
-            {
-                get => Text.Padding.Left;
-                set => Text.Padding = new MarginPadding { Left = value };
-            }
-
-            public float DownIconRightPadding
-            {
-                get => Icon.Margin.Right;
-                set => Icon.Margin = new MarginPadding { Right = value };
-            }
-
             private Color4 accentColour;
             public virtual Color4 AccentColour
             {
