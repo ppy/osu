@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
     public class ColoursScreen : EditorScreen
     {
         private readonly FillFlowContainer comboColourButtonContainer;
+        private readonly OsuColourButton playfieldBackgroundColourButton;
         private readonly NewComboColourButton newComboColourButton;
         private readonly OsuCircularButton removeComboColourButton;
         private readonly OsuSpriteText backgroundColourBottomLabel;
@@ -24,6 +25,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private int currentComboColours = 5;
 
         public Color4[] DefaultComboColours { get; private set; } = new Color4[8];
+        public Color4 DefaultPlayfieldBackgroundColour { get; private set; }
 
         public ColoursScreen()
         {
@@ -146,7 +148,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                                     TextSize = 12,
                                                     Font = @"Exo2.0-BoldItalic",
                                                 },
-                                                new OsuColourButton(true)
+                                                playfieldBackgroundColourButton = new OsuColourButton(true)
                                                 {
                                                     Anchor = Anchor.TopLeft,
                                                     Origin = Anchor.TopLeft,
@@ -188,7 +190,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         [BackgroundDependencyLoader]
         private void load(OsuColour osuColour)
         {
-            // The first 5 colours are taken from osu!stable and the last 3 are 
+            // The first 5 colours are taken from osu!stable
+            // Since these colours are standard and independent from anything else, they could be directly initialised in their declaration
+            // Also, I should ask about the colours that are to be used first
             DefaultComboColours = new[]
             {
                 osuColour.PurpleDark,
@@ -200,6 +204,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 osuColour.Pink,
                 osuColour.RedDark,
             };
+
+            DefaultPlayfieldBackgroundColour = osuColour.BlueLight;
 
             setDefaultColours();
 
@@ -241,5 +247,16 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             currentComboColours--;
             updateInfo();
         }
+
+        public void ChangeComboColour(int comboIndex, Color4 newColour)
+        {
+            if (comboIndex >= currentComboColours)
+                throw new IndexOutOfRangeException("The provided combo colour index is out of range.");
+
+            // ReSharper disable once PossibleNullReferenceException
+            (comboColourButtonContainer[comboIndex] as OsuColourButton).Current.Value = newColour;
+        }
+
+        public void ChangePlayfieldBackgroundColour(Color4 newColour) => playfieldBackgroundColourButton.Current.Value = newColour;
     }
 }

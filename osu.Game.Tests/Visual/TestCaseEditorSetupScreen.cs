@@ -13,6 +13,7 @@ using osu.Game.Rulesets;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
@@ -139,6 +140,14 @@ namespace osu.Game.Tests.Visual
             AddAssert("Check new samples match playback rate value", () => !setup.CurrentScreen.Beatmap.Value.BeatmapInfo.SamplesMatchPlaybackRate);
 
             AddStep("Select Colours tab", () => setup.MenuBar.Mode.Value = SetupScreenMode.Colours);
+            AddStep("Change combo colour 1 to #ff0cca", () => (setup.CurrentScreen as ColoursScreen).ChangeComboColour(0, OsuColour.FromHex("ff0cca")));
+            AddStep("Change combo colour 2 to #abc143", () => (setup.CurrentScreen as ColoursScreen).ChangeComboColour(1, OsuColour.FromHex("abc143")));
+            AddStep("Change combo colour 3 to #def312", () => (setup.CurrentScreen as ColoursScreen).ChangeComboColour(2, OsuColour.FromHex("def312")));
+            AddStep("Change combo colour 4 to #123adc", () => (setup.CurrentScreen as ColoursScreen).ChangeComboColour(3, OsuColour.FromHex("123adc")));
+            AddStep("Change combo colour 5 to #aabbcc", () => (setup.CurrentScreen as ColoursScreen).ChangeComboColour(4, OsuColour.FromHex("aabbcc")));
+            AddStep("Change playfield background colour to #293847", () => (setup.CurrentScreen as ColoursScreen).ChangePlayfieldBackgroundColour(OsuColour.FromHex("293847")));
+            AddRepeatStep("Add new combo colours", () => (setup.CurrentScreen as ColoursScreen).AddNewComboColour(), 3);
+            AddRepeatStep("Remove combo colours", () => (setup.CurrentScreen as ColoursScreen).RemoveLastComboColour(), 6);
 
             AddStep("Select Design tab", () => setup.MenuBar.Mode.Value = SetupScreenMode.Design);
             AddStep("Enable enable countdown", () => (setup.CurrentScreen as DesignScreen).ChangeEnableCountdown(true));
