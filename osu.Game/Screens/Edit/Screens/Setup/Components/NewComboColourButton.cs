@@ -4,11 +4,9 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -18,7 +16,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
     public class NewComboColourButton : CircularContainer
     {
-        private readonly OsuSpriteText bottomLabel;
         private readonly Box fill;
         private readonly CircularContainer button;
 
@@ -31,13 +28,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public NewComboColourButton()
         {
-            SpriteIcon colourLabel;
-            
             Size = new Vector2(SIZE_X, SIZE_Y);
 
             Children = new Drawable[]
             {
-                bottomLabel = new OsuSpriteText
+                new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -60,7 +55,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                         AlwaysPresent = true
                     },
                 },
-                colourLabel = new SpriteIcon
+                new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

@@ -59,6 +59,7 @@ namespace osu.Game.Tests.Visual
 
         private void addSteps()
         {
+            // ReSharper disable PossibleNullReferenceException
             AddStep("Select General tab", () => setup.MenuBar.Mode.Value = SetupScreenMode.General);
             AddStep("Change artist to \"test artist\"", () => (setup.CurrentScreen as GeneralScreen).ChangeArtist("test artist"));
             AddAssert("Check new artist value", () => setup.CurrentScreen.Beatmap.Value.Metadata.ArtistUnicode == "test artist");
@@ -176,6 +177,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("Check new special style value", () => setup.CurrentScreen.Beatmap.Value.BeatmapInfo.SpecialStyle);
             AddStep("Disable osu!mania special style", () => (setup.CurrentScreen as AdvancedScreen).ChangeManiaSpecialStyle(false));
             AddAssert("Check new special style value", () => !setup.CurrentScreen.Beatmap.Value.BeatmapInfo.SpecialStyle);
+            // ReSharper enable PossibleNullReferenceException
         }
     }
 }

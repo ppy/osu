@@ -1,22 +1,17 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using System.Linq;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class OsuSetupEnumDropdown<T> : OsuEnumDropdown<T>, IHasAccentColour
+    public class OsuSetupEnumDropdown<T> : OsuEnumDropdown<T>
     {
         private OsuSetupDropdownHeader header;
         private OsuSetupDropdownMenu menu;

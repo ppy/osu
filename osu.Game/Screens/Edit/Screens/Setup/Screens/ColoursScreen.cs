@@ -4,24 +4,13 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
-using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays.SearchableList;
-using osu.Game.Screens.Edit.Screens.Setup.BottomHeaders;
 using osu.Game.Screens.Edit.Screens.Setup.Components;
-using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
@@ -181,6 +170,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                     Origin = Anchor.TopLeft,
                     BottomLabelText = $"Combo {i}"
                 });
+            // ReSharper disable once PossibleNullReferenceException
             (comboColourButtonContainer[7] as OsuColourButton).ColourPickerOrigin = Anchor.TopRight;
             comboColourButtonContainer.Add(newComboColourButton = new NewComboColourButton
             {
@@ -220,9 +210,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private void setDefaultColours()
         {
             for (int i = 0; i < 8; i++)
-            {
+                // ReSharper disable once PossibleNullReferenceException
                 (comboColourButtonContainer[i] as OsuColourButton).Current.Value = DefaultComboColours[i];
-            }
         }
 
         private void updateInfo()
@@ -231,7 +220,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             setDefaultColours(); // Replace with function that sets the actual beatmap colours once available
             for (int i = 0; i < 8; i++)
                 comboColourButtonContainer[i].Alpha = Convert.ToInt32(i < currentComboColours);
-            comboColourButtonContainer.Last().Alpha = Convert.ToInt32(currentComboColours < 8);
+            newComboColourButton.Alpha = Convert.ToInt32(currentComboColours < 8);
             removeComboColourButton.Disabled = currentComboColours <= 2;
         }
 

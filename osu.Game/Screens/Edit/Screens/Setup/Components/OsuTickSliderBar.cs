@@ -395,7 +395,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         private class Ticks : Container
         {
-            private bool canCreateTicks;
+            private readonly bool canCreateTicks;
 
             public event Action<float> TickClicked;
 

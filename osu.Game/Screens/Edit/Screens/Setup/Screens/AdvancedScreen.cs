@@ -9,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
