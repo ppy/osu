@@ -18,16 +18,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
     public class OsuSetupEnumDropdown<T> : OsuEnumDropdown<T>, IHasAccentColour
     {
-        public const float LABEL_CONTAINER_WIDTH = 150;
-        public const float OUTER_CORNER_RADIUS = 15;
-        public const float INNER_CORNER_RADIUS = 10;
-        public const float DEFAULT_HEADER_TEXT_SIZE = 20;
+        private OsuSetupDropdownHeader header;
+        private OsuSetupDropdownMenu menu;
+
+        public const float DEFAULT_CORNER_RADIUS = 10;
         public const float DEFAULT_HEIGHT = 40;
-        public const float DEFAULT_LABEL_TEXT_SIZE = 16;
-        public const float DEFAULT_LEFT_PADDING = 15;
-        public const float DEFAULT_TOP_PADDING = 12;
-        public const float DEFAULT_HEADER_TEXT_PADDING = 11;
         public const float DEFAULT_HEADER_ICON_PADDING = 10;
+        public const float DEFAULT_HEADER_TEXT_PADDING = 11;
+        public const float DEFAULT_HEADER_TEXT_SIZE = 20;
 
         public OsuSetupEnumDropdown()
         {
@@ -35,37 +33,43 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             Origin = Anchor.TopLeft;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour osuColour)
+        {
+            header.TextColour = osuColour.Blue;
+            header.AccentColour = osuColour.BlueDarker.Darken(0.6f);
+            menu.AccentColour = osuColour.BlueDarker.Darken(0.6f);
         }
         
-        protected override DropdownHeader CreateHeader() => new OsuSetupDropdownHeader();
+        protected override DropdownHeader CreateHeader() => header = new OsuSetupDropdownHeader();
 
-        protected override DropdownMenu CreateMenu() => new OsuSetupDropdownMenu();
+        protected override DropdownMenu CreateMenu() => menu = new OsuSetupDropdownMenu();
 
         protected class OsuSetupDropdownMenu : OsuDropdownMenu
         {
             public OsuSetupDropdownMenu()
             {
-                CornerRadius = INNER_CORNER_RADIUS;
+                CornerRadius = DEFAULT_CORNER_RADIUS;
             }
         }
 
         protected class OsuSetupDropdownHeader : OsuDropdownHeader
         {
+            public Color4 TextColour
+            {
+                get => Text.Colour;
+                set => Text.Colour = value;
+            }
+
             public OsuSetupDropdownHeader()
             {
                 Height = DEFAULT_HEIGHT;
-                CornerRadius = INNER_CORNER_RADIUS;
+                CornerRadius = DEFAULT_CORNER_RADIUS;
                 Text.TextSize = DEFAULT_HEADER_TEXT_SIZE;
                 Text.Padding = new MarginPadding { Left = DEFAULT_HEADER_TEXT_PADDING };
                 Icon.Margin = new MarginPadding { Right = DEFAULT_HEADER_ICON_PADDING };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour osuColour)
-            {
-                TextColour = osuColour.Blue;
-                AccentColour = osuColour.BlueDarker.Darken(0.6f);
             }
         }
     }

@@ -180,13 +180,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             dropdown.Current.ValueChanged += delegate { TriggerDropdownSelectionChanged(dropdown.Current.Value); };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour osuColour)
-        {
-            dropdown.HeaderTextColour = osuColour.Blue;
-            dropdown.AccentColour = osuColour.BlueDarker.Darken(0.6f);
-        }
-
         public void AddDropdownItem(string text, T value) => dropdown.AddDropdownItem(text, value);
 
         public void AddDropdownItems(IEnumerable<KeyValuePair<string, T>> items)
@@ -196,19 +189,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         }
 
         public void RemoveDropdownItem(T value) => dropdown.RemoveDropdownItem(value);
-
-        //protected virtual OsuDropdown<T> CreateDropdown() => new OsuDropdown<T>
-        //{
-        //    Anchor = Anchor.TopLeft,
-        //    Origin = Anchor.TopLeft,
-        //    RelativeSizeAxes = Axes.X,
-        //    AutoSizeAxes = Axes.Y,
-        //    HeaderHeight = DEFAULT_HEIGHT,
-        //    HeaderCornerRadius = INNER_CORNER_RADIUS,
-        //    HeaderTextSize = DEFAULT_HEADER_TEXT_SIZE,
-        //    HeaderTextLeftPadding = DEFAULT_HEADER_TEXT_PADDING,
-        //    HeaderDownIconRightPadding = DEFAULT_HEADER_ICON_PADDING,
-        //};
 
         protected virtual OsuDropdown<T> CreateDropdown() => new OsuSetupDropdown<T>();
     }
