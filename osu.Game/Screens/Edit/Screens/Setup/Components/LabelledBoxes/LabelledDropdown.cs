@@ -127,8 +127,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 
         public LabelledDropdown()
         {
-            Masking = true;
-            CornerRadius = OUTER_CORNER_RADIUS;
+            //CornerRadius = OUTER_CORNER_RADIUS;
             RelativeSizeAxes = Axes.X;
             base.Height = DEFAULT_HEIGHT + Padding.Top;
 
@@ -148,38 +147,33 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                             Height = DEFAULT_HEIGHT,
                             Colour = OsuColour.FromHex("1c2125"),
                         },
-                        new Container
+                    }
+                },
+                new GridContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = DEFAULT_HEIGHT,
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = DEFAULT_HEIGHT,
-                            Child = new GridContainer
+                            label = new OsuSpriteText
                             {
-                                RelativeSizeAxes = Axes.X,
-                                Height = DEFAULT_HEIGHT,
-                                Content = new[]
-                                {
-                                    new Drawable[]
-                                    {
-                                        label = new OsuSpriteText
-                                        {
-                                            Anchor = Anchor.TopLeft,
-                                            Origin = Anchor.TopLeft,
-                                            Padding = new MarginPadding { Left = DEFAULT_LEFT_PADDING, Top = DEFAULT_TOP_PADDING },
-                                            Colour = Color4.White,
-                                            TextSize = DEFAULT_LABEL_TEXT_SIZE,
-                                            Text = LabelText,
-                                            Font = @"Exo2.0-Bold",
-                                        },
-                                        dropdown = CreateDropdown(),
-                                    },
-                                },
-                                ColumnDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.Absolute, LABEL_CONTAINER_WIDTH),
-                                    new Dimension()
-                                }
-                            }
-                        }
+                                Anchor = Anchor.TopLeft,
+                                Origin = Anchor.TopLeft,
+                                Padding = new MarginPadding { Left = DEFAULT_LEFT_PADDING, Top = DEFAULT_TOP_PADDING },
+                                Colour = Color4.White,
+                                TextSize = DEFAULT_LABEL_TEXT_SIZE,
+                                Text = LabelText,
+                                Font = @"Exo2.0-Bold",
+                            },
+                            dropdown = CreateDropdown(),
+                        },
+                    },
+                    ColumnDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.Absolute, LABEL_CONTAINER_WIDTH),
+                        new Dimension()
                     }
                 }
             };
