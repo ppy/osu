@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -39,6 +40,11 @@ namespace osu.Game.Screens.Play
         private readonly RemainingTimeCounter remainingTimeCounter;
         private readonly BreakInfo info;
         private readonly BreakArrows breakArrows;
+
+        public Action OnBreakEnter;
+        public Action OnBreakLeave;
+
+        public bool IsBreakTime;
 
         public BreakOverlay(bool letterboxing, ScoreProcessor scoreProcessor)
             : this(letterboxing)
@@ -119,6 +125,9 @@ namespace osu.Game.Screens.Play
             {
                 if (!b.HasEffect)
                     continue;
+
+                Scheduler.AddDelayed(OnBreakEnter, b.StartTime);
+                Scheduler.AddDelayed(OnBreakLeave, b.StartTime + b.Duration);
 
                 using (BeginAbsoluteSequence(b.StartTime, true))
                 {

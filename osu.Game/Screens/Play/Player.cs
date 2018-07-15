@@ -75,6 +75,7 @@ namespace osu.Game.Screens.Play
         protected ScoreProcessor ScoreProcessor;
         protected RulesetContainer RulesetContainer;
 
+        private BreakOverlay breakOverlay;
         private HUDOverlay hudOverlay;
         private FailOverlay failOverlay;
 
@@ -171,7 +172,7 @@ namespace osu.Game.Screens.Play
                         pauseContainer.Retries = RestartCount;
                         hudOverlay.KeyCounter.IsCounting = !pauseContainer.IsPaused;
                     },
-                    OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
+                    OnResume = () => hudOverlay.KeyCounter.IsCounting = !breakOverlay.IsBreakTime,
                     Children = new[]
                     {
                         storyboardContainer = new Container
@@ -184,12 +185,14 @@ namespace osu.Game.Screens.Play
                             RelativeSizeAxes = Axes.Both,
                             Child = RulesetContainer
                         },
-                        new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
+                        breakOverlay = new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             ProcessCustomClock = false,
-                            Breaks = beatmap.Breaks
+                            Breaks = beatmap.Breaks,
+                            OnBreakEnter = BreakEnter,
+                            OnBreakLeave = BreakLeave
                         },
                         RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
                         hudOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
@@ -299,6 +302,18 @@ namespace osu.Game.Screens.Play
             failOverlay.Retries = RestartCount;
             failOverlay.Show();
             return true;
+        }
+
+        private void breakEnter()
+        {
+            hudOverlay.KeyCounter.IsCounting = false;
+            breakOverlay.IsBreakTime = true;
+        }
+
+        private void breakLeave()
+        {
+            hudOverlay.KeyCounter.IsCounting = true;
+            breakOverlay.IsBreakTime = false;
         }
 
         protected override void OnEntering(Screen last)
