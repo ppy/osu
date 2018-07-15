@@ -68,7 +68,7 @@ namespace osu.Game.Beatmaps.Formats
         }
         internal string StripComments(string line)
         {
-            var index = line.IndexOf("//");
+            var index = line.IndexOf("//", StringComparison.Ordinal);
             if (index > 0)
                 return line.Substring(0, index);
             return line;
