@@ -58,12 +58,21 @@ namespace osu.Game.Beatmaps.Formats
 
         protected virtual void ParseLine(T output, Section section, string line)
         {
+            line = StripComments(line);
+
             switch (section)
             {
                 case Section.Colours:
                     handleColours(output, line);
                     return;
             }
+        }
+        internal string StripComments(string line)
+        {
+            var index = line.IndexOf("//");
+            if (index > 0)
+                return line.Substring(0, index);
+            return line;
         }
 
         private bool hasComboColours;
@@ -74,12 +83,10 @@ namespace osu.Game.Beatmaps.Formats
 
             bool isCombo = pair.Key.StartsWith(@"Combo");
 
-            line = Regex.Replace(pair.Value, "[^0-9,]", "");
-
-            string[] split = line.Split(',');
+            string[] split = pair.Value.Split(',');
 
             if (split.Length != 3)
-                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {line}");
+                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {pair.Value}");
 
             if (!byte.TryParse(split[0], out var r) || !byte.TryParse(split[1], out var g) || !byte.TryParse(split[2], out var b))
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
