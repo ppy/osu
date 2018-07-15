@@ -62,32 +62,34 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
+            var stripped_line = StripComments(line);
+
             switch (section)
             {
                 case Section.General:
-                    handleGeneral(line);
+                    handleGeneral(stripped_line);
                     return;
                 case Section.Editor:
-                    handleEditor(line);
+                    handleEditor(stripped_line);
                     return;
                 case Section.Metadata:
                     handleMetadata(line);
                     return;
                 case Section.Difficulty:
-                    handleDifficulty(line);
+                    handleDifficulty(stripped_line);
                     return;
                 case Section.Events:
-                    handleEvent(line);
+                    handleEvent(stripped_line);
                     return;
                 case Section.TimingPoints:
-                    handleTimingPoint(line);
+                    handleTimingPoint(stripped_line);
                     return;
                 case Section.HitObjects:
-                    handleHitObject(line);
+                    handleHitObject(stripped_line);
                     return;
             }
 
-            base.ParseLine(beatmap, section, line);
+            base.ParseLine(beatmap, section, stripped_line);
         }
 
         private void handleGeneral(string line)
