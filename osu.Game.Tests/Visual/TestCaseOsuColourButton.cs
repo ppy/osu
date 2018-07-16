@@ -24,15 +24,21 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
+            OsuColourButton osuColourButton;
             Children = new Drawable[]
             {
-                new OsuColourButton
+                osuColourButton = new OsuColourButton
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     BottomLabelText = "Great Test"
                 }
             };
+
+            AddStep("Change Origin to Top Left", () => osuColourButton.ColourPickerOrigin = Anchor.TopLeft);
+            AddStep("Change Origin to Top Right", () => osuColourButton.ColourPickerOrigin = Anchor.TopRight);
+            AddStep("Change Origin to Bottom Right", () => osuColourButton.ColourPickerOrigin = Anchor.BottomRight);
+            AddStep("Change Origin to Bottom Left", () => osuColourButton.ColourPickerOrigin = Anchor.BottomLeft);
         }
     }
 }

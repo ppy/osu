@@ -18,15 +18,37 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
     {
         private readonly OsuCircularButton copyButton;
         private readonly OsuCircularButton pasteButton;
+        private readonly FillFlowContainer buttonContainer;
+        private readonly SetupOsuTextBox colourText;
+        private readonly Box colourInfoBackground;
+        private readonly FillFlowContainer colourInfoContainer;
+        private readonly OsuColourPickerGradient colourPickerGradient;
+        private readonly OsuColourPickerHue colourPickerHue;
 
         private bool isColourChangedFromGradient;
 
         public const float SIZE_X = 200;
-        public const float SIZE_Y = 350;
+        public const float SIZE_Y = 330;
         public const float COLOUR_INFO_HEIGHT = 30;
         public const float DEFAULT_PADDING = 10;
 
         private float leftPadding => OsuColourButton.SIZE_Y / 2 + DEFAULT_PADDING * 2;
+
+        public Anchor Origin
+        {
+            get => base.Origin;
+            set
+            {
+                if (value == base.Origin)
+                    return;
+
+                if (value.HasFlag(Anchor.x1) || value.HasFlag(Anchor.y1))
+                    throw new InvalidOperationException("Cannot set colour picker origin to centre in any axis.");
+
+                base.Origin = value;
+                updateOrigin();
+            }
+        }
 
         public event Action<Color4> ColourChanged;
 
@@ -37,15 +59,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public OsuColourPicker()
         {
-            SetupOsuTextBox colourText;
-            Box colourPreviewFill;
-            OsuColourPickerGradient colourPickerGradient;
-            OsuColourPickerHue colourPickerHue;
-
             Size = new Vector2(0, OsuColourButton.SIZE_Y);
             CornerRadius = 10;
             Masking = true;
-            
+
             Children = new Drawable[]
             {
                 new Box
@@ -53,12 +70,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.FromHex("232e34"),
                 },
-                new Box
+                colourInfoBackground = new Box
                 {
                     Size = new Vector2(SIZE_X, 75),
                     Colour = OsuColour.FromHex("1c2125"),
                 },
-                new FillFlowContainer
+                colourInfoContainer = new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(5),
@@ -75,35 +92,21 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                     Origin = Anchor.TopRight,
                                     Size = new Vector2(SIZE_X - leftPadding, COLOUR_INFO_HEIGHT),
                                     Position = new Vector2(-DEFAULT_PADDING, DEFAULT_PADDING),
-                                    CornerRadius = COLOUR_INFO_HEIGHT / 2,
+                                    CornerRadius = 10,
                                     Text = "#ffffff",
-                                },
-                                new CircularContainer
-                                {
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
-                                    Size = new Vector2(COLOUR_INFO_HEIGHT),
-                                    Position = new Vector2(-DEFAULT_PADDING, DEFAULT_PADDING),
-                                    Masking = true,
-                                    Child = colourPreviewFill = new Box
-                                    {
-                                        RelativeSizeAxes = Axes.Both,
-                                        Colour = Color4.White,
-                                        AlwaysPresent = true,
-                                    },
                                 },
                             }
                         },
-                        new Container // TODO: Fix the spacing here
+                        new Container
                         {
                             Size = new Vector2(SIZE_X, SIZE_Y - COLOUR_INFO_HEIGHT - DEFAULT_PADDING),
                             Children = new Drawable[]
                             {
-                                new FillFlowContainer
+                                buttonContainer = new FillFlowContainer
                                 {
                                     Direction = FillDirection.Horizontal,
                                     Spacing = new Vector2(10),
-                                    Padding = new MarginPadding { Right = 15 },
+                                    Padding = new MarginPadding { Left = leftPadding - 10, Right = 15 },
                                     Children = new[]
                                     {
                                         copyButton = new OsuCircularButton
@@ -111,7 +114,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
                                             Size = new Vector2((SIZE_X - leftPadding - 10) / 2, 20),
-                                            Margin = new MarginPadding { Left = leftPadding - 10 },
                                             CornerRadius = 10,
                                             LabelText = "Copy",
                                         },
@@ -148,7 +150,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                     colourPickerGradient.Current.Value = newValue;
                     colourPickerHue.Hue = Color4.ToHsv(newValue).X;
                 }
-                colourPreviewFill.FadeColour(newValue, 200, Easing.OutQuint);
                 colourText.Text = toHexRGBString(newValue);
                 TriggerColourChanged(newValue);
             };
@@ -191,6 +192,42 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         {
             this.ResizeHeightTo(OsuColourButton.SIZE_Y, 500, Easing.OutQuint);
             this.ResizeWidthTo(0, 500, Easing.OutQuint);
+        }
+
+        private void updateOrigin()
+        {
+            if (Origin.HasFlag(Anchor.x2))
+            {
+                buttonContainer.Padding = new MarginPadding { Left = 10, Right = leftPadding - 10 };
+                colourText.X = DEFAULT_PADDING;
+                colourText.Anchor = Anchor.TopLeft;
+                colourText.Origin = Anchor.TopLeft;
+            }
+            else if (Origin.HasFlag(Anchor.x0))
+            {
+                buttonContainer.Padding = new MarginPadding { Left = leftPadding - 10, Right = 15 };
+                colourText.X = -DEFAULT_PADDING;
+                colourText.Anchor = Anchor.TopRight;
+                colourText.Origin = Anchor.TopRight;
+            }
+            if (Origin.HasFlag(Anchor.y0))
+            {
+                Y = 0;
+                colourPickerGradient.Y = 85;
+                colourPickerHue.Y = 275;
+                colourInfoContainer.Y = 0;
+                colourInfoBackground.Anchor = Anchor.TopLeft;
+                colourInfoBackground.Origin = Anchor.TopLeft;
+            }
+            else if (Origin.HasFlag(Anchor.y2))
+            {
+                Y = OsuColourButton.SIZE_Y;
+                colourPickerGradient.Y = 10;
+                colourPickerHue.Y = 200;
+                colourInfoContainer.Y = SIZE_Y - OsuColourButton.SIZE_Y;
+                colourInfoBackground.Anchor = Anchor.BottomLeft;
+                colourInfoBackground.Origin = Anchor.BottomLeft;
+            }
         }
 
         public Bindable<Color4> Current { get; } = new Bindable<Color4>();
