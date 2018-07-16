@@ -46,6 +46,11 @@ namespace osu.Game.Beatmaps
         public event Action<DownloadBeatmapSetRequest> BeatmapDownloadBegan;
 
         /// <summary>
+        /// Fired when a beatmap download is interrupted, due to user cancellation or other failures.
+        /// </summary>
+        public event Action<DownloadBeatmapSetRequest> BeatmapDownloadFailed;
+
+        /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
         public WorkingBeatmap DefaultBeatmap { private get; set; }
@@ -175,6 +180,8 @@ namespace osu.Game.Beatmaps
 
             request.Failure += error =>
             {
+                BeatmapDownloadFailed?.Invoke(request);
+
                 if (error is OperationCanceledException) return;
 
                 downloadNotification.State = ProgressNotificationState.Cancelled;
