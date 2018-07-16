@@ -480,10 +480,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             public Tick(float value)
             {
                 this.value = value;
-                Size = new Vector2(5, 6);
+                Origin = Anchor.TopCentre;
+                Size = new Vector2(7, 8);
 
                 InternalChild = box = new Box
                 {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.None,
                     Size = new Vector2(1, 2),
                     Alpha = 0.8f
