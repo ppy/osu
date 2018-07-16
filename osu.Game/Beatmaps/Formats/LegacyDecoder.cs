@@ -66,7 +66,8 @@ namespace osu.Game.Beatmaps.Formats
                     return;
             }
         }
-        internal string StripComments(string line)
+
+        protected string StripComments(string line)
         {
             var index = line.IndexOf("//", StringComparison.Ordinal);
             if (index > 0)
