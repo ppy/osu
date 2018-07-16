@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Mania.Replays
             {
                 var isSpecial = stage.IsSpecialColumn(counter);
 
-                if ((activeColumns & 1) > 0)
+                if (activeColumns.HasFlag(1))
                     Actions.Add(isSpecial ? specialAction : normalAction);
 
                 if (isSpecial)

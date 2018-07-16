@@ -306,8 +306,8 @@ namespace osu.Game.Beatmaps.Formats
                 if (split.Length >= 8)
                 {
                     int effectFlags = int.Parse(split[7]);
-                    kiaiMode = (effectFlags & 1) > 0;
-                    omitFirstBarSignature = (effectFlags & 8) > 0;
+                    kiaiMode = effectFlags.HasFlag(1);
+                    omitFirstBarSignature = effectFlags.HasFlag(8);
                 }
 
                 string stringSampleSet = sampleSet.ToString().ToLower();
