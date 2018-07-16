@@ -153,7 +153,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                                     Anchor = Anchor.TopLeft,
                                                     Origin = Anchor.TopLeft,
                                                     Position = new Vector2(15),
-                                                    BottomLabelText = "Background Colour"
+                                                    BottomLabelText = "Background Colour",
+                                                    ColourPickerOrigin = Anchor.BottomLeft,
                                                 },
                                             }
                                         },
