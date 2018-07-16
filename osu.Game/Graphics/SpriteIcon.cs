@@ -84,7 +84,7 @@ namespace osu.Game.Graphics
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
         {
-            if (invalidation.HasFlag(Invalidation.Colour) && Shadow)
+            if ((invalidation & Invalidation.Colour) > 0 && Shadow)
                 layout.Invalidate();
             return base.Invalidate(invalidation, source, shallPropagate);
         }

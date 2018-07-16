@@ -75,7 +75,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
         {
-            if (invalidation.HasFlag(Invalidation.DrawSize))
+            if ((invalidation & Invalidation.DrawSize) > 0)
                 pathCached.Invalidate();
 
             return base.Invalidate(invalidation, source, shallPropagate);

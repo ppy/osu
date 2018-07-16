@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
         {
-            if (invalidation.HasFlag(Invalidation.DrawSize))
+            if ((invalidation & Invalidation.DrawSize) > 0)
                 subtractionCache.Invalidate();
 
             return base.Invalidate(invalidation, source, shallPropagate);
