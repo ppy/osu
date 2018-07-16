@@ -2,14 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using System;
+using osu.Game.Storyboards.Drawables;
 
 namespace osu.Game.Storyboards
 {
     public class StoryboardSample : IStoryboardElement
     {
         public string Path { get; set; }
-        public bool IsDrawable => false;
+        public bool IsDrawable => true;
 
         public double Time;
         public float Volume;
@@ -21,9 +21,6 @@ namespace osu.Game.Storyboards
             Volume = volume;
         }
 
-        public Drawable CreateDrawable()
-        {
-            throw new InvalidOperationException();
-        }
+        public Drawable CreateDrawable() => new DrawableStoryboardSample(this);
     }
 }

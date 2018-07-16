@@ -22,13 +22,16 @@ namespace osu.Game.Graphics.Containers
 
         protected virtual bool PlaySamplesOnStateChange => true;
 
+        protected override bool BlockPassThroughKeyboard => true;
+
         private PreviewTrackManager previewTrackManager;
+
 
         protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
             dependencies.CacheAs<IPreviewTrackOwner>(this);
             return dependencies;
         }
@@ -69,10 +72,13 @@ namespace osu.Game.Graphics.Containers
 
         public virtual bool OnPressed(GlobalAction action)
         {
-            if (action == GlobalAction.Back)
+            switch (action)
             {
-                State = Visibility.Hidden;
-                return true;
+                case GlobalAction.Back:
+                    State = Visibility.Hidden;
+                    return true;
+                case GlobalAction.Select:
+                    return true;
             }
 
             return false;

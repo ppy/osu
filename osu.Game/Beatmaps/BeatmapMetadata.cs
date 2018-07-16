@@ -14,7 +14,6 @@ namespace osu.Game.Beatmaps
     public class BeatmapMetadata : IEquatable<BeatmapMetadata>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [JsonIgnore]
         public int ID { get; set; }
 
         public string Title { get; set; }

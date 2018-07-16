@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Play
                     OnPause = () =>
                     {
                         pauseContainer.Retries = RestartCount;
-                        hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
+                        hudOverlay.KeyCounter.IsCounting = !pauseContainer.IsPaused;
                     },
                     OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
                     Children = new[]

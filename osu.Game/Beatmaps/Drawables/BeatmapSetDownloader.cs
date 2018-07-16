@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Beatmaps.Drawables
 {
@@ -19,9 +20,9 @@ namespace osu.Game.Beatmaps.Drawables
         private BeatmapManager beatmaps;
 
         /// <summary>
-        /// Whether the associated beatmap set has been downloading (by this instance or any other instance).
+        /// Holds the current download state of the beatmap, whether is has already been downloaded, is in progress, or is not downloaded.
         /// </summary>
-        public readonly BindableBool Downloaded = new BindableBool();
+        public readonly Bindable<DownloadStatus> DownloadState = new Bindable<DownloadStatus>();
 
         public BeatmapSetDownloader(BeatmapSetInfo set, bool noVideo = false)
         {
@@ -36,10 +37,16 @@ namespace osu.Game.Beatmaps.Drawables
 
             beatmaps.ItemAdded += setAdded;
             beatmaps.ItemRemoved += setRemoved;
+            beatmaps.BeatmapDownloadBegan += downloadBegan;
+            beatmaps.BeatmapDownloadFailed += downloadFailed;
 
             // initial value
-            if (set.OnlineBeatmapSetID != null)
-                Downloaded.Value = beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID && !s.DeletePending).Any();
+            if (set.OnlineBeatmapSetID != null && beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID && !s.DeletePending).Any())
+                DownloadState.Value = DownloadStatus.Downloaded;
+            else if (beatmaps.GetExistingDownload(set) != null)
+                DownloadState.Value = DownloadStatus.Downloading;
+            else
+                DownloadState.Value = DownloadStatus.NotDownloaded;
         }
 
         protected override void Dispose(bool isDisposing)
@@ -50,6 +57,8 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 beatmaps.ItemAdded -= setAdded;
                 beatmaps.ItemRemoved -= setRemoved;
+                beatmaps.BeatmapDownloadBegan -= downloadBegan;
+                beatmaps.BeatmapDownloadFailed -= downloadFailed;
             }
         }
 
@@ -57,28 +66,45 @@ namespace osu.Game.Beatmaps.Drawables
         /// Begin downloading the associated beatmap set.
         /// </summary>
         /// <returns>True if downloading began. False if an existing download is active or completed.</returns>
-        public bool Download()
+        public void Download()
         {
-            if (Downloaded.Value)
-                return false;
-
-            if (beatmaps.GetExistingDownload(set) != null)
-                return false;
+            if (DownloadState.Value > DownloadStatus.NotDownloaded)
+                return;
 
             beatmaps.Download(set, noVideo);
-            return true;
+
+            DownloadState.Value = DownloadStatus.Downloading;
         }
 
         private void setAdded(BeatmapSetInfo s)
         {
             if (s.OnlineBeatmapSetID == set.OnlineBeatmapSetID)
-                Downloaded.Value = true;
+                DownloadState.Value = DownloadStatus.Downloaded;
         }
 
         private void setRemoved(BeatmapSetInfo s)
         {
             if (s.OnlineBeatmapSetID == set.OnlineBeatmapSetID)
-                Downloaded.Value = false;
+                DownloadState.Value = DownloadStatus.NotDownloaded;
+        }
+
+        private void downloadBegan(DownloadBeatmapSetRequest d)
+        {
+            if (d.BeatmapSet.OnlineBeatmapSetID == set.OnlineBeatmapSetID)
+                DownloadState.Value = DownloadStatus.Downloading;
+        }
+
+        private void downloadFailed(DownloadBeatmapSetRequest d)
+        {
+            if (d.BeatmapSet.OnlineBeatmapSetID == set.OnlineBeatmapSetID)
+                DownloadState.Value = DownloadStatus.NotDownloaded;
+        }
+
+        public enum DownloadStatus
+        {
+            NotDownloaded,
+            Downloading,
+            Downloaded,
         }
     }
 }
