@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -322,24 +323,6 @@ namespace osu.Game
             dependencies.Cache(notifications);
             dependencies.Cache(dialogOverlay);
 
-            // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct };
-            overlays.AddRange(singleDisplayOverlays);
-
-            foreach (var overlay in singleDisplayOverlays)
-            {
-                overlay.StateChanged += state =>
-                {
-                    if (state == Visibility.Hidden) return;
-
-                    foreach (var c in singleDisplayOverlays)
-                    {
-                        if (c == overlay) continue;
-                        c.State = Visibility.Hidden;
-                    }
-                };
-            }
-
             var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications };
             overlays.AddRange(singleDisplaySideOverlays);
 
@@ -348,12 +331,7 @@ namespace osu.Game
                 overlay.StateChanged += state =>
                 {
                     if (state == Visibility.Hidden) return;
-
-                    foreach (var c in singleDisplaySideOverlays)
-                    {
-                        if (c == overlay) continue;
-                        c.State = Visibility.Hidden;
-                    }
+                    singleDisplaySideOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
             }
 
@@ -366,12 +344,24 @@ namespace osu.Game
                 overlay.StateChanged += state =>
                 {
                     if (state == Visibility.Hidden) return;
+                    informationalOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+                };
+            }
 
-                    foreach (var c in informationalOverlays)
-                    {
-                        if (c == overlay) continue;
-                        c.State = Visibility.Hidden;
-                    }
+            // ensure only one of these overlays are open at once.
+            var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct };
+            overlays.AddRange(singleDisplayOverlays);
+
+            foreach (var overlay in singleDisplayOverlays)
+            {
+                overlay.StateChanged += state =>
+                {
+                    // informational overlays should be dismissed on a show or hide of a full overlay.
+                    informationalOverlays.ForEach(o => o.Hide());
+
+                    if (state == Visibility.Hidden) return;
+
+                    singleDisplayOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
             }
 
