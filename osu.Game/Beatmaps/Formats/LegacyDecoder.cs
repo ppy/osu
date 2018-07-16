@@ -57,12 +57,22 @@ namespace osu.Game.Beatmaps.Formats
 
         protected virtual void ParseLine(T output, Section section, string line)
         {
+            line = StripComments(line);
+
             switch (section)
             {
                 case Section.Colours:
                     handleColours(output, line);
                     return;
             }
+        }
+
+        protected string StripComments(string line)
+        {
+            var index = line.IndexOf("//", StringComparison.Ordinal);
+            if (index > 0)
+                return line.Substring(0, index);
+            return line;
         }
 
         private bool hasComboColours;
