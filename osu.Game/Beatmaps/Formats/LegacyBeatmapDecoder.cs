@@ -89,7 +89,7 @@ namespace osu.Game.Beatmaps.Formats
                     return;
             }
 
-            base.ParseLine(beatmap, section, strippedLine);
+            base.ParseLine(beatmap, section, line);
         }
 
         private void handleGeneral(string line)
