@@ -143,7 +143,7 @@ namespace osu.Game.Beatmaps
                 return;
             }
 
-            var downloadNotification = new ProgressNotification
+            var downloadNotification = new DownloadNotification
             {
                 CompletionText = $"Imported {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}!",
                 Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
@@ -452,6 +452,22 @@ namespace osu.Game.Beatmaps
             protected override IBeatmap GetBeatmap() => beatmap;
             protected override Texture GetBackground() => null;
             protected override Track GetTrack() => null;
+        }
+
+        private class DownloadNotification : ProgressNotification
+        {
+            public override bool IsImportant => false;
+
+            protected override Notification CreateCompletionNotification() => new SilencedProgressCompletionNotification
+            {
+                Activated = CompletionClickAction,
+                Text = CompletionText
+            };
+
+            private class SilencedProgressCompletionNotification : ProgressCompletionNotification
+            {
+                public override bool IsImportant => false;
+            }
         }
     }
 }
