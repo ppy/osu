@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Notifications
         /// <summary>
         /// Whether this notification should forcefully display itself.
         /// </summary>
-        public virtual bool IsImportant => false;
+        public virtual bool IsImportant => true;
 
         /// <summary>
         /// Run on user activating the notification. Return true to close.

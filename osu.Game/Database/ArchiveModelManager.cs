@@ -116,7 +116,7 @@ namespace osu.Game.Database
         /// <param name="paths">One or more archive locations on disk.</param>
         public void Import(params string[] paths)
         {
-            var notification = new ImportNotification
+            var notification = new ProgressNotification
             {
                 Text = "Import is initialising...",
                 Progress = 0,
@@ -406,11 +406,6 @@ namespace osu.Game.Database
             if (Directory.Exists(path))
                 return new LegacyFilesystemReader(path);
             throw new InvalidFormatException($"{path} is not a valid archive");
-        }
-
-        private class ImportNotification : ProgressNotification
-        {
-            public override bool IsImportant => true;
         }
     }
 }
