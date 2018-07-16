@@ -218,6 +218,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             for (int i = 0; i < 8; i++)
                 // ReSharper disable once PossibleNullReferenceException
                 (comboColourButtonContainer[i] as OsuColourButton).Current.Value = DefaultComboColours[i];
+            playfieldBackgroundColourButton.Current.Value = DefaultPlayfieldBackgroundColour;
         }
 
         private void updateInfo()

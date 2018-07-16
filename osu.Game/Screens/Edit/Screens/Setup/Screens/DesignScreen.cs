@@ -7,14 +7,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
+using System;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {
     public class DesignScreen : EditorScreen
     {
+        private readonly LabelledSwitchButton enableCountdown;
+        private readonly LabelledSwitchButton countdownSpeed;
+        private readonly LabelledTextBox countdownOffset;
         private readonly LabelledSwitchButton displayEpilepsyWarning;
         private readonly LabelledSwitchButton displayStoryboard;
-        private readonly LabelledSwitchButton enableCountdown;
         private readonly LabelledSwitchButton letterbox;
         private readonly LabelledSwitchButton widescreenSupport;
 
@@ -49,6 +52,21 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     Padding = new MarginPadding { Top = 10, Right = Setup.SCREEN_RIGHT_PADDING },
                                     LabelText = "Enable Countdown",
                                     BottomLabelText = "Adds a \"3, 2, 1, GO!\" countdown at the beginning of the map, assuming there is enough time to do so.",
+                                },
+                                countdownSpeed = new LabelledSwitchButton
+                                {
+                                    Padding = new MarginPadding { Right = Setup.SCREEN_RIGHT_PADDING },
+                                    Alpha = 0,
+                                    AlwaysPresent = true,
+                                    LabelText = "Countdown Speed",
+                                },
+                                countdownOffset = new LabelledTextBox
+                                {
+                                    Padding = new MarginPadding { Right = Setup.SCREEN_RIGHT_PADDING },
+                                    Alpha = 0,
+                                    AlwaysPresent = true,
+                                    LabelText = "Countdown Offset",
+                                    TextBoxText = "0",
                                 },
                                 new OsuSpriteText
                                 {
@@ -88,7 +106,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             updateInfo();
             Beatmap.ValueChanged += a => updateInfo();
 
-            enableCountdown.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.Countdown = a;
+            enableCountdown.SwitchButtonValueChanged += a =>
+            {
+                Beatmap.Value.BeatmapInfo.Countdown = a;
+                countdownSpeed.FadeTo(Convert.ToInt32(a), 250, Easing.OutQuint);
+                countdownOffset.FadeTo(Convert.ToInt32(a), 250, Easing.OutQuint);
+            };
             widescreenSupport.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.WidescreenStoryboard = a;
             displayStoryboard.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.StoryFireInFront = a;
             letterbox.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.LetterboxInBreaks = a;
