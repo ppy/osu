@@ -307,9 +307,9 @@ namespace osu.Game.Beatmaps.Formats
                 bool omitFirstBarSignature = false;
                 if (split.Length >= 8)
                 {
-                    int effectFlags = int.Parse(split[7]);
-                    kiaiMode = (effectFlags & 1) > 0;
-                    omitFirstBarSignature = (effectFlags & 8) > 0;
+                    EffectFlags effectFlags = (EffectFlags)int.Parse(split[7]);
+                    kiaiMode = effectFlags.HasFlag(EffectFlags.Kiai);
+                    omitFirstBarSignature = effectFlags.HasFlag(EffectFlags.OmitFirstBarLine);
                 }
 
                 string stringSampleSet = sampleSet.ToString().ToLower();
@@ -407,5 +407,13 @@ namespace osu.Game.Beatmaps.Formats
         private double getOffsetTime() => ApplyOffsets ? offset : 0;
 
         private double getOffsetTime(double time) => time + (ApplyOffsets ? offset : 0);
+
+        [Flags]
+        internal enum EffectFlags
+        {
+            None = 0,
+            Kiai = 1,
+            OmitFirstBarLine = 8
+        }
     }
 }
