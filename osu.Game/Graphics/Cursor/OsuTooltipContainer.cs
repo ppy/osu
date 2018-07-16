@@ -21,6 +21,8 @@ namespace osu.Game.Graphics.Cursor
         {
         }
 
+        protected override double AppearDelay => (1 - CurrentTooltip.Alpha) * base.AppearDelay; // reduce appear delay if the tooltip is already partly visible.
+
         public class OsuTooltip : Tooltip
         {
             private readonly Box background;

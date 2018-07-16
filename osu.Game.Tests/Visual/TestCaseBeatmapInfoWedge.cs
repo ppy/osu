@@ -110,8 +110,8 @@ namespace osu.Game.Tests.Visual
 
         private void testInfoLabels(int expectedCount)
         {
-            AddAssert("check infolabels exists", () => infoWedge.Info.InfoLabelContainer.Children.Any());
-            AddAssert("check infolabels count", () => infoWedge.Info.InfoLabelContainer.Children.Count == expectedCount);
+            AddAssert("check info labels exists", () => infoWedge.Info.InfoLabelContainer.Children.Any());
+            AddAssert("check info labels count", () => infoWedge.Info.InfoLabelContainer.Children.Count == expectedCount);
         }
 
         private void testNullBeatmap()
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("check default title", () => infoWedge.Info.TitleLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Title);
             AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Artist);
             AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.Children.Any());
-            AddAssert("check no infolabels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
+            AddAssert("check no info labels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
         }
 
         private void selectBeatmap(IBeatmap b)
