@@ -6,11 +6,10 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays;
-using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Tests.Visual
 {
@@ -20,34 +19,24 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
+            Beatmap.Value = new WaveformTestBeatmap();
+
             FillFlowContainer flow;
             Child = flow = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
                 Spacing = new Vector2(0, 10),
-                Children = new Drawable[]
-                {
-                    new MusicController
-                    {
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Y = 100,
-                        State = Visibility.Visible
-                    },
-                }
             };
 
             for (int i = 1; i <= 16; i *= 2)
             {
-                var newDisplay = new BeatmapWaveformGraph
+                var newDisplay = new WaveformGraph
                 {
                     RelativeSizeAxes = Axes.Both,
                     Resolution = 1f / i,
-                    Beatmap = Beatmap
+                    Waveform = Beatmap.Value.Waveform,
                 };
-
-                Beatmap.ValueChanged += b => newDisplay.Beatmap = b;
 
                 flow.Add(new Container
                 {
