@@ -219,6 +219,7 @@ namespace osu.Game.Screens.Play
                         if (!IsCurrentScreen) return;
 
                         pauseContainer.Hide();
+                        failOverlay.FadeOut();
                         Restart();
                     },
                 }
