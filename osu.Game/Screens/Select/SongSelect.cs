@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Allocation;
@@ -20,6 +21,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
@@ -70,7 +72,14 @@ namespace osu.Game.Screens.Select
         private DependencyContainer dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+        {
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.CacheAs(this);
+            dependencies.CacheAs(Ruleset);
+            dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
+
+            return dependencies;
+        }
 
         protected SongSelect()
         {
@@ -189,9 +198,9 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours)
         {
-            dependencies.CacheAs(this);
-            dependencies.CacheAs(Ruleset);
-            dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
+            // manual binding to parent ruleset to allow for delayed load in the incoming direction.
+            base.Ruleset.ValueChanged += r => updateSelectedBeatmap(beatmapNoDebounce);
+            Ruleset.ValueChanged += r => base.Ruleset.Value = r;
 
             if (Footer != null)
             {
@@ -277,7 +286,7 @@ namespace osu.Game.Screens.Select
                 // If selecting new beatmap without bypassing filters failed, there's possibly a ruleset mismatch
                 if (beatmap?.BeatmapInfo?.Ruleset != null && beatmap.BeatmapInfo.Ruleset != Ruleset.Value)
                 {
-                    Ruleset.Value = beatmap.BeatmapInfo.Ruleset;
+                    base.Ruleset.Value = beatmap.BeatmapInfo.Ruleset;
                     Carousel.SelectBeatmap(beatmap.BeatmapInfo);
                 }
         }
@@ -295,17 +304,24 @@ namespace osu.Game.Screens.Select
 
             void performLoad()
             {
+                WorkingBeatmap working = Beatmap.Value;
+                bool preview = false;
+
                 // We may be arriving here due to another component changing the bindable Beatmap.
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
                 if (beatmap?.Equals(Beatmap.Value.BeatmapInfo) != true)
                 {
-                    bool preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
-
-                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
-                    ensurePlayingSelected(preview);
+                    preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
+                    working = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
                 }
 
+
+                working.Mods.Value = Enumerable.Empty<Mod>();
+
+                Beatmap.Value = working;
                 Ruleset.Value = ruleset;
+
+                ensurePlayingSelected(preview);
 
                 UpdateBeatmap(Beatmap.Value);
             }

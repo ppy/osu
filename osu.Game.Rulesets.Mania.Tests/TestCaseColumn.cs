@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private Drawable createColumn(ScrollingDirection direction, ManiaAction action)
         {
-            var column = new Column(direction)
+            var column = new Column
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
