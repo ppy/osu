@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
@@ -17,13 +16,8 @@ using System.Linq;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : ScrollingPlayfield
+    public class ManiaPlayfield : ManiaScrollingPlayfield
     {
-        /// <summary>
-        /// Whether this playfield should be inverted. This flips everything inside the playfield.
-        /// </summary>
-        public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
-
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
 
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
@@ -31,16 +25,14 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected virtual bool DisplayJudgements => true;
 
-        public ManiaPlayfield(List<StageDefinition> stageDefinitions)
-            : base(ScrollingDirection.Up)
+        public ManiaPlayfield(ScrollingDirection direction, List<StageDefinition> stageDefinitions)
+            : base(direction)
         {
             if (stageDefinitions == null)
                 throw new ArgumentNullException(nameof(stageDefinitions));
 
             if (stageDefinitions.Count <= 0)
                 throw new ArgumentException("Can't have zero or fewer stages.");
-
-            Inverted.Value = true;
 
             GridContainer playfieldGrid;
             InternalChild = playfieldGrid = new GridContainer
@@ -54,10 +46,9 @@ namespace osu.Game.Rulesets.Mania.UI
             int firstColumnIndex = 0;
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = CreateStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
+                var newStage = CreateStage(direction, firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
                 newStage.DisplayJudgements = DisplayJudgements;
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
-                newStage.Inverted.BindTo(Inverted);
 
                 playfieldGrid.Content[0][i] = newStage;
 
@@ -103,7 +94,7 @@ namespace osu.Game.Rulesets.Mania.UI
             getStageByColumn(((ManiaHitObject)judgedObject.HitObject).Column).OnJudgement(judgedObject, judgement);
         }
 
-        protected virtual ManiaStage CreateStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
-            => new ManiaStage(firstColumnIndex, definition, ref normalColumnStartAction, ref specialColumnStartAction);
+        protected virtual ManiaStage CreateStage(ScrollingDirection direction, int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
+            => new ManiaStage(direction, firstColumnIndex, definition, ref normalColumnStartAction, ref specialColumnStartAction);
     }
 }

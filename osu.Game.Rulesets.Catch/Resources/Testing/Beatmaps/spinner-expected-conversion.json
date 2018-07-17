@@ -1,0 +1,74 @@
+{
+    "Mappings": [{
+        "StartTime": 18500,
+        "Objects": [{
+                "StartTime": 18500,
+                "Position": 65
+            },
+            {
+                "StartTime": 18559,
+                "Position": 482
+            },
+            {
+                "StartTime": 18618,
+                "Position": 164
+            },
+            {
+                "StartTime": 18678,
+                "Position": 315
+            },
+            {
+                "StartTime": 18737,
+                "Position": 145
+            },
+            {
+                "StartTime": 18796,
+                "Position": 159
+            },
+            {
+                "StartTime": 18856,
+                "Position": 310
+            },
+            {
+                "StartTime": 18915,
+                "Position": 441
+            },
+            {
+                "StartTime": 18975,
+                "Position": 428
+            },
+            {
+                "StartTime": 19034,
+                "Position": 243
+            },
+            {
+                "StartTime": 19093,
+                "Position": 422
+            },
+            {
+                "StartTime": 19153,
+                "Position": 481
+            },
+            {
+                "StartTime": 19212,
+                "Position": 104
+            },
+            {
+                "StartTime": 19271,
+                "Position": 473
+            },
+            {
+                "StartTime": 19331,
+                "Position": 135
+            },
+            {
+                "StartTime": 19390,
+                "Position": 360
+            },
+            {
+                "StartTime": 19450,
+                "Position": 123
+            }
+        ]
+    }]
+}

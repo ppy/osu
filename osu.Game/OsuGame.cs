@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
@@ -85,7 +86,7 @@ namespace osu.Game
         private OnScreenDisplay onscreenDisplay;
 
         private Bindable<int> configRuleset;
-        public Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private Bindable<int> configSkin;
 
@@ -101,6 +102,8 @@ namespace osu.Game
         public OsuGame(string[] args = null)
         {
             this.args = args;
+
+            forwardLoggedErrorsToNotifications();
         }
 
         public void ToggleSettings() => settings.ToggleVisibility();
@@ -120,8 +123,8 @@ namespace osu.Game
 
         private DependencyContainer dependencies;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load(FrameworkConfigManager frameworkConfig)
@@ -145,10 +148,13 @@ namespace osu.Game
 
             dependencies.CacheAs(this);
 
+            dependencies.CacheAs(ruleset);
+            dependencies.CacheAs<IBindable<RulesetInfo>>(ruleset);
+
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
-            Ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
-            Ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
+            ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
+            ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
 
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
@@ -214,7 +220,7 @@ namespace osu.Game
                 return;
             }
 
-            Ruleset.Value = s.Ruleset;
+            ruleset.Value = s.Ruleset;
 
             Beatmap.Value = BeatmapManager.GetWorkingBeatmap(s.Beatmap);
             Beatmap.Value.Mods.Value = s.Mods;
@@ -245,7 +251,8 @@ namespace osu.Game
                 new VolumeControlReceptor
                 {
                     RelativeSizeAxes = Axes.Both,
-                    ActionRequested = action => volume.Adjust(action)
+                    ActionRequested = action => volume.Adjust(action),
+                    ScrollActionRequested = (action, amount, isPrecise) => volume.Adjust(action, amount, isPrecise),
                 },
                 mainContent = new Container { RelativeSizeAxes = Axes.Both },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
@@ -305,8 +312,6 @@ namespace osu.Game
                 Depth = -6,
             }, overlayContent.Add);
 
-            forwardLoggedErrorsToNotifications();
-
             dependencies.Cache(settings);
             dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
@@ -318,24 +323,6 @@ namespace osu.Game
             dependencies.Cache(notifications);
             dependencies.Cache(dialogOverlay);
 
-            // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct };
-            overlays.AddRange(singleDisplayOverlays);
-
-            foreach (var overlay in singleDisplayOverlays)
-            {
-                overlay.StateChanged += state =>
-                {
-                    if (state == Visibility.Hidden) return;
-
-                    foreach (var c in singleDisplayOverlays)
-                    {
-                        if (c == overlay) continue;
-                        c.State = Visibility.Hidden;
-                    }
-                };
-            }
-
             var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications };
             overlays.AddRange(singleDisplaySideOverlays);
 
@@ -344,12 +331,7 @@ namespace osu.Game
                 overlay.StateChanged += state =>
                 {
                     if (state == Visibility.Hidden) return;
-
-                    foreach (var c in singleDisplaySideOverlays)
-                    {
-                        if (c == overlay) continue;
-                        c.State = Visibility.Hidden;
-                    }
+                    singleDisplaySideOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
             }
 
@@ -362,12 +344,24 @@ namespace osu.Game
                 overlay.StateChanged += state =>
                 {
                     if (state == Visibility.Hidden) return;
+                    informationalOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
+                };
+            }
 
-                    foreach (var c in informationalOverlays)
-                    {
-                        if (c == overlay) continue;
-                        c.State = Visibility.Hidden;
-                    }
+            // ensure only one of these overlays are open at once.
+            var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct };
+            overlays.AddRange(singleDisplayOverlays);
+
+            foreach (var overlay in singleDisplayOverlays)
+            {
+                overlay.StateChanged += state =>
+                {
+                    // informational overlays should be dismissed on a show or hide of a full overlay.
+                    informationalOverlays.ForEach(o => o.Hide());
+
+                    if (state == Visibility.Hidden) return;
+
+                    singleDisplayOverlays.Where(o => o != overlay).ForEach(o => o.Hide());
                 };
             }
 
@@ -394,31 +388,40 @@ namespace osu.Game
 
         private void forwardLoggedErrorsToNotifications()
         {
-            int recentErrorCount = 0;
+            int recentLogCount = 0;
 
             const double debounce = 5000;
 
             Logger.NewEntry += entry =>
             {
-                if (entry.Level < LogLevel.Error || entry.Target == null) return;
+                if (entry.Level < LogLevel.Important || entry.Target == null) return;
 
-                if (recentErrorCount < 2)
+                const int short_term_display_limit = 3;
+
+                if (recentLogCount < short_term_display_limit)
                 {
-                    notifications.Post(new SimpleNotification
+                    Schedule(() => notifications.Post(new SimpleNotification
                     {
-                        Icon = FontAwesome.fa_bomb,
-                        Text = (recentErrorCount == 0 ? entry.Message : "Subsequent errors occurred and have been logged.") + "\nClick to view log files.",
+                        Icon = entry.Level == LogLevel.Important ? FontAwesome.fa_exclamation_circle : FontAwesome.fa_bomb,
+                        Text = entry.Message,
+                    }));
+                }
+                else if (recentLogCount == short_term_display_limit)
+                {
+                    Schedule(() => notifications.Post(new SimpleNotification
+                    {
+                        Icon = FontAwesome.fa_ellipsis_h,
+                        Text = "Subsequent messages have been logged. Click to view log files.",
                         Activated = () =>
                         {
                             Host.Storage.GetStorageForDirectory("logs").OpenInNativeExplorer();
                             return true;
                         }
-                    });
+                    }));
                 }
 
-                Interlocked.Increment(ref recentErrorCount);
-
-                Scheduler.AddDelayed(() => Interlocked.Decrement(ref recentErrorCount), debounce);
+                Interlocked.Increment(ref recentLogCount);
+                Scheduler.AddDelayed(() => Interlocked.Decrement(ref recentLogCount), debounce);
             };
         }
 
@@ -541,7 +544,7 @@ namespace osu.Game
             // the use case for not applying is in visual/unit tests.
             bool applyRestrictions = !currentScreen?.AllowBeatmapRulesetChange ?? false;
 
-            Ruleset.Disabled = applyRestrictions;
+            ruleset.Disabled = applyRestrictions;
             Beatmap.Disabled = applyRestrictions;
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };

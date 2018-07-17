@@ -49,8 +49,6 @@ namespace osu.Game.Screens.Play
         public bool AllowLeadIn { get; set; } = true;
         public bool AllowResults { get; set; } = true;
 
-        protected override bool AllowBackButton => false;
-
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;
 
@@ -158,6 +156,8 @@ namespace osu.Game.Screens.Play
             userAudioOffset.TriggerChange();
 
             ScoreProcessor = RulesetContainer.CreateScoreProcessor();
+            if (!ScoreProcessor.Mode.Disabled)
+                config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
             Children = new Drawable[]
             {
@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Play
                     OnPause = () =>
                     {
                         pauseContainer.Retries = RestartCount;
-                        hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
+                        hudOverlay.KeyCounter.IsCounting = !pauseContainer.IsPaused;
                     },
                     OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
                     Children = new[]
@@ -219,15 +219,14 @@ namespace osu.Game.Screens.Play
                     {
                         if (!IsCurrentScreen) return;
 
-                        //we want to hide the hitrenderer immediately (looks better).
-                        //we may be able to remove this once the mouse cursor trail is improved.
-                        RulesetContainer?.Hide();
+                        pauseContainer.Hide();
                         Restart();
                     },
                 }
             };
 
             hudOverlay.HoldToQuit.Action = Exit;
+            hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             if (ShowStoryboard)
                 initializeStoryboard(false);

@@ -20,7 +20,9 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
 using osu.Framework.Logging;
+using osu.Game.Audio;
 using osu.Game.Database;
 using osu.Game.Graphics.Textures;
 using osu.Game.Input;
@@ -29,6 +31,7 @@ using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using OpenTK.Input;
 using DebugUtils = osu.Game.Utils.DebugUtils;
 
 namespace osu.Game
@@ -55,6 +58,8 @@ namespace osu.Game
         protected KeyBindingStore KeyBindingStore;
 
         protected SettingsStore SettingsStore;
+
+        protected RulesetConfigCache RulesetConfigCache;
 
         protected MenuCursorContainer MenuCursorContainer;
 
@@ -90,10 +95,12 @@ namespace osu.Game
 
         private DependencyContainer dependencies;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         private DatabaseContextFactory contextFactory;
+
+        protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
         [BackgroundDependencyLoader]
         private void load()
@@ -123,6 +130,7 @@ namespace osu.Game
             dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory, Host, BeatmapManager, RulesetStore));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
+            dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
             dependencies.Cache(new OsuColour());
 
             fileImporters.Add(BeatmapManager);
@@ -184,6 +192,10 @@ namespace osu.Game
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);
+
+            PreviewTrackManager previewTrackManager;
+            dependencies.Cache(previewTrackManager = new PreviewTrackManager());
+            Add(previewTrackManager);
         }
 
         protected override void LoadComplete()
@@ -257,6 +269,32 @@ namespace osu.Game
                 var copy = new OsuBindableBeatmap(Default);
                 copy.BindTo(this);
                 return copy;
+            }
+        }
+
+        private class OsuUserInputManager : UserInputManager
+        {
+            protected override MouseButtonEventManager CreateButtonManagerFor(MouseButton button)
+            {
+                switch (button)
+                {
+                    case MouseButton.Right:
+                        return new RightMouseManager(button);
+                }
+
+                return base.CreateButtonManagerFor(button);
+            }
+
+            private class RightMouseManager : MouseButtonEventManager
+            {
+                public RightMouseManager(MouseButton button)
+                    : base(button)
+                {
+                }
+
+                public override bool EnableDrag => true; // allow right-mouse dragging for absolute scroll in scroll containers.
+                public override bool EnableClick => false;
+                public override bool ChangeFocusOnClick => false;
             }
         }
     }

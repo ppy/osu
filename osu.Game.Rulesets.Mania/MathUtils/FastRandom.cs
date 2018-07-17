@@ -15,11 +15,15 @@ namespace osu.Game.Rulesets.Mania.MathUtils
         private const uint y = 842502087;
         private const uint z = 3579807591;
         private const uint w = 273326509;
-        private uint _x, _y = y, _z = z, _w = w;
+
+        internal uint X { get; private set; }
+        internal uint Y { get; private set; } = y;
+        internal uint Z { get; private set; } = z;
+        internal uint W { get; private set; } = w;
 
         public FastRandom(int seed)
         {
-            _x = (uint)seed;
+            X = (uint)seed;
         }
 
         public FastRandom()
@@ -33,11 +37,11 @@ namespace osu.Game.Rulesets.Mania.MathUtils
         /// <returns>The random value.</returns>
         public uint NextUInt()
         {
-            uint t = _x ^ _x << 11;
-            _x = _y;
-            _y = _z;
-            _z = _w;
-            return _w = _w ^ _w >> 19 ^ t ^ t >> 8;
+            uint t = X ^ X << 11;
+            X = Y;
+            Y = Z;
+            Z = W;
+            return W = W ^ W >> 19 ^ t ^ t >> 8;
         }
 
         /// <summary>

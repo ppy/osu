@@ -15,10 +15,10 @@ namespace osu.Game.Rulesets.Replays.Legacy
         public bool MouseLeft => MouseLeft1 || MouseLeft2;
         public bool MouseRight => MouseRight1 || MouseRight2;
 
-        public bool MouseLeft1 => (ButtonState & ReplayButtonState.Left1) > 0;
-        public bool MouseRight1 => (ButtonState & ReplayButtonState.Right1) > 0;
-        public bool MouseLeft2 => (ButtonState & ReplayButtonState.Left2) > 0;
-        public bool MouseRight2 => (ButtonState & ReplayButtonState.Right2) > 0;
+        public bool MouseLeft1 => ButtonState.HasFlag(ReplayButtonState.Left1);
+        public bool MouseRight1 => ButtonState.HasFlag(ReplayButtonState.Right1);
+        public bool MouseLeft2 => ButtonState.HasFlag(ReplayButtonState.Left2);
+        public bool MouseRight2 => ButtonState.HasFlag(ReplayButtonState.Right2);
 
         public ReplayButtonState ButtonState;
 

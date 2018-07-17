@@ -14,18 +14,7 @@ namespace osu.Game.Beatmaps
     public class BeatmapMetadata : IEquatable<BeatmapMetadata>
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [JsonIgnore]
         public int ID { get; set; }
-
-        private int? onlineBeatmapSetID;
-
-        [NotMapped]
-        [JsonProperty(@"id")]
-        public int? OnlineBeatmapSetID
-        {
-            get { return onlineBeatmapSetID; }
-            set { onlineBeatmapSetID = value > 0 ? value : null; }
-        }
 
         public string Title { get; set; }
         public string TitleUnicode { get; set; }
@@ -82,8 +71,7 @@ namespace osu.Game.Beatmaps
             if (other == null)
                 return false;
 
-            return onlineBeatmapSetID == other.onlineBeatmapSetID
-                && Title == other.Title
+            return Title == other.Title
                 && TitleUnicode == other.TitleUnicode
                 && Artist == other.Artist
                 && ArtistUnicode == other.ArtistUnicode

@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.Edit.Layers;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
 
 namespace osu.Game.Rulesets.Mania.Edit
@@ -44,12 +43,6 @@ namespace osu.Game.Rulesets.Mania.Edit
             return base.CreateMaskFor(hitObject);
         }
 
-        protected override HitObjectMaskLayer CreateHitObjectMaskLayer()
-        {
-            var layer = new ManiaHitObjectMaskLayer(RulesetContainer.Playfield, this);
-            layer.Inverted.BindTo(((ManiaPlayfield)RulesetContainer.Playfield).Inverted);
-
-            return layer;
-        }
+        protected override HitObjectMaskLayer CreateHitObjectMaskLayer() => new ManiaHitObjectMaskLayer(RulesetContainer.Playfield, this);
     }
 }
