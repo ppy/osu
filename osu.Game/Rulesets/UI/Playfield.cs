@@ -14,12 +14,21 @@ namespace osu.Game.Rulesets.UI
     public abstract class Playfield : ScalableContainer
     {
         /// <summary>
-        /// The HitObjects contained in this Playfield.
+        /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
         public HitObjectContainer HitObjects { get; private set; }
 
-        private readonly Lazy<List<Playfield>> nestedPlayfields = new Lazy<List<Playfield>>();
+        /// <summary>
+        /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
+        /// </summary>
+        public IEnumerable<DrawableHitObject> AllHitObjects => HitObjects?.Objects.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects)) ?? Enumerable.Empty<DrawableHitObject>();
+
+        /// <summary>
+        /// All <see cref="Playfield"/>s nested inside this <see cref="Playfield"/>.
+        /// </summary>
         public IEnumerable<Playfield> NestedPlayfields => nestedPlayfields.IsValueCreated ? nestedPlayfields.Value : Enumerable.Empty<Playfield>();
+
+        private readonly Lazy<List<Playfield>> nestedPlayfields = new Lazy<List<Playfield>>();
 
         /// <summary>
         /// A container for keeping track of DrawableHitObjects.
