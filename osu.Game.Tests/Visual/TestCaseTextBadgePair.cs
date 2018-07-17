@@ -52,10 +52,10 @@ namespace osu.Game.Tests.Visual
             
             AddStep(@"deactivate", () => textBadgePair.Deactivate());
             AddStep(@"activate", () => textBadgePair.Activate());
-            AddStep(@"purple text", () => textBadgePair.SetTextColor(Color4.Purple, 100));
-            AddStep(@"white text", () => textBadgePair.SetTextColor(Color4.White, 100));
-            AddStep(@"purple badge", () => textBadgePair.SetBadgeColor(Color4.Purple, 100));
-            AddStep(@"white badge", () => textBadgePair.SetBadgeColor(Color4.White, 100));
+            AddStep(@"purple text", () => textBadgePair.SetTextColour(Color4.Purple, 100));
+            AddStep(@"white text", () => textBadgePair.SetTextColour(Color4.White, 100));
+            AddStep(@"purple badge", () => textBadgePair.SetBadgeColour(Color4.Purple, 100));
+            AddStep(@"white badge", () => textBadgePair.SetBadgeColour(Color4.White, 100));
             AddStep(@"hide text", () => textBadgePair.HideText(250));
             AddStep(@"show text", () => textBadgePair.ShowText(250));
         }

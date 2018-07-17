@@ -30,6 +30,11 @@ namespace osu.Game.Overlays.Changelog.Header
             IsCollapsed = startCollapsed;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.Centre;
+            Margin = new MarginPadding()
+            {
+                Left = 10,
+                Right = 10,
+            };
         }
     }
 }
