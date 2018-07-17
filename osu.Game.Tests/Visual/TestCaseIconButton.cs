@@ -25,11 +25,7 @@ namespace osu.Game.Tests.Visual
                 Children = new[]
                 {
                     new NamedIconButton("No change", new IconButton()),
-                    new NamedIconButton("Background colours", new IconButton
-                    {
-                        FlashColour = Color4.DarkGreen,
-                        HoverColour = Color4.Green,
-                    }),
+                    new NamedIconButton("Background colours", new ColouredIconButton()),
                     new NamedIconButton("Full-width", new IconButton { ButtonSize = new Vector2(200, 30) }),
                     new NamedIconButton("Unchanging size", new IconButton(), false),
                     new NamedIconButton("Icon colours", new IconButton
@@ -39,6 +35,15 @@ namespace osu.Game.Tests.Visual
                     })
                 }
             };
+        }
+
+        private class ColouredIconButton : IconButton
+        {
+            public ColouredIconButton()
+            {
+                FlashColour = Color4.DarkGreen;
+                HoverColour = Color4.Green;
+            }
         }
 
         private class NamedIconButton : Container
