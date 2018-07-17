@@ -87,8 +87,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                         if (obj.IsStrong)
                             AddJudgement(new TaikoStrongHitJudgement());
                         break;
-                    case DrumRoll _:
-                        for (int i = 0; i < ((DrumRoll)obj).NestedHitObjects.OfType<DrumRollTick>().Count(); i++)
+                    case DrumRoll drumRoll:
+                        for (int i = 0; i < drumRoll.NestedHitObjects.OfType<DrumRollTick>().Count(); i++)
                         {
                             AddJudgement(new TaikoDrumRollTickJudgement { Result = HitResult.Great });
 
