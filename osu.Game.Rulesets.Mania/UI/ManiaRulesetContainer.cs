@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -35,9 +34,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<BarLine> BarLines;
 
-        private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
-        private ManiaScrollingInfo scrollingInfo;
-        protected IScrollingInfo ScrollingInfo => scrollingInfo;
+        protected new ManiaConfigManager Config => (ManiaConfigManager)base.Config;
 
         public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -74,9 +71,6 @@ namespace osu.Game.Rulesets.Mania.UI
         private void load()
         {
             BarLines.ForEach(Playfield.Add);
-
-            ((ManiaConfigManager)Config).BindWith(ManiaSetting.ScrollDirection, configDirection);
-            configDirection.BindValueChanged(d => scrollingInfo.Direction.Value = (ScrollingDirection)d, true);
         }
 
         private DependencyContainer dependencies;
@@ -84,7 +78,10 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IScrollingInfo>(scrollingInfo = new ManiaScrollingInfo());
+
+            if (dependencies.Get<ManiaScrollingInfo>() == null)
+                dependencies.CacheAs<IScrollingInfo>(new ManiaScrollingInfo(Config));
+
             return dependencies;
         }
 
@@ -116,11 +113,5 @@ namespace osu.Game.Rulesets.Mania.UI
         protected override Vector2 PlayfieldArea => new Vector2(1, 0.8f);
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
-
-        private class ManiaScrollingInfo : IScrollingInfo
-        {
-            public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
-            IBindable<ScrollingDirection> IScrollingInfo.Direction => Direction;
-        }
     }
 }
