@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual
             typeof(LabelledTextBox),
             typeof(LabelledSwitchButton),
             typeof(LabelledSliderBar),
-            typeof(SetupOsuTextBox),
+            typeof(OsuSetupTextBox),
             typeof(OsuTickSliderBar),
             typeof(OsuSwitchButton),
             typeof(OsuCircularButton),

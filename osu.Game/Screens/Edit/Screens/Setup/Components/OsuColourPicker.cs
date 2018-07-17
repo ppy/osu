@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private readonly OsuCircularButton copyButton;
         private readonly OsuCircularButton pasteButton;
         private readonly FillFlowContainer buttonContainer;
-        private readonly SetupOsuTextBox colourText;
+        private readonly OsuSetupTextBox colourText;
         private readonly Box colourInfoBackground;
         private readonly FillFlowContainer colourInfoContainer;
         private readonly OsuColourPickerGradient colourPickerGradient;
@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                             Size = new Vector2(SIZE_X, COLOUR_INFO_HEIGHT + DEFAULT_PADDING),
                             Children = new Drawable[]
                             {
-                                colourText = new SetupOsuTextBox
+                                colourText = new OsuSetupTextBox
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,

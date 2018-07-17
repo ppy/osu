@@ -9,7 +9,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class SetupOsuTextBox : OsuTextBox
+    public class OsuSetupTextBox : OsuTextBox
     {
         protected override float LeftRightPadding => 15;
 
