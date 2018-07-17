@@ -11,16 +11,22 @@ namespace osu.Game.Tests.Visual
     public class TestCaseChangelog : OsuTestCase
     {
         private ChangelogOverlay changelog;
+        private int releaseStreamCount;
+        private int index;
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
             Add(changelog = new ChangelogOverlay());
-            
+
+            releaseStreamCount = changelog.streams.badgesContainer.Children.Count;
+
             AddStep(@"Show", changelog.Show);
-            AddStep(@"Stable Release Stream", () => changelog.header.ShowReleaseStream("Stable", "Stable 20180626.1"));
-            AddStep(@"Lazer Release Stream", () => changelog.header.ShowReleaseStream("Lazer", "Lazer 2018.713.1"));
+            AddRepeatStep(@"Toggle Release Stream", () => {
+                changelog.streams.badgesContainer.Children[index].Activate();
+                index = (index == releaseStreamCount - 1) ? 0 : index + 1;
+            }, releaseStreamCount);
             AddStep(@"Listing", changelog.header.ActivateListing);
         }
 

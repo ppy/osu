@@ -14,10 +14,11 @@ namespace osu.Game.Overlays.Changelog.Header
     {
         protected SpriteText text;
         protected LineBadge lineBadge;
+        protected bool startCollapsed;
 
         public Action OnActivation;
         public Action OnDeactivation;
-
+        
         public void SetTextColour(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
         {
             text.FadeColour(newColour, duration, easing);
@@ -77,7 +78,7 @@ namespace osu.Game.Overlays.Changelog.Header
             }, duration);
         }
 
-        public TextBadgePair(ColourInfo badgeColour, string displayText = "Listing")
+        public TextBadgePair(ColourInfo badgeColour, string displayText = "Listing", bool startBadgeCollapsed = true)
         {
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
@@ -97,7 +98,7 @@ namespace osu.Game.Overlays.Changelog.Header
                         Right = 10,
                     }
                 },
-                lineBadge = new LineBadge
+                lineBadge = new LineBadge(startCollapsed)
                 {
                     Colour = badgeColour,
                 }

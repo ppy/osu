@@ -12,7 +12,7 @@ namespace osu.Game.Overlays.Changelog.Header
     {
         private ColourInfo badgeColour;
 
-        public TextBadgePairListing(ColourInfo badgeColour) : base(badgeColour, "Listing")
+        public TextBadgePairListing(ColourInfo badgeColour) : base(badgeColour, "Listing", false)
         {
             this.badgeColour = badgeColour;
             text.Font = "Exo2.0-Bold";
