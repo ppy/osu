@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Overlays.Changelog;
+using osu.Game.Overlays.Changelog.Streams;
 
 namespace osu.Game.Overlays
 {
@@ -17,7 +18,8 @@ namespace osu.Game.Overlays
     {
         private readonly ScrollContainer scroll;
 
-        public ChangelogHeader header;
+        public readonly ChangelogHeader header;
+        public readonly ChangelogStreams streams;
 
         protected Color4 purple = new Color4(191, 4, 255, 255);
 
@@ -62,9 +64,25 @@ namespace osu.Game.Overlays
                         Children = new Drawable[]
                         {
                             header = new ChangelogHeader(),
+                            streams = new ChangelogStreams(),
                         },
                     },
                 },
+            };
+            streams.SelectedRelease.ValueChanged += r =>
+            {
+                if (streams.SelectedRelease != null)
+                    header.ShowReleaseStream(r.Name, string.Join(" ", r.Name, r.DisplayVersion));
+            };
+            streams.badgesContainer.OnLoadComplete += d =>
+            {
+                header.OnListingActivated += () =>
+                {
+                    foreach (StreamBadge item in streams.badgesContainer.Children)
+                    {
+                        item.Activate(true);
+                    }
+                };
             };
         }
 

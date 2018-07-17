@@ -12,13 +12,12 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Changelog.Header;
+using System;
 
 namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogHeader : Container
     {
-        private readonly Container coverContainer;
-
         protected Color4 purple = new Color4(191, 4, 255, 255);
         private readonly Sprite coverImage;
         private readonly Sprite headerBadge; //50x50, margin-right: 20
@@ -29,6 +28,8 @@ namespace osu.Game.Overlays.Changelog
         private readonly TextBadgePairRelease releaseStream;
         private readonly FillFlowContainer breadcrumbContainer;
 
+        public Action OnListingActivated;
+
         private const float cover_height = 310;
         private const float title_height = 50;
         private const float icon_size = 50;
@@ -38,137 +39,128 @@ namespace osu.Game.Overlays.Changelog
         public ChangelogHeader()
         {
             RelativeSizeAxes = Axes.X;
-            Height = cover_height + 5; // 5 is for the "badge" that sticks a bit out of the bottom
-            Masking = true; // is masking necessary? since I see it nearly everywhere
+            Height = cover_height;
             Children = new Drawable[]
             {
-                coverContainer = new Container
+                coverImage = new Sprite
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = cover_height,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new OpenTK.Vector2(1),
+                    FillMode = FillMode.Fill,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                },
+                new Container // this is the line badge-Changelog-Stream
+                {
+                    Height = title_height,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Y = -version_height,
                     Children = new Drawable[]
                     {
-                        coverImage = new Sprite
+                        new CircularContainer // a purple circle
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Size = new OpenTK.Vector2(1),
-                            FillMode = FillMode.Fill,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                        },
-                        new Container // this is the line badge-Changelog-Stream
-                        {
-                            Height = title_height,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Y = -version_height,
+                            X = icon_margin,
+                            Masking = true,
+                            BorderColour = purple,
+                            BorderThickness = 3,
+                            MaskingSmoothness = 1,
+                            Size = new OpenTK.Vector2(50),
                             Children = new Drawable[]
                             {
-                                new CircularContainer // a purple circle
+                                headerBadge = new Sprite
                                 {
-                                    X = icon_margin,
-                                    Masking = true,
-                                    BorderColour = purple,
-                                    BorderThickness = 3,
-                                    MaskingSmoothness = 1,
-                                    Size = new OpenTK.Vector2(50),
-                                    Children = new Drawable[]
-                                    {
-                                        headerBadge = new Sprite
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Size = new OpenTK.Vector2(0.8f),
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                        },
-
-                                        // this box has 2 functions:
-                                        // - ensures the circle doesn't disappear on the X and Y edges
-                                        // - lessens the white "contamination" on the circle (due to smoothing)
-                                        new Box
-                                        {
-                                            RelativeSizeAxes = Axes.Both,
-                                            Size = new OpenTK.Vector2(1),
-                                            Alpha = 0,
-                                            AlwaysPresent = true,
-                                            Colour = purple,
-                                        }
-                                    }
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new OpenTK.Vector2(0.8f),
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
                                 },
-                                headerTextContainer = new FillFlowContainer
+
+                                // this box has 2 functions:
+                                // - ensures the circle doesn't disappear on the X and Y edges
+                                // - lessens the white "contamination" on the circle (due to smoothing)
+                                new Box
                                 {
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    X = icon_size + icon_margin * 2,
-                                    Children = new Drawable[]
-                                    {
-                                        title = new OsuSpriteText
-                                        {
-                                            Text = "Changelog ",
-                                            Font = @"Exo2.0-Light",
-                                            TextSize = 38, // web: 30
-                                        },
-                                        titleStream = new OsuSpriteText
-                                        {
-                                            Text = "Listing",
-                                            TextSize = 38, // web: 30
-                                            Font = @"Exo2.0-Light",
-                                            Colour = purple,
-                                        },
-                                    }
+                                    RelativeSizeAxes = Axes.Both,
+                                    Size = new OpenTK.Vector2(1),
+                                    Alpha = 0,
+                                    AlwaysPresent = true,
+                                    Colour = purple,
                                 }
                             }
                         },
-                        breadcrumbContainer = new FillFlowContainer // Listing > Lazer 2018.713.1
+                        headerTextContainer = new FillFlowContainer
                         {
-                            X = 2 * icon_margin + icon_size - 8,
-                            Height = version_height,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
+                            AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            X = icon_size + icon_margin * 2,
                             Children = new Drawable[]
                             {
-                                listing = new TextBadgePairListing(purple),
-                                new Container() // without a container, moving the chevron wont work
+                                title = new OsuSpriteText
                                 {
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.CentreLeft,
-                                    Margin = new MarginPadding()
-                                    {
-                                        Top = 10,
-                                        Left = 7,
-                                        Right = 9,
-                                        Bottom = 15,
-                                    },
-                                    Children = new Drawable[]
-                                    {
-                                        chevron = new SpriteIcon
-                                        {
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Size = new Vector2(7),
-                                            Colour = purple,
-                                            Icon = FontAwesome.fa_chevron_right,
-                                            Alpha = 0,
-                                            X = -200,
-                                        },
-                                    },
+                                    Text = "Changelog ",
+                                    Font = @"Exo2.0-Light",
+                                    TextSize = 38, // web: 30
                                 },
-                                releaseStream = new TextBadgePairRelease(purple, "Lazer")
+                                titleStream = new OsuSpriteText
+                                {
+                                    Text = "Listing",
+                                    TextSize = 38, // web: 30
+                                    Font = @"Exo2.0-Light",
+                                    Colour = purple,
+                                },
+                            }
+                        }
+                    }
+                },
+                breadcrumbContainer = new FillFlowContainer // Listing > Lazer 2018.713.1
+                {
+                    X = 2 * icon_margin + icon_size - 8,
+                    Height = version_height,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                    Direction = FillDirection.Horizontal,
+                    Children = new Drawable[]
+                    {
+                        listing = new TextBadgePairListing(purple),
+                        new Container() // without a container, moving the chevron wont work
+                        {
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            Margin = new MarginPadding()
+                            {
+                                Top = 10,
+                                Left = 7,
+                                Right = 9,
+                                Bottom = 15,
+                            },
+                            Children = new Drawable[]
+                            {
+                                chevron = new SpriteIcon
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Size = new Vector2(7),
+                                    Colour = purple,
+                                    Icon = FontAwesome.fa_chevron_right,
+                                    Alpha = 0,
+                                    X = -200,
+                                },
                             },
                         },
-                        new Box // purple line
-                        {
-                            Colour = purple,
-                            RelativeSizeAxes = Axes.X,
-                            Height = 3,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.CentreLeft,
-                        },
-                    }
-                }
+                        releaseStream = new TextBadgePairRelease(purple, "Lazer")
+                    },
+                },
+                new Box // purple line
+                {
+                    Colour = purple,
+                    RelativeSizeAxes = Axes.X,
+                    Height = 3,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.CentreLeft,
+                },
             };
 
             // is this a bad way to do this?
@@ -184,6 +176,7 @@ namespace osu.Game.Overlays.Changelog
                     releaseStream.Deactivate();
                     chevron.MoveToX(-20, 100).FadeOut(100);
                     ChangeHeaderText("Listing");
+                    OnListingActivated?.Invoke();
                 };
             };
         }
@@ -201,7 +194,7 @@ namespace osu.Game.Overlays.Changelog
         }
 
         public void ActivateListing() => listing.Activate();
-        
+
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
