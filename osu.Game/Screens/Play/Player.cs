@@ -138,10 +138,9 @@ namespace osu.Game.Screens.Play
             sourceClock = (IAdjustableClock)working.Track ?? new StopwatchClock();
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
-            var firstObjectTime = RulesetContainer.Objects.First().StartTime;
             adjustableClock.Seek(AllowLeadIn
-                ? Math.Min(0, firstObjectTime - Math.Max(beatmap.ControlPointInfo.TimingPointAt(firstObjectTime).BeatLength * 4, beatmap.BeatmapInfo.AudioLeadIn))
-                : firstObjectTime);
+                ? Math.Min(RulesetContainer.GameplayStartTime, beatmap.HitObjects.First().StartTime - beatmap.BeatmapInfo.AudioLeadIn)
+                : RulesetContainer.GameplayStartTime);
 
             adjustableClock.ProcessFrame();
 
@@ -199,7 +198,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        new SkipOverlay(firstObjectTime)
+                        new SkipOverlay(RulesetContainer.GameplayStartTime)
                         {
                             Clock = Clock, // skip button doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
