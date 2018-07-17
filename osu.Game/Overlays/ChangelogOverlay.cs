@@ -9,11 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Changelog;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace osu.Game.Overlays
 {
@@ -23,19 +19,22 @@ namespace osu.Game.Overlays
 
         public ChangelogHeader header;
 
+        protected Color4 purple = new Color4(191, 4, 255, 255);
+
         public ChangelogOverlay()
         {
-            Waves.FirstWaveColour = OsuColour.Gray(0.4f);
-            Waves.SecondWaveColour = OsuColour.Gray(0.3f);
-            Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
-            Waves.FourthWaveColour = OsuColour.Gray(0.1f);
+            // these possibly need adjusting?
+            Waves.FirstWaveColour = OsuColour.FromHex(@"bf04ff");
+            Waves.SecondWaveColour = OsuColour.FromHex(@"8F03BF");
+            Waves.ThirdWaveColour = OsuColour.FromHex(@"600280");
+            Waves.FourthWaveColour = OsuColour.FromHex(@"300140");
 
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
             RelativeSizeAxes = Axes.Both;
             Width = 0.85f;
-
             Masking = true;
+
             EdgeEffect = new EdgeEffectParameters
             {
                 Colour = Color4.Black.Opacity(0),

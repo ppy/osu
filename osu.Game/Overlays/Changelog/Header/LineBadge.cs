@@ -3,8 +3,6 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
-using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Changelog.Header
 {
@@ -12,24 +10,26 @@ namespace osu.Game.Overlays.Changelog.Header
     {
         private const float transition_duration = 100;
         private const float uncollapsed_height = 10;
-        public float UncollapsedHeight => uncollapsed_height;
+
         public float TransitionDuration => transition_duration;
-        private bool isCollapsed;
+        public float UncollapsedHeight => uncollapsed_height;
+        protected bool isCollapsed;
         public bool IsCollapsed
         {
             get { return isCollapsed; }
             set
             {
                 isCollapsed = value;
-                this.ResizeHeightTo(value ? 1 : 10, transition_duration);
+                this.ResizeHeightTo(value ? 1 : uncollapsed_height, transition_duration);
             }
         }
 
-        public LineBadge(bool startCollapsed = false)
+        public LineBadge()
         {
-            IsCollapsed = startCollapsed;
             Anchor = Anchor.BottomCentre;
             Origin = Anchor.Centre;
+
+            // this margin prevents jumps when changing text's font weight
             Margin = new MarginPadding()
             {
                 Left = 10,

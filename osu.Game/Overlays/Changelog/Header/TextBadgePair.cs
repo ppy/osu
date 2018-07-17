@@ -1,16 +1,10 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
-using osu.Game.Graphics;
-using osu.Game.Overlays.Changelog;
 using System;
 
 namespace osu.Game.Overlays.Changelog.Header
@@ -43,7 +37,11 @@ namespace osu.Game.Overlays.Changelog.Header
 
         public void ShowText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
         {
-            if (!string.IsNullOrEmpty(displayText)) text.Text = displayText;
+            if (!string.IsNullOrEmpty(displayText))
+            {
+                text.Text = displayText;
+            }
+
             text.MoveToY(0, duration, easing)
                 .FadeIn(duration, easing)
                 .Finally(d => {
@@ -74,7 +72,7 @@ namespace osu.Game.Overlays.Changelog.Header
             // didn't apply to transforms that come after the .finally), I'm using a scheduler here
             Scheduler.AddDelayed(() =>
             {
-                lineBadge.ResizeWidthTo(0); // resizes when not visible
+                //lineBadge.ResizeWidthTo(0); // resizes when not visible
                 if (!string.IsNullOrEmpty(displayText)) text.Text = displayText;
             }, duration);
         }
@@ -91,7 +89,6 @@ namespace osu.Game.Overlays.Changelog.Header
                     Text = displayText,
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
-                    AlwaysPresent = true,
                     Margin = new MarginPadding()
                     {
                         Top = 5,
