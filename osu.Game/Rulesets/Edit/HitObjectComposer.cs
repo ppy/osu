@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Edit
         protected RulesetContainer RulesetContainer;
         private readonly List<Container> layerContainers = new List<Container>();
 
+        public IEnumerable<DrawableHitObject> HitObjects => RulesetContainer.Playfield.AllHitObjects;
+
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         protected HitObjectComposer(Ruleset ruleset)
@@ -110,6 +112,13 @@ namespace osu.Game.Rulesets.Edit
             toolboxCollection.Items[0].Select();
         }
 
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.CacheAs(this);
+            return dependencies;
+        }
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -145,7 +154,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Creates a <see cref="HitObjectMaskLayer"/> depending on the ruleset.
         /// </summary>
-        protected virtual HitObjectMaskLayer CreateHitObjectMaskLayer() => new HitObjectMaskLayer(RulesetContainer.Playfield, this);
+        protected virtual HitObjectMaskLayer CreateHitObjectMaskLayer() => new HitObjectMaskLayer();
 
         /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.

@@ -8,33 +8,27 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
     public class HitObjectMaskLayer : CompositeDrawable
     {
-        protected readonly Playfield Playfield;
-        protected readonly HitObjectComposer Composer;
-
         private MaskContainer maskContainer;
+        private HitObjectComposer composer;
 
-        public HitObjectMaskLayer(Playfield playfield, HitObjectComposer composer)
+        public HitObjectMaskLayer()
         {
-            // we need the playfield as HitObjects may not be initialised until its BDL.
-            Playfield = playfield;
-
-            Composer = composer;
-
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(HitObjectComposer composer)
         {
+            this.composer = composer;
+
             maskContainer = new MaskContainer();
 
-            var maskSelection = Composer.CreateMaskSelection();
+            var maskSelection = composer.CreateMaskSelection();
 
             maskContainer.MaskSelected += maskSelection.HandleSelected;
             maskContainer.MaskDeselected += maskSelection.HandleDeselected;
@@ -56,17 +50,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 dragLayer.CreateProxy()
             };
 
-            addMasks(Playfield);
-        }
-
-        private void addMasks(Playfield playfield)
-        {
-            foreach (var obj in playfield.HitObjects.Objects)
+            foreach (var obj in composer.HitObjects)
                 addMask(obj);
-
-            if (playfield.NestedPlayfields != null)
-                foreach (var p in playfield.NestedPlayfields)
-                    addMasks(p);
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
@@ -81,7 +66,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create a mask for.</param>
         private void addMask(DrawableHitObject hitObject)
         {
-            var mask = Composer.CreateMaskFor(hitObject);
+            var mask = composer.CreateMaskFor(hitObject);
             if (mask == null)
                 return;
 
