@@ -56,6 +56,12 @@ namespace osu.Game.Rulesets.UI
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
+        /// <summary>
+        /// The point in time at which gameplay starts, including any required lead-in for display purposes.
+        /// Defaults to two seconds before the first <see cref="HitObject"/>. Override as necessary.
+        /// </summary>
+        public virtual double GameplayStartTime => Objects.First().StartTime - 2000;
+
         private readonly Lazy<Playfield> playfield;
 
         /// <summary>
