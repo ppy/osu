@@ -33,14 +33,16 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
         {
-            if (h is HitCircle circle)
-                return new DrawableHitCircle(circle);
+            switch (h)
+            {
+                case HitCircle circle:
+                    return new DrawableHitCircle(circle);
+                case Slider slider:
+                    return new DrawableSlider(slider);
+                case Spinner spinner:
+                    return new DrawableSpinner(spinner);
+            }
 
-            if (h is Slider slider)
-                return new DrawableSlider(slider);
-
-            if (h is Spinner spinner)
-                return new DrawableSpinner(spinner);
             return null;
         }
 
