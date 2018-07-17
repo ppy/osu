@@ -10,6 +10,7 @@ namespace osu.Game.Overlays.Changelog.Header
     public class TextBadgePairRelease : TextBadgePair
     {
         private TextBadgePairListing listingBadge;
+        private const float transition_duration = 125;
 
         public TextBadgePairRelease(ColourInfo badgeColour, string displayText) : base(badgeColour, displayText)
         {
@@ -27,15 +28,15 @@ namespace osu.Game.Overlays.Changelog.Header
         public void Activate(string displayText = null)
         {
             ClearTransforms();
-            if (text.IsPresent) ChangeText(250, displayText);
-            else ShowText();
+            if (!lineBadge.IsCollapsed) ChangeText(transition_duration, displayText);
+            else ShowText(transition_duration, displayText);
             OnActivation?.Invoke();
         }
 
         public override void Deactivate()
         {
             FinishTransforms(true);
-            HideText(250);
+            HideText(transition_duration);
             OnDeactivation?.Invoke();
         }
     }

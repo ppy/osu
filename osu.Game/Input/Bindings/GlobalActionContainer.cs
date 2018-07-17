@@ -63,6 +63,8 @@ namespace osu.Game.Input.Bindings
         ToggleChat,
         [Description("Toggle social overlay")]
         ToggleSocial,
+        [Description("Toggle changelog")]
+        ToggleChangelog,
         [Description("Reset input settings")]
         ResetInputSettings,
         [Description("Toggle toolbar")]

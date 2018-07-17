@@ -53,6 +53,8 @@ namespace osu.Game
 
         private DialogOverlay dialogOverlay;
 
+        private ChangelogOverlay changelog;
+
         private DirectOverlay direct;
 
         private SocialOverlay social;
@@ -109,6 +111,8 @@ namespace osu.Game
         public void ToggleSettings() => settings.ToggleVisibility();
 
         public void ToggleDirect() => direct.ToggleVisibility();
+
+        public void ToggleChangelog() => changelog.ToggleVisibility();
 
         /// <summary>
         /// Close all game-wide overlays.
@@ -281,6 +285,7 @@ namespace osu.Game
             loadComponentSingleFile(screenshotManager, Add);
 
             //overlay elements
+            loadComponentSingleFile(changelog = new ChangelogOverlay { Depth = -1 }, mainContent.Add);
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
             loadComponentSingleFile(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
             loadComponentSingleFile(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
@@ -315,6 +320,7 @@ namespace osu.Game
             dependencies.Cache(settings);
             dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
+            dependencies.Cache(changelog);
             dependencies.Cache(direct);
             dependencies.Cache(chat);
             dependencies.Cache(userProfile);
@@ -349,7 +355,7 @@ namespace osu.Game
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct };
+            var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct, changelog };
             overlays.AddRange(singleDisplayOverlays);
 
             foreach (var overlay in singleDisplayOverlays)
@@ -458,6 +464,9 @@ namespace osu.Game
                     return true;
                 case GlobalAction.ToggleSocial:
                     social.ToggleVisibility();
+                    return true;
+                case GlobalAction.ToggleChangelog:
+                    changelog.ToggleVisibility();
                     return true;
                 case GlobalAction.ResetInputSettings:
                     var sensitivity = frameworkConfig.GetBindable<double>(FrameworkSetting.CursorSensitivity);

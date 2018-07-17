@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Changelog.Header;
@@ -55,13 +57,16 @@ namespace osu.Game.Overlays.Changelog
                         {
                             RelativeSizeAxes = Axes.Both,
                             Size = new OpenTK.Vector2(1),
+                            FillMode = FillMode.Fill,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                         },
-                        new Container // cover
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = cover_height,
-                            Children = new Drawable[]
-                            {
+                        //new Container
+                        //{
+                        //    RelativeSizeAxes = Axes.X,
+                        //    Height = cover_height,
+                        //    Children = new Drawable[]
+                        //    {
                                 new Container // this is the line badge-Changelog-Stream
                                 {
                                     Height = title_height,
@@ -108,12 +113,14 @@ namespace osu.Game.Overlays.Changelog
                                                 title = new OsuSpriteText
                                                 {
                                                     Text = "Changelog ",
-                                                    TextSize = 30,
+                                                    Font = @"Exo2.0-Light",
+                                                    TextSize = 38, // web: 30
                                                 },
                                                 titleStream = new OsuSpriteText
                                                 {
                                                     Text = "Listing",
-                                                    TextSize = 30,
+                                                    TextSize = 38, // web: 30
+                                                    Font = @"Exo2.0-Light",
                                                     Colour = purple,
                                                 },
                                             }
@@ -122,7 +129,7 @@ namespace osu.Game.Overlays.Changelog
                                 },
                                 breadcrumbContainer = new FillFlowContainer // Listing > Lazer 2018.713.1
                                 {
-                                    X = 2 * icon_margin + icon_size - 10,
+                                    X = 2 * icon_margin + icon_size - 8, // for some reason off by 3px
                                     Height = version_height,
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
@@ -130,6 +137,21 @@ namespace osu.Game.Overlays.Changelog
                                     Children = new Drawable[]
                                     {
                                         listing = new TextBadgePairListing(purple),
+                                        new SpriteIcon
+                                        {
+                                            Anchor = Anchor.CentreLeft,
+                                            Origin = Anchor.CentreLeft,
+                                            Size = new Vector2(7),
+                                            Colour = OsuColour.FromHex(@"bf04ff"),
+                                            Icon = FontAwesome.fa_chevron_right,
+                                            Margin = new MarginPadding()
+                                            {
+                                                Top = 8,
+                                                Left = 5,
+                                                Right = 5,
+                                                Bottom = 15,
+                                            },
+                                        },
                                         releaseStream = new TextBadgePairRelease(purple, "Lazer")
                                     },
                                 },
@@ -141,42 +163,37 @@ namespace osu.Game.Overlays.Changelog
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.CentreLeft,
                                 },
-                            }
-                        }
+                        //    }
+                        //}
                     }
                 }
             };
-            breadcrumbContainer.OnLoadComplete = d =>
+
+            // is this a bad way to do this?
+            OnLoadComplete = d =>
             {
                 releaseStream.OnActivation = listing.Deactivate;
-                listing.OnActivation = releaseStream.Deactivate;
+                listing.OnActivation = () =>
+                {
+                    releaseStream.Deactivate();
+                    ChangeHeaderText("Listing");
+                };
             };
-            listing.text.OnUpdate = d =>
-            {
-                listing.lineBadge.ResizeWidthTo(listing.text.DrawWidth);
-            };
-        }
-        
-        public void ListingActivation()
-        {
-            releaseStream.Deactivate();
         }
 
-        public void ReleaseActivation()
+        public void ShowReleaseStream(string headerText, string breadcrumbText)
         {
-            listing.Deactivate();
+            releaseStream.Activate(breadcrumbText);
+            ChangeHeaderText(headerText);
         }
 
-        public void ActivateRelease(string displayText)
+        private void ChangeHeaderText(string headerText)
         {
-            releaseStream.Activate(displayText);
-            titleStream.Text = displayText;
+            titleStream.Text = headerText;
+            titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
         }
 
-        public void ActivateListing()
-        {
-            listing.Activate();
-        }
+        public void ActivateListing() => listing.Activate();
         
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)

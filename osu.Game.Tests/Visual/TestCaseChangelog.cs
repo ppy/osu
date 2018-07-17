@@ -17,13 +17,11 @@ namespace osu.Game.Tests.Visual
             base.LoadComplete();
 
             Add(changelog = new ChangelogOverlay());
-            changelog.ToggleVisibility();
-
-            //AddStep(@"toggle", changelog.ToggleVisibility);
-            AddStep(@"toggle text 1", () => changelog.header.ActivateRelease("Release 20180626.1"));
-            AddStep(@"toggle text 2", () => changelog.header.ActivateRelease("Lazer 2018.713.1"));
-            AddStep(@"toggle text 3", () => changelog.header.ActivateRelease("Beta 20180626"));
-            AddStep(@"go to listing", changelog.header.ActivateListing);
+            
+            AddStep(@"Show", changelog.Show);
+            AddStep(@"Stable Release Stream", () => changelog.header.ShowReleaseStream("Stable", "Stable 20180626.1"));
+            AddStep(@"Lazer Release Stream", () => changelog.header.ShowReleaseStream("Lazer", "Lazer 2018.713.1"));
+            AddStep(@"Listing", changelog.header.ActivateListing);
         }
 
         public TestCaseChangelog()

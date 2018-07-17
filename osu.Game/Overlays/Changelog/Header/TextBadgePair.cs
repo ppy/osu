@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -8,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
+using osu.Game.Graphics;
 using osu.Game.Overlays.Changelog;
 using System;
 
@@ -16,23 +18,18 @@ namespace osu.Game.Overlays.Changelog.Header
 
     public class TextBadgePair : ClickableContainer
     {
-        // When in listing, "Listing" is white and doesn't change on mouseover
-        // when release stream is chosen, "Listing" turns purple, and lighter font
-        // on mouseover, the badge scales up
-        // Version name steals "Listing"'s styling
-
-        public SpriteText text;
-        public LineBadge lineBadge;
+        protected SpriteText text;
+        protected LineBadge lineBadge;
 
         public Action OnActivation;
         public Action OnDeactivation;
 
-        public void SetTextColor(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
+        public void SetTextColour(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
         {
             text.FadeColour(newColour, duration, easing);
         }
 
-        public void SetBadgeColor(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
+        public void SetBadgeColour(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
         {
             lineBadge.FadeColour(newColour, duration, easing);
         }
@@ -44,30 +41,42 @@ namespace osu.Game.Overlays.Changelog.Header
                 .FadeOut(duration, easing);
         }
 
-        public void ShowText(double duration = 0, Easing easing = Easing.InOutCubic)
+        public void ShowText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
         {
-            lineBadge.IsCollapsed = false;
+            if (!string.IsNullOrEmpty(displayText)) text.Text = displayText;
             text.MoveToY(0, duration, easing)
                 .FadeIn(duration, easing)
-                .Finally(d => lineBadge.ResizeWidthTo(text.DrawWidth, 250));
+                .Finally(d => {
+                    // waiting until text is drawn to use its DrawWidth
+                    UpdateBadgeWidth();
+                    lineBadge.IsCollapsed = false;
+                });
         }
 
+        /// <param name="duration">
+        /// The duration of popping in and popping out not combined.
+        /// Full change takes double this time.</param>
         public void ChangeText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
         {
             lineBadge.IsCollapsed = true;
             text.MoveToY(20, duration, easing)
                 .FadeOut(duration, easing)
-                .Finally(d =>
-                {
-                    lineBadge.ResizeWidthTo(0);
-                    if (!string.IsNullOrEmpty(displayText)) text.Text = displayText;
-                    text.MoveToY(0, duration, easing)
-                        .FadeIn(duration, easing)
-                        .OnComplete(dd => {
-                            lineBadge.ResizeWidthTo(text.DrawWidth);
-                            lineBadge.IsCollapsed = false;
-                        });
+                .Then()
+                .MoveToY(0, duration, easing)
+                .FadeIn(duration, easing)
+                .OnComplete(dd => {
+                    UpdateBadgeWidth();
+                    lineBadge.IsCollapsed = false;
                 });
+
+            // since using .finally/.oncomplete after first fadeout made the badge
+            // not hide sometimes in visual tests(because FinishTransforms()/CancelTransforms()
+            // didn't apply to transforms that come after the .finally), I'm using a scheduler here
+            Scheduler.AddDelayed(() =>
+            {
+                lineBadge.ResizeWidthTo(0); // resizes when not visible
+                if (!string.IsNullOrEmpty(displayText)) text.Text = displayText;
+            }, duration);
         }
 
         public TextBadgePair(ColourInfo badgeColour, string displayText = "Listing")
@@ -78,10 +87,10 @@ namespace osu.Game.Overlays.Changelog.Header
             {
                 text = new SpriteText
                 {
-                    TextSize = 20,
+                    TextSize = 21, // web is 16, but here it looks too small?
                     Text = displayText,
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                     AlwaysPresent = true,
                     Margin = new MarginPadding()
                     {
@@ -109,5 +118,7 @@ namespace osu.Game.Overlays.Changelog.Header
             lineBadge.IsCollapsed = false;
             text.Font = "Exo2.0-Bold";
         }
+
+        public void UpdateBadgeWidth() => lineBadge.ResizeWidthTo(text.DrawWidth);
     }
 }

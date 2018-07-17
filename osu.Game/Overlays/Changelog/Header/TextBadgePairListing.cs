@@ -11,29 +11,33 @@ namespace osu.Game.Overlays.Changelog.Header
 {
     public class TextBadgePairListing : TextBadgePair
     {
-        private TextBadgePairRelease releaseBadge;
         private ColourInfo badgeColour;
 
         public TextBadgePairListing(ColourInfo badgeColour) : base(badgeColour, "Listing")
         {
-            this.releaseBadge = releaseBadge;
             this.badgeColour = badgeColour;
             text.Font = "Exo2.0-Bold";
+            text.Anchor = Anchor.TopCentre;
+            text.Origin = Anchor.TopCentre;
+
+            // this doesn't work without the scheduler
+            // (because the text isn't yet fully drawn when it's loaded?)
+            text.OnLoadComplete = d => Scheduler.Add(UpdateBadgeWidth);
         }
 
         public override void Activate()
         {
             lineBadge.IsCollapsed = false;
             text.Font = "Exo2.0-Bold";
-            SetTextColor(Color4.White, 100);
+            SetTextColour(Color4.White, 100);
             OnActivation?.Invoke();
         }
 
         public override void Deactivate()
         {
             lineBadge.IsCollapsed = true;
-            //text.Font = "Exo2.0-Regular"; // commented out since it makes bad resize-jumping
-            SetTextColor(badgeColour, 100);
+            text.Font = "Exo2.0-Regular"; // commented out since it makes bad resize-jumping
+            SetTextColour(badgeColour, 100);
             OnDeactivation?.Invoke();
         }
 
