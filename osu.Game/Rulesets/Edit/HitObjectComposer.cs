@@ -28,8 +28,7 @@ namespace osu.Game.Rulesets.Edit
         private RulesetContainer rulesetContainer;
         private readonly List<Container> layerContainers = new List<Container>();
 
-        public IEnumerable<DrawableHitObject> HitObjects => rulesetContainer.Playfield.HitObjects.Objects;
-        public IEnumerable<DrawableHitObject> AliveHitObjects => rulesetContainer.Playfield.HitObjects.AliveObjects;
+        public IEnumerable<DrawableHitObject> HitObjects => rulesetContainer.Playfield.AllHitObjects;
 
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
