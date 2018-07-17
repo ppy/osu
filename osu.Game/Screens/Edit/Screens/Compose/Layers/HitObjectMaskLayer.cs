@@ -8,30 +8,24 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
     public class HitObjectMaskLayer : CompositeDrawable
     {
-        private readonly Playfield playfield;
-        private readonly HitObjectComposer composer;
-
         private MaskContainer maskContainer;
+        private HitObjectComposer composer;
 
-        public HitObjectMaskLayer(Playfield playfield, HitObjectComposer composer)
+        public HitObjectMaskLayer()
         {
-            // we need the playfield as HitObjects may not be initialised until its BDL.
-            this.playfield = playfield;
-
-            this.composer = composer;
-
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(HitObjectComposer composer)
         {
+            this.composer = composer;
+
             maskContainer = new MaskContainer();
 
             var maskSelection = composer.CreateMaskSelection();
@@ -54,7 +48,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 dragLayer.CreateProxy()
             };
 
-            foreach (var obj in playfield.HitObjects.Objects)
+            foreach (var obj in composer.HitObjects)
                 addMask(obj);
         }
 
