@@ -43,6 +43,6 @@ namespace osu.Game.Rulesets.Mania.Edit
             return base.CreateMaskFor(hitObject);
         }
 
-        protected override HitObjectMaskLayer CreateHitObjectMaskLayer() => new ManiaHitObjectMaskLayer(RulesetContainer.Playfield, this);
+        protected override HitObjectMaskLayer CreateHitObjectMaskLayer() => new ManiaHitObjectMaskLayer();
     }
 }

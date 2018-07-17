@@ -2,8 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using OpenTK;
 
@@ -13,8 +11,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers
     {
         public readonly IBindable<bool> Inverted = new Bindable<bool>();
 
-        public ManiaHitObjectMaskLayer(Playfield playfield, HitObjectComposer composer)
-            : base(playfield, composer)
+        public ManiaHitObjectMaskLayer()
         {
             Inverted.ValueChanged += invertedChanged;
         }
