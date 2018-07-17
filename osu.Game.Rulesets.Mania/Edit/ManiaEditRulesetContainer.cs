@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
         }
 
-        protected override Playfield CreatePlayfield() => new ManiaEditPlayfield(ScrollingInfo.Direction.Value, Beatmap.Stages)
+        protected override Playfield CreatePlayfield() => new ManiaEditPlayfield(Beatmap.Stages)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
