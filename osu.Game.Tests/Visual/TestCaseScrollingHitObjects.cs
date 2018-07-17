@@ -117,7 +117,6 @@ namespace osu.Game.Tests.Visual
             public new readonly ScrollingDirection Direction;
 
             public TestPlayfield(ScrollingDirection direction)
-                : base(direction)
             {
                 Direction = direction;
 
