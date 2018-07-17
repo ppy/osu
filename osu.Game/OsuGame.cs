@@ -24,6 +24,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform;
 using osu.Framework.Threading;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Notifications;
@@ -34,6 +35,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
 using osu.Game.Overlays.Volume;
+using osu.Game.Screens.Select;
 
 namespace osu.Game
 {
@@ -180,6 +182,41 @@ namespace osu.Game
         public void ShowBeatmapSet(int setId) => beatmapSetOverlay.FetchAndShowBeatmapSet(setId);
 
         /// <summary>
+        /// Present a beatmap at song select.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to select.</param>
+        public void PresentBeatmap(BeatmapSetInfo beatmap)
+        {
+            CloseAllOverlays(false);
+
+            void setBeatmap()
+            {
+                if (Beatmap.Disabled)
+                {
+                    Schedule(setBeatmap);
+                    return;
+                }
+
+                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(beatmap.Beatmaps.First());
+            }
+
+            switch (currentScreen)
+            {
+                case SongSelect _:
+                    break;
+                default:
+                    // navigate to song select if we are not already there.
+                    var menu = (MainMenu)intro.ChildScreen;
+
+                    menu.MakeCurrent();
+                    menu.LoadToSolo();
+                    break;
+            }
+
+            setBeatmap();
+        }
+
+        /// <summary>
         /// Show a user's profile as an overlay.
         /// </summary>
         /// <param name="userId">The user to display.</param>
@@ -245,6 +282,7 @@ namespace osu.Game
             BeatmapManager.PostNotification = n => notifications?.Post(n);
 
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
+            BeatmapManager.PresentBeatmap = PresentBeatmap;
 
             AddRange(new Drawable[]
             {
