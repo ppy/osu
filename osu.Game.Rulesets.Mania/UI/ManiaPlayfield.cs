@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.UI.Scrolling;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,8 +24,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected virtual bool DisplayJudgements => true;
 
-        public ManiaPlayfield(ScrollingDirection direction, List<StageDefinition> stageDefinitions)
-            : base(direction)
+        public ManiaPlayfield(List<StageDefinition> stageDefinitions)
         {
             if (stageDefinitions == null)
                 throw new ArgumentNullException(nameof(stageDefinitions));
@@ -46,7 +44,7 @@ namespace osu.Game.Rulesets.Mania.UI
             int firstColumnIndex = 0;
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = CreateStage(direction, firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
+                var newStage = CreateStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
                 newStage.DisplayJudgements = DisplayJudgements;
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
 
@@ -94,7 +92,7 @@ namespace osu.Game.Rulesets.Mania.UI
             getStageByColumn(((ManiaHitObject)judgedObject.HitObject).Column).OnJudgement(judgedObject, judgement);
         }
 
-        protected virtual ManiaStage CreateStage(ScrollingDirection direction, int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
-            => new ManiaStage(direction, firstColumnIndex, definition, ref normalColumnStartAction, ref specialColumnStartAction);
+        protected virtual ManiaStage CreateStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
+            => new ManiaStage(firstColumnIndex, definition, ref normalColumnStartAction, ref specialColumnStartAction);
     }
 }

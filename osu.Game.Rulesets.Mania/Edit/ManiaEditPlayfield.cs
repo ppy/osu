@@ -4,7 +4,6 @@
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.UI;
 using System.Collections.Generic;
-using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
@@ -12,12 +11,12 @@ namespace osu.Game.Rulesets.Mania.Edit
     {
         protected override bool DisplayJudgements => false;
 
-        public ManiaEditPlayfield(ScrollingDirection direction, List<StageDefinition> stages)
-            : base(direction, stages)
+        public ManiaEditPlayfield(List<StageDefinition> stages)
+            : base(stages)
         {
         }
 
-        protected override ManiaStage CreateStage(ScrollingDirection direction, int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
-            => new ManiaEditStage(direction, firstColumnIndex, definition, ref normalColumnStartAction, ref specialColumnStartAction);
+        protected override ManiaStage CreateStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
+            => new ManiaEditStage(firstColumnIndex, definition, ref normalColumnStartAction, ref specialColumnStartAction);
     }
 }
