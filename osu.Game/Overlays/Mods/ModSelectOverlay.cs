@@ -44,6 +44,8 @@ namespace osu.Game.Overlays.Mods
 
         private void rulesetChanged(RulesetInfo newRuleset)
         {
+            if (newRuleset == null) return;
+
             var instance = newRuleset.CreateInstance();
 
             foreach (ModSection section in ModSectionsContainer.Children)
@@ -173,7 +175,10 @@ namespace osu.Game.Overlays.Mods
             refreshSelectedMods();
         }
 
-        private void refreshSelectedMods() => SelectedMods.Value = ModSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
+        private void refreshSelectedMods()
+        {
+            SelectedMods.Value = ModSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
+        }
 
         public ModSelectOverlay()
         {

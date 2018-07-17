@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using OpenTK;
@@ -47,6 +48,15 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuReplayInputHandler(replay);
+
+        public override double GameplayStartTime
+        {
+            get
+            {
+                var first = (OsuHitObject)Objects.First();
+                return first.StartTime - first.TimePreempt;
+            }
+        }
 
         protected override Vector2 GetAspectAdjustedSize()
         {

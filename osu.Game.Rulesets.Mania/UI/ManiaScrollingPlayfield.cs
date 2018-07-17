@@ -11,11 +11,6 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        public ManiaScrollingPlayfield(ScrollingDirection direction)
-            : base(direction)
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load(IScrollingInfo scrollingInfo)
         {
