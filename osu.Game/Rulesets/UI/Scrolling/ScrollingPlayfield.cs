@@ -57,22 +57,23 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)base.HitObjects;
 
+        /// <summary>
+        /// The direction in which <see cref="DrawableHitObject"/>s in this <see cref="ScrollingPlayfield"/> should scroll.
+        /// </summary>
         protected readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
         /// <summary>
         /// Creates a new <see cref="ScrollingPlayfield"/>.
         /// </summary>
-        /// <param name="direction">The direction in which <see cref="DrawableHitObject"/>s in this container should scroll.</param>
         /// <param name="customWidth">The width to scale the internal coordinate space to.
         /// May be null if scaling based on <paramref name="customHeight"/> is desired. If <paramref name="customHeight"/> is also null, no scaling will occur.
         /// </param>
         /// <param name="customHeight">The height to scale the internal coordinate space to.
         /// May be null if scaling based on <paramref name="customWidth"/> is desired. If <paramref name="customWidth"/> is also null, no scaling will occur.
         /// </param>
-        protected ScrollingPlayfield(ScrollingDirection direction, float? customWidth = null, float? customHeight = null)
+        protected ScrollingPlayfield(float? customWidth = null, float? customHeight = null)
             : base(customWidth, customHeight)
         {
-            Direction.Value = direction;
         }
 
         [BackgroundDependencyLoader]
