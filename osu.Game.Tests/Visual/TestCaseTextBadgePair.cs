@@ -3,11 +3,9 @@
 
 using NUnit.Framework;
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Overlays.Changelog.Header;
 
 namespace osu.Game.Tests.Visual
@@ -58,19 +56,7 @@ namespace osu.Game.Tests.Visual
             AddStep(@"white badge", () => textBadgePair.SetBadgeColour(Color4.White, 100));
             AddStep(@"hide text", () => textBadgePair.HideText(250));
             AddStep(@"show text", () => textBadgePair.ShowText(250));
+            AddStep(@"change text", () => textBadgePair.ChangeText(250));
         }
-
-        //[BackgroundDependencyLoader]
-        //private void load(OsuColour colours)
-        //{
-
-        //}
-
-        //private enum BreadcrumbTab
-        //{
-        //    Click,
-        //    The,
-        //    Circles,
-        //}
     }
 }

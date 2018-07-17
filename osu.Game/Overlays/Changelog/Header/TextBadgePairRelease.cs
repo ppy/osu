@@ -1,9 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
-using osu.Framework.Input;
 
 namespace osu.Game.Overlays.Changelog.Header
 {
@@ -27,15 +25,17 @@ namespace osu.Game.Overlays.Changelog.Header
 
         public void Activate(string displayText = null)
         {
-            ClearTransforms();
-            if (!lineBadge.IsCollapsed) ChangeText(transition_duration, displayText);
+            //ClearTransforms();
+            // not using if (!lineBadge.IsCollapsed) because the text sometimes gets reset
+            // when quickly switching release streams
+            if (text.IsPresent) ChangeText(transition_duration, displayText);
             else ShowText(transition_duration, displayText);
             OnActivation?.Invoke();
         }
 
         public override void Deactivate()
         {
-            FinishTransforms(true);
+            //FinishTransforms(true);
             HideText(transition_duration);
             OnDeactivation?.Invoke();
         }

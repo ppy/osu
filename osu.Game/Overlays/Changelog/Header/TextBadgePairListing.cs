@@ -5,7 +5,6 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Input;
-using System;
 
 namespace osu.Game.Overlays.Changelog.Header
 {
