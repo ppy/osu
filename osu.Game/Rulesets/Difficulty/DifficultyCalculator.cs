@@ -71,10 +71,10 @@ namespace osu.Game.Rulesets.Difficulty
                     case 1:
                         yield return currentSet.Single();
                         break;
+                    default:
+                        yield return new MultiMod(currentSet.ToArray());
+                        break;
                 }
-
-                if (currentSetCount > 1)
-                    yield return new MultiMod(currentSet.ToArray());
 
                 // Apply mods in the adjustment set recursively. Using the entire adjustment set would result in duplicate multi-mod mod
                 // combinations in further recursions, so a moving subset is used to eliminate this effect
