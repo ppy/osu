@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -24,6 +25,8 @@ namespace osu.Game.Rulesets.Edit
         private readonly Ruleset ruleset;
 
         protected ICompositionTool CurrentTool { get; private set; }
+
+        protected IRulesetConfigManager Config { get; private set; }
 
         protected RulesetContainer RulesetContainer;
         private readonly List<Container> layerContainers = new List<Container>();
@@ -115,7 +118,10 @@ namespace osu.Game.Rulesets.Edit
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
             dependencies.CacheAs(this);
+            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(ruleset);
+
             return dependencies;
         }
 
