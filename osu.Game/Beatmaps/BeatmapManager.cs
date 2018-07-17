@@ -46,6 +46,11 @@ namespace osu.Game.Beatmaps
         public event Action<DownloadBeatmapSetRequest> BeatmapDownloadBegan;
 
         /// <summary>
+        /// Fired when a beatmap download is interrupted, due to user cancellation or other failures.
+        /// </summary>
+        public event Action<DownloadBeatmapSetRequest> BeatmapDownloadFailed;
+
+        /// <summary>
         /// Fired when a beatmap load is requested (into the interactive game UI).
         /// </summary>
         public Action<BeatmapSetInfo> PresentBeatmap;
@@ -148,7 +153,7 @@ namespace osu.Game.Beatmaps
                 return;
             }
 
-            var downloadNotification = new ProgressNotification
+            var downloadNotification = new DownloadNotification
             {
                 CompletionText = $"Imported {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}!",
                 Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
@@ -188,6 +193,8 @@ namespace osu.Game.Beatmaps
 
             request.Failure += error =>
             {
+                BeatmapDownloadFailed?.Invoke(request);
+
                 if (error is OperationCanceledException) return;
 
                 downloadNotification.State = ProgressNotificationState.Cancelled;
@@ -465,6 +472,22 @@ namespace osu.Game.Beatmaps
             protected override IBeatmap GetBeatmap() => beatmap;
             protected override Texture GetBackground() => null;
             protected override Track GetTrack() => null;
+        }
+
+        private class DownloadNotification : ProgressNotification
+        {
+            public override bool IsImportant => false;
+
+            protected override Notification CreateCompletionNotification() => new SilencedProgressCompletionNotification
+            {
+                Activated = CompletionClickAction,
+                Text = CompletionText
+            };
+
+            private class SilencedProgressCompletionNotification : ProgressCompletionNotification
+            {
+                public override bool IsImportant => false;
+            }
         }
     }
 }
