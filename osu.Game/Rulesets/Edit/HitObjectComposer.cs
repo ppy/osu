@@ -28,6 +28,9 @@ namespace osu.Game.Rulesets.Edit
         private RulesetContainer rulesetContainer;
         private readonly List<Container> layerContainers = new List<Container>();
 
+        public IEnumerable<DrawableHitObject> HitObjects => rulesetContainer.Playfield.HitObjects.Objects;
+        public IEnumerable<DrawableHitObject> AliveHitObjects => rulesetContainer.Playfield.HitObjects.AliveObjects;
+
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         protected HitObjectComposer(Ruleset ruleset)
@@ -60,7 +63,7 @@ namespace osu.Game.Rulesets.Edit
             };
 
             var layerAboveRuleset = CreateLayerContainer();
-            layerAboveRuleset.Child = new HitObjectMaskLayer(rulesetContainer.Playfield, this);
+            layerAboveRuleset.Child = new HitObjectMaskLayer();
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -108,6 +111,13 @@ namespace osu.Game.Rulesets.Edit
                 .ToList();
 
             toolboxCollection.Items[0].Select();
+        }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.CacheAs(this);
+            return dependencies;
         }
 
         protected override void UpdateAfterChildren()
