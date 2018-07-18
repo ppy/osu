@@ -7,13 +7,11 @@ namespace osu.Game.Tests.Platform
 {
     public class TestStorage : DesktopStorage
     {
-        public TestStorage(string baseName) : base(baseName, null)
+        public TestStorage(string baseName)
+            : base(baseName, null)
         {
         }
 
-        public override string GetDatabaseConnectionString(string name)
-        {
-            return "DataSource=:memory:";
-        }
+        public override string GetDatabaseConnectionString(string name) => "Data Source=" + GetUsablePathFor($"{(object)name}.db", true);
     }
 }
