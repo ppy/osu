@@ -9,7 +9,6 @@ using System;
 
 namespace osu.Game.Overlays.Changelog.Header
 {
-
     public class TextBadgePair : ClickableContainer
     {
         protected SpriteText text;
@@ -18,7 +17,7 @@ namespace osu.Game.Overlays.Changelog.Header
 
         public Action OnActivation;
         public Action OnDeactivation;
-        
+
         public void SetTextColour(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
         {
             text.FadeColour(newColour, duration, easing);

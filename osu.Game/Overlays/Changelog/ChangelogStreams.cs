@@ -7,6 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Changelog.Streams;
 using System;
@@ -23,7 +24,7 @@ namespace osu.Game.Overlays.Changelog
 
         private readonly StreamColour streamColour;
         public readonly FillFlowContainer<StreamBadge> badgesContainer;
-        
+
         public ChangelogStreams()
         {
             streamColour = new StreamColour();
@@ -76,6 +77,32 @@ namespace osu.Game.Overlays.Changelog
                     };
                 }
             };
+        }
+
+        protected override bool OnHover(InputState state)
+        {
+            // is this nullreference-safe for badgesContainer?
+            foreach (StreamBadge streamBadge in badgesContainer.Children)
+            {
+                if (SelectedRelease.Value != null)
+                {
+                    if (SelectedRelease.Value.Name != streamBadge.Name)
+                    {
+                        streamBadge.Deactivate();
+                    }
+                }
+                else streamBadge.Deactivate();
+            }
+            return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            if (SelectedRelease.Value == null)
+            {
+                foreach (StreamBadge streamBadge in badgesContainer.Children) streamBadge.Activate(true);
+            }
+            base.OnHoverLost(state);
         }
     }
 }

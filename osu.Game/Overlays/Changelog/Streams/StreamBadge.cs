@@ -13,7 +13,7 @@ using System;
 
 namespace osu.Game.Overlays.Changelog.Streams
 {
-    public class StreamBadge : Container
+    public class StreamBadge : ClickableContainer
     {
         private const float badgeHeight = 56.5f;
         private const float badgeWidth = 100;
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Changelog.Streams
                             TextSize = 16,
                             Margin = new MarginPadding
                             {
-                                Top = 5,
+                                Top = 7,
                             }
                         },
                         new SpriteText
@@ -80,6 +80,7 @@ namespace osu.Game.Overlays.Changelog.Streams
                 lineBadge = new Header.LineBadge(false, 2, 4)
                 {
                     Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
                     Width = 1,
                     Colour = colour,
                     RelativeSizeAxes = Axes.X,
