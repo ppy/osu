@@ -223,6 +223,7 @@ namespace osu.Game.Screens.Play
             hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
+            RulesetContainer.IsPaused.ValueChanged += paused => hudOverlay.KeyCounter.IsCounting = !paused;
 
             if (ShowStoryboard)
                 initializeStoryboard(false);
