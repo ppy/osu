@@ -162,6 +162,7 @@ namespace osu.Game.Screens.Play
             {
                 pauseContainer = new PauseContainer(offsetClock, adjustableClock)
                 {
+                    Retries = RestartCount,
                     OnRetry = Restart,
                     OnQuit = Exit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
