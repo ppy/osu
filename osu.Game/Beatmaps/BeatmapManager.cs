@@ -91,7 +91,8 @@ namespace osu.Game.Beatmaps
 
         protected override void Populate(BeatmapSetInfo model, ArchiveReader archive)
         {
-            model.Beatmaps = createBeatmapDifficulties(archive);
+            if (archive != null)
+                model.Beatmaps = createBeatmapDifficulties(archive);
 
             foreach (BeatmapInfo b in model.Beatmaps)
             {
