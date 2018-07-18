@@ -12,6 +12,6 @@ namespace osu.Game.Tests.Platform
         {
         }
 
-        public override string GetDatabaseConnectionString(string name) => "Data Source=" + GetUsablePathFor($"{(object)name}.db", true);
+        public override string GetDatabaseConnectionString(string name) => "Data Source=" + GetUsablePathFor($"{name}.db", true);
     }
 }
