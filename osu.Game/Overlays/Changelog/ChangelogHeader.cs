@@ -133,7 +133,9 @@ namespace osu.Game.Overlays.Changelog
                             {
                                 Top = 10,
                                 Left = 7,
-                                Right = 9,
+                                // + chevron size, and account for gained space on left by
+                                // listing's font draw width being smaller
+                                Right = 18,
                                 Bottom = 15,
                             },
                             Children = new Drawable[]

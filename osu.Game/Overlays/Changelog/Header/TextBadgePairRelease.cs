@@ -12,7 +12,6 @@ namespace osu.Game.Overlays.Changelog.Header
 
         public TextBadgePairRelease(ColourInfo badgeColour, string displayText) : base(badgeColour, displayText)
         {
-            this.listingBadge = listingBadge;
             text.Font = "Exo2.0-Bold";
             text.Y = 20;
             text.Alpha = 0;
