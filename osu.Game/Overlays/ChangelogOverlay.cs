@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Changelog;
 using osu.Game.Overlays.Changelog.Streams;
 
@@ -16,12 +17,10 @@ namespace osu.Game.Overlays
 {
     public class ChangelogOverlay : WaveOverlayContainer
     {
-        private readonly ScrollContainer scroll;
+        private readonly ChangelogHeader header;
+        public readonly ChangelogStreams Streams;
 
-        private ChangelogHeader header;
-        public readonly ChangelogStreams streams;
-
-        protected Color4 purple = new Color4(191, 4, 255, 255);
+        protected readonly Color4 Purple = new Color4(191, 4, 255, 255);
 
         public ChangelogOverlay()
         {
@@ -52,7 +51,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = new Color4(20, 18, 23, 255)
                 },
-                scroll = new ScrollContainer
+                new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -64,25 +63,25 @@ namespace osu.Game.Overlays
                         Children = new Drawable[]
                         {
                             header = new ChangelogHeader(),
-                            streams = new ChangelogStreams(),
+                            Streams = new ChangelogStreams(),
                         },
                     },
                 },
             };
-            streams.SelectedRelease.ValueChanged += r =>
+            Streams.SelectedRelease.ValueChanged += r =>
             {
-                if (streams.SelectedRelease.Value != null)
+                if (Streams.SelectedRelease.Value != null)
                     header.ShowReleaseStream(r.Name, string.Join(" ", r.Name, r.DisplayVersion));
             };
-            streams.badgesContainer.OnLoadComplete += d =>
+            Streams.BadgesContainer.OnLoadComplete += d =>
             {
                 header.OnListingActivated += () =>
                 {
-                    streams.SelectedRelease.Value = null;
-                    foreach (StreamBadge item in streams.badgesContainer.Children)
-                    {
-                        item.Activate(true);
-                    }
+                    Streams.SelectedRelease.Value = null;
+                    if (!Streams.IsHovered)
+                        foreach (StreamBadge item in Streams.BadgesContainer.Children) item.Activate(true);
+                    else
+                        foreach (StreamBadge item in Streams.BadgesContainer.Children) item.Deactivate();
                 };
             };
         }
@@ -91,6 +90,24 @@ namespace osu.Game.Overlays
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+
+        public override bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Back:
+                    if (header.IsListingActivated()) State = Visibility.Hidden;
+
+                    // the problem here is that when hovering over the builds' container
+                    // and pressing back, they don't lower their opacity they're rehovered on
+                    else header.ActivateListing();
+                    return true;
+                case GlobalAction.Select:
+                    return true;
+            }
+
+            return false;
+        }
 
         protected override void PopIn()
         {

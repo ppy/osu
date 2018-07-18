@@ -8,18 +8,20 @@ namespace osu.Game.Overlays.Changelog.Header
 {
     public class LineBadge : Circle
     {
-        public float TransitionDuration = 100;
+        public float TransitionDuration = 400;
         public float UncollapsedHeight;
         public float CollapsedHeight;
 
-        protected bool isCollapsed;
+        private bool isCollapsed;
         public bool IsCollapsed
         {
             get { return isCollapsed; }
             set
             {
                 isCollapsed = value;
-                this.ResizeHeightTo(value ? CollapsedHeight : UncollapsedHeight, TransitionDuration);
+                this.ResizeHeightTo(value ? CollapsedHeight : UncollapsedHeight,
+                    value ? TransitionDuration / 2f : TransitionDuration,
+                    value ? Easing.Out : Easing.OutElastic);
             }
         }
 
@@ -32,7 +34,7 @@ namespace osu.Game.Overlays.Changelog.Header
             Height = startCollapsed ? CollapsedHeight : UncollapsedHeight;
 
             // this margin prevents jumps when changing text's font weight
-            Margin = new MarginPadding()
+            Margin = new MarginPadding
             {
                 Left = 10,
                 Right = 10,

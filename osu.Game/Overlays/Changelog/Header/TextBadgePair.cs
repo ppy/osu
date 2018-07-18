@@ -1,45 +1,51 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input;
 using System;
 
 namespace osu.Game.Overlays.Changelog.Header
 {
-    public class TextBadgePair : ClickableContainer
+    public class TextBadgePair : Container
     {
-        protected SpriteText text;
-        protected LineBadge lineBadge;
-        protected bool startCollapsed;
+        protected SpriteText Text;
+        protected LineBadge LineBadge;
+        public bool IsActivated { get; protected set; }
 
         public Action OnActivation;
         public Action OnDeactivation;
+        private SampleChannel sampleHover;
+        protected SampleChannel SampleActivate;
 
         public void SetTextColour(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
         {
-            text.FadeColour(newColour, duration, easing);
+            Text.FadeColour(newColour, duration, easing);
         }
 
         public void SetBadgeColour(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
         {
-            lineBadge.FadeColour(newColour, duration, easing);
+            LineBadge.FadeColour(newColour, duration, easing);
         }
 
         public void HideText(double duration = 0, Easing easing = Easing.InOutCubic)
         {
-            lineBadge.IsCollapsed = true;
-            text.MoveToY(20, duration, easing)
+            LineBadge.IsCollapsed = true;
+            Text.MoveToY(20, duration, easing)
                 .FadeOut(duration, easing);
         }
 
         public void ShowText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
         {
-            lineBadge.IsCollapsed = false;
-            if (!string.IsNullOrEmpty(displayText)) text.Text = displayText;
-            text.MoveToY(0, duration, easing)
+            LineBadge.IsCollapsed = false;
+            if (!string.IsNullOrEmpty(displayText)) Text.Text = displayText;
+            Text.MoveToY(0, duration, easing)
                 .FadeIn(duration, easing);
         }
 
@@ -48,8 +54,8 @@ namespace osu.Game.Overlays.Changelog.Header
         /// Full change takes double this time.</param>
         public void ChangeText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
         {
-            lineBadge.IsCollapsed = true;
-            text.MoveToY(20, duration, easing)
+            LineBadge.IsCollapsed = true;
+            Text.MoveToY(20, duration, easing)
                 .FadeOut(duration, easing)
                 .Then()
                 .MoveToY(0, duration, easing)
@@ -60,30 +66,30 @@ namespace osu.Game.Overlays.Changelog.Header
             // didn't apply to transforms that come after the .finally), I'm using a scheduler here
             Scheduler.AddDelayed(() =>
             {
-                if (!string.IsNullOrEmpty(displayText)) text.Text = displayText;
-                lineBadge.IsCollapsed = false;
+                if (!string.IsNullOrEmpty(displayText)) Text.Text = displayText;
+                LineBadge.IsCollapsed = false;
             }, duration);
         }
 
-        public TextBadgePair(ColourInfo badgeColour, string displayText = "Listing", bool startBadgeCollapsed = true)
+        public TextBadgePair(ColourInfo badgeColour, string displayText = "Listing", bool startCollapsed = true)
         {
             AutoSizeAxes = Axes.X;
             RelativeSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
-                text = new SpriteText
+                Text = new SpriteText
                 {
                     TextSize = 21, // web is 16, but here it looks too small?
                     Text = displayText,
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
-                    Margin = new MarginPadding()
+                    Margin = new MarginPadding
                     {
                         Top = 5,
                         Bottom = 15,
                     }
                 },
-                lineBadge = new LineBadge(startCollapsed)
+                LineBadge = new LineBadge(startCollapsed)
                 {
                     Width = 1,
                     Colour = badgeColour,
@@ -94,14 +100,30 @@ namespace osu.Game.Overlays.Changelog.Header
 
         public virtual void Deactivate()
         {
-            lineBadge.IsCollapsed = true;
-            text.Font = "Exo2.0-Regular";
+            IsActivated = false;
+            LineBadge.IsCollapsed = true;
+            Text.Font = "Exo2.0-Regular";
         }
 
         public virtual void Activate()
         {
-            lineBadge.IsCollapsed = false;
-            text.Font = "Exo2.0-Bold";
+            IsActivated = true;
+            LineBadge.IsCollapsed = false;
+            Text.Font = "Exo2.0-Bold";
+            SampleActivate?.Play();
+        }
+
+        protected override bool OnHover(InputState state)
+        {
+            if (!IsActivated) sampleHover?.Play();
+            return base.OnHover(state);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleHover = audio.Sample.Get(@"UI/generic-hover-soft");
+            SampleActivate = audio.Sample.Get(@"UI/generic-select-soft");
         }
     }
 }

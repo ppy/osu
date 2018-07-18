@@ -12,29 +12,34 @@ namespace osu.Game.Overlays.Changelog.Header
 
         public TextBadgePairRelease(ColourInfo badgeColour, string displayText) : base(badgeColour, displayText)
         {
-            text.Font = "Exo2.0-Bold";
-            text.Y = 20;
-            text.Alpha = 0;
+            Text.Font = "Exo2.0-Bold";
+            Text.Y = 20;
+            Text.Alpha = 0;
         }
 
         public void SetText(string displayText)
         {
-            text.Text = displayText;
+            Text.Text = displayText;
         }
 
         public void Activate(string displayText = null)
         {
-            //ClearTransforms();
-            // not using if (!lineBadge.IsCollapsed) because the text sometimes gets reset
-            // when quickly switching release streams
-            if (text.IsPresent) ChangeText(transition_duration, displayText);
-            else ShowText(transition_duration, displayText);
+            if (IsActivated)
+            {
+                if (displayText != Text.Text) ChangeText(transition_duration, displayText);
+            }
+            else
+            {
+                ShowText(transition_duration, displayText);
+                IsActivated = true;
+            }
+            SampleActivate?.Play();
             OnActivation?.Invoke();
         }
 
         public override void Deactivate()
         {
-            //FinishTransforms(true);
+            IsActivated = false;
             HideText(transition_duration);
             OnDeactivation?.Invoke();
         }

@@ -3,32 +3,28 @@
 
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Overlays.Changelog.Streams;
-using System;
 
 namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogStreams : Container
     {
-        private const float containerHeight = 106.5f;
-        private const float containerTopBottomMargin = 20;
-        private const float containerSideMargin = 85;
+        private const float container_height = 106.5f;
+        private const float container_margin_y = 20;
+        private const float container_margin_x = 85;
 
         public Bindable<ReleaseStreamInfo> SelectedRelease = new Bindable<ReleaseStreamInfo>();
 
-        private readonly StreamColour streamColour;
-        public readonly FillFlowContainer<StreamBadge> badgesContainer;
+        public readonly FillFlowContainer<StreamBadge> BadgesContainer;
 
         public ChangelogStreams()
         {
-            streamColour = new StreamColour();
-            Height = containerHeight;
+            Height = container_height;
             RelativeSizeAxes = Axes.X;
             Children = new Drawable[]
             {
@@ -38,39 +34,39 @@ namespace osu.Game.Overlays.Changelog
                     Size = new OpenTK.Vector2(1),
                     Colour = new Color4(32, 24, 35, 255),
                 },
-                badgesContainer = new FillFlowContainer<StreamBadge>
+                BadgesContainer = new FillFlowContainer<StreamBadge>
                 {
                     Direction = FillDirection.Horizontal,
                     RelativeSizeAxes = Axes.Both,
-                    Margin = new MarginPadding()
+                    Margin = new MarginPadding
                     {
-                        Top = containerTopBottomMargin,
-                        Bottom = containerTopBottomMargin,
-                        Left = containerSideMargin,
-                        Right = containerSideMargin,
+                        Top = container_margin_y,
+                        Bottom = container_margin_y,
+                        Left = container_margin_x,
+                        Right = container_margin_x,
                     },
                     Children = new[]
                     {
-                        new StreamBadge(streamColour.Stable, "Stable", "20180626.1", 16370, true),
-                        new StreamBadge(streamColour.Beta, "Beta", "20180626", 186),
-                        new StreamBadge(streamColour.Lazer, "Lazer", "2018.713.1"),
+                        new StreamBadge(StreamColour.STABLE, "Stable", "20180626.1", 16370, true),
+                        new StreamBadge(StreamColour.BETA, "Beta", "20180626", 186),
+                        new StreamBadge(StreamColour.LAZER, "Lazer", "2018.713.1"),
                     },
                 },
             };
-            badgesContainer.OnLoadComplete = d =>
+            BadgesContainer.OnLoadComplete = d =>
             {
-                foreach (StreamBadge streamBadge in badgesContainer.Children)
+                foreach (StreamBadge streamBadge in BadgesContainer.Children)
                 {
                     streamBadge.OnActivation = () =>
                     {
-                        SelectedRelease.Value = new ReleaseStreamInfo()
+                        SelectedRelease.Value = new ReleaseStreamInfo
                         {
                             DisplayVersion = streamBadge.DisplayVersion,
                             IsFeatured = streamBadge.IsFeatured,
                             Name = streamBadge.Name,
                             Users = streamBadge.Users,
                         };
-                        foreach (StreamBadge item in badgesContainer.Children)
+                        foreach (StreamBadge item in BadgesContainer.Children)
                         {
                             if (item.Name != streamBadge.Name) item.Deactivate();
                         }
@@ -82,7 +78,7 @@ namespace osu.Game.Overlays.Changelog
         protected override bool OnHover(InputState state)
         {
             // is this nullreference-safe for badgesContainer?
-            foreach (StreamBadge streamBadge in badgesContainer.Children)
+            foreach (StreamBadge streamBadge in BadgesContainer.Children)
             {
                 if (SelectedRelease.Value != null)
                 {
@@ -100,7 +96,7 @@ namespace osu.Game.Overlays.Changelog
         {
             if (SelectedRelease.Value == null)
             {
-                foreach (StreamBadge streamBadge in badgesContainer.Children) streamBadge.Activate(true);
+                foreach (StreamBadge streamBadge in BadgesContainer.Children) streamBadge.Activate(true);
             }
             base.OnHoverLost(state);
         }

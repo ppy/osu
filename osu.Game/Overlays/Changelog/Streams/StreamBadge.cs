@@ -1,12 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using System;
@@ -15,21 +16,20 @@ namespace osu.Game.Overlays.Changelog.Streams
 {
     public class StreamBadge : ClickableContainer
     {
-        private const float badgeHeight = 56.5f;
-        private const float badgeWidth = 100;
-        private const float badgeTopBottomMargin = 5;
+        private const float badge_height = 56.5f;
+        private const float badge_width = 100;
         private const float transition_duration = 100;
 
         public Action OnActivation;
 
-        private bool isActive;
+        private bool isActivated;
 
-        private Header.LineBadge lineBadge;
-
-        public string Name { get; private set; }
-        public string DisplayVersion { get; private set; }
-        public bool IsFeatured { get; private set; }
-        public float Users { get; private set; }
+        private readonly Header.LineBadge lineBadge;
+        private SampleChannel sampleHover;
+        public readonly string Name;
+        public readonly string DisplayVersion;
+        public readonly bool IsFeatured;
+        public readonly float Users;
 
         public StreamBadge(ColourInfo colour, string streamName, string streamBuild, float onlineUsers = 0, bool isFeatured = false)
         {
@@ -37,10 +37,10 @@ namespace osu.Game.Overlays.Changelog.Streams
             DisplayVersion = streamBuild;
             IsFeatured = isFeatured;
             Users = onlineUsers;
-            Height = badgeHeight;
-            Width = isFeatured ? badgeWidth * 2 : badgeWidth;
+            Height = badge_height;
+            Width = isFeatured ? badge_width * 2 : badge_width;
             Margin = new MarginPadding(5);
-            isActive = true;
+            isActivated = true;
             Children = new Drawable[]
             {
                 new FillFlowContainer<SpriteText>
@@ -84,13 +84,14 @@ namespace osu.Game.Overlays.Changelog.Streams
                     Width = 1,
                     Colour = colour,
                     RelativeSizeAxes = Axes.X,
+                    TransitionDuration = 600,
                 },
             };
         }
 
         public void Activate(bool withoutHeaderUpdate = false)
         {
-            isActive = true;
+            isActivated = true;
             this.FadeIn(transition_duration);
             lineBadge.IsCollapsed = false;
             if (!withoutHeaderUpdate) OnActivation?.Invoke();
@@ -98,9 +99,12 @@ namespace osu.Game.Overlays.Changelog.Streams
 
         public void Deactivate()
         {
-            isActive = false;
-            this.FadeTo(0.5f, transition_duration);
-            lineBadge.IsCollapsed = true;
+            isActivated = false;
+            if (!IsHovered)
+            {
+                this.FadeTo(0.5f, transition_duration);
+                lineBadge.IsCollapsed = true;
+            }
         }
 
         protected override bool OnClick(InputState state)
@@ -111,6 +115,7 @@ namespace osu.Game.Overlays.Changelog.Streams
 
         protected override bool OnHover(InputState state)
         {
+            if (!isActivated) sampleHover?.Play();
             this.FadeIn(transition_duration);
             lineBadge.IsCollapsed = false;
             return base.OnHover(state);
@@ -118,12 +123,18 @@ namespace osu.Game.Overlays.Changelog.Streams
 
         protected override void OnHoverLost(InputState state)
         {
-            if (!isActive)
+            if (!isActivated)
             {
                 this.FadeTo(0.5f, transition_duration);
                 lineBadge.IsCollapsed = true;
             }
             base.OnHoverLost(state);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(AudioManager audio)
+        {
+            sampleHover = audio.Sample.Get(@"UI/generic-hover-soft");
         }
     }
 }
