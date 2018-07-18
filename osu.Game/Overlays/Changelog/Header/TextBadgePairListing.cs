@@ -19,6 +19,11 @@ namespace osu.Game.Overlays.Changelog.Header
             text.Anchor = Anchor.TopCentre;
             text.Origin = Anchor.TopCentre;
 
+            // I'm using this for constant badge width here, so that the whole
+            // thing doesn't jump left/right when listing's size changes
+            // due to different font weight (and thus width)
+            lineBadge.RelativeSizeAxes = Axes.None;
+
             // this doesn't work without the scheduler
             // (because the text isn't yet fully drawn when it's loaded?)
             text.OnLoadComplete = d => Scheduler.Add(UpdateBadgeWidth);
@@ -57,5 +62,7 @@ namespace osu.Game.Overlays.Changelog.Header
             if (lineBadge.IsCollapsed) lineBadge.ResizeHeightTo(1, lineBadge.TransitionDuration);
             base.OnHoverLost(state);
         }
+
+        public void UpdateBadgeWidth() => lineBadge.ResizeWidthTo(text.DrawWidth);
     }
 }

@@ -37,18 +37,10 @@ namespace osu.Game.Overlays.Changelog.Header
 
         public void ShowText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
         {
-            if (!string.IsNullOrEmpty(displayText))
-            {
-                text.Text = displayText;
-            }
-
+            lineBadge.IsCollapsed = false;
+            if (!string.IsNullOrEmpty(displayText)) text.Text = displayText;
             text.MoveToY(0, duration, easing)
-                .FadeIn(duration, easing)
-                .Finally(d => {
-                    // waiting until text is drawn to use its DrawWidth
-                    UpdateBadgeWidth();
-                    lineBadge.IsCollapsed = false;
-                });
+                .FadeIn(duration, easing);
         }
 
         /// <param name="duration">
@@ -61,19 +53,15 @@ namespace osu.Game.Overlays.Changelog.Header
                 .FadeOut(duration, easing)
                 .Then()
                 .MoveToY(0, duration, easing)
-                .FadeIn(duration, easing)
-                .OnComplete(dd => {
-                    UpdateBadgeWidth();
-                    lineBadge.IsCollapsed = false;
-                });
+                .FadeIn(duration, easing);
 
             // since using .finally/.oncomplete after first fadeout made the badge
             // not hide sometimes in visual tests(because FinishTransforms()/CancelTransforms()
             // didn't apply to transforms that come after the .finally), I'm using a scheduler here
             Scheduler.AddDelayed(() =>
             {
-                //lineBadge.ResizeWidthTo(0); // resizes when not visible
                 if (!string.IsNullOrEmpty(displayText)) text.Text = displayText;
+                lineBadge.IsCollapsed = false;
             }, duration);
         }
 
@@ -93,13 +81,13 @@ namespace osu.Game.Overlays.Changelog.Header
                     {
                         Top = 5,
                         Bottom = 15,
-                        Left = 10,
-                        Right = 10,
                     }
                 },
                 lineBadge = new LineBadge(startCollapsed)
                 {
+                    Width = 1,
                     Colour = badgeColour,
+                    RelativeSizeAxes = Axes.X,
                 }
             };
         }
@@ -115,7 +103,5 @@ namespace osu.Game.Overlays.Changelog.Header
             lineBadge.IsCollapsed = false;
             text.Font = "Exo2.0-Bold";
         }
-
-        public void UpdateBadgeWidth() => lineBadge.ResizeWidthTo(text.DrawWidth);
     }
 }

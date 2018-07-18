@@ -18,7 +18,7 @@ namespace osu.Game.Overlays
     {
         private readonly ScrollContainer scroll;
 
-        public readonly ChangelogHeader header;
+        private ChangelogHeader header;
         public readonly ChangelogStreams streams;
 
         protected Color4 purple = new Color4(191, 4, 255, 255);
@@ -86,6 +86,8 @@ namespace osu.Game.Overlays
                 };
             };
         }
+
+        public void ActivateListing() => header.ActivateListing();
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
