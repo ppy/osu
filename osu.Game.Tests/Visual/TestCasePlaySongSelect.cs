@@ -54,11 +54,11 @@ namespace osu.Game.Tests.Visual
             public new BeatmapCarousel Carousel => base.Carousel;
         }
 
+        private TestSongSelect songSelect;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            TestSongSelect songSelect = null;
-
             var storage = new TestStorage(@"TestCasePlaySongSelect");
 
             // this is by no means clean. should be replacing inside of OsuGameBase somehow.
@@ -75,42 +75,36 @@ namespace osu.Game.Tests.Visual
                 DefaultBeatmap = defaultBeatmap = Beatmap.Default
             });
 
-            void loadNewSongSelect(bool deleteMaps = false) => AddStep("reload song select", () =>
-            {
-                if (deleteMaps)
-                {
-                    manager.Delete(manager.GetAllUsableBeatmapSets());
-                    Beatmap.SetDefault();
-                }
+            Beatmap.SetDefault();
+        }
 
-                if (songSelect != null)
-                {
-                    Remove(songSelect);
-                    songSelect.Dispose();
-                }
+        [SetUp]
+        public virtual void SetUp()
+        {
+            manager?.Delete(manager.GetAllUsableBeatmapSets());
 
-                Add(songSelect = new TestSongSelect());
-            });
+            Child = songSelect = new TestSongSelect();
+        }
 
-            loadNewSongSelect(true);
-
-            AddWaitStep(3);
-
+        [Test]
+        public void TestDummy()
+        {
             AddAssert("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
 
             AddAssert("dummy shown on wedge", () => songSelect.CurrentBeatmapDetailsBeatmap == defaultBeatmap);
 
-            AddStep("import test maps", () =>
-            {
-                for (int i = 0; i < 100; i += 10)
-                    manager.Import(createTestBeatmapSet(i));
-            });
-
+            addManyTestMaps();
             AddWaitStep(3);
+
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
+        }
 
-            loadNewSongSelect();
+        [Test]
+        public void TestSorting()
+        {
+            addManyTestMaps();
             AddWaitStep(3);
+
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
 
             AddStep(@"Sort by Artist", delegate { songSelect.FilterControl.Sort = SortMode.Artist; });
@@ -119,55 +113,66 @@ namespace osu.Game.Tests.Visual
             AddStep(@"Sort by Difficulty", delegate { songSelect.FilterControl.Sort = SortMode.Difficulty; });
         }
 
-        private BeatmapSetInfo createTestBeatmapSet(int i)
+        [Test]
+        public void TestRulesetChange()
         {
+            AddStep("import test maps", () =>
+            {
+                manager.Import(createTestBeatmapSet(0, rulesets.AvailableRulesets.Where(r => r.ID == 0).ToArray()));
+                manager.Import(createTestBeatmapSet(1, rulesets.AvailableRulesets.Where(r => r.ID == 0).ToArray()));
+            });
+        }
+
+        private void addManyTestMaps()
+        {
+            AddStep("import test maps", () =>
+            {
+                var usableRulesets = rulesets.AvailableRulesets.Where(r => r.ID != 2).ToArray();
+
+                for (int i = 0; i < 100; i += 10)
+                    manager.Import(createTestBeatmapSet(i, usableRulesets));
+            });
+        }
+
+        private BeatmapSetInfo createTestBeatmapSet(int idOffset, RulesetInfo[] rulesets)
+        {
+            int j = 0;
+            RulesetInfo getRuleset() => rulesets[j++ % rulesets.Length];
+
+            var beatmaps = new List<BeatmapInfo>();
+
+            int setId = 1234 + idOffset;
+
+            for (int i = 0; i < 6; i++)
+            {
+                int beatmapId = 1234 + idOffset + i;
+
+                beatmaps.Add(new BeatmapInfo
+                {
+                    Ruleset = getRuleset(),
+                    OnlineBeatmapID = beatmapId,
+                    Path = "normal.osu",
+                    Version = $"{beatmapId}",
+                    BaseDifficulty = new BeatmapDifficulty
+                    {
+                        OverallDifficulty = 3.5f,
+                    }
+                });
+            }
+
+
             return new BeatmapSetInfo
             {
-                OnlineBeatmapSetID = 1234 + i,
+                OnlineBeatmapSetID = setId,
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
                     // Create random metadata, then we can check if sorting works based on these
-                    Artist = "MONACA " + RNG.Next(0, 9),
-                    Title = "Black Song " + RNG.Next(0, 9),
+                    Artist = "Some Artist " + RNG.Next(0, 9),
+                    Title = $"Some Song (set id {setId})",
                     AuthorString = "Some Guy " + RNG.Next(0, 9),
                 },
-                Beatmaps = new List<BeatmapInfo>(new[]
-                {
-                    new BeatmapInfo
-                    {
-                        OnlineBeatmapID = 1234 + i,
-                        Ruleset = rulesets.AvailableRulesets.First(),
-                        Path = "normal.osu",
-                        Version = "Normal",
-                        BaseDifficulty = new BeatmapDifficulty
-                        {
-                            OverallDifficulty = 3.5f,
-                        }
-                    },
-                    new BeatmapInfo
-                    {
-                        OnlineBeatmapID = 1235 + i,
-                        Ruleset = rulesets.AvailableRulesets.First(),
-                        Path = "hard.osu",
-                        Version = "Hard",
-                        BaseDifficulty = new BeatmapDifficulty
-                        {
-                            OverallDifficulty = 5,
-                        }
-                    },
-                    new BeatmapInfo
-                    {
-                        OnlineBeatmapID = 1236 + i,
-                        Ruleset = rulesets.AvailableRulesets.First(),
-                        Path = "insane.osu",
-                        Version = "Insane",
-                        BaseDifficulty = new BeatmapDifficulty
-                        {
-                            OverallDifficulty = 7,
-                        }
-                    },
-                }),
+                Beatmaps = beatmaps
             };
         }
     }
