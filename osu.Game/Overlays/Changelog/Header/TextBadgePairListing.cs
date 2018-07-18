@@ -10,37 +10,41 @@ namespace osu.Game.Overlays.Changelog.Header
 {
     public class TextBadgePairListing : TextBadgePair
     {
-        private ColourInfo badgeColour;
+        private readonly ColourInfo badgeColour;
 
         public TextBadgePairListing(ColourInfo badgeColour) : base(badgeColour, "Listing", false)
         {
+            IsActivated = true;
             this.badgeColour = badgeColour;
-            text.Font = "Exo2.0-Bold";
-            text.Anchor = Anchor.TopCentre;
-            text.Origin = Anchor.TopCentre;
+            Text.Font = "Exo2.0-Bold";
+            Text.Anchor = Anchor.TopCentre;
+            Text.Origin = Anchor.TopCentre;
 
             // I'm using this for constant badge width here, so that the whole
             // thing doesn't jump left/right when listing's size changes
             // due to different font weight (and thus width)
-            lineBadge.RelativeSizeAxes = Axes.None;
+            LineBadge.RelativeSizeAxes = Axes.None;
 
             // this doesn't work without the scheduler
             // (because the text isn't yet fully drawn when it's loaded?)
-            text.OnLoadComplete = d => Scheduler.Add(UpdateBadgeWidth);
+            Text.OnLoadComplete = d => Scheduler.Add(UpdateBadgeWidth);
         }
 
         public override void Activate()
         {
-            lineBadge.IsCollapsed = false;
-            text.Font = "Exo2.0-Bold";
+            IsActivated = true;
+            LineBadge.IsCollapsed = false;
+            Text.Font = "Exo2.0-Bold";
             SetTextColour(Color4.White, 100);
+            SampleActivate?.Play();
             OnActivation?.Invoke();
         }
 
         public override void Deactivate()
         {
-            lineBadge.IsCollapsed = true;
-            text.Font = "Exo2.0-Regular"; // commented out since it makes bad resize-jumping
+            IsActivated = false;
+            LineBadge.IsCollapsed = true;
+            Text.Font = "Exo2.0-Regular"; // commented out since it makes bad resize-jumping
             SetTextColour(badgeColour, 100);
             OnDeactivation?.Invoke();
         }
@@ -53,16 +57,16 @@ namespace osu.Game.Overlays.Changelog.Header
 
         protected override bool OnHover(InputState state)
         {
-            lineBadge.ResizeHeightTo(lineBadge.UncollapsedHeight, lineBadge.TransitionDuration);
+            LineBadge.ResizeHeightTo(LineBadge.UncollapsedHeight, LineBadge.TransitionDuration, Easing.OutElastic);
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            if (lineBadge.IsCollapsed) lineBadge.ResizeHeightTo(1, lineBadge.TransitionDuration);
+            if (IsActivated == false) LineBadge.ResizeHeightTo(1, LineBadge.TransitionDuration, Easing.Out);
             base.OnHoverLost(state);
         }
 
-        public void UpdateBadgeWidth() => lineBadge.ResizeWidthTo(text.DrawWidth);
+        public void UpdateBadgeWidth() => LineBadge.ResizeWidthTo(Text.DrawWidth);
     }
 }

@@ -2,13 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using Newtonsoft.Json;
-using osu.Game.Database;
 using osu.Game.IO.Serialization;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Changelog
 {
