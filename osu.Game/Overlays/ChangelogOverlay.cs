@@ -71,13 +71,14 @@ namespace osu.Game.Overlays
             };
             streams.SelectedRelease.ValueChanged += r =>
             {
-                if (streams.SelectedRelease != null)
+                if (streams.SelectedRelease.Value != null)
                     header.ShowReleaseStream(r.Name, string.Join(" ", r.Name, r.DisplayVersion));
             };
             streams.badgesContainer.OnLoadComplete += d =>
             {
                 header.OnListingActivated += () =>
                 {
+                    streams.SelectedRelease.Value = null;
                     foreach (StreamBadge item in streams.badgesContainer.Children)
                     {
                         item.Activate(true);
