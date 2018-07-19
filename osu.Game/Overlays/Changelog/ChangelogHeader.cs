@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Changelog.Header;
 using System;
 
@@ -26,6 +27,8 @@ namespace osu.Game.Overlays.Changelog
         private readonly TextBadgePairRelease releaseStream;
 
         public Action OnListingActivated;
+
+        public APIChangelog ChangelogEntry;
 
         private const float cover_height = 310;
         private const float title_height = 50;
@@ -181,10 +184,11 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
-        public void ShowReleaseStream(string headerText, string breadcrumbText)
+        public void ShowReleaseStream()
         {
-            releaseStream.Activate(breadcrumbText);
-            changeHeaderText(headerText);
+            releaseStream.Activate(String.Join(" ",
+                ChangelogEntry.UpdateStream.DisplayName, ChangelogEntry.DisplayVersion));
+            changeHeaderText(ChangelogEntry.UpdateStream.DisplayName);
         }
 
         private void changeHeaderText(string headerText)

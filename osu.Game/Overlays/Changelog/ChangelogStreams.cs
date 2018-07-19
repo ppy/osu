@@ -2,13 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
-using osu.Game.Graphics;
-using osu.Game.Overlays.Changelog.Streams;
+using osu.Game.Online.API.Requests.Responses;
+using System;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -17,8 +16,9 @@ namespace osu.Game.Overlays.Changelog
         private const float container_height = 106.5f;
         private const float container_margin_y = 20;
         private const float container_margin_x = 85;
+        public Action OnSelection;
 
-        public Bindable<ReleaseStreamInfo> SelectedRelease = new Bindable<ReleaseStreamInfo>();
+        public APIChangelog SelectedRelease;
 
         public readonly FillFlowContainer<StreamBadge> BadgesContainer;
 
@@ -45,31 +45,23 @@ namespace osu.Game.Overlays.Changelog
                         Left = container_margin_x,
                         Right = container_margin_x,
                     },
-                    Children = new[]
-                    {
-                        new StreamBadge(StreamColour.STABLE, "Stable", "20180626.1", 16370, true),
-                        new StreamBadge(StreamColour.BETA, "Beta", "20180626", 186),
-                        new StreamBadge(StreamColour.LAZER, "Lazer", "2018.713.1"),
-                    },
                 },
             };
-            BadgesContainer.OnLoadComplete = d =>
+            // ok, so this is probably not the best.
+            // will need to reflect on this.
+            // do we need the changelog to be updateable?
+            BadgesContainer.OnUpdate = d =>
             {
                 foreach (StreamBadge streamBadge in BadgesContainer.Children)
                 {
                     streamBadge.OnActivation = () =>
                     {
-                        SelectedRelease.Value = new ReleaseStreamInfo
-                        {
-                            DisplayVersion = streamBadge.DisplayVersion,
-                            IsFeatured = streamBadge.IsFeatured,
-                            Name = streamBadge.Name,
-                            Users = streamBadge.Users,
-                        };
+                        SelectedRelease = streamBadge.ChangelogEntry;
                         foreach (StreamBadge item in BadgesContainer.Children)
                         {
-                            if (item.Name != streamBadge.Name) item.Deactivate();
+                            if (item.ChangelogEntry.Id != streamBadge.ChangelogEntry.Id) item.Deactivate();
                         }
+                        OnSelection?.Invoke();
                     };
                 }
             };
@@ -80,9 +72,9 @@ namespace osu.Game.Overlays.Changelog
             // is this nullreference-safe for badgesContainer?
             foreach (StreamBadge streamBadge in BadgesContainer.Children)
             {
-                if (SelectedRelease.Value != null)
+                if (SelectedRelease != null)
                 {
-                    if (SelectedRelease.Value.Name != streamBadge.Name)
+                    if (SelectedRelease.UpdateStream.Id != streamBadge.ChangelogEntry.Id)
                     {
                         streamBadge.Deactivate();
                     }
@@ -94,7 +86,7 @@ namespace osu.Game.Overlays.Changelog
 
         protected override void OnHoverLost(InputState state)
         {
-            if (SelectedRelease.Value == null)
+            if (SelectedRelease == null)
             {
                 foreach (StreamBadge streamBadge in BadgesContainer.Children) streamBadge.Activate(true);
             }

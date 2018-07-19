@@ -6,13 +6,14 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
+using osu.Game.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using System;
 
-namespace osu.Game.Overlays.Changelog.Streams
+namespace osu.Game.Overlays.Changelog
 {
     public class StreamBadge : ClickableContainer
     {
@@ -26,19 +27,13 @@ namespace osu.Game.Overlays.Changelog.Streams
 
         private readonly Header.LineBadge lineBadge;
         private SampleChannel sampleHover;
-        public readonly string Name;
-        public readonly string DisplayVersion;
-        public readonly bool IsFeatured;
-        public readonly float Users;
+        public readonly APIChangelog ChangelogEntry;
 
-        public StreamBadge(ColourInfo colour, string streamName, string streamBuild, float onlineUsers = 0, bool isFeatured = false)
+        public StreamBadge(APIChangelog changelogEntry)
         {
-            Name = streamName;
-            DisplayVersion = streamBuild;
-            IsFeatured = isFeatured;
-            Users = onlineUsers;
+            ChangelogEntry = changelogEntry;
             Height = badge_height;
-            Width = isFeatured ? badge_width * 2 : badge_width;
+            Width = ChangelogEntry.IsFeatured ? badge_width * 2 : badge_width;
             Margin = new MarginPadding(5);
             isActivated = true;
             Children = new Drawable[]
@@ -52,7 +47,7 @@ namespace osu.Game.Overlays.Changelog.Streams
                     {
                         new SpriteText
                         {
-                            Text = streamName,
+                            Text = ChangelogEntry.UpdateStream.DisplayName,
                             Font = @"Exo2.0-Bold",
                             TextSize = 16,
                             Margin = new MarginPadding
@@ -62,14 +57,14 @@ namespace osu.Game.Overlays.Changelog.Streams
                         },
                         new SpriteText
                         {
-                            Text = streamBuild,
+                            Text = ChangelogEntry.DisplayVersion,
                             Font = @"Exo2.0-Light",
                             TextSize = 21,
                         },
                         new SpriteText
                         {
-                            Text = onlineUsers > 0 ?
-                                string.Join(" ", onlineUsers.ToString("N0"), "users online"):
+                            Text = ChangelogEntry.Users > 0 ?
+                                string.Join(" ", ChangelogEntry.Users.ToString("N0"), "users online"):
                                 null,
                             TextSize = 12,
                             Font = @"Exo2.0-Regular",
@@ -82,7 +77,7 @@ namespace osu.Game.Overlays.Changelog.Streams
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Width = 1,
-                    Colour = colour,
+                    Colour = StreamColour.FromStreamName(ChangelogEntry.UpdateStream.Name),
                     RelativeSizeAxes = Axes.X,
                     TransitionDuration = 600,
                 },

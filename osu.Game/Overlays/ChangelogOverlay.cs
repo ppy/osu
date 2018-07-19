@@ -3,6 +3,7 @@
 
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,8 +11,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Changelog;
-using osu.Game.Overlays.Changelog.Streams;
 
 namespace osu.Game.Overlays
 {
@@ -19,6 +22,9 @@ namespace osu.Game.Overlays
     {
         private readonly ChangelogHeader header;
         public readonly ChangelogStreams Streams;
+        private APIChangelog changelogEntry;
+
+        private APIAccess api;
 
         protected readonly Color4 Purple = new Color4(191, 4, 255, 255);
 
@@ -35,6 +41,8 @@ namespace osu.Game.Overlays
             RelativeSizeAxes = Axes.Both;
             Width = 0.85f;
             Masking = true;
+
+            ChangelogContent content; // told by appveyor to conver to local variable..
 
             EdgeEffect = new EdgeEffectParameters
             {
@@ -64,25 +72,36 @@ namespace osu.Game.Overlays
                         {
                             header = new ChangelogHeader(),
                             Streams = new ChangelogStreams(),
+                            new ChangelogChart(),
+                            // will need to default to day-sorted content
+                            content = new ChangelogContent(),
                         },
                     },
                 },
             };
-            Streams.SelectedRelease.ValueChanged += r =>
+            Streams.OnSelection = () =>
             {
-                if (Streams.SelectedRelease.Value != null)
-                    header.ShowReleaseStream(r.Name, string.Join(" ", r.Name, r.DisplayVersion));
+                if (Streams.SelectedRelease != null)
+                {
+                    header.ChangelogEntry = Streams.SelectedRelease;
+                }
+                header.ShowReleaseStream();
+                content.Clear();
+                content.Add(new ChangelogContentGroup(Streams.SelectedRelease));
             };
             Streams.BadgesContainer.OnLoadComplete += d =>
             {
-                header.OnListingActivated += () =>
-                {
-                    Streams.SelectedRelease.Value = null;
-                    if (!Streams.IsHovered)
-                        foreach (StreamBadge item in Streams.BadgesContainer.Children) item.Activate(true);
-                    else
-                        foreach (StreamBadge item in Streams.BadgesContainer.Children) item.Deactivate();
-                };
+                FetchChangelog();
+            };
+            header.OnListingActivated += () =>
+            {
+                Streams.SelectedRelease = null;
+                content.Clear();
+                // should add listing to content here
+                if (!Streams.IsHovered)
+                    foreach (StreamBadge item in Streams.BadgesContainer.Children) item.Activate(true);
+                else
+                    foreach (StreamBadge item in Streams.BadgesContainer.Children) item.Deactivate();
             };
         }
 
@@ -119,6 +138,25 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
             FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(APIAccess api)
+        {
+            this.api = api;
+        }
+
+        public void FetchChangelog()
+        {
+            var req = new GetChangelogLatestBuildsRequest();
+            req.Success += res =>
+            {
+                foreach (APIChangelog item in res)
+                {
+                    Streams.BadgesContainer.Add(new StreamBadge(item));
+                }
+            };
+            api.Queue(req);
         }
     }
 }
