@@ -13,6 +13,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -310,12 +311,15 @@ namespace osu.Game.Screens.Select
 
             void performLoad()
             {
+                Logger.Log($"performLoad with b:{beatmap} r:{ruleset}");
+
                 WorkingBeatmap working = Beatmap.Value;
 
                 bool preview = false;
 
                 if (ruleset?.Equals(Ruleset.Value) == false)
                 {
+                    Logger.Log($"ruleset changed from {Ruleset.Value} to {ruleset}");
                     Ruleset.Value = ruleset;
 
                     // force a filter before attempting to change the beatmap.
@@ -327,6 +331,8 @@ namespace osu.Game.Screens.Select
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
                 if (!Equals(beatmap, Beatmap.Value.BeatmapInfo))
                 {
+                    Logger.Log($"beatmap changed from {Beatmap.Value.BeatmapInfo} to {beatmap}");
+
                     preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
                     working = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
 
@@ -467,6 +473,8 @@ namespace osu.Game.Screens.Select
         /// <param name="beatmap">The working beatmap.</param>
         protected virtual void UpdateBeatmap(WorkingBeatmap beatmap)
         {
+            Logger.Log($"working beatmap updated to {beatmap}");
+
             if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
