@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
             Position = Parent.ToLocalSpace(HitObject.ScreenSpaceDrawQuad.TopLeft);
 
             // This is a side-effect of not matching the hitobject's anchors/origins, which is kinda hard to do
-            // When scrolling upwards our origin is at the top of the head note (which is where the origin already is),
+            // When scrolling upwards our origin is already at the top of the head note (which is the intended location),
             // but when scrolling downwards our origin is at the _bottom_ of the tail note (where we need to be at the _top_ of the tail note)
             if (direction.Value == ScrollingDirection.Down)
                 Y -= HitObject.Tail.DrawHeight;
