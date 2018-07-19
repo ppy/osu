@@ -107,25 +107,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             set => content.Colour = value;
         }
 
-        //public Anchor Anchor
-        //{
-        //    get => base.Anchor;
-        //    set
-        //    {
-        //        base.Anchor = value;
-        //        radioButtonCollection.Anchor = value;
-        //    }
-        //}
-
-        //public Anchor Origin
-        //{
-        //    get => base.Origin;
-        //    set
-        //    {
-        //        base.Origin = value;
-        //        radioButtonCollection.Origin = value;
-        //    }
-        //}
+        public OsuSetupRadioButton CurrentSelection
+        {
+            get => radioButtonCollection.SelectedRadioButton;
+            set => radioButtonCollection.SelectedRadioButton = value;
+        }
 
         public IEnumerable<OsuSetupRadioButton> Items
         {

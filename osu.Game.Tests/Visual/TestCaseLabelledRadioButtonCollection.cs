@@ -24,9 +24,13 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
+            LabelledRadioButtonCollection labelledRadioButtonCollection;
+            OsuSetupRadioButton ok;
+            OsuSetupRadioButton no;
+
             Children = new Drawable[]
             {
-                new LabelledRadioButtonCollection
+                labelledRadioButtonCollection = new LabelledRadioButtonCollection
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -34,11 +38,11 @@ namespace osu.Game.Tests.Visual
                     BottomLabelText = "This collection contains extraordinary options, such as \"OK!\" and \"No\".",
                     Items = new[]
                     {
-                        new OsuSetupRadioButton
+                        ok = new OsuSetupRadioButton
                         {
                             LabelText = "OK!"
                         },
-                        new OsuSetupRadioButton
+                        no = new OsuSetupRadioButton
                         {
                             LabelText = "No"
                         }
@@ -46,6 +50,18 @@ namespace osu.Game.Tests.Visual
                     Padding = new MarginPadding { Left = 150, Right = 150 }
                 }
             };
+
+            AddAssert("Check initial selected value of the collection", () => labelledRadioButtonCollection.CurrentSelection == ok);
+            AddAssert("Check value of the OK button", () => ok.Current.Value);
+            AddAssert("Check value of the No button", () => !no.Current.Value);
+            AddStep("Select the No button", () => labelledRadioButtonCollection.CurrentSelection = no);
+            AddAssert("Check selected value of the collection", () => labelledRadioButtonCollection.CurrentSelection == no);
+            AddAssert("Check value of the OK button", () => !ok.Current.Value);
+            AddAssert("Check value of the No button", () => no.Current.Value);
+            AddStep("Select the OK button", () => labelledRadioButtonCollection.CurrentSelection = ok);
+            AddAssert("Check selected value of the collection", () => labelledRadioButtonCollection.CurrentSelection == ok);
+            AddAssert("Check value of the OK button", () => ok.Current.Value);
+            AddAssert("Check value of the No button", () => !no.Current.Value);
         }
     }
 }
