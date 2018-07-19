@@ -17,9 +17,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
     public class ColoursScreen : EditorScreen
     {
         private readonly FillFlowContainer comboColourButtonContainer;
-        private readonly OsuColourButton playfieldBackgroundColourButton;
+        private readonly OsuSetupColourButton playfieldBackgroundColourButton;
         private readonly NewComboColourButton newComboColourButton;
-        private readonly OsuCircularButton removeComboColourButton;
+        private readonly OsuSetupCircularButton removeComboColourButton;
         private readonly OsuSpriteText backgroundColourBottomLabel;
 
         private int currentComboColours = 5;
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                                         },
                                                     }
                                                 },
-                                                removeComboColourButton = new OsuCircularButton
+                                                removeComboColourButton = new OsuSetupCircularButton
                                                 {
                                                     Anchor = Anchor.BottomRight,
                                                     Origin = Anchor.BottomRight,
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                                     TextSize = 12,
                                                     Font = @"Exo2.0-BoldItalic",
                                                 },
-                                                playfieldBackgroundColourButton = new OsuColourButton(true)
+                                                playfieldBackgroundColourButton = new OsuSetupColourButton(true)
                                                 {
                                                     Anchor = Anchor.TopLeft,
                                                     Origin = Anchor.TopLeft,
@@ -167,14 +167,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             };
 
             for (int i = 1; i <= 8; i++)
-                comboColourButtonContainer.Add(new OsuColourButton
+                comboColourButtonContainer.Add(new OsuSetupColourButton
                 {
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     BottomLabelText = $"Combo {i}"
                 });
             // ReSharper disable once PossibleNullReferenceException
-            (comboColourButtonContainer[7] as OsuColourButton).ColourPickerOrigin = Anchor.TopRight;
+            (comboColourButtonContainer[7] as OsuSetupColourButton).ColourPickerOrigin = Anchor.TopRight;
             comboColourButtonContainer.Add(newComboColourButton = new NewComboColourButton
             {
                 Anchor = Anchor.TopLeft,
@@ -218,7 +218,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         {
             for (int i = 0; i < 8; i++)
                 // ReSharper disable once PossibleNullReferenceException
-                (comboColourButtonContainer[i] as OsuColourButton).Current.Value = DefaultComboColours[i];
+                (comboColourButtonContainer[i] as OsuSetupColourButton).Current.Value = DefaultComboColours[i];
             playfieldBackgroundColourButton.Current.Value = DefaultPlayfieldBackgroundColour;
         }
 
@@ -256,7 +256,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                 throw new IndexOutOfRangeException("The provided combo colour index is out of range.");
 
             // ReSharper disable once PossibleNullReferenceException
-            (comboColourButtonContainer[comboIndex] as OsuColourButton).Current.Value = newColour;
+            (comboColourButtonContainer[comboIndex] as OsuSetupColourButton).Current.Value = newColour;
         }
 
         public void ChangePlayfieldBackgroundColour(Color4 newColour) => playfieldBackgroundColourButton.Current.Value = newColour;

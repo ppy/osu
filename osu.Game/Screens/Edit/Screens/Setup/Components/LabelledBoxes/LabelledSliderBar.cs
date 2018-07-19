@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         private readonly Box box;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
-        private readonly OsuTickSliderBar sliderBar;
+        private readonly OsuSetupTickSliderBar sliderBar;
 
         public const float LABEL_CONTAINER_WIDTH = 150;
         public const float OUTER_CORNER_RADIUS = 15;
@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                                 Text = LabelText,
                                                 Font = @"Exo2.0-Bold",
                                             },
-                                            sliderBar = new OsuTickSliderBar(sliderMinValue, sliderMaxValue, sliderNormalPrecision, sliderAlternatePrecision)
+                                            sliderBar = new OsuSetupTickSliderBar(sliderMinValue, sliderMaxValue, sliderNormalPrecision, sliderAlternatePrecision)
                                             {
                                                 Anchor = Anchor.TopLeft,
                                                 Origin = Anchor.TopLeft,

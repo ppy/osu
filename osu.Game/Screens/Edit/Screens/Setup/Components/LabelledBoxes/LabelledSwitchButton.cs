@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         private readonly Box box;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
-        private readonly OsuSwitchButton switchButton;
+        private readonly OsuSetupSwitchButton switchButton;
 
         public const float OUTER_CORNER_RADIUS = 15;
         public const float DEFAULT_LABEL_TEXT_SIZE = 16;
@@ -156,7 +156,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                             Text = LabelText,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        switchButton = new OsuSwitchButton
+                                        switchButton = new OsuSetupSwitchButton
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,

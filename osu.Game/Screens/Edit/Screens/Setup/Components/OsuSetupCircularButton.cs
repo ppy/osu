@@ -14,7 +14,7 @@ using System;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class OsuCircularButton : Container, IHasAccentColour
+    public class OsuSetupCircularButton : Container, IHasAccentColour
     {
         private readonly Box fill;
         private readonly OsuSpriteText label;
@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             }
         }
 
-        public OsuCircularButton()
+        public OsuSetupCircularButton()
         {
             Size = new Vector2(SIZE_X, SIZE_Y);
             CornerRadius = 15;

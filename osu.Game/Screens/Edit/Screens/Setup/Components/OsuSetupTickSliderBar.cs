@@ -21,7 +21,7 @@ using System.Globalization;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class OsuTickSliderBar : SliderBar<float>, IHasTooltip, IHasAccentColour
+    public class OsuSetupTickSliderBar : SliderBar<float>, IHasTooltip, IHasAccentColour
     {
         /// <summary>
         /// Maximum number of decimal digits to be displayed in the tooltip.
@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             }
         }
 
-        public OsuTickSliderBar(float minValue, float maxValue, float normalPrecision, float alternatePrecision)
+        public OsuSetupTickSliderBar(float minValue, float maxValue, float normalPrecision, float alternatePrecision)
         {
             MinValue = minValue;
             MaxValue = maxValue;

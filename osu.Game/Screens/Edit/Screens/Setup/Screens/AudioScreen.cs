@@ -22,15 +22,15 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private readonly LabelledSliderBar defaultSampleVolume;
         private readonly LabelledSwitchButton samplesMatchPlaybackRate;
 
-        private readonly OsuCircularButton normalSample;
-        private readonly OsuCircularButton whistleSample;
-        private readonly OsuCircularButton finishSample;
-        private readonly OsuCircularButton clapSample;
+        private readonly OsuSetupCircularButton normalSample;
+        private readonly OsuSetupCircularButton whistleSample;
+        private readonly OsuSetupCircularButton finishSample;
+        private readonly OsuSetupCircularButton clapSample;
 
         private readonly Container resetDefaultSampleBankSettingsContainer;
         private readonly Container resetDefaultSampleVolumeSettingsContainer;
-        private readonly OsuCircularButton resetDefaultSampleBankSettingsButton;
-        private readonly OsuCircularButton resetDefaultSampleVolumeSettingsButton;
+        private readonly OsuSetupCircularButton resetDefaultSampleBankSettingsButton;
+        private readonly OsuSetupCircularButton resetDefaultSampleVolumeSettingsButton;
 
         private readonly Container sampleBankSettings;
         private readonly Container sampleVolumeSettings;
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                                                     Text = "This beatmap has timing-section-dependent sample bank settings, therefore you cannot set beatmap-wide settings here.",
                                                                     Font = @"Exo2.0-Bold",
                                                                 },
-                                                                resetDefaultSampleBankSettingsButton = new OsuCircularButton
+                                                                resetDefaultSampleBankSettingsButton = new OsuSetupCircularButton
                                                                 {
                                                                     Anchor = Anchor.CentreRight,
                                                                     Origin = Anchor.CentreRight,
@@ -203,7 +203,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                                                     Text = "This beatmap has timing-section-dependent sample volume settings, therefore you cannot set beatmap-wide settings here.",
                                                                     Font = @"Exo2.0-Bold",
                                                                 },
-                                                                resetDefaultSampleVolumeSettingsButton = new OsuCircularButton
+                                                                resetDefaultSampleVolumeSettingsButton = new OsuSetupCircularButton
                                                                 {
                                                                     Anchor = Anchor.CentreRight,
                                                                     Origin = Anchor.CentreRight,
@@ -273,25 +273,25 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                                                     Margin = new MarginPadding { Top = 10, Right = 15 },
                                                                     Children = new[]
                                                                     {
-                                                                        clapSample = new OsuCircularButton
+                                                                        clapSample = new OsuSetupCircularButton
                                                                         {
                                                                             Anchor = Anchor.TopRight,
                                                                             Origin = Anchor.TopRight,
                                                                             LabelText = "Clap"
                                                                         },
-                                                                        finishSample = new OsuCircularButton
+                                                                        finishSample = new OsuSetupCircularButton
                                                                         {
                                                                             Anchor = Anchor.TopRight,
                                                                             Origin = Anchor.TopRight,
                                                                             LabelText = "Finish"
                                                                         },
-                                                                        whistleSample = new OsuCircularButton
+                                                                        whistleSample = new OsuSetupCircularButton
                                                                         {
                                                                             Anchor = Anchor.TopRight,
                                                                             Origin = Anchor.TopRight,
                                                                             LabelText = "Whistle"
                                                                         },
-                                                                        normalSample = new OsuCircularButton
+                                                                        normalSample = new OsuSetupCircularButton
                                                                         {
                                                                             Anchor = Anchor.TopRight,
                                                                             Origin = Anchor.TopRight,

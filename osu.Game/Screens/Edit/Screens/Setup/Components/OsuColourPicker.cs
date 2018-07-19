@@ -16,8 +16,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
     public class OsuColourPicker : Container, IHasCurrentValue<Color4>
     {
-        private readonly OsuCircularButton copyButton;
-        private readonly OsuCircularButton pasteButton;
+        private readonly OsuSetupCircularButton copyButton;
+        private readonly OsuSetupCircularButton pasteButton;
         private readonly FillFlowContainer buttonContainer;
         private readonly OsuSetupTextBox colourText;
         private readonly Box colourInfoBackground;
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         public const float COLOUR_INFO_HEIGHT = 30;
         public const float DEFAULT_PADDING = 10;
 
-        private float leftPadding => OsuColourButton.SIZE_Y / 2 + DEFAULT_PADDING * 2;
+        private float leftPadding => OsuSetupColourButton.SIZE_Y / 2 + DEFAULT_PADDING * 2;
 
         public Anchor Origin
         {
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public OsuColourPicker()
         {
-            Size = new Vector2(0, OsuColourButton.SIZE_Y);
+            Size = new Vector2(0, OsuSetupColourButton.SIZE_Y);
             CornerRadius = 10;
             Masking = true;
 
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                     Padding = new MarginPadding { Left = leftPadding - 10, Right = 15 },
                                     Children = new[]
                                     {
-                                        copyButton = new OsuCircularButton
+                                        copyButton = new OsuSetupCircularButton
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                             CornerRadius = 10,
                                             LabelText = "Copy",
                                         },
-                                        pasteButton = new OsuCircularButton
+                                        pasteButton = new OsuSetupCircularButton
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
@@ -190,7 +190,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public void Collapse()
         {
-            this.ResizeHeightTo(OsuColourButton.SIZE_Y, 500, Easing.OutQuint);
+            this.ResizeHeightTo(OsuSetupColourButton.SIZE_Y, 500, Easing.OutQuint);
             this.ResizeWidthTo(0, 500, Easing.OutQuint);
         }
 
@@ -221,10 +221,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             }
             else if (Origin.HasFlag(Anchor.y2))
             {
-                Y = OsuColourButton.SIZE_Y;
+                Y = OsuSetupColourButton.SIZE_Y;
                 colourPickerGradient.Y = 10;
                 colourPickerHue.Y = 200;
-                colourInfoContainer.Y = SIZE_Y - OsuColourButton.SIZE_Y;
+                colourInfoContainer.Y = SIZE_Y - OsuSetupColourButton.SIZE_Y;
                 colourInfoBackground.Anchor = Anchor.BottomLeft;
                 colourInfoBackground.Origin = Anchor.BottomLeft;
             }

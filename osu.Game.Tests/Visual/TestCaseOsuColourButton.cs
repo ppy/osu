@@ -15,7 +15,7 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(OsuColourButton),
+            typeof(OsuSetupColourButton),
             typeof(OsuColourPicker),
             typeof(OsuColourPickerGradient),
             typeof(OsuColourPickerHue),
@@ -24,10 +24,10 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            OsuColourButton osuColourButton;
+            OsuSetupColourButton osuColourButton;
             Children = new Drawable[]
             {
-                osuColourButton = new OsuColourButton
+                osuColourButton = new OsuSetupColourButton
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

@@ -13,7 +13,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class OsuColourButton : CircularContainer, IHasCurrentValue<Color4>
+    public class OsuSetupColourButton : CircularContainer, IHasCurrentValue<Color4>
     {
         private bool isColourPickerOpen;
         public bool IsColourPickerOpen
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             }
         }
 
-        public OsuColourButton(bool expanded = false)
+        public OsuSetupColourButton(bool expanded = false)
         {
             OsuSpriteText colourLabel;
             Box fill;

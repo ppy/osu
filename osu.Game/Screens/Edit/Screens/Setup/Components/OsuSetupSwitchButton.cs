@@ -15,7 +15,7 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class OsuSwitchButton : CircularContainer, IHasCurrentValue<bool>, IHasAccentColour
+    public class OsuSetupSwitchButton : CircularContainer, IHasCurrentValue<bool>, IHasAccentColour
     {
         private readonly Box fill;
         private readonly Container switchContainer;
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             }
         }
 
-        public OsuSwitchButton()
+        public OsuSetupSwitchButton()
         {
             Box innerSwitch;
 
