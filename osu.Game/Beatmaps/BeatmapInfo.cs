@@ -77,6 +77,10 @@ namespace osu.Game.Beatmaps
         // General
         public int AudioLeadIn { get; set; }
         public bool Countdown { get; set; }
+        [NotMapped]
+        public int CountdownSpeed { get; set; }
+        [NotMapped]
+        public int CountdownOffset { get; set; }
         public float StackLeniency { get; set; }
         public bool SpecialStyle { get; set; }
 

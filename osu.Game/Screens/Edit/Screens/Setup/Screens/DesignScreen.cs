@@ -6,6 +6,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Screens.Edit.Screens.Setup.Components;
 using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
 using System;
 
@@ -14,7 +15,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
     public class DesignScreen : EditorScreen
     {
         private readonly LabelledSwitchButton enableCountdown;
-        private readonly LabelledSwitchButton countdownSpeed;
+        private readonly LabelledRadioButtonCollection countdownSpeed;
+        private readonly OsuSetupRadioButton halfCountdownSpeed;
+        private readonly OsuSetupRadioButton normalCountdownSpeed;
+        private readonly OsuSetupRadioButton doubleCountdownSpeed;
         private readonly LabelledTextBox countdownOffset;
         private readonly LabelledSwitchButton displayEpilepsyWarning;
         private readonly LabelledSwitchButton displayStoryboard;
@@ -53,12 +57,29 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
                                     LabelText = "Enable Countdown",
                                     BottomLabelText = "Adds a \"3, 2, 1, GO!\" countdown at the beginning of the map, assuming there is enough time to do so.",
                                 },
-                                countdownSpeed = new LabelledSwitchButton
+                                countdownSpeed = new LabelledRadioButtonCollection
                                 {
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
                                     Padding = new MarginPadding { Right = Setup.SCREEN_RIGHT_PADDING },
                                     Alpha = 0,
                                     AlwaysPresent = true,
                                     LabelText = "Countdown Speed",
+                                    Items = new[]
+                                    {
+                                        halfCountdownSpeed = new OsuSetupRadioButton
+                                        {
+                                            LabelText = "Half"
+                                        },
+                                        normalCountdownSpeed = new OsuSetupRadioButton
+                                        {
+                                            LabelText = "Normal"
+                                        },
+                                        doubleCountdownSpeed = new OsuSetupRadioButton
+                                        {
+                                            LabelText = "Double"
+                                        },
+                                    }
                                 },
                                 countdownOffset = new LabelledTextBox
                                 {
@@ -109,8 +130,34 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             enableCountdown.SwitchButtonValueChanged += a =>
             {
                 Beatmap.Value.BeatmapInfo.Countdown = a;
-                countdownSpeed.FadeTo(Convert.ToInt32(a), 250, Easing.OutQuint);
-                countdownOffset.FadeTo(Convert.ToInt32(a), 250, Easing.OutQuint);
+                countdownSpeed.FadeTo(a ? 1 : 0, 250, Easing.OutQuint);
+                countdownOffset.FadeTo(a ? 1 : 0, 250, Easing.OutQuint);
+            };
+            halfCountdownSpeed.Current.ValueChanged += a =>
+            {
+                if (a)
+                    Beatmap.Value.BeatmapInfo.CountdownSpeed = 1;
+            };
+            normalCountdownSpeed.Current.ValueChanged += a =>
+            {
+                if (a)
+                    Beatmap.Value.BeatmapInfo.CountdownSpeed = 0;
+            };
+            doubleCountdownSpeed.Current.ValueChanged += a =>
+            {
+                if (a)
+                    Beatmap.Value.BeatmapInfo.CountdownSpeed = 2;
+            };
+            countdownOffset.TextBoxTextChanged += a =>
+            {
+                try
+                {
+                    Beatmap.Value.BeatmapInfo.CountdownOffset = Convert.ToInt32(a);
+                }
+                catch
+                {
+                    countdownOffset.TextBoxText = Beatmap.Value?.BeatmapInfo.CountdownOffset.ToString() ?? "0";
+                }
             };
             widescreenSupport.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.WidescreenStoryboard = a;
             displayStoryboard.SwitchButtonValueChanged += a => Beatmap.Value.BeatmapInfo.StoryFireInFront = a;
@@ -127,6 +174,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
         private void updateInfo()
         {
             enableCountdown.CurrentValue = Beatmap.Value?.BeatmapInfo.Countdown ?? false;
+            halfCountdownSpeed.Current.Value = Beatmap.Value?.BeatmapInfo.CountdownSpeed == 1;
+            normalCountdownSpeed.Current.Value = Beatmap.Value?.BeatmapInfo.CountdownSpeed == 0;
+            doubleCountdownSpeed.Current.Value = Beatmap.Value?.BeatmapInfo.CountdownSpeed == 2;
+            countdownOffset.TextBoxText = Beatmap.Value?.BeatmapInfo.CountdownOffset.ToString() ?? "0";
             widescreenSupport.CurrentValue = Beatmap.Value?.BeatmapInfo.WidescreenStoryboard ?? false;
             displayStoryboard.CurrentValue = Beatmap.Value?.BeatmapInfo.StoryFireInFront ?? false;
             letterbox.CurrentValue = Beatmap.Value?.BeatmapInfo.LetterboxInBreaks ?? false;
