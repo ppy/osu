@@ -2,17 +2,25 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
+using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.UI.Scrolling;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
 {
     public class HoldNoteMask : HitObjectMask
     {
+        public new DrawableHoldNote HitObject => (DrawableHoldNote)base.HitObject;
+
+        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
+
         private readonly BodyPiece body;
 
         public HoldNoteMask(DrawableHoldNote hold)
@@ -30,17 +38,25 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, IScrollingInfo scrollingInfo)
         {
             body.BorderColour = colours.Yellow;
+
+            direction.BindTo(scrollingInfo.Direction);
         }
 
         protected override void Update()
         {
             base.Update();
 
-            Size = HitObject.DrawSize;
+            Size = HitObject.DrawSize + new Vector2(0, HitObject.Tail.DrawHeight);
             Position = Parent.ToLocalSpace(HitObject.ScreenSpaceDrawQuad.TopLeft);
+
+            // This is a side-effect of not matching the hitobject's anchors/origins, which is kinda hard to do
+            // When scrolling upwards our origin is at the top of the head note (which is where the origin already is),
+            // but when scrolling downwards our origin is at the _bottom_ of the tail note (where we need to be at the _top_ of the tail note)
+            if (direction.Value == ScrollingDirection.Down)
+                Y -= HitObject.Tail.DrawHeight;
         }
 
         private class HoldNoteNoteMask : NoteMask
@@ -54,6 +70,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
             protected override void Update()
             {
                 base.Update();
+
+                Anchor = HitObject.Anchor;
+                Origin = HitObject.Origin;
 
                 Position = HitObject.DrawPosition;
             }
