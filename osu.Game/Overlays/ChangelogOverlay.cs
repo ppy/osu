@@ -96,9 +96,11 @@ namespace osu.Game.Overlays
                 content.Clear();
                 // should add listing to content here
                 if (!Streams.IsHovered)
-                    foreach (StreamBadge item in Streams.BadgesContainer.Children) item.Activate(true);
+                    foreach (StreamBadge item in Streams.BadgesContainer.Children)
+                        item.Activate(true);
                 else
-                    foreach (StreamBadge item in Streams.BadgesContainer.Children) item.Deactivate();
+                    foreach (StreamBadge item in Streams.BadgesContainer.Children)
+                        item.Deactivate();
             };
         }
 
@@ -112,13 +114,10 @@ namespace osu.Game.Overlays
             switch (action)
             {
                 case GlobalAction.Back:
-                    if (header.IsListingActivated()) State = Visibility.Hidden;
-
-                    // the problem here is that when hovering over the builds' container
-                    // and pressing back, they don't lower their opacity they're rehovered on
-                    else header.ActivateListing();
-                    return true;
-                case GlobalAction.Select:
+                    if (header.IsListingActivated())
+                        State = Visibility.Hidden;
+                    else
+                        header.ActivateListing();
                     return true;
             }
 
@@ -150,9 +149,7 @@ namespace osu.Game.Overlays
             {
                 Streams.BadgesContainer.Clear();
                 foreach (APIChangelog item in res)
-                {
                     Streams.BadgesContainer.Add(new StreamBadge(item));
-                }
             };
             api.Queue(req);
         }

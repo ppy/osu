@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Changelog
                         new SpriteText
                         {
                             Text = ChangelogEntry.Users > 0 ?
-                                string.Join(" ", ChangelogEntry.Users.ToString("N0"), "users online"):
+                                string.Format($"{ChangelogEntry.Users:N0} users online") :
                                 null,
                             TextSize = 12,
                             Font = @"Exo2.0-Regular",
@@ -87,7 +87,8 @@ namespace osu.Game.Overlays.Changelog
             isActivated = true;
             this.FadeIn(transition_duration);
             lineBadge.IsCollapsed = false;
-            if (!withoutHeaderUpdate) OnActivation?.Invoke();
+            if (!withoutHeaderUpdate)
+                OnActivation?.Invoke();
         }
 
         public void Deactivate()

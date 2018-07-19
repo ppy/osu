@@ -44,7 +44,8 @@ namespace osu.Game.Overlays.Changelog.Header
         public void ShowText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
         {
             LineBadge.IsCollapsed = false;
-            if (!string.IsNullOrEmpty(displayText)) Text.Text = displayText;
+            if (!string.IsNullOrEmpty(displayText))
+                Text.Text = displayText;
             Text.MoveToY(0, duration, easing)
                 .FadeIn(duration, easing);
         }
@@ -111,7 +112,8 @@ namespace osu.Game.Overlays.Changelog.Header
 
         protected override bool OnHover(InputState state)
         {
-            if (!IsActivated) sampleHover?.Play();
+            if (!IsActivated)
+                sampleHover?.Play();
             return base.OnHover(state);
         }
 

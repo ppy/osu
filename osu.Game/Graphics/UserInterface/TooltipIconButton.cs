@@ -22,21 +22,20 @@ namespace osu.Game.Graphics.UserInterface
         public TooltipIconButton()
         {
             Children = new Drawable[]
+            {
+                new Box
                 {
-                    new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0,
-                    },
-                    icon = new SpriteIcon
-                    {
-                        Origin = Anchor.Centre,
-                        Anchor = Anchor.Centre,
-                        Size = new Vector2(18),
-                    }
-                };
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0,
+                },
+                icon = new SpriteIcon
+                {
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Size = new Vector2(18),
+                }
+            };
         }
-
 
         public string TooltipText { get; set; }
     }

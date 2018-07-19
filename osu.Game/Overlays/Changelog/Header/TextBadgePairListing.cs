@@ -63,7 +63,8 @@ namespace osu.Game.Overlays.Changelog.Header
 
         protected override void OnHoverLost(InputState state)
         {
-            if (IsActivated == false) LineBadge.ResizeHeightTo(1, LineBadge.TransitionDuration, Easing.Out);
+            if (!IsActivated)
+                LineBadge.ResizeHeightTo(1, LineBadge.TransitionDuration, Easing.Out);
             base.OnHoverLost(state);
         }
 
