@@ -32,9 +32,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             maskContainer.MaskSelected += maskSelection.HandleSelected;
             maskContainer.MaskDeselected += maskSelection.HandleDeselected;
             maskContainer.MaskSelectionRequested += maskSelection.HandleSelectionRequested;
-            maskContainer.MaskDragStarted += maskSelection.HandleDragStart;
             maskContainer.MaskDragRequested += maskSelection.HandleDrag;
-            maskContainer.MaskDragEnded += maskSelection.HandleDragEnd;
 
             maskSelection.DeselectAll = maskContainer.DeselectAll;
 

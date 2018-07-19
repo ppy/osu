@@ -18,8 +18,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
         public HoldNoteMask(DrawableHoldNote hold)
             : base(hold)
         {
-            var holdObject = hold.HitObject;
-
             InternalChildren = new Drawable[]
             {
                 new HoldNoteNoteMask(hold.Head),
@@ -29,8 +27,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
                     AccentColour = Color4.Transparent
                 },
             };
-
-            holdObject.ColumnChanged += _ => Position = hold.Position;
         }
 
         [BackgroundDependencyLoader]

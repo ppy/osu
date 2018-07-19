@@ -34,19 +34,9 @@ namespace osu.Game.Rulesets.Edit
         public event Action<HitObjectMask, InputState> SelectionRequested;
 
         /// <summary>
-        /// Invoked when this <see cref="HitObjectMask"/> has started drag.
-        /// </summary>
-        public event Action<HitObjectMask, InputState> DragStarted;
-
-        /// <summary>
         /// Invoked when this <see cref="HitObjectMask"/> has requested drag.
         /// </summary>
         public event Action<HitObjectMask, InputState> DragRequested;
-
-        /// <summary>
-        /// Invoked when this <see cref="HitObjectMask"/> has ended drag.
-        /// </summary>
-        public event Action<HitObjectMask, InputState> DragEnded;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="HitObjectMask"/> applies to.
@@ -130,21 +120,11 @@ namespace osu.Game.Rulesets.Edit
             return base.OnClick(state);
         }
 
-        protected override bool OnDragStart(InputState state)
-        {
-            DragStarted?.Invoke(this, state);
-            return true;
-        }
+        protected override bool OnDragStart(InputState state) => true;
 
         protected override bool OnDrag(InputState state)
         {
             DragRequested?.Invoke(this, state);
-            return true;
-        }
-
-        protected override bool OnDragEnd(InputState state)
-        {
-            DragEnded?.Invoke(this, state);
             return true;
         }
 

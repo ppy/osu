@@ -9,14 +9,9 @@ namespace osu.Game.Rulesets.Mania.Edit
 {
     public class ManiaEditPlayfield : ManiaPlayfield
     {
-        protected override bool DisplayJudgements => false;
-
         public ManiaEditPlayfield(List<StageDefinition> stages)
             : base(stages)
         {
         }
-
-        protected override ManiaStage CreateStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
-            => new ManiaEditStage(firstColumnIndex, definition, ref normalColumnStartAction, ref specialColumnStartAction);
     }
 }
