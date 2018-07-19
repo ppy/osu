@@ -41,14 +41,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 if (type.HasFlag(ConvertHitObjectType.Circle))
                 {
-                    result = CreateHit(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo);
+                    result = CreateHit(new Vector2((int)float.Parse(split[0]), (int)float.Parse(split[1])), combo);
 
                     if (split.Length > 5)
                         readCustomSampleBanks(split[5], bankInfo);
                 }
                 else if (type.HasFlag(ConvertHitObjectType.Slider))
                 {
-                    var pos = new Vector2(int.Parse(split[0]), int.Parse(split[1]));
+                    var pos = new Vector2((int)float.Parse(split[0]), (int)float.Parse(split[1]));
 
                     CurveType curveType = CurveType.Catmull;
                     double length = 0;
@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
                     }
 
-                    result = CreateHold(new Vector2(int.Parse(split[0]), int.Parse(split[1])), combo, endTime + offset);
+                    result = CreateHold(new Vector2((int)float.Parse(split[0]), (int)float.Parse(split[1])), combo, endTime + offset);
                 }
 
                 if (result == null)
