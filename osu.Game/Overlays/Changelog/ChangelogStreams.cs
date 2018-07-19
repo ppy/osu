@@ -14,42 +14,44 @@ namespace osu.Game.Overlays.Changelog
     public class ChangelogStreams : Container
     {
         private const float container_height = 106.5f;
-        private const float container_margin_y = 20;
-        private const float container_margin_x = 85;
+        private const float padding_y = 20;
+        private const float padding_x = 85;
         public Action OnSelection;
 
         public APIChangelog SelectedRelease;
+        // not using SelectedRelease as a Bindable and then using .OnValueChange instead of OnSelection
+        // because it doesn't "refresh" the selection if the same stream is chosen
 
         public readonly FillFlowContainer<StreamBadge> BadgesContainer;
 
         public ChangelogStreams()
         {
-            Height = container_height;
+            // this should actually be resizeable (https://streamable.com/yw2ug)
+            // if not, with small width:height ratio it cuts off right-most content
             RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Size = new OpenTK.Vector2(1),
                     Colour = new Color4(32, 24, 35, 255),
                 },
                 BadgesContainer = new FillFlowContainer<StreamBadge>
                 {
-                    Direction = FillDirection.Horizontal,
-                    RelativeSizeAxes = Axes.Both,
-                    Margin = new MarginPadding
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding
                     {
-                        Top = container_margin_y,
-                        Bottom = container_margin_y,
-                        Left = container_margin_x,
-                        Right = container_margin_x,
+                        Top = padding_y,
+                        Bottom = padding_y,
+                        Left = padding_x,
+                        Right = padding_x,
                     },
                 },
             };
             // ok, so this is probably not the best.
-            // will need to reflect on this.
-            // do we need the changelog to be updateable?
+            // how else can this be done?
             BadgesContainer.OnUpdate = d =>
             {
                 foreach (StreamBadge streamBadge in BadgesContainer.Children)

@@ -11,8 +11,13 @@ namespace osu.Game.Overlays.Changelog
         public ChangelogContent()
         {
             RelativeSizeAxes = Axes.X;
-            //AutoSizeAxes = Axes.Y;
+            AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
+            Padding = new MarginPadding
+            {
+                Left = 70,
+                Right = 70,
+            };
         }
     }
 }

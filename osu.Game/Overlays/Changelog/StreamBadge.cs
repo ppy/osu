@@ -76,10 +76,8 @@ namespace osu.Game.Overlays.Changelog
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Width = 1,
                     Colour = StreamColour.FromStreamName(ChangelogEntry.UpdateStream.Name),
                     RelativeSizeAxes = Axes.X,
-                    TransitionDuration = 600,
                 },
             };
         }
