@@ -46,13 +46,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             foreach (var hitObject in beatmap.HitObjects)
             {
-                // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
-                if (hitObject is Fruit)
+                switch (hitObject)
                 {
-                    difficultyHitObjects.Add(new CatchDifficultyHitObject((CatchHitObject)hitObject, halfCatchWidth));
+                    // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
+                    case Fruit fruit:
+                        difficultyHitObjects.Add(new CatchDifficultyHitObject(fruit, halfCatchWidth));
+                        break;
+                    case JuiceStream _:
+                        difficultyHitObjects.AddRange(hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)).Select(o => new CatchDifficultyHitObject(o, halfCatchWidth)));
+                        break;
                 }
-                if (hitObject is JuiceStream)
-                    difficultyHitObjects.AddRange(hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)).Select(o => new CatchDifficultyHitObject(o, halfCatchWidth)));
             }
 
             difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
