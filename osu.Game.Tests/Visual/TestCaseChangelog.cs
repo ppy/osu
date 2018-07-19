@@ -10,9 +10,9 @@ namespace osu.Game.Tests.Visual
     public class TestCaseChangelog : OsuTestCase
     {
         private ChangelogOverlay changelog;
-        private int releaseStreamCount;
         private int index;
-        private void indexIncrement() => index = index == releaseStreamCount - 1 ? 0 : index + 1;
+        private void indexIncrement() => index = index >= changelog.Streams.BadgesContainer.Children.Count - 1 ? 0 : index + 1;
+        private bool isLoaded => changelog.Streams.BadgesContainer.Children.Count > 0;
 
         protected override void LoadComplete()
         {
@@ -20,20 +20,18 @@ namespace osu.Game.Tests.Visual
 
             Add(changelog = new ChangelogOverlay());
 
-            releaseStreamCount = changelog.Streams.BadgesContainer.Children.Count;
-
             AddStep(@"Show", changelog.Show);
             AddRepeatStep(@"Toggle Release Stream", () =>
             {
-                changelog.Streams.BadgesContainer.Children[index].Activate();
+                if (isLoaded) changelog.Streams.BadgesContainer.Children[index].Activate();
                 indexIncrement();
-            }, releaseStreamCount);
+            }, 6);
             AddStep(@"Listing", changelog.ActivateListing);
             AddStep(@"Hide", changelog.Hide);
             AddWaitStep(3);
             AddStep(@"Show with Release Stream", () =>
             {
-                changelog.Streams.BadgesContainer.Children[index].Activate();
+                if (isLoaded) changelog.Streams.BadgesContainer.Children[index].Activate();
                 changelog.Show();
                 indexIncrement();
             });
@@ -45,12 +43,12 @@ namespace osu.Game.Tests.Visual
                 changelog.ActivateListing();
                 changelog.Show();
             });
-            AddWaitStep(4);
+            AddWaitStep(3);
             AddStep(@"Hide", changelog.Hide);
             AddWaitStep(3);
             AddStep(@"Activate release", () =>
             {
-                changelog.Streams.BadgesContainer.Children[index].Activate();
+                if (isLoaded) changelog.Streams.BadgesContainer.Children[index].Activate();
                 indexIncrement();
             });
             AddStep(@"Show with listing", () =>
