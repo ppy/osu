@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics;
 using OpenTK;
-using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI;
@@ -24,7 +23,5 @@ namespace osu.Game.Rulesets.Mania.Edit
         };
 
         protected override Vector2 PlayfieldArea => Vector2.One;
-
-        protected override CursorContainer CreateCursor() => null;
     }
 }

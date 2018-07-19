@@ -20,8 +20,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
             Masking = true;
 
             AddInternal(new NotePiece());
-
-            note.HitObject.ColumnChanged += _ => Position = note.Position;
         }
 
         [BackgroundDependencyLoader]

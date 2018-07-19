@@ -25,7 +25,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         private readonly List<HitObjectMask> selectedMasks;
 
         private Drawable outline;
-        private Vector2 startingPosition;
 
         public MaskSelection()
         {
@@ -55,7 +54,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         #region User Input Handling
 
-        public void HandleDragStart(HitObjectMask m, InputState state) => startingPosition = state.Mouse.Position;
         public void HandleDrag(HitObjectMask m, InputState state)
         {
             // Todo: Various forms of snapping
@@ -67,16 +65,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                     case IHasEditablePosition editablePosition:
                         editablePosition.OffsetPosition(state.Mouse.Delta);
                         break;
-                    case IHasEditableColumn editableColumn:
-                        if (IsDragged)
-                            editableColumn.OffsetColumn((int)((startingPosition.X - state.Mouse.Position.X) / m.Width)); // Perform snapping, needs fixing
-                        break;
                 }
             }
-        }
-        public void HandleDragEnd(HitObjectMask m, InputState state)
-        {
-
         }
 
         #endregion

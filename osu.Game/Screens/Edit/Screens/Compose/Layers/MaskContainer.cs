@@ -30,19 +30,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         public event Action<HitObjectMask, InputState> MaskSelectionRequested;
 
         /// <summary>
-        /// Invoked when any <see cref="HitObjectMask"/> starts drag.
-        /// </summary>
-        public event Action<HitObjectMask, InputState> MaskDragStarted;
-
-        /// <summary>
         /// Invoked when any <see cref="HitObjectMask"/> requests drag.
         /// </summary>
         public event Action<HitObjectMask, InputState> MaskDragRequested;
-
-        /// <summary>
-        /// Invoked when any <see cref="HitObjectMask"/> ends drag.
-        /// </summary>
-        public event Action<HitObjectMask, InputState> MaskDragEnded;
 
         private IEnumerable<HitObjectMask> aliveMasks => AliveInternalChildren.Cast<HitObjectMask>();
 
@@ -60,9 +50,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             drawable.Selected += onMaskSelected;
             drawable.Deselected += onMaskDeselected;
             drawable.SelectionRequested += onSelectionRequested;
-            drawable.DragStarted += onDragStarted;
             drawable.DragRequested += onDragRequested;
-            drawable.DragEnded += onDragEnded;
         }
 
         public override bool Remove(HitObjectMask drawable)
@@ -76,9 +64,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 drawable.Selected -= onMaskSelected;
                 drawable.Deselected -= onMaskDeselected;
                 drawable.SelectionRequested -= onSelectionRequested;
-                drawable.DragStarted -= onDragStarted;
                 drawable.DragRequested -= onDragRequested;
-                drawable.DragEnded -= onDragEnded;
             }
 
             return result;
@@ -117,9 +103,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         }
 
         private void onSelectionRequested(HitObjectMask mask, InputState state) => MaskSelectionRequested?.Invoke(mask, state);
-        private void onDragStarted(HitObjectMask mask, InputState state) => MaskDragStarted?.Invoke(mask, state);
         private void onDragRequested(HitObjectMask mask, InputState state) => MaskDragRequested?.Invoke(mask, state);
-        private void onDragEnded(HitObjectMask mask, InputState state) => MaskDragEnded?.Invoke(mask, state);
 
         protected override int Compare(Drawable x, Drawable y)
         {

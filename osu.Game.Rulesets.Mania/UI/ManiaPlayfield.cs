@@ -4,25 +4,18 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     public class ManiaPlayfield : ManiaScrollingPlayfield
     {
-        public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
-
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
-        public IReadOnlyList<ManiaStage> Stages => stages;
-
-        protected virtual bool DisplayJudgements => true;
 
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
         {
@@ -44,8 +37,7 @@ namespace osu.Game.Rulesets.Mania.UI
             int firstColumnIndex = 0;
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
-                var newStage = CreateStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
-                newStage.DisplayJudgements = DisplayJudgements;
+                var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
 
                 playfieldGrid.Content[0][i] = newStage;
@@ -57,11 +49,7 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        public override void Add(DrawableHitObject h)
-        {
-            h.OnJudgement += OnJudgement;
-            getStageByColumn(((ManiaHitObject)h.HitObject).Column).Add(h);
-        }
+        public override void Add(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Add(h);
 
         public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
 
@@ -83,16 +71,5 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             maniaConfig.BindWith(ManiaSetting.ScrollTime, VisibleTimeRange);
         }
-
-        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
-        {
-            if (!judgedObject.DisplayJudgement || !DisplayJudgements)
-                return;
-
-            getStageByColumn(((ManiaHitObject)judgedObject.HitObject).Column).OnJudgement(judgedObject, judgement);
-        }
-
-        protected virtual ManiaStage CreateStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
-            => new ManiaStage(firstColumnIndex, definition, ref normalColumnStartAction, ref specialColumnStartAction);
     }
 }
