@@ -60,9 +60,8 @@ namespace osu.Game.Overlays.Changelog
                     {
                         SelectedRelease = streamBadge.ChangelogEntry;
                         foreach (StreamBadge item in BadgesContainer.Children)
-                        {
-                            if (item.ChangelogEntry.Id != streamBadge.ChangelogEntry.Id) item.Deactivate();
-                        }
+                            if (item.ChangelogEntry.Id != streamBadge.ChangelogEntry.Id)
+                                item.Deactivate();
                         OnSelection?.Invoke();
                     };
                 }
@@ -77,11 +76,10 @@ namespace osu.Game.Overlays.Changelog
                 if (SelectedRelease != null)
                 {
                     if (SelectedRelease.UpdateStream.Id != streamBadge.ChangelogEntry.Id)
-                    {
                         streamBadge.Deactivate();
-                    }
                 }
-                else streamBadge.Deactivate();
+                else
+                    streamBadge.Deactivate();
             }
             return base.OnHover(state);
         }
@@ -89,9 +87,8 @@ namespace osu.Game.Overlays.Changelog
         protected override void OnHoverLost(InputState state)
         {
             if (SelectedRelease == null)
-            {
-                foreach (StreamBadge streamBadge in BadgesContainer.Children) streamBadge.Activate(true);
-            }
+                foreach (StreamBadge streamBadge in BadgesContainer.Children)
+                    streamBadge.Activate(true);
             base.OnHoverLost(state);
         }
     }

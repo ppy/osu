@@ -23,13 +23,12 @@ namespace osu.Game.Overlays.Changelog.Header
         {
             if (IsActivated)
             {
-                if (displayText != Text.Text) ChangeText(transition_duration, displayText);
+                if (displayText != Text.Text)
+                    ChangeText(transition_duration, displayText);
             }
             else
-            {
                 ShowText(transition_duration, displayText);
-                IsActivated = true;
-            }
+            IsActivated = true;
             SampleActivate?.Play();
             OnActivation?.Invoke();
         }

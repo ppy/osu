@@ -27,12 +27,6 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty("created_at")]
         public DateTimeOffset CreatedAt { get; set; }
 
-        [JsonProperty("disqus_id")]
-        public string DisqusId { get; set; }
-
-        [JsonProperty("disqus_title")]
-        public string DisqusTitle { get; set; }
-
         [JsonProperty("update_stream")]
         public UpdateStream UpdateStream { get; set; }
 
