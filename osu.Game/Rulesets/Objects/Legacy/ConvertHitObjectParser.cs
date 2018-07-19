@@ -30,6 +30,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
             {
                 string[] split = text.Split(',');
 
+                Vector2 pos = new Vector2((int)Convert.ToSingle(split[0], CultureInfo.InvariantCulture), (int)Convert.ToSingle(split[1], CultureInfo.InvariantCulture));
+
                 ConvertHitObjectType type = (ConvertHitObjectType)int.Parse(split[3]) & ~ConvertHitObjectType.ColourHax;
                 bool combo = type.HasFlag(ConvertHitObjectType.NewCombo);
                 type &= ~ConvertHitObjectType.NewCombo;
@@ -41,15 +43,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 if (type.HasFlag(ConvertHitObjectType.Circle))
                 {
-                    result = CreateHit(new Vector2((int)float.Parse(split[0]), (int)float.Parse(split[1])), combo);
+                    result = CreateHit(pos, combo);
 
                     if (split.Length > 5)
                         readCustomSampleBanks(split[5], bankInfo);
                 }
                 else if (type.HasFlag(ConvertHitObjectType.Slider))
                 {
-                    var pos = new Vector2((int)float.Parse(split[0]), (int)float.Parse(split[1]));
-
                     CurveType curveType = CurveType.Catmull;
                     double length = 0;
                     var points = new List<Vector2> { Vector2.Zero };
@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
                     }
 
-                    result = CreateHold(new Vector2((int)float.Parse(split[0]), (int)float.Parse(split[1])), combo, endTime + offset);
+                    result = CreateHold(pos, combo, endTime + offset);
                 }
 
                 if (result == null)
