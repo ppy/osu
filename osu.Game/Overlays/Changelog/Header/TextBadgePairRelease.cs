@@ -17,10 +17,7 @@ namespace osu.Game.Overlays.Changelog.Header
             Text.Alpha = 0;
         }
 
-        public void SetText(string displayText)
-        {
-            Text.Text = displayText;
-        }
+        public void SetText(string displayText) => Text.Text = displayText;
 
         public void Activate(string displayText = null)
         {

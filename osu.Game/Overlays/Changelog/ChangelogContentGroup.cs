@@ -75,7 +75,8 @@ namespace osu.Game.Overlays.Changelog
                                 {
                                     Text = build.DisplayVersion,
                                     TextSize = 28, // web: 24,
-                                    Colour = StreamColour.STABLE,
+                                    Font = @"Exo2.0-Light",
+                                    Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
                                 },
                             }
                         },
@@ -90,7 +91,7 @@ namespace osu.Game.Overlays.Changelog
                 new SpriteText
                 {
                     // do we need .ToUniversalTime() here?
-                    // also, this is a temporary solution to weekdays in >localized< date strings
+                    // also, this should be a temporary solution to weekdays in >localized< date strings
                     Text = build.CreatedAt.Date.ToLongDateString().Replace(build.CreatedAt.ToString("dddd") + ", ", ""),
                     TextSize = 17, // web: 14,
                     Colour = OsuColour.FromHex(@"FD5"),

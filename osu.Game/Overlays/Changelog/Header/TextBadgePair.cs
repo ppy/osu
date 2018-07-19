@@ -61,9 +61,8 @@ namespace osu.Game.Overlays.Changelog.Header
                 .MoveToY(0, duration, easing)
                 .FadeIn(duration, easing);
 
-            // since using .finally/.oncomplete after first fadeout made the badge
-            // not hide sometimes in visual tests(because FinishTransforms()/CancelTransforms()
-            // didn't apply to transforms that come after the .finally), I'm using a scheduler here
+            // since using .finally/.oncomplete after first fadeout made the badge not hide
+            // sometimes in visual tests (https://streamable.com/0qssq), I'm using a scheduler here
             Scheduler.AddDelayed(() =>
             {
                 if (!string.IsNullOrEmpty(displayText)) Text.Text = displayText;
@@ -79,10 +78,8 @@ namespace osu.Game.Overlays.Changelog.Header
             {
                 Text = new SpriteText
                 {
-                    TextSize = 21, // web is 16, but here it looks too small?
+                    TextSize = 21, // web: 16,
                     Text = displayText,
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
                     Margin = new MarginPadding
                     {
                         Top = 5,
@@ -91,7 +88,6 @@ namespace osu.Game.Overlays.Changelog.Header
                 },
                 LineBadge = new LineBadge(startCollapsed)
                 {
-                    Width = 1,
                     Colour = badgeColour,
                     RelativeSizeAxes = Axes.X,
                 }

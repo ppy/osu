@@ -79,6 +79,7 @@ namespace osu.Game.Overlays
                     },
                 },
             };
+            OnLoadComplete += d => FetchChangelog(); // is i
             Streams.OnSelection = () =>
             {
                 if (Streams.SelectedRelease != null)
@@ -86,12 +87,8 @@ namespace osu.Game.Overlays
                     header.ChangelogEntry = Streams.SelectedRelease;
                 }
                 header.ShowReleaseStream();
-                content.Clear();
+                content.Clear(); // this should probably happen with some transition
                 content.Add(new ChangelogContentGroup(Streams.SelectedRelease));
-            };
-            Streams.BadgesContainer.OnLoadComplete += d =>
-            {
-                FetchChangelog();
             };
             header.OnListingActivated += () =>
             {
@@ -151,6 +148,7 @@ namespace osu.Game.Overlays
             var req = new GetChangelogLatestBuildsRequest();
             req.Success += res =>
             {
+                Streams.BadgesContainer.Clear();
                 foreach (APIChangelog item in res)
                 {
                     Streams.BadgesContainer.Add(new StreamBadge(item));

@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Changelog
     {
         protected Color4 Purple = new Color4(191, 4, 255, 255);
         private readonly Sprite coverImage;
-        private readonly Sprite headerBadge; //50x50, margin-right: 20
+        private readonly Sprite headerBadge;
         private readonly OsuSpriteText titleStream;
         private readonly TextBadgePairListing listing;
         private readonly TextBadgePairRelease releaseStream;
@@ -46,10 +46,7 @@ namespace osu.Game.Overlays.Changelog
                 coverImage = new Sprite
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Size = new Vector2(1),
                     FillMode = FillMode.Fill,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
                 },
                 new Container // this is the line badge-Changelog-Stream
                 {
@@ -79,11 +76,11 @@ namespace osu.Game.Overlays.Changelog
 
                                 // this box has 2 functions:
                                 // - ensures the circle doesn't disappear on the X and Y edges
-                                // - lessens the white "contamination" on the circle (due to smoothing)
+                                // - gets rid of the white "contamination" on the circle (due to smoothing)
+                                //   (https://i.imgur.com/SMuvWBZ.png)
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Size = new Vector2(1),
                                     Alpha = 0,
                                     AlwaysPresent = true,
                                     Colour = Purple,

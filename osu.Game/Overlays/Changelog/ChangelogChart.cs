@@ -10,6 +10,7 @@ using osu.Game.Graphics;
 namespace osu.Game.Overlays.Changelog
 {
     // maybe look to osu.Game.Screens.Play.SquareGraph for reference later
+    // placeholder json file: https://api.myjson.com/bins/10ye8a
     public class ChangelogChart : BufferedContainer
     {
         public ChangelogChart()
