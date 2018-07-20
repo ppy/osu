@@ -54,8 +54,6 @@ namespace osu.Game.Rulesets.Catch.Objects
             var tickDistance = Math.Min(TickDistance, length);
             var spanDuration = length / Velocity;
 
-            var minDistanceFromEnd = Velocity * 0.01;
-
             AddNested(new Fruit
             {
                 Samples = Samples,
@@ -63,38 +61,38 @@ namespace osu.Game.Rulesets.Catch.Objects
                 X = X
             });
 
-            double lastDropletTime = StartTime;
-
             for (int span = 0; span < this.SpanCount(); span++)
             {
                 var spanStartTime = StartTime + span * spanDuration;
                 var reversed = span % 2 == 1;
 
-                for (double d = 0; d <= length; d += tickDistance)
+                for (double d = 0; d < length - 0.01; d += tickDistance)
                 {
-                    var timeProgress = d / length;
-                    var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
+                    var timeProgressStart = d / length;
+                    var timeProgressEnd = Math.Min((d + tickDistance) / length, 1);
 
-                    double time = spanStartTime + timeProgress * spanDuration;
+                    double startTime = spanStartTime + timeProgressStart * spanDuration;
+                    double endTime = spanStartTime + timeProgressEnd * spanDuration;
 
                     if (LegacyLastTickOffset != null)
                     {
                         // If we're the last tick, apply the legacy offset
-                        if (span == this.SpanCount() - 1 && d + tickDistance > length)
-                            time = Math.Max(StartTime + Duration / 2, time - LegacyLastTickOffset.Value);
+                        if (span == this.SpanCount() - 1 && d + tickDistance > length - 0.01)
+                            endTime = Math.Max(StartTime + Duration / 2, endTime - LegacyLastTickOffset.Value);
                     }
 
-                    double tinyTickInterval = time - lastDropletTime;
+                    double tinyTickInterval = endTime - startTime;
                     while (tinyTickInterval > 100)
                         tinyTickInterval /= 2;
 
-                    for (double t = lastDropletTime + tinyTickInterval; t < time; t += tinyTickInterval)
+                    for (double t = startTime + tinyTickInterval; t < endTime - 0.01; t += tinyTickInterval)
                     {
-                        double progress = reversed ? 1 - (t - spanStartTime) / spanDuration : (t - spanStartTime) / spanDuration;
+                        double progress = (t - spanStartTime) / spanDuration;
+                        double timeP = reversed ? 1 - progress : progress;
 
                         AddNested(new TinyDroplet
                         {
-                            StartTime = t,
+                            StartTime = spanStartTime + timeP * spanDuration,
                             X = X + Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
                             Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                             {
@@ -105,12 +103,14 @@ namespace osu.Game.Rulesets.Catch.Objects
                         });
                     }
 
-                    if (d > minDistanceFromEnd && Math.Abs(d - length) > minDistanceFromEnd)
+                    if (timeProgressEnd * spanDuration < spanDuration)
                     {
+                        double timeP = reversed ? 1 - timeProgressEnd : timeProgressEnd;
+
                         AddNested(new Droplet
                         {
-                            StartTime = time,
-                            X = X + Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
+                            StartTime = spanStartTime + timeP * spanDuration,
+                            X = X + Curve.PositionAt(timeProgressEnd).X / CatchPlayfield.BASE_WIDTH,
                             Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                             {
                                 Bank = s.Bank,
@@ -119,8 +119,6 @@ namespace osu.Game.Rulesets.Catch.Objects
                             }))
                         });
                     }
-
-                    lastDropletTime = time;
                 }
 
                 AddNested(new Fruit
