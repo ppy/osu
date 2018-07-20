@@ -85,7 +85,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public GithubUser GithubUser { get; set; }
     }
 
-    public partial class GithubUser
+    public class GithubUser
     {
         [JsonProperty("id")]
         public long Id { get; set; }
