@@ -1270,6 +1270,111 @@
                     "Position": 408.720825
                 }
             ]
-        }
+        },
+        {
+            "StartTime": 25000,
+            "Objects": [
+                {
+                    "StartTime": 25000,
+                    "Position": 448
+                },
+                {
+                    "StartTime": 25062,
+                    "Position": 442
+                },
+                {
+                    "StartTime": 25125,
+                    "Position": 446
+                },
+                {
+                    "StartTime": 25187,
+                    "Position": 440
+                },
+                {
+                    "StartTime": 25250,
+                    "Position": 467
+                },
+                {
+                    "StartTime": 25312,
+                    "Position": 442
+                },
+                {
+                    "StartTime": 25375,
+                    "Position": 445
+                },
+                {
+                    "StartTime": 25437,
+                    "Position": 463
+                },
+                {
+                    "StartTime": 25500,
+                    "Position": 448
+                },
+                {
+                    "StartTime": 25562,
+                    "Position": 464
+                },
+                {
+                    "StartTime": 25625,
+                    "Position": 463
+                },
+                {
+                    "StartTime": 25687,
+                    "Position": 442
+                },
+                {
+                    "StartTime": 25750,
+                    "Position": 448
+                },
+                {
+                    "StartTime": 25812,
+                    "Position": 446
+                },
+                {
+                    "StartTime": 25875,
+                    "Position": 461
+                },
+                {
+                    "StartTime": 25937,
+                    "Position": 433
+                },
+                {
+                    "StartTime": 26000,
+                    "Position": 448
+                },
+                {
+                    "StartTime": 26058,
+                    "Position": 445
+                },
+                {
+                    "StartTime": 26116,
+                    "Position": 449
+                },
+                {
+                    "StartTime": 26174,
+                    "Position": 445
+                },
+                {
+                    "StartTime": 26232,
+                    "Position": 443
+                },
+                {
+                    "StartTime": 26290,
+                    "Position": 451
+                },
+                {
+                    "StartTime": 26348,
+                    "Position": 458
+                },
+                {
+                    "StartTime": 26406,
+                    "Position": 451
+                },
+                {
+                    "StartTime": 26500,
+                    "Position": 448
+                }
+              ]
+            }
     ]
 }

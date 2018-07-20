@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         if (reversed)
                         {
                             if (span == this.SpanCount() - 1 && d == 0)
-                                startTime = Math.Max(EndTime - Duration / 2, startTime + LegacyLastTickOffset.Value);
+                                startTime = Math.Min(EndTime, startTime + LegacyLastTickOffset.Value);
                         } else
                         {
                             if (span == this.SpanCount() - 1 && d + tickDistance > length - 0.01)
