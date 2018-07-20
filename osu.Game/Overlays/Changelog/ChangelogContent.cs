@@ -41,8 +41,7 @@ namespace osu.Game.Overlays.Changelog
         {
             Clear();
             add(changelog);
-            //fetchChangelogBuild(changelog);
-            fetchChangelogBuild();
+            fetchChangelogBuild(changelog);
         }
 
         private void showNext()
@@ -69,11 +68,9 @@ namespace osu.Game.Overlays.Changelog
             this.api = api;
         }
 
-        //private void fetchChangelogBuild(APIChangelog build)
-        private void fetchChangelogBuild()
+        private void fetchChangelogBuild(APIChangelog build)
         {
-            //var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
-            var req = new GetChangelogBuildRequest();
+            var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
             req.Success += res =>
             {
                 currentBuild = res;
