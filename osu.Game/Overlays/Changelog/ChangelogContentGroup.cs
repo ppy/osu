@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.Changelog
                             Icon = FontAwesome.fa_chevron_left,
                             Size = new Vector2(24),
                             TooltipText = "Previous",
-                            OnPressed = PreviousRequested,
+                            OnPressed = () => PreviousRequested(),
                         },
                         new FillFlowContainer<SpriteText>
                         {
@@ -84,7 +84,7 @@ namespace osu.Game.Overlays.Changelog
                             Icon = FontAwesome.fa_chevron_right,
                             Size = new Vector2(24),
                             TooltipText = "Next",
-                            OnPressed = NextRequested,
+                            OnPressed = () => NextRequested(),
                         },
                     }
                 },

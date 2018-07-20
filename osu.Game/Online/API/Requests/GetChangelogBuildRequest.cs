@@ -7,14 +7,16 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetChangelogBuildRequest : APIRequest<APIChangelog>
     {
-        private string url;
-        /// <param name="url">This will need to be changed to "long Id"
-        /// Placeholder for testing</param>
-        GetChangelogBuildRequest(string url)
+        private readonly string name;
+        private readonly string version;
+
+        public GetChangelogBuildRequest(string streamName, string buildVersion)
         {
-            this.url = url;
+            name = streamName;
+            version = buildVersion;
         }
-        protected override string Uri => @"";
-        protected override string Target => url;
+
+        //protected override string Target => $@"changelog/{name}/{version}";
+        protected override string Uri => @"https://api.myjson.com/bins/ya5q2"; // for testing
     }
 }

@@ -87,8 +87,7 @@ namespace osu.Game.Overlays
                     header.ChangelogEntry = Streams.SelectedRelease;
                 }
                 header.ShowReleaseStream();
-                content.Clear(); // this should probably happen with some transition
-                content.Add(new ChangelogContentGroup(Streams.SelectedRelease));
+                content.ShowBuild(Streams.SelectedRelease);
             };
             header.OnListingActivated += () =>
             {
