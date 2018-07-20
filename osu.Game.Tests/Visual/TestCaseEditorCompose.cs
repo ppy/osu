@@ -17,14 +17,10 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Compose) };
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame)
+        private void load()
         {
-            osuGame.Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo);
-
-            var compose = new Compose();
-            compose.Beatmap.BindTo(osuGame.Beatmap);
-
-            Child = compose;
+            Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            Child = new Compose();
         }
     }
 }

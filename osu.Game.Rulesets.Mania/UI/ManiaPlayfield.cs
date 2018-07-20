@@ -8,35 +8,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Configuration;
-using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : ScrollingPlayfield
+    public class ManiaPlayfield : ManiaScrollingPlayfield
     {
-        /// <summary>
-        /// Whether this playfield should be inverted. This flips everything inside the playfield.
-        /// </summary>
-        public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
-
         public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
 
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
-            : base(ScrollingDirection.Up)
         {
             if (stageDefinitions == null)
                 throw new ArgumentNullException(nameof(stageDefinitions));
 
             if (stageDefinitions.Count <= 0)
                 throw new ArgumentException("Can't have zero or fewer stages.");
-
-            Inverted.Value = true;
 
             GridContainer playfieldGrid;
             InternalChild = playfieldGrid = new GridContainer
@@ -52,7 +42,6 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
-                newStage.Inverted.BindTo(Inverted);
 
                 playfieldGrid.Content[0][i] = newStage;
 

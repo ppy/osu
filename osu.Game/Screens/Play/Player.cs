@@ -49,8 +49,6 @@ namespace osu.Game.Screens.Play
         public bool AllowLeadIn { get; set; } = true;
         public bool AllowResults { get; set; } = true;
 
-        protected override bool AllowBackButton => false;
-
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;
 
@@ -121,7 +119,7 @@ namespace osu.Game.Screens.Play
                     // let's try again forcing the beatmap's ruleset.
                     ruleset = beatmap.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
-                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(Beatmap);
+                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(Beatmap.Value);
                 }
 
                 if (!RulesetContainer.Objects.Any())
@@ -140,10 +138,9 @@ namespace osu.Game.Screens.Play
             sourceClock = (IAdjustableClock)working.Track ?? new StopwatchClock();
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
-            var firstObjectTime = RulesetContainer.Objects.First().StartTime;
             adjustableClock.Seek(AllowLeadIn
-                ? Math.Min(0, firstObjectTime - Math.Max(beatmap.ControlPointInfo.TimingPointAt(firstObjectTime).BeatLength * 4, beatmap.BeatmapInfo.AudioLeadIn))
-                : firstObjectTime);
+                ? Math.Min(RulesetContainer.GameplayStartTime, beatmap.HitObjects.First().StartTime - beatmap.BeatmapInfo.AudioLeadIn)
+                : RulesetContainer.GameplayStartTime);
 
             adjustableClock.ProcessFrame();
 
@@ -158,6 +155,8 @@ namespace osu.Game.Screens.Play
             userAudioOffset.TriggerChange();
 
             ScoreProcessor = RulesetContainer.CreateScoreProcessor();
+            if (!ScoreProcessor.Mode.Disabled)
+                config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
             Children = new Drawable[]
             {
@@ -169,7 +168,7 @@ namespace osu.Game.Screens.Play
                     OnPause = () =>
                     {
                         pauseContainer.Retries = RestartCount;
-                        hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
+                        hudOverlay.KeyCounter.IsCounting = !pauseContainer.IsPaused;
                     },
                     OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
                     Children = new[]
@@ -199,7 +198,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        new SkipOverlay(firstObjectTime)
+                        new SkipOverlay(RulesetContainer.GameplayStartTime)
                         {
                             Clock = Clock, // skip button doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
@@ -219,15 +218,14 @@ namespace osu.Game.Screens.Play
                     {
                         if (!IsCurrentScreen) return;
 
-                        //we want to hide the hitrenderer immediately (looks better).
-                        //we may be able to remove this once the mouse cursor trail is improved.
-                        RulesetContainer?.Hide();
+                        pauseContainer.Hide();
                         Restart();
                     },
                 }
             };
 
             hudOverlay.HoldToQuit.Action = Exit;
+            hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             if (ShowStoryboard)
                 initializeStoryboard(false);

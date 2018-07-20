@@ -56,6 +56,12 @@ namespace osu.Game.Rulesets.UI
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
+        /// <summary>
+        /// The point in time at which gameplay starts, including any required lead-in for display purposes.
+        /// Defaults to two seconds before the first <see cref="HitObject"/>. Override as necessary.
+        /// </summary>
+        public virtual double GameplayStartTime => Objects.First().StartTime - 2000;
+
         private readonly Lazy<Playfield> playfield;
 
         /// <summary>
@@ -70,13 +76,9 @@ namespace osu.Game.Rulesets.UI
 
         protected readonly Ruleset Ruleset;
 
-        private IRulesetConfigManager rulesetConfig;
+        protected IRulesetConfigManager Config { get; private set; }
+
         private OnScreenDisplay onScreenDisplay;
-
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         /// <summary>
         /// A visual representation of a <see cref="Rulesets.Ruleset"/>.
@@ -90,18 +92,20 @@ namespace osu.Game.Rulesets.UI
             Cursor = CreateCursor();
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OnScreenDisplay onScreenDisplay, SettingsStore settings)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            this.onScreenDisplay = onScreenDisplay;
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            rulesetConfig = CreateConfig(Ruleset, settings);
+            onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
-            if (rulesetConfig != null)
+            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+            if (Config != null)
             {
-                dependencies.Cache(rulesetConfig);
-                onScreenDisplay?.BeginTracking(this, rulesetConfig);
+                dependencies.Cache(Config);
+                onScreenDisplay?.BeginTracking(this, Config);
             }
+
+            return dependencies;
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -136,8 +140,6 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         protected virtual CursorContainer CreateCursor() => null;
 
-        protected virtual IRulesetConfigManager CreateConfig(Ruleset ruleset, SettingsStore settings) => null;
-
         /// <summary>
         /// Creates a Playfield.
         /// </summary>
@@ -148,10 +150,10 @@ namespace osu.Game.Rulesets.UI
         {
             base.Dispose(isDisposing);
 
-            if (rulesetConfig != null)
+            if (Config != null)
             {
-                onScreenDisplay?.StopTracking(this, rulesetConfig);
-                rulesetConfig = null;
+                onScreenDisplay?.StopTracking(this, Config);
+                Config = null;
             }
         }
     }
@@ -160,7 +162,7 @@ namespace osu.Game.Rulesets.UI
     /// RulesetContainer that applies conversion to Beatmaps. Does not contain a Playfield
     /// and does not load drawable hit objects.
     /// <para>
-    /// Should not be derived - derive <see cref="RulesetContainer{TObject}"/> instead.
+    /// Should not be derived - derive <see cref="RulesetContainer{TPlayfield, TObject}"/> instead.
     /// </para>
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>

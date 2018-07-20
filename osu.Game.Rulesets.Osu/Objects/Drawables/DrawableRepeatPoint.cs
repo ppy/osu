@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using osu.Game.Graphics;
@@ -89,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // find the next vector2 in the curve which is not equal to our current position to infer a rotation.
             for (int i = searchStart; i >= 0 && i < curve.Count; i += direction)
             {
-                if (curve[i] == Position)
+                if (Precision.AlmostEquals(curve[i], Position))
                     continue;
 
                 Rotation = MathHelper.RadiansToDegrees((float)Math.Atan2(curve[i].Y - Position.Y, curve[i].X - Position.X));

@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
+using osu.Framework.Platform;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -17,6 +17,7 @@ namespace osu.Game.Graphics.UserInterface
         public string Link { get; set; }
 
         private Color4 hoverColour;
+        private GameHost host;
 
         public ExternalLinkButton(string link = null)
         {
@@ -30,9 +31,10 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, GameHost host)
         {
             hoverColour = colours.Yellow;
+            this.host = host;
         }
 
         protected override bool OnHover(InputState state)
@@ -50,11 +52,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(InputState state)
         {
             if(Link != null)
-                Process.Start(new ProcessStartInfo
-                {
-                    FileName = Link,
-                    UseShellExecute = true //see https://github.com/dotnet/corefx/issues/10361
-                });
+                host.OpenUrlExternally(Link);
             return true;
         }
 
