@@ -3,7 +3,7 @@
 
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
+namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
     // TODO: Uncomment constraint once upgraded to C# 7.3 or greater
     public class LabelledEnumDropdown<T> : LabelledDropdown<T>

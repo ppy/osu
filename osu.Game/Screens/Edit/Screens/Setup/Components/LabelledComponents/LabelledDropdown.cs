@@ -12,7 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
+namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
     public class LabelledDropdown<T> : CompositeDrawable
     {

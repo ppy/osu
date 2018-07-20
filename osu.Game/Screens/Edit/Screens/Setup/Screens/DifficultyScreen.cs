@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Edit.Screens.Setup.BottomHeaders;
-using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
+using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 {

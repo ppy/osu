@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Edit.Screens.Setup.Components;
-using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
+using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents;
 using System;
 using System.Linq;
 

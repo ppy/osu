@@ -10,18 +10,20 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using System;
+using System.Collections.Generic;
 
-namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
+namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
-    public class LabelledSwitchButton : CompositeDrawable
+    public class LabelledRadioButtonCollection : CompositeDrawable
     {
         private readonly Container content;
         private readonly Container outerContainer;
         private readonly Box box;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
-        private readonly OsuSetupSwitchButton switchButton;
+        private readonly OsuSetupRadioButtonCollection radioButtonCollection;
 
+        public const float LABEL_CONTAINER_WIDTH = 150;
         public const float OUTER_CORNER_RADIUS = 15;
         public const float DEFAULT_LABEL_TEXT_SIZE = 16;
         public const float DEFAULT_BOTTOM_LABEL_TEXT_SIZE = 12;
@@ -30,17 +32,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
         public const float DEFAULT_TOP_PADDING = 12;
         public const float DEFAULT_BOTTOM_PADDING = 12;
 
-        public event Action<bool> SwitchButtonValueChanged;
+        public event Action<OsuSetupRadioButton> SelectedRadioButtonChanged;
 
-        public void TriggerSwitchButtonValueChanged(bool newValue)
+        public void TriggerSelectedRadioButtonChanged(OsuSetupRadioButton newSelected)
         {
-            SwitchButtonValueChanged?.Invoke(newValue);
-        }
-
-        public bool CurrentValue
-        {
-            get => switchButton.Current.Value;
-            set => switchButton.Current.Value = value;
+            SelectedRadioButtonChanged?.Invoke(newSelected);
         }
 
         private string labelText;
@@ -95,8 +91,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
 
         public MarginPadding RadioButtonPadding
         {
-            get => switchButton.Padding;
-            set => switchButton.Padding = value;
+            get => radioButtonCollection.Padding;
+            set => radioButtonCollection.Padding = value;
         }
 
         public Color4 LabelTextColour
@@ -111,7 +107,19 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
             set => content.Colour = value;
         }
 
-        public LabelledSwitchButton()
+        public OsuSetupRadioButton CurrentSelection
+        {
+            get => radioButtonCollection.SelectedRadioButton;
+            set => radioButtonCollection.SelectedRadioButton = value;
+        }
+
+        public IEnumerable<OsuSetupRadioButton> Items
+        {
+            get => radioButtonCollection.Items;
+            set => radioButtonCollection.Items = value;
+        }
+
+        public LabelledRadioButtonCollection()
         {
             Masking = true;
             CornerRadius = OUTER_CORNER_RADIUS;
@@ -156,11 +164,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                                             Text = LabelText,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        switchButton = new OsuSetupSwitchButton
+                                        radioButtonCollection = new OsuSetupRadioButtonCollection
                                         {
-                                            Anchor = Anchor.TopRight,
-                                            Origin = Anchor.TopRight,
-                                            Position = new Vector2(-15, 10),
+                                            Anchor = Anchor.TopLeft,
+                                            Origin = Anchor.TopLeft,
+                                            Position = new Vector2(LABEL_CONTAINER_WIDTH, 10),
                                         },
                                     },
                                 },
@@ -179,7 +187,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                 }
             };
 
-            switchButton.Current.ValueChanged += TriggerSwitchButtonValueChanged;
+            radioButtonCollection.SelectedRadioButtonChanged += SelectedRadioButtonChanged;
         }
 
         [BackgroundDependencyLoader]

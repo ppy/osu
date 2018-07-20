@@ -9,7 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using System;
 
-namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
+namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
     public class LabelledTextBox : CompositeDrawable
     {

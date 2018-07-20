@@ -5,7 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Screens.Edit.Screens.Setup;
 using osu.Game.Screens.Edit.Screens.Setup.Components;
-using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes;
+using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents;
 using osu.Game.Screens.Edit.Screens.Setup.BottomHeaders;
 using osu.Game.Screens.Edit.Screens.Setup.Screens;
 using osu.Game.Tests.Beatmaps;
