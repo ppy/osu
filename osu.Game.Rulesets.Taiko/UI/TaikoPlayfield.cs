@@ -226,6 +226,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
+            if (!DisplayJudgements)
+                return;
+
             if (judgedObject.DisplayJudgement && judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
                 judgementContainer.Add(new DrawableTaikoJudgement(judgement, judgedObject)

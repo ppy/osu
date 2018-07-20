@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            if (!judgement.IsHit || !judgedObject.DisplayJudgement)
+            if (!judgement.IsHit || !judgedObject.DisplayJudgement || !DisplayJudgements)
                 return;
 
             explosionContainer.Add(new HitExplosion(judgedObject)

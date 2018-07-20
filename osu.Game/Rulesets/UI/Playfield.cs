@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -20,6 +21,11 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public IReadOnlyList<Playfield> NestedPlayfields => nestedPlayfields;
         private List<Playfield> nestedPlayfields;
+
+        /// <summary>
+        /// Whether judgements should be displayed by this and and all nested <see cref="Playfield"/>s.
+        /// </summary>
+        public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
         /// <summary>
         /// A container for keeping track of DrawableHitObjects.
@@ -73,6 +79,8 @@ namespace osu.Game.Rulesets.UI
                 nestedPlayfields = new List<Playfield>();
 
             nestedPlayfields.Add(otherPlayfield);
+
+            otherPlayfield.DisplayJudgements.BindTo(DisplayJudgements);
         }
 
         /// <summary>

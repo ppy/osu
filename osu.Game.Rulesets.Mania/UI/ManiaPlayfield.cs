@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Configuration;
@@ -73,11 +72,6 @@ namespace osu.Game.Rulesets.Mania.UI
         private void load(ManiaConfigManager maniaConfig)
         {
             maniaConfig.BindWith(ManiaSetting.ScrollTime, VisibleTimeRange);
-        }
-
-        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
-        {
-            getStageByColumn(((ManiaHitObject)judgedObject.HitObject).Column).OnJudgement(judgedObject, judgement);
         }
     }
 }

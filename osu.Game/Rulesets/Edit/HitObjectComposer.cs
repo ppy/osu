@@ -110,6 +110,13 @@ namespace osu.Game.Rulesets.Edit
             toolboxCollection.Items[0].Select();
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            rulesetContainer.Playfield.DisplayJudgements.Value = false;
+        }
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
