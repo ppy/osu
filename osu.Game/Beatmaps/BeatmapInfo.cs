@@ -67,6 +67,10 @@ namespace osu.Game.Beatmaps
         // General
         public int AudioLeadIn { get; set; }
         public bool Countdown { get; set; } = true;
+        [NotMapped]
+        public int CountdownSpeed { get; set; }
+        [NotMapped]
+        public int CountdownOffset { get; set; }
         public float StackLeniency { get; set; } = 0.7f;
         public bool SpecialStyle { get; set; }
 
@@ -75,7 +79,14 @@ namespace osu.Game.Beatmaps
         public RulesetInfo Ruleset { get; set; }
 
         public bool LetterboxInBreaks { get; set; }
+        [NotMapped]
+        public bool StoryFireInFront { get; set; }
+        [NotMapped]
+        public bool EpilepsyWarning { get; set; }
         public bool WidescreenStoryboard { get; set; }
+
+        [NotMapped]
+        public bool SamplesMatchPlaybackRate { get; set; }
 
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
