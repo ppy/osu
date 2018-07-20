@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Changelog
                         new SpriteText
                         {
                             Text = ChangelogEntry.Users > 0 ?
-                                string.Format($"{ChangelogEntry.Users:N0} users online") :
+                                $"{ChangelogEntry.Users:N0} users online" :
                                 null,
                             TextSize = 12,
                             Font = @"Exo2.0-Regular",
