@@ -14,6 +14,7 @@ namespace osu.Game.Overlays.Changelog
     {
         private APIChangelog currentBuild;
         private APIAccess api;
+        private ChangelogContentGroup changelogContentGroup;
 
         public ChangelogContent()
         {
@@ -27,20 +28,19 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
-        public override void Add(ChangelogContentGroup changelogContentGroup)
+        private void add(APIChangelog changelogBuild)
         {
-            if (changelogContentGroup != null)
-            {
-                changelogContentGroup.PreviousRequested = showPrevious;
-                changelogContentGroup.NextRequested = showNext;
-            }
-            base.Add(changelogContentGroup);
+            Add(changelogContentGroup = new ChangelogContentGroup(changelogBuild)
+                {
+                    PreviousRequested = showPrevious,
+                    NextRequested = showNext,
+                });
         }
 
         public void ShowBuild(APIChangelog changelog)
         {
             Clear();
-            Add(new ChangelogContentGroup(changelog));
+            add(changelog);
             //fetchChangelogBuild(changelog);
             fetchChangelogBuild();
         }
@@ -48,23 +48,19 @@ namespace osu.Game.Overlays.Changelog
         private void showNext()
         {
             if (currentBuild.Versions.Next != null)
-            {
-                Clear();
-                Add(new ChangelogContentGroup(currentBuild.Versions.Next));
-                //fetchChangelogBuild(currentBuild.Versions.Next);
-                fetchChangelogBuild();
-            }
+                ShowBuild(currentBuild.Versions.Next);
         }
 
         private void showPrevious()
         {
             if (currentBuild.Versions.Previous != null)
-            {
-                Clear();
-                Add(new ChangelogContentGroup(currentBuild.Versions.Previous));
-                //fetchChangelogBuild(currentBuild.Versions.Previous);
-                fetchChangelogBuild();
-            }
+                ShowBuild(currentBuild.Versions.Previous);
+        }
+
+        private void updateChevronTooltips()
+        {
+            changelogContentGroup.UpdateChevronTooltips(currentBuild.Versions.Previous?.DisplayVersion,
+                currentBuild.Versions.Next?.DisplayVersion);
         }
 
         [BackgroundDependencyLoader]
@@ -78,7 +74,11 @@ namespace osu.Game.Overlays.Changelog
         {
             //var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
             var req = new GetChangelogBuildRequest();
-            req.Success += res => currentBuild = res;
+            req.Success += res =>
+            {
+                currentBuild = res;
+                updateChevronTooltips();
+            };
             api.Queue(req);
         }
     }

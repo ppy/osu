@@ -14,6 +14,8 @@ namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogContentGroup : FillFlowContainer
     {
+        private readonly TooltipIconButton chevronPrevious, chevronNext;
+
         public Action NextRequested, PreviousRequested;
         public ChangelogContentGroup(APIChangelog build)
         {
@@ -40,7 +42,7 @@ namespace osu.Game.Overlays.Changelog
                     },
                     Children = new Drawable[]
                     {
-                        new TooltipIconButton
+                        chevronPrevious = new TooltipIconButton
                         {
                             Icon = FontAwesome.fa_chevron_left,
                             Size = new Vector2(24),
@@ -77,7 +79,7 @@ namespace osu.Game.Overlays.Changelog
                                 },
                             }
                         },
-                        new TooltipIconButton
+                        chevronNext = new TooltipIconButton
                         {
                             Icon = FontAwesome.fa_chevron_right,
                             Size = new Vector2(24),
@@ -102,6 +104,24 @@ namespace osu.Game.Overlays.Changelog
                     },
                 },
             };
+        }
+
+        public void UpdateChevronTooltips(string previousVersion, string nextVersion)
+        {
+            if (string.IsNullOrEmpty(previousVersion))
+                chevronPrevious.IsEnabled = false;
+            else
+            {
+                chevronPrevious.TooltipText = previousVersion;
+                chevronPrevious.IsEnabled = true;
+            }
+            if (string.IsNullOrEmpty(nextVersion))
+                chevronNext.IsEnabled = false;
+            else
+            {
+                chevronNext.TooltipText = nextVersion;
+                chevronNext.IsEnabled = true;
+            }
         }
         //public ChangelogContentGroup() { } // for listing
     }
