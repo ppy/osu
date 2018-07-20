@@ -224,9 +224,6 @@ namespace osu.Game.Screens.Play
 
             RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
 
-            // schedule to ensure we count any key presses from the current frame (which may affect gameplay).
-            RulesetContainer.IsPaused.ValueChanged += paused => Schedule(() => hudOverlay.KeyCounter.IsCounting = !paused);
-
             if (ShowStoryboard)
                 initializeStoryboard(false);
 
