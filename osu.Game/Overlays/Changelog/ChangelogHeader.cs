@@ -48,7 +48,7 @@ namespace osu.Game.Overlays.Changelog
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fill,
                 },
-                new Container // this is the line badge-Changelog-Stream
+                new Container
                 {
                     Height = title_height,
                     Anchor = Anchor.BottomLeft,
@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Changelog
                     Y = -version_height,
                     Children = new Drawable[]
                     {
-                        new CircularContainer // a purple circle
+                        new CircularContainer
                         {
                             X = icon_margin,
                             Masking = true,
@@ -131,8 +131,6 @@ namespace osu.Game.Overlays.Changelog
                             {
                                 Top = 10,
                                 Left = 7,
-                                // + chevron size, and account for gained space on left by
-                                // listing's font draw width being smaller
                                 Right = 18,
                                 Bottom = 15,
                             },
@@ -153,7 +151,7 @@ namespace osu.Game.Overlays.Changelog
                         releaseStream = new TextBadgePairRelease(Purple, "Lazer")
                     },
                 },
-                new Box // purple line
+                new Box
                 {
                     Colour = Purple,
                     RelativeSizeAxes = Axes.X,

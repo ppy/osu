@@ -5,16 +5,13 @@ using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Game.Graphics.Containers;
-using System;
 
 namespace osu.Game.Graphics.UserInterface
 {
     public class TooltipIconButton : OsuClickableContainer, IHasTooltip
     {
         private readonly SpriteIcon icon;
-        public Action OnPressed;
 
         public FontAwesome Icon
         {
@@ -38,12 +35,6 @@ namespace osu.Game.Graphics.UserInterface
                     Size = new Vector2(18),
                 }
             };
-        }
-
-        protected override bool OnClick(InputState state)
-        {
-            OnPressed?.Invoke();
-            return base.OnClick(state);
         }
 
         public string TooltipText { get; set; }
