@@ -16,7 +16,6 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Tests.Platform;
 
 namespace osu.Game.Tests.Visual
 {
@@ -28,6 +27,7 @@ namespace osu.Game.Tests.Visual
         private RulesetStore rulesets;
 
         private WorkingBeatmap defaultBeatmap;
+        private DatabaseContextFactory factory;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -59,10 +59,11 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            var storage = new TestStorage(@"TestCasePlaySongSelect");
+            factory = new DatabaseContextFactory(LocalStorage);
+            factory.ResetDatabase();
 
-            // this is by no means clean. should be replacing inside of OsuGameBase somehow.
-            DatabaseContextFactory factory = new DatabaseContextFactory(storage);
+            using (var usage = factory.Get())
+                usage.Migrate();
 
             factory.ResetDatabase();
 
@@ -70,7 +71,7 @@ namespace osu.Game.Tests.Visual
                 usage.Migrate();
 
             Dependencies.Cache(rulesets = new RulesetStore(factory));
-            Dependencies.Cache(manager = new BeatmapManager(storage, factory, rulesets, null, null)
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, null)
             {
                 DefaultBeatmap = defaultBeatmap = Beatmap.Default
             });
