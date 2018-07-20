@@ -167,7 +167,7 @@ namespace osu.Game.Screens.Play
             public Color4 LitColour = Color4.LightBlue;
             protected readonly Color4 DimmedColour = Color4.White.Opacity(140);
 
-            private float cubeCount => DrawHeight / WIDTH;
+            private float cubeCount => Math.Max(DrawHeight / WIDTH, 1);
             private const float cube_size = 4;
             private const float padding = 2;
             public const float WIDTH = cube_size + padding;
