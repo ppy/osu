@@ -31,7 +31,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public UpdateStream UpdateStream { get; set; }
 
         [JsonProperty("changelog_entries")]
-        public List<object> ChangelogEntries { get; set; }
+        public List<ChangelogEntry> ChangelogEntries { get; set; }
 
         [JsonProperty("versions")]
         public Versions Versions { get; set; }
