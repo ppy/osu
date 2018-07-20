@@ -108,20 +108,10 @@ namespace osu.Game.Overlays.Changelog
 
         public void UpdateChevronTooltips(string previousVersion, string nextVersion)
         {
-            if (string.IsNullOrEmpty(previousVersion))
-                chevronPrevious.IsEnabled = false;
-            else
-            {
+            if (!string.IsNullOrEmpty(previousVersion))
                 chevronPrevious.TooltipText = previousVersion;
-                chevronPrevious.IsEnabled = true;
-            }
-            if (string.IsNullOrEmpty(nextVersion))
-                chevronNext.IsEnabled = false;
-            else
-            {
+            if (!string.IsNullOrEmpty(nextVersion))
                 chevronNext.TooltipText = nextVersion;
-                chevronNext.IsEnabled = true;
-            }
         }
         //public ChangelogContentGroup() { } // for listing
     }

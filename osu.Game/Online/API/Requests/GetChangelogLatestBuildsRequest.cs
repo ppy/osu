@@ -8,7 +8,7 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetChangelogLatestBuildsRequest : APIRequest<List<APIChangelog>>
     {
-        //protected override string Target => @"changelog";
-        protected override string Uri => @"https://api.myjson.com/bins/16waui"; // for testing
+        protected override string Target => @"changelog/latest-builds";
+        protected override string Uri => $@"https://houtarouoreki.github.io/fake-api/{Target}"; // for testing
     }
 }
