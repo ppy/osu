@@ -77,8 +77,15 @@ namespace osu.Game.Rulesets.Catch.Objects
                     if (LegacyLastTickOffset != null)
                     {
                         // If we're the last tick, apply the legacy offset
-                        if (span == this.SpanCount() - 1 && d + tickDistance > length - 0.01)
-                            endTime = Math.Max(StartTime + Duration / 2, endTime - LegacyLastTickOffset.Value);
+                        if (reversed)
+                        {
+                            if (span == this.SpanCount() - 1 && d == 0)
+                                startTime = Math.Max(EndTime - Duration / 2, startTime + LegacyLastTickOffset.Value);
+                        } else
+                        {
+                            if (span == this.SpanCount() - 1 && d + tickDistance > length - 0.01)
+                                endTime = Math.Max(StartTime + Duration / 2, endTime - LegacyLastTickOffset.Value);
+                        }
                     }
 
                     double tinyTickInterval = endTime - startTime;
