@@ -194,8 +194,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             string[] split = str.Split(':');
 
-            var bank = (LegacyBeatmapDecoder.LegacySampleBank)Convert.ToInt32(split[0]);
-            var addbank = (LegacyBeatmapDecoder.LegacySampleBank)Convert.ToInt32(split[1]);
+            var bank = (LegacyBeatmapDecoder.LegacySampleBank)int.Parse(split[0]);
+            var addbank = (LegacyBeatmapDecoder.LegacySampleBank)int.Parse(split[1]);
 
             string stringBank = bank.ToString().ToLower();
             if (stringBank == @"none")
@@ -206,6 +206,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             bankInfo.Normal = stringBank;
             bankInfo.Add = stringAddBank;
+
+            if (split.Length > 2)
+                bankInfo.CustomSampleBank = int.Parse(split[2]);
 
             if (split.Length > 3)
                 bankInfo.Volume = int.Parse(split[3]);
@@ -258,41 +261,45 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             var soundTypes = new List<SampleInfo>
             {
-                new SampleInfo
+                new LegacySampleInfo
                 {
                     Bank = bankInfo.Normal,
                     Name = SampleInfo.HIT_NORMAL,
-                    Volume = bankInfo.Volume
+                    Volume = bankInfo.Volume,
+                    CustomSampleBank = bankInfo.CustomSampleBank
                 }
             };
 
             if (type.HasFlag(LegacySoundType.Finish))
             {
-                soundTypes.Add(new SampleInfo
+                soundTypes.Add(new LegacySampleInfo
                 {
                     Bank = bankInfo.Add,
                     Name = SampleInfo.HIT_FINISH,
-                    Volume = bankInfo.Volume
+                    Volume = bankInfo.Volume,
+                    CustomSampleBank = bankInfo.CustomSampleBank
                 });
             }
 
             if (type.HasFlag(LegacySoundType.Whistle))
             {
-                soundTypes.Add(new SampleInfo
+                soundTypes.Add(new LegacySampleInfo
                 {
                     Bank = bankInfo.Add,
                     Name = SampleInfo.HIT_WHISTLE,
-                    Volume = bankInfo.Volume
+                    Volume = bankInfo.Volume,
+                    CustomSampleBank = bankInfo.CustomSampleBank
                 });
             }
 
             if (type.HasFlag(LegacySoundType.Clap))
             {
-                soundTypes.Add(new SampleInfo
+                soundTypes.Add(new LegacySampleInfo
                 {
                     Bank = bankInfo.Add,
                     Name = SampleInfo.HIT_CLAP,
-                    Volume = bankInfo.Volume
+                    Volume = bankInfo.Volume,
+                    CustomSampleBank = bankInfo.CustomSampleBank
                 });
             }
 
@@ -307,7 +314,21 @@ namespace osu.Game.Rulesets.Objects.Legacy
             public string Add;
             public int Volume;
 
+            public int CustomSampleBank;
+
             public SampleBankInfo Clone() => (SampleBankInfo)MemberwiseClone();
+        }
+
+        private class LegacySampleInfo : SampleInfo
+        {
+            public int CustomSampleBank
+            {
+                set
+                {
+                    if (value > 1)
+                        Suffix = value.ToString();
+                }
+            }
         }
 
         private class FileSampleInfo : SampleInfo

@@ -240,6 +240,23 @@ namespace osu.Game.Tests.Beatmaps.Formats
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
+                Assert.AreEqual("normal-hitnormal", getTestableSampleInfo(hitObjects[0]).LookupNames.First());
+                Assert.AreEqual("normal-hitnormal2", getTestableSampleInfo(hitObjects[1]).LookupNames.First());
+                Assert.AreEqual("normal-hitnormal3", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
+            }
+
+            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+        }
+
+        [Test]
+        public void TestDecodeHitObjectFileSamples()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+            using (var resStream = Resource.OpenResource("hitobject-file-samples.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
                 Assert.AreEqual("hit_1.wav", getTestableSampleInfo(hitObjects[0]).LookupNames.First());
                 Assert.AreEqual("hit_2.wav", getTestableSampleInfo(hitObjects[1]).LookupNames.First());
                 Assert.AreEqual("normal-hitnormal2", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
