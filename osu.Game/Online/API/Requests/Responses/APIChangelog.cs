@@ -25,7 +25,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool IsFeatured { get; set; }
 
         [JsonProperty("created_at")]
-        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? CreatedAt { get; set; }
 
         [JsonProperty("update_stream")]
         public UpdateStream UpdateStream { get; set; }
@@ -49,19 +49,19 @@ namespace osu.Game.Online.API.Requests.Responses
     public class ChangelogEntry
     {
         [JsonProperty("id")]
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         [JsonProperty("repository")]
         public string Repository { get; set; }
 
         [JsonProperty("github_pull_request_id")]
-        public long GithubPullRequestId { get; set; }
+        public long? GithubPullRequestId { get; set; }
 
         [JsonProperty("github_url")]
         public string GithubUrl { get; set; }
 
         [JsonProperty("url")]
-        public object Url { get; set; }
+        public string Url { get; set; }
 
         [JsonProperty("type")]
         public string Type { get; set; }
@@ -76,10 +76,10 @@ namespace osu.Game.Online.API.Requests.Responses
         public string MessageHtml { get; set; }
 
         [JsonProperty("major")]
-        public bool Major { get; set; }
+        public bool? Major { get; set; }
 
         [JsonProperty("created_at")]
-        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? CreatedAt { get; set; }
 
         [JsonProperty("github_user")]
         public GithubUser GithubUser { get; set; }
@@ -88,7 +88,7 @@ namespace osu.Game.Online.API.Requests.Responses
     public class GithubUser
     {
         [JsonProperty("id")]
-        public long Id { get; set; }
+        public long? Id { get; set; }
 
         [JsonProperty("display_name")]
         public string DisplayName { get; set; }

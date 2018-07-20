@@ -9,6 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -17,6 +18,8 @@ namespace osu.Game.Overlays.Changelog
         private readonly TooltipIconButton chevronPrevious, chevronNext;
 
         public Action NextRequested, PreviousRequested;
+        public readonly TextFlowContainer ChangelogEntries;
+
         public ChangelogContentGroup(APIChangelog build)
         {
             RelativeSizeAxes = Axes.X;
@@ -92,7 +95,8 @@ namespace osu.Game.Overlays.Changelog
                 {
                     // do we need .ToUniversalTime() here?
                     // also, this should be a temporary solution to weekdays in >localized< date strings
-                    Text = build.CreatedAt.Date.ToLongDateString().Replace(build.CreatedAt.ToString("dddd") + ", ", ""),
+                    Text = build.CreatedAt.HasValue ? build.CreatedAt.Value.Date.ToLongDateString()
+                        .Replace(build.CreatedAt.Value.ToString("dddd") + ", ", "") : null,
                     TextSize = 17, // web: 14,
                     Colour = OsuColour.FromHex(@"FD5"),
                     Font = @"Exo2.0-Medium",
@@ -102,6 +106,11 @@ namespace osu.Game.Overlays.Changelog
                     {
                         Top = 5,
                     },
+                },
+                ChangelogEntries = new TextFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                 },
             };
         }
@@ -117,6 +126,17 @@ namespace osu.Game.Overlays.Changelog
             {
                 chevronNext.TooltipText = nextVersion;
                 chevronNext.IsEnabled = true;
+            }
+        }
+
+        public void GenerateText(List<ChangelogEntry> changelogEntries)
+        {
+            foreach (ChangelogEntry entry in changelogEntries)
+            {
+                ChangelogEntries.AddParagraph(entry.Type);
+                ChangelogEntries.AddParagraph(entry.Title);
+                ChangelogEntries.AddText($"({entry.Repository}#{entry.GithubPullRequestId})");
+                ChangelogEntries.AddText($"by {entry.GithubUser.DisplayName}");
             }
         }
         //public ChangelogContentGroup() { } // for listing

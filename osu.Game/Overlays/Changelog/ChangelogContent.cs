@@ -83,6 +83,7 @@ namespace osu.Game.Overlays.Changelog
             req.Success += res =>
             {
                 CurrentBuild = res;
+                changelogContentGroup.GenerateText(CurrentBuild.ChangelogEntries);
                 updateChevronTooltips();
             };
             api.Queue(req);
