@@ -8,12 +8,13 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
+using System;
 
 namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogContentGroup : FillFlowContainer
     {
-        // will porobably depend in some way on #1692 (https://github.com/ppy/osu-framework/pull/1692)
+        public Action NextRequested, PreviousRequested;
         // need to keep in mind it looks different on Listing (one contains all builds from a date)
         // and when a stream is selected (looks like now)
         public ChangelogContentGroup(APIChangelog build)
@@ -45,10 +46,8 @@ namespace osu.Game.Overlays.Changelog
                         {
                             Icon = FontAwesome.fa_chevron_left,
                             Size = new Vector2(24),
-                            // how do we link to previous/next builds?
-                            // I'm thinking some linked list, but how do we make that
-                            // from the available API data
                             TooltipText = "Previous",
+                            OnPressed = PreviousRequested,
                         },
                         new FillFlowContainer<SpriteText>
                         {
@@ -85,6 +84,7 @@ namespace osu.Game.Overlays.Changelog
                             Icon = FontAwesome.fa_chevron_right,
                             Size = new Vector2(24),
                             TooltipText = "Next",
+                            OnPressed = NextRequested,
                         },
                     }
                 },
