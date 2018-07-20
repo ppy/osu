@@ -7,12 +7,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
+using System;
 
 namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogContent : FillFlowContainer<ChangelogContentGroup>
     {
-        private APIChangelog currentBuild;
+        public APIChangelog CurrentBuild { get; private set; }
+        public Action OnBuildChanged;
         private APIAccess api;
         private ChangelogContentGroup changelogContentGroup;
 
@@ -31,35 +33,42 @@ namespace osu.Game.Overlays.Changelog
         private void add(APIChangelog changelogBuild)
         {
             Add(changelogContentGroup = new ChangelogContentGroup(changelogBuild)
-                {
-                    PreviousRequested = showPrevious,
-                    NextRequested = showNext,
-                });
+            {
+                PreviousRequested = showPrevious,
+                NextRequested = showNext,
+            });
         }
 
         public void ShowBuild(APIChangelog changelog)
         {
             Clear();
             add(changelog);
+            CurrentBuild = changelog;
             fetchChangelogBuild(changelog);
+        }
+
+        private void showBuild(APIChangelog changelog)
+        {
+            ShowBuild(changelog);
+            OnBuildChanged();
         }
 
         private void showNext()
         {
-            if (currentBuild.Versions.Next != null)
-                ShowBuild(currentBuild.Versions.Next);
+            if (CurrentBuild.Versions.Next != null)
+                showBuild(CurrentBuild.Versions.Next);
         }
 
         private void showPrevious()
         {
-            if (currentBuild.Versions.Previous != null)
-                ShowBuild(currentBuild.Versions.Previous);
+            if (CurrentBuild.Versions.Previous != null)
+                showBuild(CurrentBuild.Versions.Previous);
         }
 
         private void updateChevronTooltips()
         {
-            changelogContentGroup.UpdateChevronTooltips(currentBuild.Versions.Previous?.DisplayVersion,
-                currentBuild.Versions.Next?.DisplayVersion);
+            changelogContentGroup.UpdateChevronTooltips(CurrentBuild.Versions.Previous?.DisplayVersion,
+                CurrentBuild.Versions.Next?.DisplayVersion);
         }
 
         [BackgroundDependencyLoader]
@@ -73,7 +82,7 @@ namespace osu.Game.Overlays.Changelog
             var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
             req.Success += res =>
             {
-                currentBuild = res;
+                CurrentBuild = res;
                 updateChevronTooltips();
             };
             api.Queue(req);

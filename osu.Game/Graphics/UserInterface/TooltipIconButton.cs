@@ -20,7 +20,6 @@ namespace osu.Game.Graphics.UserInterface
     public class TooltipIconButton : ClickableContainer, IHasTooltip
     {
         private readonly SpriteIcon icon;
-        private SampleChannel sampleClick;
         private SampleChannel sampleHover;
         public Action Action;
 
@@ -55,8 +54,8 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Size = new Vector2(18),
-                    Alpha = 0.5f,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(0.8f),
                 }
             };
         }
@@ -64,10 +63,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(InputState state)
         {
             if (isEnabled)
-            {
                 Action?.Invoke();
-                sampleClick?.Play();
-            }
             return base.OnClick(state);
         }
 
@@ -81,7 +77,6 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
-            sampleClick = audio.Sample.Get(@"UI/generic-select-soft");
             sampleHover = audio.Sample.Get(@"UI/generic-hover-soft");
         }
 
