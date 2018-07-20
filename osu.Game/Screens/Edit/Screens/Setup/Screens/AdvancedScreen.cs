@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
             updateInfo();
             Beatmap.ValueChanged += a => updateInfo();
 
-            stackLeniency.SliderBarValueChanged += a => Beatmap.Value.BeatmapInfo.StackLeniency = a;
+            stackLeniency.SliderBarValueChanged += a => Beatmap.Value.BeatmapInfo.StackLeniency = a / 10;
             availableGamemodes.DropdownSelectionChanged += a =>
             {
                 Beatmap.Value.BeatmapInfo.RulesetID = (int)a;
@@ -159,10 +159,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         private void updateInfo()
         {
-            stackLeniency.CurrentValue = Beatmap.Value?.BeatmapInfo.StackLeniency ?? 7;
+            stackLeniency.CurrentValue = Beatmap.Value?.BeatmapInfo.StackLeniency ?? 0.7f;
             availableGamemodes.DropdownSelectedItem = (AvailableGamemodes?)Beatmap.Value?.BeatmapInfo.RulesetID ?? AvailableGamemodes.All;
             maniaSpecialStyle.CurrentValue = Beatmap.Value?.BeatmapInfo.SpecialStyle ?? false;
-            // 
 
             float newAlpha = Beatmap.Value?.BeatmapInfo.RulesetID == 3 ? 1 : 0;
             maniaSpecialStyle.FadeTo(newAlpha, 500, Easing.OutQuint);
