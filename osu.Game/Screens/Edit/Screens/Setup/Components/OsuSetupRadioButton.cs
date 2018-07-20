@@ -135,7 +135,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 BorderThickness = BORDER_THICKNESS;
 
                 AlwaysPresent = true;
-                //Masking = true;
 
                 Children = new Drawable[]
                 {
@@ -152,15 +151,15 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                         }
                     }
                 };
-                
+
                 Current.ValueChanged += newValue =>
                 {
                     if (newValue)
                     {
-                        float newSize = BUTTON_SIZE - BORDER_THICKNESS - SWITCH_PADDING;
-                        radioButtonContainer.TransformTo(nameof(CornerRadius), newSize / 2, 500, Easing.OutQuint);
-                        radioButtonContainer.ResizeTo(newSize, 500, Easing.OutQuint);
-                        innerFill.ResizeTo(newSize, 500, Easing.OutQuint);
+                        const float new_size = BUTTON_SIZE - BORDER_THICKNESS - SWITCH_PADDING;
+                        radioButtonContainer.TransformTo(nameof(CornerRadius), new_size / 2, 500, Easing.OutQuint);
+                        radioButtonContainer.ResizeTo(new_size, 500, Easing.OutQuint);
+                        innerFill.ResizeTo(new_size, 500, Easing.OutQuint);
                     }
                     else
                     {

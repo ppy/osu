@@ -15,7 +15,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
     public class DesignScreen : EditorScreen
     {
         private readonly LabelledSwitchButton enableCountdown;
-        private readonly LabelledRadioButtonCollection countdownSpeed;
         private readonly OsuSetupRadioButton halfCountdownSpeed;
         private readonly OsuSetupRadioButton normalCountdownSpeed;
         private readonly OsuSetupRadioButton doubleCountdownSpeed;
@@ -27,6 +26,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Screens
 
         public DesignScreen()
         {
+            LabelledRadioButtonCollection countdownSpeed;
+
             Children = new Drawable[]
             {
                 new Container

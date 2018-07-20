@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         private readonly OsuColourPicker colourPicker;
         private readonly OsuSpriteText bottomLabel;
-        
+
         public const float COLLAPSED_SIZE = 75;
         public const float EXPANDED_SIZE = 160;
         public const float SIZE_Y = 75;
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         protected override bool OnClick(InputState state)
         {
             IsColourPickerOpen = !IsColourPickerOpen;
-            
+
             return base.OnClick(state);
         }
 

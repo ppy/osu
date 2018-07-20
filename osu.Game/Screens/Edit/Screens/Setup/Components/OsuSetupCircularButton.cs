@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
     {
         private readonly Box fill;
         private readonly OsuSpriteText label;
-        
+
         public const float DEFAULT_LABEL_TEXT_SIZE = 14;
         public const float SIZE_X = 125;
         public const float SIZE_Y = 30;

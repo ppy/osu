@@ -2,17 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,10 +39,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public IEnumerable<OsuSetupRadioButton> Items
         {
-            get => this.Children.Cast<OsuSetupRadioButton>();
+            get => Children.Cast<OsuSetupRadioButton>();
             set
             {
-                this.Children = (IReadOnlyList<Drawable>)value;
+                Children = (IReadOnlyList<Drawable>)value;
                 if (value.Any())
                     SelectedRadioButton = value.ElementAt(0);
                 foreach (var r in value)

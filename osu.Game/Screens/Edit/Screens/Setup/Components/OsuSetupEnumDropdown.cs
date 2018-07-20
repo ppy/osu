@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             header.AccentColour = osuColour.BlueDarker.Darken(0.6f);
             menu.AccentColour = osuColour.BlueDarker.Darken(0.6f);
         }
-        
+
         protected override DropdownHeader CreateHeader() => header = new OsuSetupDropdownHeader();
 
         protected override DropdownMenu CreateMenu() => menu = new OsuSetupDropdownMenu();

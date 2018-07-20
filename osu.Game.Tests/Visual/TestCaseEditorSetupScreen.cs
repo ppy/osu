@@ -50,7 +50,7 @@ namespace osu.Game.Tests.Visual
             typeof(GeneralScreenBottomHeader),
             typeof(DifficultyScreenBottomHeader),
         };
-        
+
         [BackgroundDependencyLoader]
         private void load(OsuGameBase osuGame)
         {

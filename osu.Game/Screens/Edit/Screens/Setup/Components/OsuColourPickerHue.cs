@@ -72,9 +72,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         private Color4 calculateColour(float x) => Color4.FromHsv(new Vector4(x / SIZE_X, 1, 1, 1));
 
-        private float selectedColourXPosition;
-
-        private void setMouseStateValue(InputState state) => Current.Value = calculateColour(selectedColourXPosition = MathHelper.Clamp(state.Mouse.Position.X - Position.X, 0, SIZE_X - 1));
+        private void setMouseStateValue(InputState state) => Current.Value = calculateColour(MathHelper.Clamp(state.Mouse.Position.X - Position.X, 0, SIZE_X - 1));
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {

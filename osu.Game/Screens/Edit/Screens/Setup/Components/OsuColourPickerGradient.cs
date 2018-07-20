@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private bool isColourChangedFromActiveColour;
 
         private readonly Container pickerContainer;
-        
+
         public const float SIZE_X = 180;
         public const float SIZE_Y = 180;
         public const float COLOUR_LABEL_TEXT_SIZE = 18;

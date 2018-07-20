@@ -315,7 +315,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             Nub.Glowing = false;
             base.OnHoverLost(state);
         }
-        
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             leftShiftHeld |= args.Key == Key.ShiftLeft;

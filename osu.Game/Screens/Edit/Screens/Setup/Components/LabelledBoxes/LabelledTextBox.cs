@@ -200,7 +200,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledBoxes
                     }
                 }
             };
-            
+
             textBox.OnCommit += delegate { TriggerTextBoxTextChanged(textBox.Text); };
         }
     }

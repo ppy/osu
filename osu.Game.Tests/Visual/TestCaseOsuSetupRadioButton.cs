@@ -31,6 +31,9 @@ namespace osu.Game.Tests.Visual
                     LabelText = "Radio button 1"
                 }
             };
+
+            AddStep("Set radio button value to true", () => osuSetupRadioButton.Current.Value = true);
+            AddStep("Set radio button value to false", () => osuSetupRadioButton.Current.Value = false);
         }
     }
 }

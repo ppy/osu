@@ -203,7 +203,7 @@ namespace osu.Game.Graphics.UserInterface
                 get { return Text.Text; }
                 set { Text.Text = value; }
             }
-            
+
             private Color4 accentColour;
             public virtual Color4 AccentColour
             {

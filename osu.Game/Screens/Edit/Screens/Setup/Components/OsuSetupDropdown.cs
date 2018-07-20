@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
     {
         private OsuSetupDropdownHeader header;
         private OsuSetupDropdownMenu menu;
-        
+
         public const float DEFAULT_CORNER_RADIUS = 10;
         public const float DEFAULT_HEIGHT = 40;
         public const float DEFAULT_HEADER_ICON_PADDING = 10;

@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 Current.Value = a;
                 isColourChangedFromGradient = false;
             };
-            
+
             colourText.OnCommit += delegate
             {
                 try
