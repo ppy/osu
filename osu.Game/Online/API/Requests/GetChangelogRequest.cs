@@ -7,7 +7,7 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetChangelogRequest : APIRequest<APIChangelog[]>
     {
-        protected override string Uri => Target;
-        protected override string Target => "https://api.myjson.com/bins/6zv2i";
+        //protected override string Target => @"changelog";
+        protected override string Uri => @"https://api.myjson.com/bins/6zv2i"; // for testing
     }
 }

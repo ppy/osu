@@ -6,12 +6,9 @@ using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {
-    /// <summary>
-    /// Obviously a placeholder
-    /// </summary>
     public class GetChangelogLatestBuildsRequest : APIRequest<List<APIChangelog>>
     {
-        protected override string Uri => Target;
-        protected override string Target => @"https://api.myjson.com/bins/16waui";
+        //protected override string Target => @"changelog";
+        protected override string Uri => @"https://api.myjson.com/bins/16waui"; // for testing
     }
 }

@@ -42,7 +42,7 @@ namespace osu.Game.Overlays
             Width = 0.85f;
             Masking = true;
 
-            ChangelogContent content; // told by appveyor to conver to local variable..
+            ChangelogContent content; // told by appveyor to convert to local variable..
 
             EdgeEffect = new EdgeEffectParameters
             {
@@ -73,13 +73,12 @@ namespace osu.Game.Overlays
                             header = new ChangelogHeader(),
                             Streams = new ChangelogStreams(),
                             new ChangelogChart(),
-                            // will need to default to day-sorted content
                             content = new ChangelogContent(),
                         },
                     },
                 },
             };
-            OnLoadComplete += d => FetchChangelog(); // is i
+            OnLoadComplete += d => FetchChangelog();
             Streams.OnSelection = () =>
             {
                 if (Streams.SelectedRelease != null)

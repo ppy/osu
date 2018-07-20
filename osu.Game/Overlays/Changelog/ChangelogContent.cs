@@ -29,8 +29,11 @@ namespace osu.Game.Overlays.Changelog
 
         public override void Add(ChangelogContentGroup changelogContentGroup)
         {
-            changelogContentGroup.PreviousRequested = ShowPrevious;
-            changelogContentGroup.NextRequested = ShowNext;
+            if (changelogContentGroup != null)
+            {
+                changelogContentGroup.PreviousRequested = showPrevious;
+                changelogContentGroup.NextRequested = showNext;
+            }
             base.Add(changelogContentGroup);
         }
 
@@ -38,26 +41,29 @@ namespace osu.Game.Overlays.Changelog
         {
             Clear();
             Add(new ChangelogContentGroup(changelog));
-            FetchChangelogBuild(changelog);
+            //fetchChangelogBuild(changelog);
+            fetchChangelogBuild();
         }
 
-        private void ShowNext()
+        private void showNext()
         {
             if (currentBuild.Versions.Next != null)
             {
                 Clear();
                 Add(new ChangelogContentGroup(currentBuild.Versions.Next));
-                FetchChangelogBuild(currentBuild.Versions.Next);
+                //fetchChangelogBuild(currentBuild.Versions.Next);
+                fetchChangelogBuild();
             }
         }
 
-        private void ShowPrevious()
+        private void showPrevious()
         {
             if (currentBuild.Versions.Previous != null)
             {
                 Clear();
                 Add(new ChangelogContentGroup(currentBuild.Versions.Previous));
-                FetchChangelogBuild(currentBuild.Versions.Previous);
+                //fetchChangelogBuild(currentBuild.Versions.Previous);
+                fetchChangelogBuild();
             }
         }
 
@@ -67,9 +73,11 @@ namespace osu.Game.Overlays.Changelog
             this.api = api;
         }
 
-        private void FetchChangelogBuild(APIChangelog build)
+        //private void fetchChangelogBuild(APIChangelog build)
+        private void fetchChangelogBuild()
         {
-            var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
+            //var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
+            var req = new GetChangelogBuildRequest();
             req.Success += res => currentBuild = res;
             api.Queue(req);
         }

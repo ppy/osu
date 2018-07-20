@@ -15,8 +15,6 @@ namespace osu.Game.Overlays.Changelog
     public class ChangelogContentGroup : FillFlowContainer
     {
         public Action NextRequested, PreviousRequested;
-        // need to keep in mind it looks different on Listing (one contains all builds from a date)
-        // and when a stream is selected (looks like now)
         public ChangelogContentGroup(APIChangelog build)
         {
             RelativeSizeAxes = Axes.X;
@@ -47,7 +45,7 @@ namespace osu.Game.Overlays.Changelog
                             Icon = FontAwesome.fa_chevron_left,
                             Size = new Vector2(24),
                             TooltipText = "Previous",
-                            OnPressed = () => PreviousRequested(),
+                            Action = () => PreviousRequested(),
                         },
                         new FillFlowContainer<SpriteText>
                         {
@@ -65,7 +63,7 @@ namespace osu.Game.Overlays.Changelog
                                     TextSize = 28, // web: 24,
                                     Font = @"Exo2.0-Medium",
                                 },
-                                new SpriteText // a space...
+                                new SpriteText
                                 {
                                     Text = " ",
                                     TextSize = 28,
@@ -84,7 +82,7 @@ namespace osu.Game.Overlays.Changelog
                             Icon = FontAwesome.fa_chevron_right,
                             Size = new Vector2(24),
                             TooltipText = "Next",
-                            OnPressed = () => NextRequested(),
+                            Action = () => NextRequested(),
                         },
                     }
                 },
@@ -105,6 +103,6 @@ namespace osu.Game.Overlays.Changelog
                 },
             };
         }
-        //public ChangelogContentGroup(DateTimeOffset date) { }
+        //public ChangelogContentGroup() { } // for listing
     }
 }

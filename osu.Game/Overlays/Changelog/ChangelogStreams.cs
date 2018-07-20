@@ -26,8 +26,6 @@ namespace osu.Game.Overlays.Changelog
 
         public ChangelogStreams()
         {
-            // this should actually be resizeable (https://streamable.com/yw2ug)
-            // if not, with small width:height ratio it cuts off right-most content
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
@@ -70,7 +68,6 @@ namespace osu.Game.Overlays.Changelog
 
         protected override bool OnHover(InputState state)
         {
-            // is this nullreference-safe for badgesContainer?
             foreach (StreamBadge streamBadge in BadgesContainer.Children)
             {
                 if (SelectedRelease != null)
