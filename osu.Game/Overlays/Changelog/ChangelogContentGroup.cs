@@ -44,9 +44,9 @@ namespace osu.Game.Overlays.Changelog
                     {
                         chevronPrevious = new TooltipIconButton
                         {
+                            IsEnabled = false,
                             Icon = FontAwesome.fa_chevron_left,
                             Size = new Vector2(24),
-                            TooltipText = "Previous",
                             Action = () => PreviousRequested(),
                         },
                         new FillFlowContainer<SpriteText>
@@ -81,9 +81,9 @@ namespace osu.Game.Overlays.Changelog
                         },
                         chevronNext = new TooltipIconButton
                         {
+                            IsEnabled = false,
                             Icon = FontAwesome.fa_chevron_right,
                             Size = new Vector2(24),
-                            TooltipText = "Next",
                             Action = () => NextRequested(),
                         },
                     }
@@ -109,9 +109,15 @@ namespace osu.Game.Overlays.Changelog
         public void UpdateChevronTooltips(string previousVersion, string nextVersion)
         {
             if (!string.IsNullOrEmpty(previousVersion))
+            {
                 chevronPrevious.TooltipText = previousVersion;
+                chevronPrevious.IsEnabled = true;
+            }
             if (!string.IsNullOrEmpty(nextVersion))
+            {
                 chevronNext.TooltipText = nextVersion;
+                chevronNext.IsEnabled = true;
+            }
         }
         //public ChangelogContentGroup() { } // for listing
     }
