@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Changelog
         private readonly Header.LineBadge lineBadge;
         private SampleChannel sampleHover;
         public readonly APIChangelog ChangelogEntry;
-        private readonly FillFlowContainer<SpriteText> Text;
+        private readonly FillFlowContainer<SpriteText> text;
 
         public StreamBadge(APIChangelog changelogEntry)
         {
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Changelog
             isActivated = true;
             Children = new Drawable[]
             {
-                Text = new FillFlowContainer<SpriteText>
+                text = new FillFlowContainer<SpriteText>
                 {
                     AutoSizeAxes = Axes.X,
                     RelativeSizeAxes = Axes.Y,
@@ -87,7 +87,6 @@ namespace osu.Game.Overlays.Changelog
         {
             isActivated = true;
             this.FadeIn(transition_duration);
-            Text.FadeIn(transition_duration);
             lineBadge.IsCollapsed = false;
             if (!withoutHeaderUpdate)
                 OnActivation?.Invoke();
@@ -131,9 +130,9 @@ namespace osu.Game.Overlays.Changelog
             base.OnHoverLost(state);
         }
 
-        public void EnableDim() => Text.FadeTo(0.5f, transition_duration);
+        public void EnableDim() => text.FadeTo(0.5f, transition_duration);
 
-        public void DisableDim() => Text.FadeIn(transition_duration);
+        public void DisableDim() => text.FadeIn(transition_duration);
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
