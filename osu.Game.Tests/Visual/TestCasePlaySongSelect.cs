@@ -82,11 +82,10 @@ namespace osu.Game.Tests.Visual
         public virtual void SetUp()
         {
             manager?.Delete(manager.GetAllUsableBeatmapSets());
-
             Child = songSelect = new TestSongSelect();
         }
 
-        //[Test]
+        [Test]
         public void TestDummy()
         {
             AddAssert("dummy selected", () => songSelect.CurrentBeatmap == defaultBeatmap);
@@ -99,7 +98,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("random map selected", () => songSelect.CurrentBeatmap != defaultBeatmap);
         }
 
-        //[Test]
+        [Test]
         public void TestSorting()
         {
             addManyTestMaps();
@@ -114,23 +113,34 @@ namespace osu.Game.Tests.Visual
         }
 
         [Test]
-        public void TestRulesetChange()
+        public void ImportUnderDifferentRuleset()
         {
-            AddStep("change ruleset", () => Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == 2));
-
-            AddStep("import test maps", () =>
-            {
-                manager.Import(createTestBeatmapSet(0, rulesets.AvailableRulesets.Where(r => r.ID == 0).ToArray()));
-                manager.Import(createTestBeatmapSet(1, rulesets.AvailableRulesets.Where(r => r.ID == 2).ToArray()));
-
-            });
-
-            AddStep("change ruleset", () => Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == 1));
-
+            changeRuleset(2);
+            importForRuleset(0);
             AddUntilStep(() => songSelect.Carousel.SelectedBeatmap == null, "no selection");
-
-            AddStep("change ruleset", () => Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == 0));
         }
+
+        [Test]
+        public void ImportUnderCurrentRuleset()
+        {
+            changeRuleset(2);
+            importForRuleset(2);
+            importForRuleset(1);
+            AddUntilStep(() => songSelect.Carousel.SelectedBeatmap.RulesetID == 2, "has selection");
+
+            changeRuleset(1);
+            AddUntilStep(() => songSelect.Carousel.SelectedBeatmap.RulesetID == 1, "has selection");
+
+            changeRuleset(0);
+            AddUntilStep(() => songSelect.Carousel.SelectedBeatmap == null, "no selection");
+        }
+
+        private void importForRuleset(int id) => AddStep($"import test map for ruleset {id}", () => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())));
+
+        private static int importId;
+        private int getImportId() => ++importId;
+
+        private void changeRuleset(int id) => AddStep($"change ruleset to {id}", () => Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == id));
 
         private void addManyTestMaps()
         {
@@ -143,18 +153,16 @@ namespace osu.Game.Tests.Visual
             });
         }
 
-        private BeatmapSetInfo createTestBeatmapSet(int idOffset, RulesetInfo[] rulesets)
+        private BeatmapSetInfo createTestBeatmapSet(int setId, RulesetInfo[] rulesets)
         {
             int j = 0;
             RulesetInfo getRuleset() => rulesets[j++ % rulesets.Length];
 
             var beatmaps = new List<BeatmapInfo>();
 
-            int setId = 1234 + idOffset;
-
             for (int i = 0; i < 6; i++)
             {
-                int beatmapId = 1234 + idOffset + i;
+                int beatmapId = setId * 10 + i;
 
                 beatmaps.Add(new BeatmapInfo
                 {
@@ -168,7 +176,6 @@ namespace osu.Game.Tests.Visual
                     }
                 });
             }
-
 
             return new BeatmapSetInfo
             {

@@ -309,9 +309,9 @@ namespace osu.Game.Screens.Select
             var beatmap = beatmapNoDebounce;
             var ruleset = rulesetNoDebounce;
 
-            void performLoad()
+            void run()
             {
-                Logger.Log($"performLoad with b:{beatmap} r:{ruleset}");
+                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
 
                 WorkingBeatmap working = Beatmap.Value;
 
@@ -319,19 +319,24 @@ namespace osu.Game.Screens.Select
 
                 if (ruleset?.Equals(Ruleset.Value) == false)
                 {
-                    Logger.Log($"ruleset changed from {Ruleset.Value} to {ruleset}");
+                    Logger.Log($"ruleset changed from \"{Ruleset.Value}\" to \"{ruleset}\"");
                     Ruleset.Value = ruleset;
 
                     // force a filter before attempting to change the beatmap.
                     // we may still be in the wrong ruleset as there is a debounce delay on ruleset changes.
                     Carousel.Filter(null, false);
+
+                    // Filtering only completes after the carousel runs Update.
+                    // If we also have a pending beatmap change we should delay it one frame.
+                    selectionChangedDebounce = Schedule(run);
+                    return;
                 }
 
                 // We may be arriving here due to another component changing the bindable Beatmap.
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
                 if (!Equals(beatmap, Beatmap.Value.BeatmapInfo))
                 {
-                    Logger.Log($"beatmap changed from {Beatmap.Value.BeatmapInfo} to {beatmap}");
+                    Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
 
                     preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
                     working = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
@@ -355,9 +360,9 @@ namespace osu.Game.Screens.Select
             selectionChangedDebounce?.Cancel();
 
             if (beatmap == null)
-                performLoad();
+                run();
             else
-                selectionChangedDebounce = Scheduler.AddDelayed(performLoad, 200);
+                selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
         }
 
         private void triggerRandom()
