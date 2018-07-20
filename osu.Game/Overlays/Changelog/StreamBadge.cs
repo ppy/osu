@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Changelog
         private readonly Header.LineBadge lineBadge;
         private SampleChannel sampleHover;
         public readonly APIChangelog ChangelogEntry;
+        private readonly FillFlowContainer<SpriteText> Text;
 
         public StreamBadge(APIChangelog changelogEntry)
         {
@@ -38,7 +39,7 @@ namespace osu.Game.Overlays.Changelog
             isActivated = true;
             Children = new Drawable[]
             {
-                new FillFlowContainer<SpriteText>
+                Text = new FillFlowContainer<SpriteText>
                 {
                     AutoSizeAxes = Axes.X,
                     RelativeSizeAxes = Axes.Y,
@@ -86,6 +87,7 @@ namespace osu.Game.Overlays.Changelog
         {
             isActivated = true;
             this.FadeIn(transition_duration);
+            Text.FadeIn(transition_duration);
             lineBadge.IsCollapsed = false;
             if (!withoutHeaderUpdate)
                 OnActivation?.Invoke();
@@ -94,6 +96,7 @@ namespace osu.Game.Overlays.Changelog
         public void Deactivate()
         {
             isActivated = false;
+            DisableDim();
             if (!IsHovered)
             {
                 this.FadeTo(0.5f, transition_duration);
@@ -109,7 +112,8 @@ namespace osu.Game.Overlays.Changelog
 
         protected override bool OnHover(InputState state)
         {
-            if (!isActivated) sampleHover?.Play();
+            sampleHover?.Play();
+            DisableDim();
             this.FadeIn(transition_duration);
             lineBadge.IsCollapsed = false;
             return base.OnHover(state);
@@ -122,8 +126,14 @@ namespace osu.Game.Overlays.Changelog
                 this.FadeTo(0.5f, transition_duration);
                 lineBadge.IsCollapsed = true;
             }
+            else
+                EnableDim();
             base.OnHoverLost(state);
         }
+
+        public void EnableDim() => Text.FadeTo(0.5f, transition_duration);
+
+        public void DisableDim() => Text.FadeIn(transition_duration);
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
