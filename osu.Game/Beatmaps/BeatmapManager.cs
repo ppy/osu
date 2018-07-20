@@ -123,7 +123,7 @@ namespace osu.Game.Beatmaps
 
         private void validateOnlineIds(List<BeatmapInfo> beatmaps)
         {
-            var beatmapIds = beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID);
+            var beatmapIds = beatmaps.Where(b => b.OnlineBeatmapID.HasValue).Select(b => b.OnlineBeatmapID).ToList();
 
             // ensure all IDs are unique in this set and none match existing IDs in the local beatmap store.
             if (beatmapIds.GroupBy(b => b).Any(g => g.Count() > 1) || QueryBeatmaps(b => beatmapIds.Contains(b.OnlineBeatmapID)).Any())
