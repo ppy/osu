@@ -72,8 +72,10 @@ namespace osu.Game.Overlays.Changelog
             {
                 if (SelectedRelease != null)
                 {
-                    if (SelectedRelease.UpdateStream.Id != streamBadge.ChangelogEntry.Id)
+                    if (SelectedRelease.UpdateStream.Id != streamBadge.ChangelogEntry.UpdateStream.Id)
                         streamBadge.Deactivate();
+                    else
+                        streamBadge.EnableDim();
                 }
                 else
                     streamBadge.Deactivate();
@@ -83,9 +85,13 @@ namespace osu.Game.Overlays.Changelog
 
         protected override void OnHoverLost(InputState state)
         {
-            if (SelectedRelease == null)
-                foreach (StreamBadge streamBadge in BadgesContainer.Children)
+            foreach (StreamBadge streamBadge in BadgesContainer.Children)
+            {
+                if (SelectedRelease == null)
                     streamBadge.Activate(true);
+                else if (streamBadge.ChangelogEntry.UpdateStream.Id == SelectedRelease.UpdateStream.Id)
+                    streamBadge.DisableDim();
+            }
             base.OnHoverLost(state);
         }
     }
