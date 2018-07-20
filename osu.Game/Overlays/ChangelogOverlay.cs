@@ -100,6 +100,11 @@ namespace osu.Game.Overlays
                     foreach (StreamBadge item in Streams.BadgesContainer.Children)
                         item.Deactivate();
             };
+            content.OnBuildChanged = () =>
+            {
+                header.ChangelogEntry = content.CurrentBuild;
+                header.ShowReleaseStream();
+            };
         }
 
         public void ActivateListing() => header.ActivateListing();
