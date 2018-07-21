@@ -25,24 +25,22 @@ namespace osu.Game.Overlays.Changelog
             Direction = FillDirection.Vertical;
             Padding = new MarginPadding
             {
-                Left = 70,
-                Right = 70,
+                Horizontal = 70,
+                Bottom = 100,
             };
         }
 
         private void add(APIChangelog changelogBuild)
         {
-            Add(changelogContentGroup = new ChangelogContentGroup(changelogBuild)
+            Child = changelogContentGroup = new ChangelogContentGroup(changelogBuild)
             {
                 PreviousRequested = showPrevious,
                 NextRequested = showNext,
-            });
+            };
         }
 
         public void ShowBuild(APIChangelog changelog)
         {
-            Clear();
-            add(changelog);
             CurrentBuild = changelog;
             fetchChangelogBuild(changelog);
         }
@@ -83,6 +81,7 @@ namespace osu.Game.Overlays.Changelog
             req.Success += res =>
             {
                 CurrentBuild = res;
+                add(CurrentBuild);
                 changelogContentGroup.GenerateText(CurrentBuild.ChangelogEntries);
                 updateChevronTooltips();
             };
