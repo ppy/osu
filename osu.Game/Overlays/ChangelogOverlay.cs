@@ -22,6 +22,7 @@ namespace osu.Game.Overlays
     {
         private readonly ChangelogHeader header;
         public readonly ChangelogStreams Streams;
+        private readonly ChangelogChart chart;
         private APIChangelog changelogEntry;
 
         private APIAccess api;
@@ -72,7 +73,7 @@ namespace osu.Game.Overlays
                         {
                             header = new ChangelogHeader(),
                             Streams = new ChangelogStreams(),
-                            new ChangelogChart(),
+                            chart = new ChangelogChart(),
                             content = new ChangelogContent(),
                         },
                     },
@@ -87,6 +88,7 @@ namespace osu.Game.Overlays
                 }
                 header.ShowReleaseStream();
                 content.ShowBuild(Streams.SelectedRelease);
+                chart.ShowChart(Streams.SelectedRelease);
             };
             header.OnListingActivated += () =>
             {

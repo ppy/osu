@@ -6,6 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -13,13 +14,15 @@ namespace osu.Game.Overlays.Changelog
     // placeholder json file: https://api.myjson.com/bins/10ye8a
     public class ChangelogChart : BufferedContainer
     {
+        private Box background;
+
         public ChangelogChart()
         {
             RelativeSizeAxes = Axes.X;
             Height = 100;
             Children = new Drawable[]
             {
-                new Box
+                background = new Box
                 {
                     Colour = StreamColour.STABLE,
                     RelativeSizeAxes = Axes.Both,
@@ -32,6 +35,11 @@ namespace osu.Game.Overlays.Changelog
                     Origin = Anchor.Centre,
                 },
             };
+        }
+
+        public void ShowChart(APIChangelog releaseStream)
+        {
+            background.Colour = StreamColour.FromStreamName(releaseStream.UpdateStream.Name);
         }
     }
 }
