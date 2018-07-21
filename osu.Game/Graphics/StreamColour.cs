@@ -28,9 +28,10 @@ namespace osu.Game.Graphics
 
         public static ColourInfo FromStreamName(string name)
         {
-            if (colours.TryGetValue(name, out ColourInfo colour))
-                return colour;
-            else return new Color4(255, 255, 255, 255);
+            if (!string.IsNullOrEmpty(name))
+                if (colours.TryGetValue(name, out ColourInfo colour))
+                    return colour;
+            return new Color4(255, 255, 255, 255);
         }
     }
 }
