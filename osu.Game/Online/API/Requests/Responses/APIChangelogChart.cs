@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using Newtonsoft.Json;
-using osu.Framework.Lists;
 using System;
 using System.Collections.Generic;
 

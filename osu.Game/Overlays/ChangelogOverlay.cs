@@ -101,6 +101,7 @@ namespace osu.Game.Overlays
                 else
                     foreach (StreamBadge item in Streams.BadgesContainer.Children)
                         item.Deactivate();
+                chart.ShowChart();
             };
             content.OnBuildChanged = () =>
             {
@@ -155,6 +156,7 @@ namespace osu.Game.Overlays
                 Streams.BadgesContainer.Clear();
                 foreach (APIChangelog item in res)
                     Streams.BadgesContainer.Add(new StreamBadge(item));
+                chart.ShowChart();
             };
             api.Queue(req);
         }
