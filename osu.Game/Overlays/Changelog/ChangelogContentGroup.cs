@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using System;
@@ -17,6 +18,8 @@ namespace osu.Game.Overlays.Changelog
     public class ChangelogContentGroup : FillFlowContainer
     {
         private readonly TooltipIconButton chevronPrevious, chevronNext;
+        private readonly SortedDictionary<string, List<ChangelogEntry>> categories =
+            new SortedDictionary<string, List<ChangelogEntry>>();
 
         public Action NextRequested, PreviousRequested;
         public readonly FillFlowContainer ChangelogEntries;
@@ -97,10 +100,7 @@ namespace osu.Game.Overlays.Changelog
                     Font = @"Exo2.0-Medium",
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Margin = new MarginPadding
-                    {
-                        Top = 5,
-                    },
+                    Margin = new MarginPadding{ Top = 5, }
                 },
                 ChangelogEntries = new FillFlowContainer
                 {
@@ -127,7 +127,16 @@ namespace osu.Game.Overlays.Changelog
 
         public void GenerateText(List<ChangelogEntry> changelogEntries)
         {
+            // sort entries by category
             foreach (ChangelogEntry entry in changelogEntries)
+            {
+                if (!categories.ContainsKey(entry.Category))
+                    categories.Add(entry.Category, new List<ChangelogEntry> { entry });
+                else
+                    categories[entry.Category].Add(entry);
+            }
+
+            foreach (KeyValuePair<string, List<ChangelogEntry>> category in categories)
             {
                 // textflowcontainer is unusable for formatting text
                 // this has to be a placeholder before we get a
@@ -135,47 +144,43 @@ namespace osu.Game.Overlays.Changelog
                 // it can't handle overflowing properly
                 ChangelogEntries.Add(new SpriteText
                 {
-                    Text = entry.Category,
+                    Text = category.Key,
                     TextSize = 24, // web: 18,
                     Font = @"Exo2.0-Bold",
                     Margin = new MarginPadding { Top = 35, Bottom = 15, },
                 });
-                ChangelogEntries.Add(new FillFlowContainer
+                foreach (ChangelogEntry entry in category.Value)
                 {
-                    Direction = FillDirection.Full,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Children = new Drawable[]
+                    OsuTextFlowContainer title;
+
+                    ChangelogEntries.Add(title = new OsuTextFlowContainer
                     {
-                        new SpriteIcon
+                        Direction = FillDirection.Full,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
+                        LineSpacing = 0.25f,
+                    });
+                    title.AddIcon(FontAwesome.fa_check, t => { t.TextSize = 12; t.Padding = new MarginPadding { Left = -17, Right = 5 }; });
+                    title.AddText(entry.Title, t => { t.TextSize = 18; }); //t.Padding = new MarginPadding(10); });
+                    if (!string.IsNullOrEmpty(entry.Repository))
+                    {
+                        title.AddText($" ({entry.Repository.Substring(4)}#{entry.GithubPullRequestId})", t =>
                         {
-                            Anchor = Anchor.TopLeft,
-                            Origin = Anchor.TopRight,
-                            Icon = FontAwesome.fa_check,
-                            Size = new Vector2(14),
-                            Margin = new MarginPadding { Top = 2, Right = 4 },
-                        },
-                        new TextFlowContainer(t => t.TextSize = 18)
-                        {
-                            Text = entry.Title,
-                            AutoSizeAxes = Axes.Both,
-                        },
-                        new SpriteText
-                        {
-                            Text = !string.IsNullOrEmpty(entry.Repository) ?
-                                $" ({entry.Repository.Substring(4)}#{entry.GithubPullRequestId})" :
-                                null,
-                            TextSize = 18,
-                            Colour = new Color4(153, 238, 255, 255),
-                        },
-                        new SpriteText
-                        {
-                            Text = $" by {entry.GithubUser.DisplayName}",
-                            TextSize = 14, // web: 12;
-                            Margin = new MarginPadding { Top = 4, Left = 10, },
-                        },
+                            t.TextSize = 18;
+                            t.Colour = Color4.SkyBlue;
+                        });
                     }
-                });
+                    title.AddText($" by {entry.GithubUser.DisplayName}", t => t.TextSize = 14); //web: 12;
+                    ChangelogEntries.Add(new SpriteText
+                    {
+                        TextSize = 14, // web: 12,
+                        Colour = new Color4(235, 184, 254, 255),
+                        Text = $"{entry.MessageHtml?.Replace("<p>", "").Replace("</p>", "")}\n",
+                        Margin = new MarginPadding { Bottom = 10, },
+                        AutoSizeAxes = Axes.Y,
+                        RelativeSizeAxes = Axes.X,
+                    });
+                }
             }
         }
         //public ChangelogContentGroup() { } // for listing
