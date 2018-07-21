@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Changelog
 
         public APIChangelog ChangelogEntry;
 
-        private const float cover_height = 310;
+        private const float cover_height = 280;
         private const float title_height = 50;
         private const float icon_size = 50;
         private const float icon_margin = 20;
@@ -155,7 +155,7 @@ namespace osu.Game.Overlays.Changelog
                 {
                     Colour = Purple,
                     RelativeSizeAxes = Axes.X,
-                    Height = 3,
+                    Height = 2,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.CentreLeft,
                 },
