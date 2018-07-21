@@ -13,8 +13,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
-using osu.Framework.Input;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 

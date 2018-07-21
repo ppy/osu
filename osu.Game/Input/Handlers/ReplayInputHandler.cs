@@ -3,8 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Input;
 using osu.Framework.Input.Handlers;
+using osu.Framework.Input.StateChanges;
+using osu.Framework.Input.States;
 using osu.Framework.Platform;
 using OpenTK;
 
