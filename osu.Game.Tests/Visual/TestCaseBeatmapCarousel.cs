@@ -530,7 +530,7 @@ namespace osu.Game.Tests.Visual
         {
             public new List<DrawableCarouselItem> Items => base.Items;
 
-            public bool PendingFilterTask => FilterTask != null;
+            public bool PendingFilterTask => PendingFilter != null;
         }
     }
 }
