@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Changelog
                 {
                     // do we need .ToUniversalTime() here?
                     // also, this should be a temporary solution to weekdays in >localized< date strings
-                    Text = build.CreatedAt.Value.Date.ToLongDateString().Replace(build.CreatedAt.Value.ToString("dddd") + ", ", ""),
+                    Text = build.CreatedAt.Date.ToLongDateString().Replace(build.CreatedAt.ToString("dddd") + ", ", ""),
                     TextSize = 17, // web: 14,
                     Colour = OsuColour.FromHex(@"FD5"),
                     Font = @"Exo2.0-Medium",
