@@ -58,7 +58,7 @@ namespace osu.Game.Overlays
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(20, 18, 23, 255)
+                    Colour = new Color4(49, 36, 54, 255),
                 },
                 new ScrollContainer
                 {
