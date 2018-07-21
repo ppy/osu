@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Online.API.Requests.Responses;
-using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {

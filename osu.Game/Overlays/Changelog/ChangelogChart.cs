@@ -18,8 +18,8 @@ namespace osu.Game.Overlays.Changelog
     // placeholder json file: https://api.myjson.com/bins/10ye8a
     public class ChangelogChart : BufferedContainer
     {
-        private Box background;
-        private SpriteText text;
+        private readonly Box background;
+        private readonly SpriteText text;
         private APIAccess api;
 
         public ChangelogChart()
@@ -43,6 +43,14 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
+        /// <summary>
+        /// Draw the graph with all builds
+        /// </summary>
+        public void ShowChart() => fetchAndShowChangelogChart();
+
+        /// <summary>
+        /// Draw the graph for a specific build
+        /// </summary>
         public void ShowChart(APIChangelog releaseStream) => fetchAndShowChangelogChart(releaseStream);
 
         private bool isEmpty(APIChangelogChart changelogChart)
@@ -53,7 +61,7 @@ namespace osu.Game.Overlays.Changelog
             return true;
         }
 
-        private void showChart(APIChangelogChart chartInfo, string updateStreamName)
+        private void showChart(APIChangelogChart chartInfo, string updateStreamName = null)
         {
             if (!isEmpty(chartInfo))
             {
@@ -77,6 +85,13 @@ namespace osu.Game.Overlays.Changelog
         {
             var req = new GetChangelogChartRequest(build.UpdateStream.Name);
             req.Success += res => showChart(res, build.UpdateStream.Name);
+            api.Queue(req);
+        }
+
+        private void fetchAndShowChangelogChart()
+        {
+            var req = new GetChangelogChartRequest();
+            req.Success += res => showChart(res);
             api.Queue(req);
         }
     }
