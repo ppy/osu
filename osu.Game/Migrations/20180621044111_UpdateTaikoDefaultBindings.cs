@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-using osu.Framework.Logging;
 
 namespace osu.Game.Migrations
 {

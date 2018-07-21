@@ -11,12 +11,12 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using OpenTK;
-using osu.Framework.Input;
 using osu.Game.Users;
 using System.ComponentModel;
 using osu.Game.Graphics;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Input.States;
 using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 using Container = osu.Framework.Graphics.Containers.Container;
 

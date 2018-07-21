@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Direct

@@ -6,9 +6,10 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK.Graphics;
-using osu.Framework.Input;
 using osu.Framework.Configuration;
 using osu.Framework.Allocation;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Configuration;
 using OpenTK;
 

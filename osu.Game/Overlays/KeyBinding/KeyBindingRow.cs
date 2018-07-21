@@ -9,14 +9,16 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using JoystickEventArgs = osu.Framework.Input.EventArgs.JoystickEventArgs;
 
 namespace osu.Game.Overlays.KeyBinding
 {
@@ -230,7 +232,7 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnJoystickPress(InputState state, Framework.Input.JoystickEventArgs args)
+        protected override bool OnJoystickPress(InputState state, JoystickEventArgs args)
         {
             if (!HasFocus)
                 return false;
@@ -241,7 +243,7 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnJoystickRelease(InputState state, Framework.Input.JoystickEventArgs args)
+        protected override bool OnJoystickRelease(InputState state, JoystickEventArgs args)
         {
             if (!HasFocus)
                 return base.OnJoystickRelease(state, args);

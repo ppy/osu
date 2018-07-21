@@ -8,11 +8,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using osu.Game.Configuration;
 using System;
 using JetBrains.Annotations;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using OpenTK.Input;
 
 namespace osu.Game.Graphics.Cursor

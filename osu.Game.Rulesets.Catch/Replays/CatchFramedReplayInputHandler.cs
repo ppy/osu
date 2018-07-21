@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Framework.Input;
+using osu.Framework.Input.StateChanges;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Replays;
 
