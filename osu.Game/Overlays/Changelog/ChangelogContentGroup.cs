@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
+using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -18,18 +19,13 @@ namespace osu.Game.Overlays.Changelog
         private readonly TooltipIconButton chevronPrevious, chevronNext;
 
         public Action NextRequested, PreviousRequested;
-        public readonly TextFlowContainer ChangelogEntries;
+        public readonly FillFlowContainer ChangelogEntries;
 
         public ChangelogContentGroup(APIChangelog build)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
-            Padding = new MarginPadding
-            {
-                Left = 70,
-                Right = 70,
-            };
             Children = new Drawable[]
             {
                 // build version, arrows
@@ -95,8 +91,7 @@ namespace osu.Game.Overlays.Changelog
                 {
                     // do we need .ToUniversalTime() here?
                     // also, this should be a temporary solution to weekdays in >localized< date strings
-                    Text = build.CreatedAt.HasValue ? build.CreatedAt.Value.Date.ToLongDateString()
-                        .Replace(build.CreatedAt.Value.ToString("dddd") + ", ", "") : null,
+                    Text = build.CreatedAt.Value.Date.ToLongDateString().Replace(build.CreatedAt.Value.ToString("dddd") + ", ", ""),
                     TextSize = 17, // web: 14,
                     Colour = OsuColour.FromHex(@"FD5"),
                     Font = @"Exo2.0-Medium",
@@ -107,10 +102,11 @@ namespace osu.Game.Overlays.Changelog
                         Top = 5,
                     },
                 },
-                ChangelogEntries = new TextFlowContainer
+                ChangelogEntries = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
                 },
             };
         }
@@ -133,10 +129,53 @@ namespace osu.Game.Overlays.Changelog
         {
             foreach (ChangelogEntry entry in changelogEntries)
             {
-                ChangelogEntries.AddParagraph(entry.Type);
-                ChangelogEntries.AddParagraph(entry.Title);
-                ChangelogEntries.AddText($"({entry.Repository}#{entry.GithubPullRequestId})");
-                ChangelogEntries.AddText($"by {entry.GithubUser.DisplayName}");
+                // textflowcontainer is unusable for formatting text
+                // this has to be a placeholder before we get a
+                // proper markdown/html formatting..
+                // it can't handle overflowing properly
+                ChangelogEntries.Add(new SpriteText
+                {
+                    Text = entry.Category,
+                    TextSize = 24, // web: 18,
+                    Font = @"Exo2.0-Bold",
+                    Margin = new MarginPadding { Top = 35, Bottom = 15, },
+                });
+                ChangelogEntries.Add(new FillFlowContainer
+                {
+                    Direction = FillDirection.Full,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Children = new Drawable[]
+                    {
+                        new SpriteIcon
+                        {
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopRight,
+                            Icon = FontAwesome.fa_check,
+                            Size = new Vector2(14),
+                            Margin = new MarginPadding { Top = 2, Right = 4 },
+                        },
+                        new TextFlowContainer(t => t.TextSize = 18)
+                        {
+                            Text = entry.Title,
+                            AutoSizeAxes = Axes.Both,
+                        },
+                        new SpriteText
+                        {
+                            Text = !string.IsNullOrEmpty(entry.Repository) ?
+                                $" ({entry.Repository.Substring(4)}#{entry.GithubPullRequestId})" :
+                                null,
+                            TextSize = 18,
+                            Colour = new Color4(153, 238, 255, 255),
+                        },
+                        new SpriteText
+                        {
+                            Text = $" by {entry.GithubUser.DisplayName}",
+                            TextSize = 14, // web: 12;
+                            Margin = new MarginPadding { Top = 4, Left = 10, },
+                        },
+                    }
+                });
             }
         }
         //public ChangelogContentGroup() { } // for listing
