@@ -123,11 +123,21 @@ namespace osu.Game.Screens.Play
             }
 
             var max = values.Max();
+            float sum = 0;
+            float iteration = 0;
 
             float step = values.Length / (float)ColumnCount;
             for (float i = 0; i < values.Length; i += step)
             {
-                newValues.Add((float)values[(int)i] / max);
+                sum = 0;
+                iteration = 0;
+                for (float x = i; x < i+step; x++)
+                {
+                    sum += (float) values[(int) x];
+                    iteration = (x - i) + 1;
+                }
+                sum = sum / iteration;
+                newValues.Add(sum / max);
             }
 
             calculatedValues = newValues.ToArray();
