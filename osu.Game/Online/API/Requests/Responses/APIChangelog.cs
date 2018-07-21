@@ -25,7 +25,7 @@ namespace osu.Game.Online.API.Requests.Responses
         public bool IsFeatured { get; set; }
 
         [JsonProperty("created_at")]
-        public DateTimeOffset? CreatedAt { get; set; }
+        public DateTimeOffset CreatedAt { get; set; }
 
         [JsonProperty("update_stream")]
         public UpdateStream UpdateStream { get; set; }
