@@ -8,11 +8,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Timing;
+using OpenTK.Graphics;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Configuration;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
