@@ -6,12 +6,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Input;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Toolbar

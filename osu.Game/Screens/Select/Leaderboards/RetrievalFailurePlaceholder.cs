@@ -3,7 +3,8 @@
 
 using System;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using OpenTK;
