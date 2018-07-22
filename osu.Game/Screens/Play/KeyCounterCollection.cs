@@ -46,6 +46,15 @@ namespace osu.Game.Screens.Play
             key.KeyPressed += () => keyCountersState[key.Name].Add(key.SaveState());
         }
 
+        public void RestoreKeyCounterState(double time)
+        {
+            foreach (var counter in Children)
+            {
+                var targetState = keyCountersState[counter.Name].LastOrDefault(state => state.CurrentTime <= time);
+                counter.RestoreState(targetState);
+            }
+        }
+
         public void ResetCount()
         {
             foreach (var counter in Children)
