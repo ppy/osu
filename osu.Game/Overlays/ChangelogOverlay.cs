@@ -13,7 +13,6 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Changelog;
 
 namespace osu.Game.Overlays
@@ -21,13 +20,15 @@ namespace osu.Game.Overlays
     public class ChangelogOverlay : WaveOverlayContainer
     {
         private readonly ChangelogHeader header;
-        public readonly ChangelogStreams Streams;
+        private readonly ChangelogBadges badges;
         private readonly ChangelogChart chart;
-        private APIChangelog changelogEntry;
+        private readonly ChangelogContent content;
+
+        private readonly Color4 purple = new Color4(191, 4, 255, 255);
 
         private APIAccess api;
 
-        protected readonly Color4 Purple = new Color4(191, 4, 255, 255);
+        private bool isAtListing;
 
         public ChangelogOverlay()
         {
@@ -42,8 +43,6 @@ namespace osu.Game.Overlays
             RelativeSizeAxes = Axes.Both;
             Width = 0.85f;
             Masking = true;
-
-            ChangelogContent content; // told by appveyor to convert to local variable..
 
             EdgeEffect = new EdgeEffectParameters
             {
@@ -72,48 +71,21 @@ namespace osu.Game.Overlays
                         Children = new Drawable[]
                         {
                             header = new ChangelogHeader(),
-                            Streams = new ChangelogStreams(),
+                            badges = new ChangelogBadges(),
                             chart = new ChangelogChart(),
                             content = new ChangelogContent()
                         },
                     },
                 },
             };
-            OnLoadComplete += d =>
-            {
-                FetchChangelog();
-                content.ShowListing();
-            };
-            Streams.OnSelection = () =>
-            {
-                if (Streams.SelectedRelease != null)
-                {
-                    header.ChangelogEntry = Streams.SelectedRelease;
-                }
-                header.ShowReleaseStream();
-                content.ShowBuild(Streams.SelectedRelease);
-                chart.ShowChart(Streams.SelectedRelease);
-            };
-            header.OnListingActivated += () =>
-            {
-                Streams.SelectedRelease = null;
-                content.ShowListing();
-                if (!Streams.IsHovered)
-                    foreach (StreamBadge item in Streams.BadgesContainer.Children)
-                        item.Activate(true);
-                else
-                    foreach (StreamBadge item in Streams.BadgesContainer.Children)
-                        item.Deactivate();
-                chart.ShowChart();
-            };
-            content.OnBuildChanged = () =>
-            {
-                header.ChangelogEntry = content.CurrentBuild;
-                header.ShowReleaseStream();
-            };
+            //    content.ShowListing();
+            //    if (!Streams.IsHovered)
+            //        foreach (StreamBadge item in Streams.BadgesContainer.Children)
+            //            item.Activate(true);
+            //    else
+            //        foreach (StreamBadge item in Streams.BadgesContainer.Children)
+            //            item.Deactivate();
         }
-
-        public void ActivateListing() => header.ActivateListing();
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
@@ -123,10 +95,10 @@ namespace osu.Game.Overlays
             switch (action)
             {
                 case GlobalAction.Back:
-                    if (header.IsListingActivated())
+                    if (isAtListing)
                         State = Visibility.Hidden;
                     else
-                        header.ActivateListing();
+                        FetchAndShowListing();
                     return true;
             }
 
@@ -151,16 +123,30 @@ namespace osu.Game.Overlays
             this.api = api;
         }
 
-        public void FetchChangelog()
+        /// <summary>
+        /// Fetches and shows changelog listing.
+        /// </summary>
+        public void FetchAndShowListing()
         {
             var req = new GetChangelogLatestBuildsRequest();
-            req.Success += res =>
-            {
-                Streams.BadgesContainer.Clear();
-                foreach (APIChangelog item in res)
-                    Streams.BadgesContainer.Add(new StreamBadge(item));
-                chart.ShowChart();
-            };
+            header.ShowListing();
+            badges.SelectNone();
+            chart.ShowAllUpdateStreams();
+            req.Success += content.ShowListing;
+            api.Queue(req);
+        }
+
+        /// <summary>
+        /// Fetches and shows a specific build from a specific update stream.
+        /// </summary>
+        /// <param name="sentByBadges">If true, will select fetched build's update stream badge.</param>
+        public void FetchAndShowBuild(string updateStream, string version)
+        {
+            var req = new GetChangelogBuildRequest(updateStream, version);
+            header.ShowBuild(updateStream, version);
+            badges.SelectBadge(updateStream);
+            chart.ShowUpdateStream(updateStream);
+            req.Success += content.ShowBuild;
             api.Queue(req);
         }
     }
