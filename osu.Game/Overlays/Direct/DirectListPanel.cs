@@ -120,8 +120,8 @@ namespace osu.Game.Overlays.Direct
                                     Alpha = 0,
                                     Child = new DownloadButton(SetInfo)
                                     {
-                                        Size = new Vector2(height - vertical_padding * 2),
-                                        Margin = new MarginPadding { Left = vertical_padding },
+                                        Size = new Vector2(height - vertical_padding * 3),
+                                        Margin = new MarginPadding { Left = vertical_padding, Right = vertical_padding },
                                     },
                                 },
                                 new FillFlowContainer

@@ -53,8 +53,7 @@ namespace osu.Game.Screens.Play
             configVisibility.BindValueChanged(_ => updateVisibility(), true);
         }
 
-        //further: change default values here and in KeyCounter if needed, instead of passing them in every constructor
-        private bool isCounting;
+        private bool isCounting = true;
         public bool IsCounting
         {
             get { return isCounting; }

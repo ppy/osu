@@ -84,9 +84,9 @@ namespace osu.Game.Screens.Select
 
         protected override void UpdateBeatmap(WorkingBeatmap beatmap)
         {
-            base.UpdateBeatmap(beatmap);
-
             beatmap.Mods.BindTo(SelectedMods);
+
+            base.UpdateBeatmap(beatmap);
 
             BeatmapDetails.Beatmap = beatmap;
 

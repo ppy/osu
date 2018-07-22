@@ -14,6 +14,8 @@ namespace osu.Game.Skinning
 
         protected override void ParseLine(SkinConfiguration skin, Section section, string line)
         {
+            line = StripComments(line);
+
             switch (section)
             {
                 case Section.General:

@@ -142,14 +142,14 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.Centre,
                                             Children = new[]
                                             {
-                                                prevButton = new IconButton
+                                                prevButton = new MusicIconButton
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
                                                     Action = prev,
                                                     Icon = FontAwesome.fa_step_backward,
                                                 },
-                                                playButton = new IconButton
+                                                playButton = new MusicIconButton
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
@@ -158,7 +158,7 @@ namespace osu.Game.Overlays
                                                     Action = play,
                                                     Icon = FontAwesome.fa_play_circle_o,
                                                 },
-                                                nextButton = new IconButton
+                                                nextButton = new MusicIconButton
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
@@ -167,7 +167,7 @@ namespace osu.Game.Overlays
                                                 },
                                             }
                                         },
-                                        playlistButton = new IconButton
+                                        playlistButton = new MusicIconButton
                                         {
                                             Origin = Anchor.Centre,
                                             Anchor = Anchor.CentreRight,
@@ -403,6 +403,16 @@ namespace osu.Game.Overlays
             None,
             Next,
             Prev
+        }
+
+        private class MusicIconButton : IconButton
+        {
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                HoverColour = colours.YellowDark.Opacity(0.6f);
+                FlashColour = colours.Yellow;
+            }
         }
 
         private class Background : BufferedContainer

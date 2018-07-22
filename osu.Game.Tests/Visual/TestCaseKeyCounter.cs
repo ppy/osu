@@ -18,7 +18,6 @@ namespace osu.Game.Tests.Visual
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
-                IsCounting = true,
                 Children = new KeyCounter[]
                 {
                     new KeyCounterKeyboard(Key.Z),
