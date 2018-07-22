@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Difficulty
 {
     public abstract class DifficultyCalculator
     {
+        //Use something from this class
         private readonly Ruleset ruleset;
         private readonly WorkingBeatmap beatmap;
 
