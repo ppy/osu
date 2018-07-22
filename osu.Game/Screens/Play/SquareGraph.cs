@@ -123,18 +123,17 @@ namespace osu.Game.Screens.Play
             }
 
             var max = values.Max();
-            float sum = 0;
-            float iteration = 0;
 
+            //There apply some changes
             float step = values.Length / (float)ColumnCount;
             for (float i = 0; i < values.Length; i += step)
             {
-                sum = 0;
-                iteration = 0;
+                float sum = 0;
+                float iteration = 0;
                 for (float x = i; x < i+step; x++)
                 {
-                    sum += (float) values[(int) x];
-                    iteration = (x - i) + 1;
+                    sum += values[(int) x];
+                    iteration = x - i + 1;
                 }
                 sum = sum / iteration;
                 newValues.Add(sum / max);
@@ -240,6 +239,7 @@ namespace osu.Game.Screens.Play
                 fillActive();
             }
 
+            //There to apply some changes changes
             private void fillActive()
             {
                 Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
