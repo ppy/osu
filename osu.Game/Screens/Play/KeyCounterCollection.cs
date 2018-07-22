@@ -2,18 +2,17 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Timing;
-using OpenTK.Graphics;
 using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
+using osu.Framework.Timing;
 using osu.Game.Configuration;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -23,8 +22,6 @@ namespace osu.Game.Screens.Play
 
         public readonly Bindable<bool> Visible = new Bindable<bool>(true);
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
-
-        private readonly Dictionary<string, List<KeyCounterState>> keyCountersState = new Dictionary<string, List<KeyCounterState>>();
 
         public KeyCounterCollection()
         {
@@ -42,18 +39,12 @@ namespace osu.Game.Screens.Play
             key.KeyDownTextColor = KeyDownTextColor;
             key.KeyUpTextColor = KeyUpTextColor;
             key.AudioClock = AudioClock;
-
-            keyCountersState.Add(key.Name, new List<KeyCounterState>());
-            key.KeyPressed += () => keyCountersState[key.Name].Add(key.SaveState());
         }
 
         public void RestoreKeyCounterState(double time)
         {
             foreach (var counter in Children)
-            {
-                var targetState = keyCountersState[counter.Name].LastOrDefault(state => state.Time <= time);
-                counter.RestoreState(targetState);
-            }
+                counter.RestoreState(time);
         }
 
         public void ResetCount()
