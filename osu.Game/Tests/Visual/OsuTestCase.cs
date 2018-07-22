@@ -1,10 +1,12 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Configuration;
+using osu.Framework.Platform;
 using osu.Framework.Testing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
@@ -20,6 +22,9 @@ namespace osu.Game.Tests.Visual
 
         protected DependencyContainer Dependencies { get; private set; }
 
+        private readonly Lazy<Storage> localStorage;
+        protected Storage LocalStorage => localStorage.Value;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -31,6 +36,11 @@ namespace osu.Game.Tests.Visual
             Dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
 
             return Dependencies;
+        }
+
+        protected OsuTestCase()
+        {
+            localStorage = new Lazy<Storage>(() => new DesktopStorage($"{GetType().Name}-{Guid.NewGuid()}", null));
         }
 
         [BackgroundDependencyLoader]
@@ -50,6 +60,9 @@ namespace osu.Game.Tests.Visual
                 beatmap.Disabled = true;
                 beatmap.Value.Track.Stop();
             }
+
+            if (localStorage.IsValueCreated)
+                localStorage.Value.DeleteDirectory(".");
         }
 
         protected override ITestCaseTestRunner CreateRunner() => new OsuTestCaseTestRunner();

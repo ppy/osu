@@ -24,6 +24,11 @@ namespace osu.Game.Overlays.Notifications
         public event Action Closed;
 
         /// <summary>
+        /// Whether this notification should forcefully display itself.
+        /// </summary>
+        public virtual bool IsImportant => true;
+
+        /// <summary>
         /// Run on user activating the notification. Return true to close.
         /// </summary>
         public Func<bool> Activated;

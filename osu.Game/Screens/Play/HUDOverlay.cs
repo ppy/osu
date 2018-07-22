@@ -195,7 +195,6 @@ namespace osu.Game.Screens.Play
 
         protected virtual KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
         {
-            IsCounting = true,
             FadeTime = 50,
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,

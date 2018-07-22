@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             Rank = newRank;
 
-            if (IsLoaded)
+            if (LoadState >= LoadState.Ready)
                 updateTexture();
         }
     }
