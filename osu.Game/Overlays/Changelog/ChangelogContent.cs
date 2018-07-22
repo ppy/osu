@@ -129,7 +129,7 @@ namespace osu.Game.Overlays.Changelog
         private void fetchAndShowChangelog()
         {
             var req = new GetChangelogRequest();
-            req.Success += res => add(res);
+            req.Success += add;
             api.Queue(req);
         }
 
