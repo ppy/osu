@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Changelog
         private readonly SortedDictionary<string, List<ChangelogEntry>> categories =
             new SortedDictionary<string, List<ChangelogEntry>>();
 
-        public Action NextRequested, PreviousRequested;
+        public Action NextRequested, PreviousRequested, BuildRequested;
         public readonly FillFlowContainer ChangelogEntries;
 
         public ChangelogContentGroup(APIChangelog build)
@@ -29,6 +29,7 @@ namespace osu.Game.Overlays.Changelog
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
+            Padding = new MarginPadding { Horizontal = 70 };
             Children = new Drawable[]
             {
                 // build version, arrows
@@ -111,6 +112,67 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
+        public ChangelogContentGroup(APIChangelog build, bool newDate = false)
+        {
+            RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
+            Direction = FillDirection.Vertical;
+            Padding = new MarginPadding { Horizontal = 70 };
+            Children = new Drawable[]
+            {
+                new SpriteText
+                {
+                    // do we need .ToUniversalTime() here?
+                    // also, this should be a temporary solution to weekdays in >localized< date strings
+                    Text = build.CreatedAt.Date.ToLongDateString().Replace(build.CreatedAt.ToString("dddd") + ", ", ""),
+                    TextSize = 28, // web: 24,
+                    Colour = OsuColour.FromHex(@"FD5"),
+                    Font = @"Exo2.0-Light",
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Margin = new MarginPadding{ Top = 20, },
+                    Alpha = newDate ? 1 : 0,
+                },
+                new FillFlowContainer
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Horizontal,
+                    Margin = new MarginPadding{ Top = 20, },
+                    Spacing = new Vector2(5),
+                    Children = new Drawable[]
+                    {
+                        new SpriteText
+                        {
+                            Text = build.UpdateStream.DisplayName,
+                            TextSize = 20, // web: 18,
+                            Font = @"Exo2.0-Medium",
+                        },
+                        new SpriteText
+                        {
+                            Text = build.DisplayVersion,
+                            TextSize = 20, // web: 18,
+                            Font = @"Exo2.0-Light",
+                            Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
+                        },
+                        new ClickableText
+                        {
+                            Text = " ok ",
+                            TextSize = 20,
+                            Action = BuildRequested,
+                        },
+                    }
+                },
+                ChangelogEntries = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
+                },
+            };
+        }
+
         public void UpdateChevronTooltips(string previousVersion, string nextVersion)
         {
             if (!string.IsNullOrEmpty(previousVersion))
@@ -138,10 +200,6 @@ namespace osu.Game.Overlays.Changelog
 
             foreach (KeyValuePair<string, List<ChangelogEntry>> category in categories)
             {
-                // textflowcontainer is unusable for formatting text
-                // this has to be a placeholder before we get a
-                // proper markdown/html formatting..
-                // it can't handle overflowing properly
                 ChangelogEntries.Add(new SpriteText
                 {
                     Text = category.Key,
@@ -183,6 +241,5 @@ namespace osu.Game.Overlays.Changelog
                 }
             }
         }
-        //public ChangelogContentGroup() { } // for listing
     }
 }

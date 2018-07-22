@@ -93,8 +93,7 @@ namespace osu.Game.Overlays
             header.OnListingActivated += () =>
             {
                 Streams.SelectedRelease = null;
-                content.Clear();
-                // should add listing to content here
+                content.ShowListing();
                 if (!Streams.IsHovered)
                     foreach (StreamBadge item in Streams.BadgesContainer.Children)
                         item.Activate(true);

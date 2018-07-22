@@ -8,6 +8,6 @@ namespace osu.Game.Online.API.Requests
     public class GetChangelogRequest : APIRequest<APIChangelog[]>
     {
         protected override string Target => @"changelog";
-        protected override string Uri => $@"https://houtarouoreki.github.io/fake-api/{Target}"; // for testing
+        protected override string Uri => $@"https://houtarouoreki.github.io/fake-api/{Target}/index"; // for testing
     }
 }
