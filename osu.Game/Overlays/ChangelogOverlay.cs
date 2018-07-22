@@ -79,15 +79,8 @@ namespace osu.Game.Overlays
                     },
                 },
             };
-
             badges.Selected += onBuildSelected;
-            //    content.ShowListing();
-            //    if (!Streams.IsHovered)
-            //        foreach (StreamBadge item in Streams.BadgesContainer.Children)
-            //            item.Activate(true);
-            //    else
-            //        foreach (StreamBadge item in Streams.BadgesContainer.Children)
-            //            item.Deactivate();
+            header.ListingActivated += FetchAndShowListing;
         }
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
@@ -131,12 +124,22 @@ namespace osu.Game.Overlays
             this.api = api;
         }
 
+        protected override void LoadComplete()
+        {
+            var req = new GetChangelogLatestBuildsRequest();
+            req.Success += badges.Populate;
+            api.Queue(req);
+            FetchAndShowListing();
+            base.LoadComplete();
+        }
+
         /// <summary>
         /// Fetches and shows changelog listing.
         /// </summary>
         public void FetchAndShowListing()
         {
-            var req = new GetChangelogLatestBuildsRequest();
+            isAtListing = true;
+            var req = new GetChangelogRequest();
             header.ShowListing();
             badges.SelectNone();
             chart.ShowAllUpdateStreams();
@@ -147,14 +150,15 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Fetches and shows a specific build from a specific update stream.
         /// </summary>
-        /// <param name="sentByBadges">If true, will select fetched build's update stream badge.</param>
-        public void FetchAndShowBuild(string updateStream, string version)
+        public void FetchAndShowBuild(string updateStream, string version, bool sentByBadges = false)
         {
+            isAtListing = false;
             var req = new GetChangelogBuildRequest(updateStream, version);
-            header.ShowBuild(updateStream, version);
-            badges.SelectUpdateStream(updateStream);
+            if (!sentByBadges)
+                badges.SelectUpdateStream(updateStream);
             chart.ShowUpdateStream(updateStream);
             req.Success += content.ShowBuild;
+            req.Success += res => header.ShowBuild(res.UpdateStream.DisplayName, res.DisplayVersion);
             api.Queue(req);
         }
     }
