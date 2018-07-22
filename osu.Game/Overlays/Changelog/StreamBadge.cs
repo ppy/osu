@@ -21,7 +21,9 @@ namespace osu.Game.Overlays.Changelog
         private const float badge_width = 100;
         private const float transition_duration = 100;
 
-        public Action OnActivation;
+        public delegate void SelectedHandler(StreamBadge source, EventArgs args);
+
+        public event SelectedHandler Selected;
 
         private bool isActivated;
 
@@ -88,8 +90,8 @@ namespace osu.Game.Overlays.Changelog
             isActivated = true;
             this.FadeIn(transition_duration);
             lineBadge.IsCollapsed = false;
-            if (!withoutHeaderUpdate)
-                OnActivation?.Invoke();
+            if (!withoutHeaderUpdate && Selected != null)
+                Selected(this, EventArgs.Empty);
         }
 
         public void Deactivate()
