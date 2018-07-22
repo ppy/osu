@@ -15,10 +15,12 @@ namespace osu.Game.Overlays.Changelog
 {
     public class ChangelogContent : FillFlowContainer
     {
-        public APIChangelog CurrentBuild { get; private set; }
-        public Action OnBuildChanged;
         private APIAccess api;
         private ChangelogContentGroup changelogContentGroup;
+
+        public delegate void BuildSelectedEventHandler(string updateStream, string version, EventArgs args);
+
+        public event BuildSelectedEventHandler BuildSelected;
 
         public ChangelogContent()
         {
@@ -48,10 +50,9 @@ namespace osu.Game.Overlays.Changelog
                             Margin = new MarginPadding { Top = 30, },
                         });
                     }
-                    Add(changelogContentGroup = new ChangelogContentGroup(build, true)
-                    {
-                        BuildRequested = () => showBuild(build),
-                    });
+                    // watch out for this?
+                    Add(changelogContentGroup = new ChangelogContentGroup(build, true));
+                    changelogContentGroup.BuildSelected += OnBuildSelected;
                     changelogContentGroup.GenerateText(build.ChangelogEntries);
                     currentDate = build.CreatedAt.Date;
                 }
@@ -64,86 +65,21 @@ namespace osu.Game.Overlays.Changelog
                         Colour = new Color4(32, 24, 35, 255),
                         Margin = new MarginPadding { Top = 30, },
                     });
-                    Add(changelogContentGroup = new ChangelogContentGroup(build, false)
-                    {
-                        BuildRequested = () => showBuild(build),
-                    });
+                    Add(changelogContentGroup = new ChangelogContentGroup(build, false));
+                    changelogContentGroup.BuildSelected += OnBuildSelected;
                     changelogContentGroup.GenerateText(build.ChangelogEntries);
                 }
             }
         }
 
+        private void OnBuildSelected(string updateStream, string version, EventArgs args)
+        {
+            throw new NotImplementedException();
+        }
+
         private void add(APIChangelog changelogBuild)
         {
-            Child = changelogContentGroup = new ChangelogContentGroup(changelogBuild)
-            {
-                PreviousRequested = showPrevious,
-                NextRequested = showNext,
-            };
-        }
-
-        /// <summary>
-        /// Doesn't send back that the build has changed
-        /// </summary>
-        public void ShowBuild(APIChangelog changelog)
-        {
-            fetchAndShowChangelogBuild(changelog);
-            CurrentBuild = changelog;
-        }
-
-        /// <summary>
-        /// Sends back that the build has changed
-        /// </summary>
-        private void showBuild(APIChangelog changelog)
-        {
-            ShowBuild(changelog);
-            OnBuildChanged();
-        }
-
-        public void ShowListing() => fetchAndShowChangelog();
-
-        private void showNext()
-        {
-            if (CurrentBuild.Versions.Next != null)
-                showBuild(CurrentBuild.Versions.Next);
-        }
-
-        private void showPrevious()
-        {
-            if (CurrentBuild.Versions.Previous != null)
-                showBuild(CurrentBuild.Versions.Previous);
-        }
-
-        private void updateChevronTooltips()
-        {
-            changelogContentGroup.UpdateChevronTooltips(CurrentBuild.Versions.Previous?.DisplayVersion,
-                CurrentBuild.Versions.Next?.DisplayVersion);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(APIAccess api)
-        {
-            this.api = api;
-        }
-
-        private void fetchAndShowChangelog()
-        {
-            var req = new GetChangelogRequest();
-            req.Success += add;
-            api.Queue(req);
-        }
-
-        private void fetchAndShowChangelogBuild(APIChangelog build)
-        {
-            var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
-            req.Success += res =>
-            {
-                CurrentBuild = res;
-                add(CurrentBuild);
-                changelogContentGroup.GenerateText(CurrentBuild.ChangelogEntries);
-                updateChevronTooltips();
-            };
-            api.Queue(req);
+            Child = changelogContentGroup = new ChangelogContentGroup(changelogBuild);
         }
     }
 }
