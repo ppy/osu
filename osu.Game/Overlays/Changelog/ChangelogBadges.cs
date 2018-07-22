@@ -109,8 +109,7 @@ namespace osu.Game.Overlays.Changelog
 
         protected virtual void OnSelected(StreamBadge source)
         {
-            if (Selected != null)
-                Selected(source.ChangelogEntry.UpdateStream.Name, source.ChangelogEntry.Version, EventArgs.Empty);
+            Selected?.Invoke(source.ChangelogEntry.UpdateStream.Name, source.ChangelogEntry.Version, EventArgs.Empty);
         }
 
         protected override bool OnHover(InputState state)
@@ -135,7 +134,7 @@ namespace osu.Game.Overlays.Changelog
             foreach (StreamBadge streamBadge in badgesContainer.Children)
             {
                 if (selectedStreamId < 0)
-                    streamBadge.Activate(true);
+                    streamBadge.Activate();
                 else if (streamBadge.ChangelogEntry.UpdateStream.Id == selectedStreamId)
                     streamBadge.DisableDim();
             }
