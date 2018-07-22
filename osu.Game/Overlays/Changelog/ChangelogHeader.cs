@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Changelog.Header;
 using System;
 
@@ -24,6 +23,7 @@ namespace osu.Game.Overlays.Changelog
         private readonly Sprite headerBadge;
         private readonly OsuSpriteText titleStream;
         private readonly TextBadgePairListing listing;
+        private readonly SpriteIcon chevron;
         private readonly TextBadgePairRelease releaseStream;
 
         public Action ListingActivated;
@@ -36,7 +36,6 @@ namespace osu.Game.Overlays.Changelog
 
         public ChangelogHeader()
         {
-            SpriteIcon chevron; // AppVeyor told me this should be a local variable..?
             RelativeSizeAxes = Axes.X;
             Height = cover_height;
             Children = new Drawable[]
@@ -166,12 +165,14 @@ namespace osu.Game.Overlays.Changelog
             releaseStream.Activate($"{displayName} {displayVersion}");
             titleStream.Text = displayName;
             titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
+            chevron.MoveToX(0, 100).FadeIn(100);
         }
 
         public void ShowListing()
         {
             releaseStream.Deactivate();
             listing.Activate();
+            chevron.MoveToX(-20, 100).FadeOut(100);
         }
 
         [BackgroundDependencyLoader]

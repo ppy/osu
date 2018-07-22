@@ -90,8 +90,8 @@ namespace osu.Game.Overlays.Changelog
             isActivated = true;
             this.FadeIn(transition_duration);
             lineBadge.IsCollapsed = false;
-            if (!withoutFiringUpdates && Selected != null)
-                Selected(this, EventArgs.Empty);
+            if (!withoutFiringUpdates)
+                Selected?.Invoke(this, EventArgs.Empty);
         }
 
         public void Deactivate()

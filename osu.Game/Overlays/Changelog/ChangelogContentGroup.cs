@@ -190,8 +190,7 @@ namespace osu.Game.Overlays.Changelog
 
         protected virtual void OnBuildSelected(string updateStream, string version)
         {
-            if (BuildSelected != null)
-                BuildSelected(updateStream, version, EventArgs.Empty);
+            BuildSelected?.Invoke(updateStream, version, EventArgs.Empty);
         }
 
         public void GenerateText(List<ChangelogEntry> changelogEntries)

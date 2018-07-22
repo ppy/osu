@@ -2,12 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using System;
 
@@ -52,7 +50,7 @@ namespace osu.Game.Overlays.Changelog
                     }
                     // watch out for this?
                     Add(changelogContentGroup = new ChangelogContentGroup(build, true));
-                    changelogContentGroup.BuildSelected += onBuildSelected;
+                    changelogContentGroup.BuildSelected += OnBuildSelected;
                     changelogContentGroup.GenerateText(build.ChangelogEntries);
                     currentDate = build.CreatedAt.Date;
                 }
@@ -66,7 +64,7 @@ namespace osu.Game.Overlays.Changelog
                         Margin = new MarginPadding { Top = 30, },
                     });
                     Add(changelogContentGroup = new ChangelogContentGroup(build, false));
-                    changelogContentGroup.BuildSelected += onBuildSelected;
+                    changelogContentGroup.BuildSelected += OnBuildSelected;
                     changelogContentGroup.GenerateText(build.ChangelogEntries);
                 }
             }
@@ -77,10 +75,9 @@ namespace osu.Game.Overlays.Changelog
             Child = changelogContentGroup = new ChangelogContentGroup(changelogBuild);
         }
 
-        protected virtual void onBuildSelected(string updateStream, string version, EventArgs args)
+        protected virtual void OnBuildSelected(string updateStream, string version, EventArgs args)
         {
-            if (BuildSelected != null)
-                BuildSelected(updateStream, version, EventArgs.Empty);
+            BuildSelected?.Invoke(updateStream, version, EventArgs.Empty);
         }
     }
 }
