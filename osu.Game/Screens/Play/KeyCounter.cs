@@ -1,7 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,12 +17,12 @@ namespace osu.Game.Screens.Play
 {
     public abstract class KeyCounter : Container
     {
-        public event Action KeyPressed;
-
         private Sprite buttonSprite;
         private Sprite glowSprite;
         private Container textLayer;
         private SpriteText countSpriteText;
+
+        private readonly List<KeyCounterState> states = new List<KeyCounterState>();
 
         public bool IsCounting { get; set; } = true;
         private int countPresses;
@@ -51,7 +52,7 @@ namespace osu.Game.Screens.Play
                     if (value && IsCounting)
                     {
                         CountPresses++;
-                        KeyPressed?.Invoke();
+                        SaveState();
                     }
                 }
             }
@@ -139,8 +140,19 @@ namespace osu.Game.Screens.Play
 
         public void ResetCount() => CountPresses = 0;
 
-        public KeyCounterState SaveState() => new KeyCounterState(AudioClock.CurrentTime, CountPresses);
+        public void SaveState()
+        {
+            var lastState = states.LastOrDefault();
 
-        public void RestoreState(KeyCounterState state) => CountPresses = state.Count;
+            if (lastState == null || lastState.Time < AudioClock.CurrentTime)
+                states.Add(new KeyCounterState(AudioClock.CurrentTime, CountPresses));
+        }
+
+        public void RestoreState(double time)
+        {
+            var targetState = states.LastOrDefault(state => state.Time <= time) ?? states.LastOrDefault();
+            var targetCount = targetState?.Count ?? 0;
+            CountPresses = targetCount;
+        }
     }
 }
