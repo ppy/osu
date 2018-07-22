@@ -160,11 +160,11 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
-        public void ShowBuild(string updateStream, string version)
+        public void ShowBuild(string displayName, string displayVersion)
         {
             listing.Deactivate();
-            releaseStream.Activate($"{updateStream} {version}");
-            titleStream.Text = updateStream;
+            releaseStream.Activate($"{displayName} {displayVersion}");
+            titleStream.Text = displayName;
             titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
         }
 

@@ -23,6 +23,7 @@ namespace osu.Game.Overlays.Changelog
         public event SelectionHandler Selected;
 
         private readonly FillFlowContainer<StreamBadge> badgesContainer;
+        private long selectedStreamId = -1;
 
         public ChangelogBadges()
         {
@@ -66,29 +67,43 @@ namespace osu.Game.Overlays.Changelog
             foreach (APIChangelog updateStream in latestBuilds)
             {
                 var streamBadge = new StreamBadge(updateStream);
-                streamBadge.Selected += OnBadgeSelected;
+                streamBadge.Selected += onBadgeSelected;
                 badgesContainer.Add(streamBadge);
             }
         }
 
         public void SelectNone()
         {
-            foreach (StreamBadge streamBadge in badgesContainer)
-                streamBadge.Deactivate();
+            selectedStreamId = -1;
+            if (badgesContainer != null)
+            {
+                foreach (StreamBadge streamBadge in badgesContainer)
+                {
+                    if (!IsHovered)
+                        streamBadge.Activate();
+                    else
+                        streamBadge.Deactivate();
+                }
+            }
         }
 
         public void SelectUpdateStream(string updateStream)
         {
             foreach (StreamBadge streamBadge in badgesContainer)
+            {
                 if (streamBadge.ChangelogEntry.UpdateStream.Name == updateStream)
                 {
+                    selectedStreamId = streamBadge.ChangelogEntry.UpdateStream.Id;
                     streamBadge.Activate();
-                    return;
                 }
+                else
+                    streamBadge.Deactivate();
+            }
         }
 
-        private void OnBadgeSelected(StreamBadge source, EventArgs args)
+        private void onBadgeSelected(StreamBadge source, EventArgs args)
         {
+            selectedStreamId = source.ChangelogEntry.UpdateStream.Id;
             OnSelected(source);
         }
 
@@ -98,33 +113,33 @@ namespace osu.Game.Overlays.Changelog
                 Selected(source.ChangelogEntry.UpdateStream.Name, source.ChangelogEntry.Version, EventArgs.Empty);
         }
 
-        //protected override bool OnHover(InputState state)
-        //{
-        //    foreach (StreamBadge streamBadge in BadgesContainer.Children)
-        //    {
-        //        if (SelectedRelease != null)
-        //        {
-        //            if (SelectedRelease.UpdateStream.Id != streamBadge.ChangelogEntry.UpdateStream.Id)
-        //                streamBadge.Deactivate();
-        //            else
-        //                streamBadge.EnableDim();
-        //        }
-        //        else
-        //            streamBadge.Deactivate();
-        //    }
-        //    return base.OnHover(state);
-        //}
+        protected override bool OnHover(InputState state)
+        {
+            foreach (StreamBadge streamBadge in badgesContainer.Children)
+            {
+                if (selectedStreamId < 0)
+                {
+                    if (selectedStreamId != streamBadge.ChangelogEntry.UpdateStream.Id)
+                        streamBadge.Deactivate();
+                    else
+                        streamBadge.EnableDim();
+                }
+                else
+                    streamBadge.Deactivate();
+            }
+            return base.OnHover(state);
+        }
 
-        //protected override void OnHoverLost(InputState state)
-        //{
-        //    foreach (StreamBadge streamBadge in BadgesContainer.Children)
-        //    {
-        //        if (SelectedRelease == null)
-        //            streamBadge.Activate(true);
-        //        else if (streamBadge.ChangelogEntry.UpdateStream.Id == SelectedRelease.UpdateStream.Id)
-        //            streamBadge.DisableDim();
-        //    }
-        //    base.OnHoverLost(state);
-        //}
+        protected override void OnHoverLost(InputState state)
+        {
+            foreach (StreamBadge streamBadge in badgesContainer.Children)
+            {
+                if (selectedStreamId < 0)
+                    streamBadge.Activate(true);
+                else if (streamBadge.ChangelogEntry.UpdateStream.Id == selectedStreamId)
+                    streamBadge.DisableDim();
+            }
+            base.OnHoverLost(state);
+        }
     }
 }

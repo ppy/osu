@@ -85,12 +85,12 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
-        public void Activate(bool withoutHeaderUpdate = false)
+        public void Activate(bool withoutFiringUpdates = true)
         {
             isActivated = true;
             this.FadeIn(transition_duration);
             lineBadge.IsCollapsed = false;
-            if (!withoutHeaderUpdate && Selected != null)
+            if (!withoutFiringUpdates && Selected != null)
                 Selected(this, EventArgs.Empty);
         }
 
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.Changelog
 
         protected override bool OnClick(InputState state)
         {
-            Activate();
+            Activate(false);
             return base.OnClick(state);
         }
 
