@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            KeyCounter = CreateKeyCounter(),
+                            KeyCounter = CreateKeyCounter(offsetClock),
                             HoldToQuit = CreateQuitButton(),
                         }
                     }
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Play
             BindRulesetContainer(rulesetContainer);
 
             Progress.Objects = rulesetContainer.Objects;
-            Progress.AudioClock = KeyCounter.AudioClock = offsetClock;
+            Progress.AudioClock = offsetClock;
             Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
             Progress.OnSeek = pos => adjustableClock.Seek(pos);
 
@@ -193,12 +193,13 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20 }
         };
 
-        protected virtual KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
+        protected virtual KeyCounterCollection CreateKeyCounter(IClock offsetClock) => new KeyCounterCollection
         {
             FadeTime = 50,
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),
+            AudioClock = offsetClock
         };
 
         protected virtual ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
