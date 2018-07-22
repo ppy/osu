@@ -16,6 +16,7 @@ namespace osu.Game.Tests.Visual
             base.LoadComplete();
 
             Add(changelog = new ChangelogOverlay());
+            AddStep(@"Show", changelog.Show);
         }
     }
 }
