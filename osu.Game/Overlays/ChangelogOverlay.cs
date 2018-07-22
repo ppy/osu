@@ -74,12 +74,16 @@ namespace osu.Game.Overlays
                             header = new ChangelogHeader(),
                             Streams = new ChangelogStreams(),
                             chart = new ChangelogChart(),
-                            content = new ChangelogContent(),
+                            content = new ChangelogContent()
                         },
                     },
                 },
             };
-            OnLoadComplete += d => FetchChangelog();
+            OnLoadComplete += d =>
+            {
+                FetchChangelog();
+                content.ShowListing();
+            };
             Streams.OnSelection = () =>
             {
                 if (Streams.SelectedRelease != null)
