@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            KeyCounter = CreateKeyCounter(offsetClock),
+                            KeyCounter = CreateKeyCounter(adjustableClock),
                             HoldToQuit = CreateQuitButton(),
                         }
                     }
@@ -81,7 +81,11 @@ namespace osu.Game.Screens.Play
             Progress.Objects = rulesetContainer.Objects;
             Progress.AudioClock = offsetClock;
             Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
-            Progress.OnSeek = pos => adjustableClock.Seek(pos);
+            Progress.OnSeek = pos =>
+            {
+                adjustableClock.Seek(pos);
+                KeyCounter.RestoreKeyCounterState(pos);
+            };
 
             ModDisplay.Current.BindTo(working.Mods);
 
