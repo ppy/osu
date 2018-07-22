@@ -11,9 +11,7 @@ using osu.Game.Graphics.Sprites;
 using System;
 
 namespace osu.Game.Graphics.UserInterface
-{/// <summary>
-/// 
-/// </summary>
+{
     public class ClickableText : OsuSpriteText, IHasTooltip
     {
         private bool isEnabled;
