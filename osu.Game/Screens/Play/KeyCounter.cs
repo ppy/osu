@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Timing;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
@@ -54,6 +55,8 @@ namespace osu.Game.Screens.Play
         public Color4 KeyDownTextColor { get; set; } = Color4.DarkGray;
         public Color4 KeyUpTextColor { get; set; } = Color4.White;
         public int FadeTime { get; set; }
+
+        public IClock AudioClock { get; set; }
 
         protected KeyCounter(string name)
         {
@@ -129,5 +132,9 @@ namespace osu.Game.Screens.Play
         }
 
         public void ResetCount() => CountPresses = 0;
+
+        public KeyCounterMemento SaveState() => new KeyCounterMemento(AudioClock.CurrentTime, CountPresses);
+
+        public void RestoreState(KeyCounterMemento memento) => CountPresses = memento.CountPresses;
     }
 }
