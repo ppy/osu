@@ -23,8 +23,10 @@ namespace osu.Game.Rulesets.Catch.UI
         private readonly CatcherArea catcherArea;
 
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation)
-            : base(ScrollingDirection.Down, BASE_WIDTH)
+            : base(BASE_WIDTH)
         {
+            Direction.Value = ScrollingDirection.Down;
+
             Container explodingFruitContainer;
 
             Anchor = Anchor.TopCentre;
