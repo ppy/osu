@@ -6,7 +6,7 @@ using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 
 namespace osu.Game.Graphics.Containers
 {
