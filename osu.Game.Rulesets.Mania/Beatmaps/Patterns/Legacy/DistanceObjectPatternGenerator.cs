@@ -133,26 +133,26 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             if (ConversionDifficulty > 6.5)
             {
-                if ((convertType & PatternType.LowProbability) > 0)
+                if (convertType.HasFlag(PatternType.LowProbability))
                     return generateNRandomNotes(HitObject.StartTime, 0.78, 0.3, 0);
                 return generateNRandomNotes(HitObject.StartTime, 0.85, 0.36, 0.03);
             }
 
             if (ConversionDifficulty > 4)
             {
-                if ((convertType & PatternType.LowProbability) > 0)
+                if (convertType.HasFlag(PatternType.LowProbability))
                     return generateNRandomNotes(HitObject.StartTime, 0.43, 0.08, 0);
                 return generateNRandomNotes(HitObject.StartTime, 0.56, 0.18, 0);
             }
 
             if (ConversionDifficulty > 2.5)
             {
-                if ((convertType & PatternType.LowProbability) > 0)
+                if (convertType.HasFlag(PatternType.LowProbability))
                     return generateNRandomNotes(HitObject.StartTime, 0.3, 0, 0);
                 return generateNRandomNotes(HitObject.StartTime, 0.37, 0.08, 0);
             }
 
-            if ((convertType & PatternType.LowProbability) > 0)
+            if (convertType.HasFlag(PatternType.LowProbability))
                 return generateNRandomNotes(HitObject.StartTime, 0.17, 0, 0);
             return generateNRandomNotes(HitObject.StartTime, 0.27, 0, 0);
         }
@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             var pattern = new Pattern();
 
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
-            if ((convertType & PatternType.ForceNotStack) > 0 && PreviousPattern.ColumnWithObjects < TotalColumns)
+            if (convertType.HasFlag(PatternType.ForceNotStack) && PreviousPattern.ColumnWithObjects < TotalColumns)
             {
                 while (PreviousPattern.ColumnHasObject(nextColumn))
                     nextColumn = Random.Next(RandomStart, TotalColumns);
@@ -361,7 +361,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             bool isDoubleSample(SampleInfo sample) => sample.Name == SampleInfo.HIT_CLAP || sample.Name == SampleInfo.HIT_FINISH;
 
-            bool canGenerateTwoNotes = (convertType & PatternType.LowProbability) == 0;
+            bool canGenerateTwoNotes = !convertType.HasFlag(PatternType.LowProbability);
             canGenerateTwoNotes &= HitObject.Samples.Any(isDoubleSample) || sampleInfoListAt(HitObject.StartTime).Any(isDoubleSample);
 
             if (canGenerateTwoNotes)
@@ -391,7 +391,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int columnRepeat = Math.Min(spanCount, TotalColumns);
 
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
-            if ((convertType & PatternType.ForceNotStack) > 0 && PreviousPattern.ColumnWithObjects < TotalColumns)
+            if (convertType.HasFlag(PatternType.ForceNotStack) && PreviousPattern.ColumnWithObjects < TotalColumns)
             {
                 while (PreviousPattern.ColumnHasObject(nextColumn))
                     nextColumn = Random.Next(RandomStart, TotalColumns);
@@ -425,7 +425,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             var pattern = new Pattern();
 
             int holdColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
-            if ((convertType & PatternType.ForceNotStack) > 0 && PreviousPattern.ColumnWithObjects < TotalColumns)
+            if (convertType.HasFlag(PatternType.ForceNotStack) && PreviousPattern.ColumnWithObjects < TotalColumns)
             {
                 while (PreviousPattern.ColumnHasObject(holdColumn))
                     holdColumn = Random.Next(RandomStart, TotalColumns);

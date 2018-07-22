@@ -99,6 +99,7 @@ namespace osu.Game.Overlays.Direct
                 attachDownload(downloadRequest);
 
             beatmaps.BeatmapDownloadBegan += attachDownload;
+            beatmaps.ItemAdded += setAdded;
         }
 
         public override bool DisposeOnDeathRemoval => true;
@@ -107,6 +108,7 @@ namespace osu.Game.Overlays.Direct
         {
             base.Dispose(isDisposing);
             beatmaps.BeatmapDownloadBegan -= attachDownload;
+            beatmaps.ItemAdded -= setAdded;
         }
 
         protected override void Update()
@@ -169,6 +171,12 @@ namespace osu.Game.Overlays.Direct
                 progressBar.Current.Value = 1;
                 progressBar.FillColour = colours.Yellow;
             };
+        }
+
+        private void setAdded(BeatmapSetInfo s)
+        {
+            if (s.OnlineBeatmapSetID == SetInfo.OnlineBeatmapSetID)
+                progressBar.FadeOut(500);
         }
 
         protected override void LoadComplete()

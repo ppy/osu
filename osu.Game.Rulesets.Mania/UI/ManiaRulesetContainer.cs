@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mania.UI
             return dependencies;
         }
 
-        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(scrollingInfo.Direction, Beatmap.Stages)
+        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
