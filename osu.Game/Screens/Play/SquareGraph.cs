@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Play
 {
     public class SquareGraph : BufferedContainer
     {
+        //add some scaling. easy beatmaps have to have got small, static amount of cubes, and harder more cubes more dynamical
         private Column[] columns = { };
 
         public int ColumnCount => columns.Length;

@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
+        //Copy some code from here
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
