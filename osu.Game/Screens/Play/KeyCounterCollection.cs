@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -22,6 +23,8 @@ namespace osu.Game.Screens.Play
         public readonly Bindable<bool> Visible = new Bindable<bool>(true);
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
 
+        private readonly Dictionary<string, List<KeyCounterMemento>> keyCountersState = new Dictionary<string, List<KeyCounterMemento>>();
+
         public KeyCounterCollection()
         {
             Direction = FillDirection.Horizontal;
@@ -38,6 +41,9 @@ namespace osu.Game.Screens.Play
             key.KeyDownTextColor = KeyDownTextColor;
             key.KeyUpTextColor = KeyUpTextColor;
             key.AudioClock = AudioClock;
+
+            keyCountersState.Add(key.Name, new List<KeyCounterMemento>());
+            key.KeyPressed += () => keyCountersState[key.Name].Add(key.SaveState());
         }
 
         public void ResetCount()
