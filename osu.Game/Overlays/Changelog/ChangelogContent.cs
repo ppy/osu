@@ -1,9 +1,11 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -11,7 +13,7 @@ using System;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogContent : FillFlowContainer<ChangelogContentGroup>
+    public class ChangelogContent : FillFlowContainer
     {
         public APIChangelog CurrentBuild { get; private set; }
         public Action OnBuildChanged;
@@ -23,11 +25,52 @@ namespace osu.Game.Overlays.Changelog
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
-            Padding = new MarginPadding
+            Padding = new MarginPadding{ Bottom = 100, };
+        }
+
+        private void add(APIChangelog[] changelog)
+        {
+            DateTime currentDate = new DateTime();
+
+            Clear();
+
+            foreach (APIChangelog build in changelog)
             {
-                Horizontal = 70,
-                Bottom = 100,
-            };
+                if (build.CreatedAt.Date != currentDate)
+                {
+                    if (Children.Count != 0)
+                    {
+                        Add(new Box
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Height = 2,
+                            Colour = new Color4(17, 17, 17, 255),
+                            Margin = new MarginPadding { Top = 30, },
+                        });
+                    }
+                    Add(changelogContentGroup = new ChangelogContentGroup(build, true)
+                    {
+                        BuildRequested = () => showBuild(build),
+                    });
+                    changelogContentGroup.GenerateText(build.ChangelogEntries);
+                    currentDate = build.CreatedAt.Date;
+                }
+                else
+                {
+                    changelogContentGroup.Add(new Box
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = 1,
+                        Colour = new Color4(32, 24, 35, 255),
+                        Margin = new MarginPadding { Top = 30, },
+                    });
+                    Add(changelogContentGroup = new ChangelogContentGroup(build, false)
+                    {
+                        BuildRequested = () => ShowBuild(build),
+                    });
+                    changelogContentGroup.GenerateText(build.ChangelogEntries);
+                }
+            }
         }
 
         private void add(APIChangelog changelogBuild)
@@ -41,9 +84,11 @@ namespace osu.Game.Overlays.Changelog
 
         public void ShowBuild(APIChangelog changelog)
         {
+            fetchAndShowChangelogBuild(changelog);
             CurrentBuild = changelog;
-            fetchChangelogBuild(changelog);
         }
+
+        public void ShowListing() => fetchAndShowChangelog();
 
         private void showBuild(APIChangelog changelog)
         {
@@ -75,7 +120,14 @@ namespace osu.Game.Overlays.Changelog
             this.api = api;
         }
 
-        private void fetchChangelogBuild(APIChangelog build)
+        private void fetchAndShowChangelog()
+        {
+            var req = new GetChangelogRequest();
+            req.Success += res => add(res);
+            api.Queue(req);
+        }
+
+        private void fetchAndShowChangelogBuild(APIChangelog build)
         {
             var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
             req.Success += res =>
