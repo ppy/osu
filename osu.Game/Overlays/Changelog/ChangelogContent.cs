@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Changelog
                     });
                     Add(changelogContentGroup = new ChangelogContentGroup(build, false)
                     {
-                        BuildRequested = () => ShowBuild(build),
+                        BuildRequested = () => showBuild(build),
                     });
                     changelogContentGroup.GenerateText(build.ChangelogEntries);
                 }
@@ -82,19 +82,25 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
+        /// <summary>
+        /// Doesn't send back that the build has changed
+        /// </summary>
         public void ShowBuild(APIChangelog changelog)
         {
             fetchAndShowChangelogBuild(changelog);
             CurrentBuild = changelog;
         }
 
-        public void ShowListing() => fetchAndShowChangelog();
-
+        /// <summary>
+        /// Sends back that the build has changed
+        /// </summary>
         private void showBuild(APIChangelog changelog)
         {
             ShowBuild(changelog);
             OnBuildChanged();
         }
+
+        public void ShowListing() => fetchAndShowChangelog();
 
         private void showNext()
         {

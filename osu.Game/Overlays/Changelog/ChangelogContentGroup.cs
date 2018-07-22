@@ -149,18 +149,13 @@ namespace osu.Game.Overlays.Changelog
                             TextSize = 20, // web: 18,
                             Font = @"Exo2.0-Medium",
                         },
-                        new SpriteText
+                        new ClickableText
                         {
                             Text = build.DisplayVersion,
                             TextSize = 20, // web: 18,
                             Font = @"Exo2.0-Light",
                             Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
-                        },
-                        new ClickableText
-                        {
-                            Text = " ok ",
-                            TextSize = 20,
-                            Action = BuildRequested,
+                            Action = () => BuildRequested(),
                         },
                     }
                 },
