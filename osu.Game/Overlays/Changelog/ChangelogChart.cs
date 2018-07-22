@@ -44,14 +44,8 @@ namespace osu.Game.Overlays.Changelog
         }
 
         /// <summary>
-        /// Draw the graph with all builds
-        /// </summary>
-        public void ShowChart() => fetchAndShowChangelogChart();
-
-        /// <summary>
         /// Draw the graph for a specific build
         /// </summary>
-        public void ShowChart(APIChangelog releaseStream) => fetchAndShowChangelogChart(releaseStream);
 
         private bool isEmpty(APIChangelogChart changelogChart)
         {
@@ -81,14 +75,14 @@ namespace osu.Game.Overlays.Changelog
             this.api = api;
         }
 
-        private void fetchAndShowChangelogChart(APIChangelog build)
+        public void ShowUpdateStream(string updateStream)
         {
-            var req = new GetChangelogChartRequest(build.UpdateStream.Name);
-            req.Success += res => showChart(res, build.UpdateStream.Name);
+            var req = new GetChangelogChartRequest(updateStream);
+            req.Success += res => showChart(res, updateStream);
             api.Queue(req);
         }
 
-        private void fetchAndShowChangelogChart()
+        public void ShowAllUpdateStreams()
         {
             var req = new GetChangelogChartRequest();
             req.Success += res => showChart(res);

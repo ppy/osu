@@ -10,6 +10,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays.Changelog
             Padding = new MarginPadding{ Bottom = 100, };
         }
 
-        private void add(APIChangelog[] changelog)
+        public void ShowListing(List<APIChangelog> changelog)
         {
             DateTime currentDate = new DateTime();
 
@@ -52,7 +53,7 @@ namespace osu.Game.Overlays.Changelog
                     }
                     // watch out for this?
                     Add(changelogContentGroup = new ChangelogContentGroup(build, true));
-                    changelogContentGroup.BuildSelected += OnBuildSelected;
+                    changelogContentGroup.BuildSelected += onBuildSelected;
                     changelogContentGroup.GenerateText(build.ChangelogEntries);
                     currentDate = build.CreatedAt.Date;
                 }
@@ -66,20 +67,21 @@ namespace osu.Game.Overlays.Changelog
                         Margin = new MarginPadding { Top = 30, },
                     });
                     Add(changelogContentGroup = new ChangelogContentGroup(build, false));
-                    changelogContentGroup.BuildSelected += OnBuildSelected;
+                    changelogContentGroup.BuildSelected += onBuildSelected;
                     changelogContentGroup.GenerateText(build.ChangelogEntries);
                 }
             }
         }
 
-        private void OnBuildSelected(string updateStream, string version, EventArgs args)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void add(APIChangelog changelogBuild)
+        public void ShowBuild(APIChangelog changelogBuild)
         {
             Child = changelogContentGroup = new ChangelogContentGroup(changelogBuild);
+        }
+
+        protected virtual void onBuildSelected(string updateStream, string version, EventArgs args)
+        {
+            if (BuildSelected != null)
+                BuildSelected(updateStream, version, EventArgs.Empty);
         }
     }
 }

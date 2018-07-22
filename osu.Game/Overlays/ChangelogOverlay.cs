@@ -14,6 +14,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Changelog;
+using System;
 
 namespace osu.Game.Overlays
 {
@@ -78,6 +79,8 @@ namespace osu.Game.Overlays
                     },
                 },
             };
+
+            badges.Selected += onBuildSelected;
             //    content.ShowListing();
             //    if (!Streams.IsHovered)
             //        foreach (StreamBadge item in Streams.BadgesContainer.Children)
@@ -117,6 +120,11 @@ namespace osu.Game.Overlays
             FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
         }
 
+        private void onBuildSelected(string updateStream, string version, EventArgs e)
+        {
+            FetchAndShowBuild(updateStream, version);
+        }
+
         [BackgroundDependencyLoader]
         private void load(APIAccess api)
         {
@@ -144,7 +152,7 @@ namespace osu.Game.Overlays
         {
             var req = new GetChangelogBuildRequest(updateStream, version);
             header.ShowBuild(updateStream, version);
-            badges.SelectBadge(updateStream);
+            badges.SelectUpdateStream(updateStream);
             chart.ShowUpdateStream(updateStream);
             req.Success += content.ShowBuild;
             api.Queue(req);
