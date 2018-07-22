@@ -10,20 +10,25 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseClickableText : OsuTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ClickableText) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ClickableText), typeof(FillFlowContainer) };
 
         public TestCaseClickableText()
         {
             ClickableText text;
 
-            AddRange(new[] {
-                new ClickableText{ Text = "Default", },
-                new ClickableText{ IsEnabled = false, Text = "Disabled", },
-                new ClickableText{ Text = "Without sounds", IsMuted = true, },
-                new ClickableText{ Text = "Without click sounds", IsClickMuted = true, },
-                new ClickableText{ Text = "Without hover sounds", IsHoverMuted = true, },
-                text = new ClickableText{ Text = "Disables after click (Action)", },
-                new ClickableText{ Text = "Has tooltip", TooltipText = "Yep", }
+            Add(new FillFlowContainer<ClickableText>
+            {
+                Direction = FillDirection.Vertical,
+                Children = new[]
+                {
+                    new ClickableText{ Text = "Default", },
+                    new ClickableText{ IsEnabled = false, Text = "Disabled", },
+                    new ClickableText{ Text = "Without sounds", IsMuted = true, },
+                    new ClickableText{ Text = "Without click sounds", IsClickMuted = true, },
+                    new ClickableText{ Text = "Without hover sounds", IsHoverMuted = true, },
+                    text = new ClickableText{ Text = "Disables after click (Action)", },
+                    new ClickableText{ Text = "Has tooltip", TooltipText = "Yep", }
+                }
             });
             text.Action = () => text.IsEnabled = false;
         }
