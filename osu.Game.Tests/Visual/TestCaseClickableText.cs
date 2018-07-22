@@ -12,11 +12,11 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ClickableText), typeof(FillFlowContainer) };
 
-        public TestCaseClickableText()
-        {
-            ClickableText text;
+        ClickableText text;
 
-            Add(new FillFlowContainer<ClickableText>
+        protected override void LoadComplete()
+        {
+            using (var fillFlowContainer = new FillFlowContainer<ClickableText>
             {
                 Direction = FillDirection.Vertical,
                 Children = new[]
@@ -29,8 +29,12 @@ namespace osu.Game.Tests.Visual
                     text = new ClickableText{ Text = "Disables after click (Action)", },
                     new ClickableText{ Text = "Has tooltip", TooltipText = "Yep", }
                 }
-            });
+            })
+            {
+                Add(fillFlowContainer);
+            }
             text.Action = () => text.IsEnabled = false;
+            base.LoadComplete();
         }
     }
 }
