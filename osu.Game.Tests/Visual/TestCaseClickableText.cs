@@ -12,6 +12,7 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ClickableText), typeof(FillFlowContainer) };
 
+        private readonly ClickableText text;
         public TestCaseClickableText() => Child = new FillFlowContainer
         {
             Children = new[]
@@ -21,7 +22,7 @@ namespace osu.Game.Tests.Visual
                 new ClickableText { Text = "Without sounds", IsMuted = true, },
                 new ClickableText { Text = "Without click sounds", IsClickMuted = true, },
                 new ClickableText { Text = "Without hover sounds", IsHoverMuted = true, },
-                new ClickableText { Text = "Disables after click (Action)", },
+                text = new ClickableText { Text = "Disables after click (Action)", Action = () => text.IsEnabled = false },
                 new ClickableText { Text = "Has tooltip", TooltipText = "Yep", },
             }
         };
