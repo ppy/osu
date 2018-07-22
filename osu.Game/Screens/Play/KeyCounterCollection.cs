@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play
         public readonly Bindable<bool> Visible = new Bindable<bool>(true);
         private readonly Bindable<bool> configVisibility = new Bindable<bool>();
 
-        private readonly Dictionary<string, List<KeyCounterMemento>> keyCountersState = new Dictionary<string, List<KeyCounterMemento>>();
+        private readonly Dictionary<string, List<KeyCounterState>> keyCountersState = new Dictionary<string, List<KeyCounterState>>();
 
         public KeyCounterCollection()
         {
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Play
             key.KeyUpTextColor = KeyUpTextColor;
             key.AudioClock = AudioClock;
 
-            keyCountersState.Add(key.Name, new List<KeyCounterMemento>());
+            keyCountersState.Add(key.Name, new List<KeyCounterState>());
             key.KeyPressed += () => keyCountersState[key.Name].Add(key.SaveState());
         }
 
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play
         {
             foreach (var counter in Children)
             {
-                var targetState = keyCountersState[counter.Name].LastOrDefault(state => state.CurrentTime <= time);
+                var targetState = keyCountersState[counter.Name].LastOrDefault(state => state.Time <= time);
                 counter.RestoreState(targetState);
             }
         }

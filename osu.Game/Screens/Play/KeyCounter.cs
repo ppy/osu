@@ -139,8 +139,8 @@ namespace osu.Game.Screens.Play
 
         public void ResetCount() => CountPresses = 0;
 
-        public KeyCounterMemento SaveState() => new KeyCounterMemento(AudioClock.CurrentTime, CountPresses);
+        public KeyCounterState SaveState() => new KeyCounterState(AudioClock.CurrentTime, CountPresses);
 
-        public void RestoreState(KeyCounterMemento memento) => CountPresses = memento.CountPresses;
+        public void RestoreState(KeyCounterState state) => CountPresses = state.Count;
     }
 }
