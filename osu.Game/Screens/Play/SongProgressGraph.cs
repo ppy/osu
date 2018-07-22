@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Play
 
                 var interval = (lastHit - firstHit + 1) / granularity;
 
-                //There apply some changes
+                //There apply some changes. add some info for scaling. values to be read from difficulty
                 foreach (var h in objects)
                 {
                     var endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
