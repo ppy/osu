@@ -3,10 +3,10 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input.States;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
-using osu.Framework.Input;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {

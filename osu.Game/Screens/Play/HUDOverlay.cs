@@ -5,7 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -195,7 +196,6 @@ namespace osu.Game.Screens.Play
 
         protected virtual KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
         {
-            IsCounting = true,
             FadeTime = 50,
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
