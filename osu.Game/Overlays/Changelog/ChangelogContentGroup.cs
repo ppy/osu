@@ -156,6 +156,7 @@ namespace osu.Game.Overlays.Changelog
                             Font = @"Exo2.0-Light",
                             Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
                             Action = () => BuildRequested(),
+                            IsClickMuted = true,
                         },
                     }
                 },
@@ -211,7 +212,7 @@ namespace osu.Game.Overlays.Changelog
                         Direction = FillDirection.Full,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        LineSpacing = 0.25f,
+                        Margin = new MarginPadding{ Vertical = 5, },
                     });
                     title.AddIcon(FontAwesome.fa_check, t => { t.TextSize = 12; t.Padding = new MarginPadding { Left = -17, Right = 5 }; });
                     title.AddText(entry.Title, t => { t.TextSize = 18; }); //t.Padding = new MarginPadding(10); });
@@ -224,14 +225,16 @@ namespace osu.Game.Overlays.Changelog
                         });
                     }
                     title.AddText($" by {entry.GithubUser.DisplayName}", t => t.TextSize = 14); //web: 12;
-                    ChangelogEntries.Add(new SpriteText
+                    TextFlowContainer messageContainer;
+                    ChangelogEntries.Add(messageContainer = new OsuTextFlowContainer
                     {
-                        TextSize = 14, // web: 12,
-                        Colour = new Color4(235, 184, 254, 255),
-                        Text = $"{entry.MessageHtml?.Replace("<p>", "").Replace("</p>", "")}\n",
-                        Margin = new MarginPadding { Bottom = 10, },
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
+                    });
+                    messageContainer.AddText($"{entry.MessageHtml?.Replace("<p>", "").Replace("</p>", "")}\n", t =>
+                    {
+                        t.TextSize = 14; // web: 12,
+                        t.Colour = new Color4(235, 184, 254, 255);
                     });
                 }
             }
