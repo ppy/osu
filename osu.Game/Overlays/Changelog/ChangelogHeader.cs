@@ -26,9 +26,7 @@ namespace osu.Game.Overlays.Changelog
         private readonly TextBadgePairListing listing;
         private readonly TextBadgePairRelease releaseStream;
 
-        public Action OnListingActivated;
-
-        public APIChangelog ChangelogEntry;
+        public Action ListingActivated;
 
         private const float cover_height = 280;
         private const float title_height = 50;
@@ -160,41 +158,21 @@ namespace osu.Game.Overlays.Changelog
                     Origin = Anchor.CentreLeft,
                 },
             };
-
-            // is this a bad way to do this?
-            OnLoadComplete = d =>
-            {
-                releaseStream.OnActivation = () =>
-                {
-                    listing.Deactivate();
-                    chevron.MoveToX(0, 100).FadeIn(100);
-                };
-                listing.OnActivation = () =>
-                {
-                    releaseStream.Deactivate();
-                    chevron.MoveToX(-20, 100).FadeOut(100);
-                    changeHeaderText("Listing");
-                    OnListingActivated?.Invoke();
-                };
-            };
         }
 
-        public void ShowReleaseStream()
+        public void ShowBuild(string updateStream, string version)
         {
-            releaseStream.Activate(String.Join(" ",
-                ChangelogEntry.UpdateStream.DisplayName, ChangelogEntry.DisplayVersion));
-            changeHeaderText(ChangelogEntry.UpdateStream.DisplayName);
-        }
-
-        private void changeHeaderText(string headerText)
-        {
-            titleStream.Text = headerText;
+            listing.Deactivate();
+            releaseStream.Activate($"{updateStream} {version}");
+            titleStream.Text = updateStream;
             titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
         }
 
-        public void ActivateListing() => listing.Activate();
-
-        public bool IsListingActivated() => listing.IsActivated;
+        public void ShowListing()
+        {
+            releaseStream.Deactivate();
+            listing.Activate();
+        }
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
