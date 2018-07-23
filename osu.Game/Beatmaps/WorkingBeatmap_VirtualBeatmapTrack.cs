@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Audio.Track;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps
