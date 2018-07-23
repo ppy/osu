@@ -26,7 +26,9 @@ namespace osu.Game.Overlays.Changelog
         private readonly SpriteIcon chevron;
         private readonly TextBadgePairRelease releaseStream;
 
-        public Action ListingActivated;
+        public delegate void ListingSelectedEventHandler();
+
+        public event ListingSelectedEventHandler ListingSelected;
 
         private const float cover_height = 280;
         private const float title_height = 50;
@@ -127,7 +129,7 @@ namespace osu.Game.Overlays.Changelog
                             Margin = new MarginPadding
                             {
                                 Top = 10,
-                                Left = 7,
+                                Left = 15,
                                 Right = 18,
                                 Bottom = 15,
                             },
@@ -157,6 +159,7 @@ namespace osu.Game.Overlays.Changelog
                     Origin = Anchor.CentreLeft,
                 },
             };
+            listing.Activated += OnListingSelected;
         }
 
         public void ShowBuild(string displayName, string displayVersion)
@@ -173,6 +176,11 @@ namespace osu.Game.Overlays.Changelog
             releaseStream.Deactivate();
             listing.Activate();
             chevron.MoveToX(-20, 100).FadeOut(100);
+        }
+
+        protected virtual void OnListingSelected(object source, EventArgs e)
+        {
+            ListingSelected?.Invoke();
         }
 
         [BackgroundDependencyLoader]

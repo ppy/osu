@@ -32,21 +32,21 @@ namespace osu.Game.Overlays.Changelog.Header
 
         public override void Activate()
         {
+            if (IsActivated)
+                return;
             IsActivated = true;
             LineBadge.Uncollapse();
             Text.Font = "Exo2.0-Bold";
             SetTextColour(Color4.White, 100);
             SampleActivate?.Play();
-            OnActivation?.Invoke();
         }
 
         public override void Deactivate()
         {
             IsActivated = false;
             LineBadge.Collapse();
-            Text.Font = "Exo2.0-Regular"; // commented out since it makes bad resize-jumping
+            Text.Font = "Exo2.0-Regular";
             SetTextColour(badgeColour, 100);
-            OnDeactivation?.Invoke();
         }
 
         protected override bool OnClick(InputState state)

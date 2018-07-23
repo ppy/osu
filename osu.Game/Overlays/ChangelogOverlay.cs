@@ -79,8 +79,9 @@ namespace osu.Game.Overlays
                     },
                 },
             };
+            header.ListingSelected += FetchAndShowListing;
             badges.Selected += onBuildSelected;
-            header.ListingActivated += FetchAndShowListing;
+            content.BuildSelected += onBuildSelected;
         }
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
@@ -152,6 +153,9 @@ namespace osu.Game.Overlays
         /// </summary>
         public void FetchAndShowBuild(string updateStream, string version, bool sentByBadges = false)
         {
+            //// I should probably change this to take APIChangelog as an argument,
+            //// instantly update the header and badge, and if it doesn't contain the
+            //// needed info, just subscribe to when the info will be available
             isAtListing = false;
             var req = new GetChangelogBuildRequest(updateStream, version);
             if (!sentByBadges)

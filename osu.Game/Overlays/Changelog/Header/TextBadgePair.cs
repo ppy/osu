@@ -20,8 +20,10 @@ namespace osu.Game.Overlays.Changelog.Header
         protected LineBadge LineBadge;
         public bool IsActivated { get; protected set; }
 
-        public Action OnActivation;
-        public Action OnDeactivation;
+        public delegate void ActivatedEventHandler(object source, EventArgs args);
+
+        public event ActivatedEventHandler Activated;
+
         private SampleChannel sampleHover;
         protected SampleChannel SampleActivate;
 
@@ -118,6 +120,17 @@ namespace osu.Game.Overlays.Changelog.Header
             if (!IsActivated)
                 sampleHover?.Play();
             return base.OnHover(state);
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            OnActivated();
+            return base.OnClick(state);
+        }
+
+        protected virtual void OnActivated()
+        {
+            Activated?.Invoke(this, EventArgs.Empty);
         }
 
         [BackgroundDependencyLoader]
