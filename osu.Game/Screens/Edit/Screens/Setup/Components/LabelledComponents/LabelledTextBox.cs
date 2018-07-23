@@ -8,29 +8,25 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using System;
+using static osu.Framework.Graphics.UserInterface.TextBox;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
     public class LabelledTextBox : CompositeDrawable
     {
-        private readonly OsuSetupTextBox textBox;
+        private readonly SetupTextBox textBox;
         private readonly Container content;
         private readonly OsuSpriteText label;
 
-        public const float LABEL_CONTAINER_WIDTH = 150;
-        public const float OUTER_CORNER_RADIUS = 15;
-        public const float INNER_CORNER_RADIUS = 10;
-        public const float DEFAULT_HEIGHT = 40;
-        public const float DEFAULT_LABEL_LEFT_PADDING = 15;
-        public const float DEFAULT_LABEL_TOP_PADDING = 12;
-        public const float DEFAULT_LABEL_TEXT_SIZE = 16;
+        private const float label_container_width = 150;
+        private const float outer_corner_radius = 15;
+        private const float inner_corner_radius = 10;
+        private const float default_height = 40;
+        private const float default_label_left_padding = 15;
+        private const float default_label_top_padding = 12;
+        private const float default_label_text_size = 16;
 
-        public event Action<string> TextBoxTextChanged;
-
-        public void TriggerTextBoxTextChanged(string newText)
-        {
-            TextBoxTextChanged?.Invoke(newText);
-        }
+        public event OnCommitHandler TextBoxTextChanged;
 
         private bool readOnly;
         public bool ReadOnly
@@ -65,30 +61,30 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             }
         }
 
-        private string textBoxPlaceholderText;
-        public string TextBoxPlaceholderText
+        private string placeholderText;
+        public string PlaceholderText
         {
-            get => textBoxPlaceholderText;
+            get => placeholderText;
             set
             {
-                textBoxPlaceholderText = value;
+                placeholderText = value;
                 textBox.PlaceholderText = value;
             }
         }
 
-        private string textBoxText;
-        public string TextBoxText
+        private string text;
+        public string Text
         {
-            get => textBoxText;
+            get => text;
             set
             {
-                textBoxText = value;
+                text = value;
                 textBox.Text = value;
-                TextBoxTextChanged?.Invoke(value);
+                TextBoxTextChanged?.Invoke(textBox, true);
             }
         }
 
-        private float height = DEFAULT_HEIGHT;
+        private float height = default_height;
         public float Height
         {
             get => height;
@@ -137,34 +133,32 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         public LabelledTextBox()
         {
             Masking = true;
-            CornerRadius = OUTER_CORNER_RADIUS;
+            CornerRadius = outer_corner_radius;
             RelativeSizeAxes = Axes.X;
-            base.Height = DEFAULT_HEIGHT + Padding.Top;
+            base.Height = default_height + Padding.Top;
 
             InternalChildren = new Drawable[]
             {
                 new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = DEFAULT_HEIGHT,
-                    CornerRadius = OUTER_CORNER_RADIUS,
+                    RelativeSizeAxes = Axes.Both,
+                    CornerRadius = outer_corner_radius,
                     Masking = true,
                     Children = new Drawable[]
                     {
                         new Box
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = DEFAULT_HEIGHT,
+                            RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.FromHex("1c2125"),
                         },
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = DEFAULT_HEIGHT,
+                            Height = default_height,
                             Child = new GridContainer
                             {
                                 RelativeSizeAxes = Axes.X,
-                                Height = DEFAULT_HEIGHT,
+                                Height = default_height,
                                 Content = new[]
                                 {
                                     new Drawable[]
@@ -173,26 +167,26 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
-                                            Padding = new MarginPadding { Left = DEFAULT_LABEL_LEFT_PADDING, Top = DEFAULT_LABEL_TOP_PADDING },
+                                            Padding = new MarginPadding { Left = default_label_left_padding, Top = default_label_top_padding },
                                             Colour = Color4.White,
-                                            TextSize = DEFAULT_LABEL_TEXT_SIZE,
+                                            TextSize = default_label_text_size,
                                             Text = LabelText,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        textBox = new OsuSetupTextBox
+                                        textBox = new SetupTextBox
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
                                             RelativeSizeAxes = Axes.X,
-                                            Height = DEFAULT_HEIGHT,
+                                            Height = default_height,
                                             ReadOnly = ReadOnly,
-                                            CornerRadius = INNER_CORNER_RADIUS,
+                                            CornerRadius = inner_corner_radius,
                                         },
                                     },
                                 },
                                 ColumnDimensions = new[]
                                 {
-                                    new Dimension(GridSizeMode.Absolute, LABEL_CONTAINER_WIDTH),
+                                    new Dimension(GridSizeMode.Absolute, label_container_width),
                                     new Dimension()
                                 }
                             }
@@ -201,7 +195,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                 }
             };
 
-            textBox.OnCommit += delegate { TriggerTextBoxTextChanged(textBox.Text); };
+            textBox.OnCommit += (_, a) => TextBoxTextChanged?.Invoke(textBox, a);
         }
     }
 }
