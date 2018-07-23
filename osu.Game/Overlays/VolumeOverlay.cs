@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
@@ -86,19 +87,13 @@ namespace osu.Game.Overlays
         {
             base.LoadComplete();
 
-            volumeMeterMaster.Bindable.ValueChanged += _ => settingChanged();
-            volumeMeterEffect.Bindable.ValueChanged += _ => settingChanged();
-            volumeMeterMusic.Bindable.ValueChanged += _ => settingChanged();
-            muteButton.Current.ValueChanged += _ => settingChanged();
+            volumeMeterMaster.Bindable.ValueChanged += _ => Show();
+            volumeMeterEffect.Bindable.ValueChanged += _ => Show();
+            volumeMeterMusic.Bindable.ValueChanged += _ => Show();
+            muteButton.Current.ValueChanged += _ => Show();
         }
 
-        private void settingChanged()
-        {
-            Show();
-            schedulePopOut();
-        }
-
-        public bool Adjust(GlobalAction action)
+        public bool Adjust(GlobalAction action, float amount = 1, bool isPrecise = false)
         {
             if (!IsLoaded) return false;
 
@@ -108,13 +103,13 @@ namespace osu.Game.Overlays
                     if (State == Visibility.Hidden)
                         Show();
                     else
-                        volumeMeterMaster.Decrease();
+                        volumeMeterMaster.Decrease(amount, isPrecise);
                     return true;
                 case GlobalAction.IncreaseVolume:
                     if (State == Visibility.Hidden)
                         Show();
                     else
-                        volumeMeterMaster.Increase();
+                        volumeMeterMaster.Increase(amount, isPrecise);
                     return true;
                 case GlobalAction.ToggleMute:
                     Show();
@@ -126,6 +121,14 @@ namespace osu.Game.Overlays
         }
 
         private ScheduledDelegate popOutDelegate;
+
+        public override void Show()
+        {
+            if (State == Visibility.Visible)
+                schedulePopOut();
+
+            base.Show();
+        }
 
         protected override void PopIn()
         {
@@ -140,10 +143,33 @@ namespace osu.Game.Overlays
             this.FadeOut(100);
         }
 
+        protected override bool OnMouseMove(InputState state)
+        {
+            // keep the scheduled event correctly timed as long as we have movement.
+            schedulePopOut();
+            return base.OnMouseMove(state);
+        }
+
+        protected override bool OnHover(InputState state)
+        {
+            schedulePopOut();
+            return true;
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            schedulePopOut();
+            base.OnHoverLost(state);
+        }
+
         private void schedulePopOut()
         {
             popOutDelegate?.Cancel();
-            this.Delay(1000).Schedule(Hide, out popOutDelegate);
+            this.Delay(1000).Schedule(() =>
+            {
+                if (!IsHovered)
+                    Hide();
+            }, out popOutDelegate);
         }
     }
 }

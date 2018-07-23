@@ -80,30 +80,31 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
             foreach (var obj in beatmap.HitObjects)
             {
-                if (obj is Hit)
+                switch (obj)
                 {
-                    AddJudgement(new TaikoJudgement { Result = HitResult.Great });
-                    if (obj.IsStrong)
-                        AddJudgement(new TaikoStrongHitJudgement());
-                }
-                else if (obj is DrumRoll)
-                {
-                    for (int i = 0; i < ((DrumRoll)obj).NestedHitObjects.OfType<DrumRollTick>().Count(); i++)
-                    {
-                        AddJudgement(new TaikoDrumRollTickJudgement { Result = HitResult.Great });
+                    case Hit _:
+                        AddJudgement(new TaikoJudgement { Result = HitResult.Great });
+                        if (obj.IsStrong)
+                            AddJudgement(new TaikoStrongHitJudgement());
+                        break;
+                    case DrumRoll drumRoll:
+                        var count = drumRoll.NestedHitObjects.OfType<DrumRollTick>().Count();
+                        for (int i = 0; i < count; i++)
+                        {
+                            AddJudgement(new TaikoDrumRollTickJudgement { Result = HitResult.Great });
+
+                            if (obj.IsStrong)
+                                AddJudgement(new TaikoStrongHitJudgement());
+                        }
+
+                        AddJudgement(new TaikoJudgement { Result = HitResult.Great });
 
                         if (obj.IsStrong)
                             AddJudgement(new TaikoStrongHitJudgement());
-                    }
-
-                    AddJudgement(new TaikoJudgement { Result = HitResult.Great });
-
-                    if (obj.IsStrong)
-                        AddJudgement(new TaikoStrongHitJudgement());
-                }
-                else if (obj is Swell)
-                {
-                    AddJudgement(new TaikoJudgement { Result = HitResult.Great });
+                        break;
+                    case Swell _:
+                        AddJudgement(new TaikoJudgement { Result = HitResult.Great });
+                        break;
                 }
             }
         }

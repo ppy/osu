@@ -34,7 +34,8 @@ namespace osu.Game.Beatmaps.Formats
 
         private readonly int offset;
 
-        public LegacyBeatmapDecoder(int version = LATEST_VERSION) : base(version)
+        public LegacyBeatmapDecoder(int version = LATEST_VERSION)
+            : base(version)
         {
             // BeatmapVersion 4 and lower had an incorrect offset (stable has this set as 24ms off)
             offset = FormatVersion < 5 ? 24 : 0;
@@ -61,28 +62,30 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
+            var strippedLine = StripComments(line);
+
             switch (section)
             {
                 case Section.General:
-                    handleGeneral(line);
+                    handleGeneral(strippedLine);
                     return;
                 case Section.Editor:
-                    handleEditor(line);
+                    handleEditor(strippedLine);
                     return;
                 case Section.Metadata:
                     handleMetadata(line);
                     return;
                 case Section.Difficulty:
-                    handleDifficulty(line);
+                    handleDifficulty(strippedLine);
                     return;
                 case Section.Events:
-                    handleEvent(line);
+                    handleEvent(strippedLine);
                     return;
                 case Section.TimingPoints:
-                    handleTimingPoint(line);
+                    handleTimingPoint(strippedLine);
                     return;
                 case Section.HitObjects:
-                    handleHitObject(line);
+                    handleHitObject(strippedLine);
                     return;
             }
 
@@ -135,6 +138,7 @@ namespace osu.Game.Beatmaps.Formats
                             parser = new Rulesets.Objects.Legacy.Mania.ConvertHitObjectParser();
                             break;
                     }
+
                     break;
                 case @"LetterboxInBreaks":
                     beatmap.BeatmapInfo.LetterboxInBreaks = int.Parse(pair.Value) == 1;
@@ -216,8 +220,7 @@ namespace osu.Game.Beatmaps.Formats
                     beatmap.BeatmapInfo.OnlineBeatmapID = int.Parse(pair.Value);
                     break;
                 case @"BeatmapSetID":
-                    beatmap.BeatmapInfo.OnlineBeatmapSetID = int.Parse(pair.Value);
-                    metadata.OnlineBeatmapSetID = int.Parse(pair.Value);
+                    beatmap.BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = int.Parse(pair.Value) };
                     break;
             }
         }
@@ -297,9 +300,9 @@ namespace osu.Game.Beatmaps.Formats
                 if (split.Length >= 4)
                     sampleSet = (LegacySampleBank)int.Parse(split[3]);
 
-                //SampleBank sampleBank = SampleBank.Default;
-                //if (split.Length >= 5)
-                //    sampleBank = (SampleBank)int.Parse(split[4]);
+                int customSampleBank = 0;
+                if (split.Length >= 5)
+                    customSampleBank = int.Parse(split[4]);
 
                 int sampleVolume = defaultSampleVolume;
                 if (split.Length >= 6)
@@ -313,22 +316,18 @@ namespace osu.Game.Beatmaps.Formats
                 bool omitFirstBarSignature = false;
                 if (split.Length >= 8)
                 {
-                    int effectFlags = int.Parse(split[7]);
-                    kiaiMode = (effectFlags & 1) > 0;
-                    omitFirstBarSignature = (effectFlags & 8) > 0;
+                    EffectFlags effectFlags = (EffectFlags)int.Parse(split[7]);
+                    kiaiMode = effectFlags.HasFlag(EffectFlags.Kiai);
+                    omitFirstBarSignature = effectFlags.HasFlag(EffectFlags.OmitFirstBarLine);
                 }
 
                 string stringSampleSet = sampleSet.ToString().ToLower();
                 if (stringSampleSet == @"none")
                     stringSampleSet = @"normal";
 
-                DifficultyControlPoint difficultyPoint = beatmap.ControlPointInfo.DifficultyPointAt(time);
-                SampleControlPoint samplePoint = beatmap.ControlPointInfo.SamplePointAt(time);
-                EffectControlPoint effectPoint = beatmap.ControlPointInfo.EffectPointAt(time);
-
                 if (timingChange)
                 {
-                    beatmap.ControlPointInfo.TimingPoints.Add(new TimingControlPoint
+                    handleTimingControlPoint(new TimingControlPoint
                     {
                         Time = time,
                         BeatLength = beatLength,
@@ -336,39 +335,66 @@ namespace osu.Game.Beatmaps.Formats
                     });
                 }
 
-                if (speedMultiplier != difficultyPoint.SpeedMultiplier)
+                handleDifficultyControlPoint(new DifficultyControlPoint
                 {
-                    beatmap.ControlPointInfo.DifficultyPoints.RemoveAll(x => x.Time == time);
-                    beatmap.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint
-                    {
-                        Time = time,
-                        SpeedMultiplier = speedMultiplier
-                    });
-                }
+                    Time = time,
+                    SpeedMultiplier = speedMultiplier
+                });
 
-                if (stringSampleSet != samplePoint.SampleBank || sampleVolume != samplePoint.SampleVolume)
+                handleEffectControlPoint(new EffectControlPoint
                 {
-                    beatmap.ControlPointInfo.SamplePoints.Add(new SampleControlPoint
-                    {
-                        Time = time,
-                        SampleBank = stringSampleSet,
-                        SampleVolume = sampleVolume
-                    });
-                }
+                    Time = time,
+                    KiaiMode = kiaiMode,
+                    OmitFirstBarLine = omitFirstBarSignature
+                });
 
-                if (kiaiMode != effectPoint.KiaiMode || omitFirstBarSignature != effectPoint.OmitFirstBarLine)
+                handleSampleControlPoint(new LegacySampleControlPoint
                 {
-                    beatmap.ControlPointInfo.EffectPoints.Add(new EffectControlPoint
-                    {
-                        Time = time,
-                        KiaiMode = kiaiMode,
-                        OmitFirstBarLine = omitFirstBarSignature
-                    });
-                }
+                    Time = time,
+                    SampleBank = stringSampleSet,
+                    SampleVolume = sampleVolume,
+                    CustomSampleBank = customSampleBank
+                });
             }
             catch (FormatException e)
             {
             }
+        }
+
+        private void handleTimingControlPoint(TimingControlPoint newPoint)
+        {
+            beatmap.ControlPointInfo.TimingPoints.Add(newPoint);
+        }
+
+        private void handleDifficultyControlPoint(DifficultyControlPoint newPoint)
+        {
+            var existing = beatmap.ControlPointInfo.DifficultyPointAt(newPoint.Time);
+
+            if (newPoint.EquivalentTo(existing))
+                return;
+
+            beatmap.ControlPointInfo.DifficultyPoints.RemoveAll(x => x.Time == newPoint.Time);
+            beatmap.ControlPointInfo.DifficultyPoints.Add(newPoint);
+        }
+
+        private void handleEffectControlPoint(EffectControlPoint newPoint)
+        {
+            var existing = beatmap.ControlPointInfo.EffectPointAt(newPoint.Time);
+
+            if (newPoint.EquivalentTo(existing))
+                return;
+
+            beatmap.ControlPointInfo.EffectPoints.Add(newPoint);
+        }
+
+        private void handleSampleControlPoint(SampleControlPoint newPoint)
+        {
+            var existing = beatmap.ControlPointInfo.SamplePointAt(newPoint.Time);
+
+            if (newPoint.EquivalentTo(existing))
+                return;
+
+            beatmap.ControlPointInfo.SamplePoints.Add(newPoint);
         }
 
         private void handleHitObject(string line)
@@ -390,5 +416,13 @@ namespace osu.Game.Beatmaps.Formats
         private double getOffsetTime() => ApplyOffsets ? offset : 0;
 
         private double getOffsetTime(double time) => time + (ApplyOffsets ? offset : 0);
+
+        [Flags]
+        internal enum EffectFlags
+        {
+            None = 0,
+            Kiai = 1,
+            OmitFirstBarLine = 8
+        }
     }
 }

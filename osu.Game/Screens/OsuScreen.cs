@@ -8,7 +8,6 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -17,7 +16,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using OpenTK;
-using OpenTK.Input;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Containers;
 
@@ -77,50 +75,36 @@ namespace osu.Game.Screens
 
         private ParallaxContainer backgroundParallaxContainer;
 
-        public WorkingBeatmap InitialBeatmap
-        {
-            set
-            {
-                if (IsLoaded) throw new InvalidOperationException($"Cannot set {nameof(InitialBeatmap)} post-load.");
-                Beatmap.Value = value;
-            }
-        }
-
         protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private SampleChannel sampleExit;
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuGameBase game, OsuGame osuGame, AudioManager audio)
+        [BackgroundDependencyLoader(true)]
+        private void load(BindableBeatmap beatmap, OsuGame osu, AudioManager audio, Bindable<RulesetInfo> ruleset)
         {
-            if (game != null)
-            {
-                //if we were given a beatmap at ctor time, we want to pass this on to the game-wide beatmap.
-                var localMap = Beatmap.Value;
-                Beatmap.BindTo(game.Beatmap);
-                if (localMap != null)
-                    Beatmap.Value = localMap;
-            }
+            Beatmap.BindTo(beatmap);
+            Ruleset.BindTo(ruleset);
 
-            if (osuGame != null)
+            if (osu != null)
             {
-                Ruleset.BindTo(osuGame.Ruleset);
-                OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+                OverlayActivationMode.BindTo(osu.OverlayActivationMode);
 
                 updateOverlayStates = () =>
                 {
                     if (HideOverlaysOnEnter)
-                        osuGame.CloseAllOverlays();
+                        osu.CloseAllOverlays();
                     else
-                        osuGame.Toolbar.State = Visibility.Visible;
+                        osu.Toolbar.State = Visibility.Visible;
                 };
             }
 
             sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
 
-        public bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(GlobalAction action)
         {
+            if (!IsCurrentScreen) return false;
+
             if (action == GlobalAction.Back && AllowBackButton)
             {
                 Exit();
@@ -131,20 +115,6 @@ namespace osu.Game.Screens
         }
 
         public bool OnReleased(GlobalAction action) => action == GlobalAction.Back && AllowBackButton;
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (args.Repeat || !IsCurrentScreen) return false;
-
-            switch (args.Key)
-            {
-                case Key.Escape:
-                    Exit();
-                    return true;
-            }
-
-            return base.OnKeyDown(state, args);
-        }
 
         protected override void OnResuming(Screen last)
         {
@@ -210,11 +180,10 @@ namespace osu.Game.Screens
 
             if (Background != null && !Background.Equals(nextOsu?.Background))
             {
-                if (nextOsu != null)
-                    //We need to use MakeCurrent in case we are jumping up multiple game screens.
-                    nextOsu.Background?.MakeCurrent();
-                else
-                    Background.Exit();
+                Background.Exit();
+
+                //We need to use MakeCurrent in case we are jumping up multiple game screens.
+                nextOsu?.Background?.MakeCurrent();
             }
 
             if (base.OnExiting(next))

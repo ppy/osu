@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Direct
 
         public DirectGridPanel(BeatmapSetInfo beatmap) : base(beatmap)
         {
-            Width = 400;
+            Width = 380;
             Height = 140 + vertical_padding; //full height of all the elements plus vertical padding (autosize uses the image)
         }
 
@@ -149,7 +149,7 @@ namespace osu.Game.Overlays.Direct
                                             {
                                                 new OsuSpriteText
                                                 {
-                                                    Text = $"{SetInfo.Metadata.Source}",
+                                                    Text = SetInfo.Metadata.Source,
                                                     TextSize = 14,
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
@@ -166,14 +166,12 @@ namespace osu.Game.Overlays.Direct
                                         },
                                     },
                                 },
-                                new DownloadButton
+                                new DownloadButton(SetInfo)
                                 {
-                                    Size = new Vector2(30),
+                                    Size = new Vector2(50, 30),
                                     Margin = new MarginPadding(horizontal_padding),
-                                    Anchor = Anchor.CentreRight,
-                                    Origin = Anchor.CentreRight,
-                                    Colour = colours.Gray5,
-                                    Action = StartDownload
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
                                 },
                             },
                         },
