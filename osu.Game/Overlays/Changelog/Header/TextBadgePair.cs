@@ -25,53 +25,6 @@ namespace osu.Game.Overlays.Changelog.Header
         private SampleChannel sampleHover;
         protected SampleChannel SampleActivate;
 
-        public void SetTextColour(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
-        {
-            Text.FadeColour(newColour, duration, easing);
-        }
-
-        public void SetBadgeColour(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
-        {
-            LineBadge.FadeColour(newColour, duration, easing);
-        }
-
-        public void HideText(double duration = 0, Easing easing = Easing.InOutCubic)
-        {
-            LineBadge.Collapse();
-            Text.MoveToY(20, duration, easing)
-                .FadeOut(duration, easing);
-        }
-
-        public void ShowText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
-        {
-            LineBadge.Uncollapse();
-            if (!string.IsNullOrEmpty(displayText))
-                Text.Text = displayText;
-            Text.MoveToY(0, duration, easing)
-                .FadeIn(duration, easing);
-        }
-
-        /// <param name="duration">
-        /// The duration of popping in and popping out not combined.
-        /// Full change takes double this time.</param>
-        public void ChangeText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
-        {
-            LineBadge.Collapse();
-            Text.MoveToY(20, duration, easing)
-                .FadeOut(duration, easing)
-                .Then()
-                .MoveToY(0, duration, easing)
-                .FadeIn(duration, easing);
-
-            // since using .finally/.oncomplete after first fadeout made the badge not hide
-            // sometimes in visual tests (https://streamable.com/0qssq), I'm using a scheduler here
-            Scheduler.AddDelayed(() =>
-            {
-                if (!string.IsNullOrEmpty(displayText)) Text.Text = displayText;
-                LineBadge.Uncollapse();
-            }, duration);
-        }
-
         public TextBadgePair(ColourInfo badgeColour, string displayText = "Listing", bool startCollapsed = true)
         {
             AutoSizeAxes = Axes.X;
@@ -98,6 +51,27 @@ namespace osu.Game.Overlays.Changelog.Header
             };
         }
 
+        /// <param name="duration">
+        /// The duration of popping in and popping out not combined.
+        /// Full change takes double this time.</param>
+        public void ChangeText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
+        {
+            LineBadge.Collapse();
+            Text.MoveToY(20, duration, easing)
+                .FadeOut(duration, easing)
+                .Then()
+                .MoveToY(0, duration, easing)
+                .FadeIn(duration, easing);
+
+            // since using .finally/.oncomplete after first fadeout made the badge not hide
+            // sometimes in visual tests (https://streamable.com/0qssq), I'm using a scheduler here
+            Scheduler.AddDelayed(() =>
+            {
+                if (!string.IsNullOrEmpty(displayText)) Text.Text = displayText;
+                LineBadge.Uncollapse();
+            }, duration);
+        }
+
         public virtual void Deactivate()
         {
             IsActivated = false;
@@ -111,6 +85,32 @@ namespace osu.Game.Overlays.Changelog.Header
             LineBadge.Uncollapse();
             Text.Font = "Exo2.0-Bold";
             SampleActivate?.Play();
+        }
+
+        public void SetTextColour(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
+        {
+            Text.FadeColour(newColour, duration, easing);
+        }
+
+        public void SetBadgeColour(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
+        {
+            LineBadge.FadeColour(newColour, duration, easing);
+        }
+
+        public void HideText(double duration = 0, Easing easing = Easing.InOutCubic)
+        {
+            LineBadge.Collapse();
+            Text.MoveToY(20, duration, easing)
+                .FadeOut(duration, easing);
+        }
+
+        public void ShowText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
+        {
+            LineBadge.Uncollapse();
+            if (!string.IsNullOrEmpty(displayText))
+                Text.Text = displayText;
+            Text.MoveToY(0, duration, easing)
+                .FadeIn(duration, easing);
         }
 
         protected override bool OnHover(InputState state)
