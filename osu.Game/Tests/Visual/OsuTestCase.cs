@@ -62,7 +62,16 @@ namespace osu.Game.Tests.Visual
             }
 
             if (localStorage.IsValueCreated)
-                localStorage.Value.DeleteDirectory(".");
+            {
+                try
+                {
+                    localStorage.Value.DeleteDirectory(".");
+                }
+                catch
+                {
+                    // we don't really care if this fails; it will just leave folders lying around from test runs.
+                }
+            }
         }
 
         protected override ITestCaseTestRunner CreateRunner() => new OsuTestCaseTestRunner();
