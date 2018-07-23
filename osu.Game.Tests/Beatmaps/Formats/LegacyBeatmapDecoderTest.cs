@@ -214,10 +214,10 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
-        public void TestDecodeCustomSamples()
+        public void TestDecodeControlPointCustomSampleBank()
         {
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
-            using (var resStream = Resource.OpenResource("custom-samples.osu"))
+            using (var resStream = Resource.OpenResource("controlpoint-custom-samplebank.osu"))
             using (var stream = new StreamReader(resStream))
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
@@ -228,25 +228,42 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("normal-hitnormal", getTestableSampleInfo(hitObjects[3]).LookupNames.First());
             }
 
-            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(new SampleInfo { Name = "hitnormal" });
+            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
         }
 
         [Test]
-        public void TestDecodeCustomHitObjectSamples()
+        public void TestDecodeHitObjectCustomSampleBank()
         {
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
-            using (var resStream = Resource.OpenResource("custom-hitobject-samples.osu"))
+            using (var resStream = Resource.OpenResource("hitobject-custom-samplebank.osu"))
             using (var stream = new StreamReader(resStream))
             {
                 var hitObjects = decoder.Decode(stream).HitObjects;
 
-                Assert.AreEqual("hit_1.wav", hitObjects[0].Samples[0].LookupNames.First());
-                Assert.AreEqual("hit_2.wav", hitObjects[1].Samples[0].LookupNames.First());
-                Assert.AreEqual("normal-hitnormal2", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
-                Assert.AreEqual("hit_1.wav", hitObjects[3].Samples[0].LookupNames.First());
+                Assert.AreEqual("normal-hitnormal", getTestableSampleInfo(hitObjects[0]).LookupNames.First());
+                Assert.AreEqual("normal-hitnormal2", getTestableSampleInfo(hitObjects[1]).LookupNames.First());
+                Assert.AreEqual("normal-hitnormal3", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
             }
 
-            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(new SampleInfo { Name = "hitnormal" });
+            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+        }
+
+        [Test]
+        public void TestDecodeHitObjectFileSamples()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+            using (var resStream = Resource.OpenResource("hitobject-file-samples.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                Assert.AreEqual("hit_1.wav", getTestableSampleInfo(hitObjects[0]).LookupNames.First());
+                Assert.AreEqual("hit_2.wav", getTestableSampleInfo(hitObjects[1]).LookupNames.First());
+                Assert.AreEqual("normal-hitnormal2", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
+                Assert.AreEqual("hit_1.wav", getTestableSampleInfo(hitObjects[3]).LookupNames.First());
+            }
+
+            SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
         }
     }
 }
