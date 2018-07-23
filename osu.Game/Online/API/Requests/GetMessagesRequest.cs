@@ -18,7 +18,7 @@ namespace osu.Game.Online.API.Requests
             if (channels == null)
                 throw new ArgumentNullException(nameof(channels));
             if (channels.Any(c => c.Target != TargetType.Channel))
-                throw new ArgumentException($"All channels in the argument channels must have the {nameof(Channel.Target)} Channel");
+                throw new ArgumentException($"All channels in the argument channels must have a {nameof(Channel.Target)} of {nameof(TargetType.Channel)}");
 
             this.channels = channels;
         }
