@@ -6,6 +6,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Input;
 using System.Diagnostics;
+using osu.Framework.Platform;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public string Link;
 
-        public const float DEFAULT_TEXT_SIZE = 12;
+        private const float default_text_size = 12;
 
         public float TextSize
         {
@@ -43,7 +44,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             Child = label = new OsuSpriteText
             {
                 Font = @"Exo2.0-Bold",
-                TextSize = DEFAULT_TEXT_SIZE
+                TextSize = default_text_size
             };
         }
 
