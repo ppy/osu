@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests.Responses;
 using System;
 
@@ -27,7 +28,7 @@ namespace osu.Game.Overlays.Changelog
 
         private bool isActivated;
 
-        private readonly Header.LineBadge lineBadge;
+        private readonly LineBadge lineBadge;
         private SampleChannel sampleHover;
         public readonly APIChangelog ChangelogEntry;
         private readonly FillFlowContainer<SpriteText> text;
@@ -75,21 +76,23 @@ namespace osu.Game.Overlays.Changelog
                         },
                     }
                 },
-                lineBadge = new Header.LineBadge(false, 2, 4)
+                lineBadge = new LineBadge(false)
                 {
                     Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
                     Colour = StreamColour.FromStreamName(ChangelogEntry.UpdateStream.Name),
-                    RelativeSizeAxes = Axes.X,
+                    UncollapsedSize = 4,
+                    CollapsedSize = 2,
                 },
             };
         }
 
+        /// <param name="withoutFiringUpdates">In case we don't want to
+        /// fire the <see cref="Selected"/> event.</param>
         public void Activate(bool withoutFiringUpdates = true)
         {
             isActivated = true;
             this.FadeIn(transition_duration);
-            lineBadge.IsCollapsed = false;
+            lineBadge.Uncollapse();
             if (!withoutFiringUpdates)
                 Selected?.Invoke(this, EventArgs.Empty);
         }
@@ -101,7 +104,7 @@ namespace osu.Game.Overlays.Changelog
             if (!IsHovered)
             {
                 this.FadeTo(0.5f, transition_duration);
-                lineBadge.IsCollapsed = true;
+                lineBadge.Collapse(200);
             }
         }
 
@@ -116,7 +119,7 @@ namespace osu.Game.Overlays.Changelog
             sampleHover?.Play();
             DisableDim();
             this.FadeIn(transition_duration);
-            lineBadge.IsCollapsed = false;
+            lineBadge.Uncollapse();
             return base.OnHover(state);
         }
 
@@ -125,7 +128,7 @@ namespace osu.Game.Overlays.Changelog
             if (!isActivated)
             {
                 this.FadeTo(0.5f, transition_duration);
-                lineBadge.IsCollapsed = true;
+                lineBadge.Collapse(200);
             }
             else
                 EnableDim();

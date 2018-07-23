@@ -33,7 +33,7 @@ namespace osu.Game.Overlays.Changelog.Header
         public override void Activate()
         {
             IsActivated = true;
-            LineBadge.IsCollapsed = false;
+            LineBadge.Uncollapse();
             Text.Font = "Exo2.0-Bold";
             SetTextColour(Color4.White, 100);
             SampleActivate?.Play();
@@ -43,7 +43,7 @@ namespace osu.Game.Overlays.Changelog.Header
         public override void Deactivate()
         {
             IsActivated = false;
-            LineBadge.IsCollapsed = true;
+            LineBadge.Collapse();
             Text.Font = "Exo2.0-Regular"; // commented out since it makes bad resize-jumping
             SetTextColour(badgeColour, 100);
             OnDeactivation?.Invoke();
@@ -57,14 +57,14 @@ namespace osu.Game.Overlays.Changelog.Header
 
         protected override bool OnHover(InputState state)
         {
-            LineBadge.ResizeHeightTo(LineBadge.UncollapsedHeight, LineBadge.TransitionDuration, Easing.OutElastic);
+            LineBadge.Uncollapse();
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
             if (!IsActivated)
-                LineBadge.ResizeHeightTo(1, LineBadge.TransitionDuration, Easing.Out);
+                LineBadge.Collapse();
             base.OnHoverLost(state);
         }
 
