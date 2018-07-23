@@ -13,6 +13,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Changelog;
 using System;
 
@@ -114,9 +115,9 @@ namespace osu.Game.Overlays
             FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
         }
 
-        private void onBuildSelected(string updateStream, string version, EventArgs e)
+        private void onBuildSelected(APIChangelog build, EventArgs e)
         {
-            FetchAndShowBuild(updateStream, version);
+            FetchAndShowBuild(build);
         }
 
         [BackgroundDependencyLoader]
@@ -151,18 +152,21 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Fetches and shows a specific build from a specific update stream.
         /// </summary>
-        public void FetchAndShowBuild(string updateStream, string version, bool sentByBadges = false)
+        public void FetchAndShowBuild(APIChangelog build, bool sentByBadges = false)
         {
-            //// I should probably change this to take APIChangelog as an argument,
-            //// instantly update the header and badge, and if it doesn't contain the
-            //// needed info, just subscribe to when the info will be available
             isAtListing = false;
-            var req = new GetChangelogBuildRequest(updateStream, version);
+            var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
+
+            if (build.UpdateStream.DisplayName != null && build.DisplayVersion != null)
+                header.ShowBuild(build.UpdateStream.DisplayName, build.DisplayVersion);
+            else
+                req.Success += res => header.ShowBuild(res.UpdateStream.DisplayName, res.DisplayVersion);
+
             if (!sentByBadges)
-                badges.SelectUpdateStream(updateStream);
-            chart.ShowUpdateStream(updateStream);
+                badges.SelectUpdateStream(build.UpdateStream.Name);
+
+            chart.ShowUpdateStream(build.UpdateStream.Name);
             req.Success += content.ShowBuild;
-            req.Success += res => header.ShowBuild(res.UpdateStream.DisplayName, res.DisplayVersion);
             api.Queue(req);
         }
     }

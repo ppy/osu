@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Changelog
         private APIAccess api;
         private ChangelogContentGroup changelogContentGroup;
 
-        public delegate void BuildSelectedEventHandler(string updateStream, string version, EventArgs args);
+        public delegate void BuildSelectedEventHandler(APIChangelog build, EventArgs args);
 
         public event BuildSelectedEventHandler BuildSelected;
 
@@ -80,9 +80,9 @@ namespace osu.Game.Overlays.Changelog
             changelogContentGroup.BuildSelected += OnBuildSelected;
         }
 
-        protected virtual void OnBuildSelected(string updateStream, string version, EventArgs args)
+        protected virtual void OnBuildSelected(APIChangelog build, EventArgs args)
         {
-            BuildSelected?.Invoke(updateStream, version, EventArgs.Empty);
+            BuildSelected?.Invoke(build, EventArgs.Empty);
         }
     }
 }
