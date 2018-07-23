@@ -30,14 +30,12 @@ namespace osu.Game.Overlays.Changelog.Header
                 ShowText(transition_duration, displayText);
             IsActivated = true;
             SampleActivate?.Play();
-            OnActivation?.Invoke();
         }
 
         public override void Deactivate()
         {
             IsActivated = false;
             HideText(transition_duration);
-            OnDeactivation?.Invoke();
         }
     }
 }
