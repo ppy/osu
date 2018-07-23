@@ -31,7 +31,6 @@ namespace osu.Game.Overlays.Changelog
         public void ShowListing(APIChangelog[] changelog)
         {
             DateTime currentDate = new DateTime();
-
             Clear();
 
             foreach (APIChangelog build in changelog)
@@ -48,10 +47,10 @@ namespace osu.Game.Overlays.Changelog
                             Margin = new MarginPadding { Top = 30, },
                         });
                     }
-                    // watch out for this?
-                    Add(changelogContentGroup = new ChangelogContentGroup(build, true));
+                    changelogContentGroup = new ChangelogContentGroup(build, true);
                     changelogContentGroup.BuildSelected += OnBuildSelected;
                     changelogContentGroup.GenerateText(build.ChangelogEntries);
+                    Add(changelogContentGroup);
                     currentDate = build.CreatedAt.Date;
                 }
                 else
@@ -63,9 +62,11 @@ namespace osu.Game.Overlays.Changelog
                         Colour = new Color4(32, 24, 35, 255),
                         Margin = new MarginPadding { Top = 30, },
                     });
-                    Add(changelogContentGroup = new ChangelogContentGroup(build, false));
+
+                    changelogContentGroup = new ChangelogContentGroup(build, false);
                     changelogContentGroup.BuildSelected += OnBuildSelected;
                     changelogContentGroup.GenerateText(build.ChangelogEntries);
+                    Add(changelogContentGroup);
                 }
             }
         }

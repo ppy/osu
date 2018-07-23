@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
         /// takes up the full parent's axis defined by <see cref="IsHorizontal"/>.
         /// </summary>
         /// <param name="startCollapsed">Whether to initialize with the
-        /// <see cref="CollapsedSize"/> or the <see cref="UncollapsedSize"/></param>
+        /// <see cref="CollapsedSize"/> or the <see cref="UncollapsedSize"/>.</param>
         public LineBadge(bool startCollapsed = true)
         {
             IsCollapsed = startCollapsed;

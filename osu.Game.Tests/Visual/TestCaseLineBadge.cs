@@ -13,10 +13,10 @@ namespace osu.Game.Tests.Visual
     {
         public TestCaseLineBadge()
         {
-            Container containerHorizontal;
+            Container container;
             LineBadge lineBadge;
 
-            Add(containerHorizontal = new Container
+            Add(container = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -41,7 +41,7 @@ namespace osu.Game.Tests.Visual
             AddStep(@"", () => { });
             AddStep(@"Collapse", () => lineBadge.Collapse());
             AddStep(@"Uncollapse", () => lineBadge.Uncollapse());
-            AddSliderStep(@"Resize container", 1, 300, 150, value => containerHorizontal.ResizeTo(value));
+            AddSliderStep(@"Resize container", 1, 300, 150, value => container.ResizeTo(value));
             AddStep(@"Horizontal", () => lineBadge.IsHorizontal = true);
             AddStep(@"Anchor top", () => lineBadge.Anchor = Anchor.TopCentre);
             AddStep(@"Vertical", () => lineBadge.IsHorizontal = false);

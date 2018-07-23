@@ -15,7 +15,6 @@ using osu.Game.Online.API.Requests.Responses;
 namespace osu.Game.Overlays.Changelog
 {
     // maybe look to osu.Game.Screens.Play.SquareGraph for reference later
-    // placeholder json file: https://api.myjson.com/bins/10ye8a
     public class ChangelogChart : BufferedContainer
     {
         private readonly Box background;
@@ -42,10 +41,6 @@ namespace osu.Game.Overlays.Changelog
                 },
             };
         }
-
-        /// <summary>
-        /// Draw the graph for a specific build
-        /// </summary>
 
         private bool isEmpty(APIChangelogChart changelogChart)
         {
