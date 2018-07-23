@@ -203,29 +203,42 @@ namespace osu.Game.Online.Chat
         {
             var joinedUserChannels = JoinedChannels.Where(c => c.Target == TargetType.User).ToList();
 
-            var outgoingMessages = messages.Where(m => m.Sender.Id == api.LocalUser.Value.Id);
-            var outgoingMessagesGroups = outgoingMessages.GroupBy(m => m.TargetId);
-            var incomingMessagesGroups = messages.Except(outgoingMessages).GroupBy(m => m.UserId);
-
-            foreach (var messageGroup in incomingMessagesGroups)
+            Channel getChannelForUser(User user)
             {
-                var targetUser = messageGroup.First().Sender;
-                var channel = joinedUserChannels.FirstOrDefault(c => c.Id == targetUser.Id);
+                var channel = joinedUserChannels.FirstOrDefault(c => c.Id == user.Id);
 
                 if (channel == null)
                 {
-                    channel = new PrivateChannel { User = targetUser };
+                    channel = new PrivateChannel { User = user };
                     JoinedChannels.Add(channel);
                     joinedUserChannels.Add(channel);
                 }
 
-                channel.AddNewMessages(messageGroup.ToArray());
-                var outgoingTargetMessages = outgoingMessagesGroups.FirstOrDefault(g => g.Key == targetUser.Id);
+                return channel;
+            }
+
+            long localUserId = api.LocalUser.Value.Id;
+
+            var outgoingGroups = messages.Where(m => m.Sender.Id == localUserId).GroupBy(m => m.TargetId);
+            var incomingGroups = messages.Where(m => m.Sender.Id != localUserId).GroupBy(m => m.UserId);
+
+            foreach (var group in incomingGroups)
+            {
+                var targetUser = group.First().Sender;
+
+                var channel = getChannelForUser(targetUser);
+
+                channel.AddNewMessages(group.ToArray());
+
+                var outgoingTargetMessages = outgoingGroups.FirstOrDefault(g => g.Key == targetUser.Id);
                 if (outgoingTargetMessages != null)
                     channel.AddNewMessages(outgoingTargetMessages.ToArray());
             }
 
-            var withoutReplyGroups = outgoingMessagesGroups.Where(g => joinedUserChannels.All(m => m.Id != g.Key));
+            // Because of the way the API provides data right now, outgoing messages do not contain required
+            // user (or in the future, target channel) metadata. As such we need to do a second request
+            // to find out the specifics of the user.
+            var withoutReplyGroups = outgoingGroups.Where(g => joinedUserChannels.All(m => m.Id != g.Key));
 
             foreach (var withoutReplyGroup in withoutReplyGroups)
             {
@@ -234,10 +247,8 @@ namespace osu.Game.Online.Chat
                 userReq.Failure += exception => Logger.Error(exception, "Failed to get user informations.");
                 userReq.Success += user =>
                 {
-                    var channel = new PrivateChannel { User = user };
-
+                    var channel = getChannelForUser(user);
                     channel.AddNewMessages(withoutReplyGroup.ToArray());
-                    JoinedChannels.Add(channel);
                 };
 
                 api.Queue(userReq);
