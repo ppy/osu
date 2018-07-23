@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Input;
 using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
