@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.States;
+using osu.Game.Graphics.UserInterface;
 using System;
 
 namespace osu.Game.Overlays.Changelog.Header
@@ -36,14 +37,14 @@ namespace osu.Game.Overlays.Changelog.Header
 
         public void HideText(double duration = 0, Easing easing = Easing.InOutCubic)
         {
-            LineBadge.IsCollapsed = true;
+            LineBadge.Collapse();
             Text.MoveToY(20, duration, easing)
                 .FadeOut(duration, easing);
         }
 
         public void ShowText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
         {
-            LineBadge.IsCollapsed = false;
+            LineBadge.Uncollapse();
             if (!string.IsNullOrEmpty(displayText))
                 Text.Text = displayText;
             Text.MoveToY(0, duration, easing)
@@ -55,7 +56,7 @@ namespace osu.Game.Overlays.Changelog.Header
         /// Full change takes double this time.</param>
         public void ChangeText(double duration = 0, string displayText = null, Easing easing = Easing.InOutCubic)
         {
-            LineBadge.IsCollapsed = true;
+            LineBadge.Collapse();
             Text.MoveToY(20, duration, easing)
                 .FadeOut(duration, easing)
                 .Then()
@@ -67,7 +68,7 @@ namespace osu.Game.Overlays.Changelog.Header
             Scheduler.AddDelayed(() =>
             {
                 if (!string.IsNullOrEmpty(displayText)) Text.Text = displayText;
-                LineBadge.IsCollapsed = false;
+                LineBadge.Uncollapse();
             }, duration);
         }
 
@@ -89,8 +90,10 @@ namespace osu.Game.Overlays.Changelog.Header
                 },
                 LineBadge = new LineBadge(startCollapsed)
                 {
+                    CollapsedSize = 2,
+                    UncollapsedSize = 10,
                     Colour = badgeColour,
-                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.BottomCentre,
                 }
             };
         }
@@ -98,14 +101,14 @@ namespace osu.Game.Overlays.Changelog.Header
         public virtual void Deactivate()
         {
             IsActivated = false;
-            LineBadge.IsCollapsed = true;
+            LineBadge.Collapse();
             Text.Font = "Exo2.0-Regular";
         }
 
         public virtual void Activate()
         {
             IsActivated = true;
-            LineBadge.IsCollapsed = false;
+            LineBadge.Uncollapse();
             Text.Font = "Exo2.0-Bold";
             SampleActivate?.Play();
         }
