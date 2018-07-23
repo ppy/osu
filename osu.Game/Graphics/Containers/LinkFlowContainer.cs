@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -87,9 +88,9 @@ namespace osu.Game.Graphics.Containers
                             {
                                 channelManager.OpenChannel(linkArgument);
                             }
-                            catch (ChannelNotFoundException)
+                            catch (ChannelNotFoundException e)
                             {
-                                //channel was not found
+                                Logger.Error(e, "It should not be possible that the user is able to click a invalid channel link.");    
                             }
                             break;
                         case LinkAction.OpenEditorTimestamp:
