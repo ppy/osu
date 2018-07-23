@@ -88,7 +88,7 @@ namespace osu.Game.Tests.Visual
             if (users == null || users.Count == 0)
                 return;
 
-            chatTabControl.AddItem(new Channel(users[RNG.Next(0, users.Count - 1)]));
+            chatTabControl.AddItem(new PrivateChannel { User = users[RNG.Next(0, users.Count - 1)] });
         }
 
         private void addChannel(string name)

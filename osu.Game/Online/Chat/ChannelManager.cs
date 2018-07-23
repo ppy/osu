@@ -69,7 +69,7 @@ namespace osu.Game.Online.Chat
                 throw new ArgumentNullException(nameof(user));
 
             CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Target == TargetType.User && c.Id == user.Id)
-                                   ?? new Channel(user);
+                                   ?? new PrivateChannel { User = user };
         }
 
         public ChannelManager()
@@ -214,7 +214,7 @@ namespace osu.Game.Online.Chat
 
                 if (channel == null)
                 {
-                    channel = new Channel(targetUser);
+                    channel = new PrivateChannel { User = targetUser };
                     JoinedChannels.Add(channel);
                     joinedUserChannels.Add(channel);
                 }
@@ -234,7 +234,7 @@ namespace osu.Game.Online.Chat
                 userReq.Failure += exception => Logger.Error(exception, "Failed to get user informations.");
                 userReq.Success += user =>
                 {
-                    var channel = new Channel(user);
+                    var channel = new PrivateChannel { User = user };
 
                     channel.AddNewMessages(withoutReplyGroup.ToArray());
                     JoinedChannels.Add(channel);
