@@ -160,6 +160,7 @@ namespace osu.Game.Overlays.Changelog
                 },
             };
             listing.Activated += OnListingSelected;
+            releaseStream.Activated += OnReleaseSelected;
         }
 
         public void ShowBuild(string displayName, string displayVersion)
@@ -175,12 +176,19 @@ namespace osu.Game.Overlays.Changelog
         {
             releaseStream.Deactivate();
             listing.Activate();
+            titleStream.Text = "Listing";
+            titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
             chevron.MoveToX(-20, 100).FadeOut(100);
         }
 
         protected virtual void OnListingSelected(object source, EventArgs e)
         {
             ListingSelected?.Invoke();
+        }
+
+        protected virtual void OnReleaseSelected(object source, EventArgs e)
+        {
+            titleStream.FlashColour(Color4.White, 500, Easing.OutQuad);
         }
 
         [BackgroundDependencyLoader]

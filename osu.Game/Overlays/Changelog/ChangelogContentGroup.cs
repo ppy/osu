@@ -159,7 +159,6 @@ namespace osu.Game.Overlays.Changelog
                             Font = @"Exo2.0-Light",
                             Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
                             Action = () => OnBuildSelected(build),
-                            IsClickMuted = true,
                         },
                     }
                 },

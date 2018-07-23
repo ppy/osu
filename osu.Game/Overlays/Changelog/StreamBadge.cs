@@ -29,15 +29,17 @@ namespace osu.Game.Overlays.Changelog
         private bool isActivated;
 
         private readonly LineBadge lineBadge;
+        private SampleChannel sampleClick;
         private SampleChannel sampleHover;
-        public readonly APIChangelog ChangelogEntry;
+
+        public readonly APIChangelog LatestBuild;
         private readonly FillFlowContainer<SpriteText> text;
 
-        public StreamBadge(APIChangelog changelogEntry)
+        public StreamBadge(APIChangelog latestBuild)
         {
-            ChangelogEntry = changelogEntry;
+            this.LatestBuild = latestBuild;
             Height = badge_height;
-            Width = ChangelogEntry.IsFeatured ? badge_width * 2 : badge_width;
+            base.Width = this.LatestBuild.IsFeatured ? badge_width * 2 : badge_width;
             Margin = new MarginPadding(5);
             isActivated = true;
             Children = new Drawable[]
@@ -51,7 +53,7 @@ namespace osu.Game.Overlays.Changelog
                     {
                         new SpriteText
                         {
-                            Text = ChangelogEntry.UpdateStream.DisplayName,
+                            Text = this.LatestBuild.UpdateStream.DisplayName,
                             Font = @"Exo2.0-Bold",
                             TextSize = 16,
                             Margin = new MarginPadding
@@ -61,14 +63,14 @@ namespace osu.Game.Overlays.Changelog
                         },
                         new SpriteText
                         {
-                            Text = ChangelogEntry.DisplayVersion,
+                            Text = this.LatestBuild.DisplayVersion,
                             Font = @"Exo2.0-Light",
                             TextSize = 21,
                         },
                         new SpriteText
                         {
-                            Text = ChangelogEntry.Users > 0 ?
-                                $"{ChangelogEntry.Users:N0} users online" :
+                            Text = this.LatestBuild.Users > 0 ?
+                                $"{this.LatestBuild.Users:N0} users online" :
                                 null,
                             TextSize = 12,
                             Font = @"Exo2.0-Regular",
@@ -79,7 +81,7 @@ namespace osu.Game.Overlays.Changelog
                 lineBadge = new LineBadge(false)
                 {
                     Anchor = Anchor.TopCentre,
-                    Colour = StreamColour.FromStreamName(ChangelogEntry.UpdateStream.Name),
+                    Colour = StreamColour.FromStreamName(this.LatestBuild.UpdateStream.Name),
                     UncollapsedSize = 4,
                     CollapsedSize = 2,
                 },
@@ -111,6 +113,7 @@ namespace osu.Game.Overlays.Changelog
         protected override bool OnClick(InputState state)
         {
             Activate(false);
+            sampleClick?.Play();
             return base.OnClick(state);
         }
 
@@ -142,6 +145,7 @@ namespace osu.Game.Overlays.Changelog
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
         {
+            sampleClick = audio.Sample.Get(@"UI/generic-select-soft");
             sampleHover = audio.Sample.Get(@"UI/generic-hover-soft");
         }
     }

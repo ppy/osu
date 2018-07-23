@@ -29,7 +29,6 @@ namespace osu.Game.Overlays.Changelog.Header
             else
                 ShowText(transition_duration, displayText);
             IsActivated = true;
-            SampleActivate?.Play();
         }
 
         public override void Deactivate()

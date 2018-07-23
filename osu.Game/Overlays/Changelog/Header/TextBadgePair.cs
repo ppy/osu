@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Changelog.Header
         public event ActivatedEventHandler Activated;
 
         private SampleChannel sampleHover;
-        protected SampleChannel SampleActivate;
+        private SampleChannel sampleActivate;
 
         public TextBadgePair(ColourInfo badgeColour, string displayText = "Listing", bool startCollapsed = true)
         {
@@ -86,7 +86,6 @@ namespace osu.Game.Overlays.Changelog.Header
             IsActivated = true;
             LineBadge.Uncollapse();
             Text.Font = "Exo2.0-Bold";
-            SampleActivate?.Play();
         }
 
         public void SetTextColour(ColourInfo newColour, double duration = 0, Easing easing = Easing.None)
@@ -125,6 +124,7 @@ namespace osu.Game.Overlays.Changelog.Header
         protected override bool OnClick(InputState state)
         {
             OnActivated();
+            sampleActivate?.Play();
             return base.OnClick(state);
         }
 
@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Changelog.Header
         private void load(AudioManager audio)
         {
             sampleHover = audio.Sample.Get(@"UI/generic-hover-soft");
-            SampleActivate = audio.Sample.Get(@"UI/generic-select-soft");
+            sampleActivate = audio.Sample.Get(@"UI/generic-select-soft");
         }
     }
 }
