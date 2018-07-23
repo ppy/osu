@@ -74,6 +74,9 @@ namespace osu.Game.Overlays.Changelog
         public void ShowBuild(APIChangelog changelogBuild)
         {
             Child = changelogContentGroup = new ChangelogContentGroup(changelogBuild);
+            changelogContentGroup.GenerateText(changelogBuild.ChangelogEntries);
+            changelogContentGroup.UpdateChevronTooltips(changelogBuild.Versions.Previous?.DisplayVersion,
+                changelogBuild.Versions.Next?.DisplayVersion);
         }
 
         protected virtual void OnBuildSelected(string updateStream, string version, EventArgs args)
