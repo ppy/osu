@@ -20,6 +20,7 @@ namespace osu.Game.Online.Chat
         /// Contains every joined user except the current logged in user.
         /// </summary>
         public readonly ObservableCollection<User> JoinedUsers = new ObservableCollection<User>();
+
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
         private readonly List<LocalEchoMessage> pendingMessages = new List<LocalEchoMessage>();
 
@@ -28,7 +29,7 @@ namespace osu.Game.Online.Chat
         public event Action<Message> MessageRemoved;
 
         public readonly Bindable<bool> Joined = new Bindable<bool>();
-        public TargetType Target { get; }
+        public TargetType Target { get; protected set; }
         public bool ReadOnly => false; //todo not yet used.
         public override string ToString() => Name;
 
@@ -47,19 +48,6 @@ namespace osu.Game.Online.Chat
         [JsonConstructor]
         public Channel()
         {
-        }
-
-        /// <summary>
-        /// Contructs a private channel
-        /// TODO this class needs to be serialized from something like channels/private, instead of creating from the contructor
-        /// </summary>
-        /// <param name="user">The user</param>
-        public Channel(User user)
-        {
-            Target = TargetType.User;
-            Name = user.Username;
-            Id = user.Id;
-            JoinedUsers.Add(user);
         }
 
         public void AddLocalEcho(LocalEchoMessage message)
@@ -113,7 +101,5 @@ namespace osu.Game.Online.Chat
             if (messageCount > MaxHistory)
                 Messages.RemoveRange(0, messageCount - MaxHistory);
         }
-
-
     }
 }
