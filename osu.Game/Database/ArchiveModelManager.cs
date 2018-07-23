@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.IO.File;
 using osu.Framework.Logging;
@@ -175,7 +176,24 @@ namespace osu.Game.Database
         /// <param name="archive">The archive to be imported.</param>
         public TModel Import(ArchiveReader archive)
         {
-            TModel item = null;
+            try
+            {
+                return Import(CreateModel(archive), archive);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Model creation of {archive.Name} failed.", LoggingTarget.Database);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Import an item from a <see cref="TModel"/>.
+        /// </summary>
+        /// <param name="item">The model to be imported.</param>
+        /// <param name="archive">An optional archive to use for model population.</param>
+        public TModel Import(TModel item, ArchiveReader archive = null)
+        {
             delayEvents();
 
             try
@@ -186,18 +204,16 @@ namespace osu.Game.Database
                     {
                         if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
 
-                        // create a new model (don't yet add to database)
-                        item = CreateModel(archive);
-
                         var existing = CheckForExisting(item);
 
                         if (existing != null)
                         {
-                            Logger.Log($"Found existing {typeof(TModel)} for {archive.Name} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
+                            Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
                             return existing;
                         }
 
-                        item.Files = createFileInfos(archive, Files);
+                        if (archive != null)
+                            item.Files = createFileInfos(archive, Files);
 
                         Populate(item, archive);
 
@@ -211,11 +227,11 @@ namespace osu.Game.Database
                     }
                 }
 
-                Logger.Log($"Import of {archive.Name} successfully completed!", LoggingTarget.Database);
+                Logger.Log($"Import of {item} successfully completed!", LoggingTarget.Database);
             }
             catch (Exception e)
             {
-                Logger.Error(e, $"Import of {archive.Name} failed and has been rolled back.", LoggingTarget.Database);
+                Logger.Error(e, $"Import of {item} failed and has been rolled back.", LoggingTarget.Database);
                 item = null;
             }
             finally
@@ -226,12 +242,6 @@ namespace osu.Game.Database
 
             return item;
         }
-
-        /// <summary>
-        /// Import an item from a <see cref="TModel"/>.
-        /// </summary>
-        /// <param name="item">The model to be imported.</param>
-        public void Import(TModel item) => ModelStore.Add(item);
 
         /// <summary>
         /// Perform an update of the specified item.
@@ -385,8 +395,8 @@ namespace osu.Game.Database
         /// After this method, the model should be in a state ready to commit to a store.
         /// </summary>
         /// <param name="model">The model to populate.</param>
-        /// <param name="archive">The archive to use as a reference for population.</param>
-        protected virtual void Populate(TModel model, ArchiveReader archive)
+        /// <param name="archive">The archive to use as a reference for population. May be null.</param>
+        protected virtual void Populate(TModel model, [CanBeNull] ArchiveReader archive)
         {
         }
 

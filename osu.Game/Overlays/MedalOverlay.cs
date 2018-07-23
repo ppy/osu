@@ -16,11 +16,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input;
 using OpenTK.Input;
-using System.Linq;
 using osu.Framework.Graphics.Shapes;
 using System;
+using System.Linq;
+using osu.Framework.Input.States;
 using osu.Framework.MathUtils;
 
 namespace osu.Game.Overlays

@@ -58,8 +58,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         public TaikoPlayfield(ControlPointInfo controlPoints)
-            : base(ScrollingDirection.Left)
         {
+            Direction.Value = ScrollingDirection.Left;
+
             AddRangeInternal(new Drawable[]
             {
                 backgroundContainer = new Container
@@ -212,17 +213,22 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             base.Add(h);
 
-            var barline = h as DrawableBarLine;
-            if (barline != null)
-                barlineContainer.Add(barline.CreateProxy());
-
-            var taikoObject = h as DrawableTaikoHitObject;
-            if (taikoObject != null)
-                topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
+            switch (h)
+            {
+                case DrawableBarLine barline:
+                    barlineContainer.Add(barline.CreateProxy());
+                    break;
+                case DrawableTaikoHitObject taikoObject:
+                    topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
+                    break;
+            }
         }
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
+            if (!DisplayJudgements)
+                return;
+
             if (judgedObject.DisplayJudgement && judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
                 judgementContainer.Add(new DrawableTaikoJudgement(judgement, judgedObject)

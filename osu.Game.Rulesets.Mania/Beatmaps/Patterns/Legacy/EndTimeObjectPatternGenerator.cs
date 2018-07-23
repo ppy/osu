@@ -19,9 +19,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         public EndTimeObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, IBeatmap originalBeatmap)
             : base(random, hitObject, beatmap, new Pattern(), originalBeatmap)
         {
-            var endtimeData = HitObject as IHasEndTime;
-
-            endTime = endtimeData?.EndTime ?? 0;
+            endTime = (HitObject as IHasEndTime)?.EndTime ?? 0;
         }
 
         public override IEnumerable<Pattern> Generate()
@@ -35,15 +33,19 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             bool generateHold = endTime - HitObject.StartTime >= 100;
 
-            if (TotalColumns == 8)
+            switch (TotalColumns)
             {
-                if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000)
+                case 8 when HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000:
                     addToPattern(pattern, 0, generateHold);
-                else
+                    break;
+                case 8:
                     addToPattern(pattern, getNextRandomColumn(RandomStart), generateHold);
+                    break;
+                default:
+                    if (TotalColumns > 0)
+                        addToPattern(pattern, getNextRandomColumn(0), generateHold);
+                    break;
             }
-            else if (TotalColumns > 0)
-                addToPattern(pattern, getNextRandomColumn(0), generateHold);
 
             return pattern;
         }

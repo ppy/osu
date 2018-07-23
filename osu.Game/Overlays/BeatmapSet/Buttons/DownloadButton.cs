@@ -61,21 +61,29 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
             Action = () =>
             {
-                if (!downloader.Download())
+                if (downloader.DownloadState.Value == BeatmapSetDownloader.DownloadStatus.Downloading)
                 {
                     Content.MoveToX(-5, 50, Easing.OutSine).Then()
                            .MoveToX(5, 100, Easing.InOutSine).Then()
                            .MoveToX(-5, 100, Easing.InOutSine).Then()
                            .MoveToX(0, 50, Easing.InSine);
+                    return;
                 }
+
+                downloader.Download();
             };
 
-            downloader.Downloaded.ValueChanged += d =>
+            downloader.DownloadState.ValueChanged += state =>
             {
-                if (d)
-                    this.FadeOut(200);
-                else
-                    this.FadeIn(200);
+                switch (state)
+                {
+                    case BeatmapSetDownloader.DownloadStatus.Downloaded:
+                        this.FadeOut(200);
+                        break;
+                    case BeatmapSetDownloader.DownloadStatus.NotDownloaded:
+                        this.FadeIn(200);
+                        break;
+                }
             };
         }
     }

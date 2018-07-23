@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            void adjustFadeIn(OsuHitObject h) => h.TimeFadein = h.TimePreempt * fade_in_duration_multiplier;
+            void adjustFadeIn(OsuHitObject h) => h.TimeFadeIn = h.TimePreempt * fade_in_duration_multiplier;
 
             foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var h = d.HitObject;
 
-            var fadeOutStartTime = h.StartTime - h.TimePreempt + h.TimeFadein;
+            var fadeOutStartTime = h.StartTime - h.TimePreempt + h.TimeFadeIn;
             var fadeOutDuration = h.TimePreempt * fade_out_duration_multiplier;
 
             // new duration from completed fade in to end (before fading out)

@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 // This is so on repeats ticks don't appear too late to be visually processed by the player.
                 offset = 200;
             else
-                offset = TimeFadein * 0.66f;
+                offset = TimeFadeIn * 0.66f;
 
             TimePreempt = (StartTime - SpanStartTime) / 2 + offset;
         }
