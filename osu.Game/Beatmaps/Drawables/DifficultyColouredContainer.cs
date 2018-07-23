@@ -9,14 +9,14 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class DifficultyColouredContainer : Container, IHasAccentColour
+    public abstract class DifficultyColouredContainer : Container, IHasAccentColour
     {
         public Color4 AccentColour { get; set; }
 
         private readonly BeatmapInfo beatmap;
         private OsuColour palette;
 
-        public DifficultyColouredContainer(BeatmapInfo beatmap)
+        protected DifficultyColouredContainer(BeatmapInfo beatmap)
         {
             this.beatmap = beatmap;
         }

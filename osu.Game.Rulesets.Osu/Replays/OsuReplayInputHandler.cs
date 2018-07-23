@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Input;
+using osu.Framework.Input.StateChanges;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Replays;
 using OpenTK;

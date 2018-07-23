@@ -4,7 +4,6 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -14,6 +13,8 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
 using System;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -56,15 +57,15 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 base.Origin = value;
-                c1.Origin = c1.Anchor = (value & Anchor.x2) > 0 ? Anchor.TopLeft : Anchor.TopRight;
-                c2.Origin = c2.Anchor = (value & Anchor.x2) > 0 ? Anchor.TopRight : Anchor.TopLeft;
+                c1.Origin = c1.Anchor = value.HasFlag(Anchor.x2) ? Anchor.TopLeft : Anchor.TopRight;
+                c2.Origin = c2.Anchor = value.HasFlag(Anchor.x2) ? Anchor.TopRight : Anchor.TopLeft;
 
-                X = (value & Anchor.x2) > 0 ? SIZE_RETRACTED.X * shear * 0.5f : 0;
+                X = value.HasFlag(Anchor.x2) ? SIZE_RETRACTED.X * shear * 0.5f : 0;
 
                 Remove(c1);
                 Remove(c2);
-                c1.Depth = (value & Anchor.x2) > 0 ? 0 : 1;
-                c2.Depth = (value & Anchor.x2) > 0 ? 1 : 0;
+                c1.Depth = value.HasFlag(Anchor.x2) ? 0 : 1;
+                c2.Depth = value.HasFlag(Anchor.x2) ? 1 : 0;
                 Add(c1);
                 Add(c2);
             }

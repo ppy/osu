@@ -56,10 +56,15 @@ namespace osu.Game.Rulesets.Mania.Replays
             {
                 foreach (var point in group)
                 {
-                    if (point is HitPoint)
-                        actions.Add(columnActions[point.Column]);
-                    if (point is ReleasePoint)
-                        actions.Remove(columnActions[point.Column]);
+                    switch (point)
+                    {
+                        case HitPoint _:
+                            actions.Add(columnActions[point.Column]);
+                            break;
+                        case ReleasePoint _:
+                            actions.Remove(columnActions[point.Column]);
+                            break;
+                    }
                 }
 
                 Replay.Frames.Add(new ManiaReplayFrame(group.First().Time, actions.ToArray()));

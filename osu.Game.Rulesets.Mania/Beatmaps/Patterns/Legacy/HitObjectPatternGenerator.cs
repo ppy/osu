@@ -21,7 +21,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
         private readonly PatternType convertType;
 
-        public HitObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, double previousTime, Vector2 previousPosition, double density, PatternType lastStair, IBeatmap originalBeatmap)
+        public HitObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, Pattern previousPattern, double previousTime, Vector2 previousPosition, double density,
+                                         PatternType lastStair, IBeatmap originalBeatmap)
             : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
         {
             if (previousTime > hitObject.StartTime) throw new ArgumentOutOfRangeException(nameof(previousTime));
@@ -79,7 +80,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             else
                 convertType |= PatternType.LowProbability;
 
-            if ((convertType & PatternType.KeepSingle) == 0)
+            if (!convertType.HasFlag(PatternType.KeepSingle))
             {
                 if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && TotalColumns != 8)
                     convertType |= PatternType.Mirror;
@@ -107,7 +108,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
                 int lastColumn = PreviousPattern.HitObjects.FirstOrDefault()?.Column ?? 0;
 
-                if ((convertType & PatternType.Reverse) > 0 && PreviousPattern.HitObjects.Any())
+                if (convertType.HasFlag(PatternType.Reverse) && PreviousPattern.HitObjects.Any())
                 {
                     // Generate a new pattern by copying the last hit objects in reverse-column order
                     for (int i = RandomStart; i < TotalColumns; i++)
@@ -117,7 +118,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     return pattern;
                 }
 
-                if ((convertType & PatternType.Cycle) > 0 && PreviousPattern.HitObjects.Count() == 1
+                if (convertType.HasFlag(PatternType.Cycle) && PreviousPattern.HitObjects.Count() == 1
                                                           // If we convert to 7K + 1, let's not overload the special key
                                                           && (TotalColumns != 8 || lastColumn != 0)
                                                           // Make sure the last column was not the centre column
@@ -130,7 +131,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     return pattern;
                 }
 
-                if ((convertType & PatternType.ForceStack) > 0 && PreviousPattern.HitObjects.Any())
+                if (convertType.HasFlag(PatternType.ForceStack) && PreviousPattern.HitObjects.Any())
                 {
                     // Generate a new pattern by placing on the already filled columns
                     for (int i = RandomStart; i < TotalColumns; i++)
@@ -142,7 +143,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
                 if (PreviousPattern.HitObjects.Count() == 1)
                 {
-                    if ((convertType & PatternType.Stair) > 0)
+                    if (convertType.HasFlag(PatternType.Stair))
                     {
                         // Generate a new pattern by placing on the next column, cycling back to the start if there is no "next"
                         int targetColumn = lastColumn + 1;
@@ -153,7 +154,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                         return pattern;
                     }
 
-                    if ((convertType & PatternType.ReverseStair) > 0)
+                    if (convertType.HasFlag(PatternType.ReverseStair))
                     {
                         // Generate a new pattern by placing on the previous column, cycling back to the end if there is no "previous"
                         int targetColumn = lastColumn - 1;
@@ -165,10 +166,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     }
                 }
 
-                if ((convertType & PatternType.KeepSingle) > 0)
+                if (convertType.HasFlag(PatternType.KeepSingle))
                     return pattern = generateRandomNotes(1);
 
-                if ((convertType & PatternType.Mirror) > 0)
+                if (convertType.HasFlag(PatternType.Mirror))
                 {
                     if (ConversionDifficulty > 6.5)
                         return pattern = generateRandomPatternWithMirrored(0.12, 0.38, 0.12);
@@ -179,21 +180,21 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
                 if (ConversionDifficulty > 6.5)
                 {
-                    if ((convertType & PatternType.LowProbability) > 0)
+                    if (convertType.HasFlag(PatternType.LowProbability))
                         return pattern = generateRandomPattern(0.78, 0.42, 0, 0);
                     return pattern = generateRandomPattern(1, 0.62, 0, 0);
                 }
 
                 if (ConversionDifficulty > 4)
                 {
-                    if ((convertType & PatternType.LowProbability) > 0)
+                    if (convertType.HasFlag(PatternType.LowProbability))
                         return pattern = generateRandomPattern(0.35, 0.08, 0, 0);
                     return pattern = generateRandomPattern(0.52, 0.15, 0, 0);
                 }
 
                 if (ConversionDifficulty > 2)
                 {
-                    if ((convertType & PatternType.LowProbability) > 0)
+                    if (convertType.HasFlag(PatternType.LowProbability))
                         return pattern = generateRandomPattern(0.18, 0, 0, 0);
                     return pattern = generateRandomPattern(0.45, 0, 0, 0);
                 }
@@ -204,9 +205,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 foreach (var obj in pattern.HitObjects)
                 {
-                    if ((convertType & PatternType.Stair) > 0 && obj.Column == TotalColumns - 1)
+                    if (convertType.HasFlag(PatternType.Stair) && obj.Column == TotalColumns - 1)
                         StairType = PatternType.ReverseStair;
-                    if ((convertType & PatternType.ReverseStair) > 0 && obj.Column == RandomStart)
+                    if (convertType.HasFlag(PatternType.ReverseStair) && obj.Column == RandomStart)
                         StairType = PatternType.Stair;
                 }
             }
@@ -225,7 +226,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         {
             var pattern = new Pattern();
 
-            bool allowStacking = (convertType & PatternType.ForceNotStack) == 0;
+            bool allowStacking = !convertType.HasFlag(PatternType.ForceNotStack);
 
             if (!allowStacking)
                 noteCount = Math.Min(noteCount, TotalColumns - RandomStart - PreviousPattern.ColumnWithObjects);
@@ -235,7 +236,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 while (pattern.ColumnHasObject(nextColumn) || PreviousPattern.ColumnHasObject(nextColumn) && !allowStacking)
                 {
-                    if ((convertType & PatternType.Gathered) > 0)
+                    if (convertType.HasFlag(PatternType.Gathered))
                     {
                         nextColumn++;
                         if (nextColumn == TotalColumns)
@@ -367,7 +368,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         {
             addToCentre = false;
 
-            if ((convertType & PatternType.ForceNotStack) > 0)
+            if (convertType.HasFlag(PatternType.ForceNotStack))
                 return getRandomNoteCount(1 / 2f + p2 / 2, p2, (p2 + p3) / 2, p3);
 
             switch (TotalColumns)

@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Direct
@@ -120,8 +120,8 @@ namespace osu.Game.Overlays.Direct
                                     Alpha = 0,
                                     Child = new DownloadButton(SetInfo)
                                     {
-                                        Size = new Vector2(height - vertical_padding * 2),
-                                        Margin = new MarginPadding { Left = vertical_padding },
+                                        Size = new Vector2(height - vertical_padding * 3),
+                                        Margin = new MarginPadding { Left = vertical_padding, Right = vertical_padding },
                                     },
                                 },
                                 new FillFlowContainer

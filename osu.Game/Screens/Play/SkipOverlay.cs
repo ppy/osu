@@ -6,7 +6,6 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
@@ -17,6 +16,8 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
