@@ -21,6 +21,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly SpriteIcon icon;
         private SampleChannel sampleHover;
+
         public Action Action;
 
         private bool isEnabled;
@@ -30,7 +31,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 isEnabled = value;
-                icon.Alpha = value ? 1 : 0.5f;
+                icon.FadeTo(value ? 1 : 0.5f, 250);
             }
         }
 
