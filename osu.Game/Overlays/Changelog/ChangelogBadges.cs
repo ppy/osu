@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.Changelog
         {
             foreach (StreamBadge streamBadge in badgesContainer.Children)
             {
-                if (selectedStreamId < 0)
+                if (selectedStreamId >= 0)
                 {
                     if (selectedStreamId != streamBadge.LatestBuild.UpdateStream.Id)
                         streamBadge.Deactivate();
