@@ -38,7 +38,6 @@ namespace osu.Game.Overlays.Changelog.Header
             LineBadge.Uncollapse();
             Text.Font = "Exo2.0-Bold";
             SetTextColour(Color4.White, 100);
-            SampleActivate?.Play();
         }
 
         public override void Deactivate()

@@ -4,6 +4,8 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -25,6 +27,8 @@ namespace osu.Game.Overlays
         private readonly ChangelogBadges badges;
         private readonly ChangelogChart chart;
         private readonly ChangelogContent content;
+
+        private SampleChannel sampleBack;
 
         private readonly Color4 purple = new Color4(191, 4, 255, 255);
 
@@ -96,7 +100,10 @@ namespace osu.Game.Overlays
                     if (isAtListing)
                         State = Visibility.Hidden;
                     else
+                    {
                         FetchAndShowListing();
+                        sampleBack?.Play();
+                    }
                     return true;
             }
 
@@ -121,9 +128,10 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(APIAccess api, AudioManager audio)
         {
             this.api = api;
+            sampleBack = audio.Sample.Get(@"UI/generic-select-soft"); // @"UI/screen-back" feels non-fitting here
         }
 
         protected override void LoadComplete()

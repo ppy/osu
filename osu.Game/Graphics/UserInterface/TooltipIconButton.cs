@@ -21,6 +21,7 @@ namespace osu.Game.Graphics.UserInterface
     {
         private readonly SpriteIcon icon;
         private SampleChannel sampleHover;
+        private SampleChannel sampleClick;
 
         public Action Action;
 
@@ -64,7 +65,10 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnClick(InputState state)
         {
             if (isEnabled)
+            {
+                sampleClick?.Play();
                 Action?.Invoke();
+            }
             return base.OnClick(state);
         }
 
@@ -79,6 +83,7 @@ namespace osu.Game.Graphics.UserInterface
         private void load(AudioManager audio)
         {
             sampleHover = audio.Sample.Get(@"UI/generic-hover-soft");
+            sampleClick = audio.Sample.Get(@"UI/generic-select-soft");
         }
 
         public string TooltipText { get; set; }

@@ -80,9 +80,9 @@ namespace osu.Game.Overlays.Changelog
         {
             foreach (StreamBadge streamBadge in badgesContainer)
             {
-                if (streamBadge.ChangelogEntry.UpdateStream.Name == updateStream)
+                if (streamBadge.LatestBuild.UpdateStream.Name == updateStream)
                 {
-                    selectedStreamId = streamBadge.ChangelogEntry.UpdateStream.Id;
+                    selectedStreamId = streamBadge.LatestBuild.UpdateStream.Id;
                     streamBadge.Activate();
                 }
                 else
@@ -92,13 +92,13 @@ namespace osu.Game.Overlays.Changelog
 
         private void onBadgeSelected(StreamBadge source, EventArgs args)
         {
-            selectedStreamId = source.ChangelogEntry.UpdateStream.Id;
+            selectedStreamId = source.LatestBuild.UpdateStream.Id;
             OnSelected(source);
         }
 
         protected virtual void OnSelected(StreamBadge source)
         {
-            Selected?.Invoke(source.ChangelogEntry, EventArgs.Empty);
+            Selected?.Invoke(source.LatestBuild, EventArgs.Empty);
         }
 
         protected override bool OnHover(InputState state)
@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.Changelog
             {
                 if (selectedStreamId < 0)
                 {
-                    if (selectedStreamId != streamBadge.ChangelogEntry.UpdateStream.Id)
+                    if (selectedStreamId != streamBadge.LatestBuild.UpdateStream.Id)
                         streamBadge.Deactivate();
                     else
                         streamBadge.EnableDim();
@@ -124,7 +124,7 @@ namespace osu.Game.Overlays.Changelog
             {
                 if (selectedStreamId < 0)
                     streamBadge.Activate();
-                else if (streamBadge.ChangelogEntry.UpdateStream.Id == selectedStreamId)
+                else if (streamBadge.LatestBuild.UpdateStream.Id == selectedStreamId)
                     streamBadge.DisableDim();
             }
             base.OnHoverLost(state);
