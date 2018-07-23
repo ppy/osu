@@ -5,7 +5,8 @@ using System;
 using System.Threading;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using OpenTK;
 
 namespace osu.Game.Screens

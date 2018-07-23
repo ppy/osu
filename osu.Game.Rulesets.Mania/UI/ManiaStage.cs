@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            if (!judgedObject.DisplayJudgement)
+            if (!judgedObject.DisplayJudgement || !DisplayJudgements)
                 return;
 
             judgements.Clear();
