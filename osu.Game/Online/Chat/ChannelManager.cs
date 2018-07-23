@@ -49,7 +49,7 @@ namespace osu.Game.Online.Chat
 
         private IAPIProvider api;
         private ScheduledDelegate fetchMessagesScheduleder;
-        private GetMessagesRequest fetchMsgReq;
+        private GetMessagesRequest fetchMessageReq;
         private GetPrivateMessagesRequest fetchUserMsgReq;
         private long? lastChannelMsgId;
         private long? lastUserMsgId;
@@ -156,16 +156,16 @@ namespace osu.Game.Online.Chat
 
         private void fetchNewMessages()
         {
-            if (fetchMsgReq == null)
+            if (fetchMessageReq == null)
                 fetchMessages(
-                    () => fetchMsgReq = new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), lastChannelMsgId),
+                    () => fetchMessageReq = new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), lastChannelMsgId),
                     messages =>
                     {
                         if (messages == null)
                             return;
                         handleChannelMessages(messages);
                         lastChannelMsgId = messages.LastOrDefault()?.Id ?? lastChannelMsgId;
-                        fetchMsgReq = null;
+                        fetchMessageReq = null;
                     }
                 );
 
@@ -301,8 +301,8 @@ namespace osu.Game.Online.Chat
                     fetchMessagesScheduleder = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
                     break;
                 default:
-                    fetchMsgReq?.Cancel();
-                    fetchMsgReq = null;
+                    fetchMessageReq?.Cancel();
+                    fetchMessageReq = null;
                     fetchMessagesScheduleder?.Cancel();
                     break;
             }
