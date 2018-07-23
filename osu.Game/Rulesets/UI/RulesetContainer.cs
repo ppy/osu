@@ -89,6 +89,14 @@ namespace osu.Game.Rulesets.UI
             Ruleset = ruleset;
             playfield = new Lazy<Playfield>(CreatePlayfield);
 
+            IsPaused.ValueChanged += paused =>
+            {
+                if (HasReplayLoaded)
+                    return;
+
+                KeyBindingInputManager.UseParentInput = !paused;
+            };
+
             Cursor = CreateCursor();
         }
 
@@ -119,6 +127,11 @@ namespace osu.Game.Rulesets.UI
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
         public Replay Replay { get; private set; }
+
+        /// <summary>
+        /// Whether the game is paused. Used to block user input.
+        /// </summary>
+        public readonly BindableBool IsPaused = new BindableBool();
 
         /// <summary>
         /// Sets a replay to be used, overriding local input.

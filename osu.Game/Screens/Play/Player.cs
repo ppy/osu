@@ -12,7 +12,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -162,15 +162,10 @@ namespace osu.Game.Screens.Play
             {
                 pauseContainer = new PauseContainer(offsetClock, adjustableClock)
                 {
+                    Retries = RestartCount,
                     OnRetry = Restart,
                     OnQuit = Exit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
-                    OnPause = () =>
-                    {
-                        pauseContainer.Retries = RestartCount;
-                        hudOverlay.KeyCounter.IsCounting = !pauseContainer.IsPaused;
-                    },
-                    OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
                     Children = new[]
                     {
                         storyboardContainer = new Container
@@ -226,6 +221,8 @@ namespace osu.Game.Screens.Play
 
             hudOverlay.HoldToQuit.Action = Exit;
             hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
+
+            RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
 
             if (ShowStoryboard)
                 initializeStoryboard(false);

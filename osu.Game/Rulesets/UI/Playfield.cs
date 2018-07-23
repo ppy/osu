@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -29,6 +30,11 @@ namespace osu.Game.Rulesets.UI
         public IEnumerable<Playfield> NestedPlayfields => nestedPlayfields.IsValueCreated ? nestedPlayfields.Value : Enumerable.Empty<Playfield>();
 
         private readonly Lazy<List<Playfield>> nestedPlayfields = new Lazy<List<Playfield>>();
+
+        /// <summary>
+        /// Whether judgements should be displayed by this and and all nested <see cref="Playfield"/>s.
+        /// </summary>
+        public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
         /// <summary>
         /// A container for keeping track of DrawableHitObjects.
@@ -76,7 +82,11 @@ namespace osu.Game.Rulesets.UI
         /// This does not add the <see cref="Playfield"/> to the draw hierarchy.
         /// </summary>
         /// <param name="otherPlayfield">The <see cref="Playfield"/> to add.</param>
-        protected void AddNested(Playfield otherPlayfield) => nestedPlayfields.Value.Add(otherPlayfield);
+        protected void AddNested(Playfield otherPlayfield)
+        {
+            otherPlayfield.DisplayJudgements.BindTo(DisplayJudgements);
+            nestedPlayfields.Value.Add(otherPlayfield);
+        }
 
         /// <summary>
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.

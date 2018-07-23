@@ -4,12 +4,12 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using System;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using System;
-using System.Collections.Generic;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
