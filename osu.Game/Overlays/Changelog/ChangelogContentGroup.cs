@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Changelog
         private readonly SortedDictionary<string, List<ChangelogEntry>> categories =
             new SortedDictionary<string, List<ChangelogEntry>>();
 
-        public delegate void BuildSelectedEventHandler(string updateStream, string version, EventArgs args);
+        public delegate void BuildSelectedEventHandler(APIChangelog build, EventArgs args);
 
         public event BuildSelectedEventHandler BuildSelected;
 
@@ -53,8 +53,7 @@ namespace osu.Game.Overlays.Changelog
                             IsEnabled = false,
                             Icon = FontAwesome.fa_chevron_left,
                             Size = new Vector2(24),
-                            Action = () => OnBuildSelected(build.Versions.Previous.UpdateStream.Name,
-                                build.Versions.Previous.Version),
+                            Action = () => OnBuildSelected(build.Versions.Previous),
                         },
                         new FillFlowContainer<SpriteText>
                         {
@@ -91,8 +90,7 @@ namespace osu.Game.Overlays.Changelog
                             IsEnabled = false,
                             Icon = FontAwesome.fa_chevron_right,
                             Size = new Vector2(24),
-                            Action = () => OnBuildSelected(build.Versions.Next.UpdateStream.Name,
-                                build.Versions.Next.Version),
+                            Action = () => OnBuildSelected(build.Versions.Next),
                         },
                     }
                 },
@@ -160,7 +158,7 @@ namespace osu.Game.Overlays.Changelog
                             TextSize = 20, // web: 18,
                             Font = @"Exo2.0-Light",
                             Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
-                            Action = () => OnBuildSelected(build.UpdateStream.Name, build.Version),
+                            Action = () => OnBuildSelected(build),
                             IsClickMuted = true,
                         },
                     }
@@ -188,9 +186,9 @@ namespace osu.Game.Overlays.Changelog
             }
         }
 
-        protected virtual void OnBuildSelected(string updateStream, string version)
+        protected virtual void OnBuildSelected(APIChangelog build)
         {
-            BuildSelected?.Invoke(updateStream, version, EventArgs.Empty);
+            BuildSelected?.Invoke(build, EventArgs.Empty);
         }
 
         public void GenerateText(List<ChangelogEntry> changelogEntries)

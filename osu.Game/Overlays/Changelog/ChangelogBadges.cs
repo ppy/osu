@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Changelog
         private const float padding_y = 20;
         private const float padding_x = 85;
 
-        public delegate void SelectionHandler(string updateStream, string version, EventArgs args);
+        public delegate void SelectionHandler(APIChangelog releaseStream, EventArgs args);
 
         public event SelectionHandler Selected;
 
@@ -49,17 +49,6 @@ namespace osu.Game.Overlays.Changelog
                     },
                 },
             };
-            //foreach (StreamBadge streamBadge in BadgesContainer.Children)
-            //{
-            //    streamBadge.OnActivation = () =>
-            //    {
-            //        SelectedRelease = streamBadge.ChangelogEntry;
-            //        foreach (StreamBadge item in BadgesContainer.Children)
-            //            if (item.ChangelogEntry.Id != streamBadge.ChangelogEntry.Id)
-            //                item.Deactivate();
-            //        OnSelection?.Invoke();
-            //    };
-            //}
         }
 
         public void Populate(List<APIChangelog> latestBuilds)
@@ -109,7 +98,7 @@ namespace osu.Game.Overlays.Changelog
 
         protected virtual void OnSelected(StreamBadge source)
         {
-            Selected?.Invoke(source.ChangelogEntry.UpdateStream.Name, source.ChangelogEntry.Version, EventArgs.Empty);
+            Selected?.Invoke(source.ChangelogEntry, EventArgs.Empty);
         }
 
         protected override bool OnHover(InputState state)
