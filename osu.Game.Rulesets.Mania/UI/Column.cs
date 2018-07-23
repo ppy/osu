@@ -7,6 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.UI.Components;
@@ -19,21 +21,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float column_width = 45;
         private const float special_column_width = 70;
 
-        private ManiaAction action;
-
-        public ManiaAction Action
-        {
-            get => action;
-            set
-            {
-                if (action == value)
-                    return;
-                action = value;
-
-                background.Action = value;
-                keyArea.Action = value;
-            }
-        }
+        public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
         private readonly ColumnBackground background;
         private readonly ColumnKeyArea keyArea;
@@ -44,8 +32,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override Container<Drawable> Content => hitObjectArea;
 
-        public Column(ScrollingDirection direction)
-            : base(direction)
+        public Column()
         {
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
@@ -130,6 +117,13 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.CacheAs<IBindable<ManiaAction>>(Action);
+            return dependencies;
+        }
+
         /// <summary>
         /// Adds a DrawableHitObject to this Playfield.
         /// </summary>
@@ -144,7 +138,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
-            if (!judgement.IsHit || !judgedObject.DisplayJudgement)
+            if (!judgement.IsHit || !judgedObject.DisplayJudgement || !DisplayJudgements)
                 return;
 
             explosionContainer.Add(new HitExplosion(judgedObject)

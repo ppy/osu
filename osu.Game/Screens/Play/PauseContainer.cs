@@ -4,13 +4,12 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
 using OpenTK.Graphics;
-using OpenTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -20,7 +19,7 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class PauseContainer : Container
     {
-        public bool IsPaused { get; private set; }
+        public readonly BindableBool IsPaused = new BindableBool();
 
         public Func<bool> CheckCanPause;
 
@@ -40,9 +39,6 @@ namespace osu.Game.Screens.Play
 
         public Action OnRetry;
         public Action OnQuit;
-
-        public Action OnResume;
-        public Action OnPause;
 
         private readonly FramedClock framedClock;
         private readonly DecoupleableInterpolatingFramedClock decoupledClock;
@@ -86,9 +82,8 @@ namespace osu.Game.Screens.Play
 
             // stop the seekable clock (stops the audio eventually)
             decoupledClock.Stop();
-            IsPaused = true;
+            IsPaused.Value = true;
 
-            OnPause?.Invoke();
             pauseOverlay.Show();
 
             lastPauseActionTime = Time.Current;
@@ -98,7 +93,7 @@ namespace osu.Game.Screens.Play
         {
             if (!IsPaused) return;
 
-            IsPaused = false;
+            IsPaused.Value = false;
             IsResuming = false;
             lastPauseActionTime = Time.Current;
 
@@ -107,7 +102,6 @@ namespace osu.Game.Screens.Play
             decoupledClock.Seek(decoupledClock.CurrentTime);
             decoupledClock.Start();
 
-            OnResume?.Invoke();
             pauseOverlay.Hide();
         }
 
@@ -138,16 +132,7 @@ namespace osu.Game.Screens.Play
             public override string Header => "paused";
             public override string Description => "you're not going to do what i think you're going to do, are ya?";
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-            {
-                if (!args.Repeat && args.Key == Key.Escape)
-                {
-                    InternalButtons.Children.First().TriggerOnClick();
-                    return true;
-                }
-
-                return base.OnKeyDown(state, args);
-            }
+            protected override Action BackAction => () => InternalButtons.Children.First().TriggerOnClick();
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)

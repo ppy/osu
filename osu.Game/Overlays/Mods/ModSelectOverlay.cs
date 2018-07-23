@@ -40,10 +40,12 @@ namespace osu.Game.Overlays.Mods
 
         public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
 
-        public readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private void rulesetChanged(RulesetInfo newRuleset)
         {
+            if (newRuleset == null) return;
+
             var instance = newRuleset.CreateInstance();
 
             foreach (ModSection section in ModSectionsContainer.Children)
@@ -51,8 +53,8 @@ namespace osu.Game.Overlays.Mods
             refreshSelectedMods();
         }
 
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, Bindable<RulesetInfo> ruleset, RulesetStore rulesets, AudioManager audio)
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset, AudioManager audio)
         {
             SelectedMods.ValueChanged += selectedModsChanged;
 
@@ -60,13 +62,8 @@ namespace osu.Game.Overlays.Mods
             HighMultiplierColour = colours.Green;
             UnrankedLabel.Colour = colours.Blue;
 
-            if (ruleset != null)
-                Ruleset.BindTo(ruleset);
-            else
-                Ruleset.Value = rulesets.AvailableRulesets.First();
-
-            Ruleset.ValueChanged += rulesetChanged;
-            Ruleset.TriggerChange();
+            Ruleset.BindTo(ruleset);
+            Ruleset.BindValueChanged(rulesetChanged, true);
 
             sampleOn = audio.Sample.Get(@"UI/check-on");
             sampleOff = audio.Sample.Get(@"UI/check-off");
@@ -178,7 +175,10 @@ namespace osu.Game.Overlays.Mods
             refreshSelectedMods();
         }
 
-        private void refreshSelectedMods() => SelectedMods.Value = ModSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
+        private void refreshSelectedMods()
+        {
+            SelectedMods.Value = ModSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
+        }
 
         public ModSelectOverlay()
         {

@@ -39,6 +39,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private int downCount;
 
+        private const float pressed_scale = 1.2f;
+        private const float released_scale = 1f;
+
+        private float targetScale => downCount > 0 ? pressed_scale : released_scale;
+
         public bool OnPressed(OsuAction action)
         {
             switch (action)
@@ -46,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
                     downCount++;
-                    ActiveCursor.ScaleTo(1).ScaleTo(1.2f, 100, Easing.OutQuad);
+                    ActiveCursor.ScaleTo(released_scale).ScaleTo(targetScale, 100, Easing.OutQuad);
                     break;
             }
 
@@ -60,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
                     if (--downCount == 0)
-                        ActiveCursor.ScaleTo(1, 200, Easing.OutQuad);
+                        ActiveCursor.ScaleTo(targetScale, 200, Easing.OutQuad);
                     break;
             }
 
@@ -72,13 +77,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         protected override void PopIn()
         {
             fadeContainer.FadeTo(1, 300, Easing.OutQuint);
-            ActiveCursor.ScaleTo(1, 400, Easing.OutQuint);
+            ActiveCursor.ScaleTo(targetScale, 400, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             fadeContainer.FadeTo(0.05f, 450, Easing.OutQuint);
-            ActiveCursor.ScaleTo(0.8f, 450, Easing.OutQuint);
+            ActiveCursor.ScaleTo(targetScale * 0.8f, 450, Easing.OutQuint);
         }
 
         public class OsuCursor : Container

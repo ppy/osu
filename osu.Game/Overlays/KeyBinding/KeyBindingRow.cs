@@ -9,14 +9,16 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using JoystickEventArgs = osu.Framework.Input.EventArgs.JoystickEventArgs;
 
 namespace osu.Game.Overlays.KeyBinding
 {
@@ -102,6 +104,7 @@ namespace osu.Game.Overlays.KeyBinding
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Margin = new MarginPadding(padding),
+                    Padding = new MarginPadding { Top = height },
                     Alpha = 0,
                     Colour = colours.YellowDark
                 }
@@ -186,7 +189,7 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 if (bindTarget.IsHovered)
                 {
-                    bindTarget.UpdateKeyCombination(new KeyCombination(KeyCombination.FromInputState(state).Keys.Append(state.Mouse.ScrollDelta.Y > 0 ? InputKey.MouseWheelUp : InputKey.MouseWheelDown)));
+                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state, state.Mouse.ScrollDelta));
                     finalise();
                     return true;
                 }
@@ -202,9 +205,6 @@ namespace osu.Game.Overlays.KeyBinding
 
             switch (args.Key)
             {
-                case Key.Escape:
-                    finalise();
-                    return true;
                 case Key.Delete:
                 {
                     if (state.Keyboard.ShiftPressed)
@@ -232,7 +232,7 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnJoystickPress(InputState state, Framework.Input.JoystickEventArgs args)
+        protected override bool OnJoystickPress(InputState state, JoystickEventArgs args)
         {
             if (!HasFocus)
                 return false;
@@ -243,7 +243,7 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnJoystickRelease(InputState state, Framework.Input.JoystickEventArgs args)
+        protected override bool OnJoystickRelease(InputState state, JoystickEventArgs args)
         {
             if (!HasFocus)
                 return base.OnJoystickRelease(state, args);
@@ -270,7 +270,7 @@ namespace osu.Game.Overlays.KeyBinding
                 GetContainingInputManager().ChangeFocus(null);
 
             pressAKey.FadeOut(300, Easing.OutQuint);
-            pressAKey.Padding = new MarginPadding { Top = height, Bottom = -pressAKey.DrawHeight };
+            pressAKey.BypassAutoSizeAxes |= Axes.Y;
         }
 
         protected override void OnFocus(InputState state)
@@ -279,7 +279,7 @@ namespace osu.Game.Overlays.KeyBinding
             AutoSizeEasing = Easing.OutQuint;
 
             pressAKey.FadeIn(300, Easing.OutQuint);
-            pressAKey.Padding = new MarginPadding { Top = height };
+            pressAKey.BypassAutoSizeAxes &= ~Axes.Y;
 
             updateBindTarget();
             base.OnFocus(state);

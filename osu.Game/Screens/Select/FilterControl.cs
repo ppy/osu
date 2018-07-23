@@ -13,8 +13,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
-using osu.Framework.Input;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 
@@ -29,6 +30,7 @@ namespace osu.Game.Screens.Select
         private readonly TabControl<GroupMode> groupTabs;
 
         private SortMode sort = SortMode.Title;
+
         public SortMode Sort
         {
             get { return sort; }
@@ -43,6 +45,7 @@ namespace osu.Game.Screens.Select
         }
 
         private GroupMode group = GroupMode.All;
+
         public GroupMode Group
         {
             get { return group; }
@@ -69,7 +72,8 @@ namespace osu.Game.Screens.Select
 
         private readonly SearchTextBox searchTextBox;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => base.ReceiveMouseInputAt(screenSpacePos) || groupTabs.ReceiveMouseInputAt(screenSpacePos) || sortTabs.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) =>
+            base.ReceiveMouseInputAt(screenSpacePos) || groupTabs.ReceiveMouseInputAt(screenSpacePos) || sortTabs.ReceiveMouseInputAt(screenSpacePos);
 
         public FilterControl()
         {
@@ -177,8 +181,7 @@ namespace osu.Game.Screens.Select
             showConverted = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
             showConverted.ValueChanged += val => updateCriteria();
 
-            if (parentRuleset != null)
-                ruleset.BindTo(parentRuleset);
+            ruleset.BindTo(parentRuleset);
             ruleset.BindValueChanged(val => updateCriteria(), true);
         }
 

@@ -70,24 +70,24 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(ManiaConfigManager config)
+        private void load()
         {
             BarLines.ForEach(Playfield.Add);
 
-            config.BindWith(ManiaSetting.ScrollDirection, configDirection);
+            ((ManiaConfigManager)Config).BindWith(ManiaSetting.ScrollDirection, configDirection);
             configDirection.BindValueChanged(d => scrollingInfo.Direction.Value = (ScrollingDirection)d, true);
         }
 
         private DependencyContainer dependencies;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
             dependencies.CacheAs<IScrollingInfo>(scrollingInfo = new ScrollingInfo());
             return dependencies;
         }
 
-        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(scrollingInfo.Direction, Beatmap.Stages)
+        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -101,17 +101,15 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {
-            ManiaAction action = Playfield.Columns.ElementAt(h.Column).Action;
-
-            var holdNote = h as HoldNote;
-            if (holdNote != null)
-                return new DrawableHoldNote(holdNote, action);
-
-            var note = h as Note;
-            if (note != null)
-                return new DrawableNote(note, action);
-
-            return null;
+            switch (h)
+            {
+                case HoldNote holdNote:
+                    return new DrawableHoldNote(holdNote);
+                case Note note:
+                    return new DrawableNote(note);
+                default:
+                    return null;
+            }
         }
 
         protected override Vector2 PlayfieldArea => new Vector2(1, 0.8f);
