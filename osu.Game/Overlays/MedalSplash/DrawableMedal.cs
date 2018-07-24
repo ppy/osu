@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Globalization;
 using osu.Framework;
 using OpenTK;
 using osu.Framework.Allocation;
@@ -62,7 +63,7 @@ namespace osu.Game.Overlays.MedalSplash
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Text = "Medal Unlocked".ToUpper(),
+                    Text = "Medal Unlocked".ToUpper(CultureInfo.InvariantCulture),
                     TextSize = 24,
                     Font = @"Exo2.0-Light",
                     Alpha = 0f,

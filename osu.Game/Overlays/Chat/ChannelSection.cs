@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using OpenTK;
 using osu.Framework.Graphics;
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays.Chat
         public string Header
         {
             get { return header.Text; }
-            set { header.Text = value.ToUpper(); }
+            set { header.Text = value.ToUpper(CultureInfo.InvariantCulture); }
         }
 
         public IEnumerable<Channel> Channels

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Globalization;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
@@ -51,7 +52,7 @@ namespace osu.Game.Rulesets.Judgements
 
             Child = new SkinnableDrawable($"Play/{Judgement.Result}", _ => JudgementText = new OsuSpriteText
             {
-                Text = Judgement.Result.GetDescription().ToUpper(),
+                Text = Judgement.Result.GetDescription().ToUpper(CultureInfo.InvariantCulture),
                 Font = @"Venera",
                 Colour = judgementColour(Judgement.Result),
                 Scale = new Vector2(0.85f, 1),
