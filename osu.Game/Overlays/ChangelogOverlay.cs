@@ -26,6 +26,7 @@ namespace osu.Game.Overlays
         private readonly ChangelogHeader header;
         private readonly ChangelogBadges badges;
         private readonly ChangelogChart chart;
+        private readonly ChangelogContent listing;
         private readonly ChangelogContent content;
 
         private readonly ScrollContainer scroll;
@@ -85,13 +86,15 @@ namespace osu.Game.Overlays
                             header = new ChangelogHeader(),
                             badges = new ChangelogBadges(),
                             chart = new ChangelogChart(),
+                            listing = new ChangelogContent(),
                             content = new ChangelogContent()
                         },
                     },
                 },
             };
-            header.ListingSelected += FetchAndShowListing;
+            header.ListingSelected += ShowListing;
             badges.Selected += onBuildSelected;
+            listing.BuildSelected += onBuildSelected;
             content.BuildSelected += onBuildSelected;
         }
 
@@ -107,7 +110,7 @@ namespace osu.Game.Overlays
             var req = new GetChangelogLatestBuildsRequest();
             req.Success += badges.Populate;
             api.Queue(req);
-            FetchAndShowListing();
+            fetchListing();
             base.LoadComplete();
         }
 
@@ -132,7 +135,7 @@ namespace osu.Game.Overlays
                         State = Visibility.Hidden;
                     else
                     {
-                        FetchAndShowListing();
+                        ShowListing();
                         sampleBack?.Play();
                     }
                     return true;
@@ -143,10 +146,7 @@ namespace osu.Game.Overlays
 
         private void onBuildSelected(APIChangelog build, EventArgs e) => FetchAndShowBuild(build);
 
-        /// <summary>
-        /// If we're not already at it, fetches and shows changelog listing.
-        /// </summary>
-        public void FetchAndShowListing()
+        private void fetchListing()
         {
             header.ShowListing();
             if (isAtListing)
@@ -155,12 +155,22 @@ namespace osu.Game.Overlays
             var req = new GetChangelogRequest();
             badges.SelectNone();
             chart.ShowAllUpdateStreams();
-            req.Success += listing =>
-            {
-                content.ShowListing(listing);
-                scroll.ScrollTo(savedScrollPosition);
-            };
+            req.Success += listing.ShowListing;
             api.Queue(req);
+        }
+
+        public void ShowListing()
+        {
+            header.ShowListing();
+            if (isAtListing)
+                return;
+            isAtListing = true;
+            content.Hide();
+            listing.Show();
+            badges.SelectNone();
+            chart.ShowAllUpdateStreams();
+            listing.Show();
+            scroll.ScrollTo(savedScrollPosition);
         }
 
         /// <summary>
@@ -181,6 +191,8 @@ namespace osu.Game.Overlays
             chart.ShowUpdateStream(build.UpdateStream.Name);
             req.Success += APIChangelog =>
             {
+                listing.Hide();
+                content.Show();
                 content.ShowBuild(APIChangelog);
                 if (scroll.Current > scroll.GetChildPosInContent(content))
                     scroll.ScrollTo(content);
