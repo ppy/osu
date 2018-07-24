@@ -28,6 +28,8 @@ namespace osu.Game.Overlays
         private readonly ChangelogChart chart;
         private readonly ChangelogContent content;
 
+        private readonly ScrollContainer scroll;
+
         private readonly Color4 purple = new Color4(191, 4, 255, 255);
 
         private SampleChannel sampleBack;
@@ -35,6 +37,7 @@ namespace osu.Game.Overlays
         private APIAccess api;
 
         private bool isAtListing;
+        private float savedScrollPosition;
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
@@ -68,7 +71,7 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both,
                     Colour = new Color4(49, 36, 54, 255),
                 },
-                new ScrollContainer
+                scroll = new ScrollContainer
                 {
                     RelativeSizeAxes = Axes.Both,
                     ScrollbarVisible = false,
@@ -152,7 +155,11 @@ namespace osu.Game.Overlays
             var req = new GetChangelogRequest();
             badges.SelectNone();
             chart.ShowAllUpdateStreams();
-            req.Success += content.ShowListing;
+            req.Success += listing =>
+            {
+                content.ShowListing(listing);
+                scroll.ScrollTo(savedScrollPosition);
+            };
             api.Queue(req);
         }
 
@@ -173,7 +180,13 @@ namespace osu.Game.Overlays
                 badges.SelectUpdateStream(build.UpdateStream.Name);
 
             chart.ShowUpdateStream(build.UpdateStream.Name);
-            req.Success += content.ShowBuild;
+            req.Success += APIChangelog =>
+            {
+                savedScrollPosition = scroll.Current;
+                content.ShowBuild(APIChangelog);
+                if (scroll.Current > scroll.GetChildPosInContent(content))
+                    scroll.ScrollTo(content);
+            };
             api.Queue(req);
         }
     }
