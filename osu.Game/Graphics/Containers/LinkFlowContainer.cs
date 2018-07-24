@@ -90,8 +90,9 @@ namespace osu.Game.Graphics.Containers
                             }
                             catch (ChannelNotFoundException e)
                             {
-                                Logger.Error(e, "It should not be possible that the user is able to click a invalid channel link.");    
+                                Logger.Error(e, "It should not be possible that the user is able to click a invalid channel link.");
                             }
+
                             break;
                         case LinkAction.OpenEditorTimestamp:
                         case LinkAction.JoinMultiplayerMatch:
