@@ -28,13 +28,16 @@ namespace osu.Game.Overlays
         private readonly ChangelogChart chart;
         private readonly ChangelogContent content;
 
-        private SampleChannel sampleBack;
-
         private readonly Color4 purple = new Color4(191, 4, 255, 255);
+
+        private SampleChannel sampleBack;
 
         private APIAccess api;
 
         private bool isAtListing;
+
+        // receive input outside our bounds so we can trigger a close event on ourselves.
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
         public ChangelogOverlay()
         {
@@ -89,8 +92,33 @@ namespace osu.Game.Overlays
             content.BuildSelected += onBuildSelected;
         }
 
-        // receive input outside our bounds so we can trigger a close event on ourselves.
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+        [BackgroundDependencyLoader]
+        private void load(APIAccess api, AudioManager audio)
+        {
+            this.api = api;
+            sampleBack = audio.Sample.Get(@"UI/generic-select-soft"); // @"UI/screen-back" feels non-fitting here
+        }
+
+        protected override void LoadComplete()
+        {
+            var req = new GetChangelogLatestBuildsRequest();
+            req.Success += badges.Populate;
+            api.Queue(req);
+            FetchAndShowListing();
+            base.LoadComplete();
+        }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+            FadeEdgeEffectTo(0.25f, WaveContainer.APPEAR_DURATION, Easing.In);
+        }
+
+        protected override void PopOut()
+        {
+            base.PopOut();
+            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
+        }
 
         public override bool OnPressed(GlobalAction action)
         {
@@ -110,38 +138,7 @@ namespace osu.Game.Overlays
             return false;
         }
 
-        protected override void PopIn()
-        {
-            base.PopIn();
-            FadeEdgeEffectTo(0.25f, WaveContainer.APPEAR_DURATION, Easing.In);
-        }
-
-        protected override void PopOut()
-        {
-            base.PopOut();
-            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
-        }
-
-        private void onBuildSelected(APIChangelog build, EventArgs e)
-        {
-            FetchAndShowBuild(build);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(APIAccess api, AudioManager audio)
-        {
-            this.api = api;
-            sampleBack = audio.Sample.Get(@"UI/generic-select-soft"); // @"UI/screen-back" feels non-fitting here
-        }
-
-        protected override void LoadComplete()
-        {
-            var req = new GetChangelogLatestBuildsRequest();
-            req.Success += badges.Populate;
-            api.Queue(req);
-            FetchAndShowListing();
-            base.LoadComplete();
-        }
+        private void onBuildSelected(APIChangelog build, EventArgs e) => FetchAndShowBuild(build);
 
         /// <summary>
         /// Fetches and shows changelog listing.
