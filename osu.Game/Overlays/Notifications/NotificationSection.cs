@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -56,7 +55,7 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 title = value;
-                if (titleText != null) titleText.Text = title.ToUpper(CultureInfo.InvariantCulture);
+                if (titleText != null) titleText.Text = title.ToUpperInvariant();
             }
         }
 
@@ -102,7 +101,7 @@ namespace osu.Game.Overlays.Notifications
                             {
                                 titleText = new OsuSpriteText
                                 {
-                                    Text = title.ToUpper(CultureInfo.InvariantCulture),
+                                    Text = title.ToUpperInvariant(),
                                     Font = @"Exo2.0-Black",
                                 },
                                 countText = new OsuSpriteText
@@ -155,7 +154,7 @@ namespace osu.Game.Overlays.Notifications
             public string Text
             {
                 get { return text.Text; }
-                set { text.Text = value.ToUpper(CultureInfo.InvariantCulture); }
+                set { text.Text = value.ToUpperInvariant(); }
             }
         }
 

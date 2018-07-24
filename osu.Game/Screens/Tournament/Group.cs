@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using osu.Framework.Allocation;
@@ -52,7 +51,7 @@ namespace osu.Game.Screens.Tournament
 
                     Position = new Vector2(0, 7f),
 
-                    Text = $"GROUP {name.ToUpper(CultureInfo.InvariantCulture)}",
+                    Text = $"GROUP {name.ToUpperInvariant()}",
                     TextSize = 8f,
                     Font = @"Exo2.0-Bold",
                     Colour = new Color4(255, 204, 34, 255),
@@ -162,7 +161,7 @@ namespace osu.Game.Screens.Tournament
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
 
-                                Text = team.Acronym.ToUpper(CultureInfo.InvariantCulture),
+                                Text = team.Acronym.ToUpperInvariant(),
                                 TextSize = 10f,
                                 Font = @"Exo2.0-Bold"
                             }
