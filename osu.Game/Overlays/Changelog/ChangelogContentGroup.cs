@@ -171,7 +171,13 @@ namespace osu.Game.Overlays.Changelog
                     Direction = FillDirection.Vertical,
                 },
             };
-            clickableText.Action += () => clickableText.IsEnabled = false;
+
+            // we may not want double clicks to make it double the work
+            clickableText.Action += () =>
+            {
+                clickableText.IsEnabled = false;
+                Scheduler.AddDelayed(() => clickableText.IsEnabled = true, 2000);
+            };
         }
 
         public void UpdateChevronTooltips(string previousVersion, string nextVersion)
