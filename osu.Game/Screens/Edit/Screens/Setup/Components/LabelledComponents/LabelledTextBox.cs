@@ -27,25 +27,25 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         private const float default_label_text_size = 16;
 
         public event OnCommitHandler OnCommit;
-        
+
         public bool ReadOnly
         {
             get => textBox.ReadOnly;
             set => textBox.ReadOnly = value;
         }
-        
+
         public string LabelText
         {
             get => label.Text;
             set => label.Text = value;
         }
-        
+
         public float LabelTextSize
         {
             get => label.TextSize;
             set => label.TextSize = value;
         }
-        
+
         public string PlaceholderText
         {
             get => textBox.PlaceholderText;
