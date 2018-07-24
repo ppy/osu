@@ -47,6 +47,11 @@ namespace osu.Game.Overlays.Chat
             ChannelTabControl.Current.Value = channel;
         }
 
+        /// <summary>
+        /// Adds a channel to the ChatTabControl.
+        /// The first channel added will automaticly selected.
+        /// </summary>
+        /// <param name="channel">The channel that is going to be added.</param>
         public void AddItem(Channel channel)
         { 
             if (!ChannelTabControl.Items.Contains(channel))
@@ -56,6 +61,11 @@ namespace osu.Game.Overlays.Chat
                 Current.Value = channel;
         }
 
+        /// <summary>
+        /// Removes a channel from the ChatTabControl.
+        /// If the selected channel is the one that is beeing removed, the next available channel will be selected.
+        /// </summary>
+        /// <param name="channel">The channel that is going to be removed.</param>
         public void RemoveItem(Channel channel)
         {
             ChannelTabControl.RemoveItem(channel);

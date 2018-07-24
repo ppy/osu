@@ -70,7 +70,7 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// Opens a new private channel.
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="user">The user the private channel is opened with.</param>
         public void OpenPrivateChannel(User user)
         {
             if (user == null)
@@ -139,6 +139,10 @@ namespace osu.Game.Online.Chat
             api.Queue(req);
         }
 
+        /// <summary>
+        /// Posts a command locally. Commands like /help will result in a help message written in the current channel.
+        /// </summary>
+        /// <param name="text">the text containing the command identifier and command parameters.</param>
         public void PostCommand(string text)
         {
             if (CurrentChannel.Value == null)
@@ -319,7 +323,9 @@ namespace osu.Game.Online.Chat
         }
     }
 
-
+    /// <summary>
+    /// An exception thrown when a channel could not been found.
+    /// </summary>
     public class ChannelNotFoundException : Exception
     {
         public ChannelNotFoundException(string channelName)
