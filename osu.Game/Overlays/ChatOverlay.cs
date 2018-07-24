@@ -332,6 +332,10 @@ namespace osu.Game.Overlays
             channelManager.CurrentChannel.ValueChanged += currentChatChanged;
             channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
             channelManager.AvailableChannels.CollectionChanged += (sender, args) => channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
+
+            //for the case that channelmanager was faster at fetching the channels than our attachment to CollectionChanged.
+            channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
+            joinedChannelsChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, channelManager.JoinedChannels));
         }
 
         private void postMessage(TextBox textbox, bool newText)
