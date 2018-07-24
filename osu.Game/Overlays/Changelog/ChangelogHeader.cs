@@ -114,7 +114,7 @@ namespace osu.Game.Overlays.Changelog
                 },
                 new FillFlowContainer // Listing > Lazer 2018.713.1
                 {
-                    X = 2 * icon_margin + icon_size - 8,
+                    X = 2 * icon_margin + icon_size,
                     Height = version_height,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
