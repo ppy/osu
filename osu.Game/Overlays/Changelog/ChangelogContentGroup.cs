@@ -42,10 +42,7 @@ namespace osu.Game.Overlays.Changelog
                     Origin = Anchor.TopCentre,
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding
-                    {
-                        Top = 20,
-                    },
+                    Margin = new MarginPadding { Top = 20 },
                     Children = new Drawable[]
                     {
                         chevronPrevious = new TooltipIconButton
@@ -58,11 +55,7 @@ namespace osu.Game.Overlays.Changelog
                         new FillFlowContainer<SpriteText>
                         {
                             AutoSizeAxes = Axes.Both,
-                            Margin = new MarginPadding
-                            {
-                                Left = 40,
-                                Right = 40,
-                            },
+                            Margin = new MarginPadding { Horizontal = 40 },
                             Children = new[]
                             {
                                 new SpriteText
@@ -104,7 +97,7 @@ namespace osu.Game.Overlays.Changelog
                     Font = @"Exo2.0-Medium",
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Margin = new MarginPadding{ Top = 5, }
+                    Margin = new MarginPadding { Top = 5 }
                 },
                 ChangelogEntries = new FillFlowContainer
                 {
@@ -133,7 +126,7 @@ namespace osu.Game.Overlays.Changelog
                     Font = @"Exo2.0-Light",
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Margin = new MarginPadding{ Top = 20, },
+                    Margin = new MarginPadding { Top = 20 },
                     Alpha = newDate ? 1 : 0,
                 },
                 new FillFlowContainer
@@ -142,7 +135,7 @@ namespace osu.Game.Overlays.Changelog
                     Origin = Anchor.TopCentre,
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Horizontal,
-                    Margin = new MarginPadding{ Top = 20, },
+                    Margin = new MarginPadding { Top = 20 },
                     Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {
@@ -208,7 +201,7 @@ namespace osu.Game.Overlays.Changelog
                     Text = category.Key,
                     TextSize = 24, // web: 18,
                     Font = @"Exo2.0-Bold",
-                    Margin = new MarginPadding { Top = 35, Bottom = 15, },
+                    Margin = new MarginPadding { Top = 35, Bottom = 15 },
                 });
                 foreach (ChangelogEntry entry in category.Value)
                 {
@@ -219,10 +212,14 @@ namespace osu.Game.Overlays.Changelog
                         Direction = FillDirection.Full,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Margin = new MarginPadding{ Vertical = 5, },
+                        Margin = new MarginPadding { Vertical = 5 },
                     });
-                    title.AddIcon(FontAwesome.fa_check, t => { t.TextSize = 12; t.Padding = new MarginPadding { Left = -17, Right = 5 }; });
-                    title.AddText(entry.Title, t => { t.TextSize = 18; }); //t.Padding = new MarginPadding(10); });
+                    title.AddIcon(FontAwesome.fa_check, t =>
+                    {
+                        t.TextSize = 12;
+                        t.Padding = new MarginPadding { Left = -17, Right = 5 };
+                    });
+                    title.AddText(entry.Title, t => { t.TextSize = 18; });
                     if (!string.IsNullOrEmpty(entry.Repository))
                     {
                         title.AddText($" ({entry.Repository.Substring(4)}#{entry.GithubPullRequestId})", t =>
