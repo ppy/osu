@@ -23,9 +23,16 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sampleHover;
         private SampleChannel sampleClick;
 
+        /// <summary>
+        /// The action to fire upon click, if <see cref="IsEnabled"/> is set to true.
+        /// </summary>
         public Action Action;
 
         private bool isEnabled;
+
+        /// <summary>
+        /// If set to true, upon click the <see cref="Action"/> will execute. It wont otherwise.
+        /// </summary>
         public bool IsEnabled
         {
             get { return isEnabled; }
@@ -42,6 +49,9 @@ namespace osu.Game.Graphics.UserInterface
             set { icon.Icon = value; }
         }
 
+        /// <summary>
+        /// A simple icon that has an action upon click and can be disabled.
+        /// </summary>
         public TooltipIconButton()
         {
             isEnabled = true;
