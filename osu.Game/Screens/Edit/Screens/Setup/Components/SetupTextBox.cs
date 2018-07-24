@@ -12,13 +12,5 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
     public class SetupTextBox : OsuTextBox
     {
         protected override float LeftRightPadding => 15;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour osuColour)
-        {
-            BorderColour = osuColour.Blue;
-        }
-
-        protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), Colour = BorderColour, TextSize = CalculatedTextSize };
     }
 }
