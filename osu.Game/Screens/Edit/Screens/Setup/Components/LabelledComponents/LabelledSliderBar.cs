@@ -97,13 +97,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                 sliderBar.TooltipTextSuffix = value;
             }
         }
-        
+
         public string LabelText
         {
             get => label.Text;
             set => label.Text = value;
         }
-        
+
         public string BottomLabelText
         {
             get => bottomText.Text;
@@ -129,7 +129,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             get => sliderBar.RightTickCaption;
             set => sliderBar.RightTickCaption = value;
         }
-        
+
         public float LabelTextSize
         {
             get => label.TextSize;
