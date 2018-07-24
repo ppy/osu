@@ -84,10 +84,10 @@ namespace osu.Game.Online.Chat
             CurrentChannel.ValueChanged += currentChannelChanged;
 
             channelMessagesHandler = new IncomingMessagesHandler(
-                () => new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), channelMessagesHandler.LastMessageId), handleChannelMessages);
+                lastId => new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), lastId), handleChannelMessages);
 
             privateMessagesHandler = new IncomingMessagesHandler(
-                () => new GetPrivateMessagesRequest(privateMessagesHandler.LastMessageId),handleUserMessages);
+                lastId => new GetPrivateMessagesRequest(lastId),handleUserMessages);
         }
 
         private void currentChannelChanged(Channel channel)
