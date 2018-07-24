@@ -21,16 +21,44 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public readonly ObservableCollection<User> JoinedUsers = new ObservableCollection<User>();
 
+        /// <summary>
+        /// Contains all the messages send in the channel.
+        /// </summary>
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
+
+        /// <summary>
+        /// Contains all the messages that are still pending for submission to the server.
+        /// </summary>
         private readonly List<LocalEchoMessage> pendingMessages = new List<LocalEchoMessage>();
 
+
+        /// <summary>
+        /// An event that fires when new messages arrived.
+        /// </summary>
         public event Action<IEnumerable<Message>> NewMessagesArrived;
+
+        /// <summary>
+        /// An event that fires when a pending message gets resolved.
+        /// </summary>
         public event Action<LocalEchoMessage, Message> PendingMessageResolved;
+
+        /// <summary>
+        /// An event that fires when a pending message gets removed.
+        /// </summary>
         public event Action<Message> MessageRemoved;
 
+        /// <summary>
+        /// Signalles if the current user joined this channel or not. Defaults to false.
+        /// </summary>
         public readonly Bindable<bool> Joined = new Bindable<bool>();
+
+        /// <summary>
+        /// Signalles whether the channels target is a private channel or public channel.
+        /// </summary>
         public TargetType Target { get; protected set; }
+
         public bool ReadOnly => false; //todo not yet used.
+
         public override string ToString() => Name;
 
         [JsonProperty(@"name")]
@@ -50,6 +78,10 @@ namespace osu.Game.Online.Chat
         {
         }
 
+        /// <summary>
+        /// Adds the argument message as a local echo. When this local echo is resolved <see cref="PendingMessageResolved"/> will get called.
+        /// </summary>
+        /// <param name="message"></param>
         public void AddLocalEcho(LocalEchoMessage message)
         {
             pendingMessages.Add(message);
@@ -58,6 +90,10 @@ namespace osu.Game.Online.Chat
             NewMessagesArrived?.Invoke(new[] { message });
         }
 
+        /// <summary>
+        /// Adds new messages to the channel and purges old messages. Triggers the <see cref="NewMessagesArrived"/> event.
+        /// </summary>
+        /// <param name="messages"></param>
         public void AddNewMessages(params Message[] messages)
         {
             messages = messages.Except(Messages).ToArray();
