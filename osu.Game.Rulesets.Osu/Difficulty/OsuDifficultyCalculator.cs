@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (!beatmap.HitObjects.Any())
                 return //what to return?
-            
+
              OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
              Skill[] skills =
             {
