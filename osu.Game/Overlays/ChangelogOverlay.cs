@@ -141,13 +141,15 @@ namespace osu.Game.Overlays
         private void onBuildSelected(APIChangelog build, EventArgs e) => FetchAndShowBuild(build);
 
         /// <summary>
-        /// Fetches and shows changelog listing.
+        /// If we're not already at it, fetches and shows changelog listing.
         /// </summary>
         public void FetchAndShowListing()
         {
+            header.ShowListing();
+            if (isAtListing)
+                return;
             isAtListing = true;
             var req = new GetChangelogRequest();
-            header.ShowListing();
             badges.SelectNone();
             chart.ShowAllUpdateStreams();
             req.Success += content.ShowListing;
