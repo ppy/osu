@@ -7,6 +7,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Input;
 using System.Diagnostics;
 using osu.Framework.Platform;
+using osu.Framework.Input.States;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
@@ -14,9 +15,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
     {
         private readonly OsuSpriteText label;
 
-        public string Link;
-
         private const float default_text_size = 12;
+
+        public string Link;
 
         public float TextSize
         {
