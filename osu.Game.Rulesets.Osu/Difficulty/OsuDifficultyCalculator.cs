@@ -74,9 +74,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedRating.Add(x * difficulty_multiplier)
             }
 
-            for(int x = 0; x < aimRating)
+            for(int x = 0; x < aimRating.Count(); x++)
             {
-                osuDifficultySectionRating.Add(aimRating[x] + speedRating[x] + Math.Abs(aimRating[x] - speedRating[x]) / 2;);
+                osuDifficultySectionRating.Add(aimRating[x] + speedRating[x] + Math.Abs(aimRating[x] - speedRating[x]) / 2);
             }
 
             return osuDifficultySectionRating
