@@ -23,9 +23,63 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public List<double> OsuDifficultyAt()
+        public List<double> OsuDifficultyAt(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
-            //throws list of difficulties(strains) at sections or at hitobjects
+            //throws list of difficulties(strains) at sections (((((or at hitobjects)))))
+            //remember that first section is double-timed
+
+            if (!beatmap.HitObjects.Any())
+                return //what to return?
+            
+             OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
+             Skill[] skills =
+            {
+                new Aim(),
+                new Speed()
+            };
+
+            double sectionLength = section_length * timeRate;
+
+            // The first object doesn't generate a strain, so we begin with an incremented section end
+            double currentSectionEnd = 2 * sectionLength;
+
+            foreach (OsuDifficultyHitObject h in difficultyBeatmap)
+            {
+                while (h.BaseObject.StartTime > currentSectionEnd)
+                {
+                    foreach (Skill s in skills)
+                    {
+                        s.SaveCurrentPeak();
+                        s.StartNewSectionFrom(currentSectionEnd);
+                    }
+
+                    currentSectionEnd += sectionLength;
+                }
+
+                foreach (Skill s in skills)
+                    s.Process(h);
+            }
+
+            private List<double> aimRating = new List<double>();
+            private List<double> speedRating = new List<double>();
+            private List<double> osuDifficultySectionRating = new List<double>();
+
+            foreach(double x in Skills[0].StrainPeaks)
+            {
+                aimRating.Add(x * difficulty_multiplier)
+            }
+
+            foreach(double x in Skills[1].StrainPeaks)
+            {
+                speedRating.Add(x * difficulty_multiplier)
+            }
+
+            for(int x = 0; x < aimRating)
+            {
+                osuDifficultySectionRating.Add(aimRating[x] + speedRating[x] + Math.Abs(aimRating[x] - speedRating[x]) / 2;);
+            }
+
+            return osuDifficultySectionRating
         }
 
         //Copy some code from here
