@@ -54,6 +54,12 @@ namespace osu.Game.Tests.Visual
             public new BeatmapCarousel Carousel => base.Carousel;
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            factory.ResetDatabase();
+            base.Dispose(isDisposing);
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
