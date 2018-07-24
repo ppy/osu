@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public List<double> OsuDifficultyAt(IBeatmap beatmap, Mod[] mods, double timeRate)
+        public List<double> OsuDifficultyAt(IBeatmap beatmap, double timeRate)
         {
             //throws list of difficulties(strains) at sections (((((or at hitobjects)))))
             //remember that first section is double-timed
