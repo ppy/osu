@@ -13,10 +13,9 @@ namespace osu.Game.Tests.Visual
     {
         public TestCaseTextBadgePair()
         {
-            Container container;
             TextBadgePair textBadgePair;
 
-            Add(container = new Container
+            Add(new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
