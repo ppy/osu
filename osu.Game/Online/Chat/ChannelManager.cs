@@ -265,20 +265,28 @@ namespace osu.Game.Online.Chat
 
             req.Success += channels =>
             {
-                channels.Where(channel => AvailableChannels.All(c => c.Id != channel.Id))
-                        .ForEach(channel => AvailableChannels.Add(channel));
+                foreach (var channel in channels)
+                {
+                    if (JoinedChannels.Any(c => c.Id == channel.Id))
+                        continue;
 
-                channels.Where(channel => defaultChannels.Any(c => c.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
-                        .Where(channel => JoinedChannels.All(c => c.Id != channel.Id))
-                        .ForEach(channel =>
-                        {
-                            JoinedChannels.Add(channel);
+                    // add as available if not already
+                    if (AvailableChannels.All(c => c.Id != channel.Id))
+                        AvailableChannels.Add(channel);
 
-                            var fetchInitialMsgReq = new GetMessagesRequest(new[] { channel }, null);
-                            fetchInitialMsgReq.Success += handleChannelMessages;
-                            fetchInitialMsgReq.Failure += exception => Logger.Error(exception, "Failed to fetch inital messages.");
-                            api.Queue(fetchInitialMsgReq);
-                        });
+                    // join any channels classified as "defaults"
+                    if (defaultChannels.Any(c => c.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        JoinedChannels.Add(channel);
+
+                        // TODO: remove this when the API supports returning initial fetch messages for more than one channel.
+                        // right now it caps out at 50 messages and therefore only returns one channel's worth of content.
+                        var fetchInitialMsgReq = new GetMessagesRequest(new[] { channel }, null);
+                        fetchInitialMsgReq.Success += handleChannelMessages;
+                        fetchInitialMsgReq.Failure += exception => Logger.Error(exception, "Failed to fetch inital messages.");
+                        api.Queue(fetchInitialMsgReq);
+                    }
+                }
 
                 fetchNewMessages();
             };
