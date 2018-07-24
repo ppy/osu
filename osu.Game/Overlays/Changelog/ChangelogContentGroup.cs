@@ -50,7 +50,11 @@ namespace osu.Game.Overlays.Changelog
                             IsEnabled = false,
                             Icon = FontAwesome.fa_chevron_left,
                             Size = new Vector2(24),
-                            Action = () => OnBuildSelected(build.Versions.Previous),
+                            Action = () =>
+                            {
+                                OnBuildSelected(build.Versions.Previous);
+                                chevronPrevious.IsEnabled = false;
+                            },
                         },
                         new FillFlowContainer<SpriteText>
                         {
@@ -83,7 +87,11 @@ namespace osu.Game.Overlays.Changelog
                             IsEnabled = false,
                             Icon = FontAwesome.fa_chevron_right,
                             Size = new Vector2(24),
-                            Action = () => OnBuildSelected(build.Versions.Next),
+                            Action = () =>
+                            {
+                                OnBuildSelected(build.Versions.Next);
+                                chevronNext.IsEnabled = false;
+                            },
                         },
                     }
                 },
@@ -110,6 +118,7 @@ namespace osu.Game.Overlays.Changelog
 
         public ChangelogContentGroup(APIChangelog build, bool newDate = false)
         {
+            ClickableText clickableText;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
@@ -145,7 +154,7 @@ namespace osu.Game.Overlays.Changelog
                             TextSize = 20, // web: 18,
                             Font = @"Exo2.0-Medium",
                         },
-                        new ClickableText
+                        clickableText = new ClickableText
                         {
                             Text = build.DisplayVersion,
                             TextSize = 20, // web: 18,
@@ -162,6 +171,7 @@ namespace osu.Game.Overlays.Changelog
                     Direction = FillDirection.Vertical,
                 },
             };
+            clickableText.Action += () => clickableText.IsEnabled = false;
         }
 
         public void UpdateChevronTooltips(string previousVersion, string nextVersion)
