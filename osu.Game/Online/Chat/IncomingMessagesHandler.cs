@@ -4,39 +4,44 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
 
 namespace osu.Game.Online.Chat
 {
+    /// <summary>
+    /// Handles tracking and updating of a specific message type, allowing polling and requesting of only new messages on an ongoing basis.
+    /// </summary>
     public class IncomingMessagesHandler
     {
         public long? LastMessageId { get; private set; }
 
         private APIMessagesRequest getMessagesRequest;
 
-        public Func<APIMessagesRequest> CreateMessagesRequest { set; private get; }
-
-        public Action<List<Message>> OnNewMessages { set; private get; }
+        private readonly Func<APIMessagesRequest> createRequest;
+        private readonly Action<List<Message>> onNewMessages;
 
         public bool CanRequestNewMessages => getMessagesRequest == null;
+
+        public IncomingMessagesHandler([NotNull] Func<APIMessagesRequest> createRequest, [NotNull] Action<List<Message>> onNewMessages)
+        {
+            this.createRequest = createRequest ?? throw new ArgumentNullException(nameof(createRequest));
+            this.onNewMessages = onNewMessages ?? throw new ArgumentNullException(nameof(onNewMessages));
+        }
 
         public void RequestNewMessages(IAPIProvider api)
         {
             if (!CanRequestNewMessages)
                 throw new InvalidOperationException("Requesting new messages is not possible yet, because the old request is still ongoing.");
 
-            if (OnNewMessages == null)
-                throw new InvalidOperationException($"You need to set an handler for the new incoming messages ({nameof(OnNewMessages)}) first before using {nameof(RequestNewMessages)}.");
-
-            getMessagesRequest = CreateMessagesRequest.Invoke();
-
+            getMessagesRequest = createRequest.Invoke();
             getMessagesRequest.Success += handleNewMessages;
             getMessagesRequest.Failure += exception =>
             {
                 Logger.Error(exception, "Fetching messages failed.");
 
-                //allowing new messages to be requested even after the fail.
+                // allowing new messages to be requested even after the fail.
                 getMessagesRequest = null;
             };
 
@@ -45,15 +50,14 @@ namespace osu.Game.Online.Chat
 
         private void handleNewMessages(List<Message> messages)
         {
-
-            //allowing new messages to be requested.
+            // allowing new messages to be requested.
             getMessagesRequest = null;
 
-            //in case of no new messages we simply do nothing.
+            // in case of no new messages we simply do nothing.
             if (messages == null || messages.Count == 0)
                 return;
 
-            OnNewMessages.Invoke(messages);
+            onNewMessages.Invoke(messages);
 
             LastMessageId = messages.Max(m => m.Id) ?? LastMessageId;
         }
