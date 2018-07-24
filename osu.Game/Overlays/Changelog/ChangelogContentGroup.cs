@@ -221,15 +221,13 @@ namespace osu.Game.Overlays.Changelog
                 });
                 foreach (ChangelogEntry entry in category.Value)
                 {
-                    OsuTextFlowContainer title;
-
-                    ChangelogEntries.Add(title = new OsuTextFlowContainer
+                    OsuTextFlowContainer title = new OsuTextFlowContainer
                     {
                         Direction = FillDirection.Full,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Margin = new MarginPadding { Vertical = 5 },
-                    });
+                    };
                     title.AddIcon(FontAwesome.fa_check, t =>
                     {
                         t.TextSize = 12;
@@ -238,24 +236,27 @@ namespace osu.Game.Overlays.Changelog
                     title.AddText(entry.Title, t => { t.TextSize = 18; });
                     if (!string.IsNullOrEmpty(entry.Repository))
                     {
-                        title.AddText($" ({entry.Repository.Substring(4)}#{entry.GithubPullRequestId})", t =>
+                        title.AddText(" (", t => t.TextSize = 18);
+                        title.AddText($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}", t =>
                         {
                             t.TextSize = 18;
                             t.Colour = Color4.SkyBlue;
                         });
+                        title.AddText(")", t => t.TextSize = 18);
                     }
                     title.AddText($" by\u00A0{entry.GithubUser.DisplayName}", t => t.TextSize = 14); //web: 12;
-                    TextFlowContainer messageContainer;
-                    ChangelogEntries.Add(messageContainer = new OsuTextFlowContainer
+                    ChangelogEntries.Add(title);
+                    TextFlowContainer messageContainer = new TextFlowContainer
                     {
                         AutoSizeAxes = Axes.Y,
                         RelativeSizeAxes = Axes.X,
-                    });
+                    };
                     messageContainer.AddText($"{entry.MessageHtml?.Replace("<p>", "").Replace("</p>", "")}\n", t =>
                     {
                         t.TextSize = 14; // web: 12,
                         t.Colour = new Color4(235, 184, 254, 255);
                     });
+                    ChangelogEntries.Add(messageContainer);
                 }
             }
         }
