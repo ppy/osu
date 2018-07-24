@@ -27,82 +27,41 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         private const float default_label_text_size = 16;
 
         public event OnCommitHandler OnCommit;
-
-        private bool readOnly;
+        
         public bool ReadOnly
         {
-            get => readOnly;
-            set
-            {
-                textBox.ReadOnly = value;
-                readOnly = value;
-            }
+            get => textBox.ReadOnly;
+            set => textBox.ReadOnly = value;
         }
-
-        private string labelText;
+        
         public string LabelText
         {
-            get => labelText;
-            set
-            {
-                labelText = value;
-                label.Text = value;
-            }
+            get => label.Text;
+            set => label.Text = value;
         }
-
-        private float labelTextSize;
+        
         public float LabelTextSize
         {
-            get => labelTextSize;
-            set
-            {
-                labelTextSize = value;
-                label.TextSize = value;
-            }
+            get => label.TextSize;
+            set => label.TextSize = value;
         }
-
-        private string placeholderText;
+        
         public string PlaceholderText
         {
-            get => placeholderText;
-            set
-            {
-                placeholderText = value;
-                textBox.PlaceholderText = value;
-            }
+            get => textBox.PlaceholderText;
+            set => textBox.PlaceholderText = value;
         }
 
-        private string text;
         public string Text
         {
-            get => text;
-            set
-            {
-                text = value;
-                textBox.Text = value;
-            }
-        }
-
-        private float height = default_height;
-        public float Height
-        {
-            get => height;
-            private set
-            {
-                height = value;
-                textBox.Height = value;
-                content.Height = value;
-            }
+            get => textBox.Text;
+            set => textBox.Text = value;
         }
 
         public MarginPadding Padding
         {
             get => base.Padding;
-            set
-            {
-                base.Padding = value;
-                base.Height = Height + base.Padding.Top;
-            }
+            set => base.Padding = value;
         }
 
         public MarginPadding LabelPadding
@@ -132,7 +91,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         public LabelledTextBox()
         {
             RelativeSizeAxes = Axes.X;
-            base.Height = default_height + Padding.Top;
+            Height = default_height;
             CornerRadius = outer_corner_radius;
             Masking = true;
 
@@ -148,42 +107,37 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                         RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.FromHex("1c2125"),
                     },
-                    new Container
+                    new GridContainer
                     {
                         RelativeSizeAxes = Axes.X,
                         Height = default_height,
-                        Child = new GridContainer
+                        Content = new[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = default_height,
-                            Content = new[]
+                            new Drawable[]
                             {
-                                new Drawable[]
+                                label = new OsuSpriteText
                                 {
-                                    label = new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.TopLeft,
-                                        Origin = Anchor.TopLeft,
-                                        Padding = new MarginPadding { Left = default_label_left_padding, Top = default_label_top_padding },
-                                        Colour = Color4.White,
-                                        TextSize = default_label_text_size,
-                                        Font = @"Exo2.0-Bold",
-                                    },
-                                    textBox = new OsuTextBox
-                                    {
-                                        Anchor = Anchor.TopLeft,
-                                        Origin = Anchor.TopLeft,
-                                        RelativeSizeAxes = Axes.X,
-                                        Height = default_height,
-                                        CornerRadius = inner_corner_radius,
-                                    },
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Padding = new MarginPadding { Left = default_label_left_padding, Top = default_label_top_padding },
+                                    Colour = Color4.White,
+                                    TextSize = default_label_text_size,
+                                    Font = @"Exo2.0-Bold",
+                                },
+                                textBox = new OsuTextBox
+                                {
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    RelativeSizeAxes = Axes.Both,
+                                    Height = 1,
+                                    CornerRadius = inner_corner_radius,
                                 },
                             },
-                            ColumnDimensions = new[]
-                            {
-                                new Dimension(GridSizeMode.Absolute, label_container_width),
-                                new Dimension()
-                            }
+                        },
+                        ColumnDimensions = new[]
+                        {
+                            new Dimension(GridSizeMode.Absolute, label_container_width),
+                            new Dimension()
                         }
                     }
                 }
