@@ -132,7 +132,15 @@ namespace osu.Game.Overlays
             {
                 case GlobalAction.Back:
                     if (isAtListing)
-                        State = Visibility.Hidden;
+                    {
+                        if (scroll.Current > scroll.GetChildPosInContent(listing))
+                        {
+                            scroll.ScrollTo(0);
+                            sampleBack?.Play();
+                        }
+                        else
+                            State = Visibility.Hidden;
+                    }
                     else
                     {
                         ShowListing();
