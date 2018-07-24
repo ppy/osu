@@ -2,12 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
+using osu.Framework.Input.States;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Input;
 using System.Diagnostics;
-using osu.Framework.Platform;
-using osu.Framework.Input.States;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
