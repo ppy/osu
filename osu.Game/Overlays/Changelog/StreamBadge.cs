@@ -37,9 +37,9 @@ namespace osu.Game.Overlays.Changelog
 
         public StreamBadge(APIChangelog latestBuild)
         {
-            this.LatestBuild = latestBuild;
+            LatestBuild = latestBuild;
             Height = badge_height;
-            base.Width = this.LatestBuild.IsFeatured ? badge_width * 2 : badge_width;
+            Width = LatestBuild.IsFeatured ? badge_width * 2 : badge_width;
             Margin = new MarginPadding(5);
             isActivated = true;
             Children = new Drawable[]
@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Changelog
                     {
                         new SpriteText
                         {
-                            Text = this.LatestBuild.UpdateStream.DisplayName,
+                            Text = LatestBuild.UpdateStream.DisplayName,
                             Font = @"Exo2.0-Bold",
                             TextSize = 16,
                             Margin = new MarginPadding
@@ -63,14 +63,14 @@ namespace osu.Game.Overlays.Changelog
                         },
                         new SpriteText
                         {
-                            Text = this.LatestBuild.DisplayVersion,
+                            Text = LatestBuild.DisplayVersion,
                             Font = @"Exo2.0-Light",
                             TextSize = 21,
                         },
                         new SpriteText
                         {
-                            Text = this.LatestBuild.Users > 0 ?
-                                $"{this.LatestBuild.Users:N0} users online" :
+                            Text = LatestBuild.Users > 0 ?
+                                $"{LatestBuild.Users:N0} users online" :
                                 null,
                             TextSize = 12,
                             Font = @"Exo2.0-Regular",
@@ -81,7 +81,7 @@ namespace osu.Game.Overlays.Changelog
                 lineBadge = new LineBadge(false)
                 {
                     Anchor = Anchor.TopCentre,
-                    Colour = StreamColour.FromStreamName(this.LatestBuild.UpdateStream.Name),
+                    Colour = StreamColour.FromStreamName(LatestBuild.UpdateStream.Name),
                     UncollapsedSize = 4,
                     CollapsedSize = 2,
                 },
