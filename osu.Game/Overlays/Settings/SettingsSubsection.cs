@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using osu.Framework.Allocation;
 
@@ -51,7 +52,7 @@ namespace osu.Game.Overlays.Settings
             {
                 new OsuSpriteText
                 {
-                    Text = Header.ToUpper(),
+                    Text = Header.ToUpper(CultureInfo.InvariantCulture),
                     Margin = new MarginPadding { Bottom = 10, Left = SettingsOverlay.CONTENT_MARGINS, Right = SettingsOverlay.CONTENT_MARGINS },
                     Font = @"Exo2.0-Black",
                 },

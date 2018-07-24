@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
@@ -176,9 +177,9 @@ namespace osu.Game.Overlays
         {
             Schedule(() =>
             {
-                textLine1.Text = description.Name.ToUpper();
+                textLine1.Text = description.Name.ToUpper(CultureInfo.InvariantCulture);
                 textLine2.Text = description.Value;
-                textLine3.Text = description.Shortcut.ToUpper();
+                textLine3.Text = description.Shortcut.ToUpper(CultureInfo.InvariantCulture);
 
                 if (string.IsNullOrEmpty(textLine3.Text))
                     textLine3.Text = "NO KEY BOUND";

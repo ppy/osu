@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Globalization;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -23,7 +24,7 @@ namespace osu.Game.Beatmaps.Drawables
                 if (value == status) return;
                 status = value;
 
-                statusText.Text = Enum.GetName(typeof(BeatmapSetOnlineStatus), Status)?.ToUpper();
+                statusText.Text = Enum.GetName(typeof(BeatmapSetOnlineStatus), Status)?.ToUpper(CultureInfo.InvariantCulture);
             }
         }
 
