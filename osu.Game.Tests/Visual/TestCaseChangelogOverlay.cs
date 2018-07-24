@@ -7,7 +7,7 @@ using osu.Game.Overlays;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseChangelog : OsuTestCase
+    public class TestCaseChangelogOverlay : OsuTestCase
     {
         private ChangelogOverlay changelog;
 
