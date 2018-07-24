@@ -37,6 +37,8 @@ namespace osu.Game.Overlays.Changelog.Header
                 {
                     TextSize = 21, // web: 16,
                     Text = displayText,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
                     Margin = new MarginPadding
                     {
                         Top = 5,
@@ -49,6 +51,7 @@ namespace osu.Game.Overlays.Changelog.Header
                     UncollapsedSize = 10,
                     Colour = badgeColour,
                     Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.Centre,
                 }
             };
         }
@@ -69,7 +72,8 @@ namespace osu.Game.Overlays.Changelog.Header
             // sometimes in visual tests (https://streamable.com/0qssq), I'm using a scheduler here
             Scheduler.AddDelayed(() =>
             {
-                if (!string.IsNullOrEmpty(displayText)) Text.Text = displayText;
+                if (!string.IsNullOrEmpty(displayText))
+                    Text.Text = displayText;
                 LineBadge.Uncollapse();
             }, duration);
         }
