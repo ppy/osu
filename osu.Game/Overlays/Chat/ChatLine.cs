@@ -248,7 +248,7 @@ namespace osu.Game.Overlays.Chat
             private void load(UserProfileOverlay profile, ChannelManager chatManager)
             {
                 Action = () => profile?.ShowUser(sender);
-                startChatAction = () => chatManager?.OpenUserChannel(sender);
+                startChatAction = () => chatManager?.OpenPrivateChannel(sender);
             }
 
             public MenuItem[] ContextMenuItems => new MenuItem[]
