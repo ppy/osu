@@ -126,7 +126,6 @@ namespace osu.Game
             dependencies.CacheAs<IAPIProvider>(api);
 
             var channelManager = new ChannelManager();
-            dependencies.Inject(channelManager);
             dependencies.Cache(channelManager);
             AddInternal(channelManager);
 
