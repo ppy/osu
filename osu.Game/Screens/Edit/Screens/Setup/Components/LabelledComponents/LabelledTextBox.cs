@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         private const float default_label_top_padding = 12;
         private const float default_label_text_size = 16;
 
-        public event OnCommitHandler TextBoxTextChanged;
+        public event OnCommitHandler OnCommit;
 
         private bool readOnly;
         public bool ReadOnly
@@ -80,7 +80,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             {
                 text = value;
                 textBox.Text = value;
-                TextBoxTextChanged?.Invoke(textBox, true);
             }
         }
 
@@ -195,7 +194,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                 }
             };
 
-            textBox.OnCommit += (_, a) => TextBoxTextChanged?.Invoke(textBox, a);
+            textBox.OnCommit += OnCommit;
         }
     }
 }
