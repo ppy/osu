@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public list<double> OsuDifficultyAt()
+        public List<double> OsuDifficultyAt()
         {
             //throws list of difficulties(strains) at sections or at hitobjects
         }
