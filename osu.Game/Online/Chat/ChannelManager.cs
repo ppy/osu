@@ -200,17 +200,17 @@ namespace osu.Game.Online.Chat
 
         private void handleUserMessages(IEnumerable<Message> messages)
         {
-            var joinedUserChannels = JoinedChannels.Where(c => c.Target == TargetType.User).ToList();
+            var joinedPrivateChannels = JoinedChannels.Where(c => c.Target == TargetType.User).ToList();
 
             Channel getChannelForUser(User user)
             {
-                var channel = joinedUserChannels.FirstOrDefault(c => c.Id == user.Id);
+                var channel = joinedPrivateChannels.FirstOrDefault(c => c.Id == user.Id);
 
                 if (channel == null)
                 {
                     channel = new PrivateChannel { User = user };
                     JoinedChannels.Add(channel);
-                    joinedUserChannels.Add(channel);
+                    joinedPrivateChannels.Add(channel);
                 }
 
                 return channel;
@@ -237,7 +237,7 @@ namespace osu.Game.Online.Chat
             // Because of the way the API provides data right now, outgoing messages do not contain required
             // user (or in the future, target channel) metadata. As such we need to do a second request
             // to find out the specifics of the user.
-            var withoutReplyGroups = outgoingGroups.Where(g => joinedUserChannels.All(m => m.Id != g.Key));
+            var withoutReplyGroups = outgoingGroups.Where(g => joinedPrivateChannels.All(m => m.Id != g.Key));
 
             foreach (var withoutReplyGroup in withoutReplyGroups)
             {
