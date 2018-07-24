@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Chat
         /// </summary>
         /// <param name="channel">The channel that is going to be added.</param>
         public void AddItem(Channel channel)
-        { 
+        {
             if (!ChannelTabControl.Items.Contains(channel))
                 ChannelTabControl.AddItem(channel);
 
