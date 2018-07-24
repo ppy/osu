@@ -23,6 +23,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
+        public double OsuDifficultyAt()
+        {
+            //throws list of difficulties at sections or at hitobjects
+        }
+
         //Copy some code from here
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
