@@ -168,7 +168,6 @@ namespace osu.Game.Overlays
         /// </summary>
         public void FetchAndShowBuild(APIChangelog build, bool sentByBadges = false)
         {
-            isAtListing = false;
             var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
 
             if (build.UpdateStream.DisplayName != null && build.DisplayVersion != null)
@@ -182,10 +181,12 @@ namespace osu.Game.Overlays
             chart.ShowUpdateStream(build.UpdateStream.Name);
             req.Success += APIChangelog =>
             {
-                savedScrollPosition = scroll.Current;
                 content.ShowBuild(APIChangelog);
                 if (scroll.Current > scroll.GetChildPosInContent(content))
                     scroll.ScrollTo(content);
+                if (isAtListing)
+                    savedScrollPosition = scroll.Current;
+                isAtListing = false;
             };
             api.Queue(req);
         }
