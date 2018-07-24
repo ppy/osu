@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using System;
 using static osu.Framework.Graphics.UserInterface.TextBox;
 
@@ -14,7 +15,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
     public class LabelledTextBox : CompositeDrawable
     {
-        private readonly SetupTextBox textBox;
+        private readonly OsuTextBox textBox;
         private readonly Container content;
         private readonly OsuSpriteText label;
 
@@ -172,7 +173,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                                             Text = LabelText,
                                             Font = @"Exo2.0-Bold",
                                         },
-                                        textBox = new SetupTextBox
+                                        textBox = new OsuTextBox
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
