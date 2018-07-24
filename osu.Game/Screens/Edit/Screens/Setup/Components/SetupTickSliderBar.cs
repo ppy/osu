@@ -21,17 +21,17 @@ using System.Globalization;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class OsuSetupTickSliderBar : SliderBar<float>, IHasTooltip, IHasAccentColour
+    public class SetupTickSliderBar : SliderBar<float>, IHasTooltip, IHasAccentColour
     {
         /// <summary>
         /// Maximum number of decimal digits to be displayed in the tooltip.
         /// </summary>
-        public const int MAX_DECIMAL_DIGITS = 5;
-        public const float DEFAULT_HEIGHT = 20;
-        public const float DEFAULT_SLIDER_HEIGHT = 8;
-        public const float NUB_SIZE_X = 36;
-        public const float NUB_SIZE_Y = 20;
-        public const float DEFAULT_CAPTION_TEXT_SIZE = 13;
+        private const int max_decimal_digits = 5;
+        private const float default_height = 20;
+        private const float default_slider_height = 8;
+        private const float nub_size_x = 36;
+        private const float nub_size_y = 20;
+        private const float default_caption_text_size = 13;
 
         private bool leftShiftHeld;
         private bool rightShiftHeld;
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 var floatValue = CurrentNumber.Value;
                 var floatPrecision = CurrentNumber.Precision;
 
-                var decimalPrecision = normalise((decimal)floatPrecision, MAX_DECIMAL_DIGITS);
+                var decimalPrecision = normalise((decimal)floatPrecision, max_decimal_digits);
 
                 // Find the number of significant digits (we could have less than 5 after normalize())
                 var significantDigits = findPrecision(decimalPrecision);
@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             }
         }
 
-        public OsuSetupTickSliderBar(float minValue, float maxValue, float normalPrecision, float alternatePrecision)
+        public SetupTickSliderBar(float minValue, float maxValue, float normalPrecision, float alternatePrecision)
         {
             MinValue = minValue;
             MaxValue = maxValue;
@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             AlternatePrecision = alternatePrecision;
 
             RelativeSizeAxes = Axes.X;
-            Height = DEFAULT_HEIGHT;
+            Height = default_height;
             RangePadding = 20;
             Y = 5;
             Children = new Drawable[]
@@ -186,20 +186,20 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = DEFAULT_HEIGHT,
+                    Height = default_height,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(2),
                     Children = new Drawable[]
                     {
                         new Container
                         {
-                            Height = DEFAULT_HEIGHT,
+                            Height = default_height,
                             RelativeSizeAxes = Axes.X,
                             Children = new Drawable[]
                             {
                                 new Container
                                 {
-                                    Height = DEFAULT_SLIDER_HEIGHT,
+                                    Height = default_slider_height,
                                     RelativeSizeAxes = Axes.X,
                                     CornerRadius = 3,
                                     Masking = true,
@@ -209,14 +209,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                     {
                                         leftBox = new Box
                                         {
-                                            Height = DEFAULT_SLIDER_HEIGHT,
+                                            Height = default_slider_height,
                                             RelativeSizeAxes = Axes.X,
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
                                         },
                                         rightBox = new Box
                                         {
-                                            Height = DEFAULT_SLIDER_HEIGHT,
+                                            Height = default_slider_height,
                                             RelativeSizeAxes = Axes.X,
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
@@ -229,7 +229,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                     Anchor = Anchor.TopLeft,
                                     Origin = Anchor.TopCentre,
                                     RelativePositionAxes = Axes.X,
-                                    Size = new Vector2(NUB_SIZE_X, NUB_SIZE_Y)
+                                    Size = new Vector2(nub_size_x, nub_size_y)
                                 },
                             }
                         },
@@ -249,7 +249,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                         Anchor = Anchor.TopLeft,
                                         Origin = Anchor.TopLeft,
                                         Alpha = 0.8f,
-                                        TextSize = DEFAULT_CAPTION_TEXT_SIZE,
+                                        TextSize = default_caption_text_size,
                                     }
                                 },
                                 new Container
@@ -262,7 +262,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                         Anchor = Anchor.TopCentre,
                                         Origin = Anchor.TopCentre,
                                         Alpha = 0.8f,
-                                        TextSize = DEFAULT_CAPTION_TEXT_SIZE,
+                                        TextSize = default_caption_text_size,
                                     }
                                 },
                                 new Container
@@ -275,7 +275,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,
                                         Alpha = 0.8f,
-                                        TextSize = DEFAULT_CAPTION_TEXT_SIZE,
+                                        TextSize = default_caption_text_size,
                                     }
                                 }
                             },

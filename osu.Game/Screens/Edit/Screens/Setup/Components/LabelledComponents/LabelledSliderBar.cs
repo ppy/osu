@@ -14,24 +14,21 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
     public class LabelledSliderBar : CompositeDrawable
     {
-        private readonly Container content;
-        private readonly Container outerContainer;
         private readonly Box box;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
-        private readonly OsuSetupTickSliderBar sliderBar;
+        private readonly SetupTickSliderBar sliderBar;
 
-        public const float LABEL_CONTAINER_WIDTH = 150;
-        public const float OUTER_CORNER_RADIUS = 15;
-        public const float INNER_CORNER_RADIUS = 10;
-        public const float DEFAULT_LABEL_TEXT_SIZE = 16;
-        public const float DEFAULT_BOTTOM_LABEL_TEXT_SIZE = 12;
-        public const float NORMAL_HEIGHT = 60;
-        public const float DEFAULT_LABEL_PADDING = 15;
-        public const float DEFAULT_TOP_PADDING = 10;
-        public const float DEFAULT_BOTTOM_PADDING = 12;
-        public const float DEFAULT_LEFT_SLIDER_BAR_PADDING = 20;
-        public const float DEFAULT_RIGHT_SLIDER_BAR_PADDING = 35;
+        private const float label_container_width = 150;
+        private const float corner_radius = 15;
+        private const float default_label_text_size = 16;
+        private const float default_bottom_label_text_size = 12;
+        private const float normal_height = 60;
+        private const float default_label_padding = 15;
+        private const float default_top_padding = 10;
+        private const float default_bottom_padding = 12;
+        private const float default_left_slider_bar_padding = 20;
+        private const float default_right_slider_bar_padding = 35;
 
         public event Action<float> SliderBarValueChanged;
 
@@ -43,11 +40,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         public float CurrentValue
         {
             get => sliderBar.Current.Value;
-            set
-            {
-                sliderBar.Current.Value = value;
-                TriggerSliderBarValueChanged(value);
-            }
+            set => sliderBar.Current.Value = value;
         }
 
         private float sliderMinValue;
@@ -104,27 +97,20 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                 sliderBar.TooltipTextSuffix = value;
             }
         }
-
-        private string labelText;
+        
         public string LabelText
         {
-            get => labelText;
-            set
-            {
-                labelText = value;
-                label.Text = value;
-            }
+            get => label.Text;
+            set => label.Text = value;
         }
-
-        private string bottomLabelText;
+        
         public string BottomLabelText
         {
-            get => bottomLabelText;
+            get => bottomText.Text;
             set
             {
-                bottomLabelText = value;
                 bottomText.Text = value;
-                changeHeight(NORMAL_HEIGHT + (value != "" ? 20 : 0));
+                Height = normal_height + (value != "" ? 20 : 0);
             }
         }
 
@@ -143,26 +129,17 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             get => sliderBar.RightTickCaption;
             set => sliderBar.RightTickCaption = value;
         }
-
-        private float labelTextSize;
+        
         public float LabelTextSize
         {
-            get => labelTextSize;
-            set
-            {
-                labelTextSize = value;
-                label.TextSize = value;
-            }
+            get => label.TextSize;
+            set => label.TextSize = value;
         }
 
         public MarginPadding Padding
         {
             get => base.Padding;
-            set
-            {
-                base.Padding = value;
-                Height = NORMAL_HEIGHT + base.Padding.Top;
-            }
+            set => base.Padding = value;
         }
 
         public MarginPadding LabelPadding
@@ -185,43 +162,39 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 
         public Color4 BackgroundColour
         {
-            get => content.Colour;
-            set => content.Colour = value;
+            get => box.Colour;
+            set => box.Colour = value;
         }
 
         public LabelledSliderBar()
         {
             Masking = true;
-            CornerRadius = OUTER_CORNER_RADIUS;
+            CornerRadius = corner_radius;
             RelativeSizeAxes = Axes.X;
-            Height = NORMAL_HEIGHT + Padding.Top;
+            Height = normal_height;
 
             InternalChildren = new Drawable[]
             {
-                outerContainer = new Container
+                new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = NORMAL_HEIGHT,
-                    CornerRadius = 15,
+                    RelativeSizeAxes = Axes.Both,
+                    CornerRadius = corner_radius,
                     Masking = true,
                     Children = new Drawable[]
                     {
                         box = new Box
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = NORMAL_HEIGHT,
+                            RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.FromHex("1c2125"),
                         },
-                        content = new Container
+                        new Container
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = NORMAL_HEIGHT,
+                            RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
                                 new GridContainer
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = NORMAL_HEIGHT,
+                                    RelativeSizeAxes = Axes.Both,
                                     Content = new[]
                                     {
                                         new Drawable[]
@@ -230,18 +203,17 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                                             {
                                                 Anchor = Anchor.TopLeft,
                                                 Origin = Anchor.TopLeft,
-                                                Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Top = DEFAULT_TOP_PADDING },
+                                                Padding = new MarginPadding { Left = default_label_padding, Top = default_top_padding },
                                                 Colour = Color4.White,
-                                                TextSize = DEFAULT_LABEL_TEXT_SIZE,
-                                                Text = LabelText,
+                                                TextSize = default_label_text_size,
                                                 Font = @"Exo2.0-Bold",
                                             },
-                                            sliderBar = new OsuSetupTickSliderBar(sliderMinValue, sliderMaxValue, sliderNormalPrecision, sliderAlternatePrecision)
+                                            sliderBar = new SetupTickSliderBar(sliderMinValue, sliderMaxValue, sliderNormalPrecision, sliderAlternatePrecision)
                                             {
                                                 Anchor = Anchor.TopLeft,
                                                 Origin = Anchor.TopLeft,
-                                                Y = DEFAULT_TOP_PADDING,
-                                                Padding = new MarginPadding { Left = DEFAULT_LEFT_SLIDER_BAR_PADDING, Right = DEFAULT_RIGHT_SLIDER_BAR_PADDING },
+                                                Y = default_top_padding,
+                                                Padding = new MarginPadding { Left = default_left_slider_bar_padding, Right = default_right_slider_bar_padding },
                                                 Colour = Color4.White,
                                                 TooltipTextSuffix = tooltipTextSuffix
                                             },
@@ -249,7 +221,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                                     },
                                     ColumnDimensions = new[]
                                     {
-                                        new Dimension(GridSizeMode.Absolute, LABEL_CONTAINER_WIDTH),
+                                        new Dimension(GridSizeMode.Absolute, label_container_width),
                                         new Dimension()
                                     }
                                 },
@@ -257,10 +229,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Bottom = DEFAULT_BOTTOM_PADDING },
-                                    TextSize = DEFAULT_BOTTOM_LABEL_TEXT_SIZE,
+                                    Padding = new MarginPadding { Left = default_label_padding, Bottom = default_bottom_padding },
+                                    TextSize = default_bottom_label_text_size,
                                     Font = @"Exo2.0-BoldItalic",
-                                    Text = BottomLabelText
                                 },
                             }
                         }
@@ -275,14 +246,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         private void load(OsuColour osuColour)
         {
             bottomText.Colour = osuColour.Yellow;
-        }
-
-        private void changeHeight(float newHeight)
-        {
-            Height = newHeight + Padding.Top;
-            content.Height = newHeight;
-            box.Height = newHeight;
-            outerContainer.Height = newHeight;
         }
     }
 }
