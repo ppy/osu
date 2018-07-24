@@ -244,7 +244,7 @@ namespace osu.Game.Overlays.Changelog
                             t.Colour = Color4.SkyBlue;
                         });
                     }
-                    title.AddText($" by {entry.GithubUser.DisplayName}", t => t.TextSize = 14); //web: 12;
+                    title.AddText($" by\u00A0{entry.GithubUser.DisplayName}", t => t.TextSize = 14); //web: 12;
                     TextFlowContainer messageContainer;
                     ChangelogEntries.Add(messageContainer = new OsuTextFlowContainer
                     {
