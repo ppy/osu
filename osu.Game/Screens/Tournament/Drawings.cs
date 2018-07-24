@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -324,7 +323,7 @@ namespace osu.Game.Screens.Tournament
                             if (string.IsNullOrEmpty(line))
                                 continue;
 
-                            if (line.ToUpper(CultureInfo.InvariantCulture).StartsWith("GROUP"))
+                            if (line.ToUpperInvariant().StartsWith("GROUP"))
                                 continue;
 
                             // ReSharper disable once AccessToModifiedClosure
