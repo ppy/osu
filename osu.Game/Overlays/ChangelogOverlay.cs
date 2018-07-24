@@ -197,13 +197,13 @@ namespace osu.Game.Overlays
                 badges.SelectUpdateStream(build.UpdateStream.Name);
 
             chart.ShowUpdateStream(build.UpdateStream.Name);
-            req.Success += APIChangelog =>
+            req.Success += apiChangelog =>
             {
                 listing.Hide();
                 content.Show();
-                content.ShowBuild(APIChangelog);
+                content.ShowBuild(apiChangelog);
                 if (scroll.Current > scroll.GetChildPosInContent(content))
-                    scroll.ScrollTo(content);
+                    scroll.ScrollTo(chart);
                 if (isAtListing)
                     savedScrollPosition = scroll.Current;
                 isAtListing = false;

@@ -17,6 +17,10 @@ namespace osu.Game.Overlays.Changelog
     // maybe look to osu.Game.Screens.Play.SquareGraph for reference later
     public class ChangelogChart : BufferedContainer
     {
+        private const float height = 100;
+        private const float transition_duration = 300;
+
+        private readonly Container container;
         private readonly Box background;
         private readonly SpriteText text;
         private APIAccess api;
@@ -24,20 +28,25 @@ namespace osu.Game.Overlays.Changelog
         public ChangelogChart()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 100;
-            Children = new Drawable[]
+            AutoSizeAxes = Axes.Y;
+            Child = container = new Container
             {
-                background = new Box
+                RelativeSizeAxes = Axes.X,
+                Height = height,
+                Children = new Drawable[]
                 {
-                    Colour = StreamColour.STABLE,
-                    RelativeSizeAxes = Axes.Both,
-                },
-                text = new SpriteText
-                {
-                    Text = "Graph Placeholder",
-                    TextSize = 28,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
+                    background = new Box
+                    {
+                        Colour = StreamColour.STABLE,
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    text = new SpriteText
+                    {
+                        Text = "Graph Placeholder",
+                        TextSize = 28,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
                 },
             };
         }
@@ -55,13 +64,10 @@ namespace osu.Game.Overlays.Changelog
             if (!isEmpty(chartInfo))
             {
                 background.Colour = StreamColour.FromStreamName(updateStreamName);
-                text.Text = "Graph placeholder\n(chart is not empty)";
+                container.MoveToY(0, transition_duration, Easing.InOutQuad).FadeIn(transition_duration);
             }
             else
-            {
-                background.Colour = Color4.Black;
-                text.Text = "Graph placeholder\n(chart is empty)";
-            }
+                container.MoveToY(-height, transition_duration, Easing.InOutQuad).FadeOut(transition_duration);
         }
 
         [BackgroundDependencyLoader]
