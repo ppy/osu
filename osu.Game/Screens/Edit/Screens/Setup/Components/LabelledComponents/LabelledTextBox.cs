@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using System;
 using static osu.Framework.Graphics.UserInterface.TextBox;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
@@ -132,63 +131,58 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 
         public LabelledTextBox()
         {
-            Masking = true;
-            CornerRadius = outer_corner_radius;
             RelativeSizeAxes = Axes.X;
             base.Height = default_height + Padding.Top;
+            CornerRadius = outer_corner_radius;
+            Masking = true;
 
-            InternalChildren = new Drawable[]
+            InternalChild = new Container
             {
-                new Container
+                RelativeSizeAxes = Axes.Both,
+                CornerRadius = outer_corner_radius,
+                Masking = true,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    CornerRadius = outer_corner_radius,
-                    Masking = true,
-                    Children = new Drawable[]
+                    new Box
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.FromHex("1c2125"),
-                        },
-                        new Container
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = OsuColour.FromHex("1c2125"),
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Height = default_height,
+                        Child = new GridContainer
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = default_height,
-                            Child = new GridContainer
+                            Content = new[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                Height = default_height,
-                                Content = new[]
+                                new Drawable[]
                                 {
-                                    new Drawable[]
+                                    label = new OsuSpriteText
                                     {
-                                        label = new OsuSpriteText
-                                        {
-                                            Anchor = Anchor.TopLeft,
-                                            Origin = Anchor.TopLeft,
-                                            Padding = new MarginPadding { Left = default_label_left_padding, Top = default_label_top_padding },
-                                            Colour = Color4.White,
-                                            TextSize = default_label_text_size,
-                                            Text = LabelText,
-                                            Font = @"Exo2.0-Bold",
-                                        },
-                                        textBox = new OsuTextBox
-                                        {
-                                            Anchor = Anchor.TopLeft,
-                                            Origin = Anchor.TopLeft,
-                                            RelativeSizeAxes = Axes.X,
-                                            Height = default_height,
-                                            ReadOnly = ReadOnly,
-                                            CornerRadius = inner_corner_radius,
-                                        },
+                                        Anchor = Anchor.TopLeft,
+                                        Origin = Anchor.TopLeft,
+                                        Padding = new MarginPadding { Left = default_label_left_padding, Top = default_label_top_padding },
+                                        Colour = Color4.White,
+                                        TextSize = default_label_text_size,
+                                        Font = @"Exo2.0-Bold",
+                                    },
+                                    textBox = new OsuTextBox
+                                    {
+                                        Anchor = Anchor.TopLeft,
+                                        Origin = Anchor.TopLeft,
+                                        RelativeSizeAxes = Axes.X,
+                                        Height = default_height,
+                                        CornerRadius = inner_corner_radius,
                                     },
                                 },
-                                ColumnDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.Absolute, label_container_width),
-                                    new Dimension()
-                                }
+                            },
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.Absolute, label_container_width),
+                                new Dimension()
                             }
                         }
                     }
