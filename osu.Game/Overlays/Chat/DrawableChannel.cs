@@ -55,15 +55,11 @@ namespace osu.Game.Overlays.Chat
             Channel.PendingMessageResolved += pendingMessageResolved;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            newMessagesArrived(Channel.Messages);
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            newMessagesArrived(Channel.Messages);
             scrollToEnd();
         }
 

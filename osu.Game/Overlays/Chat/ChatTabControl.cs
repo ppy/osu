@@ -48,8 +48,10 @@ namespace osu.Game.Overlays.Chat
         }
 
         public void AddItem(Channel channel)
-        {
-            ChannelTabControl.AddItem(channel);
+        { 
+            if (!ChannelTabControl.Items.Contains(channel))
+                ChannelTabControl.AddItem(channel);
+
             if (Current.Value == null)
                 Current.Value = channel;
         }

@@ -125,23 +125,26 @@ namespace osu.Game.Overlays.Chat.Selection
 
         public void UpdateAvailableChannels(IEnumerable<Channel> channels)
         {
-            sectionsFlow.ChildrenEnumerable = new[]
+            Scheduler.Add(() =>
             {
-                new ChannelSection
+                sectionsFlow.ChildrenEnumerable = new[]
                 {
-                    Header = "All Channels",
-                    Channels = channels,
-                },
-            };
+                    new ChannelSection
+                    {
+                        Header = "All Channels",
+                        Channels = channels,
+                    },
+                };
 
-            foreach (ChannelSection s in sectionsFlow.Children)
-            {
-                foreach (ChannelListItem c in s.ChannelFlow.Children)
+                foreach (ChannelSection s in sectionsFlow.Children)
                 {
-                    c.OnRequestJoin = channel => { OnRequestJoin?.Invoke(channel); };
-                    c.OnRequestLeave = channel => { OnRequestLeave?.Invoke(channel); };
+                    foreach (ChannelListItem c in s.ChannelFlow.Children)
+                    {
+                        c.OnRequestJoin = channel => { OnRequestJoin?.Invoke(channel); };
+                        c.OnRequestLeave = channel => { OnRequestLeave?.Invoke(channel); };
+                    }
                 }
-            }
+            });
         }
 
         [BackgroundDependencyLoader]
