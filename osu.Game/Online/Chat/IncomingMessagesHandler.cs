@@ -15,16 +15,18 @@ namespace osu.Game.Online.Chat
     /// </summary>
     public class IncomingMessagesHandler
     {
+        public delegate APIMessagesRequest CreateRequestDelegate(long? lastMessageId);
+
         public long? LastMessageId { get; private set; }
 
         private APIMessagesRequest getMessagesRequest;
 
-        private readonly Func<APIMessagesRequest> createRequest;
+        private readonly CreateRequestDelegate createRequest;
         private readonly Action<List<Message>> onNewMessages;
 
         public bool CanRequestNewMessages => getMessagesRequest == null;
 
-        public IncomingMessagesHandler([NotNull] Func<APIMessagesRequest> createRequest, [NotNull] Action<List<Message>> onNewMessages)
+        public IncomingMessagesHandler([NotNull] CreateRequestDelegate createRequest, [NotNull] Action<List<Message>> onNewMessages)
         {
             this.createRequest = createRequest ?? throw new ArgumentNullException(nameof(createRequest));
             this.onNewMessages = onNewMessages ?? throw new ArgumentNullException(nameof(onNewMessages));
@@ -35,7 +37,7 @@ namespace osu.Game.Online.Chat
             if (!CanRequestNewMessages)
                 throw new InvalidOperationException("Requesting new messages is not possible yet, because the old request is still ongoing.");
 
-            getMessagesRequest = createRequest.Invoke();
+            getMessagesRequest = createRequest.Invoke(LastMessageId);
             getMessagesRequest.Success += handleNewMessages;
             getMessagesRequest.Failure += exception =>
             {
