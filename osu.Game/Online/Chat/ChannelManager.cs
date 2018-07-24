@@ -47,13 +47,17 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public ObservableCollection<Channel> AvailableChannels { get; } = new ObservableCollection<Channel>();
 
+        private readonly IncomingMessagesHandler channelMessagesHandler;
+        private readonly IncomingMessagesHandler privateMessagesHandler;
+
         private IAPIProvider api;
         private ScheduledDelegate fetchMessagesScheduleder;
-        private GetMessagesRequest fetchMessageReq;
-        private GetPrivateMessagesRequest fetchUserMsgReq;
-        private long? lastChannelMsgId;
-        private long? lastUserMsgId;
 
+        /// <summary>
+        /// Opens a channel or switches to the channel if already opened.
+        /// </summary>
+        /// <exception cref="ChannelNotFoundException">If the name of the specifed channel was not found this exception will be thrown.</exception>
+        /// <param name="name"></param>
         public void OpenChannel(string name)
         {
             if (name == null)
@@ -63,7 +67,11 @@ namespace osu.Game.Online.Chat
                                    ?? throw new ChannelNotFoundException(name);
         }
 
-        public void OpenUserChannel(User user)
+        /// <summary>
+        /// Opens a new private channel.
+        /// </summary>
+        /// <param name="user"></param>
+        public void OpenPrivateChannel(User user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
@@ -75,6 +83,14 @@ namespace osu.Game.Online.Chat
         public ChannelManager()
         {
             CurrentChannel.ValueChanged += currentChannelChanged;
+
+            channelMessagesHandler = new IncomingMessagesHandler();
+            channelMessagesHandler.CreateMessagesRequest = () => new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), channelMessagesHandler.LastMessageId);
+            channelMessagesHandler.OnNewMessages = handleChannelMessages;
+
+            privateMessagesHandler = new IncomingMessagesHandler();
+            privateMessagesHandler.CreateMessagesRequest = () => new GetPrivateMessagesRequest(privateMessagesHandler.LastMessageId);
+            privateMessagesHandler.OnNewMessages = handleUserMessages;
         }
 
         private void currentChannelChanged(Channel channel)
@@ -156,32 +172,11 @@ namespace osu.Game.Online.Chat
 
         private void fetchNewMessages()
         {
-            if (fetchMessageReq == null)
-                fetchMessages(
-                    () => fetchMessageReq = new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), lastChannelMsgId),
-                    messages =>
-                    {
-                        if (messages == null)
-                            return;
-                        handleChannelMessages(messages);
-                        lastChannelMsgId = messages.LastOrDefault()?.Id ?? lastChannelMsgId;
-                        fetchMessageReq = null;
-                    }
-                );
+            if (channelMessagesHandler.CanRequestNewMessages)
+                channelMessagesHandler.RequestNewMessages(api);
 
-
-            if (fetchUserMsgReq == null)
-                fetchMessages(
-                    () => fetchUserMsgReq = new GetPrivateMessagesRequest(lastUserMsgId),
-                    messages =>
-                    {
-                        if (messages == null)
-                            return;
-                        handleUserMessages(messages);
-                        lastUserMsgId = messages.Max(m => m.Id) ?? lastUserMsgId;
-                        fetchUserMsgReq = null;
-                    }
-                );
+            if (privateMessagesHandler.CanRequestNewMessages)
+                privateMessagesHandler.RequestNewMessages(api);
         }
 
         private void fetchMessages(Func<APIMessagesRequest> messagesRequest, Action<List<Message>> handler)
@@ -272,7 +267,7 @@ namespace osu.Game.Online.Chat
                 channels.Where(channel => AvailableChannels.All(c => c.Id != channel.Id))
                         .ForEach(channel => AvailableChannels.Add(channel));
 
-                channels.Where(channel => defaultChannels.Contains(channel.Name))
+                channels.Where(channel => defaultChannels.Any(c => c.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
                         .Where(channel => JoinedChannels.All(c => c.Id != channel.Id))
                         .ForEach(channel =>
                         {
@@ -286,7 +281,12 @@ namespace osu.Game.Online.Chat
 
                 fetchNewMessages();
             };
-            req.Failure += error => Logger.Error(error, "Fetching channel list failed");
+            req.Failure += error =>
+            {
+                Logger.Error(error, "Fetching channel list failed");
+
+                initializeDefaultChannels();
+            };
 
             api.Queue(req);
         }
@@ -298,12 +298,15 @@ namespace osu.Game.Online.Chat
                 case APIState.Online:
                     if (JoinedChannels.Count == 0)
                         initializeDefaultChannels();
+
                     fetchMessagesScheduleder = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
                     break;
                 default:
-                    fetchMessageReq?.Cancel();
-                    fetchMessageReq = null;
+                    channelMessagesHandler.CancelOngoingRequests();
+                    privateMessagesHandler.CancelOngoingRequests();
+
                     fetchMessagesScheduleder?.Cancel();
+                    fetchMessagesScheduleder = null;
                     break;
             }
         }
