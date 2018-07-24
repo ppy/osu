@@ -20,8 +20,6 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
-        protected virtual bool DisplayJudgements => true;
-
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
         public OsuPlayfield()
