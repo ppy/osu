@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public OsuDifficultySectionRating  = new List<double>();
+        public List<double> OsuDifficultySectionRating  = new List<double>();
 
         public List<double> OsuDifficultyAt (IBeatmap beatmap, double timeRate)
         {
