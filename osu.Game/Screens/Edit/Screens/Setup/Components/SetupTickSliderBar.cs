@@ -77,6 +77,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 Precision = value ? AlternatePrecision : NormalPrecision;
             }
         }
+
         public float MinValue
         {
             get => CurrentNumber.MinValue;

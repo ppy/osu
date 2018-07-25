@@ -32,59 +32,34 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 
         public event Action<float> SliderBarValueChanged;
 
-        public void TriggerSliderBarValueChanged(float newValue)
-        {
-            SliderBarValueChanged?.Invoke(newValue);
-        }
-
         public float CurrentValue
         {
             get => sliderBar.Current.Value;
             set => sliderBar.Current.Value = value;
         }
 
-        private float sliderMinValue;
         public float SliderMinValue
         {
-            get => sliderMinValue;
-            set
-            {
-                sliderMinValue = value;
-                sliderBar.MinValue = value;
-            }
+            get => sliderBar.MinValue;
+            set => sliderBar.MinValue = value;
         }
 
-        private float sliderMaxValue = 10;
         public float SliderMaxValue
         {
-            get => sliderMaxValue;
-            set
-            {
-                sliderMaxValue = value;
-                sliderBar.MaxValue = value;
-            }
+            get => sliderBar.MaxValue;
+            set => sliderBar.MaxValue = value;
         }
 
-        private float sliderNormalPrecision = 1;
         public float SliderNormalPrecision
         {
-            get => sliderNormalPrecision;
-            set
-            {
-                sliderNormalPrecision = value;
-                sliderBar.NormalPrecision = value;
-            }
+            get => sliderBar.NormalPrecision;
+            set => sliderBar.NormalPrecision = value;
         }
 
-        private float sliderAlternatePrecision = 1;
         public float SliderAlternatePrecision
         {
-            get => sliderAlternatePrecision;
-            set
-            {
-                sliderAlternatePrecision = value;
-                sliderBar.AlternatePrecision = value;
-            }
+            get => sliderBar.AlternatePrecision;
+            set => sliderBar.AlternatePrecision = value;
         }
 
         private string tooltipTextSuffix = "";
@@ -175,71 +150,62 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 
             InternalChildren = new Drawable[]
             {
+                box = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.FromHex("1c2125"),
+                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    CornerRadius = corner_radius,
-                    Masking = true,
                     Children = new Drawable[]
                     {
-                        box = new Box
+                        new GridContainer
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.FromHex("1c2125"),
-                        },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Children = new Drawable[]
+                            Content = new[]
                             {
-                                new GridContainer
+                                new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Content = new[]
+                                    label = new OsuSpriteText
                                     {
-                                        new Drawable[]
-                                        {
-                                            label = new OsuSpriteText
-                                            {
-                                                Anchor = Anchor.TopLeft,
-                                                Origin = Anchor.TopLeft,
-                                                Padding = new MarginPadding { Left = default_label_padding, Top = default_top_padding },
-                                                Colour = Color4.White,
-                                                TextSize = default_label_text_size,
-                                                Font = @"Exo2.0-Bold",
-                                            },
-                                            sliderBar = new SetupTickSliderBar(sliderMinValue, sliderMaxValue, sliderNormalPrecision, sliderAlternatePrecision)
-                                            {
-                                                Anchor = Anchor.TopLeft,
-                                                Origin = Anchor.TopLeft,
-                                                Y = default_top_padding,
-                                                Padding = new MarginPadding { Left = default_left_slider_bar_padding, Right = default_right_slider_bar_padding },
-                                                Colour = Color4.White,
-                                                TooltipTextSuffix = tooltipTextSuffix
-                                            },
-                                        },
+                                        Anchor = Anchor.TopLeft,
+                                        Origin = Anchor.TopLeft,
+                                        Padding = new MarginPadding { Left = default_label_padding, Top = default_top_padding },
+                                        Colour = Color4.White,
+                                        TextSize = default_label_text_size,
+                                        Font = @"Exo2.0-Bold",
                                     },
-                                    ColumnDimensions = new[]
+                                    sliderBar = new SetupTickSliderBar(0, 10, 1, 1)
                                     {
-                                        new Dimension(GridSizeMode.Absolute, label_container_width),
-                                        new Dimension()
-                                    }
+                                        Anchor = Anchor.TopLeft,
+                                        Origin = Anchor.TopLeft,
+                                        Y = default_top_padding,
+                                        Padding = new MarginPadding { Left = default_left_slider_bar_padding, Right = default_right_slider_bar_padding },
+                                        Colour = Color4.White,
+                                        TooltipTextSuffix = tooltipTextSuffix
+                                    },
                                 },
-                                bottomText = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Padding = new MarginPadding { Left = default_label_padding, Bottom = default_bottom_padding },
-                                    TextSize = default_bottom_label_text_size,
-                                    Font = @"Exo2.0-BoldItalic",
-                                },
+                            },
+                            ColumnDimensions = new[]
+                            {
+                                new Dimension(GridSizeMode.Absolute, label_container_width),
+                                new Dimension()
                             }
-                        }
+                        },
+                        bottomText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Padding = new MarginPadding { Left = default_label_padding, Bottom = default_bottom_padding },
+                            TextSize = default_bottom_label_text_size,
+                            Font = @"Exo2.0-BoldItalic",
+                        },
                     }
                 }
             };
 
-            sliderBar.Current.ValueChanged += TriggerSliderBarValueChanged;
+            sliderBar.Current.ValueChanged += SliderBarValueChanged;
         }
 
         [BackgroundDependencyLoader]
