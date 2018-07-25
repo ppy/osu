@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
         private double currentSectionPeak = 1; // We also keep track of the peak strain level in the current section.
         private readonly List<double> strainPeaks = new List<double>();
-        public readonly List<double> StrainPeaks { get { return strainPeaks; } }
+        public List<double> StrainPeaks { get { return strainPeaks; } }
 
         /// <summary>
         /// Process an <see cref="OsuDifficultyHitObject"/> and update current strain values accordingly.
