@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                     for (double t = startTime + tinyTickInterval; t < endTime - 0.01; t += tinyTickInterval)
                     {
                         double curveProgress = (t - spanStartTime) / spanDuration;
-                        double curveProgressStable = ((int)(curveProgress * spanDuration)) / spanDuration; //match the integer time error of stable
+                        double curveProgressStable = (int)(curveProgress * spanDuration) / spanDuration; //match the integer time error of stable
                         double timeProgress = reversed ? 1 - curveProgress : curveProgress;
 
                         AddNested(new TinyDroplet
@@ -111,10 +111,10 @@ namespace osu.Game.Rulesets.Catch.Objects
                         });
                     }
 
-                    if ((length * (1 - timeProgressEnd)) / tickDistance > 0.02) //match the edge-cases of stable
+                    if (length * (1 - timeProgressEnd) / tickDistance > 0.02) //match the edge-cases of stable
                     {
                         double curveProgress = timeProgressEnd;
-                        double curveProgressStable = ((int)(curveProgress * spanDuration)) / spanDuration; //match the integer time error of stable
+                        double curveProgressStable = (int)(curveProgress * spanDuration) / spanDuration; //match the integer time error of stable
                         double timeProgress = reversed ? 1 - curveProgress : curveProgress;
 
                         AddNested(new Droplet

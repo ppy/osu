@@ -18,17 +18,17 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
     {
         public const int RNG_SEED = 1337;
 
-        public IEnumerable<Mod> mods;
+        public IEnumerable<Mod> Mods;
 
         private float lastStartX;
         private int lastStartTime;
 
-        private FastRandom rng = new FastRandom(RNG_SEED);
+        private readonly FastRandom rng = new FastRandom(RNG_SEED);
 
         public CatchBeatmapProcessor(IBeatmap beatmap, IEnumerable<Mod> mods)
             : base(beatmap)
         {
-            this.mods = mods;
+            Mods = mods;
         }
 
         public override void PostProcess()
@@ -75,10 +75,10 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         }
                         var firstFruit = (CatchHitObject)juiceStream.NestedHitObjects.FirstOrDefault();
                         lastStartX = juiceStream.X + juiceStream.ControlPoints.LastOrDefault().X / CatchPlayfield.BASE_WIDTH;
-                        lastStartTime = (int)firstFruit.StartTime;
+                        if (firstFruit != null) lastStartTime = (int)firstFruit.StartTime;
                         break;
                     case Fruit fruit:
-                        if (mods.OfType<ModHardRock>().Count() == 0) break;
+                        if (Mods.OfType<ModHardRock>().Any()) break;
 
                         var catchObject = (CatchHitObject)fruit;
 
@@ -128,7 +128,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                             break;
                         }
 
-                        if (Math.Abs(diff * CatchPlayfield.BASE_WIDTH) < timeDiff / 3)
+                        if (Math.Abs(diff * CatchPlayfield.BASE_WIDTH) < (float)(timeDiff / 3))
                         {
                             if (diff > 0)
                             {
