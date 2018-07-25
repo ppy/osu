@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                 var spanStartTime = StartTime + span * spanDuration;
                 var reversed = span % 2 == 1;
 
-                for (double d = 0; d < length; d += tickDistance)
+                for (double d = 0; d < length - 0.01; d += tickDistance)
                 {
                     var timeProgressStart = d / length;
                     var timeProgressEnd = Math.Min((d + tickDistance) / length, 1);
@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                                 startTime = Math.Min(EndTime, startTime + LegacyLastTickOffset.Value);
                         } else
                         {
-                            if (span == this.SpanCount() - 1 && d + tickDistance >= length)
+                            if (span == this.SpanCount() - 1 && d + tickDistance >= length - 0.01)
                                 endTime = Math.Max(StartTime + Duration / 2, endTime - LegacyLastTickOffset.Value);
                         }
                     }
@@ -92,7 +92,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                     while (tinyTickInterval > 100)
                         tinyTickInterval /= 2;
 
-                    for (double t = startTime + tinyTickInterval; t < endTime; t += tinyTickInterval)
+                    for (double t = startTime + tinyTickInterval; t < endTime - 0.01; t += tinyTickInterval)
                     {
                         double curveProgress = (t - spanStartTime) / spanDuration;
                         double curveProgressStable = (int)(curveProgress * spanDuration) / spanDuration; //match the integer time error of stable
