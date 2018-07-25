@@ -34,8 +34,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (!beatmap.HitObjects.Any())
                 return new List<double>();
 
-            private OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
-            new Skill[] skills =
+            //here comes problems
+            //private OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
+            Skill[] skills =
             {
                 new Aim(),
                 new Speed()
@@ -63,21 +64,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     s.Process(h);
             }
 
-            var List<double> aimRating = new List<double>(), speedRating = new List<double>(), osuDifficultySectionRating = new List<double>();
+            //here comes new problems
+            //var List<double> aimRating = new List<double>(), speedRating = new List<double>(), osuDifficultySectionRating = new List<double>();
 
-            foreach(double x in Skills[0].StrainPeaks)
+            foreach(double x in skills[0].StrainPeaks)
             {
-                aimRating.Add(x * difficulty_multiplier)
+                aimRating.Add(x * difficulty_multiplier);
             };
 
-            foreach(double x in Skills[1].StrainPeaks)
+            foreach(double x in skills[1].StrainPeaks)
             {
-                speedRating.Add(x * difficulty_multiplier)
+                speedRating.Add(x * difficulty_multiplier);
             }
 
             for (int x = 0; x < aimRating.Count(); x++)
             {
-                osuDifficultySectionRating.Add(aimRating[x] + speedRating[x] + Math.Abs(aimRating[x] - speedRating[x]) / 2)
+                osuDifficultySectionRating.Add(aimRating[x] + speedRating[x] + Math.Abs(aimRating[x] - speedRating[x]) / 2);
             }
 
             return osuDifficultySectionRating;
