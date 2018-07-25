@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Edit.Screens.Setup.Components;
 using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents;
 using System;
@@ -26,14 +27,17 @@ namespace osu.Game.Tests.Visual
         private void load()
         {
             LabelledSwitchButton labelledSwitchButton;
-            Children = new Drawable[]
+            Child = new Container
             {
-                labelledSwitchButton = new LabelledSwitchButton
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.X,
+                Padding = new MarginPadding { Left = 150, Right = 150 },
+                Child = labelledSwitchButton = new LabelledSwitchButton
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     LabelText = "Secret Feature",
-                    Padding = new MarginPadding { Left = 150, Right = 150 }
                 }
             };
 
@@ -41,7 +45,7 @@ namespace osu.Game.Tests.Visual
             {
                 count += a ? 1 : 0;
                 labelledSwitchButton.BottomLabelText = a ? $"Thanks for {(count > 0 ? "re-" : "")}enabling this useful secret feature{(count > 0 ? $" for the {count}{getOrderedNumberSuffix(count)} time" : "")}. Unfortunately, we cannot tell you what this does as it is secret."
-                                                        : "Why did you disable this? :(";
+                                                         : "Why did you disable this? :(";
             };
 
             AddStep("Set value to true", () => labelledSwitchButton.CurrentValue = true);

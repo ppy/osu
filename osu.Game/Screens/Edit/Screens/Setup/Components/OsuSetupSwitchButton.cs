@@ -20,10 +20,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private readonly Box fill;
         private readonly Container switchContainer;
 
-        public const float BORDER_THICKNESS = 4.5f;
-        public const float SWITCH_PADDING = 1.25f;
-        public const float SIZE_X = 45;
-        public const float SIZE_Y = 20;
+        private const float border_thickness = 4.5f;
+        private const float switch_padding = 1.25f;
+        private const float size_x = 45;
+        private const float size_y = 20;
 
         private Color4 enabledColour;
         public Color4 EnabledColour
@@ -53,10 +53,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         {
             Box innerSwitch;
 
-            Size = new Vector2(SIZE_X, SIZE_Y);
+            Size = new Vector2(size_x, size_y);
 
             BorderColour = Color4.White;
-            BorderThickness = BORDER_THICKNESS;
+            BorderThickness = border_thickness;
 
             Masking = true;
 
@@ -70,13 +70,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 },
                 switchContainer = new Container
                 {
-                    CornerRadius = SIZE_Y / 2 - BORDER_THICKNESS - SWITCH_PADDING,
+                    CornerRadius = size_y / 2 - border_thickness - switch_padding,
                     Masking = true,
-                    Size = new Vector2(SIZE_Y - 2 * BORDER_THICKNESS - 2 * SWITCH_PADDING),
-                    Position = new Vector2(BORDER_THICKNESS + SWITCH_PADDING),
+                    Size = new Vector2(size_y - 2 * border_thickness - 2 * switch_padding),
+                    Position = new Vector2(border_thickness + switch_padding),
                     Child = innerSwitch = new Box
                     {
-                        Size = new Vector2(SIZE_Y - 2 * BORDER_THICKNESS - 2 * SWITCH_PADDING),
+                        Size = new Vector2(size_y - 2 * border_thickness - 2 * switch_padding),
                     }
                 }
             };
@@ -84,9 +84,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             Current.ValueChanged += newValue =>
             {
                 if (newValue)
-                    switchContainer.MoveToX(SIZE_X - BORDER_THICKNESS - SWITCH_PADDING - innerSwitch.Size.X, 200, Easing.OutQuint);
+                    switchContainer.MoveToX(size_x - border_thickness - switch_padding - innerSwitch.Size.X, 200, Easing.OutQuint);
                 else
-                    switchContainer.MoveToX(BORDER_THICKNESS + SWITCH_PADDING, 200, Easing.OutQuint);
+                    switchContainer.MoveToX(border_thickness + switch_padding, 200, Easing.OutQuint);
                 this.FadeAccent((newValue ? enabledColour : disabledColour).Lighten(IsHovered ? 0.3f : 0), 500, Easing.OutQuint);
                 fill.FadeTo(newValue ? 1 : 0, 500, Easing.OutQuint);
             };

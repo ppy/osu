@@ -22,13 +22,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         private readonly OsuSpriteText bottomText;
         private readonly OsuSetupSwitchButton switchButton;
 
-        public const float OUTER_CORNER_RADIUS = 15;
-        public const float DEFAULT_LABEL_TEXT_SIZE = 16;
-        public const float DEFAULT_BOTTOM_LABEL_TEXT_SIZE = 12;
-        public const float NORMAL_HEIGHT = 40;
-        public const float DEFAULT_LABEL_PADDING = 15;
-        public const float DEFAULT_TOP_PADDING = 12;
-        public const float DEFAULT_BOTTOM_PADDING = 12;
+        private const float corner_radius = 15;
+        private const float default_label_text_size = 16;
+        private const float default_bottom_label_text_size = 12;
+        private const float normal_height = 40;
+        private const float default_label_padding = 15;
+        private const float default_top_padding = 12;
+        private const float default_bottom_padding = 12;
 
         public event Action<bool> SwitchButtonValueChanged;
 
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             {
                 bottomLabelText = value;
                 bottomText.Text = value;
-                changeHeight(NORMAL_HEIGHT + (value != "" ? 20 : 0));
+                changeHeight(normal_height + (value != "" ? 20 : 0));
             }
         }
 
@@ -75,28 +75,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                 labelTextSize = value;
                 label.TextSize = value;
             }
-        }
-
-        public MarginPadding Padding
-        {
-            get => base.Padding;
-            set
-            {
-                base.Padding = value;
-                Height = Height + base.Padding.Top;
-            }
-        }
-
-        public MarginPadding LabelPadding
-        {
-            get => label.Padding;
-            set => label.Padding = value;
-        }
-
-        public MarginPadding RadioButtonPadding
-        {
-            get => switchButton.Padding;
-            set => switchButton.Padding = value;
         }
 
         public Color4 LabelTextColour
@@ -114,45 +92,45 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         public LabelledSwitchButton()
         {
             Masking = true;
-            CornerRadius = OUTER_CORNER_RADIUS;
+            CornerRadius = corner_radius;
             RelativeSizeAxes = Axes.X;
-            Height = NORMAL_HEIGHT + Padding.Top;
+            Height = normal_height;
 
             InternalChildren = new Drawable[]
             {
                 outerContainer = new Container
                 {
                     RelativeSizeAxes = Axes.X,
-                    Height = NORMAL_HEIGHT,
-                    CornerRadius = OUTER_CORNER_RADIUS,
+                    Height = normal_height,
+                    CornerRadius = corner_radius,
                     Masking = true,
                     Children = new Drawable[]
                     {
                         box = new Box
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = NORMAL_HEIGHT,
+                            Height = normal_height,
                             Colour = OsuColour.FromHex("1c2125"),
                         },
                         content = new Container
                         {
                             RelativeSizeAxes = Axes.X,
-                            Height = NORMAL_HEIGHT,
+                            Height = normal_height,
                             Children = new Drawable[]
                             {
                                 new Container
                                 {
                                     RelativeSizeAxes = Axes.X,
-                                    Height = NORMAL_HEIGHT,
+                                    Height = normal_height,
                                     Children = new Drawable[]
                                     {
                                         label = new OsuSpriteText
                                         {
                                             Anchor = Anchor.TopLeft,
                                             Origin = Anchor.TopLeft,
-                                            Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Top = DEFAULT_TOP_PADDING },
+                                            Padding = new MarginPadding { Left = default_label_padding, Top = default_top_padding },
                                             Colour = Color4.White,
-                                            TextSize = DEFAULT_LABEL_TEXT_SIZE,
+                                            TextSize = default_label_text_size,
                                             Text = LabelText,
                                             Font = @"Exo2.0-Bold",
                                         },
@@ -168,8 +146,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                    Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Bottom = DEFAULT_BOTTOM_PADDING },
-                                    TextSize = DEFAULT_BOTTOM_LABEL_TEXT_SIZE,
+                                    Padding = new MarginPadding { Left = default_label_padding, Bottom = default_bottom_padding },
+                                    TextSize = default_bottom_label_text_size,
                                     Font = @"Exo2.0-BoldItalic",
                                     Text = BottomLabelText
                                 },
