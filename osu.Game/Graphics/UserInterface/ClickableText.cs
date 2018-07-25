@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -20,8 +21,12 @@ namespace osu.Game.Graphics.UserInterface
     {
         private bool isEnabled;
         private bool isMuted;
+
         private SampleChannel sampleHover;
         private SampleChannel sampleClick;
+
+        protected Color4 HoverColour;
+        protected Color4 IdleColour;
 
         /// <summary>
         /// An action that can be set to execute after click.
@@ -78,8 +83,17 @@ namespace osu.Game.Graphics.UserInterface
         protected override bool OnHover(InputState state)
         {
             if (isEnabled && !IsHoverMuted)
+            {
+                this.FadeColour(HoverColour, 500, Easing.OutQuint);
                 sampleHover?.Play();
+            }
             return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            this.FadeColour(IdleColour, 500, Easing.OutQuint);
+            base.OnHoverLost(state);
         }
 
         protected override bool OnClick(InputState state)
@@ -93,13 +107,20 @@ namespace osu.Game.Graphics.UserInterface
             return base.OnClick(state);
         }
 
+        protected override void LoadComplete()
+        {
+            IdleColour = Colour;
+            base.LoadComplete();
+        }
+
         public string TooltipText { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load(AudioManager audio, OsuColour colours)
         {
             sampleClick = audio.Sample.Get(@"UI/generic-select-soft");
             sampleHover = audio.Sample.Get(@"UI/generic-hover-soft");
+            HoverColour = colours.Yellow;
         }
     }
 }
