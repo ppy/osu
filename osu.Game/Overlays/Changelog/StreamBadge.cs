@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Changelog
                             Text = LatestBuild.UpdateStream.DisplayName,
                             Font = @"Exo2.0-Bold",
                             TextSize = 14, // web: 12,
-                            Margin = new MarginPadding { Top = 6, },
+                            Margin = new MarginPadding { Top = 6 },
                         },
                         new SpriteText
                         {

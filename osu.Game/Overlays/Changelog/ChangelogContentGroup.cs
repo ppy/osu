@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.Changelog
                     Font = @"Exo2.0-Medium",
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Margin = new MarginPadding { Top = 5 }
+                    Margin = new MarginPadding { Top = 5 },
                 },
                 ChangelogEntries = new FillFlowContainer
                 {

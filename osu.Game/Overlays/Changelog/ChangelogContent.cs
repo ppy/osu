@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Changelog
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
-            Padding = new MarginPadding{ Bottom = 100, };
+            Padding = new MarginPadding{ Bottom = 100 };
         }
 
         public void ShowListing(APIChangelog[] changelog)
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Changelog
                             RelativeSizeAxes = Axes.X,
                             Height = 2,
                             Colour = new Color4(17, 17, 17, 255),
-                            Margin = new MarginPadding { Top = 30, },
+                            Margin = new MarginPadding { Top = 30 },
                         });
                     }
                     changelogContentGroup = new ChangelogContentGroup(build, true);
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Changelog
                         RelativeSizeAxes = Axes.X,
                         Height = 1,
                         Colour = new Color4(32, 24, 35, 255),
-                        Margin = new MarginPadding { Top = 30, },
+                        Margin = new MarginPadding { Top = 30 },
                     });
 
                     changelogContentGroup = new ChangelogContentGroup(build, false);
