@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Screens.Edit.Screens.Setup.Components;
 using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents;
 using System;
@@ -28,9 +29,13 @@ namespace osu.Game.Tests.Visual
             OsuSetupRadioButton ok;
             OsuSetupRadioButton no;
 
-            Children = new Drawable[]
+            Child = new Container
             {
-                labelledRadioButtonCollection = new LabelledRadioButtonCollection
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.X,
+                Padding = new MarginPadding { Left = 150, Right = 150 },
+                Child = labelledRadioButtonCollection = new LabelledRadioButtonCollection
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -47,7 +52,6 @@ namespace osu.Game.Tests.Visual
                             LabelText = "No"
                         }
                     },
-                    Padding = new MarginPadding { Left = 150, Right = 150 }
                 }
             };
 

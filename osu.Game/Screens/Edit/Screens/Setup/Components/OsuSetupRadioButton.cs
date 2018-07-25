@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -27,20 +26,18 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public void TriggerRadioButtonClicked(OsuSetupRadioButton sender)
         {
-            RadioButtonClicked?.Invoke(this);
+            RadioButtonClicked?.Invoke(sender);
         }
 
         public const float BUTTON_SIZE = 20;
 
         private Color4 osuColourBlue;
-
-        private string labelText;
+        
         public string LabelText
         {
-            get => labelText;
+            get => radioButtonLabel.Text;
             set
             {
-                labelText = value;
                 radioButtonLabel.Text = value;
                 Width = BUTTON_SIZE + 5 + radioButtonLabel.DrawWidth; // Fix radio button sizing according to label text
             }
@@ -112,8 +109,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         {
             private readonly Container radioButtonContainer;
 
-            public const float BORDER_THICKNESS = 4.5f;
-            public const float SWITCH_PADDING = 1.25f;
+            private const float border_thickness = 4.5f;
+            private const float switch_padding = 1.25f;
 
             private Color4 defaultColour;
             public Color4 DefaultColour
@@ -133,7 +130,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 Size = new Vector2(BUTTON_SIZE);
 
                 BorderColour = Color4.White;
-                BorderThickness = BORDER_THICKNESS;
+                BorderThickness = border_thickness;
 
                 AlwaysPresent = true;
 
@@ -157,7 +154,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 {
                     if (newValue)
                     {
-                        const float new_size = BUTTON_SIZE - BORDER_THICKNESS - SWITCH_PADDING;
+                        const float new_size = BUTTON_SIZE - border_thickness - switch_padding;
                         radioButtonContainer.TransformTo(nameof(CornerRadius), new_size / 2, 500, Easing.OutQuint);
                         radioButtonContainer.ResizeTo(new_size, 500, Easing.OutQuint);
                         innerFill.ResizeTo(new_size, 500, Easing.OutQuint);
