@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -22,7 +21,6 @@ namespace osu.Game.Overlays.Changelog
 
         private readonly Container container;
         private readonly Box background;
-        private readonly SpriteText text;
         private APIAccess api;
 
         public ChangelogChart()
@@ -40,7 +38,7 @@ namespace osu.Game.Overlays.Changelog
                         Colour = StreamColour.STABLE,
                         RelativeSizeAxes = Axes.Both,
                     },
-                    text = new SpriteText
+                    new SpriteText
                     {
                         Text = "Graph Placeholder",
                         TextSize = 28,
