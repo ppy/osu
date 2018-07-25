@@ -54,6 +54,8 @@ namespace osu.Game.Rulesets.Catch.Objects
             var tickDistance = Math.Min(TickDistance, length);
             var spanDuration = length / Velocity;
 
+            var minDistanceFromEnd = 0.02 * tickDistance;
+
             AddNested(new Fruit
             {
                 Samples = Samples,
@@ -66,7 +68,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                 var spanStartTime = StartTime + span * spanDuration;
                 var reversed = span % 2 == 1;
 
-                for (double d = 0; d <= length; d += tickDistance)
+                for (double d = 0; d <= length - minDistanceFromEnd; d += tickDistance)
                 {
                     var timeProgressStart = d / length;
                     var timeProgressEnd = Math.Min((d + tickDistance) / length, 1);
@@ -83,7 +85,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                                 startTime = Math.Min(EndTime, startTime + LegacyLastTickOffset.Value);
                         } else
                         {
-                            if (span == this.SpanCount() - 1 && d + tickDistance > length)
+                            if (span == this.SpanCount() - 1 && d + tickDistance > length - minDistanceFromEnd)
                                 endTime = Math.Max(StartTime + Duration / 2, endTime - LegacyLastTickOffset.Value);
                         }
                     }
@@ -111,7 +113,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         });
                     }
 
-                    if (length * (1 - timeProgressEnd) / tickDistance > 0.02) //match the edge-cases of stable
+                    if (length * (1 - timeProgressEnd) > minDistanceFromEnd) //match the edge-cases of stable
                     {
                         double curveProgress = timeProgressEnd;
                         double curveProgressStable = (int)(curveProgress * spanDuration) / spanDuration; //match the integer time error of stable
