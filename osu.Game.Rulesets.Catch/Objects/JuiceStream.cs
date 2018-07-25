@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                             }))
                         });
                     }
-                    
+
                     if ((length * (1 - timeProgressEnd)) / tickDistance > 0.02) //match the edge-cases of stable
                     {
                         double curveProgress = timeProgressEnd;
