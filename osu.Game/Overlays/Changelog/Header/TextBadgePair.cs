@@ -39,11 +39,7 @@ namespace osu.Game.Overlays.Changelog.Header
                     Text = displayText,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Margin = new MarginPadding
-                    {
-                        Top = 5,
-                        Bottom = 15,
-                    }
+                    Margin = new MarginPadding { Top = 5, Bottom = 15 },
                 },
                 LineBadge = new LineBadge(startCollapsed)
                 {

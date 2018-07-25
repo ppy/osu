@@ -15,8 +15,8 @@ namespace osu.Game.Overlays.Changelog
     public class ChangelogBadges : Container
     {
         private const float container_height = 106.5f;
-        private const float padding_y = 20;
-        private const float padding_x = 85;
+        private const float vertical_padding = 20;
+        private const float horizontal_padding = 85;
 
         public delegate void SelectionHandler(APIChangelog releaseStream, EventArgs args);
 
@@ -40,13 +40,7 @@ namespace osu.Game.Overlays.Changelog
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding
-                    {
-                        Top = padding_y,
-                        Bottom = padding_y,
-                        Left = padding_x,
-                        Right = padding_x,
-                    },
+                    Padding = new MarginPadding { Vertical = vertical_padding, Horizontal = horizontal_padding },
                 },
             };
         }
