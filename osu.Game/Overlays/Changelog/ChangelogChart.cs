@@ -13,12 +13,13 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Changelog
 {
-    public class ChangelogChart : BufferedContainer
+    public class ChangelogChart : Container
     {
         private const float height = 100;
         private const float transition_duration = 300;
 
-        private readonly Container container;
+        // why make the child buffered? https://streamable.com/swbdj
+        private readonly BufferedContainer container;
         private readonly Box background;
         private APIAccess api;
 
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.Changelog
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Child = container = new Container
+            Child = container = new BufferedContainer
             {
                 RelativeSizeAxes = Axes.X,
                 Height = height,
