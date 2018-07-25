@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Changelog
                 {
                     background = new Box
                     {
-                        Colour = StreamColour.STABLE,
+                        Colour = OsuColour.Gray(0),
                         RelativeSizeAxes = Axes.Both,
                     },
                     new SpriteText
@@ -44,6 +44,7 @@ namespace osu.Game.Overlays.Changelog
                         TextSize = 28,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
+                        Colour = OsuColour.Gray(1),
                     },
                 },
             };
