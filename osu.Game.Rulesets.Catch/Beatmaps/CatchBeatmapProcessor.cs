@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
 using osu.Game.Rulesets.Catch.MathUtils;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
@@ -17,9 +18,17 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
     {
         public const int RNG_SEED = 1337;
 
-        public CatchBeatmapProcessor(IBeatmap beatmap)
+        public IEnumerable<Mod> mods;
+
+        private float lastStartX;
+        private int lastStartTime;
+
+        private FastRandom rng = new FastRandom(RNG_SEED);
+
+        public CatchBeatmapProcessor(IBeatmap beatmap, IEnumerable<Mod> mods)
             : base(beatmap)
         {
+            this.mods = mods;
         }
 
         public override void PostProcess()
@@ -41,9 +50,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         private void applyPositionOffsets()
         {
-            var rng = new FastRandom(RNG_SEED);
-            // todo: HardRock displacement should be applied here
-
             foreach (var obj in Beatmap.HitObjects)
             {
                 switch (obj)
@@ -67,6 +73,79 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                                 rng.Next(); // osu!stable retrieved a random droplet rotation
                             hitObject.X = MathHelper.Clamp(hitObject.X, 0, 1);
                         }
+                        var firstFruit = (CatchHitObject)juiceStream.NestedHitObjects.FirstOrDefault();
+                        lastStartX = juiceStream.X + juiceStream.ControlPoints.LastOrDefault().X / CatchPlayfield.BASE_WIDTH;
+                        lastStartTime = (int)firstFruit.StartTime;
+                        break;
+                    case Fruit fruit:
+                        if (mods.OfType<ModHardRock>().Count() == 0) break;
+
+                        var catchObject = (CatchHitObject)fruit;
+
+                        float position = catchObject.X;
+                        int startTime = (int)catchObject.StartTime;
+
+                        if (lastStartX == 0)
+                        {
+                            lastStartX = position;
+                            lastStartTime = startTime;
+                            break;
+                        }
+
+                        float diff = lastStartX - position;
+                        int timeDiff = startTime - lastStartTime;
+
+                        if (timeDiff > 1000)
+                        {
+                            lastStartX = position;
+                            lastStartTime = startTime;
+                            break;
+                        }
+
+                        if (diff == 0)
+                        {
+                            bool right = rng.NextBool();
+
+                            float rand = Math.Min(20, rng.Next(0, timeDiff / 4)) / CatchPlayfield.BASE_WIDTH;
+
+                            if (right)
+                            {
+                                if (position + rand <= 1)
+                                    position += rand;
+                                else
+                                    position -= rand;
+                            }
+                            else
+                            {
+                                if (position - rand >= 0)
+                                    position -= rand;
+                                else
+                                    position += rand;
+                            }
+
+                            catchObject.X = position;
+
+                            break;
+                        }
+
+                        if (Math.Abs(diff * CatchPlayfield.BASE_WIDTH) < timeDiff / 3)
+                        {
+                            if (diff > 0)
+                            {
+                                if (position - diff > 0)
+                                    position -= diff;
+                            }
+                            else
+                            {
+                                if (position - diff < 1)
+                                    position -= diff;
+                            }
+                        }
+
+                        catchObject.X = position;
+
+                        lastStartX = position;
+                        lastStartTime = startTime;
                         break;
                 }
             }

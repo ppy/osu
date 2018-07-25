@@ -116,7 +116,7 @@ namespace osu.Game.Beatmaps
                     mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
             }
 
-            IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
+            IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted, Mods.Value);
 
             processor?.PreProcess();
 

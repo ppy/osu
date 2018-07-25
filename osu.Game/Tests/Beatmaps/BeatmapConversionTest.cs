@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Beatmaps
             };
 
             IBeatmap convertedBeatmap = Converter.Convert();
-            rulesetInstance.CreateBeatmapProcessor(convertedBeatmap)?.PostProcess();
+            rulesetInstance.CreateBeatmapProcessor(convertedBeatmap, null)?.PostProcess();
 
             return result;
         }

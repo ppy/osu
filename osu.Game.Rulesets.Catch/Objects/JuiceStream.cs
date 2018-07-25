@@ -83,7 +83,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                                 startTime = Math.Min(EndTime, startTime + LegacyLastTickOffset.Value);
                         } else
                         {
-                            if (span == this.SpanCount() - 1 && d + tickDistance > length - 0.01)
+                            if (span == this.SpanCount() - 1 && d + tickDistance >= length - 0.01)
                                 endTime = Math.Max(StartTime + Duration / 2, endTime - LegacyLastTickOffset.Value);
                         }
                     }
@@ -94,13 +94,14 @@ namespace osu.Game.Rulesets.Catch.Objects
 
                     for (double t = startTime + tinyTickInterval; t < endTime - 0.01; t += tinyTickInterval)
                     {
-                        double progress = (t - spanStartTime) / spanDuration;
-                        double timeP = reversed ? 1 - progress : progress;
+                        double curveProgress = (t - spanStartTime) / spanDuration;
+                        //double curveProgressStable = ((int)(curveProgress * spanDuration)) / spanDuration; //match the integer time error of stable
+                        double timeProgress = reversed ? 1 - curveProgress : curveProgress;
 
                         AddNested(new TinyDroplet
                         {
-                            StartTime = spanStartTime + timeP * spanDuration,
-                            X = X + Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
+                            StartTime = spanStartTime + timeProgress * spanDuration,
+                            X = X + Curve.PositionAt(curveProgress).X / CatchPlayfield.BASE_WIDTH,
                             Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                             {
                                 Bank = s.Bank,
@@ -109,15 +110,17 @@ namespace osu.Game.Rulesets.Catch.Objects
                             }))
                         });
                     }
-
-                    if (timeProgressEnd * spanDuration < spanDuration)
+                    
+                    if ((length * (1 - timeProgressEnd)) / tickDistance > 0.02) //match the edge-cases of stable
                     {
-                        double timeP = reversed ? 1 - timeProgressEnd : timeProgressEnd;
+                        double curveProgress = timeProgressEnd;
+                        //double curveProgressStable = ((int)(curveProgress * spanDuration)) / spanDuration; //match the integer time error of stable
+                        double timeProgress = reversed ? 1 - curveProgress : curveProgress;
 
                         AddNested(new Droplet
                         {
-                            StartTime = spanStartTime + timeP * spanDuration,
-                            X = X + Curve.PositionAt(timeProgressEnd).X / CatchPlayfield.BASE_WIDTH,
+                            StartTime = spanStartTime + timeProgress * spanDuration,
+                            X = X + Curve.PositionAt(curveProgress).X / CatchPlayfield.BASE_WIDTH,
                             Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                             {
                                 Bank = s.Bank,
