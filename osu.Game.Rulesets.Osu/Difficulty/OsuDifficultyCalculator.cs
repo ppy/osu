@@ -23,16 +23,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public List<double> osuDifficultySectionRating  = new List<double>();
+        public List<double> OsuDifficultySectionRating  = new List<double>();
 
-        public void OsuDifficultyAt(IBeatmap beatmap, double timeRate)
+        public List<double> OsuDifficultyAt(IBeatmap beatmap, double timeRate)
         {
             //throws list of difficulties(strains) at sections (((((or at hitobjects)))))
             //remember that first section is double-timed
 
             if (!beatmap.HitObjects.Any())
             {
-               return;
+               return new List<double>();
             }
 
             private OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
@@ -82,6 +82,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 osuDifficultySectionRating.Add(aimRating[x] + speedRating[x] + Math.Abs(aimRating[x] - speedRating[x]) / 2);
             }
+
+            return osuDifficultySectionRating;
         }
 
         //Copy some code from here
