@@ -29,7 +29,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             //remember that first section is double-timed
 
             if (!beatmap.HitObjects.Any())
-                return new List<double>()
+            {
+               return new List<double>();
+            }
 
              private OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
              Skill[] skills =
