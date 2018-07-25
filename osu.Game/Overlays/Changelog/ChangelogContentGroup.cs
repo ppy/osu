@@ -221,7 +221,7 @@ namespace osu.Game.Overlays.Changelog
                 });
                 foreach (ChangelogEntry entry in category.Value)
                 {
-                    OsuTextFlowContainer title = new OsuTextFlowContainer
+                    LinkFlowContainer title = new LinkFlowContainer
                     {
                         Direction = FillDirection.Full,
                         RelativeSizeAxes = Axes.X,
@@ -237,14 +237,18 @@ namespace osu.Game.Overlays.Changelog
                     if (!string.IsNullOrEmpty(entry.Repository))
                     {
                         title.AddText(" (", t => t.TextSize = 18);
-                        title.AddText($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}", t =>
-                        {
-                            t.TextSize = 18;
-                            t.Colour = Color4.SkyBlue;
-                        });
+                        title.AddLink($"{entry.Repository.Replace("ppy/", "")}#{entry.GithubPullRequestId}",
+                            entry.GithubUrl, Online.Chat.LinkAction.External, null,
+                            null, t => { t.TextSize = 18; });
                         title.AddText(")", t => t.TextSize = 18);
                     }
-                    title.AddText($" by\u00A0{entry.GithubUser.DisplayName}", t => t.TextSize = 14); //web: 12;
+                    title.AddText(" by ", t => t.TextSize = 14);
+                    if (entry.GithubUser.GithubUrl != null)
+                        title.AddLink(entry.GithubUser.DisplayName, entry.GithubUser.GithubUrl,
+                            Online.Chat.LinkAction.External, null, null,
+                            t => t.TextSize = 14);
+                    else
+                        title.AddText(entry.GithubUser.DisplayName, t => t.TextSize = 14); //web: 12;
                     ChangelogEntries.Add(title);
                     TextFlowContainer messageContainer = new TextFlowContainer
                     {
@@ -255,6 +259,7 @@ namespace osu.Game.Overlays.Changelog
                     {
                         t.TextSize = 14; // web: 12,
                         t.Colour = new Color4(235, 184, 254, 255);
+                        t = new ClickableText();
                     });
                     ChangelogEntries.Add(messageContainer);
                 }
