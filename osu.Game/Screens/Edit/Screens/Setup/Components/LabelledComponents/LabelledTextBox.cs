@@ -16,8 +16,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
     public class LabelledTextBox : CompositeDrawable
     {
         private const float label_container_width = 150;
-        private const float outer_corner_radius = 15;
-        private const float inner_corner_radius = 10;
+        private const float corner_radius = 15;
         private const float default_height = 40;
         private const float default_label_left_padding = 15;
         private const float default_label_top_padding = 12;
@@ -55,24 +54,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             set => textBox.Text = value;
         }
 
-        public MarginPadding Padding
-        {
-            get => base.Padding;
-            set => base.Padding = value;
-        }
-
-        public MarginPadding LabelPadding
-        {
-            get => label.Padding;
-            set => label.Padding = value;
-        }
-
-        public MarginPadding TextBoxPadding
-        {
-            get => textBox.Padding;
-            set => textBox.Padding = value;
-        }
-
         public Color4 LabelTextColour
         {
             get => label.Colour;
@@ -93,13 +74,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         {
             RelativeSizeAxes = Axes.X;
             Height = default_height;
-            CornerRadius = outer_corner_radius;
+            CornerRadius = corner_radius;
             Masking = true;
 
             InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-                CornerRadius = outer_corner_radius,
+                CornerRadius = corner_radius,
                 Masking = true,
                 Children = new Drawable[]
                 {
@@ -131,7 +112,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                                     Origin = Anchor.TopLeft,
                                     RelativeSizeAxes = Axes.Both,
                                     Height = 1,
-                                    CornerRadius = inner_corner_radius,
+                                    CornerRadius = corner_radius,
                                 },
                             },
                         },
