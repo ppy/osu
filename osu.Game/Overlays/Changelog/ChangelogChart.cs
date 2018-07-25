@@ -13,7 +13,6 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.Changelog
 {
-    // maybe look to osu.Game.Screens.Play.SquareGraph for reference later
     public class ChangelogChart : BufferedContainer
     {
         private const float height = 100;
