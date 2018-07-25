@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             //remember that first section is double-timed
 
             if (!beatmap.HitObjects.Any())
-                return //what to return?
+                return new List<double>()
 
              private OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
              Skill[] skills =
@@ -60,9 +60,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     s.Process(h);
             }
 
-            private List<double> aimRating = new List<double>[];
-            private List<double> speedRating = new List<double>[];
-            private List<double> osuDifficultySectionRating = new List<double>[];
+            private List<double> aimRating = new List<double>();
+            private List<double> speedRating = new List<double>();
+            private List<double> osuDifficultySectionRating = new List<double>();
 
             foreach(double x in Skills[0].StrainPeaks)
             {
