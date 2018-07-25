@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using NUnit.Framework;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual
@@ -17,6 +18,25 @@ namespace osu.Game.Tests.Visual
 
             Add(changelog = new ChangelogOverlay());
             AddStep(@"Show", changelog.Show);
+            AddStep(@"Hide", changelog.Hide);
+            AddWaitStep(3);
+            AddStep(@"Show with Lazer 2018.712.0", () =>
+            {
+                changelog.FetchAndShowBuild(new APIChangelog
+                {
+                    Version = "2018.712.0",
+                    UpdateStream = new UpdateStream { Name = "lazer" },
+                });
+                changelog.Show();
+            });
+            AddWaitStep(3);
+            AddStep(@"Hide", changelog.Hide);
+            AddWaitStep(3);
+            AddStep(@"Show with listing", () =>
+            {
+                changelog.ShowListing();
+                changelog.Show();
+            });
         }
     }
 }
