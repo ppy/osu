@@ -73,9 +73,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                                 rng.Next(); // osu!stable retrieved a random droplet rotation
                             hitObject.X = MathHelper.Clamp(hitObject.X, 0, 1);
                         }
-                        var firstFruit = (CatchHitObject)juiceStream.NestedHitObjects.FirstOrDefault();
                         lastStartX = juiceStream.X + juiceStream.ControlPoints.LastOrDefault().X / CatchPlayfield.BASE_WIDTH;
-                        if (firstFruit != null) lastStartTime = (int)firstFruit.StartTime;
+                        lastStartTime = (int)(juiceStream.NestedHitObjects.FirstOrDefault()?.StartTime ?? 0);
                         break;
                     case Fruit fruit:
                         if (Mods.OfType<ModHardRock>().Any()) break;
