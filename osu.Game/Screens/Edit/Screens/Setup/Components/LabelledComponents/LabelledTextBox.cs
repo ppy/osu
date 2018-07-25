@@ -5,19 +5,15 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using static osu.Framework.Graphics.UserInterface.TextBox;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
     public class LabelledTextBox : CompositeDrawable
     {
-        private readonly OsuTextBox textBox;
-        private readonly Container content;
-        private readonly OsuSpriteText label;
-
         private const float label_container_width = 150;
         private const float outer_corner_radius = 15;
         private const float inner_corner_radius = 10;
@@ -26,7 +22,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         private const float default_label_top_padding = 12;
         private const float default_label_text_size = 16;
 
-        public event OnCommitHandler OnCommit;
+        public event TextBox.OnCommitHandler OnCommit;
 
         public bool ReadOnly
         {
@@ -87,6 +83,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             get => content.Colour;
             set => content.Colour = value;
         }
+
+        private readonly OsuTextBox textBox;
+        private readonly Container content;
+        private readonly OsuSpriteText label;
 
         public LabelledTextBox()
         {
