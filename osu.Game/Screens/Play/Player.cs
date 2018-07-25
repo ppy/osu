@@ -12,7 +12,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Play
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
             adjustableClock.Seek(AllowLeadIn
-                ? Math.Min(RulesetContainer.GameplayStartTime, beatmap.HitObjects.First().StartTime - beatmap.BeatmapInfo.AudioLeadIn)
+                ? Math.Min(0, RulesetContainer.GameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn)
                 : RulesetContainer.GameplayStartTime);
 
             adjustableClock.ProcessFrame();
