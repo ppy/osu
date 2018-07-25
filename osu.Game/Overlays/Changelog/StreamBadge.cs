@@ -18,7 +18,7 @@ namespace osu.Game.Overlays.Changelog
 {
     public class StreamBadge : ClickableContainer
     {
-        private const float badge_height = 56.5f;
+        private const float badge_height = 66.5f;
         private const float badge_width = 100;
         private const float transition_duration = 100;
 
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Changelog
             LatestBuild = latestBuild;
             Height = badge_height;
             Width = LatestBuild.IsFeatured ? badge_width * 2 : badge_width;
-            Margin = new MarginPadding(5);
+            Padding = new MarginPadding(5);
             isActivated = true;
             Children = new Drawable[]
             {
@@ -55,24 +55,21 @@ namespace osu.Game.Overlays.Changelog
                         {
                             Text = LatestBuild.UpdateStream.DisplayName,
                             Font = @"Exo2.0-Bold",
-                            TextSize = 16,
-                            Margin = new MarginPadding
-                            {
-                                Top = 7,
-                            }
+                            TextSize = 14, // web: 12,
+                            Margin = new MarginPadding { Top = 6, },
                         },
                         new SpriteText
                         {
                             Text = LatestBuild.DisplayVersion,
                             Font = @"Exo2.0-Light",
-                            TextSize = 21,
+                            TextSize = 20, // web: 16,
                         },
                         new SpriteText
                         {
                             Text = LatestBuild.Users > 0 ?
                                 $"{LatestBuild.Users:N0} users online" :
                                 null,
-                            TextSize = 12,
+                            TextSize = 12, // web: 10,
                             Font = @"Exo2.0-Regular",
                             Colour = new Color4(203, 164, 218, 255),
                         },
