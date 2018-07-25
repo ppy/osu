@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
+        private List<double> OsuDifficultySectionRating = new List<double>();
+
         public List<double> OsuDifficultyAt (IBeatmap beatmap, double timeRate)
         {
             //throws list of difficulties(strains) at sections (or at hitobjects)
