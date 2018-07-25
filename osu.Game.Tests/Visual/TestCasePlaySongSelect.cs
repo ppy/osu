@@ -56,6 +56,12 @@ namespace osu.Game.Tests.Visual
 
         private TestSongSelect songSelect;
 
+        protected override void Dispose(bool isDisposing)
+        {
+            factory.ResetDatabase();
+            base.Dispose(isDisposing);
+        }
+
         [BackgroundDependencyLoader]
         private void load()
         {
