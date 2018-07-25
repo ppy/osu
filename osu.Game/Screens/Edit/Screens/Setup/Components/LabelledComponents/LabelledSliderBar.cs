@@ -111,24 +111,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             set => label.TextSize = value;
         }
 
-        public MarginPadding Padding
-        {
-            get => base.Padding;
-            set => base.Padding = value;
-        }
-
-        public MarginPadding LabelPadding
-        {
-            get => label.Padding;
-            set => label.Padding = value;
-        }
-
-        public MarginPadding SliderBarPadding
-        {
-            get => sliderBar.Padding;
-            set => sliderBar.Padding = value;
-        }
-
         public Color4 LabelTextColour
         {
             get => label.Colour;
@@ -143,10 +125,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 
         public LabelledSliderBar()
         {
-            Masking = true;
-            CornerRadius = corner_radius;
             RelativeSizeAxes = Axes.X;
             Height = normal_height;
+            Masking = true;
+            CornerRadius = corner_radius;
 
             InternalChildren = new Drawable[]
             {

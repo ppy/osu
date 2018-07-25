@@ -34,9 +34,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private const float nub_size_y = 20;
         private const float default_caption_text_size = 13;
 
-        private bool leftShiftHeld;
-        private bool rightShiftHeld;
-
         private float normalPrecision;
         public float NormalPrecision
         {
@@ -320,18 +317,14 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            leftShiftHeld |= args.Key == Key.ShiftLeft;
-            rightShiftHeld |= args.Key == Key.ShiftRight;
-            IsUsingAlternatePrecision = leftShiftHeld | rightShiftHeld;
+            IsUsingAlternatePrecision = state.Keyboard.ShiftPressed;
 
             return base.OnKeyDown(state, args);
         }
 
         protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
-            leftShiftHeld &= args.Key != Key.ShiftLeft;
-            rightShiftHeld &= args.Key != Key.ShiftRight;
-            IsUsingAlternatePrecision = leftShiftHeld | rightShiftHeld;
+            IsUsingAlternatePrecision = state.Keyboard.ShiftPressed;
 
             return base.OnKeyUp(state, args);
         }
