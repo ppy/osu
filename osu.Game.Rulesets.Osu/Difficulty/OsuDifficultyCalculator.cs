@@ -63,9 +63,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     s.Process(h);
             }
 
-            var List<double> aimRating = new List<double>();
-            var List<double> speedRating = new List<double>();
-            var List<double> osuDifficultySectionRating = new List<double>();
+            var List<double> aimRating = new List<double>(), speedRating = new List<double>(), osuDifficultySectionRating = new List<double>();
 
             foreach(double x in Skills[0].StrainPeaks)
             {
