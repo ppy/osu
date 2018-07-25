@@ -12,7 +12,7 @@ using osu.Game.Screens.Edit.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
