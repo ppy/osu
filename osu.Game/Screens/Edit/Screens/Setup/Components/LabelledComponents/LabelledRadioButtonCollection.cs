@@ -17,7 +17,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
     public class LabelledRadioButtonCollection : CompositeDrawable
     {
         private readonly Container content;
-        private readonly Container outerContainer;
         private readonly Box box;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
@@ -92,54 +91,48 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             RelativeSizeAxes = Axes.X;
             Height = NORMAL_HEIGHT;
 
-            InternalChild = outerContainer = new Container
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                CornerRadius = OUTER_CORNER_RADIUS,
-                Masking = true,
-                Children = new Drawable[]
+                box = new Box
                 {
-                    box = new Box
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.FromHex("1c2125"),
+                },
+                content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.FromHex("1c2125"),
-                    },
-                    content = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        new Container
                         {
-                            new Container
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Children = new Drawable[]
+                                label = new OsuSpriteText
                                 {
-                                    label = new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.TopLeft,
-                                        Origin = Anchor.TopLeft,
-                                        Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Top = DEFAULT_TOP_PADDING },
-                                        Colour = Color4.White,
-                                        TextSize = DEFAULT_LABEL_TEXT_SIZE,
-                                        Font = @"Exo2.0-Bold",
-                                    },
-                                    radioButtonCollection = new OsuSetupRadioButtonCollection
-                                    {
-                                        Anchor = Anchor.TopLeft,
-                                        Origin = Anchor.TopLeft,
-                                        Position = new Vector2(LABEL_CONTAINER_WIDTH, 10),
-                                    },
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Top = DEFAULT_TOP_PADDING },
+                                    Colour = Color4.White,
+                                    TextSize = DEFAULT_LABEL_TEXT_SIZE,
+                                    Font = @"Exo2.0-Bold",
+                                },
+                                radioButtonCollection = new OsuSetupRadioButtonCollection
+                                {
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Position = new Vector2(LABEL_CONTAINER_WIDTH, 10),
                                 },
                             },
-                            bottomText = new OsuSpriteText
-                            {
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
-                                Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Bottom = DEFAULT_BOTTOM_PADDING },
-                                TextSize = DEFAULT_BOTTOM_LABEL_TEXT_SIZE,
-                                Font = @"Exo2.0-BoldItalic",
-                            },
-                        }
+                        },
+                        bottomText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Padding = new MarginPadding { Left = DEFAULT_LABEL_PADDING, Bottom = DEFAULT_BOTTOM_PADDING },
+                            TextSize = DEFAULT_BOTTOM_LABEL_TEXT_SIZE,
+                            Font = @"Exo2.0-BoldItalic",
+                        },
                     }
                 }
             };
