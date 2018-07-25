@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -144,6 +145,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             };
 
             textBox.OnCommit += OnCommit;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            textBox.BorderColour = colours.Blue;
         }
     }
 }
