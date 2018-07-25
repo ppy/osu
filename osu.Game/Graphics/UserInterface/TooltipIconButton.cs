@@ -15,8 +15,7 @@ using System;
 namespace osu.Game.Graphics.UserInterface
 {
     // not inheriting osuclickablecontainer/osuhovercontainer
-    // because click/hover sounds cannot be disabled, and they make
-    // double sounds when reappearing under the cursor
+    // because click/hover sounds cannot be disabled
     public class TooltipIconButton : ClickableContainer, IHasTooltip
     {
         private readonly SpriteIcon icon;

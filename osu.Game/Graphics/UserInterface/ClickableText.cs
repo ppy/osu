@@ -12,6 +12,10 @@ using System;
 
 namespace osu.Game.Graphics.UserInterface
 {
+    // created a new class instead of using a Link in
+    // some kind of textflowcontainer because they aren't
+    // capable of having delegates/actions on click
+    // and (probably) can't be disabled
     public class ClickableText : OsuSpriteText, IHasTooltip
     {
         private bool isEnabled;
