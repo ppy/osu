@@ -23,18 +23,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public List<double> OsuDifficultyAt(IBeatmap beatmap, double timeRate)
+        public List<double> osuDifficultySectionRating  = new List<double>();
+
+        public void OsuDifficultyAt(IBeatmap beatmap, double timeRate)
         {
             //throws list of difficulties(strains) at sections (((((or at hitobjects)))))
             //remember that first section is double-timed
 
             if (!beatmap.HitObjects.Any())
             {
-               return new List<double>();
+               return;
             }
 
-             private OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
-             Skill[] skills =
+            private OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
+            Skill[] skills =
             {
                 new Aim(),
                 new Speed()
@@ -45,13 +47,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // The first object doesn't generate a strain, so we begin with an incremented section end
             double currentSectionEnd = 2 * sectionLength;
 
-            foreach (OsuDifficultyHitObject h in difficultyBeatmap)
+            foreach ( OsuDifficultyHitObject h in difficultyBeatmap )
             {
                 while (h.BaseObject.StartTime > currentSectionEnd)
                 {
                     foreach (Skill s in skills)
                     {
-                        s.SaveCurrentPeak();
+                        s.SaveCurrentPeak()
                         s.StartNewSectionFrom(currentSectionEnd);
                     }
 
@@ -68,20 +70,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             foreach(double x in Skills[0].StrainPeaks)
             {
-                aimRating.Add(x * difficulty_multiplier)
-            }
+                aimRating.Add(x * difficulty_multiplier);
+            };
 
             foreach(double x in Skills[1].StrainPeaks)
             {
-                speedRating.Add(x * difficulty_multiplier)
+                speedRating.Add(x * difficulty_multiplier);
             }
 
-            for(int x = 0; x < aimRating.Count(); x++)
+            for (int x = 0; x < aimRating.Count(); x++)
             {
                 osuDifficultySectionRating.Add(aimRating[x] + speedRating[x] + Math.Abs(aimRating[x] - speedRating[x]) / 2);
             }
-
-            return osuDifficultySectionRating
         }
 
         //Copy some code from here
