@@ -54,7 +54,8 @@ namespace osu.Game.Overlays.Changelog
         {
             if (changelogChart != null)
                 foreach (BuildHistory buildHistory in changelogChart.BuildHistory)
-                    if (buildHistory.UserCount > 0) return false;
+                    if (buildHistory.UserCount > 0)
+                        return false;
             return true;
         }
 
