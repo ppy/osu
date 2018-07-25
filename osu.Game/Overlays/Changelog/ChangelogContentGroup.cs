@@ -259,7 +259,6 @@ namespace osu.Game.Overlays.Changelog
                     {
                         t.TextSize = 14; // web: 12,
                         t.Colour = new Color4(235, 184, 254, 255);
-                        t = new ClickableText();
                     });
                     ChangelogEntries.Add(messageContainer);
                 }
