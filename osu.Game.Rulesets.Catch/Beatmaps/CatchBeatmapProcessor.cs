@@ -128,7 +128,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                             break;
                         }
 
-                        if (Math.Abs(diff * CatchPlayfield.BASE_WIDTH) < (float)(timeDiff / 3))
+                        timeDiff /= 3;
+                        if (Math.Abs(diff * CatchPlayfield.BASE_WIDTH) < timeDiff)
                         {
                             if (diff > 0)
                             {
