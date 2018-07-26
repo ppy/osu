@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         public List<double> DifficultySectionRating (params List[] list)
         {
-            //idk what to put in for a while
+            //idk what to put in function for a while
             //idk about parameters for a while
 
             IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
