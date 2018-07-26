@@ -107,10 +107,15 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Creates list containing difficulty values for each section in <see cref="Beatmap"/>. First value is used for first and second section.
         /// </summary>
-        public List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
+        public List<double> DifficultySectionRating ()
         {
             //idk what to put in for a while
             //idk about parameters for a while
+
+            IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+            var clock = new StopwatchClock();
+
+            return DifficultySectionRating (playableBeatmap, clock.Rate)
         }
     }
 }
