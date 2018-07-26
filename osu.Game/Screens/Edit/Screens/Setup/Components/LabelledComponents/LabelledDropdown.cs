@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         private const float default_vertical_offset = 12;
 
         public Bindable<T> Current { get; } = new Bindable<T>();
-        
+
         private string labelText;
         public string LabelText
         {
