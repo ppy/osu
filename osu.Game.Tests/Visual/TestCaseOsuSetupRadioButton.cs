@@ -15,16 +15,16 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(OsuSetupRadioButton),
+            typeof(SetupRadioButton),
         };
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            OsuSetupRadioButton osuSetupRadioButton;
+            SetupRadioButton osuSetupRadioButton;
             Children = new Drawable[]
             {
-                osuSetupRadioButton = new OsuSetupRadioButton
+                osuSetupRadioButton = new SetupRadioButton
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

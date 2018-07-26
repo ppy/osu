@@ -18,16 +18,16 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(LabelledRadioButtonCollection),
-            typeof(OsuSetupRadioButtonCollection),
-            typeof(OsuSetupRadioButton),
+            typeof(SetupRadioButtonCollection),
+            typeof(SetupRadioButton),
         };
 
         [BackgroundDependencyLoader]
         private void load()
         {
             LabelledRadioButtonCollection labelledRadioButtonCollection;
-            OsuSetupRadioButton ok;
-            OsuSetupRadioButton no;
+            SetupRadioButton ok;
+            SetupRadioButton no;
 
             Child = new Container
             {
@@ -43,11 +43,11 @@ namespace osu.Game.Tests.Visual
                     BottomLabelText = "This collection contains extraordinary options, such as \"OK!\" and \"No\".",
                     Items = new[]
                     {
-                        ok = new OsuSetupRadioButton
+                        ok = new SetupRadioButton
                         {
                             LabelText = "OK!"
                         },
-                        no = new OsuSetupRadioButton
+                        no = new SetupRadioButton
                         {
                             LabelText = "No"
                         }
@@ -55,15 +55,15 @@ namespace osu.Game.Tests.Visual
                 }
             };
 
-            AddAssert("Check initial selected value of the collection", () => labelledRadioButtonCollection.CurrentSelection == ok);
+            AddAssert("Check initial selected value of the collection", () => labelledRadioButtonCollection.Current.Value == ok);
             AddAssert("Check value of the OK button", () => ok.Current.Value);
             AddAssert("Check value of the No button", () => !no.Current.Value);
-            AddStep("Select the No button", () => labelledRadioButtonCollection.CurrentSelection = no);
-            AddAssert("Check selected value of the collection", () => labelledRadioButtonCollection.CurrentSelection == no);
+            AddStep("Select the No button", () => labelledRadioButtonCollection.Current.Value = no);
+            AddAssert("Check selected value of the collection", () => labelledRadioButtonCollection.Current.Value == no);
             AddAssert("Check value of the OK button", () => !ok.Current.Value);
             AddAssert("Check value of the No button", () => no.Current.Value);
-            AddStep("Select the OK button", () => labelledRadioButtonCollection.CurrentSelection = ok);
-            AddAssert("Check selected value of the collection", () => labelledRadioButtonCollection.CurrentSelection == ok);
+            AddStep("Select the OK button", () => labelledRadioButtonCollection.Current.Value = ok);
+            AddAssert("Check selected value of the collection", () => labelledRadioButtonCollection.Current.Value == ok);
             AddAssert("Check value of the OK button", () => ok.Current.Value);
             AddAssert("Check value of the No button", () => !no.Current.Value);
         }

@@ -4,23 +4,24 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using System;
 using System.Collections.Generic;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
-    public class LabelledRadioButtonCollection : CompositeDrawable
+    public class LabelledRadioButtonCollection : CompositeDrawable, IHasCurrentValue<SetupRadioButton>
     {
         private readonly Container content;
         private readonly Box box;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
-        private readonly OsuSetupRadioButtonCollection radioButtonCollection;
+        private readonly SetupRadioButtonCollection radioButtonCollection;
 
         public const float LABEL_CONTAINER_WIDTH = 150;
         public const float OUTER_CORNER_RADIUS = 15;
@@ -31,12 +32,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         public const float DEFAULT_TOP_PADDING = 12;
         public const float DEFAULT_BOTTOM_PADDING = 12;
 
-        public event Action<OsuSetupRadioButton> SelectedRadioButtonChanged;
-
-        public void TriggerSelectedRadioButtonChanged(OsuSetupRadioButton newSelected)
-        {
-            SelectedRadioButtonChanged?.Invoke(newSelected);
-        }
+        public Bindable<SetupRadioButton> Current { get; } = new Bindable<SetupRadioButton>();
         
         public string LabelText
         {
@@ -72,13 +68,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             set => content.Colour = value;
         }
 
-        public OsuSetupRadioButton CurrentSelection
+        public SetupRadioButton CurrentSelection
         {
             get => radioButtonCollection.SelectedRadioButton;
             set => radioButtonCollection.SelectedRadioButton = value;
         }
 
-        public IEnumerable<OsuSetupRadioButton> Items
+        public IEnumerable<SetupRadioButton> Items
         {
             get => radioButtonCollection.Items;
             set => radioButtonCollection.Items = value;
@@ -117,7 +113,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                                     TextSize = DEFAULT_LABEL_TEXT_SIZE,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                radioButtonCollection = new OsuSetupRadioButtonCollection
+                                radioButtonCollection = new SetupRadioButtonCollection
                                 {
                                     Anchor = Anchor.TopLeft,
                                     Origin = Anchor.TopLeft,
@@ -137,7 +133,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                 }
             };
 
-            radioButtonCollection.SelectedRadioButtonChanged += SelectedRadioButtonChanged;
+            Current.BindTo(radioButtonCollection.Current);
         }
 
         [BackgroundDependencyLoader]

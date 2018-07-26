@@ -17,14 +17,14 @@ using System;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class OsuSetupRadioButton : ClickableContainer, IHasCurrentValue<bool>, IHasAccentColour
+    public class SetupRadioButton : ClickableContainer, IHasCurrentValue<bool>, IHasAccentColour
     {
         private readonly OsuSetupRadioButtonSwitch radioButtonSwitch;
         private readonly OsuSpriteText radioButtonLabel;
 
-        public event Action<OsuSetupRadioButton> RadioButtonClicked;
+        public event Action<SetupRadioButton> RadioButtonClicked;
 
-        public void TriggerRadioButtonClicked(OsuSetupRadioButton sender)
+        public void TriggerRadioButtonClicked(SetupRadioButton sender)
         {
             RadioButtonClicked?.Invoke(sender);
         }
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             }
         }
 
-        public OsuSetupRadioButton()
+        public SetupRadioButton()
         {
             Size = new Vector2(BUTTON_SIZE + 5, BUTTON_SIZE);
 
