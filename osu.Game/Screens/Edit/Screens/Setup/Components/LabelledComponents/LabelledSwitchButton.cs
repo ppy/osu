@@ -11,7 +11,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using System;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
@@ -20,7 +19,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         private readonly Box background;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
-        private readonly SwitchButton switchButton;
 
         private const float corner_radius = 15;
         private const float default_label_text_size = 16;
@@ -69,6 +67,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 
         public LabelledSwitchButton()
         {
+            SwitchButton switchButton;
+
             RelativeSizeAxes = Axes.X;
             Height = normal_height;
             Masking = true;
