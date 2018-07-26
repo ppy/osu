@@ -17,7 +17,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
     public class LabelledRadioButtonCollection : CompositeDrawable, IHasCurrentValue<SetupRadioButton>
     {
-        private readonly Container content;
         private readonly Box box;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
@@ -64,8 +63,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 
         public Color4 BackgroundColour
         {
-            get => content.Colour;
-            set => content.Colour = value;
+            get => box.Colour;
+            set => box.Colour = value;
         }
 
         public SetupRadioButton CurrentSelection
@@ -94,7 +93,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.FromHex("1c2125"),
                 },
-                content = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
