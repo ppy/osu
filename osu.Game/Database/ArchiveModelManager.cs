@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.IO.File;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IO;
@@ -56,13 +58,49 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
+        private readonly List<Action> cachedEvents = new List<Action>();
+
+        /// <summary>
+        /// Allows delaying of outwards events until an operation is confirmed (at a database level).
+        /// </summary>
+        private bool delayingEvents;
+
+        /// <summary>
+        /// Begin delaying outwards events.
+        /// </summary>
+        private void delayEvents() => delayingEvents = true;
+
+        /// <summary>
+        /// Flush delayed events and disable delaying.
+        /// </summary>
+        /// <param name="perform">Whether the flushed events should be performed.</param>
+        private void flushEvents(bool perform)
+        {
+            if (perform)
+            {
+                foreach (var a in cachedEvents)
+                    a.Invoke();
+            }
+
+            cachedEvents.Clear();
+            delayingEvents = false;
+        }
+
+        private void handleEvent(Action a)
+        {
+            if (delayingEvents)
+                cachedEvents.Add(a);
+            else
+                a.Invoke();
+        }
+
         protected ArchiveModelManager(Storage storage, IDatabaseContextFactory contextFactory, MutableDatabaseBackedStore<TModel> modelStore, IIpcHost importHost = null)
         {
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += s => ItemAdded?.Invoke(s);
-            ModelStore.ItemRemoved += s => ItemRemoved?.Invoke(s);
+            ModelStore.ItemAdded += s => handleEvent(() => ItemAdded?.Invoke(s));
+            ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
 
             Files = new FileStore(contextFactory, storage);
 
@@ -138,23 +176,14 @@ namespace osu.Game.Database
         /// <param name="archive">The archive to be imported.</param>
         public TModel Import(ArchiveReader archive)
         {
-            using (ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
+            try
             {
-                // create a new model (don't yet add to database)
-                var item = CreateModel(archive);
-
-                var existing = CheckForExisting(item);
-
-                if (existing != null) return existing;
-
-                item.Files = createFileInfos(archive, Files);
-
-                Populate(item, archive);
-
-                // import to store
-                ModelStore.Add(item);
-
-                return item;
+                return Import(CreateModel(archive), archive);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Model creation of {archive.Name} failed.", LoggingTarget.Database);
+                return null;
             }
         }
 
@@ -162,7 +191,57 @@ namespace osu.Game.Database
         /// Import an item from a <see cref="TModel"/>.
         /// </summary>
         /// <param name="item">The model to be imported.</param>
-        public void Import(TModel item) => ModelStore.Add(item);
+        /// <param name="archive">An optional archive to use for model population.</param>
+        public TModel Import(TModel item, ArchiveReader archive = null)
+        {
+            delayEvents();
+
+            try
+            {
+                using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
+                {
+                    try
+                    {
+                        if (!write.IsTransactionLeader) throw new InvalidOperationException($"Ensure there is no parent transaction so errors can correctly be handled by {this}");
+
+                        var existing = CheckForExisting(item);
+
+                        if (existing != null)
+                        {
+                            Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
+                            return existing;
+                        }
+
+                        if (archive != null)
+                            item.Files = createFileInfos(archive, Files);
+
+                        Populate(item, archive);
+
+                        // import to store
+                        ModelStore.Add(item);
+                    }
+                    catch (Exception e)
+                    {
+                        write.Errors.Add(e);
+                        throw;
+                    }
+                }
+
+                Logger.Log($"Import of {item} successfully completed!", LoggingTarget.Database);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $"Import of {item} failed and has been rolled back.", LoggingTarget.Database);
+                item = null;
+            }
+            finally
+            {
+                // we only want to flush events after we've confirmed the write context didn't have any errors.
+                flushEvents(item != null);
+            }
+
+            return item;
+        }
 
         /// <summary>
         /// Perform an update of the specified item.
@@ -178,12 +257,8 @@ namespace osu.Game.Database
         /// <param name="item">The item to delete.</param>
         public void Delete(TModel item)
         {
-            using (var usage = ContextFactory.GetForWrite())
+            using (ContextFactory.GetForWrite())
             {
-                var context = usage.Context;
-
-                context.ChangeTracker.AutoDetectChangesEnabled = false;
-
                 // re-fetch the model on the import context.
                 var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == item.ID);
 
@@ -191,8 +266,6 @@ namespace osu.Game.Database
 
                 if (ModelStore.Delete(foundModel))
                     Files.Dereference(foundModel.Files.Select(f => f.FileInfo).ToArray());
-
-                context.ChangeTracker.AutoDetectChangesEnabled = true;
             }
         }
 
@@ -302,7 +375,7 @@ namespace osu.Game.Database
                 using (Stream s = reader.GetStream(file))
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = file,
+                        Filename = FileSafety.PathSanitise(file),
                         FileInfo = files.Add(s)
                     });
 
@@ -322,8 +395,8 @@ namespace osu.Game.Database
         /// After this method, the model should be in a state ready to commit to a store.
         /// </summary>
         /// <param name="model">The model to populate.</param>
-        /// <param name="archive">The archive to use as a reference for population.</param>
-        protected virtual void Populate(TModel model, ArchiveReader archive)
+        /// <param name="archive">The archive to use as a reference for population. May be null.</param>
+        protected virtual void Populate(TModel model, [CanBeNull] ArchiveReader archive)
         {
         }
 

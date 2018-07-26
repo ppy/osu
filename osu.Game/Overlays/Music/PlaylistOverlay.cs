@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -19,21 +19,24 @@ namespace osu.Game.Overlays.Music
     public class PlaylistOverlay : OverlayContainer
     {
         private const float transition_duration = 600;
-
         private const float playlist_height = 510;
+
+        /// <summary>
+        /// Invoked when the order of an item in the list has changed.
+        /// The second parameter indicates the new index of the item.
+        /// </summary>
+        public Action<BeatmapSetInfo, int> OrderChanged;
+
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private BeatmapManager beatmaps;
 
         private FilterControl filter;
         private PlaylistList list;
 
-        private BeatmapManager beatmaps;
-
-        private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
-
-        public IEnumerable<BeatmapSetInfo> BeatmapSets => list.BeatmapSets;
-
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, BeatmapManager beatmaps, OsuColour colours)
+        private void load(OsuColour colours, BindableBeatmap beatmap, BeatmapManager beatmaps)
         {
+            this.beatmap.BindTo(beatmap);
             this.beatmaps = beatmaps;
 
             Children = new Drawable[]
@@ -60,7 +63,8 @@ namespace osu.Game.Overlays.Music
                         {
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Top = 95, Bottom = 10, Right = 10 },
-                            OnSelect = itemSelected,
+                            Selected = itemSelected,
+                            OrderChanged = (s, i) => OrderChanged?.Invoke(s, i)
                         },
                         filter = new FilterControl
                         {
@@ -74,29 +78,16 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            beatmaps.ItemAdded += handleBeatmapAdded;
-            beatmaps.ItemRemoved += handleBeatmapRemoved;
-
-            list.BeatmapSets = beatmaps.GetAllUsableBeatmapSets();
-
-            beatmapBacking.BindTo(game.Beatmap);
-
             filter.Search.OnCommit = (sender, newText) =>
             {
-                var beatmap = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
-                if (beatmap != null) playSpecified(beatmap);
+                BeatmapInfo toSelect = list.FirstVisibleSet?.Beatmaps?.FirstOrDefault();
+                if (toSelect != null)
+                {
+                    beatmap.Value = beatmaps.GetWorkingBeatmap(toSelect);
+                    beatmap.Value.Track.Restart();
+                }
             };
         }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            beatmapBacking.ValueChanged += b => list.SelectedSet = b?.BeatmapSetInfo;
-            beatmapBacking.TriggerChange();
-        }
-
-        private void handleBeatmapAdded(BeatmapSetInfo setInfo) => Schedule(() => list.AddBeatmapSet(setInfo));
-        private void handleBeatmapRemoved(BeatmapSetInfo setInfo) => Schedule(() => list.RemoveBeatmapSet(setInfo));
 
         protected override void PopIn()
         {
@@ -117,55 +108,14 @@ namespace osu.Game.Overlays.Music
 
         private void itemSelected(BeatmapSetInfo set)
         {
-            if (set.ID == (beatmapBacking.Value?.BeatmapSetInfo?.ID ?? -1))
+            if (set.ID == (beatmap.Value?.BeatmapSetInfo?.ID ?? -1))
             {
-                beatmapBacking.Value?.Track?.Seek(0);
+                beatmap.Value?.Track?.Seek(0);
                 return;
             }
 
-            playSpecified(set.Beatmaps.First());
-        }
-
-        public void PlayPrevious()
-        {
-            var playable = list.PreviousSet;
-
-            if (playable != null)
-            {
-                playSpecified(playable.Beatmaps.First());
-                list.SelectedSet = playable;
-            }
-        }
-
-        public void PlayNext()
-        {
-            var playable = list.NextSet;
-
-            if (playable != null)
-            {
-                playSpecified(playable.Beatmaps.First());
-                list.SelectedSet = playable;
-            }
-        }
-
-        private void playSpecified(BeatmapInfo info)
-        {
-            beatmapBacking.Value = beatmaps.GetWorkingBeatmap(info, beatmapBacking);
-
-            var track = beatmapBacking.Value.Track;
-
-            track.Restart();
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (beatmaps != null)
-            {
-                beatmaps.ItemAdded -= handleBeatmapAdded;
-                beatmaps.ItemRemoved -= handleBeatmapRemoved;
-            }
+            beatmap.Value = beatmaps.GetWorkingBeatmap(set.Beatmaps.First());
+            beatmap.Value.Track.Restart();
         }
     }
 

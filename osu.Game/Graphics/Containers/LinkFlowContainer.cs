@@ -3,11 +3,11 @@
 
 using osu.Game.Online.Chat;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Framework.Platform;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
@@ -25,12 +25,14 @@ namespace osu.Game.Graphics.Containers
         private OsuGame game;
 
         private Action showNotImplementedError;
+        private GameHost host;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, NotificationOverlay notifications)
+        private void load(OsuGame game, NotificationOverlay notifications, GameHost host)
         {
             // will be null in tests
             this.game = game;
+            this.host = host;
 
             showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
@@ -61,9 +63,9 @@ namespace osu.Game.Graphics.Containers
             AddText(text.Substring(previousLinkEnd));
         }
 
-        public void AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
+        public void AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action<SpriteText> creationParameters = null)
         {
-            AddInternal(new DrawableLinkCompiler(AddText(text).ToList())
+            AddInternal(new DrawableLinkCompiler(AddText(text, creationParameters).ToList())
             {
                 TooltipText = tooltipText ?? (url != text ? url : string.Empty),
                 Action = () =>
@@ -71,9 +73,9 @@ namespace osu.Game.Graphics.Containers
                     switch (linkType)
                     {
                         case LinkAction.OpenBeatmap:
-                            // todo: replace this with overlay.ShowBeatmap(id) once an appropriate API call is implemented.
-                            if (int.TryParse(linkArgument, out int beatmapId))
-                                Process.Start($"https://osu.ppy.sh/b/{beatmapId}");
+                            // TODO: proper query params handling
+                            if (linkArgument != null && int.TryParse(linkArgument.Contains('?') ? linkArgument.Split('?')[0] : linkArgument, out int beatmapId))
+                                game?.ShowBeatmap(beatmapId);
                             break;
                         case LinkAction.OpenBeatmapSet:
                             if (int.TryParse(linkArgument, out int setId))
@@ -88,7 +90,7 @@ namespace osu.Game.Graphics.Containers
                             showNotImplementedError?.Invoke();
                             break;
                         case LinkAction.External:
-                            Process.Start(url);
+                            host.OpenUrlExternally(url);
                             break;
                         case LinkAction.OpenUserProfile:
                             if (long.TryParse(linkArgument, out long userId))

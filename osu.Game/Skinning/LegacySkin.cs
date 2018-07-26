@@ -113,6 +113,31 @@ namespace osu.Game.Skinning
                 string path = getPathForFile(name);
                 return path == null ? null : underlyingStore.Get(path);
             }
+
+            #region IDisposable Support
+
+            private bool isDisposed;
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!isDisposed)
+                {
+                    isDisposed = true;
+                }
+            }
+
+            ~LegacySkinResourceStore()
+            {
+                Dispose(false);
+            }
+
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            #endregion
         }
     }
 }

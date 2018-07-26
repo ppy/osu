@@ -5,22 +5,22 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Tests.Beatmaps;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
+    [TestFixture]
     public class OsuBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
 
         [TestCase("basic")]
         [TestCase("colinear-perfect-curve")]
+        [TestCase("slider-ticks")]
         public new void Test(string name)
         {
             base.Test(name);
@@ -28,43 +28,45 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
-            var startPosition = (hitObject as IHasPosition)?.Position ?? new Vector2(256, 192);
-            var endPosition = (hitObject as Slider)?.EndPosition ?? startPosition;
-
-            yield return new ConvertValue
+            switch (hitObject)
             {
-                StartTime = hitObject.StartTime,
-                EndTime = (hitObject as IHasEndTime)?.EndTime ?? hitObject.StartTime,
-                StartX = startPosition.X,
-                StartY = startPosition.Y,
-                EndX = endPosition.X,
-                EndY = endPosition.Y
+                case Slider slider:
+                    foreach (var nested in slider.NestedHitObjects)
+                        yield return createConvertValue(nested);
+                    break;
+                default:
+                    yield return createConvertValue(hitObject);
+                    break;
+            }
+
+            ConvertValue createConvertValue(HitObject obj) => new ConvertValue
+            {
+                StartTime = obj.StartTime,
+                EndTime = (obj as IHasEndTime)?.EndTime ?? obj.StartTime,
+                X = (obj as IHasPosition)?.X ?? OsuPlayfield.BASE_SIZE.X / 2,
+                Y = (obj as IHasPosition)?.Y ?? OsuPlayfield.BASE_SIZE.Y / 2,
             };
         }
 
-        protected override IBeatmapConverter CreateConverter(Beatmap beatmap) => new OsuBeatmapConverter();
+        protected override Ruleset CreateRuleset() => new OsuRuleset();
     }
 
     public struct ConvertValue : IEquatable<ConvertValue>
     {
         /// <summary>
-        /// A sane value to account for osu!stable using ints everwhere.
+        /// A sane value to account for osu!stable using <see cref="int"/>s everywhere.
         /// </summary>
         private const double conversion_lenience = 2;
 
         public double StartTime;
         public double EndTime;
-        public float StartX;
-        public float StartY;
-        public float EndX;
-        public float EndY;
+        public float X;
+        public float Y;
 
         public bool Equals(ConvertValue other)
-            => Precision.AlmostEquals(StartTime, other.StartTime)
+            => Precision.AlmostEquals(StartTime, other.StartTime, conversion_lenience)
                && Precision.AlmostEquals(EndTime, other.EndTime, conversion_lenience)
-               && Precision.AlmostEquals(StartX, other.StartX)
-               && Precision.AlmostEquals(StartY, other.StartY, conversion_lenience)
-               && Precision.AlmostEquals(EndX, other.EndX, conversion_lenience)
-               && Precision.AlmostEquals(EndY, other.EndY, conversion_lenience);
+               && Precision.AlmostEquals(X, other.X, conversion_lenience)
+               && Precision.AlmostEquals(Y, other.Y, conversion_lenience);
     }
 }

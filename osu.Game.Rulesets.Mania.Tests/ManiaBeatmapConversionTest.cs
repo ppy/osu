@@ -14,17 +14,14 @@ using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public class ManiaBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
+    [TestFixture]
+    public class ManiaBeatmapConversionTest : BeatmapConversionTest<ManiaConvertMapping, ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Mania";
 
-        private bool isForCurrentRuleset;
-
-        [NonParallelizable]
-        [TestCase("basic", false)]
-        public void Test(string name, bool isForCurrentRuleset)
+        [TestCase("basic")]
+        public new void Test(string name)
         {
-            this.isForCurrentRuleset = isForCurrentRuleset;
             base.Test(name);
         }
 
@@ -38,8 +35,34 @@ namespace osu.Game.Rulesets.Mania.Tests
             };
         }
 
-        protected override IBeatmapConverter CreateConverter(Beatmap beatmap) => new ManiaBeatmapConverter(isForCurrentRuleset, beatmap);
+        protected override ManiaConvertMapping CreateConvertMapping() => new ManiaConvertMapping(Converter);
+
+        protected override Ruleset CreateRuleset() => new ManiaRuleset();
     }
+
+     public class ManiaConvertMapping : ConvertMapping<ConvertValue>, IEquatable<ManiaConvertMapping>
+     {
+         public uint RandomW;
+         public uint RandomX;
+         public uint RandomY;
+         public uint RandomZ;
+
+         public ManiaConvertMapping()
+         {
+         }
+
+         public ManiaConvertMapping(IBeatmapConverter converter)
+         {
+             var maniaConverter = (ManiaBeatmapConverter)converter;
+             RandomW = maniaConverter.Random.W;
+             RandomX = maniaConverter.Random.X;
+             RandomY = maniaConverter.Random.Y;
+             RandomZ = maniaConverter.Random.Z;
+         }
+
+         public bool Equals(ManiaConvertMapping other) => other != null && RandomW == other.RandomW && RandomX == other.RandomX && RandomY == other.RandomY && RandomZ == other.RandomZ;
+         public override bool Equals(ConvertMapping<ConvertValue> other) => base.Equals(other) && Equals(other as ManiaConvertMapping);
+     }
 
     public struct ConvertValue : IEquatable<ConvertValue>
     {

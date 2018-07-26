@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -17,6 +16,8 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using System;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
@@ -306,6 +307,8 @@ namespace osu.Game.Overlays.Chat
             public class ChannelSelectorTabItem : ChannelTabItem
             {
                 public override bool IsRemovable => false;
+
+                public override bool IsSwitchable => false;
 
                 public ChannelSelectorTabItem(Channel value) : base(value)
                 {

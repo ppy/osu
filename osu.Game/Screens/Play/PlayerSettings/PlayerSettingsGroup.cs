@@ -5,7 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -50,11 +51,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
                 }
 
-                button.FadeColour(expanded ? buttonActiveColour : Color4.White, 200, Easing.OutQuint);
+                updateExpanded();
             }
         }
 
-        private Color4 buttonActiveColour;
+        private Color4 expandedColour;
 
         protected PlayerSettingsGroup()
         {
@@ -93,7 +94,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    Text = Title.ToUpper(),
+                                    Text = Title.ToUpperInvariant(),
                                     TextSize = 17,
                                     Font = @"Exo2.0-Bold",
                                     Margin = new MarginPadding { Left = 10 },
@@ -130,8 +131,12 @@ namespace osu.Game.Screens.Play.PlayerSettings
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            button.Colour = buttonActiveColour = colours.Yellow;
+            expandedColour = colours.Yellow;
+
+            updateExpanded();
         }
+
+        private void updateExpanded() => button.FadeColour(expanded ? expandedColour : Color4.White, 200, Easing.InOutQuint);
 
         protected override Container<Drawable> Content => content;
 

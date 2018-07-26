@@ -2,30 +2,27 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// Processes a post-converted Beatmap.
+    /// Provides functionality to alter a <see cref="IBeatmap"/> after it has been converted.
     /// </summary>
-    /// <typeparam name="TObject">The type of HitObject contained in the Beatmap.</typeparam>
-    public class BeatmapProcessor<TObject>
-        where TObject : HitObject
+    public class BeatmapProcessor : IBeatmapProcessor
     {
-        /// <summary>
-        /// Post-processes a Beatmap to add mode-specific components that aren't added during conversion.
-        /// <para>
-        /// An example of such a usage is for combo colours.
-        /// </para>
-        /// </summary>
-        /// <param name="beatmap">The Beatmap to process.</param>
-        public virtual void PostProcess(Beatmap<TObject> beatmap)
+        public IBeatmap Beatmap { get; }
+
+        public BeatmapProcessor(IBeatmap beatmap)
+        {
+            Beatmap = beatmap;
+        }
+
+        public virtual void PreProcess()
         {
             IHasComboInformation lastObj = null;
 
-            foreach (var obj in beatmap.HitObjects.OfType<IHasComboInformation>())
+            foreach (var obj in Beatmap.HitObjects.OfType<IHasComboInformation>())
             {
                 if (obj.NewCombo)
                 {
@@ -44,6 +41,10 @@ namespace osu.Game.Beatmaps
 
                 lastObj = obj;
             }
+        }
+
+        public virtual void PostProcess()
+        {
         }
     }
 }

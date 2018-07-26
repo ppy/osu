@@ -5,7 +5,8 @@ using System;
 using System.Threading;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using OpenTK;
 
 namespace osu.Game.Screens
@@ -26,23 +27,28 @@ namespace osu.Game.Screens
             return false;
         }
 
-        public override bool Push(Screen screen)
+        public override void Push(Screen screen)
         {
             // When trying to push a non-loaded screen, load it asynchronously and re-invoke Push
             // once it's done.
             if (screen.LoadState == LoadState.NotLoaded)
             {
                 LoadComponentAsync(screen, d => Push((BackgroundScreen)d));
-                return true;
+                return;
             }
 
             // Make sure the in-progress loading is complete before pushing the screen.
             while (screen.LoadState < LoadState.Ready)
                 Thread.Sleep(1);
 
-            base.Push(screen);
-
-            return true;
+            try
+            {
+                base.Push(screen);
+            }
+            catch (ScreenAlreadyExitedException)
+            {
+                // screen may have exited before the push was successful.
+            }
         }
 
         protected override void Update()

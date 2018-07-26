@@ -19,6 +19,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
             {
                 new SettingsCheckbox
                 {
+                    LabelText = "Right mouse drag to absolute scroll",
+                    Bindable = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Show converted beatmaps",
                     Bindable = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
                 },
@@ -26,13 +31,13 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Display beatmaps from",
                     Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
-                    KeyboardStep = 1f
+                    KeyboardStep = 0.1f
                 },
                 new SettingsSlider<double, StarSlider>
                 {
                     LabelText = "up to",
                     Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
-                    KeyboardStep = 1f
+                    KeyboardStep = 0.1f
                 },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {

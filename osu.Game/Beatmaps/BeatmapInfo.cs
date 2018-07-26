@@ -23,7 +23,6 @@ namespace osu.Game.Beatmaps
         public int BeatmapVersion;
 
         private int? onlineBeatmapID;
-        private int? onlineBeatmapSetID;
 
         [JsonProperty("id")]
         public int? OnlineBeatmapID
@@ -32,19 +31,10 @@ namespace osu.Game.Beatmaps
             set { onlineBeatmapID = value > 0 ? value : null; }
         }
 
-        [JsonProperty("beatmapset_id")]
-        [NotMapped]
-        public int? OnlineBeatmapSetID
-        {
-            get { return onlineBeatmapSetID; }
-            set { onlineBeatmapSetID = value > 0 ? value : null; }
-        }
-
         [JsonIgnore]
         public int BeatmapSetInfoID { get; set; }
 
         [Required]
-        [JsonIgnore]
         public BeatmapSetInfo BeatmapSet { get; set; }
 
         public BeatmapMetadata Metadata { get; set; }
@@ -76,8 +66,8 @@ namespace osu.Game.Beatmaps
 
         // General
         public int AudioLeadIn { get; set; }
-        public bool Countdown { get; set; }
-        public float StackLeniency { get; set; }
+        public bool Countdown { get; set; } = true;
+        public float StackLeniency { get; set; } = 0.7f;
         public bool SpecialStyle { get; set; }
 
         public int RulesetID { get; set; }
@@ -141,7 +131,12 @@ namespace osu.Game.Beatmaps
                                                       (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
 
         public bool BackgroundEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-                                                      BeatmapSet.Hash == other.BeatmapSet.Hash &&
-                                                      (Metadata ?? BeatmapSet.Metadata).BackgroundFile == (other.Metadata ?? other.BeatmapSet.Metadata).BackgroundFile;
+                                                           BeatmapSet.Hash == other.BeatmapSet.Hash &&
+                                                           (Metadata ?? BeatmapSet.Metadata).BackgroundFile == (other.Metadata ?? other.BeatmapSet.Metadata).BackgroundFile;
+
+        /// <summary>
+        /// Returns a shallow-clone of this <see cref="BeatmapInfo"/>.
+        /// </summary>
+        public BeatmapInfo Clone() => (BeatmapInfo)MemberwiseClone();
     }
 }

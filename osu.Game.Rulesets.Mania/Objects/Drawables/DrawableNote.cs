@@ -1,13 +1,15 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Extensions.Color4Extensions;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -16,31 +18,25 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
-        protected readonly GlowPiece GlowPiece;
-
-        private readonly LaneGlowPiece laneGlowPiece;
         private readonly NotePiece headPiece;
 
-        public DrawableNote(Note hitObject, ManiaAction action)
-            : base(hitObject, action)
+        public DrawableNote(Note hitObject)
+            : base(hitObject)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            InternalChildren = new Drawable[]
-            {
-                laneGlowPiece = new LaneGlowPiece
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                },
-                GlowPiece = new GlowPiece(),
-                headPiece = new NotePiece
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                }
-            };
+            CornerRadius = 5;
+            Masking = true;
+
+            InternalChild = headPiece = new NotePiece();
+        }
+
+        protected override void OnDirectionChanged(ScrollingDirection direction)
+        {
+            base.OnDirectionChanged(direction);
+
+            headPiece.Anchor = headPiece.Origin = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
         public override Color4 AccentColour
@@ -49,9 +45,14 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             set
             {
                 base.AccentColour = value;
-                laneGlowPiece.AccentColour = AccentColour;
-                GlowPiece.AccentColour = AccentColour;
                 headPiece.AccentColour = AccentColour;
+
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = AccentColour.Lighten(1f).Opacity(0.6f),
+                    Radius = 10,
+                };
             }
         }
 
@@ -71,20 +72,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             AddJudgement(new ManiaJudgement { Result = result });
         }
 
-        protected override void UpdateState(ArmedState state)
-        {
-            switch (state)
-            {
-                case ArmedState.Hit:
-                case ArmedState.Miss:
-                    this.FadeOut(100).Expire();
-                    break;
-            }
-        }
-
         public virtual bool OnPressed(ManiaAction action)
         {
-            if (action != Action)
+            if (action != Action.Value)
                 return false;
 
             return UpdateJudgement(true);

@@ -3,8 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Input;
 using osu.Framework.Input.Handlers;
+using osu.Framework.Input.StateChanges;
+using osu.Framework.Input.States;
 using osu.Framework.Platform;
 using OpenTK;
 
@@ -32,16 +33,14 @@ namespace osu.Game.Input.Handlers
 
         public override int Priority => 0;
 
-        public class ReplayState<T> : InputState
+        public class ReplayState<T> : IInput
             where T : struct
         {
             public List<T> PressedActions;
 
-            public override InputState Clone()
+            public void Apply(InputState state, IInputStateChangeHandler handler)
             {
-                var clone = (ReplayState<T>)base.Clone();
-                clone.PressedActions = new List<T>(PressedActions);
-                return clone;
+                handler.HandleCustomInput(state, this);
             }
         }
     }

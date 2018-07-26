@@ -11,7 +11,8 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Select
@@ -141,7 +142,5 @@ namespace osu.Game.Screens.Select
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
 
         protected override bool OnClick(InputState state) => true;
-
-        protected override bool OnDragStart(InputState state) => true;
     }
 }

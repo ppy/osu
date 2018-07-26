@@ -58,8 +58,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         public TaikoPlayfield(ControlPointInfo controlPoints)
-            : base(ScrollingDirection.Left)
         {
+            Direction.Value = ScrollingDirection.Left;
+
             AddRangeInternal(new Drawable[]
             {
                 backgroundContainer = new Container
@@ -212,18 +213,22 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             base.Add(h);
 
-            var barline = h as DrawableBarLine;
-            if (barline != null)
-                barlineContainer.Add(barline.CreateProxy());
-
-            // Swells should be moved at the very top of the playfield when they reach the hit target
-            var swell = h as DrawableSwell;
-            if (swell != null)
-                swell.OnStart += () => topLevelHitContainer.Add(swell.CreateProxy());
+            switch (h)
+            {
+                case DrawableBarLine barline:
+                    barlineContainer.Add(barline.CreateProxy());
+                    break;
+                case DrawableTaikoHitObject taikoObject:
+                    topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
+                    break;
+            }
         }
 
         internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
         {
+            if (!DisplayJudgements)
+                return;
+
             if (judgedObject.DisplayJudgement && judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
                 judgementContainer.Add(new DrawableTaikoJudgement(judgement, judgedObject)
@@ -244,19 +249,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                 hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == judgedObject)?.VisualiseSecondHit();
             else
             {
-                if (judgedObject.X >= -0.05f && judgedObject is DrawableHit)
-                {
-                    // If we're far enough away from the left stage, we should bring outselves in front of it
-                    // Todo: The following try-catch is temporary for replay rewinding support
-                    try
-                    {
-                        topLevelHitContainer.Add(judgedObject.CreateProxy());
-                    }
-                    catch
-                    {
-                    }
-                }
-
                 hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
 
                 if (judgedObject.HitObject.Kiai)

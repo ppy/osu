@@ -48,17 +48,20 @@ namespace osu.Game.Tests.Beatmaps.IO
             {
                 var reader = new ZipArchiveReader(osz);
 
-                BeatmapMetadata meta;
-                using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
-                    meta = Decoder.GetDecoder<Beatmap>(stream).Decode(stream).Metadata;
+                Beatmap beatmap;
 
-                Assert.AreEqual(241526, meta.OnlineBeatmapSetID);
+                using (var stream = new StreamReader(reader.GetStream("Soleily - Renatus (Deif) [Platter].osu")))
+                    beatmap = Decoder.GetDecoder<Beatmap>(stream).Decode(stream);
+
+                var meta = beatmap.Metadata;
+
+                Assert.AreEqual(241526, beatmap.BeatmapInfo.BeatmapSet.OnlineBeatmapSetID);
                 Assert.AreEqual("Soleily", meta.Artist);
                 Assert.AreEqual("Soleily", meta.ArtistUnicode);
                 Assert.AreEqual("03. Renatus - Soleily 192kbps.mp3", meta.AudioFile);
                 Assert.AreEqual("Deif", meta.AuthorString);
                 Assert.AreEqual("machinetop_background.jpg", meta.BackgroundFile);
-                Assert.AreEqual(164471 + LegacyBeatmapDecoder.UniversalOffset, meta.PreviewTime);
+                Assert.AreEqual(164471, meta.PreviewTime);
                 Assert.AreEqual(string.Empty, meta.Source);
                 Assert.AreEqual("MBC7 Unisphere 地球ヤバイEP Chikyu Yabai", meta.Tags);
                 Assert.AreEqual("Renatus", meta.Title);

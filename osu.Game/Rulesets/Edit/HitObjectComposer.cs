@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Edit
         private RulesetContainer rulesetContainer;
         private readonly List<Container> layerContainers = new List<Container>();
 
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -38,9 +38,9 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase osuGame, IFrameBasedClock framedClock)
+        private void load(IBindableBeatmap beatmap, IFrameBasedClock framedClock)
         {
-            beatmap.BindTo(osuGame.Beatmap);
+            this.beatmap.BindTo(beatmap);
 
             try
             {
@@ -110,6 +110,13 @@ namespace osu.Game.Rulesets.Edit
             toolboxCollection.Items[0].Select();
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            rulesetContainer.Playfield.DisplayJudgements.Value = false;
+        }
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
@@ -125,7 +132,7 @@ namespace osu.Game.Rulesets.Edit
 
         private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
 
-        protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap, true);
+        protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap);
 
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
 

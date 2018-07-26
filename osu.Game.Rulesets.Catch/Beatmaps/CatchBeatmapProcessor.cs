@@ -9,20 +9,67 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
+using osu.Game.Rulesets.Catch.MathUtils;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
-    public class CatchBeatmapProcessor : BeatmapProcessor<CatchHitObject>
+    public class CatchBeatmapProcessor : BeatmapProcessor
     {
-        public override void PostProcess(Beatmap<CatchHitObject> beatmap)
-        {
-            initialiseHyperDash(beatmap.HitObjects);
+        public const int RNG_SEED = 1337;
 
-            base.PostProcess(beatmap);
+        public CatchBeatmapProcessor(IBeatmap beatmap)
+            : base(beatmap)
+        {
+        }
+
+        public override void PostProcess()
+        {
+            base.PostProcess();
+
+            applyPositionOffsets();
+
+            initialiseHyperDash((List<CatchHitObject>)Beatmap.HitObjects);
 
             int index = 0;
-            foreach (var obj in beatmap.HitObjects)
+            foreach (var obj in Beatmap.HitObjects.OfType<CatchHitObject>())
+            {
                 obj.IndexInBeatmap = index++;
+                if (obj.LastInCombo && obj.NestedHitObjects.LastOrDefault() is IHasComboInformation lastNested)
+                    lastNested.LastInCombo = true;
+            }
+        }
+
+        private void applyPositionOffsets()
+        {
+            var rng = new FastRandom(RNG_SEED);
+            // todo: HardRock displacement should be applied here
+
+            foreach (var obj in Beatmap.HitObjects)
+            {
+                switch (obj)
+                {
+                    case BananaShower bananaShower:
+                        foreach (var banana in bananaShower.NestedHitObjects.OfType<Banana>())
+                        {
+                            banana.X = (float)rng.NextDouble();
+                            rng.Next(); // osu!stable retrieved a random banana type
+                            rng.Next(); // osu!stable retrieved a random banana rotation
+                            rng.Next(); // osu!stable retrieved a random banana colour
+                        }
+                        break;
+                    case JuiceStream juiceStream:
+                        foreach (var nested in juiceStream.NestedHitObjects)
+                        {
+                            var hitObject = (CatchHitObject)nested;
+                            if (hitObject is TinyDroplet)
+                                hitObject.X += rng.Next(-20, 20) / CatchPlayfield.BASE_WIDTH;
+                            else if (hitObject is Droplet)
+                                rng.Next(); // osu!stable retrieved a random droplet rotation
+                            hitObject.X = MathHelper.Clamp(hitObject.X, 0, 1);
+                        }
+                        break;
+                }
+            }
         }
 
         private void initialiseHyperDash(List<CatchHitObject> objects)

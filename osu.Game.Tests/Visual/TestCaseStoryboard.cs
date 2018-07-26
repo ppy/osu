@@ -3,7 +3,6 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -18,8 +17,6 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseStoryboard : OsuTestCase
     {
-        private readonly Bindable<WorkingBeatmap> beatmapBacking = new Bindable<WorkingBeatmap>();
-
         private readonly Container<DrawableStoryboard> storyboardContainer;
         private DrawableStoryboard storyboard;
 
@@ -43,6 +40,7 @@ namespace osu.Game.Tests.Visual
                     },
                 },
             });
+
             Add(new MusicController
             {
                 Origin = Anchor.TopRight,
@@ -55,10 +53,9 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        private void load()
         {
-            beatmapBacking.BindTo(game.Beatmap);
-            beatmapBacking.ValueChanged += beatmapChanged;
+            Beatmap.ValueChanged += beatmapChanged;
         }
 
         private void beatmapChanged(WorkingBeatmap working)
@@ -66,10 +63,10 @@ namespace osu.Game.Tests.Visual
 
         private void restart()
         {
-            var track = beatmapBacking.Value.Track;
+            var track = Beatmap.Value.Track;
 
             track.Reset();
-            loadStoryboard(beatmapBacking.Value);
+            loadStoryboard(Beatmap);
             track.Start();
         }
 
@@ -81,7 +78,7 @@ namespace osu.Game.Tests.Visual
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
             storyboardContainer.Clock = decoupledClock;
 
-            storyboard = working.Storyboard.CreateDrawable(beatmapBacking);
+            storyboard = working.Storyboard.CreateDrawable(Beatmap);
             storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);

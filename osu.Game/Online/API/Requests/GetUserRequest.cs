@@ -7,7 +7,7 @@ namespace osu.Game.Online.API.Requests
 {
     public class GetUserRequest : APIRequest<User>
     {
-        private long? userId;
+        private readonly long? userId;
 
         public GetUserRequest(long? userId = null)
         {

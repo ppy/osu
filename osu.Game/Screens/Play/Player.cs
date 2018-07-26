@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -11,7 +12,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -21,6 +22,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
+using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -35,7 +37,9 @@ namespace osu.Game.Screens.Play
     {
         protected override float BackgroundParallaxAmount => 0.1f;
 
-        public override bool ShowOverlaysOnEnter => false;
+        protected override bool HideOverlaysOnEnter => true;
+
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.UserTriggered;
 
         public Action RestartRequested;
 
@@ -68,7 +72,7 @@ namespace osu.Game.Screens.Play
 
         private SampleChannel sampleRestart;
 
-        private ScoreProcessor scoreProcessor;
+        protected ScoreProcessor ScoreProcessor;
         protected RulesetContainer RulesetContainer;
 
         private HUDOverlay hudOverlay;
@@ -77,7 +81,7 @@ namespace osu.Game.Screens.Play
         private DrawableStoryboard storyboard;
         private Container storyboardContainer;
 
-        private bool loadedSuccessfully => RulesetContainer?.Objects.Any() == true;
+        public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, APIAccess api, OsuConfigManager config)
@@ -86,17 +90,14 @@ namespace osu.Game.Screens.Play
 
             WorkingBeatmap working = Beatmap.Value;
             if (working is DummyWorkingBeatmap)
-            {
-                Exit();
                 return;
-            }
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
 
-            Beatmap beatmap;
+            IBeatmap beatmap;
 
             try
             {
@@ -110,7 +111,7 @@ namespace osu.Game.Screens.Play
 
                 try
                 {
-                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(working, ruleset.ID == beatmap.BeatmapInfo.Ruleset.ID);
+                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(working);
                 }
                 catch (BeatmapInvalidForRulesetException)
                 {
@@ -118,53 +119,54 @@ namespace osu.Game.Screens.Play
                     // let's try again forcing the beatmap's ruleset.
                     ruleset = beatmap.BeatmapInfo.Ruleset;
                     rulesetInstance = ruleset.CreateInstance();
-                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(Beatmap, true);
+                    RulesetContainer = rulesetInstance.CreateRulesetContainerWith(Beatmap.Value);
                 }
 
                 if (!RulesetContainer.Objects.Any())
-                    throw new InvalidOperationException("Beatmap contains no hit objects!");
+                {
+                    Logger.Error(new InvalidOperationException("Beatmap contains no hit objects!"), "Beatmap contains no hit objects!");
+                    return;
+                }
             }
             catch (Exception e)
             {
                 Logger.Error(e, "Could not load beatmap sucessfully!");
-
                 //couldn't load, hard abort!
-                Exit();
                 return;
             }
 
             sourceClock = (IAdjustableClock)working.Track ?? new StopwatchClock();
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
-            var firstObjectTime = RulesetContainer.Objects.First().StartTime;
             adjustableClock.Seek(AllowLeadIn
-                ? Math.Min(0, firstObjectTime - Math.Max(beatmap.ControlPointInfo.TimingPointAt(firstObjectTime).BeatLength * 4, beatmap.BeatmapInfo.AudioLeadIn))
-                : firstObjectTime);
+                ? Math.Min(0, RulesetContainer.GameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn)
+                : RulesetContainer.GameplayStartTime);
 
             adjustableClock.ProcessFrame();
 
+            // Lazer's audio timings in general doesn't match stable. This is the result of user testing, albeit limited.
+            // This only seems to be required on windows. We need to eventually figure out why, with a bit of luck.
+            var platformOffsetClock = new FramedOffsetClock(adjustableClock) { Offset = RuntimeInfo.OS == RuntimeInfo.Platform.Windows ? 22 : 0 };
+
             // the final usable gameplay clock with user-set offsets applied.
-            var offsetClock = new FramedOffsetClock(adjustableClock);
+            var offsetClock = new FramedOffsetClock(platformOffsetClock);
 
             userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
             userAudioOffset.TriggerChange();
 
-            scoreProcessor = RulesetContainer.CreateScoreProcessor();
+            ScoreProcessor = RulesetContainer.CreateScoreProcessor();
+            if (!ScoreProcessor.Mode.Disabled)
+                config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
             Children = new Drawable[]
             {
                 pauseContainer = new PauseContainer(offsetClock, adjustableClock)
                 {
+                    Retries = RestartCount,
                     OnRetry = Restart,
                     OnQuit = Exit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
-                    OnPause = () =>
-                    {
-                        pauseContainer.Retries = RestartCount;
-                        hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
-                    },
-                    OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
                         storyboardContainer = new Container
                         {
@@ -176,27 +178,28 @@ namespace osu.Game.Screens.Play
                             RelativeSizeAxes = Axes.Both,
                             Child = RulesetContainer
                         },
-                        new SkipOverlay(firstObjectTime)
+                        new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                         {
-                            Clock = Clock, // skip button doesn't want to use the audio clock directly
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             ProcessCustomClock = false,
-                            AdjustableClock = adjustableClock,
-                            FramedClock = offsetClock,
+                            Breaks = beatmap.Breaks
                         },
-                        hudOverlay = new HUDOverlay(scoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
+                        RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
+                        hudOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
                         {
                             Clock = Clock, // hud overlay doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, scoreProcessor)
+                        new SkipOverlay(RulesetContainer.GameplayStartTime)
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
+                            Clock = Clock, // skip button doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
-                            Breaks = beatmap.Breaks
-                        }
+                            AdjustableClock = adjustableClock,
+                            FramedClock = offsetClock,
+                        },
                     }
                 },
                 failOverlay = new FailOverlay
@@ -210,23 +213,26 @@ namespace osu.Game.Screens.Play
                     {
                         if (!IsCurrentScreen) return;
 
-                        //we want to hide the hitrenderer immediately (looks better).
-                        //we may be able to remove this once the mouse cursor trail is improved.
-                        RulesetContainer?.Hide();
+                        pauseContainer.Hide();
                         Restart();
                     },
                 }
             };
 
+            hudOverlay.HoldToQuit.Action = Exit;
+            hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
+
+            RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
+
             if (ShowStoryboard)
                 initializeStoryboard(false);
 
             // Bind ScoreProcessor to ourselves
-            scoreProcessor.AllJudged += onCompletion;
-            scoreProcessor.Failed += onFail;
+            ScoreProcessor.AllJudged += onCompletion;
+            ScoreProcessor.Failed += onFail;
 
             foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
-                mod.ApplyToScoreProcessor(scoreProcessor);
+                mod.ApplyToScoreProcessor(ScoreProcessor);
         }
 
         private void applyRateFromMods()
@@ -251,7 +257,7 @@ namespace osu.Game.Screens.Play
         private void onCompletion()
         {
             // Only show the completion screen if the player hasn't failed
-            if (scoreProcessor.HasFailed || onCompletionEvent != null)
+            if (ScoreProcessor.HasFailed || onCompletionEvent != null)
                 return;
 
             ValidForResume = false;
@@ -269,7 +275,7 @@ namespace osu.Game.Screens.Play
                         Beatmap = Beatmap.Value.BeatmapInfo,
                         Ruleset = ruleset
                     };
-                    scoreProcessor.PopulateScore(score);
+                    ScoreProcessor.PopulateScore(score);
                     score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
                     Push(new Results(score));
                 });
@@ -293,7 +299,7 @@ namespace osu.Game.Screens.Play
         {
             base.OnEntering(last);
 
-            if (!loadedSuccessfully)
+            if (!LoadedBeatmapSuccessfully)
                 return;
 
             Content.Alpha = 0;
@@ -343,7 +349,7 @@ namespace osu.Game.Screens.Play
                 return base.OnExiting(next);
             }
 
-            if (loadedSuccessfully)
+            if (LoadedBeatmapSuccessfully)
                 pauseContainer?.Pause();
 
             return true;
@@ -361,7 +367,7 @@ namespace osu.Game.Screens.Play
             Background?.FadeTo(1f, fade_out_duration);
         }
 
-        protected override bool OnWheel(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
+        protected override bool OnScroll(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
 
         private void initializeStoryboard(bool asyncLoad)
         {

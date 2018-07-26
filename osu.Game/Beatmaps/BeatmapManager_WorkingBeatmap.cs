@@ -30,7 +30,7 @@ namespace osu.Game.Beatmaps
                 this.audioManager = audioManager;
             }
 
-            protected override Beatmap GetBeatmap()
+            protected override IBeatmap GetBeatmap()
             {
                 try
                 {
@@ -69,11 +69,22 @@ namespace osu.Game.Beatmaps
                 }
                 catch
                 {
-                    return new TrackVirtual();
+                    return null;
                 }
             }
 
-            protected override Waveform GetWaveform() => new Waveform(store.GetStream(getPathForFile(Metadata.AudioFile)));
+            protected override Waveform GetWaveform()
+            {
+                try
+                {
+                    var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
+                    return trackData == null ? null : new Waveform(trackData);
+                }
+                catch
+                {
+                    return null;
+                }
+            }
 
             protected override Storyboard GetStoryboard()
             {

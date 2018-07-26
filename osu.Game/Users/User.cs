@@ -23,9 +23,6 @@ namespace osu.Game.Users
 
         public Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
-        [JsonProperty(@"age")]
-        public int? Age;
-
         //public Team Team;
 
         [JsonProperty(@"profile_colour")]
@@ -98,8 +95,14 @@ namespace osu.Game.Users
         [JsonProperty(@"skype")]
         public string Skype;
 
+        [JsonProperty(@"discord")]
+        public string Discord;
+
         [JsonProperty(@"website")]
         public string Website;
+
+        [JsonProperty(@"post_count")]
+        public int PostCount;
 
         [JsonProperty(@"playstyle")]
         public string[] PlayStyle;
@@ -136,6 +139,9 @@ namespace osu.Game.Users
 
         [JsonProperty(@"rankHistory")]
         public RankHistoryData RankHistory;
+
+        [JsonProperty("badges")]
+        public Badge[] Badges;
 
         public override string ToString() => Username;
     }

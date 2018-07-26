@@ -4,18 +4,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
-using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Configuration;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
@@ -36,8 +35,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<BarLine> BarLines;
 
-        public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(ruleset, beatmap, isForCurrentRuleset)
+        private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
+        private ScrollingInfo scrollingInfo;
+
+        public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
             // Generate the bar lines
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
@@ -71,6 +73,18 @@ namespace osu.Game.Rulesets.Mania.UI
         private void load()
         {
             BarLines.ForEach(Playfield.Add);
+
+            ((ManiaConfigManager)Config).BindWith(ManiaSetting.ScrollDirection, configDirection);
+            configDirection.BindValueChanged(d => scrollingInfo.Direction.Value = (ScrollingDirection)d, true);
+        }
+
+        private DependencyContainer dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+            dependencies.CacheAs<IScrollingInfo>(scrollingInfo = new ScrollingInfo());
+            return dependencies;
         }
 
         protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
@@ -85,27 +99,27 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
-        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter() => new ManiaBeatmapConverter(IsForCurrentRuleset, WorkingBeatmap.Beatmap);
-
         protected override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {
-            ManiaAction action = Playfield.Columns.ElementAt(h.Column).Action;
-
-            var holdNote = h as HoldNote;
-            if (holdNote != null)
-                return new DrawableHoldNote(holdNote, action);
-
-            var note = h as Note;
-            if (note != null)
-                return new DrawableNote(note, action);
-
-            return null;
+            switch (h)
+            {
+                case HoldNote holdNote:
+                    return new DrawableHoldNote(holdNote);
+                case Note note:
+                    return new DrawableNote(note);
+                default:
+                    return null;
+            }
         }
 
         protected override Vector2 PlayfieldArea => new Vector2(1, 0.8f);
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
 
-        protected override IRulesetConfigManager CreateConfig(Ruleset ruleset, SettingsStore settings) => new ManiaConfigManager(settings, Ruleset.RulesetInfo, Variant);
+        private class ScrollingInfo : IScrollingInfo
+        {
+            public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+            IBindable<ScrollingDirection> IScrollingInfo.Direction => Direction;
+        }
     }
 }

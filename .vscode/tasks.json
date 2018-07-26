@@ -4,41 +4,14 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build (Debug, msbuild)",
-            "type": "shell",
-            "command": "msbuild",
-            "args": [
-                "/p:TargetFramework=net461",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
-            ],
-            "group": "build",
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Build (Release, msbuild)",
-            "type": "shell",
-            "command": "msbuild",
-            "args": [
-                "/p:Configuration=Release",
-                "/p:TargetFramework=net461",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
-            ],
-            "group": "build",
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Build (Debug, dotnet)",
+            "label": "Build osu! (Debug)",
             "type": "shell",
             "command": "dotnet",
             "args": [
                 "build",
                 "--no-restore",
                 "osu.Desktop",
-                "/p:TargetFramework=netcoreapp2.0",
+                "/p:TargetFramework=netcoreapp2.1",
                 "/p:GenerateFullPaths=true",
                 "/m",
                 "/verbosity:m"
@@ -47,14 +20,14 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Build (Release, dotnet)",
+            "label": "Build osu! (Release)",
             "type": "shell",
             "command": "dotnet",
             "args": [
                 "build",
                 "--no-restore",
                 "osu.Desktop",
-                "/p:TargetFramework=netcoreapp2.0",
+                "/p:TargetFramework=netcoreapp2.1",
                 "/p:Configuration=Release",
                 "/p:GenerateFullPaths=true",
                 "/m",
@@ -64,16 +37,40 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Restore (net461)",
+            "label": "Build tests (Debug)",
             "type": "shell",
-            "command": "nuget",
+            "command": "dotnet",
             "args": [
-                "restore"
+                "build",
+                "--no-restore",
+                "osu.Game.Tests",
+                "/p:TargetFramework=netcoreapp2.1",
+                "/p:GenerateFullPaths=true",
+                "/m",
+                "/verbosity:m"
             ],
-            "problemMatcher": []
+            "group": "build",
+            "problemMatcher": "$msCompile"
         },
         {
-            "label": "Restore (netcoreapp2.0)",
+            "label": "Build tests (Release)",
+            "type": "shell",
+            "command": "dotnet",
+            "args": [
+                "build",
+                "--no-restore",
+                "osu.Game.Tests",
+                "/p:TargetFramework=netcoreapp2.1",
+                "/p:Configuration=Release",
+                "/p:GenerateFullPaths=true",
+                "/m",
+                "/verbosity:m"
+            ],
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Restore (netcoreapp2.1)",
             "type": "shell",
             "command": "dotnet",
             "args": [

@@ -5,7 +5,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -46,7 +47,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             var dragLayer = new DragLayer(maskContainer.Select);
             dragLayer.DragEnd += () => maskSelection.UpdateVisibility();
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 dragLayer,
                 maskSelection,

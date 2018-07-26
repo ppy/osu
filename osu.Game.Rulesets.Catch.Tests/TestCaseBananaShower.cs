@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         {
         }
 
-        protected override Beatmap CreateBeatmap(Ruleset ruleset)
+        protected override IBeatmap CreateBeatmap(Ruleset ruleset)
         {
             var beatmap = new Beatmap
             {

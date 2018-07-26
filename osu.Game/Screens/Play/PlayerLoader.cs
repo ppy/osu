@@ -6,16 +6,17 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
+using osu.Framework.Localisation;
 using osu.Framework.Screens;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
-using osu.Framework.Localisation;
-using osu.Framework.Threading;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
+using OpenTK;
 
 namespace osu.Game.Screens.Play
 {
@@ -25,8 +26,8 @@ namespace osu.Game.Screens.Play
 
         private BeatmapMetadataDisplay info;
 
-        private bool showOverlays = true;
-        public override bool ShowOverlaysOnEnter => showOverlays;
+        private bool hideOverlays;
+        protected override bool HideOverlaysOnEnter => hideOverlays;
 
         private Task loadTask;
 
@@ -36,7 +37,7 @@ namespace osu.Game.Screens.Play
 
             player.RestartRequested = () =>
             {
-                showOverlays = false;
+                hideOverlays = true;
                 ValidForResume = true;
             };
         }
@@ -44,18 +45,26 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(info = new BeatmapMetadataDisplay(Beatmap)
+            Add(info = new BeatmapMetadataDisplay(Beatmap.Value)
             {
                 Alpha = 0,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
 
-            Add(new VisualSettings
+            Add(new FillFlowContainer<PlayerSettingsGroup>
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                Margin = new MarginPadding(25)
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Vertical,
+                Spacing = new Vector2(0, 20),
+                Margin = new MarginPadding(25),
+                Children = new PlayerSettingsGroup[]
+                {
+                    new VisualSettings(),
+                    new InputSettings()
+                }
             });
 
             loadTask = LoadComponentAsync(player);
@@ -159,14 +168,14 @@ namespace osu.Game.Screens.Play
 
                         loadTask = null;
 
-                        if (!Push(player))
-                            Exit();
+                        //By default, we want to load the player and never be returned to.
+                        //Note that this may change if the player we load requested a re-run.
+                        ValidForResume = false;
+
+                        if (player.LoadedBeatmapSuccessfully)
+                            Push(player);
                         else
-                        {
-                            //By default, we want to load the player and never be returned to.
-                            //Note that this may change if the player we load requested a re-run.
-                            ValidForResume = false;
-                        }
+                            Exit();
                     });
                 }, 500);
             }
@@ -201,8 +210,11 @@ namespace osu.Game.Screens.Play
         {
             base.Dispose(isDisposing);
 
-            // if the player never got pushed, we should explicitly dispose it.
-            loadTask?.ContinueWith(_ => player.Dispose());
+            if (isDisposing)
+            {
+                // if the player never got pushed, we should explicitly dispose it.
+                loadTask?.ContinueWith(_ => player.Dispose());
+            }
         }
 
         private class BeatmapMetadataDisplay : Container

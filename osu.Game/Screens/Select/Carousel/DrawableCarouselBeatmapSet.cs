@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Select.Carousel
             restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
             dialogOverlay = overlay;
             if (beatmapOverlay != null)
-                viewDetails = beatmapOverlay.ShowBeatmapSet;
+                viewDetails = beatmapOverlay.FetchAndShowBeatmapSet;
 
             Children = new Drawable[]
             {

@@ -16,7 +16,6 @@ using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
-using osu.Game.Tests.Platform;
 
 namespace osu.Game.Tests.Visual
 {
@@ -27,8 +26,8 @@ namespace osu.Game.Tests.Visual
 
         private RulesetStore rulesets;
 
-        private DependencyContainer dependencies;
         private WorkingBeatmap defaultBeatmap;
+        private DatabaseContextFactory factory;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -48,8 +47,6 @@ namespace osu.Game.Tests.Visual
             typeof(DrawableCarouselBeatmapSet),
         };
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) => dependencies = new DependencyContainer(parent);
-
         private class TestSongSelect : PlaySongSelect
         {
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
@@ -57,20 +54,27 @@ namespace osu.Game.Tests.Visual
             public new BeatmapCarousel Carousel => base.Carousel;
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            factory.ResetDatabase();
+            base.Dispose(isDisposing);
+        }
+
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game)
+        private void load()
         {
             TestSongSelect songSelect = null;
 
-            var storage = new TestStorage(@"TestCasePlaySongSelect");
+            factory = new DatabaseContextFactory(LocalStorage);
+            factory.ResetDatabase();
 
-            // this is by no means clean. should be replacing inside of OsuGameBase somehow.
-            IDatabaseContextFactory factory = new SingletonContextFactory(new OsuDbContext());
+            using (var usage = factory.Get())
+                usage.Migrate();
 
-            dependencies.Cache(rulesets = new RulesetStore(factory));
-            dependencies.Cache(manager = new BeatmapManager(storage, factory, rulesets, null, null)
+            Dependencies.Cache(rulesets = new RulesetStore(factory));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, null)
             {
-                DefaultBeatmap = defaultBeatmap = game.Beatmap.Default
+                DefaultBeatmap = defaultBeatmap = Beatmap.Default
             });
 
             void loadNewSongSelect(bool deleteMaps = false) => AddStep("reload song select", () =>
@@ -78,7 +82,7 @@ namespace osu.Game.Tests.Visual
                 if (deleteMaps)
                 {
                     manager.Delete(manager.GetAllUsableBeatmapSets());
-                    game.Beatmap.SetDefault();
+                    Beatmap.SetDefault();
                 }
 
                 if (songSelect != null)
@@ -125,7 +129,6 @@ namespace osu.Game.Tests.Visual
                 Hash = new MemoryStream(Encoding.UTF8.GetBytes(Guid.NewGuid().ToString())).ComputeMD5Hash(),
                 Metadata = new BeatmapMetadata
                 {
-                    OnlineBeatmapSetID = 1234 + i,
                     // Create random metadata, then we can check if sorting works based on these
                     Artist = "MONACA " + RNG.Next(0, 9),
                     Title = "Black Song " + RNG.Next(0, 9),

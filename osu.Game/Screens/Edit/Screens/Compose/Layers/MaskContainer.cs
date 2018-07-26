@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Game.Rulesets.Edit;
 using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 
@@ -43,6 +43,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         public override void Add(HitObjectMask drawable)
         {
+            if (drawable == null) throw new ArgumentNullException(nameof(drawable));
+
             base.Add(drawable);
 
             drawable.Selected += onMaskSelected;
@@ -53,6 +55,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         public override bool Remove(HitObjectMask drawable)
         {
+            if (drawable == null) throw new ArgumentNullException(nameof(drawable));
+
             var result = base.Remove(drawable);
 
             if (result)

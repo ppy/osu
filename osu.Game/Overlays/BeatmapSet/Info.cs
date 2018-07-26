@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float metadata_width = 225;
         private const float spacing = 20;
 
-        private readonly MetadataSection description, source, tags;
+        private readonly MetadataSection source, tags;
         private readonly Box successRateBackground;
         private readonly SuccessRate successRate;
 
@@ -34,9 +34,14 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
-                source.Text = BeatmapSet.Metadata.Source;
-                tags.Text = BeatmapSet.Metadata.Tags;
+                updateDisplay();
             }
+        }
+
+        private void updateDisplay()
+        {
+            source.Text = BeatmapSet?.Metadata.Source ?? string.Empty;
+            tags.Text = BeatmapSet?.Metadata.Tags ?? string.Empty;
         }
 
         public BeatmapInfo Beatmap
@@ -78,7 +83,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Child = new Container
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Child = description = new MetadataSection("Description"),
+                                Child = new MetadataSection("Description"),
                             },
                         },
                         new Container
@@ -130,8 +135,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private void load(OsuColour colours)
         {
             successRateBackground.Colour = colours.GrayE;
-            source.TextColour = description.TextColour = colours.Gray5;
-            tags.TextColour = colours.BlueDark;
+
+            updateDisplay();
         }
 
         private class MetadataSection : FillFlowContainer
@@ -188,7 +193,7 @@ namespace osu.Game.Overlays.BeatmapSet
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                header.Colour = colours.Gray5;
+                header.Colour = textFlow.Colour = colours.Gray5;
             }
         }
     }

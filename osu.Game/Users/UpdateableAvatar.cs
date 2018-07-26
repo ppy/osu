@@ -15,6 +15,11 @@ namespace osu.Game.Users
 
         private User user;
 
+        /// <summary>
+        /// Whether to show a default guest representation on null user (as opposed to nothing).
+        /// </summary>
+        public bool ShowGuestOnNull = true;
+
         public User User
         {
             get { return user; }
@@ -40,13 +45,16 @@ namespace osu.Game.Users
         {
             displayedAvatar?.FadeOut(300);
             displayedAvatar?.Expire();
-            Add(displayedAvatar = new DelayedLoadWrapper(
-                new Avatar(user)
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    OnLoadComplete = d => d.FadeInFromZero(300, Easing.OutQuint),
-                })
-            );
+            if (user != null || ShowGuestOnNull)
+            {
+                Add(displayedAvatar = new DelayedLoadWrapper(
+                    new Avatar(user)
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        OnLoadComplete = d => d.FadeInFromZero(300, Easing.OutQuint),
+                    })
+                );
+            }
         }
     }
 }

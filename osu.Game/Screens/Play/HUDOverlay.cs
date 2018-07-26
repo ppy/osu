@@ -5,7 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
@@ -34,6 +35,7 @@ namespace osu.Game.Screens.Play
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
+        public readonly QuitButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         private Bindable<bool> showHud;
@@ -51,14 +53,26 @@ namespace osu.Game.Screens.Play
 
                 Children = new Drawable[]
                 {
-                    KeyCounter = CreateKeyCounter(),
                     ComboCounter = CreateComboCounter(),
                     ScoreCounter = CreateScoreCounter(),
                     AccuracyCounter = CreateAccuracyCounter(),
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
                     ModDisplay = CreateModsContainer(),
-                    PlayerSettingsOverlay = CreatePlayerSettingsOverlay()
+                    PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
+                    new FillFlowContainer
+                    {
+                        Anchor = Anchor.BottomRight,
+                        Origin = Anchor.BottomRight,
+                        Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Children = new Drawable[]
+                        {
+                            KeyCounter = CreateKeyCounter(),
+                            HoldToQuit = CreateQuitButton(),
+                        }
+                    }
                 }
             });
 
@@ -182,12 +196,10 @@ namespace osu.Game.Screens.Play
 
         protected virtual KeyCounterCollection CreateKeyCounter() => new KeyCounterCollection
         {
-            IsCounting = true,
             FadeTime = 50,
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),
-            Y = -TwoLayerButton.SIZE_RETRACTED.Y,
         };
 
         protected virtual ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
@@ -203,6 +215,12 @@ namespace osu.Game.Screens.Play
             Anchor = Anchor.BottomLeft,
             Origin = Anchor.BottomLeft,
             RelativeSizeAxes = Axes.X,
+        };
+
+        protected virtual QuitButton CreateQuitButton() => new QuitButton
+        {
+            Anchor = Anchor.BottomRight,
+            Origin = Anchor.BottomRight,
         };
 
         protected virtual ModDisplay CreateModsContainer() => new ModDisplay

@@ -5,9 +5,9 @@ namespace osu.Game.Screens.Select
 {
     public class MatchSongSelect : SongSelect
     {
-        protected override bool OnSelectionFinalised()
+        protected override bool OnStart()
         {
-            Exit();
+            if (IsCurrentScreen) Exit();
             return true;
         }
     }

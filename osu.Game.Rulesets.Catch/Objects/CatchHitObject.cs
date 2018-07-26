@@ -25,6 +25,11 @@ namespace osu.Game.Rulesets.Catch.Objects
         public int ComboIndex { get; set; }
 
         /// <summary>
+        /// The distance for a fruit to to next hyper if it's not a hyper.
+        /// </summary>
+        public float DistanceToHyperDash { get; set; }
+
+        /// <summary>
         /// The next fruit starts a new combo. Used for explodey.
         /// </summary>
         public virtual bool LastInCombo { get; set; }
@@ -47,6 +52,8 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             Scale = 1.0f - 0.7f * (difficulty.CircleSize - 5) / 5;
         }
+
+        protected override HitWindows CreateHitWindows() => null;
     }
 
     public enum FruitVisualRepresentation

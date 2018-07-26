@@ -3,6 +3,9 @@
   <PropertyGroup Label="C#">
     <LangVersion>7</LangVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>..\app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup Label="License">
     <None Include="..\osu.licenseheader">
       <Link>osu.licenseheader</Link>

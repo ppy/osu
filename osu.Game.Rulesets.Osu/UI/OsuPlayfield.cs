@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
 using System.Linq;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -20,11 +19,6 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly Container approachCircles;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
-
-        // Todo: This should not be a thing, but is currently required for the editor
-        // https://github.com/ppy/osu-framework/issues/1283
-        protected virtual bool ProxyApproachCircles => true;
-        protected virtual bool DisplayJudgements => true;
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
@@ -59,7 +53,7 @@ namespace osu.Game.Rulesets.Osu.UI
             h.OnJudgement += onJudgement;
 
             var c = h as IDrawableHitObjectWithProxiedApproach;
-            if (c != null && ProxyApproachCircles)
+            if (c != null)
                 approachCircles.Add(c.ProxiedLayer.CreateProxy());
 
             base.Add(h);
@@ -67,9 +61,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override void PostProcess()
         {
-            connectionLayer.HitObjects = HitObjects.Objects
-                .Select(d => d.HitObject)
-                .OrderBy(h => h.StartTime).OfType<OsuHitObject>();
+            connectionLayer.HitObjects = HitObjects.Objects.Select(d => d.HitObject).OfType<OsuHitObject>();
         }
 
         private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
@@ -80,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.UI
             DrawableOsuJudgement explosion = new DrawableOsuJudgement(judgement, judgedObject)
             {
                 Origin = Anchor.Centre,
-                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition + ((OsuJudgement)judgement).PositionOffset
+                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition
             };
 
             judgementLayer.Add(explosion);

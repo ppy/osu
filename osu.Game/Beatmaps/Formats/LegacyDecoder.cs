@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Logging;
+using osu.Game.Audio;
+using osu.Game.Beatmaps.ControlPoints;
 using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
@@ -19,7 +21,7 @@ namespace osu.Game.Beatmaps.Formats
             FormatVersion = version;
         }
 
-        protected override void ParseStreamInto(StreamReader stream, T beatmap)
+        protected override void ParseStreamInto(StreamReader stream, T output)
         {
             Section section = Section.None;
 
@@ -33,14 +35,21 @@ namespace osu.Game.Beatmaps.Formats
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
                     {
-                        Logger.Log($"Unknown section \"{line}\" in {beatmap}");
+                        Logger.Log($"Unknown section \"{line}\" in {output}");
                         section = Section.None;
                     }
 
                     continue;
                 }
 
-                ParseLine(beatmap, section, line);
+                try
+                {
+                    ParseLine(output, section, line);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error(e, $"Failed to process line \"{line}\" into {output}");
+                }
             }
         }
 
@@ -48,12 +57,22 @@ namespace osu.Game.Beatmaps.Formats
 
         protected virtual void ParseLine(T output, Section section, string line)
         {
+            line = StripComments(line);
+
             switch (section)
             {
                 case Section.Colours:
                     handleColours(output, line);
                     return;
             }
+        }
+
+        protected string StripComments(string line)
+        {
+            var index = line.IndexOf("//", StringComparison.Ordinal);
+            if (index > 0)
+                return line.Substring(0, index);
+            return line;
         }
 
         private bool hasComboColours;
@@ -159,6 +178,26 @@ namespace osu.Game.Beatmaps.Formats
             Fail = 1,
             Pass = 2,
             Foreground = 3
+        }
+
+        internal class LegacySampleControlPoint : SampleControlPoint
+        {
+            public int CustomSampleBank;
+
+            public override SampleInfo ApplyTo(SampleInfo sampleInfo)
+            {
+                var baseInfo = base.ApplyTo(sampleInfo);
+
+                if (string.IsNullOrEmpty(baseInfo.Suffix) && CustomSampleBank > 1)
+                    baseInfo.Suffix = CustomSampleBank.ToString();
+
+                return baseInfo;
+            }
+
+            public override bool EquivalentTo(ControlPoint other)
+                => base.EquivalentTo(other)
+                   && other is LegacySampleControlPoint legacy
+                   && CustomSampleBank == legacy.CustomSampleBank;
         }
     }
 }

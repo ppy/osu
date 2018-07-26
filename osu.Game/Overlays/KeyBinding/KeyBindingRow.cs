@@ -9,13 +9,16 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input;
 using OpenTK.Graphics;
 using OpenTK.Input;
+using JoystickEventArgs = osu.Framework.Input.EventArgs.JoystickEventArgs;
 
 namespace osu.Game.Overlays.KeyBinding
 {
@@ -43,7 +46,7 @@ namespace osu.Game.Overlays.KeyBinding
         }
 
         private OsuSpriteText text;
-        private OsuSpriteText pressAKey;
+        private OsuTextFlowContainer pressAKey;
 
         private FillFlowContainer<KeyButton> buttons;
 
@@ -95,11 +98,13 @@ namespace osu.Game.Overlays.KeyBinding
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight
                 },
-                pressAKey = new OsuSpriteText
+                pressAKey = new OsuTextFlowContainer
                 {
-                    Text = "Press a key to change binding, DEL to delete, ESC to cancel.",
-                    Y = height,
+                    Text = "Press a key to change binding, Shift+Delete to delete, Escape to cancel.",
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Margin = new MarginPadding(padding),
+                    Padding = new MarginPadding { Top = height },
                     Alpha = 0,
                     Colour = colours.YellowDark
                 }
@@ -178,19 +183,19 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnWheel(InputState state)
+        protected override bool OnScroll(InputState state)
         {
             if (HasFocus)
             {
                 if (bindTarget.IsHovered)
                 {
-                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
+                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state, state.Mouse.ScrollDelta));
                     finalise();
                     return true;
                 }
             }
 
-            return base.OnWheel(state);
+            return base.OnScroll(state);
         }
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
@@ -200,13 +205,17 @@ namespace osu.Game.Overlays.KeyBinding
 
             switch (args.Key)
             {
-                case Key.Escape:
-                    finalise();
-                    return true;
                 case Key.Delete:
-                    bindTarget.UpdateKeyCombination(InputKey.None);
-                    finalise();
-                    return true;
+                {
+                    if (state.Keyboard.ShiftPressed)
+                    {
+                        bindTarget.UpdateKeyCombination(InputKey.None);
+                        finalise();
+                        return true;
+                    }
+
+                    break;
+                }
             }
 
             bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
@@ -218,6 +227,26 @@ namespace osu.Game.Overlays.KeyBinding
         protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
             if (!HasFocus) return base.OnKeyUp(state, args);
+
+            finalise();
+            return true;
+        }
+
+        protected override bool OnJoystickPress(InputState state, JoystickEventArgs args)
+        {
+            if (!HasFocus)
+                return false;
+
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
+            finalise();
+
+            return true;
+        }
+
+        protected override bool OnJoystickRelease(InputState state, JoystickEventArgs args)
+        {
+            if (!HasFocus)
+                return base.OnJoystickRelease(state, args);
 
             finalise();
             return true;
@@ -241,7 +270,7 @@ namespace osu.Game.Overlays.KeyBinding
                 GetContainingInputManager().ChangeFocus(null);
 
             pressAKey.FadeOut(300, Easing.OutQuint);
-            pressAKey.Padding = new MarginPadding { Bottom = -pressAKey.DrawHeight };
+            pressAKey.BypassAutoSizeAxes |= Axes.Y;
         }
 
         protected override void OnFocus(InputState state)
@@ -250,7 +279,7 @@ namespace osu.Game.Overlays.KeyBinding
             AutoSizeEasing = Easing.OutQuint;
 
             pressAKey.FadeIn(300, Easing.OutQuint);
-            pressAKey.Padding = new MarginPadding();
+            pressAKey.BypassAutoSizeAxes &= ~Axes.Y;
 
             updateBindTarget();
             base.OnFocus(state);

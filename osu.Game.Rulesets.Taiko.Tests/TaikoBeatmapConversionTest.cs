@@ -5,27 +5,23 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.MathUtils;
-using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Taiko.Beatmaps;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Rulesets.Taiko.Tests
 {
+    [TestFixture]
     public class TaikoBeatmapConversionTest : BeatmapConversionTest<ConvertValue>
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Taiko";
 
-        private bool isForCurrentRuleset;
-
         [NonParallelizable]
-        [TestCase("basic", false), Ignore("See: https://github.com/ppy/osu/issues/2152")]
-        [TestCase("slider-generating-drumroll", false)]
-        public void Test(string name, bool isForCurrentRuleset)
+        [TestCase("basic")]
+        [TestCase("slider-generating-drumroll")]
+        public new void Test(string name)
         {
-            this.isForCurrentRuleset = isForCurrentRuleset;
             base.Test(name);
         }
 
@@ -43,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             };
         }
 
-        protected override IBeatmapConverter CreateConverter(Beatmap beatmap) => new TaikoBeatmapConverter(isForCurrentRuleset);
+        protected override Ruleset CreateRuleset() => new TaikoRuleset();
     }
 
     public struct ConvertValue : IEquatable<ConvertValue>

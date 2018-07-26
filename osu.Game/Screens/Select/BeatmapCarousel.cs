@@ -8,7 +8,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Configuration;
-using osu.Framework.Input;
 using OpenTK.Input;
 using osu.Framework.MathUtils;
 using System.Diagnostics;
@@ -18,6 +17,8 @@ using osu.Framework.Caching;
 using osu.Framework.Threading;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
@@ -97,6 +98,9 @@ namespace osu.Game.Screens.Select
 
         private readonly Container<DrawableCarouselItem> scrollableContent;
 
+
+        public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
+
         public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
         private readonly List<CarouselBeatmapSet> previouslyVisitedRandomSets = new List<CarouselBeatmapSet>();
         private readonly Stack<CarouselBeatmap> randomSelectedBeatmaps = new Stack<CarouselBeatmap>();
@@ -122,6 +126,10 @@ namespace osu.Game.Screens.Select
         private void load(OsuConfigManager config)
         {
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
+            config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
+
+            RightClickScrollingEnabled.ValueChanged += v => RightMouseScrollbar = v;
+            RightClickScrollingEnabled.TriggerChange();
         }
 
         public void RemoveBeatmapSet(BeatmapSetInfo beatmapSet)

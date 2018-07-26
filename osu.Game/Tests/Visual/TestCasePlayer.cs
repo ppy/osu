@@ -1,9 +1,11 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
@@ -18,8 +20,6 @@ namespace osu.Game.Tests.Visual
         private readonly Ruleset ruleset;
 
         protected Player Player;
-
-        private TestWorkingBeatmap working;
 
         protected TestCasePlayer(Ruleset ruleset)
         {
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual
             {
                 Player p = null;
                 AddStep(ruleset.RulesetInfo.Name, () => p = loadPlayerFor(ruleset));
-                AddUntilStep(() => p.IsLoaded);
+                AddUntilStep(() => ContinueCondition(p));
             }
             else
             {
@@ -52,28 +52,67 @@ namespace osu.Game.Tests.Visual
                 {
                     Player p = null;
                     AddStep(r.Name, () => p = loadPlayerFor(r));
-                    AddUntilStep(() => p.IsLoaded);
+                    AddUntilStep(() => ContinueCondition(p));
+
+                    AddAssert("no leaked beatmaps", () =>
+                    {
+                        p = null;
+
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        int count = 0;
+
+                        workingWeakReferences.ForEachAlive(_ => count++);
+                        return count == 1;
+                    });
+
+                    AddAssert("no leaked players", () =>
+                    {
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        int count = 0;
+
+                        playerWeakReferences.ForEachAlive(_ => count++);
+                        return count == 1;
+                    });
                 }
             }
         }
 
-        protected virtual Beatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);
+        protected virtual bool ContinueCondition(Player player) => player.IsLoaded;
 
-        private Player loadPlayerFor(RulesetInfo ri) => loadPlayerFor(ri.CreateInstance());
+        protected virtual IBeatmap CreateBeatmap(Ruleset ruleset) => new TestBeatmap(ruleset.RulesetInfo);
+
+        private readonly WeakList<WorkingBeatmap> workingWeakReferences = new WeakList<WorkingBeatmap>();
+        private readonly WeakList<Player> playerWeakReferences = new WeakList<Player>();
+
+        private Player loadPlayerFor(RulesetInfo ri)
+        {
+            Ruleset.Value = ri;
+            return loadPlayerFor(ri.CreateInstance());
+        }
 
         private Player loadPlayerFor(Ruleset r)
         {
             var beatmap = CreateBeatmap(r);
+            var working = new TestWorkingBeatmap(beatmap);
 
-            working = new TestWorkingBeatmap(beatmap);
-            working.Mods.Value = new[] { r.GetAllMods().First(m => m is ModNoFail) };
+            workingWeakReferences.Add(working);
 
-            if (Player != null)
-                Remove(Player);
+            Beatmap.Value = working;
+            Beatmap.Value.Mods.Value = new[] { r.GetAllMods().First(m => m is ModNoFail) };
 
-            var player = CreatePlayer(working, r);
+            Player?.Exit();
 
-            LoadComponentAsync(player, LoadScreen);
+            var player = CreatePlayer(r);
+
+            playerWeakReferences.Add(player);
+
+            LoadComponentAsync(player, p =>
+            {
+                Player = p;
+                LoadScreen(p);
+            });
 
             return player;
         }
@@ -82,14 +121,12 @@ namespace osu.Game.Tests.Visual
         {
             base.Update();
 
-            if (working != null)
-                // note that this will override any mod rate application
-                working.Track.Rate = Clock.Rate;
+            // note that this will override any mod rate application
+            Beatmap.Value.Track.Rate = Clock.Rate;
         }
 
-        protected virtual Player CreatePlayer(WorkingBeatmap beatmap, Ruleset ruleset) => new Player
+        protected virtual Player CreatePlayer(Ruleset ruleset) => new Player
         {
-            InitialBeatmap = beatmap,
             AllowPause = false,
             AllowLeadIn = false,
             AllowResults = false,

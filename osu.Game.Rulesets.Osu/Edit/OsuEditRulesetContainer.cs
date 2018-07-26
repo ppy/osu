@@ -4,19 +4,16 @@
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.UI;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuEditRulesetContainer : OsuRulesetContainer
     {
-        public OsuEditRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(ruleset, beatmap, isForCurrentRuleset)
+        public OsuEditRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
         }
-
-        protected override Playfield CreatePlayfield() => new OsuEditPlayfield();
 
         protected override Vector2 PlayfieldArea => Vector2.One;
 

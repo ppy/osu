@@ -26,7 +26,8 @@ namespace osu.Game.Input.Bindings
         {
             new KeyBinding(InputKey.F8, GlobalAction.ToggleChat),
             new KeyBinding(InputKey.F9, GlobalAction.ToggleSocial),
-            new KeyBinding(InputKey.F12,GlobalAction.TakeScreenshot),
+            new KeyBinding(InputKey.F10, GlobalAction.ToggleGameplayMouseButtons),
+            new KeyBinding(InputKey.F12, GlobalAction.TakeScreenshot),
 
             new KeyBinding(new[] { InputKey.Control, InputKey.Alt, InputKey.R }, GlobalAction.ResetInputSettings),
             new KeyBinding(new[] { InputKey.Control, InputKey.T }, GlobalAction.ToggleToolbar),
@@ -36,12 +37,20 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Down, GlobalAction.DecreaseVolume),
             new KeyBinding(InputKey.MouseWheelDown, GlobalAction.DecreaseVolume),
             new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
+
+            new KeyBinding(InputKey.Escape, GlobalAction.Back),
+            new KeyBinding(InputKey.MouseButton1, GlobalAction.Back),
+
+            new KeyBinding(InputKey.Space, GlobalAction.Select),
+            new KeyBinding(InputKey.Enter, GlobalAction.Select),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
         {
             new KeyBinding(InputKey.Space, GlobalAction.SkipCutscene),
-            new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry)
+            new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
         };
 
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
@@ -76,6 +85,20 @@ namespace osu.Game.Input.Bindings
         QuickRetry,
 
         [Description("Take screenshot")]
-        TakeScreenshot
+        TakeScreenshot,
+        [Description("Toggle gameplay mouse buttons")]
+        ToggleGameplayMouseButtons,
+
+        [Description("Back")]
+        Back,
+
+        [Description("Increase scroll speed")]
+        IncreaseScrollSpeed,
+
+        [Description("Decrease scroll speed")]
+        DecreaseScrollSpeed,
+
+        [Description("Select")]
+        Select,
     }
 }

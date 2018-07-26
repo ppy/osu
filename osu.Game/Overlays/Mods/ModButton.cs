@@ -7,13 +7,14 @@ using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using System;
 using System.Linq;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Mods
@@ -116,6 +117,7 @@ namespace osu.Game.Overlays.Mods
         }
 
         private Mod mod;
+        private readonly Container scaleContainer;
 
         public Mod Mod
         {
@@ -149,14 +151,26 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            switch (args.Button)
+            scaleContainer.ScaleTo(0.9f, 800, Easing.Out);
+            return base.OnMouseDown(state, args);
+        }
+
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            scaleContainer.ScaleTo(1, 500, Easing.OutElastic);
+
+            // only trigger the event if we are inside the area of the button
+            if (Contains(ToScreenSpace(state.Mouse.Position - Position)))
             {
-                case MouseButton.Left:
-                    SelectNext(1);
-                    break;
-                case MouseButton.Right:
-                    SelectNext(-1);
-                    break;
+                switch (args.Button)
+                {
+                    case MouseButton.Left:
+                        SelectNext(1);
+                        break;
+                    case MouseButton.Right:
+                        SelectNext(-1);
+                        break;
+                }
             }
 
             return true;
@@ -176,7 +190,8 @@ namespace osu.Game.Overlays.Mods
                 start = Mods.Length - 1;
 
             for (int i = start; i < Mods.Length && i >= 0; i += direction)
-                if (SelectAt(i)) return;
+                if (SelectAt(i))
+                    return;
 
             Deselect();
         }
@@ -242,8 +257,14 @@ namespace osu.Game.Overlays.Mods
                     Anchor = Anchor.TopCentre,
                     Children = new Drawable[]
                     {
-                        iconsContainer = new Container<ModIcon>
+                        scaleContainer = new Container
                         {
+                            Child = iconsContainer = new Container<ModIcon>
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                            },
                             RelativeSizeAxes = Axes.Both,
                             Origin = Anchor.Centre,
                             Anchor = Anchor.Centre,
