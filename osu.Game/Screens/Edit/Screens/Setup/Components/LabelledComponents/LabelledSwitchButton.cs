@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         private readonly Box background;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
-        private readonly OsuSetupSwitchButton switchButton;
+        private readonly SwitchButton switchButton;
 
         private const float corner_radius = 15;
         private const float default_label_text_size = 16;
@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                                         TextSize = default_label_text_size,
                                         Font = @"Exo2.0-Bold",
                                     },
-                                    switchButton = new OsuSetupSwitchButton
+                                    switchButton = new SwitchButton
                                     {
                                         Anchor = Anchor.TopRight,
                                         Origin = Anchor.TopRight,

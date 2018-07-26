@@ -18,7 +18,7 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(LabelledSwitchButton),
-            typeof(OsuSetupSwitchButton),
+            typeof(SwitchButton),
         };
 
         private int count = -1;
