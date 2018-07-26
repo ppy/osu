@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         public const float BUTTON_SIZE = 20;
 
         private Color4 osuColourBlue;
-        
+
         public string LabelText
         {
             get => radioButtonLabel.Text;

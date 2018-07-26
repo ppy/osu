@@ -33,13 +33,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         public const float DEFAULT_BOTTOM_PADDING = 12;
 
         public Bindable<SetupRadioButton> Current { get; } = new Bindable<SetupRadioButton>();
-        
+
         public string LabelText
         {
             get => label.Text;
             set => label.Text = value;
         }
-        
+
         public string BottomLabelText
         {
             get => bottomText.Text;
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                 Height = NORMAL_HEIGHT + (value != "" ? 20 : 0);
             }
         }
-        
+
         public float LabelTextSize
         {
             get => label.TextSize;
