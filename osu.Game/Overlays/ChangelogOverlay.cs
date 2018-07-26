@@ -25,7 +25,7 @@ namespace osu.Game.Overlays
     {
         private readonly ChangelogHeader header;
         private readonly ChangelogBadges badges;
-        private readonly ChangelogChart chart;
+        //private readonly ChangelogChart chart;
         private readonly ChangelogContent listing;
         private readonly ChangelogContent content;
 
@@ -85,7 +85,7 @@ namespace osu.Game.Overlays
                         {
                             header = new ChangelogHeader(),
                             badges = new ChangelogBadges(),
-                            chart = new ChangelogChart(),
+                            //chart = new ChangelogChart(),
                             listing = new ChangelogContent(),
                             content = new ChangelogContent()
                         },
@@ -162,7 +162,6 @@ namespace osu.Game.Overlays
             isAtListing = true;
             var req = new GetChangelogRequest();
             badges.SelectNone();
-            chart.ShowAllUpdateStreams();
             req.Success += listing.ShowListing;
             api.Queue(req);
         }
@@ -176,7 +175,7 @@ namespace osu.Game.Overlays
             content.Hide();
             listing.Show();
             badges.SelectNone();
-            chart.ShowAllUpdateStreams();
+            //chart.ShowAllUpdateStreams();
             listing.Show();
             scroll.ScrollTo(savedScrollPosition);
         }
@@ -184,7 +183,12 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Fetches and shows a specific build from a specific update stream.
         /// </summary>
-        public void FetchAndShowBuild(APIChangelog build, bool sentByBadges = false)
+        /// <param name="build">Must contain at least <see cref="APIChangelog.UpdateStream.Name"/> and
+        /// <see cref="APIChangelog.Version"/>. If <see cref="APIChangelog.UpdateStream.DisplayName"/> and
+        /// <see cref="APIChangelog.DisplayVersion"/> are specified, the header will instantly display them.</param>
+        /// <param name="updateBadges">Whether to update badges. Should be set to false in case
+        /// the function is called by selecting a badge, to avoid an infinite loop.</param>
+        public void FetchAndShowBuild(APIChangelog build, bool updateBadges = true)
         {
             var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
 
@@ -193,17 +197,17 @@ namespace osu.Game.Overlays
             else
                 req.Success += res => header.ShowBuild(res.UpdateStream.DisplayName, res.DisplayVersion);
 
-            if (!sentByBadges)
+            if (updateBadges)
                 badges.SelectUpdateStream(build.UpdateStream.Name);
 
-            chart.ShowUpdateStream(build.UpdateStream.Name);
+            //chart.ShowUpdateStream(build.UpdateStream.Name);
             req.Success += apiChangelog =>
             {
                 listing.Hide();
                 content.Show();
                 content.ShowBuild(apiChangelog);
                 if (scroll.Current > scroll.GetChildPosInContent(content))
-                    scroll.ScrollTo(chart);
+                    scroll.ScrollTo(content);
                 if (isAtListing)
                     savedScrollPosition = scroll.Current;
                 isAtListing = false;
