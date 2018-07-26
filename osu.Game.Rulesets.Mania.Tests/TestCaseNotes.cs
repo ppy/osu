@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             return new ScrollingTestContainer(direction)
             {
                 AutoSizeAxes = Axes.Both,
-                Child = new NoteContainer(direction, $"note, scrolling {direction.ToString().ToLower()}")
+                Child = new NoteContainer(direction, $"note, scrolling {direction.ToString().ToLowerInvariant()}")
                 {
                     Child = new DrawableNote(note) { AccentColour = Color4.OrangeRed }
                 }
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             return new ScrollingTestContainer(direction)
             {
                 AutoSizeAxes = Axes.Both,
-                Child = new NoteContainer(direction, $"hold note, scrolling {direction.ToString().ToLower()}")
+                Child = new NoteContainer(direction, $"hold note, scrolling {direction.ToString().ToLowerInvariant()}")
                 {
                     Child = new DrawableHoldNote(note)
                     {
@@ -137,9 +137,9 @@ namespace osu.Game.Rulesets.Mania.Tests
                 };
             }
 
-            protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             {
-                var dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+                var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
                 dependencies.CacheAs<IBindable<ManiaAction>>(new Bindable<ManiaAction>());
                 return dependencies;
             }

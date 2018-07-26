@@ -42,7 +42,9 @@ namespace osu.Game.Users
                     return;
 
                 country = value;
-                sprite.Texture = getFlagTexture();
+
+                if (LoadState >= LoadState.Ready)
+                    sprite.Texture = getFlagTexture();
             }
         }
 

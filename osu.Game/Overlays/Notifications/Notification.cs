@@ -7,11 +7,11 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.States;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Notifications
@@ -22,6 +22,11 @@ namespace osu.Game.Overlays.Notifications
         /// User requested close.
         /// </summary>
         public event Action Closed;
+
+        /// <summary>
+        /// Whether this notification should forcefully display itself.
+        /// </summary>
+        public virtual bool IsImportant => true;
 
         /// <summary>
         /// Run on user activating the notification. Return true to close.

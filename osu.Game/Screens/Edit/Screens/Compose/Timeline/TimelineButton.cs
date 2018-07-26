@@ -27,16 +27,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
         public TimelineButton()
         {
-            InternalChild = button = new IconButton
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                IconColour = OsuColour.Gray(0.35f),
-                IconHoverColour = Color4.White,
-                HoverColour = OsuColour.Gray(0.25f),
-                FlashColour = OsuColour.Gray(0.5f),
-                Action = () => Action?.Invoke()
-            };
+            InternalChild = button = new TimelineIconButton { Action = () => Action?.Invoke() };
 
             button.Enabled.BindTo(Enabled);
             Width = button.ButtonSize.X;
@@ -47,6 +38,19 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             base.Update();
 
             button.ButtonSize = new Vector2(button.ButtonSize.X, DrawHeight);
+        }
+
+        private class TimelineIconButton : IconButton
+        {
+            public TimelineIconButton()
+            {
+                Anchor = Anchor.Centre;
+                Origin = Anchor.Centre;
+                IconColour = OsuColour.Gray(0.35f);
+                IconHoverColour = Color4.White;
+                HoverColour = OsuColour.Gray(0.25f);
+                FlashColour = OsuColour.Gray(0.5f);
+            }
         }
     }
 }

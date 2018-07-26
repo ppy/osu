@@ -8,7 +8,8 @@ using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
 
@@ -54,6 +55,8 @@ namespace osu.Game.Screens.Select
         private readonly SpriteText spriteText;
         private readonly Box box;
         private readonly Box light;
+
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => box.ReceiveMouseInputAt(screenSpacePos);
 
         public FooterButton()
         {

@@ -56,6 +56,12 @@ namespace osu.Game.Rulesets.UI
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
+        /// <summary>
+        /// The point in time at which gameplay starts, including any required lead-in for display purposes.
+        /// Defaults to two seconds before the first <see cref="HitObject"/>. Override as necessary.
+        /// </summary>
+        public virtual double GameplayStartTime => Objects.First().StartTime - 2000;
+
         private readonly Lazy<Playfield> playfield;
 
         /// <summary>
@@ -70,7 +76,8 @@ namespace osu.Game.Rulesets.UI
 
         protected readonly Ruleset Ruleset;
 
-        private IRulesetConfigManager rulesetConfig;
+        protected IRulesetConfigManager Config { get; private set; }
+
         private OnScreenDisplay onScreenDisplay;
 
         /// <summary>
@@ -82,20 +89,28 @@ namespace osu.Game.Rulesets.UI
             Ruleset = ruleset;
             playfield = new Lazy<Playfield>(CreatePlayfield);
 
+            IsPaused.ValueChanged += paused =>
+            {
+                if (HasReplayLoaded)
+                    return;
+
+                KeyBindingInputManager.UseParentInput = !paused;
+            };
+
             Cursor = CreateCursor();
         }
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
-            rulesetConfig = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
-            if (rulesetConfig != null)
+            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+            if (Config != null)
             {
-                dependencies.Cache(rulesetConfig);
-                onScreenDisplay?.BeginTracking(this, rulesetConfig);
+                dependencies.Cache(Config);
+                onScreenDisplay?.BeginTracking(this, Config);
             }
 
             return dependencies;
@@ -112,6 +127,11 @@ namespace osu.Game.Rulesets.UI
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
         public Replay Replay { get; private set; }
+
+        /// <summary>
+        /// Whether the game is paused. Used to block user input.
+        /// </summary>
+        public readonly BindableBool IsPaused = new BindableBool();
 
         /// <summary>
         /// Sets a replay to be used, overriding local input.
@@ -143,10 +163,10 @@ namespace osu.Game.Rulesets.UI
         {
             base.Dispose(isDisposing);
 
-            if (rulesetConfig != null)
+            if (Config != null)
             {
-                onScreenDisplay?.StopTracking(this, rulesetConfig);
-                rulesetConfig = null;
+                onScreenDisplay?.StopTracking(this, Config);
+                Config = null;
             }
         }
     }

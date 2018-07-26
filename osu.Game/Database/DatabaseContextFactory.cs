@@ -5,13 +5,14 @@ using System;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore.Storage;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Platform;
 
 namespace osu.Game.Database
 {
     public class DatabaseContextFactory : IDatabaseContextFactory
     {
-        private readonly GameHost host;
+        private readonly Storage storage;
 
         private const string database_name = @"client";
 
@@ -26,9 +27,9 @@ namespace osu.Game.Database
 
         private IDbContextTransaction currentWriteTransaction;
 
-        public DatabaseContextFactory(GameHost host)
+        public DatabaseContextFactory(Storage storage)
         {
-            this.host = host;
+            this.storage = storage;
             recycleThreadContexts();
         }
 
@@ -115,9 +116,13 @@ namespace osu.Game.Database
             }
         }
 
-        private void recycleThreadContexts() => threadContexts = new ThreadLocal<OsuDbContext>(CreateContext);
+        private void recycleThreadContexts()
+        {
+            threadContexts?.Values.ForEach(c => c.Dispose());
+            threadContexts = new ThreadLocal<OsuDbContext>(CreateContext, true);
+        }
 
-        protected virtual OsuDbContext CreateContext() => new OsuDbContext(host.Storage.GetDatabaseConnectionString(database_name))
+        protected virtual OsuDbContext CreateContext() => new OsuDbContext(storage.GetDatabaseConnectionString(database_name))
         {
             Database = { AutoTransactionsEnabled = false }
         };
@@ -127,9 +132,7 @@ namespace osu.Game.Database
             lock (writeLock)
             {
                 recycleThreadContexts();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-                host.Storage.DeleteDatabase(database_name);
+                storage.DeleteDatabase(database_name);
             }
         }
     }

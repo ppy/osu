@@ -8,11 +8,13 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -192,15 +194,21 @@ namespace osu.Game.Overlays.Dialog
             };
         }
 
+        public override bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Select:
+                    Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerOnClick();
+                    return true;
+            }
+
+            return base.OnPressed(action);
+        }
+
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             if (args.Repeat) return false;
-
-            if (args.Key == Key.Enter || args.Key == Key.KeypadEnter)
-            {
-                Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerOnClick();
-                return true;
-            }
 
             // press button at number if 1-9 on number row or keypad are pressed
             var k = args.Key;

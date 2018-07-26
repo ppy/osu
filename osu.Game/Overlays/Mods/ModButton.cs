@@ -7,13 +7,14 @@ using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using System;
 using System.Linq;
 using osu.Framework.Graphics.Cursor;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Mods

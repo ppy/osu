@@ -12,7 +12,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -138,10 +138,9 @@ namespace osu.Game.Screens.Play
             sourceClock = (IAdjustableClock)working.Track ?? new StopwatchClock();
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
-            var firstObjectTime = RulesetContainer.Objects.First().StartTime;
             adjustableClock.Seek(AllowLeadIn
-                ? Math.Min(0, firstObjectTime - Math.Max(beatmap.ControlPointInfo.TimingPointAt(firstObjectTime).BeatLength * 4, beatmap.BeatmapInfo.AudioLeadIn))
-                : firstObjectTime);
+                ? Math.Min(0, RulesetContainer.GameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn)
+                : RulesetContainer.GameplayStartTime);
 
             adjustableClock.ProcessFrame();
 
@@ -163,15 +162,10 @@ namespace osu.Game.Screens.Play
             {
                 pauseContainer = new PauseContainer(offsetClock, adjustableClock)
                 {
+                    Retries = RestartCount,
                     OnRetry = Restart,
                     OnQuit = Exit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
-                    OnPause = () =>
-                    {
-                        pauseContainer.Retries = RestartCount;
-                        hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
-                    },
-                    OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
                     Children = new[]
                     {
                         storyboardContainer = new Container
@@ -199,7 +193,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        new SkipOverlay(firstObjectTime)
+                        new SkipOverlay(RulesetContainer.GameplayStartTime)
                         {
                             Clock = Clock, // skip button doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
@@ -219,9 +213,7 @@ namespace osu.Game.Screens.Play
                     {
                         if (!IsCurrentScreen) return;
 
-                        //we want to hide the hitrenderer immediately (looks better).
-                        //we may be able to remove this once the mouse cursor trail is improved.
-                        RulesetContainer?.Hide();
+                        pauseContainer.Hide();
                         Restart();
                     },
                 }
@@ -229,6 +221,8 @@ namespace osu.Game.Screens.Play
 
             hudOverlay.HoldToQuit.Action = Exit;
             hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
+
+            RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
 
             if (ShowStoryboard)
                 initializeStoryboard(false);

@@ -20,6 +20,7 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
@@ -30,6 +31,7 @@ using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using OpenTK.Input;
 using DebugUtils = osu.Game.Utils.DebugUtils;
 
 namespace osu.Game
@@ -93,17 +95,19 @@ namespace osu.Game
 
         private DependencyContainer dependencies;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         private DatabaseContextFactory contextFactory;
+
+        protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Resources.AddStore(new DllResourceStore(@"osu.Game.Resources.dll"));
 
-            dependencies.Cache(contextFactory = new DatabaseContextFactory(Host));
+            dependencies.Cache(contextFactory = new DatabaseContextFactory(Host.Storage));
 
             dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
 
@@ -220,7 +224,7 @@ namespace osu.Game
                 // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
                 contextFactory.ResetDatabase();
 
-                Logger.Log("Database purged successfully.", LoggingTarget.Database, LogLevel.Important);
+                Logger.Log("Database purged successfully.", LoggingTarget.Database);
 
                 // only run once more, then hard bail.
                 using (var db = contextFactory.GetForWrite(false))
@@ -265,6 +269,32 @@ namespace osu.Game
                 var copy = new OsuBindableBeatmap(Default);
                 copy.BindTo(this);
                 return copy;
+            }
+        }
+
+        private class OsuUserInputManager : UserInputManager
+        {
+            protected override MouseButtonEventManager CreateButtonManagerFor(MouseButton button)
+            {
+                switch (button)
+                {
+                    case MouseButton.Right:
+                        return new RightMouseManager(button);
+                }
+
+                return base.CreateButtonManagerFor(button);
+            }
+
+            private class RightMouseManager : MouseButtonEventManager
+            {
+                public RightMouseManager(MouseButton button)
+                    : base(button)
+                {
+                }
+
+                public override bool EnableDrag => true; // allow right-mouse dragging for absolute scroll in scroll containers.
+                public override bool EnableClick => false;
+                public override bool ChangeFocusOnClick => false;
             }
         }
     }

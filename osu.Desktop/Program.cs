@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework;
 using osu.Framework.Platform;
 using osu.Game.IPC;
+
 #if NET_FRAMEWORK
 using System.Runtime;
 #endif
@@ -18,10 +19,7 @@ namespace osu.Desktop
         [STAThread]
         public static int Main(string[] args)
         {
-            // required to initialise native SQLite libraries on some platforms.
-
-            if (!RuntimeInfo.IsMono)
-                useMulticoreJit();
+            useMultiCoreJit();
 
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
@@ -54,7 +52,7 @@ namespace osu.Desktop
             }
         }
 
-        private static void useMulticoreJit()
+        private static void useMultiCoreJit()
         {
 #if NET_FRAMEWORK
             var directory = Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Profiles"));

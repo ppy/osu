@@ -39,7 +39,10 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
-            new KeyBinding(InputKey.MouseButton1, GlobalAction.Back)
+            new KeyBinding(InputKey.MouseButton1, GlobalAction.Back),
+
+            new KeyBinding(InputKey.Space, GlobalAction.Select),
+            new KeyBinding(InputKey.Enter, GlobalAction.Select),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
@@ -86,7 +89,7 @@ namespace osu.Game.Input.Bindings
         [Description("Toggle gameplay mouse buttons")]
         ToggleGameplayMouseButtons,
 
-        [Description("Go back")]
+        [Description("Back")]
         Back,
 
         [Description("Increase scroll speed")]
@@ -94,5 +97,8 @@ namespace osu.Game.Input.Bindings
 
         [Description("Decrease scroll speed")]
         DecreaseScrollSpeed,
+
+        [Description("Select")]
+        Select,
     }
 }

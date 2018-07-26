@@ -101,7 +101,7 @@ namespace osu.Game.Screens
             sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
 
-        public bool OnPressed(GlobalAction action)
+        public virtual bool OnPressed(GlobalAction action)
         {
             if (!IsCurrentScreen) return false;
 

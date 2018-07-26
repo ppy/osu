@@ -13,7 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Configuration;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 
 namespace osu.Game.Graphics.UserInterface
 {
