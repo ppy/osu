@@ -103,5 +103,19 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="timeRate">The rate of time in <paramref name="beatmap"/>.</param>
         /// <returns>A structure containing the difficulty attributes.</returns>
         protected abstract DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate);
+
+        /// <summary>
+        /// Creates list containing difficulty values for each section in <see cref="Beatmap"/>. First value is used for first and second section.
+        /// </summary>
+        public List<double> DifficultySectionRating (params List[] list)
+        {
+            //idk what to put in function for a while
+            //idk about parameters for a while
+
+            IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+            var clock = new StopwatchClock();
+
+            return DifficultySectionRating (playableBeatmap, clock.Rate);
+        }
     }
 }

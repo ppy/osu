@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
@@ -21,6 +22,63 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+        }
+
+        //Throws list of difficulty values at sections. First value is possesed by two sections.
+        public override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
+        {
+            if (!beatmap.HitObjects.Any())
+                return new List<double>();
+
+            OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
+            Skill[] skills =
+            {
+                new Aim(),
+                new Speed()
+            };
+
+            double sectionLength = section_length * timeRate;
+
+            // The first object doesn't generate a strain, so we begin with an incremented section end
+            double currentSectionEnd = 2 * sectionLength;
+
+            foreach ( OsuDifficultyHitObject h in difficultyBeatmap )
+            {
+                while (h.BaseObject.StartTime > currentSectionEnd)
+                {
+                    foreach (Skill s in skills)
+                    {
+                        s.SaveCurrentPeak();
+                        s.StartNewSectionFrom(currentSectionEnd);
+                    }
+
+                    currentSectionEnd += sectionLength;
+                }
+
+                foreach (Skill s in skills)
+                    s.Process(h);
+            }
+
+            var aimRating = new List<double>();
+            var speedRating = new List<double>();
+            var osuDifficultySectionRating = new List<double>();
+
+            foreach(double x in skills[0].StrainPeaks)
+            {
+                aimRating.Add(x * difficulty_multiplier);
+            }
+
+            foreach(double x in skills[1].StrainPeaks)
+            {
+                speedRating.Add(x * difficulty_multiplier);
+            }
+
+            for (int x = 0; x < aimRating.Count; x++)
+            {
+                osuDifficultySectionRating.Add(aimRating[x] + speedRating[x] + Math.Abs(aimRating[x] - speedRating[x]) / 2);
+            }
+
+            return osuDifficultySectionRating;
         }
 
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)

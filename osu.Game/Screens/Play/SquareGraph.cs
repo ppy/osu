@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Play
 {
     public class SquareGraph : BufferedContainer
     {
+        //add some scaling. easy beatmaps have to have got small, static amount of cubes, and harder more cubes more dynamical
         private Column[] columns = { };
 
         public int ColumnCount => columns.Length;
@@ -124,10 +125,19 @@ namespace osu.Game.Screens.Play
 
             var max = values.Max();
 
+            //There apply some changes
             float step = values.Length / (float)ColumnCount;
             for (float i = 0; i < values.Length; i += step)
             {
-                newValues.Add((float)values[(int)i] / max);
+                float sum = 0;
+                float iteration = 0;
+                for (float x = i; x < i+step; x++)
+                {
+                    sum += values[(int) x];
+                    iteration = x - i + 1;
+                }
+                sum = sum / iteration;
+                newValues.Add(sum / max);
             }
 
             calculatedValues = newValues.ToArray();
@@ -167,7 +177,7 @@ namespace osu.Game.Screens.Play
             public Color4 LitColour = Color4.LightBlue;
             protected readonly Color4 DimmedColour = Color4.White.Opacity(140);
 
-            private float cubeCount => DrawHeight / WIDTH;
+            private float cubeCount => Math.Max(DrawHeight / WIDTH, 1);
             private const float cube_size = 4;
             private const float padding = 2;
             public const float WIDTH = cube_size + padding;
@@ -230,6 +240,7 @@ namespace osu.Game.Screens.Play
                 fillActive();
             }
 
+            //There to apply some changes changes
             private void fillActive()
             {
                 Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;

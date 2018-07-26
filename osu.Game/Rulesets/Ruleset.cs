@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets
 {
     public abstract class Ruleset
     {
+        //this class will be useful
         public readonly RulesetInfo RulesetInfo;
 
         public IEnumerable<Mod> GetAllMods() => Enum.GetValues(typeof(ModType)).Cast<ModType>()
