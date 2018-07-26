@@ -1,22 +1,14 @@
-#tool Microsoft.TestPlatform.Portable
-
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
 
-var target = Argument("target", "Test");
+var target = Argument("target", "Build");
 var framework = Argument("framework", "net471");
-var configuration = Argument("configuration", "Debug");
+var configuration = Argument("configuration", "Release");
 
 var osuDesktop = new FilePath("./osu.Desktop/osu.Desktop.csproj");
 
-var testProjects = new [] {
-    new FilePath("./osu.Game.Tests/osu.Game.Tests.csproj"),
-    new FilePath("./osu.Game.Rulesets.Osu.Tests/osu.Game.Rulesets.Osu.Tests.csproj"),
-    new FilePath("./osu.Game.Rulesets.Catch.Tests/osu.Game.Rulesets.Catch.Tests.csproj"),
-    new FilePath("./osu.Game.Rulesets.Mania.Tests/osu.Game.Rulesets.Mania.Tests.csproj"),
-    new FilePath("./osu.Game.Rulesets.Taiko.Tests/osu.Game.Rulesets.Taiko.Tests.csproj"),
-};
+var testProjects = GetFiles("**/*.Tests.csproj");
 
 ///////////////////////////////////////////////////////////////////////////////
 // TASKS
@@ -26,22 +18,23 @@ Task("Compile")
 .Does(() => {
     DotNetCoreBuild(osuDesktop.FullPath, new DotNetCoreBuildSettings {
         Framework = framework,
-        Configuration = "Debug"
+        Configuration = configuration
     });
 });
-
-Task("CompileTests")
-.DoesForEach(testProjects, testProject => {
-    DotNetCoreBuild(testProject.FullPath, new DotNetCoreBuildSettings {
-        Framework = framework
-    });
-});
-
 
 Task("Test")
-.IsDependentOn("CompileTests")
-.Does(() => {
-    VSTest($"./*.Tests/bin/{configuration}/{framework}/**/*Tests.exe");
+.ContinueOnError()
+.DoesForEach(testProjects, testProject => {
+    DotNetCoreTest(testProject.FullPath, new DotNetCoreTestSettings {3
+        Framework = framework,
+        Configuration = configuration,
+        Logger = $"trx;LogFileName={testProject.GetFilename()}.trx",
+        ResultsDirectory = "./TestResults/"
+    });
 });
+
+Task("Build")
+.IsDependentOn("Compile")
+.IsDependentOn("Test");
 
 RunTarget(target);
