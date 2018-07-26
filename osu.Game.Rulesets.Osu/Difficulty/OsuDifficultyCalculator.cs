@@ -65,12 +65,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
 
             //here comes new problems
-            //var List<double> aimRating = new List<double>(), speedRating = new List<double>(), osuDifficultySectionRating = new List<double>();
+            var aimRating = new List<double>();
+            var speedRating = new List<double>();
+            var osuDifficultySectionRating = new List<double>();
 
             foreach(double x in skills[0].StrainPeaks)
             {
                 aimRating.Add(x * difficulty_multiplier);
-            };
+            }
 
             foreach(double x in skills[1].StrainPeaks)
             {
