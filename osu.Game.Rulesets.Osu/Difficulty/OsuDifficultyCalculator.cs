@@ -24,9 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        private List<double> OsuDifficultySectionRating = new List<double>();
-
-        public List<double> OsuDifficultyAt (IBeatmap beatmap, double timeRate)
+        public List<double> OsuDifficultySectionRating (IBeatmap beatmap, double timeRate)
         {
             //throws list of difficulties(strains) at sections (or at hitobjects)
             //remember that first section is double-timed
@@ -79,7 +77,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 speedRating.Add(x * difficulty_multiplier);
             }
 
-            for (int x = 0; x < aimRating.Count(); x++)
+            for (int x = 0; x < aimRating.Count; x++)
             {
                 osuDifficultySectionRating.Add(aimRating[x] + speedRating[x] + Math.Abs(aimRating[x] - speedRating[x]) / 2);
             }
