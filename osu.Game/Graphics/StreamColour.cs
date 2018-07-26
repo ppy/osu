@@ -19,10 +19,15 @@ namespace osu.Game.Graphics
         private static readonly Dictionary<string, ColourInfo> colours = new Dictionary<string, ColourInfo>
         {
             { "stable40", STABLE },
+            { "Stable", STABLE },
             { "stable", STABLEFALLBACK },
+            { "Stable Fallback", STABLEFALLBACK },
             { "beta40", BETA },
+            { "Beta", BETA },
             { "cuttingedge", CUTTINGEDGE },
+            { "Cutting Edge", CUTTINGEDGE },
             { "lazer", LAZER },
+            { "Lazer", LAZER },
             { "web", WEB },
         };
 
