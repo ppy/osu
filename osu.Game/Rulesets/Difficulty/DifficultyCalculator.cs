@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Difficulty
             IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
             var clock = new StopwatchClock();
 
-            return DifficultySectionRating (playableBeatmap, clock.Rate)
+            return DifficultySectionRating (playableBeatmap, clock.Rate);
         }
     }
 }
