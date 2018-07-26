@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         }
 
         //Throws list of difficulty values at sections. First value is possesed by two sections.
-        public List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
+        public override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
                 return new List<double>();
