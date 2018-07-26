@@ -4,20 +4,20 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using System;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
-    public class LabelledSwitchButton : CompositeDrawable
+    public class LabelledSwitchButton : CompositeDrawable, IHasCurrentValue<bool>
     {
-        private readonly Container content;
-        private readonly Container outerContainer;
-        private readonly Box box;
+        private readonly Box background;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
         private readonly OsuSetupSwitchButton switchButton;
@@ -26,55 +26,33 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         private const float default_label_text_size = 16;
         private const float default_bottom_label_text_size = 12;
         private const float normal_height = 40;
-        private const float default_label_padding = 15;
-        private const float default_top_padding = 12;
-        private const float default_bottom_padding = 12;
+        private const float default_label_horizontal_offset = 15;
+        private const float default_label_vertical_offset = 12;
+        private const float default_switch_horizontal_offset = 15;
+        private const float default_switch_vertical_offset = 10;
 
-        public event Action<bool> SwitchButtonValueChanged;
-
-        public void TriggerSwitchButtonValueChanged(bool newValue)
-        {
-            SwitchButtonValueChanged?.Invoke(newValue);
-        }
-
-        public bool CurrentValue
-        {
-            get => switchButton.Current.Value;
-            set => switchButton.Current.Value = value;
-        }
-
-        private string labelText;
+        public Bindable<bool> Current { get; } = new Bindable<bool>();
+        
         public string LabelText
         {
-            get => labelText;
-            set
-            {
-                labelText = value;
-                label.Text = value;
-            }
+            get => label.Text;
+            set => label.Text = value;
         }
-
-        private string bottomLabelText;
+        
         public string BottomLabelText
         {
-            get => bottomLabelText;
+            get => bottomText.Text;
             set
             {
-                bottomLabelText = value;
                 bottomText.Text = value;
-                changeHeight(normal_height + (value != "" ? 20 : 0));
+                Height = normal_height + (value != "" ? 20 : 0);
             }
         }
-
-        private float labelTextSize;
+        
         public float LabelTextSize
         {
-            get => labelTextSize;
-            set
-            {
-                labelTextSize = value;
-                label.TextSize = value;
-            }
+            get => label.TextSize;
+            set => label.TextSize = value;
         }
 
         public Color4 LabelTextColour
@@ -85,93 +63,76 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 
         public Color4 BackgroundColour
         {
-            get => content.Colour;
-            set => content.Colour = value;
+            get => background.Colour;
+            set => background.Colour = value;
         }
 
         public LabelledSwitchButton()
         {
-            Masking = true;
-            CornerRadius = corner_radius;
             RelativeSizeAxes = Axes.X;
             Height = normal_height;
+            Masking = true;
+            CornerRadius = corner_radius;
 
-            InternalChildren = new Drawable[]
+            InternalChild = new Container
             {
-                outerContainer = new Container
+                RelativeSizeAxes = Axes.Both,
+                CornerRadius = corner_radius,
+                Masking = true,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = normal_height,
-                    CornerRadius = corner_radius,
-                    Masking = true,
-                    Children = new Drawable[]
+                    background = new Box
                     {
-                        box = new Box
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = OsuColour.FromHex("1c2125"),
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = normal_height,
-                            Colour = OsuColour.FromHex("1c2125"),
-                        },
-                        content = new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = normal_height,
-                            Children = new Drawable[]
+                            new Container
                             {
-                                new Container
+                                RelativeSizeAxes = Axes.Both,
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.X,
-                                    Height = normal_height,
-                                    Children = new Drawable[]
+                                    label = new OsuSpriteText
                                     {
-                                        label = new OsuSpriteText
-                                        {
-                                            Anchor = Anchor.TopLeft,
-                                            Origin = Anchor.TopLeft,
-                                            Padding = new MarginPadding { Left = default_label_padding, Top = default_top_padding },
-                                            Colour = Color4.White,
-                                            TextSize = default_label_text_size,
-                                            Text = LabelText,
-                                            Font = @"Exo2.0-Bold",
-                                        },
-                                        switchButton = new OsuSetupSwitchButton
-                                        {
-                                            Anchor = Anchor.TopRight,
-                                            Origin = Anchor.TopRight,
-                                            Position = new Vector2(-15, 10),
-                                        },
+                                        Anchor = Anchor.TopLeft,
+                                        Origin = Anchor.TopLeft,
+                                        Position = new Vector2(default_label_horizontal_offset, default_label_vertical_offset),
+                                        Colour = Color4.White,
+                                        TextSize = default_label_text_size,
+                                        Font = @"Exo2.0-Bold",
+                                    },
+                                    switchButton = new OsuSetupSwitchButton
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        Position = new Vector2(-default_switch_horizontal_offset, default_switch_vertical_offset),
                                     },
                                 },
-                                bottomText = new OsuSpriteText
-                                {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
-                                    Padding = new MarginPadding { Left = default_label_padding, Bottom = default_bottom_padding },
-                                    TextSize = default_bottom_label_text_size,
-                                    Font = @"Exo2.0-BoldItalic",
-                                    Text = BottomLabelText
-                                },
-                            }
+                            },
+                            bottomText = new OsuSpriteText
+                            {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                Position = new Vector2(default_label_horizontal_offset, -default_label_vertical_offset),
+                                TextSize = default_bottom_label_text_size,
+                                Font = @"Exo2.0-BoldItalic",
+                            },
                         }
                     }
                 }
             };
 
-            switchButton.Current.ValueChanged += TriggerSwitchButtonValueChanged;
+            Current.BindTo(switchButton.Current);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour osuColour)
         {
             bottomText.Colour = osuColour.Yellow;
-        }
-
-        private void changeHeight(float newHeight)
-        {
-            Height = newHeight + Padding.Top;
-            content.Height = newHeight;
-            box.Height = newHeight;
-            outerContainer.Height = newHeight;
         }
     }
 }

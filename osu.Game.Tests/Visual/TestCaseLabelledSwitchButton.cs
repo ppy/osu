@@ -41,15 +41,15 @@ namespace osu.Game.Tests.Visual
                 }
             };
 
-            labelledSwitchButton.SwitchButtonValueChanged += a =>
+            labelledSwitchButton.Current.ValueChanged += a =>
             {
                 count += a ? 1 : 0;
                 labelledSwitchButton.BottomLabelText = a ? $"Thanks for {(count > 0 ? "re-" : "")}enabling this useful secret feature{(count > 0 ? $" for the {count}{getOrderedNumberSuffix(count)} time" : "")}. Unfortunately, we cannot tell you what this does as it is secret."
                                                          : "Why did you disable this? :(";
             };
 
-            AddStep("Set value to true", () => labelledSwitchButton.CurrentValue = true);
-            AddStep("Set value to false", () => labelledSwitchButton.CurrentValue = false);
+            AddStep("Set value to true", () => labelledSwitchButton.Current.Value = true);
+            AddStep("Set value to false", () => labelledSwitchButton.Current.Value = false);
         }
 
         private string getOrderedNumberSuffix(int n)

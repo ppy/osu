@@ -24,6 +24,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private const float switch_padding = 1.25f;
         private const float size_x = 45;
         private const float size_y = 20;
+        
+        public Bindable<bool> Current { get; } = new Bindable<bool>();
 
         private Color4 enabledColour;
         public Color4 EnabledColour
@@ -32,7 +34,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             set
             {
                 if (Current.Value)
-                    BorderColour = value;
+                    AccentColour = value;
                 enabledColour = value;
             }
         }
@@ -44,8 +46,19 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             set
             {
                 if (!Current.Value)
-                    BorderColour = value;
+                    AccentColour = value;
                 disabledColour = value;
+            }
+        }
+
+        private Color4 accentColour;
+        public Color4 AccentColour
+        {
+            get => accentColour;
+            set
+            {
+                accentColour = value;
+                BorderColour = value;
             }
         }
 
@@ -54,10 +67,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             Box innerSwitch;
 
             Size = new Vector2(size_x, size_y);
-
             BorderColour = Color4.White;
             BorderThickness = border_thickness;
-
             Masking = true;
 
             Children = new Drawable[]
@@ -101,11 +112,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             fill.Colour = disabledColour;
         }
 
-        protected override void LoadComplete()
-        {
-            FadeEdgeEffectTo(0);
-        }
-
         protected override bool OnClick(InputState state)
         {
             Current.Value = !Current.Value;
@@ -122,19 +128,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         {
             this.FadeAccent(Current.Value ? enabledColour : disabledColour, 500, Easing.OutQuint);
             base.OnHoverLost(state);
-        }
-
-        public Bindable<bool> Current { get; } = new Bindable<bool>();
-
-        private Color4 accentColour;
-        public Color4 AccentColour
-        {
-            get => accentColour;
-            set
-            {
-                accentColour = value;
-                BorderColour = value;
-            }
         }
     }
 }
