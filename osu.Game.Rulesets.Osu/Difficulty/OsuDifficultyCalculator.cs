@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 return new List<double>();
 
             //here comes problems
-            //private OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
+            OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
             Skill[] skills =
             {
                 new Aim(),
