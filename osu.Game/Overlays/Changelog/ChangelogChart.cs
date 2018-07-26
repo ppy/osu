@@ -7,7 +7,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Logging;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -30,6 +29,7 @@ namespace osu.Game.Overlays.Changelog
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+            Masking = true;
             Child = container = new Container
             {
                 RelativeSizeAxes = Axes.X,
@@ -117,12 +117,13 @@ namespace osu.Game.Overlays.Changelog
                 container.Add(new Box
                 {
                     RelativeSizeAxes = Axes.Y,
-                    Width = Math.Max(container.DrawWidth / changelogChartInfo.BuildHistory.Count, 2),
+                    Width = Math.Max(container.DrawWidth / changelogChartInfo.BuildHistory.Count, 1),
                     Height = build.UserCount / maxUserCount,
                     X = currentPos,
                     Colour = colour,
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
+                    Blending = BlendingMode.None,
                 });
                 currentPos += container.DrawWidth / changelogChartInfo.BuildHistory.Count;
             }
