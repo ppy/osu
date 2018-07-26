@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new OsuRulesetContainer(this, beatmap);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new OsuBeatmapConverter(beatmap);
-        public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap, IEnumerable<Mod> mods) => new OsuBeatmapProcessor(beatmap);
+        public override IBeatmapProcessor CreateBeatmapProcessor(IBeatmap beatmap) => new OsuBeatmapProcessor(beatmap);
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {

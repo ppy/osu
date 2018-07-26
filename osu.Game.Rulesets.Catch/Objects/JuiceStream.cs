@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                     while (tinyTickInterval > 100)
                         tinyTickInterval /= 2;
 
-                    for (double t = startTime + tinyTickInterval; t < endTime; t += tinyTickInterval)
+                    for (double t = startTime + tinyTickInterval; t < endTime - 0.01; t += tinyTickInterval)
                     {
                         double curveProgress = (t - spanStartTime) / spanDuration;
                         double curveProgressStable = (int)(curveProgress * spanDuration) / spanDuration; //match the integer time error of stable

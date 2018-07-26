@@ -10,7 +10,6 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
 using osu.Game.Rulesets.Catch.MathUtils;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
 {
@@ -18,17 +17,16 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
     {
         public const int RNG_SEED = 1337;
 
-        public IEnumerable<Mod> Mods;
+        public bool HardRock { get; set; } = false;
 
         private float lastStartX;
         private int lastStartTime;
 
         private readonly FastRandom rng = new FastRandom(RNG_SEED);
 
-        public CatchBeatmapProcessor(IBeatmap beatmap, IEnumerable<Mod> mods)
+        public CatchBeatmapProcessor(IBeatmap beatmap)
             : base(beatmap)
         {
-            Mods = mods;
         }
 
         public override void PostProcess()
@@ -77,7 +75,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                         lastStartTime = (int)(juiceStream.NestedHitObjects.FirstOrDefault()?.StartTime ?? 0);
                         break;
                     case Fruit fruit:
-                        if (Mods.OfType<ModHardRock>().Any()) break;
+                        if (!HardRock) break;
 
                         var catchObject = (CatchHitObject)fruit;
 
