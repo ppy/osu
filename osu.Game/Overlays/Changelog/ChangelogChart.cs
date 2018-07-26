@@ -8,10 +8,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using System;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays.Changelog
 {
@@ -29,27 +31,10 @@ namespace osu.Game.Overlays.Changelog
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Masking = true;
             Child = container = new Container
             {
                 RelativeSizeAxes = Axes.X,
                 Height = height,
-                Children = new Drawable[]
-                {
-                    //background = new Box
-                    //{
-                    //    Colour = OsuColour.Gray(0),
-                    //    RelativeSizeAxes = Axes.Both,
-                    //},
-                    new SpriteText
-                    {
-                        Text = "Graph Placeholder",
-                        TextSize = 28,
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Colour = OsuColour.Gray(1),
-                    },
-                },
             };
         }
 
@@ -67,7 +52,10 @@ namespace osu.Game.Overlays.Changelog
             if (!isEmpty(chartInfo))
             {
                 container.MoveToY(0, transition_duration, Easing.InOutQuad).FadeIn(transition_duration);
-                plotChart(chartInfo, StreamColour.FromStreamName(updateStreamName));
+                if (string.IsNullOrEmpty(updateStreamName))
+                    plotCharts(chartInfo);
+                else
+                    plotChart(chartInfo, StreamColour.FromStreamName(updateStreamName));
             }
             else
                 container.MoveToY(-height, transition_duration, Easing.InOutQuad).FadeOut(transition_duration);
@@ -105,27 +93,63 @@ namespace osu.Game.Overlays.Changelog
             return maxUserCount;
         }
 
+        private List<float> clearUpDips(List<BuildHistory> buildHistories, float maxUserCount)
+        {
+            var buildHistory = new List<float>();
+            foreach (BuildHistory build in buildHistories)
+            {
+                if (build.UserCount / maxUserCount > 0.2f)
+                    buildHistory.Add(build.UserCount);
+            }
+            return buildHistory;
+        }
+
         private void plotChart(APIChangelogChart changelogChartInfo, ColourInfo colour)
         {
             var maxUserCount = getMaxUserCount(changelogChartInfo);
-            var currentPos = 0f;
 
-            container.Clear();
+            container.Child = new BarGraph
+            {
+                Colour = colour,
+                Values = clearUpDips(changelogChartInfo.BuildHistory, maxUserCount),
+                RelativeSizeAxes = Axes.Both,
+                Direction = BarDirection.BottomToTop,
+            };
+        }
+
+        private void plotCharts(APIChangelogChart changelogChartInfo)
+        {
+            var maxUserCount = getMaxUserCount(changelogChartInfo);
+
+            var releaseStreams = new Dictionary<string, List<float>>(changelogChartInfo.Order.Count);
+            var highestUserCounts = new Dictionary<string, float>(changelogChartInfo.Order.Count);
+
+            foreach (string updateStream in changelogChartInfo.Order)
+            {
+                releaseStreams.Add(updateStream, new List<float>());
+                highestUserCounts.Add(updateStream, 0);
+            }
 
             foreach (BuildHistory build in changelogChartInfo.BuildHistory)
             {
-                container.Add(new Box
+                releaseStreams[build.Label].Add(build.UserCount);
+                if (highestUserCounts[build.Label] < build.UserCount)
+                    highestUserCounts[build.Label] = build.UserCount;
+            }
+
+            container.Clear();
+
+            foreach (KeyValuePair<string, List<float>> releaseStream in releaseStreams)
+            {
+                var barGraph = new BarGraph
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = Math.Max(container.DrawWidth / changelogChartInfo.BuildHistory.Count, 1),
-                    Height = build.UserCount / maxUserCount,
-                    X = currentPos,
-                    Colour = colour,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                    Blending = BlendingMode.None,
-                });
-                currentPos += container.DrawWidth / changelogChartInfo.BuildHistory.Count;
+                    Colour = StreamColour.FromStreamName(releaseStream.Key),
+                    Values = releaseStream.Value,
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = BarDirection.BottomToTop,
+                    //Height = highestUserCounts[releaseStream.Key] / maxUserCount,
+                };
+                container.Add(barGraph);
             }
         }
     }
