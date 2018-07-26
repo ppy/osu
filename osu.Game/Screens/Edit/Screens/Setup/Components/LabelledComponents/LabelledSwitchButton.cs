@@ -32,13 +32,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         private const float default_switch_vertical_offset = 10;
 
         public Bindable<bool> Current { get; } = new Bindable<bool>();
-        
+
         public string LabelText
         {
             get => label.Text;
             set => label.Text = value;
         }
-        
+
         public string BottomLabelText
         {
             get => bottomText.Text;
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                 Height = normal_height + (value != "" ? 20 : 0);
             }
         }
-        
+
         public float LabelTextSize
         {
             get => label.TextSize;

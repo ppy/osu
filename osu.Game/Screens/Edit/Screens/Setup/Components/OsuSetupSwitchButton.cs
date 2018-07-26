@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private const float switch_padding = 1.25f;
         private const float size_x = 45;
         private const float size_y = 20;
-        
+
         public Bindable<bool> Current { get; } = new Bindable<bool>();
 
         private Color4 enabledColour;
