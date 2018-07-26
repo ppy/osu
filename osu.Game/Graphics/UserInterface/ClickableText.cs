@@ -82,10 +82,11 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnHover(InputState state)
         {
-            if (isEnabled && !IsHoverMuted)
+            if (isEnabled)
             {
                 this.FadeColour(HoverColour, 500, Easing.OutQuint);
-                sampleHover?.Play();
+                if (!IsHoverMuted)
+                    sampleHover?.Play();
             }
             return base.OnHover(state);
         }
