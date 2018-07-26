@@ -1,43 +1,37 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
 using OpenTK.Graphics;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
-    public class LabelledDropdown<T> : CompositeDrawable
+    public class LabelledDropdown<T> : CompositeDrawable, IHasCurrentValue<T>
     {
         private readonly OsuDropdown<T> dropdown;
         private readonly Container content;
         private readonly OsuSpriteText label;
 
-        public const float LABEL_CONTAINER_WIDTH = 150;
-        public const float OUTER_CORNER_RADIUS = 15;
-        public const float INNER_CORNER_RADIUS = 10;
-        public const float DEFAULT_HEADER_TEXT_SIZE = 20;
-        public const float DEFAULT_HEIGHT = 40;
-        public const float DEFAULT_LABEL_TEXT_SIZE = 16;
-        public const float DEFAULT_LEFT_PADDING = 15;
-        public const float DEFAULT_TOP_PADDING = 12;
-        public const float DEFAULT_HEADER_TEXT_PADDING = 11;
-        public const float DEFAULT_HEADER_ICON_PADDING = 10;
+        private const float label_container_width = 150;
+        private const float corner_radius = 15;
+        private const float default_header_text_size = 20;
+        private const float default_height = 40;
+        private const float default_label_text_size = 16;
+        private const float default_horizontal_offset = 15;
+        private const float default_vertical_offset = 12;
 
-        public event Action<T> DropdownSelectionChanged;
-
-        public void TriggerDropdownSelectionChanged(T newValue)
-        {
-            DropdownSelectionChanged?.Invoke(newValue);
-        }
-
+        public Bindable<T> Current { get; } = new Bindable<T>();
+        
         private string labelText;
         public string LabelText
         {
@@ -60,12 +54,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             }
         }
 
-        public T DropdownSelectedItem
-        {
-            get => dropdown.Current.Value;
-            set => dropdown.Current.Value = value;
-        }
-
         public int DropdownSelectedIndex
         {
             set => dropdown.Current.Value = dropdown.Items.ElementAt(value).Value;
@@ -75,40 +63,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         {
             get => dropdown.Items;
             private set => dropdown.Items = value;
-        }
-
-        private float height = DEFAULT_HEIGHT;
-        public float Height
-        {
-            get => height;
-            private set
-            {
-                height = value;
-                dropdown.Height = value;
-                content.Height = value;
-            }
-        }
-
-        public MarginPadding Padding
-        {
-            get => base.Padding;
-            set
-            {
-                base.Padding = value;
-                base.Height = Height + base.Padding.Top;
-            }
-        }
-
-        public MarginPadding LabelPadding
-        {
-            get => label.Padding;
-            set => label.Padding = value;
-        }
-
-        public MarginPadding TextBoxPadding
-        {
-            get => dropdown.Padding;
-            set => dropdown.Padding = value;
         }
 
         public Color4 LabelTextColour
@@ -126,30 +80,27 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         public LabelledDropdown()
         {
             RelativeSizeAxes = Axes.X;
-            base.Height = DEFAULT_HEIGHT + Padding.Top;
+            Height = default_height;
 
             InternalChildren = new Drawable[]
             {
                 new Container
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = DEFAULT_HEIGHT,
-                    CornerRadius = OUTER_CORNER_RADIUS,
+                    RelativeSizeAxes = Axes.Both,
+                    CornerRadius = corner_radius,
                     Masking = true,
                     Children = new Drawable[]
                     {
                         new Box
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = DEFAULT_HEIGHT,
+                            RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.FromHex("1c2125"),
                         },
                     }
                 },
                 new GridContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    Height = DEFAULT_HEIGHT,
+                    RelativeSizeAxes = Axes.Both,
                     Content = new[]
                     {
                         new Drawable[]
@@ -158,9 +109,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                             {
                                 Anchor = Anchor.TopLeft,
                                 Origin = Anchor.TopLeft,
-                                Padding = new MarginPadding { Left = DEFAULT_LEFT_PADDING, Top = DEFAULT_TOP_PADDING },
+                                Position = new Vector2(default_horizontal_offset, default_vertical_offset),
                                 Colour = Color4.White,
-                                TextSize = DEFAULT_LABEL_TEXT_SIZE,
+                                TextSize = default_label_text_size,
                                 Text = LabelText,
                                 Font = @"Exo2.0-Bold",
                             },
@@ -169,13 +120,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                     },
                     ColumnDimensions = new[]
                     {
-                        new Dimension(GridSizeMode.Absolute, LABEL_CONTAINER_WIDTH),
+                        new Dimension(GridSizeMode.Absolute, label_container_width),
                         new Dimension()
                     }
                 }
             };
 
-            dropdown.Current.ValueChanged += delegate { TriggerDropdownSelectionChanged(dropdown.Current.Value); };
+            Current.BindTo(dropdown.Current);
         }
 
         public void AddDropdownItem(string text, T value) => dropdown.AddDropdownItem(text, value);
