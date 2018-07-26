@@ -16,11 +16,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private OsuSetupDropdownHeader header;
         private OsuSetupDropdownMenu menu;
 
-        public const float DEFAULT_CORNER_RADIUS = 10;
-        public const float DEFAULT_HEIGHT = 40;
-        public const float DEFAULT_HEADER_ICON_PADDING = 10;
-        public const float DEFAULT_HEADER_TEXT_PADDING = 11;
-        public const float DEFAULT_HEADER_TEXT_SIZE = 20;
+        private const float default_corner_radius = 15;
+        private const float default_height = 40;
+        private const float default_header_icon_padding = 10;
+        private const float default_header_text_padding = 11;
+        private const float default_header_text_size = 20;
 
         public OsuSetupDropdown()
         {
@@ -33,7 +33,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour osuColour)
         {
-            header.TextColour = osuColour.Blue;
             header.AccentColour = osuColour.BlueDarker.Darken(0.6f);
             menu.AccentColour = osuColour.BlueDarker.Darken(0.6f);
         }
@@ -46,7 +45,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         {
             public OsuSetupDropdownMenu()
             {
-                CornerRadius = DEFAULT_CORNER_RADIUS;
+                CornerRadius = default_corner_radius;
             }
         }
 
@@ -60,11 +59,11 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
             public OsuSetupDropdownHeader()
             {
-                Height = DEFAULT_HEIGHT;
-                CornerRadius = DEFAULT_CORNER_RADIUS;
-                Text.TextSize = DEFAULT_HEADER_TEXT_SIZE;
-                Text.Padding = new MarginPadding { Left = DEFAULT_HEADER_TEXT_PADDING };
-                Icon.Margin = new MarginPadding { Right = DEFAULT_HEADER_ICON_PADDING };
+                Height = default_height;
+                CornerRadius = default_corner_radius;
+                Text.TextSize = default_header_text_size;
+                Text.Padding = new MarginPadding { Left = default_header_text_padding };
+                Icon.Margin = new MarginPadding { Right = default_header_icon_padding };
             }
         }
     }

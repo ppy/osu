@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents;
 using System;
@@ -24,14 +25,17 @@ namespace osu.Game.Tests.Visual
         private void load()
         {
             LabelledDropdown<int> labelledDropdown;
-            Children = new Drawable[]
+            Child = new Container
             {
-                labelledDropdown = new LabelledDropdown<int>
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.X,
+                Padding = new MarginPadding { Left = 150, Right = 150 },
+                Child = labelledDropdown = new LabelledDropdown<int>
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     LabelText = "A dropdown",
-                    Padding = new MarginPadding { Left = 150, Right = 150 }
                 }
             };
 
