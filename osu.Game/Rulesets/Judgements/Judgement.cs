@@ -55,6 +55,12 @@ namespace osu.Game.Rulesets.Judgements
         public virtual bool IsBonus => !AffectsCombo;
 
         /// <summary>
+        /// Whether this <see cref="Judgement"/> must occur during gameplay.
+        /// When all required judgements have been processed, the play counts as being complete.
+        /// </summary>
+        public virtual bool Required => AffectsCombo;
+
+        /// <summary>
         /// The numeric representation for the result achieved.
         /// </summary>
         public int NumericResult => NumericResultFor(Result);

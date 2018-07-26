@@ -260,9 +260,10 @@ namespace osu.Game.Rulesets.Scoring
                         Combo.Value++;
                         break;
                 }
-
-                JudgedHits++;
             }
+
+            if (judgement.Required)
+                JudgedHits++;
 
             if (judgement.IsBonus)
             {
@@ -285,7 +286,7 @@ namespace osu.Game.Rulesets.Scoring
             Combo.Value = judgement.ComboAtJudgement;
             HighestCombo.Value = judgement.HighestComboAtJudgement;
 
-            if (judgement.AffectsCombo)
+            if (judgement.Required)
                 JudgedHits--;
 
             if (judgement.IsBonus)
