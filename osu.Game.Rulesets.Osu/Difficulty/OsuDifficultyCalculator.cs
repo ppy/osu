@@ -24,15 +24,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
+        //Throws list of difficulty values at sections. First value is possesed by two sections.
         public List<double> OsuDifficultySectionRating (IBeatmap beatmap, double timeRate)
         {
-            //throws list of difficulties(strains) at sections (or at hitobjects)
-            //remember that first section is double-timed
-
             if (!beatmap.HitObjects.Any())
                 return new List<double>();
 
-            //here comes problems
             OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
             Skill[] skills =
             {
@@ -62,7 +59,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     s.Process(h);
             }
 
-            //here comes new problems
             var aimRating = new List<double>();
             var speedRating = new List<double>();
             var osuDifficultySectionRating = new List<double>();
@@ -85,7 +81,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return osuDifficultySectionRating;
         }
 
-        //Copy some code from here
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
