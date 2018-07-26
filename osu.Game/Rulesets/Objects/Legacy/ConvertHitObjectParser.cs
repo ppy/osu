@@ -197,10 +197,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
             var bank = (LegacyBeatmapDecoder.LegacySampleBank)int.Parse(split[0]);
             var addbank = (LegacyBeatmapDecoder.LegacySampleBank)int.Parse(split[1]);
 
-            string stringBank = bank.ToString().ToLower();
+            string stringBank = bank.ToString().ToLowerInvariant();
             if (stringBank == @"none")
                 stringBank = null;
-            string stringAddBank = addbank.ToString().ToLower();
+            string stringAddBank = addbank.ToString().ToLowerInvariant();
             if (stringAddBank == @"none")
                 stringAddBank = null;
 

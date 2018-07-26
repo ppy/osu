@@ -176,9 +176,9 @@ namespace osu.Game.Overlays
         {
             Schedule(() =>
             {
-                textLine1.Text = description.Name.ToUpper();
+                textLine1.Text = description.Name.ToUpperInvariant();
                 textLine2.Text = description.Value;
-                textLine3.Text = description.Shortcut.ToUpper();
+                textLine3.Text = description.Shortcut.ToUpperInvariant();
 
                 if (string.IsNullOrEmpty(textLine3.Text))
                     textLine3.Text = "NO KEY BOUND";
