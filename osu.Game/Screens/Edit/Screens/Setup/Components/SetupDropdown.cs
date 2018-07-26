@@ -11,18 +11,18 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class OsuSetupDropdown<T> : OsuDropdown<T>
+    public class SetupDropdown<T> : OsuDropdown<T>
     {
         private OsuSetupDropdownHeader header;
         private OsuSetupDropdownMenu menu;
 
         private const float default_corner_radius = 15;
         private const float default_height = 40;
-        private const float default_header_icon_padding = 10;
-        private const float default_header_text_padding = 11;
+        private const float default_header_icon_padding = 15;
+        private const float default_header_text_padding = 15;
         private const float default_header_text_size = 20;
 
-        public OsuSetupDropdown()
+        public SetupDropdown()
         {
             Anchor = Anchor.TopLeft;
             Origin = Anchor.TopLeft;
@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 Height = default_height;
                 CornerRadius = default_corner_radius;
                 Text.TextSize = default_header_text_size;
-                Text.Padding = new MarginPadding { Left = default_header_text_padding };
+                Foreground.Padding = new MarginPadding { Left = default_header_text_padding };
                 Icon.Margin = new MarginPadding { Right = default_header_icon_padding };
             }
         }

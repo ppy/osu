@@ -9,6 +9,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
     public class LabelledEnumDropdown<T> : LabelledDropdown<T>
         //where T : Enum
     {
-        protected override OsuDropdown<T> CreateDropdown() => new OsuSetupEnumDropdown<T>();
+        protected override OsuDropdown<T> CreateDropdown() => new SetupEnumDropdown<T>();
     }
 }

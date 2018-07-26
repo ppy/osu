@@ -188,6 +188,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 
         public void RemoveDropdownItem(T value) => dropdown.RemoveDropdownItem(value);
 
-        protected virtual OsuDropdown<T> CreateDropdown() => new OsuSetupDropdown<T>();
+        protected virtual OsuDropdown<T> CreateDropdown() => new SetupDropdown<T>();
     }
 }
