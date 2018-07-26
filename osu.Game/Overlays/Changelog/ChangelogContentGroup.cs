@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
-        public ChangelogContentGroup(APIChangelog build, bool newDate = false)
+        public ChangelogContentGroup(APIChangelog build, bool newDate)
         {
             ClickableText clickableText;
             RelativeSizeAxes = Axes.X;
