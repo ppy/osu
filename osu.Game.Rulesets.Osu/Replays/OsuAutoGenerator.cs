@@ -285,44 +285,45 @@ namespace osu.Game.Rulesets.Osu.Replays
 
             AddFrameToReplay(startFrame);
 
-            // We add intermediate frames for spinning / following a slider here.
-            if (h is Spinner)
+            switch (h)
             {
-                Spinner s = h as Spinner;
-
-                Vector2 difference = startPosition - SPINNER_CENTRE;
-
-                float radius = difference.Length;
-                float angle = radius == 0 ? 0 : (float)Math.Atan2(difference.Y, difference.X);
-
-                double t;
-
-                for (double j = h.StartTime + FrameDelay; j < s.EndTime; j += FrameDelay)
+                // We add intermediate frames for spinning / following a slider here.
+                case Spinner spinner:
                 {
-                    t = ApplyModsToTime(j - h.StartTime) * spinnerDirection;
+                    Vector2 difference = startPosition - SPINNER_CENTRE;
 
-                    Vector2 pos = SPINNER_CENTRE + CirclePosition(t / 20 + angle, SPIN_RADIUS);
-                    AddFrameToReplay(new OsuReplayFrame((int)j, new Vector2(pos.X, pos.Y), action));
+                    float radius = difference.Length;
+                    float angle = radius == 0 ? 0 : (float)Math.Atan2(difference.Y, difference.X);
+
+                    double t;
+
+                    for (double j = h.StartTime + FrameDelay; j < spinner.EndTime; j += FrameDelay)
+                    {
+                        t = ApplyModsToTime(j - h.StartTime) * spinnerDirection;
+
+                        Vector2 pos = SPINNER_CENTRE + CirclePosition(t / 20 + angle, SPIN_RADIUS);
+                        AddFrameToReplay(new OsuReplayFrame((int)j, new Vector2(pos.X, pos.Y), action));
+                    }
+
+                    t = ApplyModsToTime(spinner.EndTime - h.StartTime) * spinnerDirection;
+                    Vector2 endPosition = SPINNER_CENTRE + CirclePosition(t / 20 + angle, SPIN_RADIUS);
+
+                    AddFrameToReplay(new OsuReplayFrame(spinner.EndTime, new Vector2(endPosition.X, endPosition.Y), action));
+
+                    endFrame.Position = endPosition;
+                    break;
                 }
-
-                t = ApplyModsToTime(s.EndTime - h.StartTime) * spinnerDirection;
-                Vector2 endPosition = SPINNER_CENTRE + CirclePosition(t / 20 + angle, SPIN_RADIUS);
-
-                AddFrameToReplay(new OsuReplayFrame(s.EndTime, new Vector2(endPosition.X, endPosition.Y), action));
-
-                endFrame.Position = endPosition;
-            }
-            else if (h is Slider)
-            {
-                Slider s = h as Slider;
-
-                for (double j = FrameDelay; j < s.Duration; j += FrameDelay)
+                case Slider slider:
                 {
-                    Vector2 pos = s.StackedPositionAt(j / s.Duration);
-                    AddFrameToReplay(new OsuReplayFrame(h.StartTime + j, new Vector2(pos.X, pos.Y), action));
-                }
+                    for (double j = FrameDelay; j < slider.Duration; j += FrameDelay)
+                    {
+                        Vector2 pos = slider.StackedPositionAt(j / slider.Duration);
+                        AddFrameToReplay(new OsuReplayFrame(h.StartTime + j, new Vector2(pos.X, pos.Y), action));
+                    }
 
-                AddFrameToReplay(new OsuReplayFrame(s.EndTime, new Vector2(s.StackedEndPosition.X, s.StackedEndPosition.Y), action));
+                    AddFrameToReplay(new OsuReplayFrame(slider.EndTime, new Vector2(slider.StackedEndPosition.X, slider.StackedEndPosition.Y), action));
+                    break;
+                }
             }
 
             // We only want to let go of our button if we are at the end of the current replay. Otherwise something is still going on after us so we need to keep the button pressed!

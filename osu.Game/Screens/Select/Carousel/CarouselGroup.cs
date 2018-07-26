@@ -79,8 +79,13 @@ namespace osu.Game.Screens.Select.Carousel
         public override void Filter(FilterCriteria criteria)
         {
             base.Filter(criteria);
-            InternalChildren.Sort((x, y) => x.CompareTo(criteria, y));
-            InternalChildren.ForEach(c => c.Filter(criteria));
+
+            var children = new List<CarouselItem>(InternalChildren);
+
+            children.Sort((x, y) => x.CompareTo(criteria, y));
+            children.ForEach(c => c.Filter(criteria));
+
+            InternalChildren = children;
         }
 
         protected virtual void ChildItemStateChanged(CarouselItem item, CarouselItemState value)

@@ -44,19 +44,17 @@ namespace osu.Game.Skinning
 
         private SampleChannel loadChannel(SampleInfo info, Func<string, SampleChannel> getSampleFunction)
         {
-            SampleChannel ch = null;
+            foreach (var lookup in info.LookupNames)
+            {
+                var ch = getSampleFunction($"Gameplay/{lookup}");
+                if (ch == null)
+                    continue;
 
-            if (info.Namespace != null)
-                ch = getSampleFunction($"Gameplay/{info.Namespace}/{info.Bank}-{info.Name}");
-
-            // try without namespace as a fallback.
-            if (ch == null)
-                ch = getSampleFunction($"Gameplay/{info.Bank}-{info.Name}");
-
-            if (ch != null)
                 ch.Volume.Value = info.Volume / 100.0;
+                return ch;
+            }
 
-            return ch;
+            return null;
         }
     }
 }
