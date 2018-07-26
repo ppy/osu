@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Changelog
 
         public ChangelogContentGroup(APIChangelog build, bool newDate)
         {
-            ClickableText clickableText;
+            OsuHoverContainer clickableBuildText;
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
             Direction = FillDirection.Vertical;
@@ -138,29 +138,33 @@ namespace osu.Game.Overlays.Changelog
                     Margin = new MarginPadding { Top = 20 },
                     Alpha = newDate ? 1 : 0,
                 },
-                new FillFlowContainer
+                clickableBuildText = new OsuHoverContainer
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
                     Margin = new MarginPadding { Top = 20 },
-                    Spacing = new Vector2(5),
-                    Children = new Drawable[]
+                    Action = () => OnBuildSelected(build),
+                    Child = new FillFlowContainer
                     {
-                        new SpriteText
+                        Direction = FillDirection.Horizontal,
+                        Spacing = new Vector2(5),
+                        AutoSizeAxes = Axes.Both,
+                        Children = new Drawable[]
                         {
-                            Text = build.UpdateStream.DisplayName,
-                            TextSize = 20, // web: 18,
-                            Font = @"Exo2.0-Medium",
-                        },
-                        clickableText = new ClickableText
-                        {
-                            Text = build.DisplayVersion,
-                            TextSize = 20, // web: 18,
-                            Font = @"Exo2.0-Light",
-                            Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
-                            Action = () => OnBuildSelected(build),
+                            new SpriteText
+                            {
+                                Text = build.UpdateStream.DisplayName,
+                                TextSize = 20, // web: 18,
+                                Font = @"Exo2.0-Medium",
+                            },
+                            new SpriteText
+                            {
+                                Text = build.DisplayVersion,
+                                TextSize = 20, // web: 18,
+                                Font = @"Exo2.0-Light",
+                                Colour = StreamColour.FromStreamName(build.UpdateStream.Name),
+                            },
                         },
                     }
                 },
@@ -173,10 +177,15 @@ namespace osu.Game.Overlays.Changelog
             };
 
             // we may not want double clicks to make it double the work
-            clickableText.Action += () =>
+            // can be clicked again only after a delay
+            clickableBuildText.Action += () =>
             {
-                clickableText.IsEnabled = false;
-                Scheduler.AddDelayed(() => clickableText.IsEnabled = true, 2000);
+                clickableBuildText.Action = null;
+                clickableBuildText.FadeTo(0.5f, 500);
+                Scheduler.AddDelayed(() => {
+                    clickableBuildText.Action = () => OnBuildSelected(build);
+                    clickableBuildText.FadeIn(500);
+                }, 2000);
             };
         }
 
