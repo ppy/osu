@@ -15,10 +15,11 @@ using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class SwitchButton : CircularContainer, IHasCurrentValue<bool>, IHasAccentColour
+    public class SwitchButton : CompositeDrawable, IHasCurrentValue<bool>, IHasAccentColour
     {
         private readonly Box fill;
         private readonly Container switchContainer;
+        private readonly CircularContainer circularContainer;
 
         private const float border_thickness = 4.5f;
         private const float switch_padding = 1.25f;
@@ -58,40 +59,43 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             set
             {
                 accentColour = value;
-                BorderColour = value;
+                circularContainer.BorderColour = value;
             }
         }
 
         public SwitchButton()
         {
-            Size = new Vector2(size_x, size_y);
-            BorderColour = Color4.White;
-            BorderThickness = border_thickness;
-            Masking = true;
-
             Container switchCircle;
+            Size = new Vector2(size_x, size_y);
 
-            Children = new Drawable[]
+            InternalChild = circularContainer = new CircularContainer
             {
-                fill = new Box
+                RelativeSizeAxes = Axes.Both,
+                BorderColour = Color4.White,
+                BorderThickness = border_thickness,
+                Masking = true,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    AlwaysPresent = true,
-                    Alpha = 0
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding(border_thickness + switch_padding),
-                    Child = switchContainer = new Container
+                    fill = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Child = switchCircle = new CircularContainer
+                        AlwaysPresent = true,
+                        Alpha = 0
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding(border_thickness + switch_padding),
+                        Child = switchContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            FillMode = FillMode.Fit,
-                            Masking = true,
-                            Child = new Box { RelativeSizeAxes = Axes.Both }
+                            Child = switchCircle = new CircularContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                FillMode = FillMode.Fit,
+                                Masking = true,
+                                Child = new Box { RelativeSizeAxes = Axes.Both }
+                            }
                         }
                     }
                 }
