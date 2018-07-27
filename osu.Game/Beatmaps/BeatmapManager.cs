@@ -74,13 +74,15 @@ namespace osu.Game.Beatmaps
 
         private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
 
+        private readonly GameHost gameHost;
+
         /// <summary>
         /// Set a storage with access to an osu-stable install for import purposes.
         /// </summary>
         public Func<Storage> GetStableStorage { private get; set; }
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, IIpcHost importHost = null)
-            : base(storage, contextFactory, new BeatmapStore(contextFactory), importHost)
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, GameHost gameHost = null)
+            : base(storage, contextFactory, new BeatmapStore(contextFactory), gameHost)
         {
             beatmaps = (BeatmapStore)ModelStore;
             beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
@@ -89,6 +91,7 @@ namespace osu.Game.Beatmaps
             this.rulesets = rulesets;
             this.api = api;
             this.audioManager = audioManager;
+            this.gameHost = gameHost;
         }
 
         protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive)
@@ -163,28 +166,14 @@ namespace osu.Game.Beatmaps
                 PostNotification?.Invoke(new SimpleNotification
                 {
                     Icon = FontAwesome.fa_superpowers,
-                    Text = "You gotta be an osu!supporter to download for now 'yo"
+                    Text = "You gotta be an osu!supporter to download directly for now 'yo"
                 });
 
                 if (!beatmapSetInfo.OnlineBeatmapSetID.HasValue)
                     return;
 
                 // Open download in browser
-                var downloadUrl = $"https://osu.ppy.sh/beatmapsets/{beatmapSetInfo.OnlineBeatmapSetID}";
-
-                // https://brockallen.com/2016/09/24/process-start-for-urls-on-net-core/
-                switch (RuntimeInfo.OS)
-                {
-                    case RuntimeInfo.Platform.Windows:
-                        Process.Start(downloadUrl);
-                        break;
-                    case RuntimeInfo.Platform.Linux:
-                        Process.Start("xdg-open", downloadUrl);
-                        break;
-                    case RuntimeInfo.Platform.MacOsx:
-                        Process.Start("open", downloadUrl);
-                        break;
-                }
+                gameHost?.OpenUrlExternally($"https://osu.ppy.sh/beatmapsets/{beatmapSetInfo.OnlineBeatmapSetID}");
 
                 return;
             }
