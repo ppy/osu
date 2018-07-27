@@ -5,7 +5,6 @@ using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
@@ -68,7 +67,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             Triangles.Alpha = 0;
             Content.CornerRadius = 15;
