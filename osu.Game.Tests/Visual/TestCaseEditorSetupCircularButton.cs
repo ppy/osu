@@ -27,12 +27,15 @@ namespace osu.Game.Tests.Visual
                 Origin = Anchor.Centre,
                 LabelText = "Button",
             };
+
+            AddStep("Enable button", () => circularButton.Enabled.Value = true);
+            AddStep("Disable button", () => circularButton.Enabled.Value = false);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour osuColour)
         {
-            circularButton.DefaultColour = osuColour.Blue;
+            circularButton.AccentColour = osuColour.Blue;
         }
     }
 }
