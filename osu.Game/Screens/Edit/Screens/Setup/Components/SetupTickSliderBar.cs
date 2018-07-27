@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private const float nub_size_x = 36;
         private const float nub_size_y = 20;
         private const float default_caption_text_size = 13;
-        
+
         private readonly Box leftBox;
         private readonly Box rightBox;
         private readonly OsuSpriteText leftTickCaption;
