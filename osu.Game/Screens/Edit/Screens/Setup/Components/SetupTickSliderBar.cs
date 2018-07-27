@@ -10,28 +10,23 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using System;
-using System.Globalization;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class SetupTickSliderBar : OsuSliderBar<float>, IHasTooltip, IHasAccentColour
+    public class SetupTickSliderBar : OsuSliderBar<float>
     {
         private const float default_height = 20;
         private const float default_slider_height = 8;
         private const float nub_size_x = 36;
         private const float nub_size_y = 20;
         private const float default_caption_text_size = 13;
-
-        private SampleChannel sample;
-        private double lastSampleTime;
-        private float lastSampleValue;
+        
         private readonly Box leftBox;
         private readonly Box rightBox;
         private readonly OsuSpriteText leftTickCaption;
@@ -272,7 +267,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, OsuColour colours)
         {
-            sample = audio.Sample.Get(@"UI/sliderbar-notch");
             AccentColour = colours.BlueDark;
             Nub.Colour = colours.BlueDark;
             Nub.AccentColour = colours.BlueDark;
