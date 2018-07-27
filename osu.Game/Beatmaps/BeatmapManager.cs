@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
@@ -163,6 +165,27 @@ namespace osu.Game.Beatmaps
                     Icon = FontAwesome.fa_superpowers,
                     Text = "You gotta be an osu!supporter to download for now 'yo"
                 });
+
+                if (!beatmapSetInfo.OnlineBeatmapSetID.HasValue)
+                    return;
+
+                // Open download in browser
+                var downloadUrl = $"https://osu.ppy.sh/beatmapsets/{beatmapSetInfo.OnlineBeatmapSetID}";
+
+                // https://brockallen.com/2016/09/24/process-start-for-urls-on-net-core/
+                switch (RuntimeInfo.OS)
+                {
+                    case RuntimeInfo.Platform.Windows:
+                        Process.Start(downloadUrl);
+                        break;
+                    case RuntimeInfo.Platform.Linux:
+                        Process.Start("xdg-open", downloadUrl);
+                        break;
+                    case RuntimeInfo.Platform.MacOsx:
+                        Process.Start("open", downloadUrl);
+                        break;
+                }
+
                 return;
             }
 
