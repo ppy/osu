@@ -21,17 +21,28 @@ using System.Globalization;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class SetupTickSliderBar : SliderBar<float>, IHasTooltip, IHasAccentColour
+    public class SetupTickSliderBar : OsuSliderBar<float>, IHasTooltip, IHasAccentColour
     {
-        /// <summary>
-        /// Maximum number of decimal digits to be displayed in the tooltip.
-        /// </summary>
-        private const int max_decimal_digits = 5;
         private const float default_height = 20;
         private const float default_slider_height = 8;
         private const float nub_size_x = 36;
         private const float nub_size_y = 20;
         private const float default_caption_text_size = 13;
+
+        private SampleChannel sample;
+        private double lastSampleTime;
+        private float lastSampleValue;
+        private readonly Box leftBox;
+        private readonly Box rightBox;
+        private readonly OsuSpriteText leftTickCaption;
+        private readonly OsuSpriteText middleTickCaption;
+        private readonly OsuSpriteText rightTickCaption;
+        private readonly Ticks ticks;
+
+        protected override bool ChangeNubValue => false;
+
+        public string TooltipTextSuffix = "";
+        public override string TooltipText => $"{base.TooltipText}{TooltipTextSuffix}";
 
         private float normalPrecision;
         public float NormalPrecision
@@ -124,36 +135,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         {
             get => rightTickCaption.Text;
             set => rightTickCaption.Text = value;
-        }
-
-        private SampleChannel sample;
-        private double lastSampleTime;
-        private float lastSampleValue;
-
-        protected readonly Nub Nub;
-        private readonly Box leftBox;
-        private readonly Box rightBox;
-        private readonly OsuSpriteText leftTickCaption;
-        private readonly OsuSpriteText middleTickCaption;
-        private readonly OsuSpriteText rightTickCaption;
-        private readonly Ticks ticks;
-
-        public string TooltipTextSuffix = "";
-
-        public virtual string TooltipText
-        {
-            get
-            {
-                var floatValue = CurrentNumber.Value;
-                var floatPrecision = CurrentNumber.Precision;
-
-                var decimalPrecision = normalise((decimal)floatPrecision, max_decimal_digits);
-
-                // Find the number of significant digits (we could have less than 5 after normalize())
-                var significantDigits = findPrecision(decimalPrecision);
-
-                return $"{floatValue.ToString($"N{significantDigits}")}{TooltipTextSuffix}";
-            }
         }
 
         private Color4 accentColour;
@@ -302,57 +283,16 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             rightTickCaption.Colour = colours.BlueDark;
         }
 
-        protected override bool OnHover(InputState state)
-        {
-            Nub.Glowing = true;
-            return base.OnHover(state);
-        }
-
-        protected override void OnHoverLost(InputState state)
-        {
-            Nub.Glowing = false;
-            base.OnHoverLost(state);
-        }
-
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
             IsUsingAlternatePrecision = state.Keyboard.ShiftPressed;
-
             return base.OnKeyDown(state, args);
         }
 
         protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
         {
             IsUsingAlternatePrecision = state.Keyboard.ShiftPressed;
-
             return base.OnKeyUp(state, args);
-        }
-
-        protected override void OnUserChange()
-        {
-            base.OnUserChange();
-            playSample();
-        }
-
-        private void playSample()
-        {
-            if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
-                return;
-
-            if (Current.Value.Equals(lastSampleValue))
-                return;
-
-            lastSampleValue = Current.Value;
-
-            lastSampleTime = Clock.CurrentTime;
-            sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
-
-            if (NormalizedValue == 0)
-                sample.Frequency.Value -= 0.4f;
-            else if (NormalizedValue == 1)
-                sample.Frequency.Value += 0.4f;
-
-            sample.Play();
         }
 
         protected override void UpdateValue(float value)
@@ -360,31 +300,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             Nub.MoveToX(value, 250, Easing.OutQuint);
             leftBox.ResizeWidthTo(value, 250, Easing.OutQuint);
             rightBox.ResizeWidthTo(1 - value, 250, Easing.OutQuint);
-        }
-
-        /// <summary>
-        /// Removes all non-significant digits, keeping at most a requested number of decimal digits.
-        /// </summary>
-        /// <param name="d">The decimal to normalize.</param>
-        /// <param name="sd">The maximum number of decimal digits to keep. The final result may have fewer decimal digits than this value.</param>
-        /// <returns>The normalised decimal.</returns>
-        private decimal normalise(decimal d, int sd) => decimal.Parse(Math.Round(d, sd).ToString(string.Concat("0.", new string('#', sd)), CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
-
-        /// <summary>
-        /// Finds the number of digits after the decimal.
-        /// </summary>
-        /// <param name="d">The value to find the number of decimal digits for.</param>
-        /// <returns>The number decimal digits.</returns>
-        private int findPrecision(decimal d)
-        {
-            int precision = 0;
-            while (d != Math.Round(d))
-            {
-                d *= 10;
-                precision++;
-            }
-
-            return precision;
         }
 
         private class Ticks : Container

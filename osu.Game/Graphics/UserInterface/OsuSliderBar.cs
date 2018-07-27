@@ -30,9 +30,11 @@ namespace osu.Game.Graphics.UserInterface
         private double lastSampleTime;
         private T lastSampleValue;
 
-        protected readonly Nub Nub;
+        protected Nub Nub;
         private readonly Box leftBox;
         private readonly Box rightBox;
+
+        protected virtual bool ChangeNubValue => true;
 
         public virtual string TooltipText
         {
@@ -172,7 +174,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
-            Nub.Current.Value = false;
+            Nub.Current.Value = !ChangeNubValue;
             return base.OnMouseUp(state, args);
         }
 
