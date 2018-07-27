@@ -21,9 +21,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private readonly Box fill;
         private readonly OsuSpriteText label;
 
-        public const float DEFAULT_LABEL_TEXT_SIZE = 14;
-        public const float SIZE_X = 125;
-        public const float SIZE_Y = 30;
+        private const float default_label_text_size = 14;
+        private const float size_x = 125;
+        private const float size_y = 30;
 
         public event Action ButtonClicked;
 
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         public SetupCircularButton()
         {
-            Size = new Vector2(SIZE_X, SIZE_Y);
+            Size = new Vector2(size_x, size_y);
 
             Children = new Drawable[]
             {
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Colour = Color4.White,
-                    TextSize = DEFAULT_LABEL_TEXT_SIZE,
+                    TextSize = default_label_text_size,
                     Font = @"Exo2.0-Bold",
                 }
             };
