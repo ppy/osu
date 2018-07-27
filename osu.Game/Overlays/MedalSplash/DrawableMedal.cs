@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.MedalSplash
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Text = "Medal Unlocked".ToUpper(),
+                    Text = "Medal Unlocked".ToUpperInvariant(),
                     TextSize = 24,
                     Font = @"Exo2.0-Light",
                     Alpha = 0f,

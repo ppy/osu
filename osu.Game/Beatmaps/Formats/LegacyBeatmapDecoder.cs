@@ -312,7 +312,7 @@ namespace osu.Game.Beatmaps.Formats
                     omitFirstBarSignature = effectFlags.HasFlag(EffectFlags.OmitFirstBarLine);
                 }
 
-                string stringSampleSet = sampleSet.ToString().ToLower();
+                string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
                 if (stringSampleSet == @"none")
                     stringSampleSet = @"normal";
 
