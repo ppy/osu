@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                 fill.Colour = value;
             }
         }
-        
+
         public string LabelText
         {
             get => label.Text;
