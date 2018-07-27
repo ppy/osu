@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
     {
         public const int RNG_SEED = 1337;
 
-        public bool HardRock { get; set; } = false;
+        public bool HardRock { get; set; }
 
         private float lastStartX;
         private int lastStartTime;
