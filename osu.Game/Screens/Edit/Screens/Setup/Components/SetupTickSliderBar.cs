@@ -4,11 +4,8 @@
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
@@ -265,7 +262,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        private void load(OsuColour colours)
         {
             AccentColour = colours.BlueDark;
             Nub.Colour = colours.BlueDark;
