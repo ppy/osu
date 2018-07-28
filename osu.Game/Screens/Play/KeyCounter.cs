@@ -152,11 +152,6 @@ namespace osu.Game.Screens.Play
                 RestoreState(Clock.CurrentTime);
         }
 
-        public void RestoreState(double time)
-        {
-            var targetState = states.LastOrDefault(state => state.Time <= time) ?? states.LastOrDefault();
-            var targetCount = targetState?.Count ?? 0;
-            CountPresses = targetCount;
-        }
+        public void RestoreState(double time) => CountPresses = states.LastOrDefault(state => state.Time <= time)?.Count ?? 0;
     }
 }
