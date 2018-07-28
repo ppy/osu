@@ -38,7 +38,8 @@ namespace osu.Game.Screens.Play
             key.FadeTime = FadeTime;
             key.KeyDownTextColor = KeyDownTextColor;
             key.KeyUpTextColor = KeyUpTextColor;
-            key.Clock = (IFrameBasedClock)AudioClock;
+            if (AudioClock != null && AudioClock is IFrameBasedClock basedClock)
+                key.Clock = basedClock;
         }
 
         public void ResetCount()
