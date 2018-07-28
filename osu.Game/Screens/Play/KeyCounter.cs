@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Timing;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
@@ -23,6 +22,7 @@ namespace osu.Game.Screens.Play
         private SpriteText countSpriteText;
 
         private readonly List<KeyCounterState> states = new List<KeyCounterState>();
+        private KeyCounterState lastState;
 
         public bool IsCounting { get; set; } = true;
         private int countPresses;
@@ -62,8 +62,6 @@ namespace osu.Game.Screens.Play
         public Color4 KeyDownTextColor { get; set; } = Color4.DarkGray;
         public Color4 KeyUpTextColor { get; set; } = Color4.White;
         public int FadeTime { get; set; }
-
-        public IClock AudioClock { get; set; }
 
         protected KeyCounter(string name)
         {
@@ -142,10 +140,16 @@ namespace osu.Game.Screens.Play
 
         public void SaveState()
         {
-            var lastState = states.LastOrDefault();
+            if (lastState == null || lastState.Time < Clock.CurrentTime)
+                states.Add(lastState = new KeyCounterState(Clock.CurrentTime, CountPresses));
+        }
 
-            if (lastState == null || lastState.Time < AudioClock.CurrentTime)
-                states.Add(new KeyCounterState(AudioClock.CurrentTime, CountPresses));
+        protected override void Update()
+        {
+            base.Update();
+
+            if (lastState?.Time > Clock.CurrentTime)
+                RestoreState(Clock.CurrentTime);
         }
 
         public void RestoreState(double time)

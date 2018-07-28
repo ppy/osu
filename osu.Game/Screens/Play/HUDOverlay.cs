@@ -82,11 +82,7 @@ namespace osu.Game.Screens.Play
             Progress.Objects = rulesetContainer.Objects;
             Progress.AudioClock = offsetClock;
             Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
-            Progress.OnSeek = pos =>
-            {
-                adjustableClock.Seek(pos);
-                KeyCounter.RestoreKeyCounterState(pos);
-            };
+            Progress.OnSeek = pos => adjustableClock.Seek(pos);
 
             ModDisplay.Current.BindTo(working.Mods);
 
