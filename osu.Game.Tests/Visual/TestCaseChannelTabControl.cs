@@ -14,24 +14,22 @@ using osu.Framework.MathUtils;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
-using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
 using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseChatTabControl : OsuTestCase
+    public class TestCaseChannelTabControl : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(ChatTabControl),
-            typeof(ChannelTabControl)
+            typeof(ChannelTabControl),
         };
 
-        private readonly ChatTabControl chatTabControl;
+        private readonly ChannelTabControl channelTabControl;
 
-        public TestCaseChatTabControl()
+        public TestCaseChannelTabControl()
         {
             SpriteText currentText;
             Add(new Container
@@ -41,7 +39,7 @@ namespace osu.Game.Tests.Visual
                 Anchor = Anchor.Centre,
                 Children = new Drawable[]
                 {
-                    chatTabControl = new ChatTabControl
+                    channelTabControl = new ChannelTabControl
                     {
                         RelativeSizeAxes = Axes.X,
                         Origin = Anchor.Centre,
@@ -68,13 +66,13 @@ namespace osu.Game.Tests.Visual
                 {
                     currentText = new SpriteText
                     {
-                        Text = "Currently selected chat: "
+                        Text = "Currently selected channel:"
                     }
                 }
             });
 
-            chatTabControl.OnRequestLeave += chat => chatTabControl.RemoveItem(chat);
-            chatTabControl.Current.ValueChanged += chat => currentText.Text = "Currently selected chat: " + chat.ToString();
+            channelTabControl.OnRequestLeave += channel => channelTabControl.RemoveChannel(channel);
+            channelTabControl.Current.ValueChanged += channel => currentText.Text = "Currently selected channel: " + channel.ToString();
 
             AddStep("Add random user", addRandomUser);
             AddRepeatStep("Add 3 random users", addRandomUser, 3);
@@ -88,12 +86,12 @@ namespace osu.Game.Tests.Visual
             if (users == null || users.Count == 0)
                 return;
 
-            chatTabControl.AddItem(new PrivateChannel { User = users[RNG.Next(0, users.Count - 1)] });
+            channelTabControl.AddChannel(new PrivateChannel { User = users[RNG.Next(0, users.Count - 1)] });
         }
 
         private void addChannel(string name)
         {
-            chatTabControl.AddItem(new Channel
+            channelTabControl.AddChannel(new Channel
             {
                 Name = name
             });

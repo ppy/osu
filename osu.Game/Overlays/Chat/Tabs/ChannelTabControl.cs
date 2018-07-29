@@ -9,6 +9,7 @@ using osu.Game.Online.Chat;
 using OpenTK;
 using osu.Framework.Configuration;
 using System;
+using System.Linq;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {
@@ -62,6 +63,33 @@ namespace osu.Game.Overlays.Chat.Tabs
                 default:
                     throw new InvalidOperationException("Only TargetType User and Channel are supported.");
             }
+        }
+
+        /// <summary>
+        /// Adds a channel to the ChannelTabControl.
+        /// The first channel added will automaticly selected.
+        /// </summary>
+        /// <param name="channel">The channel that is going to be added.</param>
+        public void AddChannel(Channel channel)
+        {
+            if (!Items.Contains(channel))
+                AddItem(channel);
+
+            if (Current.Value == null)
+                Current.Value = channel;
+        }
+
+        /// <summary>
+        /// Removes a channel from the ChannelTabControl.
+        /// If the selected channel is the one that is beeing removed, the next available channel will be selected.
+        /// </summary>
+        /// <param name="channel">The channel that is going to be removed.</param>
+        public void RemoveChannel(Channel channel)
+        {
+            RemoveItem(channel);
+
+            if (Current.Value == channel)
+                Current.Value = Items.FirstOrDefault();
         }
 
         protected override void SelectTab(TabItem<Channel> tab)
