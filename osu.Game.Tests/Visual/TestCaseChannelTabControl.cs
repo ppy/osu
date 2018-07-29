@@ -74,9 +74,13 @@ namespace osu.Game.Tests.Visual
             channelTabControl.OnRequestLeave += channel => channelTabControl.RemoveChannel(channel);
             channelTabControl.Current.ValueChanged += channel => currentText.Text = "Currently selected channel: " + channel.ToString();
 
-            AddStep("Add random user", addRandomUser);
-            AddRepeatStep("Add 3 random users", addRandomUser, 3);
-            AddStep("Add random channel", () => addChannel(RNG.Next().ToString()));
+            AddStep("Add random private channel", addRandomUser);
+            AddAssert("There is only one channels", () => channelTabControl.Items.Count() == 2);
+            AddRepeatStep("Add 3 random private channels", addRandomUser, 3);
+            AddAssert("There are four channels", () => channelTabControl.Items.Count() == 5);
+            AddStep("Add random public channel", () => addChannel(RNG.Next().ToString()));
+
+            AddRepeatStep("Select a random channel", () => channelTabControl.Current.Value = channelTabControl.Items.ElementAt(RNG.Next(channelTabControl.Count + 1)), 20);
         }
 
         private List<User> users;
