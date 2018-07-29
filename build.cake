@@ -1,3 +1,5 @@
+#tool "nuget:?package=JetBrains.ReSharper.CommandLineTools"
+
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
 ///////////////////////////////////////////////////////////////////////////////
@@ -25,12 +27,17 @@ Task("Compile")
 Task("Test")
 .ContinueOnError()
 .DoesForEach(testProjects, testProject => {
-    DotNetCoreTest(testProject.FullPath, new DotNetCoreTestSettings {3
+    DotNetCoreTest(testProject.FullPath, new DotNetCoreTestSettings {
         Framework = framework,
         Configuration = configuration,
         Logger = $"trx;LogFileName={testProject.GetFilename()}.trx",
         ResultsDirectory = "./TestResults/"
     });
+});
+
+Task("InspectCode")
+.Does(() => {
+    
 });
 
 Task("Build")
