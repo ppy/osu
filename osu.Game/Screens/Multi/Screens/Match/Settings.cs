@@ -12,6 +12,7 @@ using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using OpenTK.Graphics;
 using Container = osu.Framework.Graphics.Containers.Container;
@@ -166,9 +167,9 @@ namespace osu.Game.Screens.Multi.Screens.Match
             }
         }
 
-        private class VisibilityTabControl : OsuTabControl<RoomVisibility>
+        private class VisibilityTabControl : OsuTabControl<RoomAvailability>
         {
-            protected override TabItem<RoomVisibility> CreateTabItem(RoomVisibility value) => new VisibilityTabItem(value);
+            protected override TabItem<RoomAvailability> CreateTabItem(RoomAvailability value) => new VisibilityTabItem(value);
 
             private class VisibilityTabItem : OsuTabItem
             {
@@ -176,7 +177,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
                 private OsuColour colours;
 
-                public VisibilityTabItem(RoomVisibility value)
+                public VisibilityTabItem(RoomAvailability value)
                     : base(value)
                 {
                     AutoSizeAxes = Axes.None;
@@ -263,6 +264,11 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                 });
+
+                AddItem(new GameTypeVersus());
+                AddItem(new GameTypeTag());
+                AddItem(new GameTypeTagTeam());
+                AddItem(new GameTypeTeamVersus());
             }
 
             [BackgroundDependencyLoader]
@@ -275,19 +281,22 @@ namespace osu.Game.Screens.Multi.Screens.Match
             {
                 base.SelectTab(tab);
 
-                activeTabText.Text = tab.Value.GetDescription();
+                activeTabText.Text = tab.Value.Name;
             }
 
             private class GameTypeTabItem : OsuTabItem
             {
                 private readonly CircularContainer circle;
                 private readonly Box circleBg;
+                private readonly GameType gameType;
 
                 private OsuColour colours;
 
                 public GameTypeTabItem(GameType value)
                     : base(value)
                 {
+                    this.gameType = value;
+
                     AutoSizeAxes = Axes.None;
                     RelativeSizeAxes = Axes.None;
 
@@ -305,7 +314,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                 Colour = Color4.White,
                                 RelativeSizeAxes = Axes.Both,
                             },
-                            // TODO: add the game type icons here
                         }
                     };
 
@@ -319,6 +327,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
                     circleBg.Colour = colours.Gray4;
                     circle.BorderColour = colours.Yellow;
+
+                    circle.Add(gameType.GetIcon(colours, 30));
                 }
 
                 private void fadeActive()
@@ -345,28 +355,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     fadeInactive();
                 }
             }
-        }
-
-        public enum RoomVisibility
-        {
-            [Description("Public")]
-            Public,
-            [Description("Friends Only")]
-            Friends,
-            [Description("Invite Only")]
-            Invite,
-        }
-
-        public enum GameType
-        {
-            [Description("Tag Co-op")]
-            TagCoop,
-            [Description("Head To Head")]
-            HeadToHead,
-            [Description("Tag Team Versus")]
-            TagTeamVs,
-            [Description("Team Versus")]
-            TeamVs,
         }
     }
 }
