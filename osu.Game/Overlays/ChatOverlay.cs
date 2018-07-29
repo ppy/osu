@@ -184,7 +184,10 @@ namespace osu.Game.Overlays
             channelSelection.OnRequestJoin = channel =>
             {
                 if (!channelManager.JoinedChannels.Contains(channel))
+                {
                     channelManager.JoinedChannels.Add(channel);
+                    channelManager.FetchInitalMessages(channel);
+                }
             };
             channelSelection.OnRequestLeave = channel => channelManager.JoinedChannels.Remove(channel);
         }
@@ -248,7 +251,7 @@ namespace osu.Game.Overlays
             else
             {
                 currentChannelContainer.Clear(false);
-                currentChannelContainer.Add(loaded);
+                Scheduler.Add(() => currentChannelContainer.Add(loaded));
             }
         }
 
