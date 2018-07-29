@@ -180,21 +180,6 @@ namespace osu.Game.Online.Chat
                 privateMessagesHandler.RequestNewMessages(api);
         }
 
-        private void fetchMessages(Func<APIMessagesRequest> messagesRequest, Action<List<Message>> handler)
-        {
-            if (messagesRequest == null)
-                throw new ArgumentNullException(nameof(messagesRequest));
-            if (handler == null)
-                throw new ArgumentNullException(nameof(handler));
-
-            var messagesReq = messagesRequest.Invoke();
-
-            messagesReq.Success += handler.Invoke;
-            messagesReq.Failure += exception => Logger.Error(exception, "Fetching messages failed.");
-
-            api.Queue(messagesReq);
-        }
-
         private void handleUserMessages(IEnumerable<Message> messages)
         {
             var joinedPrivateChannels = JoinedChannels.Where(c => c.Target == TargetType.User).ToList();
@@ -279,12 +264,7 @@ namespace osu.Game.Online.Chat
                     {
                         JoinedChannels.Add(channel);
 
-                        // TODO: remove this when the API supports returning initial fetch messages for more than one channel.
-                        // right now it caps out at 50 messages and therefore only returns one channel's worth of content.
-                        var fetchInitialMsgReq = new GetMessagesRequest(new[] { channel }, null);
-                        fetchInitialMsgReq.Success += handleChannelMessages;
-                        fetchInitialMsgReq.Failure += exception => Logger.Error(exception, "Failed to fetch inital messages.");
-                        api.Queue(fetchInitialMsgReq);
+                        FetchInitalMessages(channel);
                     }
                 }
 
@@ -298,6 +278,21 @@ namespace osu.Game.Online.Chat
             };
 
             api.Queue(req);
+        }
+
+        /// <summary>
+        /// Fetches inital messages of a channel
+        ///
+        /// TODO: remove this when the API supports returning initial fetch messages for more than one channel by specifying the last message id per channel instead of one last message id globally.
+        /// right now it caps out at 50 messages and therefore only returns one channel's worth of content.
+        /// </summary>
+        /// <param name="channel">The channel </param>
+        public void FetchInitalMessages(Channel channel)
+        {
+            var fetchInitialMsgReq = new GetMessagesRequest(new[] { channel }, null);
+            fetchInitialMsgReq.Success += handleChannelMessages;
+            fetchInitialMsgReq.Failure += exception => Logger.Error(exception, $"Failed to fetch inital messages for the channel {channel.Name}");
+            api.Queue(fetchInitialMsgReq);
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
