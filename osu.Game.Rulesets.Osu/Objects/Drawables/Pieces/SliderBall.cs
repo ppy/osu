@@ -28,14 +28,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             set
             {
                 accentColour = value;
-                if (ball != null)
-                    ball.Colour = value;
+                if (drawableBall != null)
+                    drawableBall.Colour = value;
             }
         }
 
         private readonly Slider slider;
         public readonly Drawable FollowCircle;
-        private readonly Box ball;
+        private Drawable drawableBall;
 
         public SliderBall(Slider slider)
         {
@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     {
                         Colour = Color4.Orange,
                         RelativeSizeAxes = Axes.Both,
-                    }, restrictSize: false),
+                    }),
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     Width = width,
@@ -68,18 +68,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    BorderThickness = 10,
-                    BorderColour = Color4.White,
                     Alpha = 1,
-                    Children = new[]
+                    Child = new Container
                     {
-                        ball = new Box
+                        Width = width,
+                        Height = width,
+                        // TODO: support skin filename animation (sliderb0, sliderb1...)
+                        Child = new SkinnableDrawable("Play/osu/sliderb", _ => new CircularContainer
                         {
-                            Colour = AccentColour,
-                            Alpha = 0.4f,
-                            Width = width,
-                            Height = width,
-                        },
+                            Masking = true,
+                            RelativeSizeAxes = Axes.Both,
+                            BorderThickness = 10,
+                            BorderColour = Color4.White,
+                            Alpha = 1,
+                            Child = drawableBall = new Box
+                            {
+                                Colour = AccentColour,
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0.4f,
+                            }
+                        }),
                     }
                 }
             };
