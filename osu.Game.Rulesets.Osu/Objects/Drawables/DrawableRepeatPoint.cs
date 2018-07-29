@@ -10,6 +10,7 @@ using OpenTK;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -33,11 +34,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
-                new SpriteIcon
+                new SkinnableDrawable("Play/osu/reversearrow", _ => new SpriteIcon
                 {
                     RelativeSizeAxes = Axes.Both,
                     Icon = FontAwesome.fa_chevron_right
-                }
+                }, restrictSize: false)
             };
         }
 
