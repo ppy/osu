@@ -34,6 +34,47 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
+        public override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
+        {
+            /* 
+            if (!beatmap.HitObjects.Any())
+                return new List<double>();
+
+            var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty);
+            float halfCatchWidth = catcher.CatchWidth * 0.5f;
+
+            var difficultyHitObjects = new List<CatchDifficultyHitObject>();
+
+            foreach (var hitObject in beatmap.HitObjects)
+            {
+                switch (hitObject)
+                {
+                    //idk about this, maybe use all hitobjects in the same way
+                    // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
+                    case Fruit fruit:
+                        difficultyHitObjects.Add(new CatchDifficultyHitObject(fruit, halfCatchWidth));
+                        break;
+                    case JuiceStream _:
+                        difficultyHitObjects.AddRange(hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)).Select(o => new CatchDifficultyHitObject(o, halfCatchWidth)));
+                        break;
+                }
+            }
+
+            difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
+
+            if (!calculateStrainValues(difficultyHitObjects, timeRate))
+                return new List<double>()
+
+            //change this block
+            // this is the same as osu!, so there's potential to share the implementation... maybe
+            //double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
+            //double starRating = Math.Sqrt(calculateDifficulty(difficultyHitObjects, timeRate)) * star_scaling_factor;
+
+            //return what to return? TYPE
+            return difficultyHitObjects
+            */
+        }
+
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
@@ -132,6 +173,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 previousHitObject = hitObject;
             }
 
+            //make this function throw list and do things below only in Calculate!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // Build the weighted sum over the highest strains for each interval
             double difficulty = 0;
             double weight = 1;
