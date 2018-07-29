@@ -139,7 +139,7 @@ namespace osu.Game.Screens.Play
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
             adjustableClock.Seek(AllowLeadIn
-                ? Math.Min(RulesetContainer.GameplayStartTime, beatmap.HitObjects.First().StartTime - beatmap.BeatmapInfo.AudioLeadIn)
+                ? Math.Min(0, RulesetContainer.GameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn)
                 : RulesetContainer.GameplayStartTime);
 
             adjustableClock.ProcessFrame();
