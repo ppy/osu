@@ -16,6 +16,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
     {
         private readonly Room room;
         private readonly Participants participants;
+        private readonly Info info;
+        private readonly Settings settings;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
@@ -30,11 +32,12 @@ namespace osu.Game.Screens.Multi.Screens.Match
         public override string Type => "room";
         public override string Title => room.Name.Value;
 
+        private MatchHeaderPage currentPage = MatchHeaderPage.Room;
+
         public Match(Room room)
         {
             this.room = room;
             Header header;
-            Info info;
 
             Children = new Drawable[]
             {
@@ -47,6 +50,12 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = Header.HEIGHT + Info.HEIGHT },
+                },
+                settings = new Settings
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = Header.HEIGHT },
+                    Alpha = 0,
                 },
             };
 
@@ -76,6 +85,45 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
             participantsBind.BindTo(room.Participants);
             participantsBind.BindValueChanged(p => participants.Users = p, true);
+
+            header.Tabs.Current.BindValueChanged(onPageChanged);
+        }
+
+        private void onPageChanged(MatchHeaderPage page)
+        {
+            if (page == currentPage) return;
+
+            // probably need to make left/right move logic generic, but we have only 2 pages for now /shrug
+            switch (page)
+            {
+                case MatchHeaderPage.Settings:
+                    info
+                        .MoveToX(300, 500f, Easing.OutExpo)
+                        .FadeOutFromOne(200);
+                    participants
+                        .MoveToX(300, 500f, Easing.OutExpo)
+                        .FadeOutFromOne(200);
+                    settings
+                        .MoveToX(0, 500f, Easing.OutExpo)
+                        .FadeInFromZero(200);
+
+                    break;
+
+                case MatchHeaderPage.Room:
+                    info
+                        .MoveToX(0, 500f, Easing.OutExpo)
+                        .FadeInFromZero(200);
+                    participants
+                        .MoveToX(0, 500f, Easing.OutExpo)
+                        .FadeInFromZero(200);
+                    settings
+                        .MoveToX(-300, 500f, Easing.OutExpo)
+                        .FadeOutFromOne(200);
+
+                    break;
+            }
+
+            currentPage = page;
         }
     }
 }
