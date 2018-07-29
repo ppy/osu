@@ -10,6 +10,7 @@ using osu.Framework.Input.States;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private readonly Slider slider;
-        public readonly Box FollowCircle;
+        public readonly Drawable FollowCircle;
         private readonly Box ball;
 
         public SliderBall(Slider slider)
@@ -46,13 +47,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             BorderThickness = 10;
             BorderColour = Color4.Orange;
 
-            Children = new Drawable[]
+            Children = new[]
             {
-                FollowCircle = new Box
+                FollowCircle = new Container
                 {
+                    Child = new SkinnableDrawable("Play/osu/sliderfollowcircle", _ => new Box
+                    {
+                        Colour = Color4.Orange,
+                        RelativeSizeAxes = Axes.Both,
+                    }, restrictSize: false),
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Colour = Color4.Orange,
                     Width = width,
                     Height = width,
                     Alpha = 0,
