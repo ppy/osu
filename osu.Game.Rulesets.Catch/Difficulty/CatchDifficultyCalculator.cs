@@ -36,6 +36,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
         {
+            /* 
             if (!beatmap.HitObjects.Any())
                 return new List<double>();
 
@@ -71,6 +72,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             //return what to return? TYPE
             return difficultyHitObjects
+            */
         }
 
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
