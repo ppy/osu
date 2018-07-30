@@ -22,9 +22,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private readonly CircularContainer circularContainer;
 
         private const float border_thickness = 4.5f;
-        private const float switch_padding = 1.25f;
-        private const float size_x = 45;
-        private const float size_y = 20;
+        private const float padding = 1.25f;
 
         public Bindable<bool> Current { get; } = new Bindable<bool>();
 
@@ -66,7 +64,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         public SwitchButton()
         {
             Container switchCircle;
-            Size = new Vector2(size_x, size_y);
+            Size = new Vector2(45, 20);
 
             InternalChild = circularContainer = new CircularContainer
             {
@@ -85,7 +83,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                     new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding(border_thickness + switch_padding),
+                        Padding = new MarginPadding(border_thickness + padding),
                         Child = switchContainer = new Container
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -107,7 +105,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
                     switchCircle.MoveToX(switchContainer.DrawWidth - switchCircle.DrawWidth, 200, Easing.OutQuint);
                 else
                     switchCircle.MoveToX(0, 200, Easing.OutQuint);
-                this.FadeAccent((newValue ? enabledColour : disabledColour).Lighten(IsHovered ? 0.3f : 0), 500, Easing.OutQuint);
+                updateHoverState();
                 fill.FadeTo(newValue ? 1 : 0, 500, Easing.OutQuint);
             };
         }
@@ -129,14 +127,19 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         protected override bool OnHover(InputState state)
         {
-            this.FadeAccent((Current.Value ? enabledColour : disabledColour).Lighten(0.3f), 500, Easing.OutQuint);
+            updateHoverState();
             return base.OnHover(state);
         }
 
         protected override void OnHoverLost(InputState state)
         {
-            this.FadeAccent(Current.Value ? enabledColour : disabledColour, 500, Easing.OutQuint);
+            updateHoverState();
             base.OnHoverLost(state);
+        }
+
+        private void updateHoverState()
+        {
+            this.FadeAccent((Current.Value ? enabledColour : disabledColour).Lighten(IsHovered ? 0.3f : 0), 500, Easing.OutQuint);
         }
     }
 }

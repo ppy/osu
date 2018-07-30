@@ -21,13 +21,13 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         private readonly OsuSpriteText bottomText;
 
         private const float corner_radius = 15;
-        private const float default_label_text_size = 16;
-        private const float default_bottom_label_text_size = 12;
-        private const float normal_height = 40;
-        private const float default_label_horizontal_offset = 15;
-        private const float default_label_vertical_offset = 12;
-        private const float default_switch_horizontal_offset = 15;
-        private const float default_switch_vertical_offset = 10;
+        private const float label_text_size = 16;
+        private const float bottom_label_text_size = 12;
+        private const float base_height = 40;
+        private const float label_horizontal_offset = 15;
+        private const float label_vertical_offset = 12;
+        private const float switch_horizontal_offset = 15;
+        private const float switch_vertical_offset = 10;
 
         public Bindable<bool> Current { get; } = new Bindable<bool>();
 
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             set
             {
                 bottomText.Text = value;
-                Height = normal_height + (value != "" ? 20 : 0);
+                Height = base_height + (value != "" ? 20 : 0);
             }
         }
 
@@ -70,58 +70,52 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             SwitchButton switchButton;
 
             RelativeSizeAxes = Axes.X;
-            Height = normal_height;
-            Masking = true;
+            Height = base_height;
             CornerRadius = corner_radius;
+            Masking = true;
 
-            InternalChild = new Container
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                CornerRadius = corner_radius,
-                Masking = true,
-                Children = new Drawable[]
+                background = new Box
                 {
-                    background = new Box
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.FromHex("1c2125"),
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = OsuColour.FromHex("1c2125"),
-                    },
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Children = new Drawable[]
+                        new Container
                         {
-                            new Container
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.Both,
-                                Children = new Drawable[]
+                                label = new OsuSpriteText
                                 {
-                                    label = new OsuSpriteText
-                                    {
-                                        Anchor = Anchor.TopLeft,
-                                        Origin = Anchor.TopLeft,
-                                        Position = new Vector2(default_label_horizontal_offset, default_label_vertical_offset),
-                                        Colour = Color4.White,
-                                        TextSize = default_label_text_size,
-                                        Font = @"Exo2.0-Bold",
-                                    },
-                                    switchButton = new SwitchButton
-                                    {
-                                        Anchor = Anchor.TopRight,
-                                        Origin = Anchor.TopRight,
-                                        Position = new Vector2(-default_switch_horizontal_offset, default_switch_vertical_offset),
-                                    },
+                                    Anchor = Anchor.TopLeft,
+                                    Origin = Anchor.TopLeft,
+                                    Position = new Vector2(label_horizontal_offset, label_vertical_offset),
+                                    Colour = Color4.White,
+                                    TextSize = label_text_size,
+                                    Font = @"Exo2.0-Bold",
+                                },
+                                switchButton = new SwitchButton
+                                {
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                    Position = new Vector2(-switch_horizontal_offset, switch_vertical_offset),
                                 },
                             },
-                            bottomText = new OsuSpriteText
-                            {
-                                Anchor = Anchor.BottomLeft,
-                                Origin = Anchor.BottomLeft,
-                                Position = new Vector2(default_label_horizontal_offset, -default_label_vertical_offset),
-                                TextSize = default_bottom_label_text_size,
-                                Font = @"Exo2.0-BoldItalic",
-                            },
-                        }
+                        },
+                        bottomText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Position = new Vector2(label_horizontal_offset, -label_vertical_offset),
+                            TextSize = bottom_label_text_size,
+                            Font = @"Exo2.0-BoldItalic",
+                        },
                     }
                 }
             };
