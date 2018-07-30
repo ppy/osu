@@ -35,7 +35,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private readonly Slider slider;
         public readonly Drawable FollowCircle;
-        private Drawable fadeFollowCircle;
         private Drawable drawableBall;
 
         public SliderBall(Slider slider)
@@ -54,6 +53,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Anchor = Anchor.Centre,
                     Width = width,
                     Height = width,
+                    Alpha = 0,
                     Child = new SkinnableDrawable("Play/osu/sliderfollowcircle", _ => new CircularContainer
                     {
                         RelativeSizeAxes = Axes.Both,
@@ -61,11 +61,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                         BorderThickness = 5,
                         BorderColour = Color4.Orange,
                         Blending = BlendingMode.Additive,
-                        Child = fadeFollowCircle = new Box
+                        Child = new Box
                         {
                             Colour = Color4.Orange,
                             RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
+                            Alpha = 0.2f,
                         }
                     }),
                 },
@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 tracking = value;
 
                 FollowCircle.ScaleTo(tracking ? 2.8f : 1, 300, Easing.OutQuint);
-                fadeFollowCircle?.FadeTo(tracking ? 0.2f : 0, 300, Easing.OutQuint);
+                FollowCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
         }
 
