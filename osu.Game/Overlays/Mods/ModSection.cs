@@ -6,12 +6,13 @@ using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 
 namespace osu.Game.Overlays.Mods
 {

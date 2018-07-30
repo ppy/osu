@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -183,7 +183,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomCentre,
                                     Height = progress_height,
                                     FillColour = colours.Yellow,
-                                    OnSeek = progress => current?.Track.Seek(progress)
+                                    OnSeek = attemptSeek
                                 }
                             },
                         },
@@ -196,6 +196,12 @@ namespace osu.Game.Overlays
             beatmaps.ItemRemoved += handleBeatmapRemoved;
 
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
+        }
+
+        private void attemptSeek(double progress)
+        {
+            if (!beatmap.Disabled)
+                current?.Track.Seek(progress);
         }
 
         private void playlistOrderChanged(BeatmapSetInfo beatmapSetInfo, int index)
@@ -219,6 +225,7 @@ namespace osu.Game.Overlays
             if (disabled)
                 playlist.Hide();
 
+            playButton.Enabled.Value = !disabled;
             prevButton.Enabled.Value = !disabled;
             nextButton.Enabled.Value = !disabled;
             playlistButton.Enabled.Value = !disabled;

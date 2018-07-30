@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Tournament
 
                     Position = new Vector2(0, 7f),
 
-                    Text = $"GROUP {name.ToUpper()}",
+                    Text = $"GROUP {name.ToUpperInvariant()}",
                     TextSize = 8f,
                     Font = @"Exo2.0-Bold",
                     Colour = new Color4(255, 204, 34, 255),
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Tournament
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
 
-                                Text = team.Acronym.ToUpper(),
+                                Text = team.Acronym.ToUpperInvariant(),
                                 TextSize = 10f,
                                 Font = @"Exo2.0-Bold"
                             }

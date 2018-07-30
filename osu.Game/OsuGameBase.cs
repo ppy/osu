@@ -107,7 +107,7 @@ namespace osu.Game
         {
             Resources.AddStore(new DllResourceStore(@"osu.Game.Resources.dll"));
 
-            dependencies.Cache(contextFactory = new DatabaseContextFactory(Host));
+            dependencies.Cache(contextFactory = new DatabaseContextFactory(Host.Storage));
 
             dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
 
@@ -224,7 +224,7 @@ namespace osu.Game
                 // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
                 contextFactory.ResetDatabase();
 
-                Logger.Log("Database purged successfully.", LoggingTarget.Database, LogLevel.Important);
+                Logger.Log("Database purged successfully.", LoggingTarget.Database);
 
                 // only run once more, then hard bail.
                 using (var db = contextFactory.GetForWrite(false))
