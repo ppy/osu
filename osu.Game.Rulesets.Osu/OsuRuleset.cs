@@ -103,6 +103,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
                         new OsuModHidden(),
                         new OsuModFlashlight(),
+                        new OsuModArrange(), 
                     };
                 case ModType.Special:
                     return new Mod[]
