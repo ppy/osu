@@ -54,7 +54,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 return new List<double>();
 
             var highestStrains = calculateDifficulty(difficultyHitObjects, timeRate);
-            //edit here
             var maniaDifficultySectionRating = new List<double>();
 
             foreach (double strain in highestStrains)
