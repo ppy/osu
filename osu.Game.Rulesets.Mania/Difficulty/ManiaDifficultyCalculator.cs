@@ -37,7 +37,33 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
         }
 
-        public override List<double> DifficultySectionRating ()
+        public override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
+        {
+            if (!beatmap.HitObjects.Any())
+                return new List<double>();
+
+            var difficultyHitObjects = new List<ManiaHitObjectDifficulty>();
+
+            int columnCount = ((ManiaBeatmap)beatmap).TotalColumns;
+
+            // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
+            // Note: Stable sort is done so that the ordering of hitobjects with equal start times doesn't change
+            difficultyHitObjects.AddRange(beatmap.HitObjects.Select(h => new ManiaHitObjectDifficulty((ManiaHitObject)h, columnCount)).OrderBy(h => h.BaseHitObject.StartTime));
+
+            if (!calculateStrainValues(difficultyHitObjects, timeRate))
+                return new List<double>();
+
+            var highestStrains = calculateDifficulty(difficultyHitObjects, timeRate);
+            //edit here
+            var maniaDifficultySectionRating = new List<double>();
+
+            foreach (double strain in highestStrains)
+            {
+                maniaDifficultySectionRating.Add(strain * star_scaling_factor);
+            }
+
+            return maniaDifficultySectionRating;
+        }
 
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
@@ -139,19 +165,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             }
 
             return highestStrains;
-            //Make this function throw a list, and do below code in Calculate
-            // Build the weighted sum over the highest strains for each interval
-            double difficulty = 0;
-            double weight = 1;
-            highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
-
-            foreach (double strain in highestStrains)
-            {
-                difficulty += weight * strain;
-                weight *= decay_weight;
-            }
-
-            return difficulty;
         }
 
         protected override Mod[] DifficultyAdjustmentMods
