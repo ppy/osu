@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Play.Break
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
-                        Text = "current progress".ToUpper(),
+                        Text = "current progress".ToUpperInvariant(),
                         TextSize = 15,
                         Font = "Exo2.0-Black",
                     },
