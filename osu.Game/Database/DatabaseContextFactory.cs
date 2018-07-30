@@ -5,6 +5,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore.Storage;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Platform;
 
 namespace osu.Game.Database
@@ -115,7 +116,11 @@ namespace osu.Game.Database
             }
         }
 
-        private void recycleThreadContexts() => threadContexts = new ThreadLocal<OsuDbContext>(CreateContext);
+        private void recycleThreadContexts()
+        {
+            threadContexts?.Values.ForEach(c => c.Dispose());
+            threadContexts = new ThreadLocal<OsuDbContext>(CreateContext, true);
+        }
 
         protected virtual OsuDbContext CreateContext() => new OsuDbContext(storage.GetDatabaseConnectionString(database_name))
         {
@@ -127,8 +132,6 @@ namespace osu.Game.Database
             lock (writeLock)
             {
                 recycleThreadContexts();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
                 storage.DeleteDatabase(database_name);
             }
         }
