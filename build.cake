@@ -38,7 +38,11 @@ Task("Test")
     });
 });
 
+Task("Restore Nuget")
+.Does(() => NuGetRestore(osuSolution));
+
 Task("InspectCode")
+.IsDependentOn("Restore Nuget")
 .Does(() => {
     InspectCode(osuSolution, new InspectCodeSettings {
         CachesHome = "inspectcode",
