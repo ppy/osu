@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        public override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
+        protected override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
                 return new List<double>();

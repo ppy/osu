@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
-        public override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
+        protected override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
                 return new List<double>();
@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             {
                 catchDifficultySectionRating.Add(Math.Sqrt(strain) * star_scaling_factor);
             }
-            
+
             return catchDifficultySectionRating;
         }
 
