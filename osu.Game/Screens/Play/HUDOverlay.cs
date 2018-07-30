@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Play
             BindRulesetContainer(rulesetContainer);
 
             //here changes and add clock
-            Progress.Objects = (rulesetContainer.Beatmap);
+            Progress.Objects = rulesetContainer.Ruleset.CreateInstance().CreateDifficultyCalculator(rulesetContainer.beatmap).DifficultySectionRating();
             Progress.AudioClock = offsetClock;
             Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
             Progress.OnSeek = pos => adjustableClock.Seek(pos);
