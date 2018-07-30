@@ -8,7 +8,7 @@ var CodeFileSanityToolPath = DownloadFile("https://github.com/peppy/CodeFileSani
 ///////////////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Build");
-var framework = Argument("framework", "net471");
+var framework = Argument("framework", "netcoreapp2.1");
 var configuration = Argument("configuration", "Release");
 
 var osuDesktop = new FilePath("./osu.Desktop/osu.Desktop.csproj");
