@@ -36,7 +36,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         public override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
         {
-            /* 
             if (!beatmap.HitObjects.Any())
                 return new List<double>();
 
@@ -63,16 +62,17 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
 
             if (!calculateStrainValues(difficultyHitObjects, timeRate))
-                return new List<double>()
+                return new List<double>();
 
-            //change this block
-            // this is the same as osu!, so there's potential to share the implementation... maybe
-            //double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
-            //double starRating = Math.Sqrt(calculateDifficulty(difficultyHitObjects, timeRate)) * star_scaling_factor;
+            var highestStrains = calculateDifficulty(difficultyHitObjects, timeRate);
+            var catchDifficultySectionRating = new List<double>();
 
-            //return what to return? TYPE
-            return difficultyHitObjects
-            */
+            foreach (double strain in highestStrains)
+            {
+                catchDifficultySectionRating.Add(Math.Sqrt(strain) * star_scaling_factor);
+            }
+            
+            return catchDifficultySectionRating;
         }
 
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
@@ -104,9 +104,22 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (!calculateStrainValues(difficultyHitObjects, timeRate))
                 return new CatchDifficultyAttributes(mods, 0);
 
+            var highestStrains = calculateDifficulty(difficultyHitObjects, timeRate);
+
+            // Build the weighted sum over the highest strains for each interval
+            double difficulty = 0;
+            double weight = 1;
+            highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
+
+            foreach (double strain in highestStrains)
+            {
+                difficulty += weight * strain;
+                weight *= decay_weight;
+            }
+
             // this is the same as osu!, so there's potential to share the implementation... maybe
             double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
-            double starRating = Math.Sqrt(calculateDifficulty(difficultyHitObjects, timeRate)) * star_scaling_factor;
+            double starRating = Math.Sqrt(difficulty) * star_scaling_factor;
 
             return new CatchDifficultyAttributes(mods, starRating)
             {
@@ -133,7 +146,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             return true;
         }
 
-        private double calculateDifficulty(List<CatchDifficultyHitObject> objects, double timeRate)
+        private List<double> calculateDifficulty(List<CatchDifficultyHitObject> objects, double timeRate)
         {
             // The strain step needs to be adjusted for the algorithm to be considered equal with speed changing mods
             double actualStrainStep = strain_step * timeRate;
@@ -173,19 +186,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 previousHitObject = hitObject;
             }
 
-            //make this function throw list and do things below only in Calculate!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            // Build the weighted sum over the highest strains for each interval
-            double difficulty = 0;
-            double weight = 1;
-            highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
-
-            foreach (double strain in highestStrains)
-            {
-                difficulty += weight * strain;
-                weight *= decay_weight;
-            }
-
-            return difficulty;
+            return highestStrains;
         }
     }
 }
