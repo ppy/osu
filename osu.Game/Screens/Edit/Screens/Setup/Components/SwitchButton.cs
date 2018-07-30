@@ -24,7 +24,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         private const float border_thickness = 4.5f;
         private const float padding = 1.25f;
 
-        public Bindable<bool> Current { get; } = new Bindable<bool>();
+        private readonly BindableBool current = new BindableBool();
+        public Bindable<bool> Current => current;
 
         private Color4 enabledColour;
         public Color4 EnabledColour
@@ -121,7 +122,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 
         protected override bool OnClick(InputState state)
         {
-            Current.Value = !Current.Value;
+            current.Toggle();
             return base.OnClick(state);
         }
 
