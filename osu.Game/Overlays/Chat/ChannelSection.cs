@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Chat
         public string Header
         {
             get { return header.Text; }
-            set { header.Text = value.ToUpper(); }
+            set { header.Text = value.ToUpperInvariant(); }
         }
 
         public IEnumerable<Channel> Channels
