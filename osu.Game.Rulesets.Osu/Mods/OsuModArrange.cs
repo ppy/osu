@@ -31,24 +31,23 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var hitObject = (OsuHitObject) drawable.HitObject;
 
-            Vector2 origPos;
-
-            if (hitObject is RepeatPoint rp)
-            {
+            // repeat points get their position data from the slider.
+            if (hitObject is RepeatPoint)
                 return;
-            }
-            else
-            {
-                origPos = drawable.Position;
-            }
 
-            using (drawable.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimeFadeIn - 1000, true))
+            Vector2 originalPosition = drawable.Position;
+
+            // avoiding that the player can see the abroupt move.
+            const int pre_time_offset = 1000;
+
+            using (drawable.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimeFadeIn - pre_time_offset, true))
             {
                 drawable
                     .MoveToOffset(new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * 250)
-                    .MoveTo(origPos, hitObject.TimeFadeIn + 1000, Easing.InOutSine);
+                    .MoveTo(originalPosition, hitObject.TimeFadeIn + pre_time_offset, Easing.InOutSine);
             }
 
+            // That way slider ticks come all from the same direction.
             if (hitObject is HitCircle || hitObject is Slider)
                 theta += 0.4f;
         }
