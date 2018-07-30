@@ -79,7 +79,8 @@ namespace osu.Game.Screens.Play
             BindProcessor(scoreProcessor);
             BindRulesetContainer(rulesetContainer);
 
-            Progress.Objects = rulesetContainer.Objects;
+            //here changes and add clock
+            Progress.Objects = (rulesetContainer.Beatmap);
             Progress.AudioClock = offsetClock;
             Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
             Progress.OnSeek = pos => adjustableClock.Seek(pos);
