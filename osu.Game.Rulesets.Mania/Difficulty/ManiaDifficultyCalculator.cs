@@ -37,6 +37,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
         }
 
+        public override List<double> DifficultySectionRating ()
+
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
@@ -53,8 +55,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             if (!calculateStrainValues(difficultyHitObjects, timeRate))
                 return new DifficultyAttributes(mods, 0);
 
+            var highestStrains = calculateDifficulty(difficultyHitObjects, timeRate);
+            double difficulty = 0;
+            double weight = 1;
+            highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
 
-            double starRating = calculateDifficulty(difficultyHitObjects, timeRate) * star_scaling_factor;
+            foreach (double strain in highestStrains)
+            {
+                difficulty += weight * strain;
+                weight *= decay_weight;
+            }
+
+            double starRating = difficulty * star_scaling_factor;
 
             return new ManiaDifficultyAttributes(mods, starRating)
             {
@@ -85,7 +97,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             }
         }
 
-        private double calculateDifficulty(List<ManiaHitObjectDifficulty> objects, double timeRate)
+        private List<double> calculateDifficulty(List<ManiaHitObjectDifficulty> objects, double timeRate)
         {
             double actualStrainStep = strain_step * timeRate;
 
@@ -126,6 +138,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 previousHitObject = hitObject;
             }
 
+            return highestStrains;
+            //Make this function throw a list, and do below code in Calculate
             // Build the weighted sum over the highest strains for each interval
             double difficulty = 0;
             double weight = 1;
