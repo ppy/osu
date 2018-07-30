@@ -5,4 +5,4 @@ test: off
 install:
   - cmd: git submodule update --init --recursive --depth=5
 build_script:
-- cmd: PowerShell -Version 2.0 .\build.ps1
+  - cmd: PowerShell -Version 2.0 .\build.ps1
