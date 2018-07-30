@@ -346,7 +346,6 @@ namespace osu.Game.Screens.Play
             {
                 // Proceed to result screen if beatmap already finished playing
                 onCompletionEvent.RunTask();
-
                 return true;
             }
 
