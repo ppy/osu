@@ -14,6 +14,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
@@ -79,6 +80,9 @@ namespace osu.Game.Screens.Play
             BindProcessor(scoreProcessor);
             BindRulesetContainer(rulesetContainer);
 
+            //here changes and add clock
+            var difficultyCalculator = rulesetContainer.Ruleset.CreateDifficultyCalculator(working);
+            Progress.Strains = difficultyCalculator.DifficultySectionRating();
             Progress.Objects = rulesetContainer.Objects;
             Progress.AudioClock = offsetClock;
             Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;

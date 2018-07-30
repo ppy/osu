@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly CursorContainer Cursor;
 
-        protected readonly Ruleset Ruleset;
+        public readonly Ruleset Ruleset;
 
         protected IRulesetConfigManager Config { get; private set; }
 
