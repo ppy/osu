@@ -330,13 +330,13 @@ namespace osu.Game.Screens.Select
 
         private FilterCriteria activeCriteria = new FilterCriteria();
 
-        protected ScheduledDelegate FilterTask;
+        protected ScheduledDelegate PendingFilter;
 
         public bool AllowSelection = true;
 
         public void FlushPendingFilterOperations()
         {
-            if (FilterTask?.Completed == false)
+            if (PendingFilter?.Completed == false)
             {
                 applyActiveCriteria(false, false);
                 Update();
@@ -357,18 +357,18 @@ namespace osu.Game.Screens.Select
 
             void perform()
             {
-                FilterTask = null;
+                PendingFilter = null;
 
                 root.Filter(activeCriteria);
                 itemsCache.Invalidate();
                 if (scroll) scrollPositionCache.Invalidate();
             }
 
-            FilterTask?.Cancel();
-            FilterTask = null;
+            PendingFilter?.Cancel();
+            PendingFilter = null;
 
             if (debounce)
-                FilterTask = Scheduler.AddDelayed(perform, 250);
+                PendingFilter = Scheduler.AddDelayed(perform, 250);
             else
                 perform();
         }
