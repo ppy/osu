@@ -54,11 +54,11 @@ namespace osu.Game.Tests.Visual
 
             breadcrumbs.Current.TriggerChange();
 
-            assertCurrent();
+            waitForCurrent();
             pushNext();
-            assertCurrent();
+            waitForCurrent();
             pushNext();
-            assertCurrent();
+            waitForCurrent();
 
             AddStep(@"make start current", () =>
             {
@@ -66,8 +66,9 @@ namespace osu.Game.Tests.Visual
                 currentScreen = startScreen;
             });
 
-            assertCurrent();
+            waitForCurrent();
             pushNext();
+            waitForCurrent();
             AddAssert(@"only 2 items", () => breadcrumbs.Items.Count() == 2);
             AddStep(@"exit current", () => changedScreen.Exit());
             AddAssert(@"current screen is first", () => startScreen == changedScreen);
@@ -80,7 +81,7 @@ namespace osu.Game.Tests.Visual
         }
 
         private void pushNext() => AddStep(@"push next screen", () => currentScreen = ((TestScreen)currentScreen).PushNext());
-        private void assertCurrent() => AddAssert(@"changedScreen correct", () => currentScreen == changedScreen);
+        private void waitForCurrent() => AddUntilStep(() => currentScreen.IsCurrentScreen, "current screen");
 
         private abstract class TestScreen : OsuScreen
         {
