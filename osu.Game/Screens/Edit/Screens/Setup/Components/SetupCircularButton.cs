@@ -9,12 +9,12 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
     public class SetupCircularButton : TriangleButton
     {
-        private const float size_x = 125;
-        private const float size_y = 30;
+        private const float width = 125;
+        private const float height = 30;
 
         public SetupCircularButton()
         {
-            Size = new Vector2(size_x, size_y);
+            Size = new Vector2(width, height);
         }
 
         [BackgroundDependencyLoader]
