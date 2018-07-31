@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             TabContainer.Spacing = new Vector2(10f, 0f);
 
-            Add(strip = new Box
+            AddInternal(strip = new Box
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
