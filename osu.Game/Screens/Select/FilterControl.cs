@@ -182,7 +182,7 @@ namespace osu.Game.Screens.Select
             showConverted.ValueChanged += val => updateCriteria();
 
             ruleset.BindTo(parentRuleset);
-            ruleset.BindValueChanged(val => updateCriteria(), true);
+            ruleset.BindValueChanged(_ => updateCriteria(), true);
         }
 
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());

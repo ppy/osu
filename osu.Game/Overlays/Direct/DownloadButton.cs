@@ -14,6 +14,7 @@ namespace osu.Game.Overlays.Direct
 {
     public class DownloadButton : OsuAnimatedButton
     {
+        private readonly BeatmapSetInfo beatmapSet;
         private readonly SpriteIcon icon;
         private readonly SpriteIcon checkmark;
         private readonly BeatmapSetDownloader downloader;
@@ -21,11 +22,13 @@ namespace osu.Game.Overlays.Direct
 
         private OsuColour colours;
 
-        public DownloadButton(BeatmapSetInfo set, bool noVideo = false)
+        public DownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
         {
+            this.beatmapSet = beatmapSet;
+
             AddRange(new Drawable[]
             {
-                downloader = new BeatmapSetDownloader(set, noVideo),
+                downloader = new BeatmapSetDownloader(beatmapSet, noVideo),
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -47,26 +50,6 @@ namespace osu.Game.Overlays.Direct
                     Icon = FontAwesome.fa_check,
                 }
             });
-
-            Action = () =>
-            {
-                if (downloader.DownloadState == BeatmapSetDownloader.DownloadStatus.Downloading)
-                {
-                    // todo: replace with ShakeContainer after https://github.com/ppy/osu/pull/2909 is merged.
-                    Content.MoveToX(-5, 50, Easing.OutSine).Then()
-                           .MoveToX(5, 100, Easing.InOutSine).Then()
-                           .MoveToX(-5, 100, Easing.InOutSine).Then()
-                           .MoveToX(0, 50, Easing.InSine);
-                }
-                else if (downloader.DownloadState == BeatmapSetDownloader.DownloadStatus.Downloaded)
-                {
-                    // TODO: Jump to song select with this set when the capability is implemented
-                }
-                else
-                {
-                    downloader.Download();
-                }
-            };
         }
 
         protected override void LoadComplete()
@@ -77,9 +60,29 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, OsuGame game)
         {
             this.colours = colours;
+
+            Action = () =>
+            {
+                switch (downloader.DownloadState.Value)
+                {
+                    case BeatmapSetDownloader.DownloadStatus.Downloading:
+                        // todo: replace with ShakeContainer after https://github.com/ppy/osu/pull/2909 is merged.
+                        Content.MoveToX(-5, 50, Easing.OutSine).Then()
+                               .MoveToX(5, 100, Easing.InOutSine).Then()
+                               .MoveToX(-5, 100, Easing.InOutSine).Then()
+                               .MoveToX(0, 50, Easing.InSine);
+                        break;
+                    case BeatmapSetDownloader.DownloadStatus.Downloaded:
+                        game.PresentBeatmap(beatmapSet);
+                        break;
+                    default:
+                        downloader.Download();
+                        break;
+                }
+            };
         }
 
         private void updateState(BeatmapSetDownloader.DownloadStatus state)
