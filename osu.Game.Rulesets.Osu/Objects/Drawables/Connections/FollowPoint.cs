@@ -38,11 +38,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                     Blending = BlendingMode.Additive,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
+                    Alpha = 0.5f,
                 }
-            }, restrictSize: false)
-            {
-                Alpha = 0.5f,
-            };
+            }, restrictSize: false);
         }
     }
 }
