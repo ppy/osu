@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -16,8 +17,10 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class DownloadButton : HeaderButton
+    public class DownloadButton : HeaderButton, IHasTooltip
     {
+        public string TooltipText => Enabled ? null : "You gotta be an osu!supporter to download for now 'yo";
+
         private readonly IBindable<User> localUser = new Bindable<User>();
 
         public DownloadButton(BeatmapSetInfo set, bool noVideo = false)
