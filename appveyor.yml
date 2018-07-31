@@ -11,7 +11,7 @@ install:
   - cmd: choco install nvika -y
   - cmd: dotnet tool install CodeFileSanity --version 0.0.16 --global
 before_build:
-  - cmd: codefilesanity
+  - cmd: CodeFileSanity
   - cmd: nuget restore -verbosity quiet
 environment:
   TargetFramework: net471
