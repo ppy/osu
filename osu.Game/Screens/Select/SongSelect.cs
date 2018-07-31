@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Select
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
 
-        public new readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        protected new readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         private DependencyContainer dependencies;
 
