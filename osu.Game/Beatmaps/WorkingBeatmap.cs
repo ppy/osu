@@ -134,6 +134,8 @@ namespace osu.Game.Beatmaps
             return converted;
         }
 
+        public override string ToString() => BeatmapInfo.ToString();
+
         public bool BackgroundLoaded => background.IsResultAvailable;
         public Texture Background => background.Value.Result;
         public async Task<Texture> GetBackgroundAsync() => await background.Value;
