@@ -16,6 +16,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
+            // Out preempt should be one span early to give the user ample warning.
+            TimePreempt += SpanDuration;
+
             // We want to show the first RepeatPoint as the TimePreempt dictates but on short (and possibly fast) sliders
             // we may need to cut down this time on following RepeatPoints to only show up to two RepeatPoints at any given time.
             if (RepeatIndex > 0)
