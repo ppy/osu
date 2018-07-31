@@ -101,6 +101,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 break;
             }
 
+
             float aimRotation = MathHelper.RadiansToDegrees((float)Math.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
             while (Math.Abs(aimRotation - Rotation) > 180)
                 aimRotation += aimRotation < Rotation ? 360 : -360;
@@ -112,6 +113,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
             else
             {
+                // If we're already snaking, interpolate to smooth out sharp curves (linear sliders, mainly).
                 Rotation = Interpolation.ValueAt(MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 100), Rotation, aimRotation, 0, 50, Easing.OutQuint);
             }
         }
