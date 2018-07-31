@@ -9,12 +9,10 @@ install:
   - cmd: git submodule update --init --recursive --depth=5
   - cmd: choco install resharper-clt -y
   - cmd: choco install nvika -y
-  - cmd: appveyor DownloadFile https://github.com/peppy/CodeFileSanity/releases/download/v0.2.5/CodeFileSanity.exe
+  - cmd: dotnet tool install CodeFileSanity --version 0.0.16 --global
 before_build:
-  - cmd: CodeFileSanity.exe
+  - cmd: CodeFileSanity
   - cmd: nuget restore -verbosity quiet
-environment:
-  TargetFramework: net471
 build:
   project: osu.sln
   parallel: true

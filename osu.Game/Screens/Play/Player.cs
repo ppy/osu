@@ -278,6 +278,8 @@ namespace osu.Game.Screens.Play
                     ScoreProcessor.PopulateScore(score);
                     score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
                     Push(new Results(score));
+
+                    onCompletionEvent = null;
                 });
             }
         }
@@ -340,6 +342,13 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(Screen next)
         {
+            if (onCompletionEvent != null)
+            {
+                // Proceed to result screen if beatmap already finished playing
+                onCompletionEvent.RunTask();
+                return true;
+            }
+
             if ((!AllowPause || HasFailed || !ValidForResume || pauseContainer?.IsPaused != false || RulesetContainer?.HasReplayLoaded != false) && (!pauseContainer?.IsResuming ?? true))
             {
                 // In the case of replays, we may have changed the playback rate.
