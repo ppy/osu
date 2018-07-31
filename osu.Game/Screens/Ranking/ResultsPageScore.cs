@@ -31,7 +31,11 @@ namespace osu.Game.Screens.Ranking
     {
         private ScoreCounter scoreCounter;
 
-        public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap) { }
+        private WorkingBeatmap working;
+
+        private Score score;
+
+        public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap) { this.score=score; this.working = beatmap; }
 
         private FillFlowContainer<DrawableScoreStatistic> statisticsContainer;
 
@@ -39,6 +43,9 @@ namespace osu.Game.Screens.Ranking
         private void load(OsuColour colours)
         {
             const float user_header_height = 120;
+
+            //wtf help
+            var difficultyCalculator = this.score.Ruleset.CreateInstance().CreateDifficultyCalculator(this.working);
 
             Children = new Drawable[]
             {
@@ -88,7 +95,7 @@ namespace osu.Game.Screens.Ranking
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Alpha = 0.5f,
-                                    Objects = Beatmap.Beatmap.HitObjects,
+                                    Strains = difficultyCalculator.DifficultySectionRating(),
                                 },
                                 scoreCounter = new SlowScoreCounter(6)
                                 {
