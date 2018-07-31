@@ -34,6 +34,9 @@ namespace osu.Game.Screens.Play
         public override bool HandleKeyboardInput => AllowSeeking;
         public override bool HandleMouseInput => AllowSeeking;
 
+        private List<double> strains;
+        public List<double> Strains{set{graph.Strains = strains = value;}}
+
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = info.AudioClock = value; } }
 
@@ -47,7 +50,7 @@ namespace osu.Game.Screens.Play
         {
             set
             {
-                graph.Objects = objects = value;
+                objects = value;
 
                 info.StartTime = firstHitTime;
                 info.EndTime = lastHitTime;

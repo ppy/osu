@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Play
 {
     public class SquareGraph : BufferedContainer
     {
+        //to do: on catch taiko and mania entry with skipping, spinners in osu!, TIMING
         //add some scaling. easy beatmaps have to have got small, static amount of cubes, and harder more cubes more dynamical
         private Column[] columns = { };
 
@@ -37,10 +38,10 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private float[] calculatedValues = { }; // values but adjusted to fit the amount of columns
+        private double[] calculatedValues = { }; // values but adjusted to fit the amount of columns
 
-        private int[] values;
-        public int[] Values
+        private List<double> values = new List<double>();
+        public List<double> Values
         {
             get { return values; }
             set
@@ -104,7 +105,7 @@ namespace osu.Game.Screens.Play
         private void redrawFilled()
         {
             for (int i = 0; i < ColumnCount; i++)
-                columns[i].Filled = calculatedValues.ElementAtOrDefault(i);
+                columns[i].Filled = (float) calculatedValues.ElementAtOrDefault(i);
             ForceRedraw();
         }
 
@@ -113,7 +114,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void recalculateValues()
         {
-            var newValues = new List<float>();
+            var newValues = new List<double>();
 
             if (values == null)
             {
@@ -126,12 +127,12 @@ namespace osu.Game.Screens.Play
             var max = values.Max();
 
             //There apply some changes
-            float step = values.Length / (float)ColumnCount;
-            for (float i = 0; i < values.Length; i += step)
+            float step = values.Count / (float)ColumnCount;
+            for (float i = 0; i < values.Count; i += step)
             {
-                float sum = 0;
+                double sum = 0;
                 float iteration = 0;
-                for (float x = i; x < i+step; x++)
+                for (float x = i; x < i+step && x <values.Count; x++)
                 {
                     sum += values[(int) x];
                     iteration = x - i + 1;
@@ -245,7 +246,14 @@ namespace osu.Game.Screens.Play
             {
                 Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
 
-                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+                //this change was bad
+                double amount = MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+
+                while (!((amount % 1) == 0))
+                {
+                    amount = Math.Ceiling(amount);
+                }
+                int countFilled = (int) amount;
 
                 for (int i = 0; i < drawableRows.Count; i++)
                     drawableRows[i].Colour = i < countFilled ? colour : EmptyColour;
