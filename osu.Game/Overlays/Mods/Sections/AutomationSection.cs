@@ -1,17 +1,17 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
+using OpenTK.Input;
 
-namespace osu.Game.Overlays.Mods
+namespace osu.Game.Overlays.Mods.Sections
 {
-    public class SpecialSection : ModSection
+    public class AutomationSection : ModSection
     {
         protected override Key[] ToggleKeys => new[] { Key.Z, Key.X, Key.C, Key.V, Key.B, Key.N, Key.M };
-        public override ModType ModType => ModType.Special;
+        public override ModType ModType => ModType.Automation;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -19,9 +19,9 @@ namespace osu.Game.Overlays.Mods
             SelectedColour = colours.BlueLight;
         }
 
-        public SpecialSection()
+        public AutomationSection()
         {
-            Header = @"Special";
+            Header = @"Automation";
         }
     }
 }

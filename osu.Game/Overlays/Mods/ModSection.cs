@@ -73,9 +73,12 @@ namespace osu.Game.Overlays.Mods
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            var index = Array.IndexOf(ToggleKeys, args.Key);
-            if (index > -1 && index < buttons.Length)
-                buttons[index].SelectNext(state.Keyboard.ShiftPressed ? -1 : 1);
+            if (ToggleKeys != null)
+            {
+                var index = Array.IndexOf(ToggleKeys, args.Key);
+                if (index > -1 && index < buttons.Length)
+                    buttons[index].SelectNext(state.Keyboard.ShiftPressed ? -1 : 1);
+            }
 
             return base.OnKeyDown(state, args);
         }
@@ -125,6 +128,10 @@ namespace osu.Game.Overlays.Mods
         protected ModSection()
         {
             AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
+
+            Origin = Anchor.TopCentre;
+            Anchor = Anchor.TopCentre;
 
             Children = new Drawable[]
             {
