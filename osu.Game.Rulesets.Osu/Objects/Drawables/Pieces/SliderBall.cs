@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private const float width = 128;
 
         private Color4 accentColour = Color4.Black;
+
         /// <summary>
         /// The colour that is used for the slider ball.
         /// </summary>
@@ -131,6 +132,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private bool tracking;
+
         public bool Tracking
         {
             get { return tracking; }
