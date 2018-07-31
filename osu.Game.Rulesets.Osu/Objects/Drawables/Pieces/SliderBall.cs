@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
                 tracking = value;
 
-                FollowCircle.ScaleTo(tracking ? 2.8f : 1, 300, Easing.OutQuint);
+                FollowCircle.ScaleTo(tracking ? 2f : 1, 300, Easing.OutQuint);
                 FollowCircle.FadeTo(tracking ? 0.2f : 0, 300, Easing.OutQuint);
             }
         }
