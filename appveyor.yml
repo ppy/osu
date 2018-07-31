@@ -9,7 +9,7 @@ install:
   - cmd: git submodule update --init --recursive --depth=5
   - cmd: choco install resharper-clt -y
   - cmd: choco install nvika -y
-  - cmd: dotnet tool install CodeFileSanity --version 13.0.0 --global --add-source https://ci.appveyor.com/nuget/codefilesanity
+  - cmd: dotnet tool install CodeFileSanity --version 0.0.16 --global
 before_build:
   - cmd: codefilesanity
   - cmd: nuget restore -verbosity quiet
