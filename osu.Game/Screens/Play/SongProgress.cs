@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using System.Linq;
+using System.Diagnostics;
 using osu.Framework.Configuration;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
@@ -57,8 +58,55 @@ namespace osu.Game.Screens.Play
 
                 bar.StartTime = firstHitTime;
                 bar.EndTime = lastHitTime;
+
+                graph.Truth = new List<bool>();
+                
+                foreach (double strain in strains)
+                {
+                    graph.Truth.Add(false);
+                }
+                
+                double StartOfLists = (objects.First().StartTime - (objects.First().StartTime % strainStep))/strainStep;
+
+                //this foreach will be for
+                for (int x = 0; x < graph.Truth.Count; x++)//each (bool truth in graph.Truth)
+                {
+                    foreach (HitObject hit in objects)
+                    {
+                        var endTime = (hit as IHasEndTime)?.EndTime ?? hit.StartTime;
+
+                        Debug.Assert(endTime >= hit.StartTime);
+
+                        //this if will dzielić x wyższego fora przzez strainstep i sprawdzał czy hitobject znajduje się w zakresie dzielenie - dzielenie+strainstep
+                        if (hit.StartTime>=x*strainStep && hit.StartTime<(x+1)*strainStep)
+                        {
+                            graph.Truth[x]=true;
+                        }
+
+                        if (endTime>=x*strainStep && endTime<(x+1)*strainStep)
+                        {
+                            graph.Truth[x]=true;
+                        }
+
+                        if (hit.StartTime<x*strainStep && endTime>(x+1)*strainStep)
+                        {
+                            graph.Truth[x]=true;
+                        }
+                    }
+                    
+                }
             }
         }
+
+        private double strainStep;
+
+        public double StrainStep
+        {
+            get 
+            {return strainStep;}
+            set 
+            {strainStep = value;}
+        }  
 
         private readonly BindableBool replayLoaded = new BindableBool();
 

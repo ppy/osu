@@ -79,8 +79,14 @@ namespace osu.Game.Screens.Play
 
             BindProcessor(scoreProcessor);
             BindRulesetContainer(rulesetContainer);
-
-            //here changes and add clock
+            if (rulesetContainer.Ruleset.LegacyID!=2)
+            {
+                Progress.StrainStep = 400;
+            }
+            else 
+            {
+                Progress.StrainStep = 750;
+            }
             var difficultyCalculator = rulesetContainer.Ruleset.CreateDifficultyCalculator(working);
             Progress.Strains = difficultyCalculator.DifficultySectionRating();
             Progress.Objects = rulesetContainer.Objects;
