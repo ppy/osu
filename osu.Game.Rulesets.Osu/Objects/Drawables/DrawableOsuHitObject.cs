@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 UpdatePreemptState();
 
-                var judgementOffset = Math.Min(HitObject.HitWindows.HalfWindowFor(HitResult.Miss), Judgements.FirstOrDefault()?.TimeOffset ?? 0);
+                var judgementOffset = Math.Min(HitObject.HitWindows.HalfWindowFor(HitResult.Miss), HitObject.Judgements.FirstOrDefault()?.TimeOffset ?? 0);
 
                 using (BeginDelayedSequence(HitObject.TimePreempt + judgementOffset, true))
                     UpdateCurrentState(state);

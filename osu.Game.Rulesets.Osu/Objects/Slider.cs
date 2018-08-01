@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double TickDistance;
 
         public HitCircle HeadCircle;
-        public HitCircle TailCircle;
+        public SliderTailCircle TailCircle;
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 ComboIndex = ComboIndex,
             };
 
-            TailCircle = new SliderCircle(this)
+            TailCircle = new SliderTailCircle(this)
             {
                 StartTime = EndTime,
                 Position = EndPosition,

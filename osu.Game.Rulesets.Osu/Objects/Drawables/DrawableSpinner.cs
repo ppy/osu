@@ -11,7 +11,6 @@ using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
 
@@ -136,17 +135,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 glow.FadeColour(completeColour, duration);
             }
 
-            if (!userTriggered && Time.Current >= Spinner.EndTime)
+            if (userTriggered || Time.Current < Spinner.EndTime)
+                return;
+
+            ApplyJudgement(HitObject.Judgement, j =>
             {
                 if (Progress >= 1)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Great });
+                    j.Result = HitResult.Great;
                 else if (Progress > .9)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Good });
+                    j.Result = HitResult.Good;
                 else if (Progress > .75)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Meh });
+                    j.Result = HitResult.Meh;
                 else if (Time.Current >= Spinner.EndTime)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Miss });
-            }
+                    j.Result = HitResult.Miss;
+            });
         }
 
         [BackgroundDependencyLoader]
