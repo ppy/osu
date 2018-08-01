@@ -7,7 +7,7 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
 {
-    public class SetupCircularButton : TriangleButton
+    public class SetupCircularButton : OsuButton
     {
         private const float width = 125;
         private const float height = 30;
@@ -20,7 +20,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            Triangles.Alpha = 0;
             Content.CornerRadius = 15;
         }
     }
