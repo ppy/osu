@@ -247,13 +247,14 @@ namespace osu.Game.Screens.Play
                 Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
 
                 //this change was bad
-                double amount = MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+               // double amount = MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
 
-                while (!((amount % 1) == 0))
-                {
-                    amount = Math.Ceiling(amount);
-                }
-                int countFilled = (int) amount;
+                //while (!((amount % 1) == 0))
+                //{
+                //    amount = Math.Ceiling(amount);
+                //}
+                //int countFilled = (int) amount;
+                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
 
                 for (int i = 0; i < drawableRows.Count; i++)
                     drawableRows[i].Colour = i < countFilled ? colour : EmptyColour;
