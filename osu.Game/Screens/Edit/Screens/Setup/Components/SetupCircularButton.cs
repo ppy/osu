@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using osu.Framework.Allocation;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components
@@ -17,10 +16,10 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components
             Size = new Vector2(width, height);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void Update()
         {
-            Content.CornerRadius = 15;
+            base.Update();
+            Content.CornerRadius = DrawHeight / 2f;
         }
     }
 }
