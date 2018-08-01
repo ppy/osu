@@ -247,6 +247,8 @@ namespace osu.Game.Rulesets.Scoring
             judgement.ComboAtJudgement = Combo;
             judgement.HighestComboAtJudgement = HighestCombo;
 
+            JudgedHits++;
+
             if (judgement.AffectsCombo)
             {
                 switch (judgement.Result)
@@ -260,8 +262,6 @@ namespace osu.Game.Rulesets.Scoring
                         Combo.Value++;
                         break;
                 }
-
-                JudgedHits++;
             }
 
             if (judgement.IsBonus)
@@ -285,8 +285,7 @@ namespace osu.Game.Rulesets.Scoring
             Combo.Value = judgement.ComboAtJudgement;
             HighestCombo.Value = judgement.HighestComboAtJudgement;
 
-            if (judgement.AffectsCombo)
-                JudgedHits--;
+            JudgedHits--;
 
             if (judgement.IsBonus)
             {
