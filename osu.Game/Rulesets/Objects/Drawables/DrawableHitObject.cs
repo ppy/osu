@@ -38,9 +38,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public event Action<DrawableHitObject, Judgement> OnJudgement;
         public event Action<DrawableHitObject, Judgement> OnJudgementRemoved;
 
-        public IReadOnlyList<Judgement> Judgements => judgements;
-        private readonly List<Judgement> judgements = new List<Judgement>();
-
         /// <summary>
         /// Whether a visible judgement should be displayed when this representation is hit.
         /// </summary>
@@ -49,20 +46,20 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been hit.
         /// </summary>
-        public bool IsHit => Judgements.Any(j => j.Final && j.IsHit) && NestedHitObjects.All(n => n.IsHit);
+        public bool IsHit => HitObject.Judgements.All(j => j.IsHit) && NestedHitObjects.All(n => n.IsHit);
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && NestedHitObjects.All(h => h.AllJudged);
+        public bool AllJudged => Judged && NestedHitObjects.All(h => h.AllJudged);
 
         /// <summary>
-        /// Whether this <see cref="DrawableHitObject"/> can be judged.
+        /// Whether this <see cref="DrawableHitObject"/> has been judged.
+        /// Note: This does NOT include nested hitobjects.
         /// </summary>
-        protected virtual bool ProvidesJudgement => true;
+        public bool Judged => HitObject.Judgements.All(h => h.HasResult);
 
         private bool judgementOccurred;
-        private bool judgementFinalized => judgements.LastOrDefault()?.Final == true;
 
         public bool Interactive = true;
         public override bool HandleKeyboardInput => Interactive;
@@ -128,23 +125,31 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public void PlaySamples() => Samples?.Play();
 
+        private double lastUpdateTime;
+
         protected override void Update()
         {
             base.Update();
 
-            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-
-            while (judgements.Count > 0)
+            if (lastUpdateTime > Time.Current)
             {
-                var lastJudgement = judgements[judgements.Count - 1];
-                if (lastJudgement.TimeOffset + endTime <= Time.Current)
-                    break;
+                var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 
-                judgements.RemoveAt(judgements.Count - 1);
-                State.Value = ArmedState.Idle;
+                for (int i = HitObject.Judgements.Count - 1; i >= 0; i--)
+                {
+                    var judgement = HitObject.Judgements[i];
 
-                OnJudgementRemoved?.Invoke(this, lastJudgement);
+                    if (judgement.TimeOffset + endTime <= Time.Current)
+                        break;
+
+                    judgement.Result = HitResult.None;
+                    State.Value = ArmedState.Idle;
+
+                    OnJudgementRemoved?.Invoke(this, judgement);
+                }
             }
+
+            lastUpdateTime = Time.Current;
         }
 
         protected override void UpdateAfterChildren()
@@ -167,15 +172,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Notifies that a new judgement has occurred for this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="judgement">The <see cref="Judgement"/>.</param>
-        protected void AddJudgement(Judgement judgement)
+        protected void ApplyJudgement<T>(T judgement, Action<T> application)
+            where T : Judgement
         {
             judgementOccurred = true;
+
+            application?.Invoke(judgement);
 
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             judgement.TimeOffset = Time.Current - endTime;
-
-            judgements.Add(judgement);
 
             switch (judgement.Result)
             {
@@ -207,7 +213,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             foreach (var d in NestedHitObjects)
                 judgementOccurred |= d.UpdateJudgement(userTriggered);
 
-            if (!ProvidesJudgement || judgementFinalized || judgementOccurred)
+            if (judgementOccurred || Judged)
                 return judgementOccurred;
 
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
@@ -218,7 +224,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// Checks if any judgements have occurred for this <see cref="DrawableHitObject"/>. This method must construct
-        /// all <see cref="Judgement"/>s and notify of them through <see cref="AddJudgement"/>.
+        /// all <see cref="Judgement"/>s and notify of them through <see cref="ApplyJudgement"/>.
         /// </summary>
         /// <param name="userTriggered">Whether the user triggered this check.</param>
         /// <param name="timeOffset">The offset from the <see cref="HitObject"/> end time at which this check occurred. A <paramref name="timeOffset"/> &gt; 0
