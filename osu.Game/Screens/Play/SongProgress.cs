@@ -68,6 +68,7 @@ namespace osu.Game.Screens.Play
                 
                 double StartOfLists = (objects.First().StartTime - (objects.First().StartTime % strainStep))/strainStep;
 
+                //this foreach will be for
                 foreach (bool truth in graph.Truth)
                 {
                     foreach (HitObject hit in objects)
@@ -76,6 +77,7 @@ namespace osu.Game.Screens.Play
 
                         Debug.Assert(endTime >= hit.StartTime);
 
+                        //this if will dzielić x wyższego fora przzez strainstep i sprawdzał czy hitobject znajduje się w zakresie dzielenie - dzielenie+strainstep
                         if (){}
                     }
                     
