@@ -24,7 +24,7 @@ environment:
   code_signing_password:
     secure: 34tLNqvjmmZEi97MLKfrnQ==
 artifacts:
-  - path: 'Releases\*'
+  - path: 'osu-deploy/releases/*'
 deploy:
   - provider: Environment
     name: github
