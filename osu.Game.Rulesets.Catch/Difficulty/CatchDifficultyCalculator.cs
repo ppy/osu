@@ -66,10 +66,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             var highestStrains = calculateDifficulty(difficultyHitObjects, timeRate);
             var catchDifficultySectionRating = new List<double>();
+            var startAt = difficultyHitObjects[0].BaseHitObject.StartTime / (strain_step * timeRate);
 
-            foreach (double strain in highestStrains)
+            for (int x = 0; x < highestStrains.Count; x++)
             {
-                catchDifficultySectionRating.Add(Math.Sqrt(strain) * star_scaling_factor);
+                if (x > startAt)
+                    catchDifficultySectionRating.Add(Math.Sqrt(highestStrains[x]) * star_scaling_factor);
             }
 
             return catchDifficultySectionRating;

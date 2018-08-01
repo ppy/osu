@@ -55,10 +55,13 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             var highestStrains = calculateDifficulty(difficultyHitObjects, timeRate);
             var maniaDifficultySectionRating = new List<double>();
+            var startAt = difficultyHitObjects[0].BaseHitObject.StartTime / (strain_step * timeRate);
 
-            foreach (double strain in highestStrains)
+
+            for (int x = 0; x < highestStrains.Count; x++)
             {
-                maniaDifficultySectionRating.Add(strain * star_scaling_factor);
+                if (x > startAt)
+                    maniaDifficultySectionRating.Add(highestStrains[x] * star_scaling_factor);
             }
 
             return maniaDifficultySectionRating;
