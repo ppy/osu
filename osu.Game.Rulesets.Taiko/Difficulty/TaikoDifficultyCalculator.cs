@@ -51,10 +51,12 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             var highestStrains = calculateDifficulty(difficultyHitObjects, timeRate);
             var taikoDifficultySectionRating = new List<double>();
+            var startAt = difficultyHitObjects[0].BaseHitObject.StartTime / (strain_step * timeRate);
 
-            foreach (double strain in highestStrains)
+            for (int x = 0; x < highestStrains.Count; x++)
             {
-                taikoDifficultySectionRating.Add(strain * star_scaling_factor);
+                if (x > startAt)
+                    taikoDifficultySectionRating.Add(highestStrains[x] * star_scaling_factor);
             }
 
             return taikoDifficultySectionRating;
