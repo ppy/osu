@@ -5,12 +5,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
 using OpenTK;
-using osu.Game.Rulesets.Osu.Judgements;
 using System.Collections.Generic;
 using System;
 using osu.Game.Rulesets.Mods;
@@ -101,11 +99,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 if (auto && !userTriggered && timeOffset > 0)
                 {
                     // force success
-                    AddJudgement(new OsuJudgement
-                    {
-                        Result = HitResult.Great
-                    });
-                    State.Value = ArmedState.Hit;
+                    ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Great);
                 }
                 else
                     base.CheckForJudgements(userTriggered, timeOffset);

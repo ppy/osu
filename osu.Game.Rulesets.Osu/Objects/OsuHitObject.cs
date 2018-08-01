@@ -2,12 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit.Types;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -73,5 +76,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         public virtual void OffsetPosition(Vector2 offset) => Position += offset;
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
+
+        public OsuJudgement Judgement { get; private set; }
+
+        protected override IEnumerable<Judgement> CreateJudgements() => new[] { Judgement = CreateJudgement() };
+
+        protected virtual OsuJudgement CreateJudgement() => new OsuJudgement();
     }
 }
