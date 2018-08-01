@@ -29,18 +29,18 @@ namespace osu.Game.Rulesets.Judgements
         public int HighestComboAtJudgement;
 
         /// <summary>
+        /// Whether this <see cref="Judgement"/> has a result.
+        /// </summary>
+        public bool HasResult => Result > HitResult.None;
+
+        /// <summary>
         /// Whether a successful hit occurred.
         /// </summary>
         public bool IsHit => Result > HitResult.Miss;
 
         /// <summary>
-        /// Whether this judgement is the final judgement for the hit object.
-        /// </summary>
-        public bool Final = true;
-
-        /// <summary>
         /// The offset from a perfect hit at which this judgement occurred.
-        /// Populated when added via <see cref="DrawableHitObject{TObject}.AddJudgement"/>.
+        /// Populated when added via <see cref="DrawableHitObject.ApplyJudgement"/>.
         /// </summary>
         public double TimeOffset { get; set; }
 

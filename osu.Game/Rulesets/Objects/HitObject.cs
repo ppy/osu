@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Objects
@@ -62,6 +64,9 @@ namespace osu.Game.Rulesets.Objects
         [JsonIgnore]
         public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects.Value;
 
+        private readonly List<Judgement> judgements = new List<Judgement>();
+        public IReadOnlyList<Judgement> Judgements => judgements;
+
         /// <summary>
         /// Applies default values to this HitObject.
         /// </summary>
@@ -70,6 +75,9 @@ namespace osu.Game.Rulesets.Objects
         public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
+
+            judgements.Clear();
+            judgements.AddRange(CreateJudgements());
 
             if (nestedHitObjects.IsValueCreated)
                 nestedHitObjects.Value.Clear();
@@ -102,6 +110,8 @@ namespace osu.Game.Rulesets.Objects
         protected virtual void CreateNestedHitObjects()
         {
         }
+
+        protected virtual IEnumerable<Judgement> CreateJudgements() => Enumerable.Empty<Judgement>();
 
         protected void AddNested(HitObject hitObject) => nestedHitObjects.Value.Add(hitObject);
 
