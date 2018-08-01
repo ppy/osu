@@ -57,8 +57,41 @@ namespace osu.Game.Screens.Play
 
                 bar.StartTime = firstHitTime;
                 bar.EndTime = lastHitTime;
+
+                const int myIndex = strains.Count;
+                graph.Truth = new List<bool>();
+                
+                foreach (double strain in strains)
+                {
+                    graph.Truth.Add(false);
+                }
+                
+                double StartOfLists = (objects.First().StartTime - (objects.First().StartTime % strainStep))/strainStep;
+
+                foreach (bool truth in graph.Truth)
+                {
+                    foreach (HitObject hit in objects)
+                    {
+                        var endTime = (hit as IHasEndTime)?.EndTime ?? hit.StartTime;
+
+                        Debug.Assert(endTime >= hit.StartTime);
+
+                        if (){}
+                    }
+                    
+                }
             }
         }
+
+        private double strainStep;
+
+        public double StrainStep
+        {
+            get 
+            {return strainStep;}
+            set 
+            {strainStep = value;}
+        }  
 
         private readonly BindableBool replayLoaded = new BindableBool();
 
