@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 {
     public class TaikoIntermediateSwellJudgement : TaikoJudgement
     {
-        public override HitResult MaxResult => HitResult.Perfect;
+        public override HitResult MaxResult => HitResult.Great;
 
         public override bool AffectsCombo => false;
 

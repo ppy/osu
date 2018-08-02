@@ -9,15 +9,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class Hit : TaikoHitObject
     {
-        public TaikoJudgement Judgement { get; private set; }
-        public TaikoStrongHitJudgement StrongJudgement { get; private set; }
-
         protected override IEnumerable<Judgement> CreateJudgements()
         {
-            yield return Judgement = new TaikoJudgement();
+            yield return new TaikoJudgement();
 
             if (IsStrong)
-                yield return StrongJudgement = new TaikoStrongHitJudgement();
+                yield return new TaikoStrongHitJudgement();
         }
     }
 }

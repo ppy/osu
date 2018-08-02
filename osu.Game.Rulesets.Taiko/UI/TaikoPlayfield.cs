@@ -224,28 +224,28 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
         }
 
-        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        internal void OnJudgement(DrawableHitObject judgedObject, JudgementResult result)
         {
             if (!DisplayJudgements)
                 return;
 
             if (judgedObject.DisplayJudgement && judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
-                judgementContainer.Add(new DrawableTaikoJudgement(judgement, judgedObject)
+                judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
                 {
-                    Anchor = judgement.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
-                    Origin = judgement.IsHit ? Anchor.BottomCentre : Anchor.Centre,
+                    Anchor = result.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
+                    Origin = result.IsHit ? Anchor.BottomCentre : Anchor.Centre,
                     RelativePositionAxes = Axes.X,
-                    X = judgement.IsHit ? judgedObject.Position.X : 0,
+                    X = result.IsHit ? judgedObject.Position.X : 0,
                 });
             }
 
-            if (!judgement.IsHit)
+            if (!result.IsHit)
                 return;
 
             bool isRim = judgedObject.HitObject is RimHit;
 
-            if (judgement is TaikoStrongHitJudgement)
+            if (result.Judgement is TaikoStrongHitJudgement)
                 hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == judgedObject)?.VisualiseSecondHit();
             else
             {

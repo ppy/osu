@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -13,7 +14,9 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -28,6 +31,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         private const float target_ring_thin_border = 1f;
         private const float target_ring_scale = 5f;
         private const float inner_ring_alpha = 0.65f;
+
+        private readonly JudgementResult result;
+        private readonly List<JudgementResult> intermediateResults;
 
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
@@ -106,6 +112,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             });
 
             MainPiece.Add(symbol = new SwellSymbolPiece());
+
+            result = Results.Single(r => !(r.Judgement is TaikoIntermediateSwellJudgement));
+            intermediateResults = Results.Where(r => r.Judgement is TaikoIntermediateSwellJudgement).ToList();
         }
 
         [BackgroundDependencyLoader]
@@ -128,12 +137,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             if (userTriggered)
             {
-                var nextIntermediate = HitObject.IntermediateJudgements.FirstOrDefault(j => !j.HasResult);
+                var nextIntermediate = intermediateResults.FirstOrDefault(j => !j.HasResult);
 
                 if (nextIntermediate != null)
-                    ApplyJudgement(nextIntermediate, j => j.Result = HitResult.Great);
+                    ApplyResult(nextIntermediate, r => r.Type = HitResult.Great);
 
-                var numHits = HitObject.IntermediateJudgements.Count(j => j.HasResult);
+                var numHits = intermediateResults.Count(r => r.HasResult);
 
                 var completion = (float)numHits / HitObject.RequiredHits;
 
@@ -147,7 +156,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
                 if (numHits == HitObject.RequiredHits)
-                    ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Great);
+                    ApplyResult(result, r => r.Type = HitResult.Great);
             }
             else
             {
@@ -156,7 +165,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 int numHits = 0;
 
-                foreach (var intermediate in HitObject.IntermediateJudgements)
+                foreach (var intermediate in intermediateResults)
                 {
                     if (intermediate.HasResult)
                     {
@@ -164,10 +173,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         continue;
                     }
 
-                    ApplyJudgement(intermediate, j => j.Result = HitResult.Miss);
+                    ApplyResult(intermediate, r => r.Type = HitResult.Miss);
                 }
 
-                ApplyJudgement(HitObject.Judgement, j => j.Result = numHits > HitObject.RequiredHits / 2 ? HitResult.Good : HitResult.Miss);
+                var hitResult = numHits > HitObject.RequiredHits / 2 ? HitResult.Good : HitResult.Miss;
+
+                ApplyResult(result, r => r.Type = hitResult);
             }
         }
 
