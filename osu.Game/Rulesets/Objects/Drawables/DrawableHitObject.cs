@@ -62,6 +62,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private readonly List<JudgementResult> results = new List<JudgementResult>();
         public IReadOnlyList<JudgementResult> Results => results;
 
+        /// <summary>
+        /// The <see cref="JudgementResult"/> that affects whether this <see cref="DrawableHitObject"/> has been hit or missed.
+        /// By default, this is the last <see cref="JudgementResult"/> in <see cref="Results"/>, and should be overridden if the order
+        /// of <see cref="Judgement"/>s in <see cref="HitObject.CreateJudgements"/> doesn't list the main <see cref="Judgement"/> as its last element.
+        /// </summary>
+        protected virtual JudgementResult MainResult => Results.LastOrDefault();
+
         private bool judgementOccurred;
 
         public bool Interactive = true;
@@ -192,16 +199,19 @@ namespace osu.Game.Rulesets.Objects.Drawables
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
             result.TimeOffset = Time.Current - endTime;
 
-            switch (result.Type)
+            if (result == MainResult)
             {
-                case HitResult.None:
-                    break;
-                case HitResult.Miss:
-                    State.Value = ArmedState.Miss;
-                    break;
-                default:
-                    State.Value = ArmedState.Hit;
-                    break;
+                switch (result.Type)
+                {
+                    case HitResult.None:
+                        break;
+                    case HitResult.Miss:
+                        State.Value = ArmedState.Miss;
+                        break;
+                    default:
+                        State.Value = ArmedState.Hit;
+                        break;
+                }
             }
 
             OnJudgement?.Invoke(this, result);
