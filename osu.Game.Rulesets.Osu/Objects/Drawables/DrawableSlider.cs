@@ -136,21 +136,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < slider.EndTime)
                 return;
 
-            ApplyJudgement(HitObject.Judgement, j =>
+            ApplyResult(Results.Single(), r =>
             {
                 var judgementsCount = NestedHitObjects.Count();
                 var judgementsHit = NestedHitObjects.Count(h => h.IsHit);
 
                 var hitFraction = (double)judgementsHit / judgementsCount;
 
-                if (hitFraction == 1 && HeadCircle.HitObject.Judgement.Result == HitResult.Great)
-                    j.Result = HitResult.Great;
-                else if (hitFraction >= 0.5 && HeadCircle.HitObject.Judgement.Result >= HitResult.Good)
-                    j.Result = HitResult.Good;
+                if (hitFraction == 1 && HeadCircle.Results.Single().Type == HitResult.Great)
+                    r.Type = HitResult.Great;
+                else if (hitFraction >= 0.5 && HeadCircle.Results.Single().Type >= HitResult.Good)
+                    r.Type = HitResult.Good;
                 else if (hitFraction > 0)
-                    j.Result = HitResult.Meh;
+                    r.Type = HitResult.Meh;
                 else
-                    j.Result = HitResult.Miss;
+                    r.Type = HitResult.Miss;
             });
         }
 

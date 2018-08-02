@@ -138,16 +138,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < Spinner.EndTime)
                 return;
 
-            ApplyJudgement(HitObject.Judgement, j =>
+            ApplyResult(Results.Single(), r =>
             {
                 if (Progress >= 1)
-                    j.Result = HitResult.Great;
+                    r.Type = HitResult.Great;
                 else if (Progress > .9)
-                    j.Result = HitResult.Good;
+                    r.Type = HitResult.Good;
                 else if (Progress > .75)
-                    j.Result = HitResult.Meh;
+                    r.Type = HitResult.Meh;
                 else if (Time.Current >= Spinner.EndTime)
-                    j.Result = HitResult.Miss;
+                    r.Type = HitResult.Miss;
             });
         }
 

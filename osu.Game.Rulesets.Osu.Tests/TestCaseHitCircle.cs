@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 if (auto && !userTriggered && timeOffset > 0)
                 {
                     // force success
-                    ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Great);
+                    ApplyResult(Results.Single(), r => r.Type = HitResult.Great);
                 }
                 else
                     base.CheckForJudgements(userTriggered, timeOffset);
