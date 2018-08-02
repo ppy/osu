@@ -35,8 +35,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
         public IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : Enumerable.Empty<DrawableHitObject>();
 
-        public event Action<DrawableHitObject, Judgement> OnJudgement;
-        public event Action<DrawableHitObject, Judgement> OnJudgementRemoved;
+        public event Action<DrawableHitObject, JudgementResult> OnJudgement;
+        public event Action<DrawableHitObject, JudgementResult> OnJudgementRemoved;
 
         /// <summary>
         /// Whether a visible judgement should be displayed when this representation is hit.
@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been hit.
         /// </summary>
-        public bool IsHit => HitObject.Judgements.All(j => j.IsHit) && NestedHitObjects.All(n => n.IsHit);
+        public bool IsHit => Results.All(j => j.IsHit) && NestedHitObjects.All(n => n.IsHit);
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
@@ -57,7 +57,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Whether this <see cref="DrawableHitObject"/> has been judged.
         /// Note: This does NOT include nested hitobjects.
         /// </summary>
-        public bool Judged => HitObject.Judgements.All(h => h.HasResult);
+        public bool Judged => Results.All(h => h.HasResult);
+
+        private readonly List<JudgementResult> results = new List<JudgementResult>();
+        public IReadOnlyList<JudgementResult> Results => results;
 
         private bool judgementOccurred;
 
@@ -74,6 +77,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
+
+            foreach (var j in hitObject.Judgements)
+                results.Add(CreateJudgementResult(j));
         }
 
         [BackgroundDependencyLoader]
@@ -135,17 +141,17 @@ namespace osu.Game.Rulesets.Objects.Drawables
             {
                 var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 
-                for (int i = HitObject.Judgements.Count - 1; i >= 0; i--)
+                for (int i = Results.Count - 1; i >= 0; i--)
                 {
-                    var judgement = HitObject.Judgements[i];
+                    var judgement = Results[i];
 
                     if (judgement.TimeOffset + endTime <= Time.Current)
                         break;
 
-                    judgement.Result = HitResult.None;
-                    State.Value = ArmedState.Idle;
-
                     OnJudgementRemoved?.Invoke(this, judgement);
+
+                    judgement.Type = HitResult.None;
+                    State.Value = ArmedState.Idle;
                 }
             }
 
@@ -161,8 +167,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected virtual void AddNested(DrawableHitObject h)
         {
-            h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
-            h.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
+            h.OnJudgement += (d, r) => OnJudgement?.Invoke(d, r);
+            h.OnJudgementRemoved += (d, r) => OnJudgementRemoved?.Invoke(d, r);
             h.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
 
             nestedHitObjects.Value.Add(h);
@@ -172,18 +178,21 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Notifies that a new judgement has occurred for this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="judgement">The <see cref="Judgement"/>.</param>
-        protected void ApplyJudgement<T>(T judgement, Action<T> application)
-            where T : Judgement
+        protected void ApplyResult(JudgementResult result, Action<JudgementResult> application)
         {
-            judgementOccurred = true;
+            // Todo: Unsure if we want to keep this
+            if (!Results.Contains(result))
+                throw new ArgumentException($"The applied judgement result must be a part of {Results}.");
 
-            application?.Invoke(judgement);
+            application?.Invoke(result);
+
+            judgementOccurred = true;
 
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-            judgement.TimeOffset = Time.Current - endTime;
+            result.TimeOffset = Time.Current - endTime;
 
-            switch (judgement.Result)
+            switch (result.Type)
             {
                 case HitResult.None:
                     break;
@@ -195,7 +204,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     break;
             }
 
-            OnJudgement?.Invoke(this, judgement);
+            OnJudgement?.Invoke(this, result);
         }
 
         /// <summary>
@@ -224,7 +233,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// Checks if any judgements have occurred for this <see cref="DrawableHitObject"/>. This method must construct
-        /// all <see cref="Judgement"/>s and notify of them through <see cref="ApplyJudgement"/>.
+        /// all <see cref="Judgement"/>s and notify of them through <see cref="ApplyResult{T}"/>.
         /// </summary>
         /// <param name="userTriggered">Whether the user triggered this check.</param>
         /// <param name="timeOffset">The offset from the <see cref="HitObject"/> end time at which this check occurred. A <paramref name="timeOffset"/> &gt; 0
@@ -232,6 +241,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual void CheckForJudgements(bool userTriggered, double timeOffset)
         {
         }
+
+        protected virtual JudgementResult CreateJudgementResult(Judgement judgement) => new JudgementResult(judgement);
     }
 
     public abstract class DrawableHitObject<TObject> : DrawableHitObject
