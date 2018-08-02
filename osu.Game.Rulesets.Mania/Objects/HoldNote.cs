@@ -98,8 +98,6 @@ namespace osu.Game.Rulesets.Mania.Objects
             }
         }
 
-        public HoldNoteJudgement Judgement { get; private set; }
-
-        protected override IEnumerable<Judgement> CreateJudgements() => new[] { Judgement = new HoldNoteJudgement() };
+        protected override IEnumerable<Judgement> CreateJudgements() => new[] { new HoldNoteJudgement() };
     }
 }
