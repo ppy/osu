@@ -100,7 +100,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (tail.AllJudged)
-                AddJudgement(new HoldNoteJudgement { Result = HitResult.Perfect });
+                ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Perfect);
         }
 
         protected override void Update()
@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     return false;
 
                 // If the key has been released too early, the user should not receive full score for the release
-                if (Judgements.Any(j => j.Result == HitResult.Miss))
+                if (HitObject.Judgement.Result == HitResult.Miss)
                     holdNote.hasBroken = true;
 
                 // The head note also handles early hits before the body, but we want accurate early hits to count as the body being held
@@ -206,10 +206,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 {
                     if (!HitObject.HitWindows.CanBeHit(timeOffset))
                     {
-                        AddJudgement(new HoldNoteTailJudgement
+                        ApplyJudgement(holdNote.HitObject.Tail.Judgement, j =>
                         {
-                            Result = HitResult.Miss,
-                            HasBroken = holdNote.hasBroken
+                            j.Result = HitResult.Miss;
+                            ((HoldNoteTailJudgement)j).HasBroken = holdNote.hasBroken;
                         });
                     }
 
@@ -220,10 +220,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (result == HitResult.None)
                     return;
 
-                AddJudgement(new HoldNoteTailJudgement
+                ApplyJudgement(holdNote.HitObject.Tail.Judgement, j =>
                 {
-                    Result = result,
-                    HasBroken = holdNote.hasBroken
+                    j.Result = result;
+                    ((HoldNoteTailJudgement)j).HasBroken = holdNote.hasBroken;
                 });
             }
 
