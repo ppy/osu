@@ -225,7 +225,12 @@ namespace osu.Game.Rulesets.Scoring
                     simulate(nested);
 
                 foreach (var judgement in obj.Judgements)
-                    AddJudgement(new JudgementResult(judgement) { Type = judgement.MaxResult });
+                {
+                    var result = CreateJudgementResult(judgement);
+                    result.Type = judgement.MaxResult;
+
+                    AddJudgement(result);
+                }
             }
         }
 
@@ -350,6 +355,8 @@ namespace osu.Game.Rulesets.Scoring
             rollingMaxBaseScore = 0;
             bonusScore = 0;
         }
+
+        protected virtual JudgementResult CreateJudgementResult(Judgement judgement) => new JudgementResult(judgement);
     }
 
     public enum ScoringMode

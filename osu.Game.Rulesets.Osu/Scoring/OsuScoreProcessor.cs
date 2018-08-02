@@ -86,5 +86,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     break;
             }
         }
+
+        protected override JudgementResult CreateJudgementResult(Judgement judgement) => new OsuJudgementResult(judgement);
     }
 }
