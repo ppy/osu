@@ -229,7 +229,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (!DisplayJudgements)
                 return;
 
-            if (judgedObject.DisplayJudgement && judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
+            if (!judgedObject.DisplayJudgement)
+                return;
+
+            if (judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
             {
                 judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
                 {
