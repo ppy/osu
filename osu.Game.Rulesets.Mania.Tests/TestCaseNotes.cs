@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             return new ScrollingTestContainer(direction)
             {
                 AutoSizeAxes = Axes.Both,
-                Child = new NoteContainer(direction, $"note, scrolling {direction.ToString().ToLower()}")
+                Child = new NoteContainer(direction, $"note, scrolling {direction.ToString().ToLowerInvariant()}")
                 {
                     Child = new DrawableNote(note) { AccentColour = Color4.OrangeRed }
                 }
@@ -77,7 +77,7 @@ namespace osu.Game.Rulesets.Mania.Tests
             return new ScrollingTestContainer(direction)
             {
                 AutoSizeAxes = Axes.Both,
-                Child = new NoteContainer(direction, $"hold note, scrolling {direction.ToString().ToLower()}")
+                Child = new NoteContainer(direction, $"hold note, scrolling {direction.ToString().ToLowerInvariant()}")
                 {
                     Child = new DrawableHoldNote(note)
                     {
