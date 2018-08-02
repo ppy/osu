@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -28,14 +27,23 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
+            {
+                if (timeOffset > HitObject.HitWindow)
+                {
+                    ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Miss);
+                    if (HitObject.IsStrong)
+                        ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Miss);
+                }
+
+                return;
+            }
+
+            if (Math.Abs(timeOffset) > HitObject.HitWindow)
                 return;
 
-            if (!(Math.Abs(timeOffset) < HitObject.HitWindow))
-                return;
-
-            AddJudgement(new TaikoDrumRollTickJudgement { Result = HitResult.Great });
+            ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Great);
             if (HitObject.IsStrong)
-                AddJudgement(new TaikoStrongHitJudgement());
+                ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Great);
         }
 
         protected override void UpdateState(ArmedState state)

@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -28,23 +27,27 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
-            if (!SecondHitAllowed)
+            if (!HitObject.Judgement.HasResult)
             {
                 base.CheckForJudgements(userTriggered, timeOffset);
+                return;
+            }
+
+            if (!HitObject.Judgement.IsHit)
+            {
+                ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Miss);
                 return;
             }
 
             if (!userTriggered)
             {
                 if (timeOffset > second_hit_window)
-                    AddJudgement(new TaikoStrongHitJudgement { Result = HitResult.None });
+                    ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Miss);
                 return;
             }
 
-            // If we get here, we're assured that the key pressed is the correct secondary key
-
             if (Math.Abs(firstHitTime - Time.Current) < second_hit_window)
-                AddJudgement(new TaikoStrongHitJudgement { Result = HitResult.Great });
+                ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Great);
         }
 
         protected override void UpdateState(ArmedState state)
@@ -73,7 +76,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return false;
 
             // Check if we've handled the first key
-            if (!SecondHitAllowed)
+            if (!HitObject.Judgement.HasResult)
             {
                 // First key hasn't been handled yet, attempt to handle it
                 bool handled = base.OnPressed(action);

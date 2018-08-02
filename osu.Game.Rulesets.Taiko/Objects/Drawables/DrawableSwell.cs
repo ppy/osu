@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -12,7 +13,6 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -128,9 +128,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             if (userTriggered)
             {
-                AddJudgement(new TaikoIntermediateSwellJudgement());
+                var nextIntermediate = HitObject.IntermediateJudgements.FirstOrDefault(j => !j.HasResult);
 
-                var completion = (float)Judgements.Count / HitObject.RequiredHits;
+                if (nextIntermediate != null)
+                    ApplyJudgement(nextIntermediate, j => j.Result = HitResult.Great);
+
+                var numHits = HitObject.IntermediateJudgements.Count(j => j.HasResult);
+
+                var completion = (float)numHits / HitObject.RequiredHits;
 
                 expandingRing
                     .FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50)
@@ -141,18 +146,28 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
-                if (Judgements.Count == HitObject.RequiredHits)
-                    AddJudgement(new TaikoJudgement { Result = HitResult.Great });
+                if (numHits == HitObject.RequiredHits)
+                    ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Great);
             }
             else
             {
                 if (timeOffset < 0)
                     return;
 
-                //TODO: THIS IS SHIT AND CAN'T EXIST POST-TAIKO WORLD CUP
-                AddJudgement(Judgements.Count > HitObject.RequiredHits / 2
-                    ? new TaikoJudgement { Result = HitResult.Good }
-                    : new TaikoJudgement { Result = HitResult.Miss });
+                int numHits = 0;
+
+                foreach (var intermediate in HitObject.IntermediateJudgements)
+                {
+                    if (intermediate.HasResult)
+                    {
+                        numHits++;
+                        continue;
+                    }
+
+                    ApplyJudgement(intermediate, j => j.Result = HitResult.Miss);
+                }
+
+                ApplyJudgement(HitObject.Judgement, j => j.Result = numHits > HitObject.RequiredHits / 2 ? HitResult.Good : HitResult.Miss);
             }
         }
 

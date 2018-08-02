@@ -3,8 +3,11 @@
 
 using osu.Game.Rulesets.Objects.Types;
 using System;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
@@ -80,6 +83,17 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
                 first = false;
             }
+        }
+
+        public TaikoJudgement Judgement { get; private set; }
+        public TaikoStrongHitJudgement StrongJudgement { get; private set; }
+
+        protected override IEnumerable<Judgement> CreateJudgements()
+        {
+            yield return Judgement = new TaikoJudgement();
+
+            if (IsStrong)
+                yield return StrongJudgement = new TaikoStrongHitJudgement();
         }
     }
 }
