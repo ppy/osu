@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Invoked when a new judgement has occurred. This occurs after the judgement has been processed by the <see cref="ScoreProcessor"/>.
         /// </summary>
-        public event Action<Judgement> NewJudgement;
+        public event Action<JudgementResult> NewJudgement;
 
         /// <summary>
         /// Additional conditions on top of <see cref="DefaultFailCondition"/> that cause a failing state.
@@ -144,9 +144,10 @@ namespace osu.Game.Rulesets.Scoring
         /// Notifies subscribers of <see cref="NewJudgement"/> that a new judgement has occurred.
         /// </summary>
         /// <param name="judgement">The judgement to notify subscribers of.</param>
-        protected void NotifyNewJudgement(Judgement judgement)
+        /// <param name="result">The judgement scoring result to notify subscribers of.</param>
+        protected void NotifyNewJudgement(JudgementResult result)
         {
-            NewJudgement?.Invoke(judgement);
+            NewJudgement?.Invoke(result);
 
             if (HasCompleted)
                 AllJudged?.Invoke();
@@ -209,32 +210,47 @@ namespace osu.Game.Rulesets.Scoring
             Mode.ValueChanged += _ => updateScore();
         }
 
-        /// <summary>
-        /// Simulates an autoplay of <see cref="HitObject"/>s that will be judged by this <see cref="ScoreProcessor{TObject}"/>
-        /// by adding <see cref="Judgement"/>s for each <see cref="HitObject"/> in the <see cref="Beatmap{TObject}"/>.
-        /// <para>
-        /// This is required for <see cref="ScoringMode.Standardised"/> to work, otherwise <see cref="ScoringMode.Classic"/> will be used.
-        /// </para>
-        /// </summary>
-        /// <param name="beatmap">The <see cref="Beatmap{TObject}"/> containing the <see cref="HitObject"/>s that will be judged by this <see cref="ScoreProcessor{TObject}"/>.</param>
-        protected virtual void SimulateAutoplay(Beatmap<TObject> beatmap) { }
+        protected virtual void ApplyBeatmap(Beatmap<TObject> beatmap)
+        {
+        }
+
+        protected virtual void SimulateAutoplay(Beatmap<TObject> beatmap)
+        {
+            foreach (var obj in beatmap.HitObjects)
+                simulate(obj);
+
+            void simulate(HitObject obj)
+            {
+                foreach (var nested in obj.NestedHitObjects)
+                    simulate(nested);
+
+                foreach (var judgement in obj.Judgements)
+                    AddJudgement(new JudgementResult(judgement) { Type = judgement.MaxResult });
+            }
+        }
 
         /// <summary>
         /// Adds a judgement to this ScoreProcessor.
         /// </summary>
         /// <param name="judgement">The judgement to add.</param>
-        protected void AddJudgement(Judgement judgement)
+        /// <param name="result">The judgement scoring result.</param>
+        protected void AddJudgement(JudgementResult result)
         {
-            OnNewJudgement(judgement);
+            OnNewJudgement(result);
             updateScore();
 
             UpdateFailed();
-            NotifyNewJudgement(judgement);
+            NotifyNewJudgement(result);
         }
 
-        protected void RemoveJudgement(Judgement judgement)
+        /// <summary>
+        /// Removes a judgement from this ScoreProcessor.
+        /// </summary>
+        /// <param name="judgement">The judgement to remove.</param>
+        /// <param name="result">The judgement scoring result.</param>
+        protected void RemoveJudgement(JudgementResult result)
         {
-            OnJudgementRemoved(judgement);
+            OnJudgementRemoved(result);
             updateScore();
         }
 
@@ -242,16 +258,17 @@ namespace osu.Game.Rulesets.Scoring
         /// Applies a judgement.
         /// </summary>
         /// <param name="judgement">The judgement to apply/</param>
-        protected virtual void OnNewJudgement(Judgement judgement)
+        /// <param name="result">The judgement scoring result.</param>
+        protected virtual void OnNewJudgement(JudgementResult result)
         {
-            judgement.ComboAtJudgement = Combo;
-            judgement.HighestComboAtJudgement = HighestCombo;
+            result.ComboAtJudgement = Combo;
+            result.HighestComboAtJudgement = HighestCombo;
 
             JudgedHits++;
 
-            if (judgement.AffectsCombo)
+            if (result.Judgement.AffectsCombo)
             {
-                switch (judgement.Result)
+                switch (result.Type)
                 {
                     case HitResult.None:
                         break;
@@ -264,15 +281,15 @@ namespace osu.Game.Rulesets.Scoring
                 }
             }
 
-            if (judgement.IsBonus)
+            if (result.Judgement.IsBonus)
             {
-                if (judgement.IsHit)
-                    bonusScore += judgement.NumericResult;
+                if (result.IsHit)
+                    bonusScore += result.Judgement.NumericResultFor(result);
             }
             else
             {
-                baseScore += judgement.NumericResult;
-                rollingMaxBaseScore += judgement.MaxNumericResult;
+                baseScore += result.Judgement.NumericResultFor(result);
+                rollingMaxBaseScore += result.Judgement.MaxNumericResult;
             }
         }
 
@@ -280,22 +297,23 @@ namespace osu.Game.Rulesets.Scoring
         /// Removes a judgement. This should reverse everything in <see cref="OnNewJudgement(Judgement)"/>.
         /// </summary>
         /// <param name="judgement">The judgement to remove.</param>
-        protected virtual void OnJudgementRemoved(Judgement judgement)
+        /// <param name="result">The judgement scoring result.</param>
+        protected virtual void OnJudgementRemoved(JudgementResult result)
         {
-            Combo.Value = judgement.ComboAtJudgement;
-            HighestCombo.Value = judgement.HighestComboAtJudgement;
+            Combo.Value = result.ComboAtJudgement;
+            HighestCombo.Value = result.HighestComboAtJudgement;
 
             JudgedHits--;
 
-            if (judgement.IsBonus)
+            if (result.Judgement.IsBonus)
             {
-                if (judgement.IsHit)
-                    bonusScore -= judgement.NumericResult;
+                if (result.IsHit)
+                    bonusScore -= result.Judgement.NumericResultFor(result);
             }
             else
             {
-                baseScore -= judgement.NumericResult;
-                rollingMaxBaseScore -= judgement.MaxNumericResult;
+                baseScore -= result.Judgement.NumericResultFor(result);
+                rollingMaxBaseScore -= result.Judgement.MaxNumericResult;
             }
         }
 
