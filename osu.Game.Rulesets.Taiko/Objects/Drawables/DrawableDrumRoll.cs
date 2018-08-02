@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -22,6 +23,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// Number of rolling hits required to reach the dark/final colour.
         /// </summary>
         private const int rolling_hits_for_engaged_colour = 5;
+
+        private readonly JudgementResult result;
+        private readonly JudgementResult strongResult;
 
         /// <summary>
         /// Rolling number of tick hits. This increases for hits and decreases for misses.
@@ -44,6 +48,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 AddNested(newTick);
                 tickContainer.Add(newTick);
             }
+
+            result = Results.Single(r => !(r.Judgement is TaikoStrongHitJudgement));
+            strongResult = Results.SingleOrDefault(r => r.Judgement is TaikoStrongHitJudgement);
         }
 
         protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();
@@ -60,9 +67,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             colourEngaged = colours.YellowDarker;
         }
 
-        private void onTickJudgement(DrawableHitObject obj, Judgement judgement)
+        private void onTickJudgement(DrawableHitObject obj, JudgementResult result)
         {
-            if (judgement.Result > HitResult.Miss)
+            if (result.Type > HitResult.Miss)
                 rollingHits++;
             else
                 rollingHits--;
@@ -84,15 +91,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             int countHit = NestedHitObjects.Count(o => o.IsHit);
             if (countHit >= HitObject.RequiredGoodHits)
             {
-                ApplyJudgement(HitObject.Judgement, j => j.Result = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good);
+                ApplyResult(result, r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good);
                 if (HitObject.IsStrong)
-                    ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Great);
+                    ApplyResult(strongResult, r => r.Type = HitResult.Great);
             }
             else
             {
-                ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Miss);
+                ApplyResult(result, r => r.Type = HitResult.Miss);
                 if (HitObject.IsStrong)
-                    ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Miss);
+                    ApplyResult(strongResult, r => r.Type = HitResult.Miss);
             }
         }
 

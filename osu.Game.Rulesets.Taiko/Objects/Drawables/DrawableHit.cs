@@ -3,8 +3,10 @@
 
 using System.Linq;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -16,6 +18,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         protected abstract TaikoAction[] HitActions { get; }
 
+        protected readonly JudgementResult Result;
+
         /// <summary>
         /// Whether the last key pressed is a valid hit key.
         /// </summary>
@@ -25,6 +29,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             : base(hit)
         {
             FillMode = FillMode.Fit;
+
+            Result = Results.Single(r => !(r.Judgement is TaikoStrongHitJudgement));
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
@@ -32,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Miss);
+                    ApplyResult(Result, r => r.Type = HitResult.Miss);
                 return;
             }
 
@@ -40,10 +46,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (result == HitResult.None)
                 return;
 
-            if (!validKeyPressed || result == HitResult.Miss)
-                ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Miss);
+            if (!validKeyPressed)
+                ApplyResult(Result, r => r.Type = HitResult.Miss);
             else
-                ApplyJudgement(HitObject.Judgement, j => j.Result = result);
+                ApplyResult(Result, r => r.Type = result);
         }
 
         public override bool OnPressed(TaikoAction action)

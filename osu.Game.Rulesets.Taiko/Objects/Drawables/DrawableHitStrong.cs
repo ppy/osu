@@ -3,8 +3,10 @@
 
 using System;
 using System.Linq;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -16,6 +18,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private const double second_hit_window = 30;
 
+        private readonly JudgementResult strongResult;
+
         private double firstHitTime;
         private bool firstKeyHeld;
         private TaikoAction firstHitAction;
@@ -23,31 +27,32 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected DrawableHitStrong(Hit hit)
             : base(hit)
         {
+            strongResult = Results.SingleOrDefault(r => r.Judgement is TaikoStrongHitJudgement);
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
-            if (!HitObject.Judgement.HasResult)
+            if (!Result.HasResult)
             {
                 base.CheckForJudgements(userTriggered, timeOffset);
                 return;
             }
 
-            if (!HitObject.Judgement.IsHit)
+            if (!Result.IsHit)
             {
-                ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Miss);
+                ApplyResult(strongResult, r => r.Type = HitResult.Miss);
                 return;
             }
 
             if (!userTriggered)
             {
                 if (timeOffset > second_hit_window)
-                    ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Miss);
+                    ApplyResult(strongResult, r => r.Type = HitResult.Miss);
                 return;
             }
 
             if (Math.Abs(firstHitTime - Time.Current) < second_hit_window)
-                ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Great);
+                ApplyResult(strongResult, r => r.Type = HitResult.Great);
         }
 
         protected override void UpdateState(ArmedState state)
@@ -76,7 +81,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return false;
 
             // Check if we've handled the first key
-            if (!HitObject.Judgement.HasResult)
+            if (!Result.HasResult)
             {
                 // First key hasn't been handled yet, attempt to handle it
                 bool handled = base.OnPressed(action);

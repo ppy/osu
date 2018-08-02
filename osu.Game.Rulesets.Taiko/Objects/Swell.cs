@@ -19,22 +19,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         public int RequiredHits = 10;
 
-        public TaikoJudgement Judgement { get; private set; }
-
-        private readonly List<TaikoIntermediateSwellJudgement> intermediateJudgements = new List<TaikoIntermediateSwellJudgement>();
-        public IReadOnlyList<TaikoIntermediateSwellJudgement> IntermediateJudgements => intermediateJudgements;
-
         protected override IEnumerable<Judgement> CreateJudgements()
         {
-            yield return Judgement = new TaikoJudgement();
+            yield return new TaikoJudgement();
 
             for (int i = 0; i < RequiredHits; i++)
-            {
-                var intermediate = new TaikoIntermediateSwellJudgement();
-                intermediateJudgements.Add(intermediate);
-
-                yield return intermediate;
-            }
+                yield return new TaikoIntermediateSwellJudgement();
         }
     }
 }

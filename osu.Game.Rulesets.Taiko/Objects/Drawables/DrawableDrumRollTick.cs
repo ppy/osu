@@ -2,19 +2,28 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableDrumRollTick : DrawableTaikoHitObject<DrumRollTick>
     {
+        private readonly JudgementResult result;
+        private readonly JudgementResult strongResult;
+
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
         {
             FillMode = FillMode.Fit;
+
+            result = Results.Single(r => !(r.Judgement is TaikoStrongHitJudgement));
+            strongResult = Results.SingleOrDefault(r => r.Judgement is TaikoStrongHitJudgement);
         }
 
         public override bool DisplayJudgement => false;
@@ -30,9 +39,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             {
                 if (timeOffset > HitObject.HitWindow)
                 {
-                    ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Miss);
+                    ApplyResult(result, r => r.Type = HitResult.Miss);
                     if (HitObject.IsStrong)
-                        ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Miss);
+                        ApplyResult(strongResult, r => r.Type = HitResult.Miss);
                 }
 
                 return;
@@ -41,9 +50,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (Math.Abs(timeOffset) > HitObject.HitWindow)
                 return;
 
-            ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Great);
+            ApplyResult(result, r => r.Type = HitResult.Great);
             if (HitObject.IsStrong)
-                ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Great);
+                ApplyResult(strongResult, r => r.Type = HitResult.Great);
         }
 
         protected override void UpdateState(ArmedState state)
