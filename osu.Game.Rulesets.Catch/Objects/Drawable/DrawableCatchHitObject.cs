@@ -5,7 +5,6 @@ using System;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
@@ -57,15 +56,11 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             if (CheckPosition == null) return;
 
-            if (timeOffset >= 0)
+            if (timeOffset >= 0 && HitObject is ICatchObjectWithJudgement judgeable)
             {
-                var judgement = CreateJudgement();
-                judgement.Result = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss;
-                AddJudgement(judgement);
+                ApplyJudgement(judgeable.Judgement, j => j.Result = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss);
             }
         }
-
-        protected virtual CatchJudgement CreateJudgement() => new CatchJudgement();
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
