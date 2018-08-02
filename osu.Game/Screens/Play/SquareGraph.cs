@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private double[] calculatedValues = { }; // values but adjusted to fit the amount of columns
+        private List<double> calculatedValues = new List<double>(); // values but adjusted to fit the amount of columns
 
         private List<double> values = new List<double>();
         public List<double> Values
@@ -48,6 +48,24 @@ namespace osu.Game.Screens.Play
             {
                 if (value == values) return;
                 values = value;
+                layout.Invalidate();
+            }
+        }
+
+        private List<bool> calculatedFake = new List<bool>();
+
+        private List<bool> fake = new List<bool>();
+        public List<bool> Fake
+        {
+            get { return fake; }
+            set
+            {
+                if (value == fake) return;
+                fake = value;
+                while (fake.Count!=values.Count)
+                {
+                    fake.Add(true);
+                }
                 layout.Invalidate();
             }
         }
@@ -105,7 +123,10 @@ namespace osu.Game.Screens.Play
         private void redrawFilled()
         {
             for (int i = 0; i < ColumnCount; i++)
-                columns[i].Filled = (float) calculatedValues.ElementAtOrDefault(i);
+                if(fake[i])
+                    columns[i].Filled = (float) calculatedValues.ElementAtOrDefault(i);
+                else
+                  columns[i].Filled = 0;
             ForceRedraw();
         }
 
@@ -115,11 +136,13 @@ namespace osu.Game.Screens.Play
         private void recalculateValues()
         {
             var newValues = new List<double>();
+            var newFake = new List<bool>();
 
             if (values == null)
             {
                 for (float i = 0; i < ColumnCount; i++)
                     newValues.Add(0);
+                    newFake.Add(false);
 
                 return;
             }
@@ -130,18 +153,31 @@ namespace osu.Game.Screens.Play
             float step = values.Count / (float)ColumnCount;
             for (float i = 0; i < values.Count; i += step)
             {
+                bool myBool = false;
                 double sum = 0;
                 float iteration = 0;
-                for (float x = i; x < i+step && x <values.Count; x++)
+                for (float x = i; x < i+step && x < values.Count; x++)
                 {
                     sum += values[(int) x];
                     iteration = x - i + 1;
+                    //try 
+                    //{
+                        if (fake[(int)x])
+                            myBool = true;
+                    //}
+                    //finally//catch (ArgumentOutOfRangeException a)
+                    //{
+                        //if(!myBool)
+                        //myBool=false;
+                    //}
                 }
                 sum = sum / iteration;
                 newValues.Add(sum / max);
+                newFake.Add(myBool);
             }
 
-            calculatedValues = newValues.ToArray();
+            calculatedValues = newValues;
+            calculatedFake = newFake;
         }
 
         /// <summary>

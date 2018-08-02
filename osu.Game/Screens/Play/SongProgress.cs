@@ -78,17 +78,17 @@ namespace osu.Game.Screens.Play
                         Debug.Assert(endTime >= hit.StartTime);
 
                         //this if will dzielić x wyższego fora przzez strainstep i sprawdzał czy hitobject znajduje się w zakresie dzielenie - dzielenie+strainstep
-                        if (hit.StartTime>=x*strainStep && hit.StartTime<(x+1)*strainStep)
+                        if (hit.StartTime>=x*strainStep+StartOfLists && hit.StartTime<(x+1)*strainStep+StartOfLists)
                         {
                             graph.Truth[x]=true;
                         }
 
-                        if (endTime>=x*strainStep && endTime<(x+1)*strainStep)
+                        if (endTime>=x*strainStep+StartOfLists && endTime<(x+1)*strainStep+StartOfLists)
                         {
                             graph.Truth[x]=true;
                         }
 
-                        if (hit.StartTime<x*strainStep && endTime>(x+1)*strainStep)
+                        if (hit.StartTime<x*strainStep+StartOfLists && endTime>(x+1)*strainStep+StartOfLists)
                         {
                             graph.Truth[x]=true;
                         }

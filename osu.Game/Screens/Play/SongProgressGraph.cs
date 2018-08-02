@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play
             get {return truth;}
             set
             {
-                truth = value;
+                Fake = truth = value;
             }
         }
     }
