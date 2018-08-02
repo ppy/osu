@@ -1,10 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -56,12 +54,6 @@ namespace osu.Game.Rulesets.Catch.Objects
         }
 
         protected override HitWindows CreateHitWindows() => null;
-
-        protected override IEnumerable<Judgement> CreateJudgements()
-        {
-            if (this is ICatchObjectWithJudgement judgeable)
-                yield return judgeable.Judgement;
-        }
     }
 
     public enum FruitVisualRepresentation
