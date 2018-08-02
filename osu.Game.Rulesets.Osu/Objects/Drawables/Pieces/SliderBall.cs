@@ -10,6 +10,7 @@ using osu.Framework.Input.States;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
 using OpenTK.Graphics;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -18,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private const float width = 128;
 
         private Color4 accentColour = Color4.Black;
+
         /// <summary>
         /// The colour that is used for the slider ball.
         /// </summary>
@@ -27,14 +29,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             set
             {
                 accentColour = value;
-                if (ball != null)
-                    ball.Colour = value;
+                if (drawableBall != null)
+                    drawableBall.Colour = value;
             }
         }
 
         private readonly Slider slider;
-        public readonly Box FollowCircle;
-        private readonly Box ball;
+        public readonly Drawable FollowCircle;
+        private Drawable drawableBall;
 
         public SliderBall(Slider slider)
         {
@@ -43,19 +45,30 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             AutoSizeAxes = Axes.Both;
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
-            BorderThickness = 10;
-            BorderColour = Color4.Orange;
 
-            Children = new Drawable[]
+            Children = new[]
             {
-                FollowCircle = new Box
+                FollowCircle = new Container
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Colour = Color4.Orange,
                     Width = width,
                     Height = width,
                     Alpha = 0,
+                    Child = new SkinnableDrawable("Play/osu/sliderfollowcircle", _ => new CircularContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        BorderThickness = 5,
+                        BorderColour = Color4.Orange,
+                        Blending = BlendingMode.Additive,
+                        Child = new Box
+                        {
+                            Colour = Color4.Orange,
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0.2f,
+                        }
+                    }),
                 },
                 new CircularContainer
                 {
@@ -63,18 +76,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    BorderThickness = 10,
-                    BorderColour = Color4.White,
                     Alpha = 1,
-                    Children = new[]
+                    Child = new Container
                     {
-                        ball = new Box
+                        Width = width,
+                        Height = width,
+                        // TODO: support skin filename animation (sliderb0, sliderb1...)
+                        Child = new SkinnableDrawable("Play/osu/sliderb", _ => new CircularContainer
                         {
-                            Colour = AccentColour,
-                            Alpha = 0.4f,
-                            Width = width,
-                            Height = width,
-                        },
+                            Masking = true,
+                            RelativeSizeAxes = Axes.Both,
+                            BorderThickness = 10,
+                            BorderColour = Color4.White,
+                            Alpha = 1,
+                            Child = drawableBall = new Box
+                            {
+                                Colour = AccentColour,
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0.4f,
+                            }
+                        }),
                     }
                 }
             };
@@ -111,6 +132,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private bool tracking;
+
         public bool Tracking
         {
             get { return tracking; }
@@ -120,8 +142,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
                 tracking = value;
 
-                FollowCircle.ScaleTo(tracking ? 2.8f : 1, 300, Easing.OutQuint);
-                FollowCircle.FadeTo(tracking ? 0.2f : 0, 300, Easing.OutQuint);
+                FollowCircle.ScaleTo(tracking ? 2f : 1, 300, Easing.OutQuint);
+                FollowCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
         }
 
