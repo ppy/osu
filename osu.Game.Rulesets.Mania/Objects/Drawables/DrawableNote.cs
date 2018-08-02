@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Extensions.Color4Extensions;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
@@ -60,7 +61,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Miss);
+                    ApplyResult(Results.Single(), r => r.Type = HitResult.Miss);
                 return;
             }
 
@@ -68,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (result == HitResult.None)
                 return;
 
-            ApplyJudgement(HitObject.Judgement, j => j.Result = result);
+            ApplyResult(Results.Single(), r => r.Type = result);
         }
 
         public virtual bool OnPressed(ManiaAction action)

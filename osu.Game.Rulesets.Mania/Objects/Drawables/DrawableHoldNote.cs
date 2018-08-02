@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -100,7 +99,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (tail.AllJudged)
-                ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Perfect);
+                ApplyResult(Results.Single(), r => r.Type = HitResult.Perfect);
         }
 
         protected override void Update()
@@ -166,7 +165,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     return false;
 
                 // If the key has been released too early, the user should not receive full score for the release
-                if (HitObject.Judgement.Result == HitResult.Miss)
+                if (Results.Single().Type == HitResult.Miss)
                     holdNote.hasBroken = true;
 
                 // The head note also handles early hits before the body, but we want accurate early hits to count as the body being held
@@ -205,13 +204,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (!userTriggered)
                 {
                     if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    {
-                        ApplyJudgement(holdNote.HitObject.Tail.Judgement, j =>
-                        {
-                            j.Result = HitResult.Miss;
-                            ((HoldNoteTailJudgement)j).HasBroken = holdNote.hasBroken;
-                        });
-                    }
+                        ApplyResult(Results.Single(), r => r.Type = HitResult.Miss);
 
                     return;
                 }
@@ -220,10 +213,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (result == HitResult.None)
                     return;
 
-                ApplyJudgement(holdNote.HitObject.Tail.Judgement, j =>
+                ApplyResult(Results.Single(), r =>
                 {
-                    j.Result = result;
-                    ((HoldNoteTailJudgement)j).HasBroken = holdNote.hasBroken;
+                    if (holdNote.hasBroken && (result == HitResult.Perfect || result == HitResult.Perfect))
+                        result = HitResult.Good;
+
+                    r.Type = result;
                 });
             }
 

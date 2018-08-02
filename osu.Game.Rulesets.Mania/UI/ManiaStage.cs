@@ -161,13 +161,13 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));
 
-        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        internal void OnJudgement(DrawableHitObject judgedObject, JudgementResult result)
         {
             if (!judgedObject.DisplayJudgement || !DisplayJudgements)
                 return;
 
             judgements.Clear();
-            judgements.Add(new DrawableManiaJudgement(judgement, judgedObject)
+            judgements.Add(new DrawableManiaJudgement(result, judgedObject)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

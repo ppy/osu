@@ -12,8 +12,6 @@ namespace osu.Game.Rulesets.Mania.Objects
     /// </summary>
     public class Note : ManiaHitObject
     {
-        public virtual ManiaJudgement Judgement { get; } = new ManiaJudgement();
-
-        protected override IEnumerable<Judgement> CreateJudgements() => new[] { Judgement };
+        protected override IEnumerable<Judgement> CreateJudgements() => new[] { new ManiaJudgement() };
     }
 }
