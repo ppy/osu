@@ -5,7 +5,6 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -16,11 +15,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
         protected abstract TaikoAction[] HitActions { get; }
-
-        /// <summary>
-        /// Whether a second hit is allowed to be processed. This occurs once this hit object has been hit successfully.
-        /// </summary>
-        protected bool SecondHitAllowed { get; private set; }
 
         /// <summary>
         /// Whether the last key pressed is a valid hit key.
@@ -38,7 +32,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
+                    ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Miss);
                 return;
             }
 
@@ -47,17 +41,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
 
             if (!validKeyPressed || result == HitResult.Miss)
-                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
+                ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Miss);
             else
-            {
-                AddJudgement(new TaikoJudgement
-                {
-                    Result = result,
-                    Final = !HitObject.IsStrong
-                });
-
-                SecondHitAllowed = true;
-            }
+                ApplyJudgement(HitObject.Judgement, j => j.Result = result);
         }
 
         public override bool OnPressed(TaikoAction action)
@@ -86,7 +72,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 switch (State.Value)
                 {
                     case ArmedState.Idle:
-                        SecondHitAllowed = false;
                         validKeyPressed = false;
 
                         UnproxyContent();

@@ -11,11 +11,6 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 
         public override bool AffectsCombo => false;
 
-        public TaikoIntermediateSwellJudgement()
-        {
-            Final = false;
-        }
-
         /// <summary>
         /// Computes the numeric result value for the combo portion of the score.
         /// </summary>

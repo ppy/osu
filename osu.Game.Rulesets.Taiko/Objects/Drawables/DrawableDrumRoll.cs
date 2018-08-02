@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Judgements;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
@@ -85,12 +84,16 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             int countHit = NestedHitObjects.Count(o => o.IsHit);
             if (countHit >= HitObject.RequiredGoodHits)
             {
-                AddJudgement(new TaikoJudgement { Result = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good });
+                ApplyJudgement(HitObject.Judgement, j => j.Result = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good);
                 if (HitObject.IsStrong)
-                    AddJudgement(new TaikoStrongHitJudgement());
+                    ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Great);
             }
             else
-                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
+            {
+                ApplyJudgement(HitObject.Judgement, j => j.Result = HitResult.Miss);
+                if (HitObject.IsStrong)
+                    ApplyJudgement(HitObject.StrongJudgement, j => j.Result = HitResult.Miss);
+            }
         }
 
         protected override void UpdateState(ArmedState state)
