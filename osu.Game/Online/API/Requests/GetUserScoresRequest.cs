@@ -20,7 +20,7 @@ namespace osu.Game.Online.API.Requests
         }
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLower()}?offset={offset}";
+        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}?offset={offset}";
     }
 
     public enum ScoreType

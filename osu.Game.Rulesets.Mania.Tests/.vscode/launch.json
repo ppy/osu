@@ -2,35 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "VisualTests (Debug, net471)",
-            "windows": {
-                "type": "clr"
-            },
-            "type": "mono",
-            "request": "launch",
-            "program": "${workspaceRoot}/bin/Debug/net471/osu.Game.Rulesets.Mania.Tests.exe",
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build (Debug, msbuild)",
-            "runtimeExecutable": null,
-            "env": {},
-            "console": "internalConsole"
-        },
-        {
-            "name": "VisualTests (Release, net471)",
-            "windows": {
-                "type": "clr"
-            },
-            "type": "mono",
-            "request": "launch",
-            "program": "${workspaceRoot}/bin/Release/net471/osu.Game.Rulesets.Mania.Tests.exe",
-            "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build (Release, msbuild)",
-            "runtimeExecutable": null,
-            "env": {},
-            "console": "internalConsole"
-        },
-        {
-            "name": "VisualTests (Debug, netcoreapp2.1)",
+            "name": "VisualTests (Debug)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
@@ -38,12 +10,12 @@
                 "${workspaceRoot}/bin/Debug/netcoreapp2.1/osu.Game.Rulesets.Mania.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build (Debug, dotnet)",
+            "preLaunchTask": "Build (Debug)",
             "env": {},
             "console": "internalConsole"
         },
         {
-            "name": "VisualTests (Release, netcoreapp2.1)",
+            "name": "VisualTests (Release)",
             "type": "coreclr",
             "request": "launch",
             "program": "dotnet",
@@ -51,7 +23,7 @@
                 "${workspaceRoot}/bin/Release/netcoreapp2.1/osu.Game.Rulesets.Mania.Tests.dll"
             ],
             "cwd": "${workspaceRoot}",
-            "preLaunchTask": "Build (Release, dotnet)",
+            "preLaunchTask": "Build (Release)",
             "env": {},
             "console": "internalConsole"
         }
