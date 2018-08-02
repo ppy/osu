@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    Text = Title.ToUpper(),
+                                    Text = Title.ToUpperInvariant(),
                                     TextSize = 17,
                                     Font = @"Exo2.0-Bold",
                                     Margin = new MarginPadding { Left = 10 },

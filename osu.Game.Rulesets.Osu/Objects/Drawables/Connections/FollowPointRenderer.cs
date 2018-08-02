@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                     Vector2 distanceVector = endPosition - startPosition;
                     int distance = (int)distanceVector.Length;
-                    float rotation = (float)Math.Atan2(distanceVector.Y, distanceVector.X);
+                    float rotation = (float)(Math.Atan2(distanceVector.Y, distanceVector.X) * (180 / Math.PI));
                     double duration = endTime - startTime;
 
                     for (int d = (int)(PointDistance * 1.5); d < distance - PointDistance; d += PointDistance)
