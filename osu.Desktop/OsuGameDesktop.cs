@@ -13,6 +13,7 @@ using osu.Game;
 using OpenTK.Input;
 using Microsoft.Win32;
 using osu.Desktop.Updater;
+using osu.Framework;
 using osu.Framework.Platform.Windows;
 
 namespace osu.Desktop
@@ -51,11 +52,10 @@ namespace osu.Desktop
                     v.State = Visibility.Visible;
                 });
 
-#if NET_FRAMEWORK
-                Add(new SquirrelUpdateManager());
-#else
-                Add(new SimpleUpdateManager());
-#endif
+                if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+                    Add(new SquirrelUpdateManager());
+                else
+                    Add(new SimpleUpdateManager());
             }
         }
 
