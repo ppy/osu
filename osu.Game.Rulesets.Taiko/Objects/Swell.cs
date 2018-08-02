@@ -21,10 +21,10 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         protected override IEnumerable<Judgement> CreateJudgements()
         {
-            yield return new TaikoJudgement();
-
             for (int i = 0; i < RequiredHits; i++)
                 yield return new TaikoIntermediateSwellJudgement();
+
+            yield return new TaikoJudgement();
         }
     }
 }
