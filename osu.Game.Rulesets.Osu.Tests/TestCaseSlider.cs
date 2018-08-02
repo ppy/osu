@@ -310,7 +310,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         private float judgementOffsetDirection = 1;
-        private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        private void onJudgement(DrawableHitObject judgedObject, JudgementResult result)
         {
             var osuObject = judgedObject as DrawableOsuHitObject;
             if (osuObject == null)
@@ -321,8 +321,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Text = judgement.IsHit ? "Hit!" : "Miss!",
-                Colour = judgement.IsHit ? Color4.Green : Color4.Red,
+                Text = result.IsHit ? "Hit!" : "Miss!",
+                Colour = result.IsHit ? Color4.Green : Color4.Red,
                 TextSize = 30,
                 Position = osuObject.HitObject.StackedEndPosition + judgementOffsetDirection * new Vector2(0, 45)
             });

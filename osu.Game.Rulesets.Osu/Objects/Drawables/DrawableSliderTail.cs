@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
 
@@ -31,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (!userTriggered && timeOffset >= 0)
-                ApplyJudgement(HitObject.Judgement, j => j.Result = Tracking ? HitResult.Great : HitResult.Miss);
+                ApplyResult(Results.Single(), r => r.Type = Tracking ? HitResult.Great : HitResult.Miss);
         }
     }
 }
