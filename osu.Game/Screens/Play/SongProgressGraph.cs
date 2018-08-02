@@ -34,5 +34,16 @@ namespace osu.Game.Screens.Play
                 }
             }
         }
+
+        private List<bool> truth = new List<bool>();
+
+        public List<bool> Truth
+        {
+            get {return truth;}
+            set
+            {
+                truth = value;
+            }
+        }
     }
 }

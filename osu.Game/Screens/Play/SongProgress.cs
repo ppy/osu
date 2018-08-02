@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using System.Linq;
+using System.Diagnostics;
 using osu.Framework.Configuration;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
@@ -58,7 +59,6 @@ namespace osu.Game.Screens.Play
                 bar.StartTime = firstHitTime;
                 bar.EndTime = lastHitTime;
 
-                const int myIndex = strains.Count;
                 graph.Truth = new List<bool>();
                 
                 foreach (double strain in strains)
