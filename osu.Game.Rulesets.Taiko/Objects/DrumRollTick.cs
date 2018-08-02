@@ -25,15 +25,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         public double HitWindow => TickSpacing / 2;
 
-        public TaikoDrumRollTickJudgement Judgement { get; private set; }
-        public TaikoStrongHitJudgement StrongJudgement { get; private set; }
-
         protected override IEnumerable<Judgement> CreateJudgements()
         {
-            yield return Judgement = new TaikoDrumRollTickJudgement();
+            yield return new TaikoDrumRollTickJudgement();
 
             if (IsStrong)
-                yield return StrongJudgement = new TaikoStrongHitJudgement();
+                yield return new TaikoStrongHitJudgement();
         }
     }
 }
