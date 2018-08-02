@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Catch.Judgements;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public class TinyDroplet : Droplet
+    public interface ICatchObjectWithJudgement
     {
-        public override CatchJudgement Judgement { get; } = new CatchTinyDropletJudgement();
+        CatchJudgement Judgement { get; }
     }
 }
