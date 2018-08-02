@@ -1,11 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.States;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -20,6 +22,8 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
+        private static readonly Vector2 background_blur = new Vector2(15);
+
         private Player player;
 
         private BeatmapMetadataDisplay info;
@@ -60,7 +64,7 @@ namespace osu.Game.Screens.Play
                 Margin = new MarginPadding(25),
                 Children = new PlayerSettingsGroup[]
                 {
-                    new VisualSettings(),
+                    visualSettings = new VisualSettings(),
                     new InputSettings()
                 }
             });
@@ -122,8 +126,32 @@ namespace osu.Game.Screens.Play
         }
 
         private ScheduledDelegate pushDebounce;
+        private VisualSettings visualSettings;
 
         private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
+
+        protected override bool OnHover(InputState state)
+        {
+            // restore our screen defaults
+            InitializeBackgroundElements();
+            return base.OnHover(state);
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            if (GetContainingInputManager().HoveredDrawables.Contains(visualSettings))
+            {
+                // show user setting preview
+                UpdateBackgroundElements();
+            }
+            base.OnHoverLost(state);
+        }
+
+        protected override void InitializeBackgroundElements()
+        {
+            Background?.FadeTo(1, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            Background?.BlurTo(background_blur, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+        }
 
         private void pushWhenLoaded()
         {
@@ -215,7 +243,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopRight,
                             Margin = new MarginPadding { Right = 5 },
-                            Colour = OsuColour.Gray(0.5f),
+                            Colour = OsuColour.Gray(0.8f),
                             Text = left,
                         },
                         new OsuSpriteText
