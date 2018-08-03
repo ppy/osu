@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override string Name => "Mirror";
         public override string ShortenedName => "MR";
-        public override ModType Type => ModType.Special;
+        public override ModType Type => ModType.Conversion;
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
 
