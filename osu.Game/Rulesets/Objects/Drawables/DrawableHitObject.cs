@@ -84,9 +84,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap b)
+        private void load(IBindableBeatmap bBeatmap)
         {
-            beatmap = b.Value;
+            beatmap = bBeatmap.Value;
             var samples = GetSamples().ToArray();
 
             if (samples.Any())
@@ -138,9 +138,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
             base.Update();
 
             if(beatmap != null)
-                foreach (var m in beatmap.Mods.Value)
-                    if (m is IUpdatableByHitObject u)
-                        u.Update(this);
+                foreach (var mod in beatmap.Mods.Value)
+                    if (mod is IUpdatableByHitObject updatable)
+                        updatable.Update(this);
 
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 

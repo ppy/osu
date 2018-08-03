@@ -47,9 +47,9 @@ namespace osu.Game.Rulesets.UI
         private WorkingBeatmap beatmap;
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap b)
+        private void load(IBindableBeatmap bBeatmap)
         {
-            beatmap = b.Value;
+            beatmap = bBeatmap.Value;
             HitObjects = CreateHitObjectContainer();
             HitObjects.RelativeSizeAxes = Axes.Both;
 
@@ -98,9 +98,9 @@ namespace osu.Game.Rulesets.UI
             base.Update();
 
             if (beatmap != null)
-                foreach (var m in beatmap.Mods.Value)
-                    if (m is IUpdatableByPlayfield u)
-                        u.Update(this);
+                foreach (var mod in beatmap.Mods.Value)
+                    if (mod is IUpdatableByPlayfield updatable)
+                        updatable.Update(this);
         }
     }
 }

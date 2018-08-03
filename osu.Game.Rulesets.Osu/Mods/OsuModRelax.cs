@@ -24,35 +24,35 @@ namespace osu.Game.Rulesets.Osu.Mods
         private bool hitStill;
         private bool hitOnce;
 
-        public void Update(DrawableHitObject o)
+        public void Update(DrawableHitObject drawable)
         {
             const float relax_leniency = 3;
 
-            if (!(o is DrawableOsuHitObject d))
+            if (!(drawable is DrawableOsuHitObject osuHit))
                 return;
 
-            double t = d.Clock.CurrentTime;
+            double time = osuHit.Clock.CurrentTime;
 
-            if (t >= d.HitObject.StartTime - relax_leniency)
+            if (time >= osuHit.HitObject.StartTime - relax_leniency)
             {
-                if (d.HitObject is IHasEndTime e && t > e.EndTime || d.IsHit)
+                if (osuHit.HitObject is IHasEndTime hasEnd && time > hasEnd.EndTime || osuHit.IsHit)
                     return;
 
-                hitStill |= d is DrawableSlider s && (s.Ball.IsHovered || d.IsHovered) || d is DrawableSpinner;
+                hitStill |= osuHit is DrawableSlider slider && (slider.Ball.IsHovered || osuHit.IsHovered) || osuHit is DrawableSpinner;
 
-                hitOnce |= d is DrawableHitCircle && d.IsHovered;
+                hitOnce |= osuHit is DrawableHitCircle && osuHit.IsHovered;
             }
         }
 
-        public void Update(Playfield r)
+        public void Update(Playfield playfield)
         {
-            var d = r.HitObjects.Objects.First(h => h is DrawableOsuHitObject) as DrawableOsuHitObject;
+            var osuHit = playfield.HitObjects.Objects.First(d => d is DrawableOsuHitObject) as DrawableOsuHitObject;
             if (hitOnce)
             {
-                hit(d, false);
-                hit(d, true);
+                hit(osuHit, false);
+                hit(osuHit, true);
             }
-            hit(d, hitStill);
+            hit(osuHit, hitStill);
 
             hitOnce = false;
             hitStill = false;
@@ -61,22 +61,22 @@ namespace osu.Game.Rulesets.Osu.Mods
         private bool wasHit;
         private bool wasLeft;
 
-        private void hit(DrawableOsuHitObject d, bool hitting)
+        private void hit(DrawableOsuHitObject osuHit, bool hitting)
         {
             if (wasHit == hitting)
                 return;
             wasHit = hitting;
 
-            var l = new ReplayState<OsuAction>
+            var state = new ReplayState<OsuAction>
             {
                 PressedActions = new List<OsuAction>()
             };
             if (hitting)
             {
-                l.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
+                state.PressedActions.Add(wasLeft ? OsuAction.LeftButton : OsuAction.RightButton);
                 wasLeft = !wasLeft;
             }
-            d.OsuActionInputManager.HandleCustomInput(new InputState(), l);
+            osuHit.OsuActionInputManager.HandleCustomInput(new InputState(), state);
         }
     }
 }
