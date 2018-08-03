@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => "Arrange";
         public override string ShortenedName => "Arrange";
         public override FontAwesome Icon => FontAwesome.fa_arrows;
-        public override ModType Type => ModType.DifficultyIncrease;
+        public override ModType Type => ModType.Fun;
         public override string Description => "Everything rotates. EVERYTHING";
         public override double ScoreMultiplier => 1.05;
 
