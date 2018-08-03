@@ -17,7 +17,6 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override FontAwesome Icon => FontAwesome.fa_arrows;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Everything rotates. EVERYTHING";
-        public override bool Ranked => true;
         public override double ScoreMultiplier => 1.05;
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
