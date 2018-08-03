@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             drawables.ForEach(drawable => drawable.ApplyCustomUpdateState += drawableOnApplyCustomUpdateState);
         }
 
-        private float theta = 0;
+        private float theta;
 
         private void drawableOnApplyCustomUpdateState(DrawableHitObject drawable, ArmedState state)
         {
