@@ -1,4 +1,4 @@
-#tool "nuget:?package=JetBrains.ReSharper.CommandLineTools"
+#addin "nuget:?package=JetBrains.ReSharper.CommandLineTools"
 #tool "nuget:?package=NVika.MSBuild"
 #addin "nuget:?package=CodeFileSanity"
 var NVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
