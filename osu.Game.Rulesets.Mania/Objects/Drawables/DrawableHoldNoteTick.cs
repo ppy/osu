@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
@@ -80,9 +79,9 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             var startTime = HoldStartTime?.Invoke();
 
             if (startTime == null || startTime > HitObject.StartTime)
-                ApplyResult(Results.Single(), r => r.Type = HitResult.Miss);
+                ApplyResult(r => r.Type = HitResult.Miss);
             else
-                ApplyResult(Results.Single(), r => r.Type = HitResult.Perfect);
+                ApplyResult(r => r.Type = HitResult.Perfect);
         }
     }
 }

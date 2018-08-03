@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
@@ -82,7 +81,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(Results.Single(), r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = HitResult.Miss);
 
                 return;
             }
@@ -91,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (result == HitResult.None)
                 return;
 
-            ApplyResult(Results.Single(), r => r.Type = result);
+            ApplyResult(r => r.Type = result);
         }
 
         protected override void UpdatePreemptState()

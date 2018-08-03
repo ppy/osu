@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
@@ -98,6 +97,6 @@ namespace osu.Game.Rulesets.Mania.Objects
             }
         }
 
-        protected override IEnumerable<Judgement> CreateJudgements() => new[] { new HoldNoteJudgement() };
+        protected override Judgement CreateJudgement() => new HoldNoteJudgement();
     }
 }

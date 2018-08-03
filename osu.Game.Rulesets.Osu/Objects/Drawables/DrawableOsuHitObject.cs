@@ -4,7 +4,6 @@
 using System;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
-using System.Linq;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Judgements;
@@ -35,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 UpdatePreemptState();
 
-                var judgementOffset = Math.Min(HitObject.HitWindows.HalfWindowFor(HitResult.Miss), Results.FirstOrDefault()?.TimeOffset ?? 0);
+                var judgementOffset = Math.Min(HitObject.HitWindows.HalfWindowFor(HitResult.Miss), Result?.TimeOffset ?? 0);
 
                 using (BeginDelayedSequence(HitObject.TimePreempt + judgementOffset, true))
                     UpdateCurrentState(state);

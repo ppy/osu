@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Lists;
@@ -64,8 +63,7 @@ namespace osu.Game.Rulesets.Objects
         [JsonIgnore]
         public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects.Value;
 
-        private readonly List<Judgement> judgements = new List<Judgement>();
-        public IReadOnlyList<Judgement> Judgements => judgements;
+        public Judgement Judgement { get; private set; }
 
         /// <summary>
         /// Applies default values to this HitObject.
@@ -76,8 +74,7 @@ namespace osu.Game.Rulesets.Objects
         {
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            judgements.Clear();
-            judgements.AddRange(CreateJudgements());
+            Judgement = CreateJudgement();
 
             if (nestedHitObjects.IsValueCreated)
                 nestedHitObjects.Value.Clear();
@@ -111,7 +108,7 @@ namespace osu.Game.Rulesets.Objects
         {
         }
 
-        protected virtual IEnumerable<Judgement> CreateJudgements() => Enumerable.Empty<Judgement>();
+        protected virtual Judgement CreateJudgement() => null;
 
         protected void AddNested(HitObject hitObject) => nestedHitObjects.Value.Add(hitObject);
 

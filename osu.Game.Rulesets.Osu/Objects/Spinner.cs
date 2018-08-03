@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.ControlPoints;
@@ -33,6 +32,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             SpinsRequired = (int)Math.Max(1, SpinsRequired * 0.6);
         }
 
-        protected override IEnumerable<Judgement> CreateJudgements() => new[] { new OsuJudgement() };
+        protected override Judgement CreateJudgement() => new OsuJudgement();
     }
 }

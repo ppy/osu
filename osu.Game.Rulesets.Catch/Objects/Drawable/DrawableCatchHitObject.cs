@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
@@ -57,8 +56,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         {
             if (CheckPosition == null) return;
 
-            if (timeOffset >= 0 && Results.Count > 0)
-                ApplyResult(Results.Single(), r => r.Type = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss);
+            if (timeOffset >= 0 && Result != null)
+                ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss);
         }
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)

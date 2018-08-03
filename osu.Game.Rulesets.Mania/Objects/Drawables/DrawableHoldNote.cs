@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (tail.AllJudged)
-                ApplyResult(Results.Single(), r => r.Type = HitResult.Perfect);
+                ApplyResult(r => r.Type = HitResult.Perfect);
         }
 
         protected override void Update()
@@ -165,7 +165,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     return false;
 
                 // If the key has been released too early, the user should not receive full score for the release
-                if (Results.Single().Type == HitResult.Miss)
+                if (Result.Type == HitResult.Miss)
                     holdNote.hasBroken = true;
 
                 // The head note also handles early hits before the body, but we want accurate early hits to count as the body being held
@@ -204,7 +204,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (!userTriggered)
                 {
                     if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                        ApplyResult(Results.Single(), r => r.Type = HitResult.Miss);
+                        ApplyResult(r => r.Type = HitResult.Miss);
 
                     return;
                 }
@@ -213,7 +213,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (result == HitResult.None)
                     return;
 
-                ApplyResult(Results.Single(), r =>
+                ApplyResult(r =>
                 {
                     if (holdNote.hasBroken && (result == HitResult.Perfect || result == HitResult.Perfect))
                         result = HitResult.Good;

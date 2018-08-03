@@ -136,16 +136,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < slider.EndTime)
                 return;
 
-            ApplyResult(Results.Single(), r =>
+            ApplyResult(r =>
             {
                 var judgementsCount = NestedHitObjects.Count();
                 var judgementsHit = NestedHitObjects.Count(h => h.IsHit);
 
                 var hitFraction = (double)judgementsHit / judgementsCount;
 
-                if (hitFraction == 1 && HeadCircle.Results.Single().Type == HitResult.Great)
+                if (hitFraction == 1 && HeadCircle.Result.Type == HitResult.Great)
                     r.Type = HitResult.Great;
-                else if (hitFraction >= 0.5 && HeadCircle.Results.Single().Type >= HitResult.Good)
+                else if (hitFraction >= 0.5 && HeadCircle.Result.Type >= HitResult.Good)
                     r.Type = HitResult.Good;
                 else if (hitFraction > 0)
                     r.Type = HitResult.Meh;

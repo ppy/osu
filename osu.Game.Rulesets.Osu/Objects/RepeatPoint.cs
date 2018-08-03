@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
@@ -28,6 +27,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                 TimePreempt = Math.Min(SpanDuration * 2, TimePreempt);
         }
 
-        protected override IEnumerable<Judgement> CreateJudgements() => new[] { new OsuJudgement() };
+        protected override Judgement CreateJudgement() => new OsuJudgement();
     }
 }
