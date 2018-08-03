@@ -138,7 +138,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (userTriggered || Time.Current < Spinner.EndTime)
                 return;
 
-            ApplyResult(Results.Single(), r =>
+            ApplyResult(r =>
             {
                 if (Progress >= 1)
                     r.Type = HitResult.Great;

@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -45,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
             if (repeatPoint.StartTime <= Time.Current)
-                ApplyResult(Results.Single(), r => r.Type = drawableSlider.Tracking ? HitResult.Great : HitResult.Miss);
+                ApplyResult(r => r.Type = drawableSlider.Tracking ? HitResult.Great : HitResult.Miss);
         }
 
         protected override void UpdatePreemptState()

@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been hit.
         /// </summary>
-        public bool IsHit => Results.All(j => j.IsHit) && NestedHitObjects.All(n => n.IsHit);
+        public bool IsHit => (Result?.IsHit ?? true) && NestedHitObjects.All(n => n.IsHit);
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
@@ -57,17 +57,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Whether this <see cref="DrawableHitObject"/> has been judged.
         /// Note: This does NOT include nested hitobjects.
         /// </summary>
-        public bool Judged => Results.All(h => h.HasResult);
+        public bool Judged => Result?.HasResult ?? true;
 
-        private readonly List<JudgementResult> results = new List<JudgementResult>();
-        public IReadOnlyList<JudgementResult> Results => results;
-
-        /// <summary>
-        /// The <see cref="JudgementResult"/> that affects whether this <see cref="DrawableHitObject"/> has been hit or missed.
-        /// By default, this is the last <see cref="JudgementResult"/> in <see cref="Results"/>, and should be overridden if the order
-        /// of <see cref="Judgement"/>s in <see cref="HitObject.CreateJudgements"/> doesn't list the main <see cref="Judgement"/> as its last element.
-        /// </summary>
-        protected virtual JudgementResult MainResult => Results.LastOrDefault();
+        public readonly JudgementResult Result;
 
         private bool judgementOccurred;
 
@@ -85,8 +77,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             HitObject = hitObject;
 
-            foreach (var j in hitObject.Judgements)
-                results.Add(CreateJudgementResult(j));
+            if (hitObject.Judgement != null)
+                Result = CreateJudgementResult(hitObject.Judgement);
         }
 
         [BackgroundDependencyLoader]
@@ -144,20 +136,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.Update();
 
-            if (lastUpdateTime > Time.Current)
+            if (Result != null && lastUpdateTime > Time.Current)
             {
                 var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 
-                for (int i = Results.Count - 1; i >= 0; i--)
+                if (Result.TimeOffset + endTime < Time.Current)
                 {
-                    var judgement = Results[i];
+                    OnJudgementRemoved?.Invoke(this, Result);
 
-                    if (judgement.TimeOffset + endTime <= Time.Current)
-                        break;
-
-                    OnJudgementRemoved?.Invoke(this, judgement);
-
-                    judgement.Type = HitResult.None;
+                    Result.Type = HitResult.None;
                     State.Value = ArmedState.Idle;
                 }
             }
@@ -185,36 +172,29 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Notifies that a new judgement has occurred for this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="judgement">The <see cref="Judgement"/>.</param>
-        protected void ApplyResult(JudgementResult result, Action<JudgementResult> application)
+        protected void ApplyResult(Action<JudgementResult> application)
         {
-            // Todo: Unsure if we want to keep this
-            if (!Results.Contains(result))
-                throw new ArgumentException($"The applied judgement result must be a part of {Results}.");
-
-            application?.Invoke(result);
+            application?.Invoke(Result);
 
             judgementOccurred = true;
 
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-            result.TimeOffset = Time.Current - endTime;
+            Result.TimeOffset = Time.Current - endTime;
 
-            if (result == MainResult)
+            switch (Result.Type)
             {
-                switch (result.Type)
-                {
-                    case HitResult.None:
-                        break;
-                    case HitResult.Miss:
-                        State.Value = ArmedState.Miss;
-                        break;
-                    default:
-                        State.Value = ArmedState.Hit;
-                        break;
-                }
+                case HitResult.None:
+                    break;
+                case HitResult.Miss:
+                    State.Value = ArmedState.Miss;
+                    break;
+                default:
+                    State.Value = ArmedState.Hit;
+                    break;
             }
 
-            OnJudgement?.Invoke(this, result);
+            OnJudgement?.Invoke(this, Result);
         }
 
         /// <summary>

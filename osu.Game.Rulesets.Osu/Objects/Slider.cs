@@ -214,6 +214,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        protected override IEnumerable<Judgement> CreateJudgements() => new[] { new OsuJudgement() };
+        protected override Judgement CreateJudgement() => new OsuJudgement();
     }
 }
