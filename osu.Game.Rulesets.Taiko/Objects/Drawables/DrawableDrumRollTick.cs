@@ -2,28 +2,19 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableDrumRollTick : DrawableTaikoHitObject<DrumRollTick>
     {
-        private readonly JudgementResult result;
-        private readonly JudgementResult strongResult;
-
         public DrawableDrumRollTick(DrumRollTick tick)
             : base(tick)
         {
             FillMode = FillMode.Fit;
-
-            result = Results.Single(r => !(r.Judgement is TaikoStrongHitJudgement));
-            strongResult = Results.SingleOrDefault(r => r.Judgement is TaikoStrongHitJudgement);
         }
 
         public override bool DisplayJudgement => false;
@@ -38,21 +29,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!userTriggered)
             {
                 if (timeOffset > HitObject.HitWindow)
-                {
-                    ApplyResult(result, r => r.Type = HitResult.Miss);
-                    if (HitObject.IsStrong)
-                        ApplyResult(strongResult, r => r.Type = HitResult.Miss);
-                }
-
+                    ApplyResult(r => r.Type = HitResult.Miss);
                 return;
             }
 
             if (Math.Abs(timeOffset) > HitObject.HitWindow)
                 return;
 
-            ApplyResult(result, r => r.Type = HitResult.Great);
-            if (HitObject.IsStrong)
-                ApplyResult(strongResult, r => r.Type = HitResult.Great);
+            ApplyResult(r => r.Type = HitResult.Great);
         }
 
         protected override void UpdateState(ArmedState state)
@@ -66,5 +50,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         }
 
         public override bool OnPressed(TaikoAction action) => UpdateJudgement(true);
+
+        protected override DrawableStrongHitObject CreateStrongObject(StrongHitObject hitObject) => new DrawableStrongDrumRollTick(hitObject, this);
     }
 }
