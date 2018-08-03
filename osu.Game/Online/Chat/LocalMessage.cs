@@ -3,9 +3,13 @@
 
 namespace osu.Game.Online.Chat
 {
-    public class LocalEchoMessage : LocalMessage
+    /// <summary>
+    /// A message which is generated and displayed locally.
+    /// </summary>
+    public class LocalMessage : Message
     {
-        public LocalEchoMessage() : base(null)
+        protected LocalMessage(long? id)
+            : base(id)
         {
         }
     }

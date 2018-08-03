@@ -4,43 +4,13 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build (Debug, msbuild)",
-            "type": "shell",
-            "command": "msbuild",
-            "args": [
-                "osu.Game.Rulesets.Mania.Tests.csproj",
-                "/p:TargetFramework=net471",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
-            ],
-            "group": "build",
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Build (Release, msbuild)",
-            "type": "shell",
-            "command": "msbuild",
-            "args": [
-                "osu.Game.Rulesets.Mania.Tests.csproj",
-                "/p:Configuration=Release",
-                "/p:TargetFramework=net471",
-                "/p:GenerateFullPaths=true",
-                "/m",
-                "/verbosity:m"
-            ],
-            "group": "build",
-            "problemMatcher": "$msCompile"
-        },
-        {
-            "label": "Build (Debug, dotnet)",
+            "label": "Build (Debug)",
             "type": "shell",
             "command": "dotnet",
             "args": [
                 "build",
                 "--no-restore",
                 "osu.Game.Rulesets.Mania.Tests.csproj",
-                "/p:TargetFramework=netcoreapp2.1",
                 "/p:GenerateFullPaths=true",
                 "/m",
                 "/verbosity:m"
@@ -49,14 +19,13 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Build (Release, dotnet)",
+            "label": "Build (Release)",
             "type": "shell",
             "command": "dotnet",
             "args": [
                 "build",
                 "--no-restore",
                 "osu.Game.Rulesets.Mania.Tests.csproj",
-                "/p:TargetFramework=netcoreapp2.1",
                 "/p:Configuration=Release",
                 "/p:GenerateFullPaths=true",
                 "/m",
@@ -66,16 +35,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "Restore (net471)",
-            "type": "shell",
-            "command": "nuget",
-            "args": [
-                "restore"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "Restore (netcoreapp2.1)",
+            "label": "Restore",
             "type": "shell",
             "command": "dotnet",
             "args": [

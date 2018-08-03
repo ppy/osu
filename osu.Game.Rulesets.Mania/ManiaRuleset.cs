@@ -120,7 +120,7 @@ namespace osu.Game.Rulesets.Mania
                         new MultiMod(new ManiaModFadeIn(), new ManiaModHidden()),
                         new ManiaModFlashlight(),
                     };
-                case ModType.Special:
+                case ModType.Conversion:
                     return new Mod[]
                     {
                         new MultiMod(new ManiaModKey4(),
@@ -135,6 +135,10 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModRandom(),
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
+                    };
+                case ModType.Automation:
+                    return new Mod[]
+                    {
                         new MultiMod(new ManiaModAutoplay(), new ModCinema()),
                     };
                 default:
