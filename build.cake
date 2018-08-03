@@ -43,6 +43,7 @@ Task("Restore Nuget")
 
 Task("InspectCode")
 .IsDependentOn("Restore Nuget")
+.IsDependentOn("Compile")
 .Does(() => {
     InspectCode(osuSolution, new InspectCodeSettings {
         CachesHome = "inspectcode",
@@ -62,7 +63,6 @@ Task("CodeFileSanity")
 
 Task("Build")
 .IsDependentOn("CodeFileSanity")
-.IsDependentOn("Compile")
 .IsDependentOn("InspectCode")
 .IsDependentOn("Test");
 
