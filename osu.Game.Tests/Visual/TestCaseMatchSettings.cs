@@ -16,10 +16,10 @@ namespace osu.Game.Tests.Visual
             typeof(Settings),
         };
 
-        private readonly Settings settings;
-
         public TestCaseMatchSettings()
         {
+            Settings settings
+
             Add(settings = new Settings
             {
                 RelativeSizeAxes = Axes.Both,

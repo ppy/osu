@@ -46,9 +46,10 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 },
                 new Container
                 {
+                    Margin = new MarginPadding { Vertical = 15, Left = SearchableListOverlay.WIDTH_PADDING / 2 },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING, Vertical = 15 },
+                    Width = 0.50f,
                     Children = new Drawable[]
                     {
                         new OsuSpriteText
@@ -58,84 +59,76 @@ namespace osu.Game.Screens.Multi.Screens.Match
                         },
                         roomNameBox = new SettingsTextBox
                         {
-                            Width = 300,
+                            RelativeSizeAxes = Axes.X,
                             Margin = new MarginPadding { Top = 20 },
                             OnCommit = onRoomNameCommit,
                         },
                         new OsuSpriteText
                         {
-                            Text = @"MAX PARTICIPANTS",
-                            Colour = Color4.White,
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                        },
-                        maxParticipantsBox = new SettingsTextBox
-                        {
-                            Width = 300,
-                            Margin = new MarginPadding { Top = 20 },
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            OnCommit = onMaxParticipantsCommit,
-                        },
-                    },
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING, Vertical = 15 },
-                    Margin = new MarginPadding { Top = 100 },
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
+                            Margin = new MarginPadding { Top = 100 },
                             Text = @"ROOM VISIBILITY",
                             Colour = Color4.White,
                         },
                         roomAvailabilityTabs = new AvailabilityTabControl
                         {
-                            Margin = new MarginPadding { Top = 20 },
+                            Margin = new MarginPadding { Top = 120 },
                             Width = 400,
                             Height = 40,
                         },
                         new OsuSpriteText
                         {
-                            Text = @"PASSWORD (OPTIONAL)",
-                            Colour = Color4.White,
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                        },
-                        passwordBox = new SettingsPasswordTextBox
-                        {
-                            Width = 300,
-                            Margin = new MarginPadding { Top = 20 },
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            OnCommit = onPasswordCommmit,
-                        },
-                    }
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING, Vertical = 15 },
-                    Margin = new MarginPadding { Top = 200 },
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
+                            Margin = new MarginPadding { Top = 200 },
                             Text = @"GAME TYPE",
                             Colour = Color4.White,
                         },
                         gameTypeTabs = new GameTypeTabControl
                         {
-                            Margin = new MarginPadding { Top = 20 },
+                            Margin = new MarginPadding { Top = 220 },
                             Width = 400,
                             Height = 80,
                         },
                     }
-                }
+                },
+                new Container
+                {
+                    Margin = new MarginPadding { Vertical = 15, Right = SearchableListOverlay.WIDTH_PADDING / 2 },
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Width = 0.35f,
+                    Children = new Drawable[]
+                    {
+                        new OsuSpriteText
+                        {
+                            Text = @"MAX PARTICIPANTS",
+                            Colour = Color4.White,
+                        },
+                        maxParticipantsBox = new SettingsTextBox
+                        {
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
+                            RelativeSizeAxes = Axes.X,
+                            Margin = new MarginPadding { Top = 20 },
+                            OnCommit = onMaxParticipantsCommit,
+                        },
+                        new OsuSpriteText
+                        {
+                            Margin = new MarginPadding { Top = 100 },
+                            Text = @"PASSWORD (OPTIONAL)",
+                            Colour = Color4.White,
+                        },
+                        passwordBox = new SettingsPasswordTextBox
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Margin = new MarginPadding { Top = 120 },
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                            OnCommit = onPasswordCommmit,
+                        },
+                    },
+
+                },
             };
 
             RoomName.BindValueChanged(n => roomNameBox.Text = n, true);
@@ -212,15 +205,15 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         private class AvailabilityTabControl : OsuTabControl<RoomAvailability>
         {
-            protected override TabItem<RoomAvailability> CreateTabItem(RoomAvailability value) => new VisibilityTabItem(value);
+            protected override TabItem<RoomAvailability> CreateTabItem(RoomAvailability value) => new AvailabilityTabItem(value);
 
-            private class VisibilityTabItem : OsuTabItem
+            private class AvailabilityTabItem : OsuTabItem
             {
                 private readonly Box bg;
 
                 private OsuColour colours;
 
-                public VisibilityTabItem(RoomAvailability value)
+                public AvailabilityTabItem(RoomAvailability value)
                     : base(value)
                 {
                     AutoSizeAxes = Axes.None;
