@@ -99,6 +99,24 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override DrawableStrongHitObject CreateStrongObject(StrongHitObject hitObject) => new DrawableStrongDrumRoll(hitObject, this);
+        protected override DrawableStrongHandler CreateStrongHandler(StrongHitObject hitObject) => new StrongHandler(hitObject, this);
+
+        private class StrongHandler : DrawableStrongHandler
+        {
+            public StrongHandler(StrongHitObject strong, DrawableDrumRoll drumRoll)
+                : base(strong, drumRoll)
+            {
+            }
+
+            protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+            {
+                if (!MainObject.Judged)
+                    return;
+
+                ApplyResult(r => r.Type = MainObject.IsHit ? HitResult.Great : HitResult.Miss);
+            }
+
+            public override bool OnPressed(TaikoAction action) => false;
+        }
     }
 }

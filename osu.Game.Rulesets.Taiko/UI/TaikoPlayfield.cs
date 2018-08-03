@@ -234,9 +234,9 @@ namespace osu.Game.Rulesets.Taiko.UI
 
             switch (result.Judgement)
             {
-                case TaikoStrongHitJudgement _:
+                case TaikoStrongJudgement _:
                     if (result.IsHit)
-                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongHitObject)judgedObject).MainObject)?.VisualiseSecondHit();
+                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongHandler)judgedObject).MainObject)?.VisualiseSecondHit();
                     break;
                 default:
                     judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)

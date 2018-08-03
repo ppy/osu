@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             var strongObject = HitObject.NestedHitObjects.OfType<StrongHitObject>().FirstOrDefault();
             if (strongObject != null)
             {
-                var vis = CreateStrongObject(strongObject);
+                var vis = CreateStrongHandler(strongObject);
                 if (vis != null)
                 {
                     AddNested(vis);
@@ -121,6 +121,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
 
-        protected virtual DrawableStrongHitObject CreateStrongObject(StrongHitObject hitObject) => null;
+        /// <summary>
+        /// Creates the handler for this <see cref="DrawableHitObject"/>'s <see cref="StrongHitObject"/>.
+        /// This is only invoked if <see cref="TaikoHitObject.IsStrong"/> is true for <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The strong hitobject.</param>
+        /// <returns>The strong hitobject handler.</returns>
+        protected virtual DrawableStrongHandler CreateStrongHandler(StrongHitObject hitObject) => null;
     }
 }
