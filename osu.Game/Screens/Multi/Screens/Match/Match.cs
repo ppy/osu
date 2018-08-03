@@ -69,19 +69,38 @@ namespace osu.Game.Screens.Multi.Screens.Match
             }, true);
 
             nameBind.BindTo(room.Name);
-            nameBind.BindValueChanged(n => info.Name = n, true);
+            settings.RoomName.BindTo(nameBind);
+            nameBind.BindValueChanged(n =>
+            {
+                info.Name = n;
+                settings.RoomName.Value = n;
+            }, true);
 
             statusBind.BindTo(room.Status);
             statusBind.BindValueChanged(s => info.Status = s, true);
 
             availabilityBind.BindTo(room.Availability);
-            availabilityBind.BindValueChanged(a => info.Availability = a, true);
+            settings.RoomAvailability.BindTo(availabilityBind);
+            availabilityBind.BindValueChanged(a =>
+            {
+                info.Availability = a;
+                settings.RoomAvailability.Value = a;
+            }, true);
 
             typeBind.BindTo(room.Type);
-            typeBind.BindValueChanged(t => info.Type = t, true);
+            settings.GameType.BindTo(typeBind);
+            typeBind.BindValueChanged(t =>
+            {
+                info.Type = t;
+                settings.GameType.Value = t;
+            }, true);
 
             maxParticipantsBind.BindTo(room.MaxParticipants);
-            maxParticipantsBind.BindValueChanged(m => { participants.Max = m; }, true);
+            settings.MaxParticipants.BindTo(maxParticipantsBind);
+            maxParticipantsBind.BindValueChanged(m => {
+                participants.Max = m;
+                settings.MaxParticipants.Value = m;
+            }, true);
 
             participantsBind.BindTo(room.Participants);
             participantsBind.BindValueChanged(p => participants.Users = p, true);
@@ -93,7 +112,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
         {
             if (page == currentPage) return;
 
-            // probably need to make left/right move logic generic, but we have only 2 pages for now /shrug
+            // probably need to make left/right move logic generic in some kind of PageContainer to go with PageTabControl, but we have only 2 pages for now /shrug
             switch (page)
             {
                 case MatchHeaderPage.Settings:

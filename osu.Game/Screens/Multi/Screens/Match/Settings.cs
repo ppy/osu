@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,6 +14,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Screens.Multi.Components;
 using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Screens.Match
@@ -21,8 +23,22 @@ namespace osu.Game.Screens.Multi.Screens.Match
     {
         private readonly Box bg;
 
+        public readonly Bindable<string> RoomName = new Bindable<string>();
+        public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
+        public readonly Bindable<string> Password = new Bindable<string>();
+
+        public Bindable<RoomAvailability> RoomAvailability => roomAvailabilityTabs.Current;
+        public Bindable<GameType> GameType => gameTypeTabs.Current;
+
+        private readonly OsuTabControl<RoomAvailability> roomAvailabilityTabs;
+        private readonly OsuTabControl<GameType> gameTypeTabs;
+
         public Settings()
         {
+            OsuTextBox roomNameBox;
+            OsuTextBox maxParticipantsBox;
+            OsuPasswordTextBox passwordBox;
+
             Children = new Drawable[]
             {
                 bg = new Box
@@ -41,10 +57,11 @@ namespace osu.Game.Screens.Multi.Screens.Match
                             Text = @"ROOM NAME",
                             Colour = Color4.White,
                         },
-                        new OsuTextBox
+                        roomNameBox = new SettingsTextBox
                         {
                             Width = 300,
                             Margin = new MarginPadding { Top = 20 },
+                            OnCommit = onRoomNameCommit,
                         },
                         new OsuSpriteText
                         {
@@ -53,12 +70,13 @@ namespace osu.Game.Screens.Multi.Screens.Match
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                         },
-                        new OsuTextBox
+                        maxParticipantsBox = new SettingsTextBox
                         {
                             Width = 300,
                             Margin = new MarginPadding { Top = 20 },
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
+                            OnCommit = onMaxParticipantsCommit,
                         },
                     },
                 },
@@ -75,7 +93,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                             Text = @"ROOM VISIBILITY",
                             Colour = Color4.White,
                         },
-                        new VisibilityTabControl
+                        roomAvailabilityTabs = new AvailabilityTabControl
                         {
                             Margin = new MarginPadding { Top = 20 },
                             Width = 400,
@@ -88,12 +106,13 @@ namespace osu.Game.Screens.Multi.Screens.Match
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                         },
-                        new SettingsPasswordTextBox
+                        passwordBox = new SettingsPasswordTextBox
                         {
                             Width = 300,
                             Margin = new MarginPadding { Top = 20 },
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
+                            OnCommit = onPasswordCommmit,
                         },
                     }
                 },
@@ -110,7 +129,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                             Text = @"GAME TYPE",
                             Colour = Color4.White,
                         },
-                        new GameTypeTabControl
+                        gameTypeTabs = new GameTypeTabControl
                         {
                             Margin = new MarginPadding { Top = 20 },
                             Width = 400,
@@ -119,12 +138,38 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     }
                 }
             };
+
+            RoomName.BindValueChanged(n => roomNameBox.Text = n, true);
+            MaxParticipants.BindValueChanged(p => maxParticipantsBox.Text = p.ToString(), true);
+            Password.BindValueChanged(p => passwordBox.Text = p, true);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             bg.Colour = colours.Gray2;
+        }
+
+        private void onRoomNameCommit(TextBox box, bool newText) => RoomName.Value = box.Text;
+
+        private void onMaxParticipantsCommit(TextBox box, bool newText)
+        {
+            if (int.TryParse(box.Text, out int number))
+                MaxParticipants.Value = number;
+            else
+                box.Text = string.Empty;
+        }
+
+        private void onPasswordCommmit(TextBox box, bool newText) => Password.Value = box.Text;
+
+        private class SettingsTextBox : OsuTextBox
+        {
+            protected override void OnFocusLost(InputState state)
+            {
+                base.OnFocusLost(state);
+
+                OnCommit?.Invoke(this, true);
+            }
         }
 
         private class SettingsPasswordTextBox : OsuPasswordTextBox
@@ -163,9 +208,16 @@ namespace osu.Game.Screens.Multi.Screens.Match
             {
                 labelBox.Colour = colours.Gray4;
             }
+
+            protected override void OnFocusLost(InputState state)
+            {
+                base.OnFocusLost(state);
+
+                OnCommit?.Invoke(this, true);
+            }
         }
 
-        private class VisibilityTabControl : OsuTabControl<RoomAvailability>
+        private class AvailabilityTabControl : OsuTabControl<RoomAvailability>
         {
             protected override TabItem<RoomAvailability> CreateTabItem(RoomAvailability value) => new VisibilityTabItem(value);
 
@@ -257,16 +309,11 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
             public GameTypeTabControl()
             {
-                Add(activeTabText = new OsuSpriteText
+                AddInternal(activeTabText = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                 });
-
-                AddItem(new GameTypeVersus());
-                AddItem(new GameTypeTag());
-                AddItem(new GameTypeTagTeam());
-                AddItem(new GameTypeTeamVersus());
             }
 
             [BackgroundDependencyLoader]
@@ -279,41 +326,26 @@ namespace osu.Game.Screens.Multi.Screens.Match
             {
                 base.SelectTab(tab);
 
-                activeTabText.Text = tab.Value.Name;
+                activeTabText.Text = tab.Value.GetDescription();
             }
 
             private class GameTypeTabItem : OsuTabItem
             {
-                private readonly CircularContainer circle;
-                private readonly Box circleBg;
-                private readonly GameType gameType;
-
-                private OsuColour colours;
+                private readonly DrawableGameType drawableType;
 
                 public GameTypeTabItem(GameType value)
                     : base(value)
                 {
-                    this.gameType = value;
-
                     AutoSizeAxes = Axes.None;
                     RelativeSizeAxes = Axes.None;
 
-                    Height = 60;
-                    Width = 60;
-
-                    Child = circle = new CircularContainer
+                    Child = drawableType = new DrawableGameType(value, 24)
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        Children = new Drawable[]
-                        {
-                            circleBg = new Box
-                            {
-                                Colour = Color4.White,
-                                RelativeSizeAxes = Axes.Both,
-                            },
-                        }
                     };
+
+                    Height = 60;
+                    Width = 60;
 
                     Colour = Color4.White;
                 }
@@ -321,22 +353,17 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 [BackgroundDependencyLoader]
                 private void load(OsuColour colours)
                 {
-                    this.colours = colours;
-
-                    circleBg.Colour = colours.Gray4;
-                    circle.BorderColour = colours.Yellow;
-
-                    circle.Add(gameType.GetIcon(colours, 30));
+                    drawableType.BorderColour = colours.Yellow;
                 }
 
                 private void fadeActive()
                 {
-                    circle.BorderThickness = 5;
+                    drawableType.BorderThickness = 5;
                 }
 
                 private void fadeInactive()
                 {
-                    circle.BorderThickness = 0;
+                    drawableType.BorderThickness = 0;
                 }
 
                 protected override void OnActivated()

@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual
                 Name = { Value = @"One Awesome Room" },
                 Status = { Value = new RoomStatusOpen() },
                 Availability = { Value = RoomAvailability.Public },
-                Type = { Value = new GameTypeTeamVersus() },
+                Type = { Value = GameType.Versus },
                 Beatmap =
                 {
                     Value = new BeatmapInfo
@@ -93,7 +93,7 @@ namespace osu.Game.Tests.Visual
             AddStep(@"change name", () => room.Name.Value = @"Two Awesome Rooms");
             AddStep(@"change status", () => room.Status.Value = new RoomStatusPlaying());
             AddStep(@"change availability", () => room.Availability.Value = RoomAvailability.FriendsOnly);
-            AddStep(@"change type", () => room.Type.Value = new GameTypeTag());
+            AddStep(@"change type", () => room.Type.Value = GameType.Tag);
             AddStep(@"change beatmap", () => room.Beatmap.Value = new BeatmapInfo
             {
                 StarDifficulty = 4.33,
