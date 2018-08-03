@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Overlays.Mods.Sections;
 using osu.Game.Rulesets.Mania;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.UI;
@@ -36,7 +37,9 @@ namespace osu.Game.Tests.Visual
             typeof(ModButtonEmpty),
             typeof(DifficultyReductionSection),
             typeof(DifficultyIncreaseSection),
-            typeof(SpecialSection),
+            typeof(AutomationSection),
+            typeof(ConversionSection),
+            typeof(FunSection),
         };
 
         private RulesetStore rulesets;
@@ -95,7 +98,7 @@ namespace osu.Game.Tests.Visual
         {
             var easierMods = ruleset.GetModsFor(ModType.DifficultyReduction);
             var harderMods = ruleset.GetModsFor(ModType.DifficultyIncrease);
-            var assistMods = ruleset.GetModsFor(ModType.Special);
+            var assistMods = ruleset.GetModsFor(ModType.Automation);
 
             var noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
             var hiddenMod = harderMods.FirstOrDefault(m => m is OsuModHidden);
@@ -119,7 +122,7 @@ namespace osu.Game.Tests.Visual
 
         private void testManiaMods(ManiaRuleset ruleset)
         {
-            testRankedText(ruleset.GetModsFor(ModType.Special).First(m => m is ManiaModRandom));
+            testRankedText(ruleset.GetModsFor(ModType.Conversion).First(m => m is ManiaModRandom));
         }
 
         private void testSingleMod(Mod mod)
