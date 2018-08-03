@@ -81,7 +81,10 @@ namespace osu.Game.Screens.Play
             BindRulesetContainer(rulesetContainer);
             if (rulesetContainer.Ruleset.LegacyID!=2)
             {
-                Progress.StrainStep = 400;
+                if (rulesetContainer.Ruleset.LegacyID!=0)
+                    Progress.StrainStep = 400;
+                else
+                    Progress.StrainStep = 1;
             }
             else 
             {
