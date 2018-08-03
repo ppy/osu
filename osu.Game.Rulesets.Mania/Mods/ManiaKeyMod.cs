@@ -13,6 +13,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override string ShortenedName => Name;
         public abstract int KeyCount { get; }
+        public override ModType Type => ModType.Conversion;
         public override double ScoreMultiplier => 1; // TODO: Implement the mania key mod score multiplier
         public override bool Ranked => true;
 

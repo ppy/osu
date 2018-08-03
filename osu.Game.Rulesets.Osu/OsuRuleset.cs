@@ -94,6 +94,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModEasy(),
                         new OsuModNoFail(),
                         new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
+                        new OsuModSpunOut(),
                     };
                 case ModType.DifficultyIncrease:
                     return new Mod[]
@@ -105,14 +106,17 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModFlashlight(),
                         new OsuModArrange(), 
                     };
-                case ModType.Special:
+                case ModType.Conversion:
                     return new Mod[]
                     {
+                        new OsuModTarget(),
+                    };
+                case ModType.Automation:
+                    return new Mod[]
+                    {
+                        new MultiMod(new OsuModAutoplay(), new ModCinema()),
                         new OsuModRelax(),
                         new OsuModAutopilot(),
-                        new OsuModSpunOut(),
-                        new MultiMod(new OsuModAutoplay(), new ModCinema()),
-                        new OsuModTarget(),
                     };
                 default:
                     return new Mod[] { };
