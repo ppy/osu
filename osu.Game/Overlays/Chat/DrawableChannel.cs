@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Chat
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            ScrollToEnd();
+            scrollToEnd();
         }
 
         protected override void Dispose(bool isDisposing)
@@ -85,8 +85,8 @@ namespace osu.Game.Overlays.Chat
 
             if (!IsLoaded) return;
 
-            if (scroll.IsScrolledToEnd(10) || !flow.Children.Any())
-                ScrollToEnd();
+            if (scroll.IsScrolledToEnd(10) || !flow.Children.Any() || newMessages.Any(m => m.GetType() == typeof(LocalEchoMessage)))
+                scrollToEnd();
 
             var staleMessages = flow.Children.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
             int count = staleMessages.Length - Channel.MAX_HISTORY;
@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Chat
             flow.Children.FirstOrDefault(c => c.Message == removed)?.FadeColour(Color4.Red, 400).FadeOut(600).Expire();
         }
 
-        public void ScrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
+        private void scrollToEnd() => ScheduleAfterChildren(() => scroll.ScrollToEnd());
 
         private class ChatLineContainer : FillFlowContainer<ChatLine>
         {
