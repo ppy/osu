@@ -93,13 +93,11 @@ namespace osu.Game.Rulesets.Catch
                         new CatchModHidden(),
                         new CatchModFlashlight(),
                     };
-                case ModType.Special:
+                case ModType.Automation:
                     return new Mod[]
                     {
-                        new CatchModRelax(),
-                        null,
-                        null,
                         new MultiMod(new CatchModAutoplay(), new ModCinema()),
+                        new CatchModRelax(),
                     };
                 default:
                     return new Mod[] { };
