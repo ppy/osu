@@ -232,30 +232,32 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (!judgedObject.DisplayJudgement)
                 return;
 
-            if (judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
+            switch (result.Judgement)
             {
-                judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
-                {
-                    Anchor = result.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
-                    Origin = result.IsHit ? Anchor.BottomCentre : Anchor.Centre,
-                    RelativePositionAxes = Axes.X,
-                    X = result.IsHit ? judgedObject.Position.X : 0,
-                });
-            }
+                case TaikoStrongHitJudgement _:
+                    if (result.IsHit)
+                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongHitObject)judgedObject).MainObject)?.VisualiseSecondHit();
+                    break;
+                default:
+                    judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
+                    {
+                        Anchor = result.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
+                        Origin = result.IsHit ? Anchor.BottomCentre : Anchor.Centre,
+                        RelativePositionAxes = Axes.X,
+                        X = result.IsHit ? judgedObject.Position.X : 0,
+                    });
 
-            if (!result.IsHit)
-                return;
+                    if (!result.IsHit)
+                        break;
 
-            bool isRim = judgedObject.HitObject is RimHit;
+                    bool isRim = judgedObject.HitObject is RimHit;
 
-            if (result.Judgement is TaikoStrongHitJudgement)
-                hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == judgedObject)?.VisualiseSecondHit();
-            else
-            {
-                hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
+                    hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
 
-                if (judgedObject.HitObject.Kiai)
-                    kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
+                    if (judgedObject.HitObject.Kiai)
+                        kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
+
+                    break;
             }
         }
     }
