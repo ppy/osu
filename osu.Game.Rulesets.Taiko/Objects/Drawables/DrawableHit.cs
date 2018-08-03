@@ -3,10 +3,8 @@
 
 using System.Linq;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -16,21 +14,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        protected abstract TaikoAction[] HitActions { get; }
-
-        protected readonly JudgementResult Result;
+        public abstract TaikoAction[] HitActions { get; }
 
         /// <summary>
-        /// Whether the last key pressed is a valid hit key.
+        /// The action that caused this <see cref="DrawableHit"/> to be hit.
         /// </summary>
-        private bool validKeyPressed;
+        public TaikoAction? HitAction { get; private set; }
+
+        private bool validActionPressed;
 
         protected DrawableHit(Hit hit)
             : base(hit)
         {
             FillMode = FillMode.Fit;
-
-            Result = Results.Single(r => !(r.Judgement is TaikoStrongHitJudgement));
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
@@ -38,7 +34,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    ApplyResult(Result, r => r.Type = HitResult.Miss);
+                    ApplyResult(r => r.Type = HitResult.Miss);
                 return;
             }
 
@@ -46,18 +42,33 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (result == HitResult.None)
                 return;
 
-            if (!validKeyPressed)
-                ApplyResult(Result, r => r.Type = HitResult.Miss);
+            if (!validActionPressed)
+                ApplyResult(r => r.Type = HitResult.Miss);
             else
-                ApplyResult(Result, r => r.Type = result);
+                ApplyResult(r => r.Type = result);
         }
 
         public override bool OnPressed(TaikoAction action)
         {
-            validKeyPressed = HitActions.Contains(action);
+            if (Judged)
+                return false;
+
+            validActionPressed = HitActions.Contains(action);
 
             // Only count this as handled if the new judgement is a hit
-            return UpdateJudgement(true);
+            var result = UpdateJudgement(true);
+
+            if (IsHit)
+                HitAction = action;
+
+            return result;
+        }
+
+        public override bool OnReleased(TaikoAction action)
+        {
+            if (action == HitAction)
+                HitAction = null;
+            return base.OnReleased(action);
         }
 
         protected override void Update()
@@ -78,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 switch (State.Value)
                 {
                     case ArmedState.Idle:
-                        validKeyPressed = false;
+                        validActionPressed = false;
 
                         UnproxyContent();
                         this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
@@ -114,5 +125,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 }
             }
         }
+
+        protected override DrawableStrongHitObject CreateStrongObject(StrongHitObject hitObject) => new DrawableStrongHit(hitObject, this);
     }
 }
