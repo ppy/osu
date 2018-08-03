@@ -7,9 +7,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public abstract class DrawableStrongHitObject : DrawableTaikoHitObject
     {
-        protected DrawableStrongHitObject(StrongHitObject strong)
+        public readonly DrawableHitObject MainObject;
+
+        protected DrawableStrongHitObject(StrongHitObject strong, DrawableHitObject mainObject)
             : base(strong)
         {
+            MainObject = mainObject;
+
             AlwaysPresent = true;
         }
 

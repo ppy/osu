@@ -7,20 +7,17 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableStrongDrumRollTick : DrawableStrongHitObject
     {
-        private readonly DrawableDrumRollTick tick;
-
         public DrawableStrongDrumRollTick(StrongHitObject strong, DrawableDrumRollTick tick)
-            : base(strong)
+            : base(strong, tick)
         {
-            this.tick = tick;
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
-            if (!tick.Judged)
+            if (!MainObject.Judged)
                 return;
 
-            ApplyResult(r => r.Type = tick.IsHit ? HitResult.Great : HitResult.Miss);
+            ApplyResult(r => r.Type = MainObject.IsHit ? HitResult.Great : HitResult.Miss);
         }
 
         public override bool OnPressed(TaikoAction action) => false;

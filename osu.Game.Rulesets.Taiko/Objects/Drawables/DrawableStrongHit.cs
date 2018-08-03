@@ -15,23 +15,22 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// </summary>
         private const double second_hit_window = 30;
 
-        private readonly DrawableHit hit;
+        public DrawableHit MainObject => (DrawableHit)base.MainObject;
 
         public DrawableStrongHit(StrongHitObject strong, DrawableHit hit)
-            : base(strong)
+            : base(strong, hit)
         {
-            this.hit = hit;
         }
 
         protected override void CheckForJudgements(bool userTriggered, double timeOffset)
         {
-            if (!hit.Result.HasResult)
+            if (!MainObject.Result.HasResult)
             {
                 base.CheckForJudgements(userTriggered, timeOffset);
                 return;
             }
 
-            if (!hit.Result.IsHit)
+            if (!MainObject.Result.IsHit)
             {
                 ApplyResult(r => r.Type = HitResult.Miss);
                 return;
@@ -44,22 +43,22 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return;
             }
 
-            if (Math.Abs(hit.Result.TimeOffset - timeOffset) < second_hit_window)
+            if (Math.Abs(MainObject.Result.TimeOffset - timeOffset) < second_hit_window)
                 ApplyResult(r => r.Type = HitResult.Great);
         }
 
         public override bool OnPressed(TaikoAction action)
         {
             // Don't process actions until the main hitobject is hit
-            if (!hit.IsHit)
+            if (!MainObject.IsHit)
                 return false;
 
             // Don't process actions if the pressed button was released
-            if (hit.HitAction == null)
+            if (MainObject.HitAction == null)
                 return false;
 
             // Don't handle invalid hit action presses
-            if (!hit.HitActions.Contains(action))
+            if (!MainObject.HitActions.Contains(action))
                 return false;
 
             return UpdateJudgement(true);
