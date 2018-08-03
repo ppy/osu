@@ -62,10 +62,6 @@ namespace osu.Game.Screens.Play
             {
                 if (value == fake) return;
                 fake = value;
-                while (fake.Count!=values.Count)
-                {
-                    fake.Add(true);
-                }
                 layout.Invalidate();
             }
         }
@@ -149,30 +145,30 @@ namespace osu.Game.Screens.Play
 
             var max = values.Max();
 
-            //There apply some changes
             float step = values.Count / (float)ColumnCount;
             for (float i = 0; i < values.Count; i += step)
             {
-                bool myBool = false;
                 double sum = 0;
                 float iteration = 0;
                 for (float x = i; x < i+step && x < values.Count; x++)
                 {
                     sum += values[(int) x];
                     iteration = x - i + 1;
-                    //try 
-                    //{
-                        if (fake[(int)x])
-                            myBool = true;
-                    //}
-                    //finally//catch (ArgumentOutOfRangeException a)
-                    //{
-                        //if(!myBool)
-                        //myBool=false;
-                    //}
                 }
                 sum = sum / iteration;
                 newValues.Add(sum / max);
+            }
+
+            step = fake.Count / (float)ColumnCount;
+            for (float i = 0; i < fake.Count; i += step)
+            {
+                bool myBool = false;
+
+                for (float x = i; x < i+step && x < fake.Count; x++)
+                {
+                    if (fake[(int)x])
+                            myBool = true;
+                }
                 newFake.Add(myBool);
             }
 

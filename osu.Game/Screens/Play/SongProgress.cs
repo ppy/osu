@@ -65,8 +65,10 @@ namespace osu.Game.Screens.Play
                 {
                     graph.Truth.Add(false);
                 }
-                
+
                 double StartOfLists = (objects.First().StartTime - (objects.First().StartTime % strainStep))/strainStep;
+                if (strainStep==1)
+                    StartOfLists = objects.First().StartTime;
 
                 //this foreach will be for
                 for (int x = 0; x < graph.Truth.Count; x++)//each (bool truth in graph.Truth)
