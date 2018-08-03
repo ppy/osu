@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             if (RNG.Next(10) == 0)
             {
                 ((TaikoPlayfield)rulesetContainer.Playfield).OnJudgement(h, new JudgementResult(new TaikoJudgement()) { Type = hitResult });
-                ((TaikoPlayfield)rulesetContainer.Playfield).OnJudgement(h, new JudgementResult(new TaikoStrongHitJudgement()) { Type = HitResult.Great });
+                ((TaikoPlayfield)rulesetContainer.Playfield).OnJudgement(h, new JudgementResult(new TaikoStrongJudgement()) { Type = HitResult.Great });
             }
         }
 

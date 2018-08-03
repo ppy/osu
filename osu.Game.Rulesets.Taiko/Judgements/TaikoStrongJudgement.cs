@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Taiko.Judgements
 {
-    public class TaikoStrongHitJudgement : TaikoJudgement
+    public class TaikoStrongJudgement : TaikoJudgement
     {
         public override bool AffectsCombo => false;
     }
