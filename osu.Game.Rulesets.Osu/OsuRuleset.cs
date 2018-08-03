@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModRelax(),
                         new OsuModAutopilot(),
                     };
-                case ModType.Fun: 
+                case ModType.Fun:
                     return new Mod[] {
                         new OsuModArrange(),
                     };
