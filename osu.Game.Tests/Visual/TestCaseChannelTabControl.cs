@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("There are four channels", () => channelTabControl.Items.Count() == 5);
             AddStep("Add random public channel", () => addChannel(RNG.Next().ToString()));
 
-            AddRepeatStep("Select a random channel", () => channelTabControl.Current.Value = channelTabControl.Items.ElementAt(RNG.Next(channelTabControl.Count + 1)), 20);
+            AddRepeatStep("Select a random channel", () => channelTabControl.Current.Value = channelTabControl.Items.ElementAt(RNG.Next(channelTabControl.Items.Count() + 1)), 20);
         }
 
         private List<User> users;
