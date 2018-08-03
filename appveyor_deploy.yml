@@ -16,17 +16,15 @@ build_script:
   - cd osu-deploy
   - nuget restore -verbosity quiet
   - msbuild osu.Desktop.Deploy.csproj
-  - cmd: ..\appveyor-tools\secure-file -decrypt ..\fdc6f19b04.enc -secret %decode_secret% -out bin\Debug\net471\osu.Desktop.Deploy.exe.config
-  - cd bin\Debug\net471\
-  - osu.Desktop.Deploy.exe %code_signing_password% %APPVEYOR_REPO_TAG_NAME%
+  - cmd: ..\appveyor-tools\secure-file -decrypt ..\fdc6f19b04.enc -secret %decode_secret% -out bin\Debug\netcoreapp2.1\osu.Desktop.Deploy.dll.config
+  - dotnet bin/Debug/netcoreapp2.1/osu.Desktop.Deploy.dll %code_signing_password% %APPVEYOR_REPO_TAG_NAME%
 environment:
-  TargetFramework: net471
   decode_secret:
     secure: i67IC2xj6DjjxmA6Oj2jing3+MwzLkq6CbGsjfZ7rdY=
   code_signing_password:
     secure: 34tLNqvjmmZEi97MLKfrnQ==
 artifacts:
-  - path: 'Releases\*'
+  - path: 'osu-deploy/releases/*'
 deploy:
   - provider: Environment
     name: github
