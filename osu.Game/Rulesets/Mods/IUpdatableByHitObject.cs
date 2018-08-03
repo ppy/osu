@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Mods
 {
     public interface IUpdatableByHitObject : IApplicableMod
     {
-        void Update(DrawableHitObject o);
+        void Update(DrawableHitObject drawable);
     }
 }

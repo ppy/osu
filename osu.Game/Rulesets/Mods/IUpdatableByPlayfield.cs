@@ -7,6 +7,6 @@ namespace osu.Game.Rulesets.Mods
 {
     public interface IUpdatableByPlayfield : IApplicableMod
     {
-        void Update(Playfield r);
+        void Update(Playfield playfield);
     }
 }
