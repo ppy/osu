@@ -30,6 +30,14 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         public bool IsStrong;
 
+        protected override void CreateNestedHitObjects()
+        {
+            base.CreateNestedHitObjects();
+
+            if (IsStrong)
+                AddNested(new StrongHitObject());
+        }
+
         protected override Judgement CreateJudgement() => new TaikoJudgement();
 
         protected override HitWindows CreateHitWindows() => new TaikoHitWindows();

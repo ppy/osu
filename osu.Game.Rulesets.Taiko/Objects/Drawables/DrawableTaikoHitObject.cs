@@ -101,6 +101,17 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             Content.Add(MainPiece = CreateMainPiece());
             MainPiece.KiaiMode = HitObject.Kiai;
+
+            var strongObject = HitObject.NestedHitObjects.OfType<StrongHitObject>().FirstOrDefault();
+            if (strongObject != null)
+            {
+                var vis = CreateStrongObject(strongObject);
+                if (vis != null)
+                {
+                    AddNested(vis);
+                    AddInternal(vis);
+                }
+            }
         }
 
         // Normal and clap samples are handled by the drum
@@ -109,5 +120,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override string SampleNamespace => "Taiko";
 
         protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
+
+        protected virtual DrawableStrongHitObject CreateStrongObject(StrongHitObject hitObject) => null;
     }
 }
