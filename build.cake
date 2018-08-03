@@ -1,7 +1,7 @@
 #tool "nuget:?package=JetBrains.ReSharper.CommandLineTools"
 #tool "nuget:?package=NVika.MSBuild"
+#addin "nuget:?package=CodeFileSanity"
 var NVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
-var CodeFileSanityToolPath = DownloadFile("https://github.com/peppy/CodeFileSanity/releases/download/v0.2.5/CodeFileSanity.exe");
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -54,10 +54,10 @@ Task("InspectCode")
 
 Task("CodeFileSanity")
 .Does(() => {
-    var result = StartProcess(CodeFileSanityToolPath);
-
-    if (result != 0)
-        throw new Exception("Code sanity failed."); 
+    ValidateCodeSanity(new ValidateCodeSanitySettings {
+        RootDirectory = ".",
+        IsAppveyorBuild = AppVeyor.IsRunningOnAppVeyor
+    });
 });
 
 Task("Build")
