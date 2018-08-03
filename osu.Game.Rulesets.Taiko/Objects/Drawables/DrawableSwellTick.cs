@@ -8,6 +8,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableSwellTick : DrawableTaikoHitObject
     {
+        public override bool DisplayJudgement => false;
+
         public DrawableSwellTick(TaikoHitObject hitObject)
             : base(hitObject)
         {
