@@ -13,7 +13,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
@@ -23,9 +22,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// Number of rolling hits required to reach the dark/final colour.
         /// </summary>
         private const int rolling_hits_for_engaged_colour = 5;
-
-        private readonly JudgementResult result;
-        private readonly JudgementResult strongResult;
 
         /// <summary>
         /// Rolling number of tick hits. This increases for hits and decreases for misses.
@@ -48,9 +44,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 AddNested(newTick);
                 tickContainer.Add(newTick);
             }
-
-            result = Results.Single(r => !(r.Judgement is TaikoStrongHitJudgement));
-            strongResult = Results.SingleOrDefault(r => r.Judgement is TaikoStrongHitJudgement);
         }
 
         protected override TaikoPiece CreateMainPiece() => new ElongatedCirclePiece();
@@ -90,17 +83,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             int countHit = NestedHitObjects.Count(o => o.IsHit);
             if (countHit >= HitObject.RequiredGoodHits)
-            {
-                ApplyResult(result, r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good);
-                if (HitObject.IsStrong)
-                    ApplyResult(strongResult, r => r.Type = HitResult.Great);
-            }
+                ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good);
             else
-            {
-                ApplyResult(result, r => r.Type = HitResult.Miss);
-                if (HitObject.IsStrong)
-                    ApplyResult(strongResult, r => r.Type = HitResult.Miss);
-            }
+                ApplyResult(r => r.Type = HitResult.Miss);
         }
 
         protected override void UpdateState(ArmedState state)
@@ -113,5 +98,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     break;
             }
         }
+
+        protected override DrawableStrongHitObject CreateStrongObject(StrongHitObject hitObject) => new DrawableStrongDrumRoll(hitObject, this);
     }
 }

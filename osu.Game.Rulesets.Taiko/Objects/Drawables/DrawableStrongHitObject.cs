@@ -10,6 +10,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected DrawableStrongHitObject(StrongHitObject strong)
             : base(strong)
         {
+            AlwaysPresent = true;
         }
 
         protected override void UpdateState(ArmedState state)
