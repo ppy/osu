@@ -8,10 +8,6 @@ using osu.Framework;
 using osu.Framework.Platform;
 using osu.Game.IPC;
 
-#if NET_FRAMEWORK
-using System.Runtime;
-#endif
-
 namespace osu.Desktop
 {
     public static class Program
@@ -19,8 +15,6 @@ namespace osu.Desktop
         [STAThread]
         public static int Main(string[] args)
         {
-            useMultiCoreJit();
-
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
 
@@ -50,15 +44,6 @@ namespace osu.Desktop
 
                 return 0;
             }
-        }
-
-        private static void useMultiCoreJit()
-        {
-#if NET_FRAMEWORK
-            var directory = Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Profiles"));
-            ProfileOptimization.SetProfileRoot(directory.FullName);
-            ProfileOptimization.StartProfile("Startup.Profile");
-#endif
         }
     }
 }
