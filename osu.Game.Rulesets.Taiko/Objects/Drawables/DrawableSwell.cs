@@ -20,11 +20,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableSwell : DrawableTaikoHitObject<Swell>
     {
-        /// <summary>
-        /// A judgement is only displayed when the user has complete the swell (either a hit or miss).
-        /// </summary>
-        public override bool DisplayJudgement => AllJudged;
-
         private const float target_ring_thick_border = 1.4f;
         private const float target_ring_thin_border = 1f;
         private const float target_ring_scale = 5f;

@@ -7,6 +7,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public abstract class DrawableStrongHitObject : DrawableTaikoHitObject
     {
+        public override bool DisplayJudgement => false;
+
         public readonly DrawableHitObject MainObject;
 
         protected DrawableStrongHitObject(StrongHitObject strong, DrawableHitObject mainObject)
