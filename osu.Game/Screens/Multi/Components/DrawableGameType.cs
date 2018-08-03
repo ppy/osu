@@ -45,6 +45,15 @@ namespace osu.Game.Screens.Multi.Components
             switch (type)
             {
                 case GameType.Versus:
+                    icon = new VersusRow(colours.Blue, colours.Blue, size * 0.6f)
+                    {
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    };
+
+                    break;
+
+                case GameType.Tag:
                     icon = new SpriteIcon
                     {
                         Anchor = Anchor.Centre,
@@ -53,15 +62,6 @@ namespace osu.Game.Screens.Multi.Components
                         Size = new Vector2(size),
                         Colour = colours.Blue,
                         Shadow = false,
-                    };
-
-                    break;
-
-                case GameType.Tag:
-                    icon = new VersusRow(colours.Blue, colours.Blue, size * 0.6f)
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
                     };
 
                     break;

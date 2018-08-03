@@ -86,9 +86,9 @@ namespace osu.Game.Tests.Visual
                 },
             };
 
-            Match match = new Match(room);
+            Match match = null;
 
-            AddStep(@"show", () => Add(match));
+            AddStep(@"show", () => Add(match = new Match(room)));
             AddStep(@"null beatmap", () => room.Beatmap.Value = null);
             AddStep(@"change name", () => room.Name.Value = @"Two Awesome Rooms");
             AddStep(@"change status", () => room.Status.Value = new RoomStatusPlaying());
@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Visual
                 },
             });
 
-            AddStep(@"exit", match.Exit);
+            AddStep(@"exit", () => match?.Exit());
         }
     }
 }

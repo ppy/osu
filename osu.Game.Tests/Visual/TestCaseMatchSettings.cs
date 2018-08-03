@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Screens.Match;
 
 namespace osu.Game.Tests.Visual
@@ -15,12 +16,21 @@ namespace osu.Game.Tests.Visual
             typeof(Settings),
         };
 
+        private readonly Settings settings;
+
         public TestCaseMatchSettings()
         {
-            Add(new Settings
+            Add(settings = new Settings
             {
                 RelativeSizeAxes = Axes.Both,
             });
+
+            AddStep(@"change room name", () => settings.RoomName.Value = @"A Different Awesome Room");
+            AddStep(@"change max participants", () => settings.MaxParticipants.Value = 16);
+            AddStep(@"null max participants", () => settings.MaxParticipants.Value = null);
+            AddStep(@"change room visibility", () => settings.RoomAvailability.Value = RoomAvailability.FriendsOnly);
+            AddStep(@"change password", () => settings.Password.Value = @"HaxxorPassword");
+            AddStep(@"change game type", () => settings.GameType.Value = GameType.TeamVersus);
         }
     }
 }
