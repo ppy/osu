@@ -56,6 +56,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = Header.HEIGHT },
                     Alpha = 0,
+                    X = -600,
                 },
             };
 
@@ -108,6 +109,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
             header.Tabs.Current.BindValueChanged(onPageChanged);
         }
 
+        private const int page_transition_duration = 500;
+
         private void onPageChanged(MatchHeaderPage page)
         {
             if (page == currentPage) return;
@@ -117,27 +120,27 @@ namespace osu.Game.Screens.Multi.Screens.Match
             {
                 case MatchHeaderPage.Settings:
                     info
-                        .MoveToX(300, 500f, Easing.OutExpo)
-                        .FadeOutFromOne(200);
+                        .MoveToX(600, page_transition_duration, Easing.OutExpo)
+                        .FadeOutFromOne(300);
                     participants
-                        .MoveToX(300, 500f, Easing.OutExpo)
-                        .FadeOutFromOne(200);
+                        .MoveToX(600, page_transition_duration, Easing.OutExpo)
+                        .FadeOutFromOne(300);
                     settings
-                        .MoveToX(0, 500f, Easing.OutExpo)
-                        .FadeInFromZero(200);
+                        .MoveToX(0, page_transition_duration, Easing.OutExpo)
+                        .FadeInFromZero(300);
 
                     break;
 
                 case MatchHeaderPage.Room:
                     info
-                        .MoveToX(0, 500f, Easing.OutExpo)
-                        .FadeInFromZero(200);
+                        .MoveToX(0, page_transition_duration, Easing.OutExpo)
+                        .FadeInFromZero(300);
                     participants
-                        .MoveToX(0, 500f, Easing.OutExpo)
-                        .FadeInFromZero(200);
+                        .MoveToX(0, page_transition_duration, Easing.OutExpo)
+                        .FadeInFromZero(300);
                     settings
-                        .MoveToX(-300, 500f, Easing.OutExpo)
-                        .FadeOutFromOne(200);
+                        .MoveToX(-600, page_transition_duration, Easing.OutExpo)
+                        .FadeOutFromOne(300);
 
                     break;
             }

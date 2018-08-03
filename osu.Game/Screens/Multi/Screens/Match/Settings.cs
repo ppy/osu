@@ -21,8 +21,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
 {
     public class Settings : Container
     {
-        private readonly Box bg;
-
         public readonly Bindable<string> RoomName = new Bindable<string>();
         public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
         public readonly Bindable<string> Password = new Bindable<string>();
@@ -41,9 +39,10 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
             Children = new Drawable[]
             {
-                bg = new Box
+                new Box
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.FromHex(@"28242d"),
                 },
                 new Container
                 {
@@ -142,12 +141,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
             RoomName.BindValueChanged(n => roomNameBox.Text = n, true);
             MaxParticipants.BindValueChanged(p => maxParticipantsBox.Text = p.ToString(), true);
             Password.BindValueChanged(p => passwordBox.Text = p, true);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            bg.Colour = colours.Gray2;
         }
 
         private void onRoomNameCommit(TextBox box, bool newText) => RoomName.Value = box.Text;
