@@ -6,8 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -123,23 +121,9 @@ namespace osu.Game.Screens.Play
             logo.Delay(resuming ? 0 : 500).MoveToOffset(new Vector2(0, -0.24f), 500, Easing.InOutExpo);
         }
 
-        private bool weHandledMouseDown;
-
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-        {
-            weHandledMouseDown = true;
-            return base.OnMouseDown(state, args);
-        }
-
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-        {
-            weHandledMouseDown = false;
-            return base.OnMouseUp(state, args);
-        }
-
         private ScheduledDelegate pushDebounce;
 
-        private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && (!GetContainingInputManager().CurrentState.Mouse.HasAnyButtonPressed || weHandledMouseDown);
+        private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
 
         private void pushWhenLoaded()
         {
