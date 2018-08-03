@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Screens.Match;
 
 namespace osu.Game.Tests.Visual
@@ -14,11 +15,14 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(Settings),
+            typeof(RoomAvailabilityTabControl),
+            typeof(GameTypeTabControl),
+            typeof(SettingsPasswordTextBox),
         };
 
         public TestCaseMatchSettings()
         {
-            Settings settings
+            Settings settings;
 
             Add(settings = new Settings
             {
