@@ -21,6 +21,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Mods.Sections;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -188,6 +189,7 @@ namespace osu.Game.Overlays.Mods
             Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
             Height = 510;
+
             Children = new Drawable[]
             {
                 new Container
@@ -211,178 +213,172 @@ namespace osu.Game.Overlays.Mods
                         },
                     },
                 },
-                new FillFlowContainer
+                new GridContainer
                 {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
+                    RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(0f, 10f),
-                    Children = new Drawable[]
+                    RowDimensions = new[]
                     {
-                        // Header
-                        new Container
+                        new Dimension(GridSizeMode.Absolute, 90),
+                        new Dimension(GridSizeMode.Distributed),
+                        new Dimension(GridSizeMode.Absolute, 70),
+                    },
+                    Content = new[]
+                    {
+                        new Drawable[]
                         {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 82,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Children = new Drawable[]
+                            new Container
                             {
-                                new Box
+                                RelativeSizeAxes = Axes.Both,
+                                Origin = Anchor.TopCentre,
+                                Anchor = Anchor.TopCentre,
+                                Children = new Drawable[]
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.Gray(10).Opacity(100),
-                                },
-                                new FillFlowContainer
-                                {
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
-                                    Width = content_width,
-                                    Padding = new MarginPadding
+                                    new Box
                                     {
-                                        Top = 10,
-                                        Bottom = 10,
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = OsuColour.Gray(10).Opacity(100),
                                     },
-                                    Children = new Drawable[]
+                                    new FillFlowContainer
                                     {
-                                        new OsuSpriteText
+                                        Origin = Anchor.Centre,
+                                        Anchor = Anchor.Centre,
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Direction = FillDirection.Vertical,
+                                        Width = content_width,
+                                        Children = new Drawable[]
                                         {
-                                            Font = @"Exo2.0-Bold",
-                                            Text = @"Gameplay Mods",
-                                            TextSize = 22,
-                                            Shadow = true,
-                                            Margin = new MarginPadding
+                                            new OsuSpriteText
                                             {
-                                                Bottom = 4,
+                                                Font = @"Exo2.0-Bold",
+                                                Text = @"Gameplay Mods",
+                                                TextSize = 22,
+                                                Shadow = true,
+                                                Margin = new MarginPadding
+                                                {
+                                                    Bottom = 4,
+                                                },
                                             },
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Text = @"Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play.",
-                                            TextSize = 18,
-                                            Shadow = true,
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Text = @"Others are just for fun.",
-                                            TextSize = 18,
-                                            Shadow = true,
+                                            new OsuTextFlowContainer(text =>
+                                            {
+                                                text.TextSize = 18;
+                                                text.Shadow = true;
+                                            })
+                                            {
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Text = "Mods provide different ways to enjoy gameplay. Some have an effect on the score you can achieve during ranked play.\nOthers are just for fun.",
+                                            },
                                         },
                                     },
                                 },
                             },
                         },
-                        // Body
-                        ModSectionsContainer = new FillFlowContainer<ModSection>
+                        new Drawable[]
                         {
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Spacing = new Vector2(0f, 10f),
-                            Width = content_width,
-                            Children = new ModSection[]
+                            // Body
+                            new OsuScrollContainer
                             {
-                                new DifficultyReductionSection
+                                ScrollbarVisible = false,
+                                Origin = Anchor.TopCentre,
+                                Anchor = Anchor.TopCentre,
+                                RelativeSizeAxes = Axes.Both,
+                                Padding = new MarginPadding { Vertical = 10 },
+                                Child = ModSectionsContainer = new FillFlowContainer<ModSection>
                                 {
-                                    RelativeSizeAxes = Axes.X,
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    Action = modButtonPressed,
-                                },
-                                new DifficultyIncreaseSection
-                                {
                                     RelativeSizeAxes = Axes.X,
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Action = modButtonPressed,
-                                },
-                                new SpecialSection
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    Origin = Anchor.TopCentre,
-                                    Anchor = Anchor.TopCentre,
-                                    Action = modButtonPressed,
-                                },
-                            }
-                        },
-                        // Footer
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 70,
-                            Origin = Anchor.TopCentre,
-                            Anchor = Anchor.TopCentre,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = new Color4(172, 20, 116, 255),
-                                    Alpha = 0.5f,
-                                },
-                                footerContainer = new FillFlowContainer
-                                {
-                                    Origin = Anchor.BottomCentre,
-                                    Anchor = Anchor.BottomCentre,
                                     AutoSizeAxes = Axes.Y,
-                                    RelativeSizeAxes = Axes.X,
+                                    Spacing = new Vector2(0f, 10f),
                                     Width = content_width,
-                                    Direction = FillDirection.Horizontal,
-                                    Padding = new MarginPadding
+                                    Children = new ModSection[]
                                     {
-                                        Vertical = 15
+                                        new DifficultyReductionSection { Action = modButtonPressed },
+                                        new DifficultyIncreaseSection { Action = modButtonPressed },
+                                        new AutomationSection { Action = modButtonPressed },
+                                        new ConversionSection { Action = modButtonPressed },
+                                        new FunSection { Action = modButtonPressed },
+                                    }
+                                },
+                            },
+                        },
+                        new Drawable[]
+                        {
+                            // Footer
+                            new Container
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Origin = Anchor.TopCentre,
+                                Anchor = Anchor.TopCentre,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = new Color4(172, 20, 116, 255),
+                                        Alpha = 0.5f,
                                     },
-                                    Children = new Drawable[]
+                                    footerContainer = new FillFlowContainer
                                     {
-                                        DeselectAllButton = new TriangleButton
+                                        Origin = Anchor.BottomCentre,
+                                        Anchor = Anchor.BottomCentre,
+                                        AutoSizeAxes = Axes.Y,
+                                        RelativeSizeAxes = Axes.X,
+                                        Width = content_width,
+                                        Direction = FillDirection.Horizontal,
+                                        Padding = new MarginPadding
                                         {
-                                            Width = 180,
-                                            Text = "Deselect All",
-                                            Action = DeselectAll,
-                                            Margin = new MarginPadding
-                                            {
-                                                Right = 20
-                                            }
+                                            Vertical = 15
                                         },
-                                        new OsuSpriteText
+                                        Children = new Drawable[]
                                         {
-                                            Text = @"Score Multiplier:",
-                                            TextSize = 30,
-                                            Margin = new MarginPadding
+                                            DeselectAllButton = new TriangleButton
                                             {
-                                                Top = 5,
-                                                Right = 10
-                                            }
-                                        },
-                                        MultiplierLabel = new OsuSpriteText
-                                        {
-                                            Font = @"Exo2.0-Bold",
-                                            TextSize = 30,
-                                            Margin = new MarginPadding
+                                                Width = 180,
+                                                Text = "Deselect All",
+                                                Action = DeselectAll,
+                                                Margin = new MarginPadding
+                                                {
+                                                    Right = 20
+                                                }
+                                            },
+                                            new OsuSpriteText
                                             {
-                                                Top = 5
-                                            }
-                                        },
-                                        UnrankedLabel = new OsuSpriteText
-                                        {
-                                            Font = @"Exo2.0-Bold",
-                                            Text = @"(Unranked)",
-                                            TextSize = 30,
-                                            Margin = new MarginPadding
+                                                Text = @"Score Multiplier:",
+                                                TextSize = 30,
+                                                Margin = new MarginPadding
+                                                {
+                                                    Top = 5,
+                                                    Right = 10
+                                                }
+                                            },
+                                            MultiplierLabel = new OsuSpriteText
                                             {
-                                                Top = 5,
-                                                Left = 10
+                                                Font = @"Exo2.0-Bold",
+                                                TextSize = 30,
+                                                Margin = new MarginPadding
+                                                {
+                                                    Top = 5
+                                                }
+                                            },
+                                            UnrankedLabel = new OsuSpriteText
+                                            {
+                                                Font = @"Exo2.0-Bold",
+                                                Text = @"(Unranked)",
+                                                TextSize = 30,
+                                                Margin = new MarginPadding
+                                                {
+                                                    Top = 5,
+                                                    Left = 10
+                                                }
                                             }
                                         }
                                     }
-                                }
-                            },
+                                },
+                            }
                         },
                     },
                 },
