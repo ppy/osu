@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
@@ -79,15 +78,12 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 ControlPointInfo = controlPointInfo
             });
 
-            var rateAdjustClock = new StopwatchClock(true) { Rate = 1 };
-
             Add(playfieldContainer = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
                 Height = 768,
-                Clock = new FramedClock(rateAdjustClock),
                 Children = new[] { rulesetContainer = new TaikoRulesetContainer(new TaikoRuleset(), beatmap) }
             });
         }
@@ -205,10 +201,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            if (strong)
-                rulesetContainer.Playfield.Add(new DrawableCentreHitStrong(h));
-            else
-                rulesetContainer.Playfield.Add(new DrawableCentreHit(h));
+            rulesetContainer.Playfield.Add(new DrawableCentreHit(h));
         }
 
         private void addRimHit(bool strong)
@@ -221,10 +214,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            if (strong)
-                rulesetContainer.Playfield.Add(new DrawableRimHitStrong(h));
-            else
-                rulesetContainer.Playfield.Add(new DrawableRimHit(h));
+            rulesetContainer.Playfield.Add(new DrawableRimHit(h));
         }
 
         private class DrawableTestHit : DrawableHitObject<TaikoHitObject>
