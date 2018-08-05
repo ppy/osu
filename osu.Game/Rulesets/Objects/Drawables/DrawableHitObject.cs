@@ -13,8 +13,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
-using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -42,8 +40,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         public IReadOnlyList<Judgement> Judgements => judgements;
         private readonly List<Judgement> judgements = new List<Judgement>();
-
-        private WorkingBeatmap beatmap;
 
         /// <summary>
         /// Whether a visible judgement should be displayed when this representation is hit.
@@ -84,9 +80,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap bBeatmap)
+        private void load()
         {
-            beatmap = bBeatmap.Value;
             var samples = GetSamples().ToArray();
 
             if (samples.Any())
@@ -136,11 +131,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected override void Update()
         {
             base.Update();
-
-            if(beatmap != null)
-                foreach (var mod in beatmap.Mods.Value)
-                    if (mod is IUpdatableByHitObject updatable)
-                        updatable.Update(this);
 
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 
