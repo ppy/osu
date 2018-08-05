@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Mods
             Vector2 originalPosition = drawable.Position;
 
             const float appear_distance = 250;
+
+            //the - 1 and + 1 prevents the hit explosion to appear in the wrong position.
             double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
             double moveDuration = hitObject.TimePreempt + 1;
 
@@ -48,7 +50,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 drawable
                     .MoveToOffset(new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * appear_distance)
                     .MoveTo(originalPosition, moveDuration, Easing.InOutSine);
-
             }
 
             // That way slider ticks come all from the same direction.
