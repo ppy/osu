@@ -49,7 +49,6 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         [JsonIgnore]
         public bool Kiai { get; private set; }
-        //maybe use this
         private float overallDifficulty = BeatmapDifficulty.DEFAULT_DIFFICULTY;
 
         /// <summary>
