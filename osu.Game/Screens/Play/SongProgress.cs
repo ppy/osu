@@ -34,8 +34,7 @@ namespace osu.Game.Screens.Play
         public override bool HandleKeyboardInput => AllowSeeking;
         public override bool HandleMouseInput => AllowSeeking;
 
-        private List<double> strains;
-        public List<double> Strains{ set { graph.Strains = strains = value; } }
+        public List<double> Strains{ set { graph.Strains = value; } }
 
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = info.AudioClock = value; } }

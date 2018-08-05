@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play
             get { return strains; }
             set
             {
-                for(int x = 0; x < value.Count(); x++)
+                for(int x = 0; x < value.Count; x++)
                 {
                     if (x == 0)
                     {
@@ -64,12 +64,12 @@ namespace osu.Game.Screens.Play
 
                 var values = new List<int>();
 
-                foreach (double strain in strains)
+                for (int x = 0; x < strains.Count; x++)
                 {
                     values.Add(0);
                 }
 
-                var startOfLists = (objects.First().StartTime - (objects.First().StartTime % strainStep))/strainStep;
+                var startOfLists = (objects.First().StartTime - objects.First().StartTime % strainStep)/strainStep;
                 if (strainStep==1)
                 {
                     startOfLists = objects.First().StartTime;
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private double strainStep = new double();
+        private double strainStep;
 
         public double StrainStep
         {

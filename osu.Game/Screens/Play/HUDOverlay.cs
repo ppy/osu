@@ -14,7 +14,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
@@ -79,17 +78,24 @@ namespace osu.Game.Screens.Play
 
             BindProcessor(scoreProcessor);
             BindRulesetContainer(rulesetContainer);
-            if (rulesetContainer.Ruleset.LegacyID!=2)
+            switch (rulesetContainer.Ruleset.LegacyID)
             {
-                if (rulesetContainer.Ruleset.LegacyID!=0)
-                    Progress.StrainStep = 400;
-                else
+                case 0:
                     Progress.StrainStep = 1;
+                    break;
+                case 1:
+                    Progress.StrainStep = 400;
+                    break;
+                case 2:
+                    Progress.StrainStep = 750;
+                    break;
+                case 3:
+                    Progress.StrainStep = 400;
+                default:
+                    Progress.StrainStep = 400;
+                    break;
             }
-            else
-            {
-                Progress.StrainStep = 750;
-            }
+
             var difficultyCalculator = rulesetContainer.Ruleset.CreateDifficultyCalculator(working);
             Progress.Strains = difficultyCalculator.DifficultySectionRating();
             Progress.Objects = rulesetContainer.Objects;
