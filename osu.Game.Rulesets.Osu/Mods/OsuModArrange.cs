@@ -39,15 +39,15 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             Vector2 originalPosition = drawable.Position;
 
-            // avoiding that the player can see the abroupt move.
-            const int pre_time_offset = 1000;
-            const float appearDistance = 250;
+            const float appear_distance = 250;
+            double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
+            double moveDuration = hitObject.TimePreempt + 1;
 
-            using (drawable.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimeFadeIn - pre_time_offset, true))
+            using (drawable.BeginAbsoluteSequence(appearTime, true))
             {
                 drawable
-                    .MoveToOffset(new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * appearDistance)
-                    .MoveTo(originalPosition, hitObject.TimeFadeIn + pre_time_offset, Easing.InOutSine);
+                    .MoveToOffset(new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * appear_distance)
+                    .MoveTo(originalPosition, moveDuration, Easing.InOutSine);
 
             }
 
