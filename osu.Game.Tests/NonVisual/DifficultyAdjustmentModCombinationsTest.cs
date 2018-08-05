@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
@@ -147,6 +148,8 @@ namespace osu.Game.Tests.NonVisual
             protected override Mod[] DifficultyAdjustmentMods { get; }
 
             protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate) => throw new NotImplementedException();
+
+            protected override List<double> DifficultySectionRating(IBeatmap beatmap, double timeRate) => new List<double>();
         }
     }
 }
