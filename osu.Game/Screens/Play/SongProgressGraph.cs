@@ -36,17 +36,6 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private List<bool> truth = new List<bool>();
-
-        public List<bool> Truth
-        {
-            get {return truth;}
-            set
-            {
-                Fake = truth = value;
-            }
-        }
-
         private IEnumerable<HitObject> objects;
 
         public IEnumerable<HitObject> Objects

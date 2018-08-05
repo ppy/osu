@@ -46,6 +46,19 @@ namespace osu.Game.Screens.Ranking
 
             var difficultyCalculator = this.score.Ruleset.CreateInstance().CreateDifficultyCalculator(this.working);
 
+            double strainStep = 1;
+            if (this.score.Ruleset.LegacyID!=0)
+            {
+                if (this.score.Ruleset.LegacyID!=2)
+                {
+                    strainStep = 400;
+                }
+                else
+                {
+                    strainStep = 750;
+                }
+            }
+
             Children = new Drawable[]
             {
                 new Container
@@ -95,7 +108,8 @@ namespace osu.Game.Screens.Ranking
                                     RelativeSizeAxes = Axes.Both,
                                     Alpha = 0.5f,
                                     Strains = difficultyCalculator.DifficultySectionRating(),
-                                    //add there beatmap Objects like in song progress and Strainstep
+                                    StrainStep = strainStep,
+                                    Objects = this.working.Beatmap.HitObjects,
                                 },
                                 scoreCounter = new SlowScoreCounter(6)
                                 {

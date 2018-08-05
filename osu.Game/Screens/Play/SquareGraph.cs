@@ -52,20 +52,6 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private List<bool> calculatedFake = new List<bool>();
-
-        private List<bool> fake = new List<bool>();
-        public List<bool> Fake
-        {
-            get { return fake; }
-            set
-            {
-                if (value == fake) return;
-                fake = value;
-                layout.Invalidate();
-            }
-        }
-
         private Color4 fillColour;
         public Color4 FillColour
         {
@@ -119,10 +105,7 @@ namespace osu.Game.Screens.Play
         private void redrawFilled()
         {
             for (int i = 0; i < ColumnCount; i++)
-                if(fake[i])
-                    columns[i].Filled = (float) calculatedValues.ElementAtOrDefault(i);
-                else
-                  columns[i].Filled = 0;
+                columns[i].Filled = (float) calculatedValues.ElementAtOrDefault(i);
             ForceRedraw();
         }
 
@@ -132,14 +115,11 @@ namespace osu.Game.Screens.Play
         private void recalculateValues()
         {
             var newValues = new List<double>();
-            var newFake = new List<bool>();
 
             if (values == null)
             {
                 for (float i = 0; i < ColumnCount; i++)
                     newValues.Add(0);
-                    newFake.Add(false);
-
                 return;
             }
 
@@ -159,22 +139,8 @@ namespace osu.Game.Screens.Play
                 newValues.Add(sum / max);
             }
 
-            step = fake.Count / (float)ColumnCount;
-            for (float i = 0; i < fake.Count; i += step)
-            {
-                bool myBool = false;
-
-                for (float x = i; x < i+step && x < fake.Count; x++)
-                {
-                    if (fake[(int)x])
-                            myBool = true;
-                }
-                newFake.Add(myBool);
-            }
-
             calculatedValues = newValues;
-            calculatedFake = newFake;
-        }
+        } 
 
         /// <summary>
         /// Recreates the entire graph.

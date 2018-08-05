@@ -58,45 +58,6 @@ namespace osu.Game.Screens.Play
 
                 bar.StartTime = firstHitTime;
                 bar.EndTime = lastHitTime;
-
-                graph.Truth = new List<bool>();
-                
-                foreach (double strain in strains)
-                {
-                    graph.Truth.Add(false);
-                }
-
-                double startOfLists = (objects.First().StartTime - (objects.First().StartTime % strainStep))/strainStep;
-                if (strainStep==1)
-                    startOfLists = objects.First().StartTime;
-
-                //this foreach will be for
-                for (int x = 0; x < graph.Truth.Count; x++)//each (bool truth in graph.Truth)
-                {
-                    foreach (HitObject hit in objects)
-                    {
-                        var endTime = (hit as IHasEndTime)?.EndTime ?? hit.StartTime;
-
-                        Debug.Assert(endTime >= hit.StartTime);
-
-                        //this if will dzielić x wyższego fora przzez strainstep i sprawdzał czy hitobject znajduje się w zakresie dzielenie - dzielenie+strainstep
-                        if (hit.StartTime>=x*strainStep+startOfLists && hit.StartTime<(x+1)*strainStep+startOfLists)
-                        {
-                            graph.Truth[x]=true;
-                        }
-
-                        if (endTime>=x*strainStep+startOfLists && endTime<(x+1)*strainStep+startOfLists)
-                        {
-                            graph.Truth[x]=true;
-                        }
-
-                        if (hit.StartTime<x*strainStep+startOfLists && endTime>(x+1)*strainStep+startOfLists)
-                        {
-                            graph.Truth[x]=true;
-                        }
-                    }
-                    
-                }
             }
         }
 
