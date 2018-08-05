@@ -64,11 +64,11 @@ namespace osu.Game.Screens.Play
 
         public double StrainStep
         {
-            get 
+            get
             {return strainStep;}
-            set 
+            set
             {graph.StrainStep = strainStep = value;}
-        }  
+        }
 
         private readonly BindableBool replayLoaded = new BindableBool();
 

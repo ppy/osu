@@ -138,7 +138,7 @@ namespace osu.Game.Screens.Play
             }
 
             calculatedValues = newValues;
-        } 
+        }
 
         /// <summary>
         /// Recreates the entire graph.
