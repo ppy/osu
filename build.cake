@@ -39,7 +39,6 @@ Task("Test")
 });
 
 // windows only because both inspectcore and nvike depend on net45
-// will be ignored on linux
 Task("InspectCode")
 .WithCriteria(IsRunningOnWindows())
 .IsDependentOn("Compile")
