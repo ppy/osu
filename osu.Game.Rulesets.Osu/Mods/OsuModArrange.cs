@@ -19,8 +19,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string ShortenedName => "Arrange";
         public override FontAwesome Icon => FontAwesome.fa_arrows;
         public override ModType Type => ModType.Fun;
-        public override double ScoreMultiplier => 1.05;
         public override string Description => "Everything rotates. EVERYTHING.";
+        public override double ScoreMultiplier => 1;
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
