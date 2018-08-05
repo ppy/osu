@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
-    //Use something from this class
     /// <summary>
     /// An enumerable container wrapping <see cref="OsuHitObject"/> input as <see cref="OsuDifficultyHitObject"/>
     /// which contains extra data required for difficulty calculation.

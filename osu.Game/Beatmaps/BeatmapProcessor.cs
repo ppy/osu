@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Beatmaps
 {
-    //maybe this will be useful
     /// <summary>
     /// Provides functionality to alter a <see cref="IBeatmap"/> after it has been converted.
     /// </summary>

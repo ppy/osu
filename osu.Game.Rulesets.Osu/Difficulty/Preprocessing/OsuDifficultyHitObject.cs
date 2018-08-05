@@ -8,7 +8,6 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
-    //this file will be very needed
     /// <summary>
     /// A wrapper around <see cref="OsuHitObject"/> extending it with additional data required for difficulty calculation.
     /// </summary>
