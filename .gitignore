@@ -262,3 +262,5 @@ paket-files/
 __pycache__/
 *.pyc
 Staging/
+
+inspectcodereport.xml
