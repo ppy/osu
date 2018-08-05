@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Ranking
                                     RelativeSizeAxes = Axes.Both,
                                     Alpha = 0.5f,
                                     Strains = difficultyCalculator.DifficultySectionRating(),
-                                    //add there beatmap objects like in song progress
+                                    //add there beatmap Objects like in song progress and Strainstep
                                 },
                                 scoreCounter = new SlowScoreCounter(6)
                                 {

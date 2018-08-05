@@ -286,7 +286,10 @@ namespace osu.Game.Screens.Play
                 //    amount = Math.Ceiling(amount);
                 //}
                 //int countFilled = (int) amount;
-                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 1, drawableRows.Count);
+
+                if (filled<0.01)
+                    countFilled = 0;
 
                 for (int i = 0; i < drawableRows.Count; i++)
                     drawableRows[i].Colour = i < countFilled ? colour : EmptyColour;

@@ -15,6 +15,7 @@ namespace osu.Game.Screens.Play
 
         public List<double> Strains
         {
+            get { return strains; }
             set
             {
                 for(int x = 0; x < value.Count(); x++)
@@ -43,6 +44,76 @@ namespace osu.Game.Screens.Play
             set
             {
                 Fake = truth = value;
+            }
+        }
+
+        private IEnumerable<HitObject> objects;
+
+        public IEnumerable<HitObject> Objects
+        {
+            get { return objects; }
+            set
+            {
+                objects = value;
+
+                if (!objects.Any())
+                {
+                    for (int x = 0; x < Strains.Count; x++)
+                    {
+                        Strains[x] = 0;
+                    }
+                }
+
+                var values = new List<int>();
+
+                foreach (double strain in strains)
+                {
+                    values.Add(0);
+                }
+
+                var startOfLists = (objects.First().StartTime - (objects.First().StartTime % strainStep))/strainStep;
+                if (strainStep==1)
+                {
+                    startOfLists = objects.First().StartTime;
+                }
+
+                var interval = strainStep;
+                if (interval==1)
+                {
+                    interval = 400;
+                }
+
+                foreach (var h in objects)
+                {
+                    var endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
+
+                    Debug.Assert(endTime >= h.StartTime);
+
+                    int startRange = (int)((h.StartTime - startOfLists) / interval);
+                    int endRange = (int)((endTime - startOfLists) / interval);
+                    for (int i = startRange; i <= endRange && i < values.Count; i++)
+                        values[i]++;
+                }
+                // zrób manipulację z values oraz Strains (zwróć uwagę na wielkość liter)
+                Debug.Assert(values.Count == Strains.Count);
+
+                for (int x = 0; x < Strains.Count; x++)
+                {
+                    if (values[x]==0)
+                        Strains[x] = 0;
+                    //dodaj if-a dla spinnerów
+                }
+            }
+        }
+
+        private double strainStep = new double();
+
+        public double StrainStep
+        {
+            get { return strainStep; }
+            set
+            {
+                strainStep = value;
             }
         }
     }
