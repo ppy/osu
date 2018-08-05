@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Play
             get { return strains; }
             set
             {
-                for(int x = 0; x < value.Count(); x++)
+                for(int x = 0; x < value.Count; x++)
                 {
                     if (x == 0)
                     {
@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private double strainStep = new double();
+        private double strainStep;
 
         public double StrainStep
         {
