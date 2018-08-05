@@ -51,52 +51,13 @@ namespace osu.Game.Screens.Play
         {
             set
             {
-                objects = value;
+                graph.Objects = objects = value;
 
                 info.StartTime = firstHitTime;
                 info.EndTime = lastHitTime;
 
                 bar.StartTime = firstHitTime;
                 bar.EndTime = lastHitTime;
-
-                graph.Truth = new List<bool>();
-                
-                foreach (double strain in strains)
-                {
-                    graph.Truth.Add(false);
-                }
-
-                double StartOfLists = (objects.First().StartTime - (objects.First().StartTime % strainStep))/strainStep;
-                if (strainStep==1)
-                    StartOfLists = objects.First().StartTime;
-
-                //this foreach will be for
-                for (int x = 0; x < graph.Truth.Count; x++)//each (bool truth in graph.Truth)
-                {
-                    foreach (HitObject hit in objects)
-                    {
-                        var endTime = (hit as IHasEndTime)?.EndTime ?? hit.StartTime;
-
-                        Debug.Assert(endTime >= hit.StartTime);
-
-                        //this if will dzielić x wyższego fora przzez strainstep i sprawdzał czy hitobject znajduje się w zakresie dzielenie - dzielenie+strainstep
-                        if (hit.StartTime>=x*strainStep+StartOfLists && hit.StartTime<(x+1)*strainStep+StartOfLists)
-                        {
-                            graph.Truth[x]=true;
-                        }
-
-                        if (endTime>=x*strainStep+StartOfLists && endTime<(x+1)*strainStep+StartOfLists)
-                        {
-                            graph.Truth[x]=true;
-                        }
-
-                        if (hit.StartTime<x*strainStep+StartOfLists && endTime>(x+1)*strainStep+StartOfLists)
-                        {
-                            graph.Truth[x]=true;
-                        }
-                    }
-                    
-                }
             }
         }
 
@@ -107,7 +68,7 @@ namespace osu.Game.Screens.Play
             get 
             {return strainStep;}
             set 
-            {strainStep = value;}
+            {graph.StrainStep = strainStep = value;}
         }  
 
         private readonly BindableBool replayLoaded = new BindableBool();

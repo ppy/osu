@@ -17,8 +17,6 @@ namespace osu.Game.Screens.Play
 {
     public class SquareGraph : BufferedContainer
     {
-        //to do: on catch taiko and mania entry with skipping, spinners in osu!, TIMING
-        //add some scaling. easy beatmaps have to have got small, static amount of cubes, and harder more cubes more dynamical
         private Column[] columns = { };
 
         public int ColumnCount => columns.Length;
@@ -48,20 +46,6 @@ namespace osu.Game.Screens.Play
             {
                 if (value == values) return;
                 values = value;
-                layout.Invalidate();
-            }
-        }
-
-        private List<bool> calculatedFake = new List<bool>();
-
-        private List<bool> fake = new List<bool>();
-        public List<bool> Fake
-        {
-            get { return fake; }
-            set
-            {
-                if (value == fake) return;
-                fake = value;
                 layout.Invalidate();
             }
         }
@@ -119,10 +103,7 @@ namespace osu.Game.Screens.Play
         private void redrawFilled()
         {
             for (int i = 0; i < ColumnCount; i++)
-                if(fake[i])
-                    columns[i].Filled = (float) calculatedValues.ElementAtOrDefault(i);
-                else
-                  columns[i].Filled = 0;
+                columns[i].Filled = (float) calculatedValues.ElementAtOrDefault(i);
             ForceRedraw();
         }
 
@@ -132,14 +113,11 @@ namespace osu.Game.Screens.Play
         private void recalculateValues()
         {
             var newValues = new List<double>();
-            var newFake = new List<bool>();
 
-            if (values == null)
+            if (values.Count == 0)
             {
                 for (float i = 0; i < ColumnCount; i++)
                     newValues.Add(0);
-                    newFake.Add(false);
-
                 return;
             }
 
@@ -159,22 +137,8 @@ namespace osu.Game.Screens.Play
                 newValues.Add(sum / max);
             }
 
-            step = fake.Count / (float)ColumnCount;
-            for (float i = 0; i < fake.Count; i += step)
-            {
-                bool myBool = false;
-
-                for (float x = i; x < i+step && x < fake.Count; x++)
-                {
-                    if (fake[(int)x])
-                            myBool = true;
-                }
-                newFake.Add(myBool);
-            }
-
             calculatedValues = newValues;
-            calculatedFake = newFake;
-        }
+        } 
 
         /// <summary>
         /// Recreates the entire graph.
@@ -273,20 +237,14 @@ namespace osu.Game.Screens.Play
                 fillActive();
             }
 
-            //There to apply some changes changes
             private void fillActive()
             {
                 Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
 
-                //this change was bad
-               // double amount = MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 1, drawableRows.Count);
 
-                //while (!((amount % 1) == 0))
-                //{
-                //    amount = Math.Ceiling(amount);
-                //}
-                //int countFilled = (int) amount;
-                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+                if (filled<0.01)
+                    countFilled = 0;
 
                 for (int i = 0; i < drawableRows.Count; i++)
                     drawableRows[i].Colour = i < countFilled ? colour : EmptyColour;

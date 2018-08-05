@@ -15,6 +15,7 @@ namespace osu.Game.Screens.Play
 
         public List<double> Strains
         {
+            get { return strains; }
             set
             {
                 for(int x = 0; x < value.Count(); x++)
@@ -35,14 +36,89 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private List<bool> truth = new List<bool>();
+        private IEnumerable<HitObject> objects;
 
-        public List<bool> Truth
+        public IEnumerable<HitObject> Objects
         {
-            get {return truth;}
+            get { return objects; }
             set
             {
-                Fake = truth = value;
+                objects = value;
+
+                if (!objects.Any())
+                {
+                    for (int x = 0; x < Strains.Count; x++)
+                    {
+                        Strains[x] = 0;
+                    }
+                }
+                else
+                {
+                    if (Strains.Count==0)
+                    {
+                        Strains.Add(1);
+                        Update();
+                        return;
+                    }
+                }
+
+                var values = new List<int>();
+
+                foreach (double strain in strains)
+                {
+                    values.Add(0);
+                }
+
+                var startOfLists = (objects.First().StartTime - (objects.First().StartTime % strainStep))/strainStep;
+                if (strainStep==1)
+                {
+                    startOfLists = objects.First().StartTime;
+                }
+
+                var interval = strainStep;
+                if (interval==1)
+                {
+                    interval = 400;
+                }
+
+                foreach (var h in objects)
+                {
+                    var endTime = (h as IHasEndTime)?.EndTime ?? h.StartTime;
+
+                    Debug.Assert(endTime >= h.StartTime);
+
+                    int startRange = (int)((h.StartTime - startOfLists) / interval);
+                    int endRange = (int)((endTime - startOfLists) / interval);
+                    for (int i = startRange; i <= endRange && i < values.Count; i++)
+                        values[i]++;
+                }
+
+                Debug.Assert(values.Count == Strains.Count);
+
+                for (int x = 0; x < Strains.Count; x++)
+                {
+                    if (values[x]==0)
+                        Strains[x] = 0;
+                    else
+                    {
+                        if (Strains[x]<0.01)
+                        {
+                            Strains[x]=0.01;
+                        }
+                    }
+                }
+                Update();
+            }
+        }
+
+        private double strainStep = new double();
+
+        public double StrainStep
+        {
+            get { return strainStep; }
+            set
+            {
+                strainStep = value;
             }
         }
     }
