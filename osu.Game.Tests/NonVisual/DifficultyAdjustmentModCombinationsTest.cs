@@ -148,7 +148,7 @@ namespace osu.Game.Tests.NonVisual
 
             protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate) => throw new NotImplementedException();
 
-            protected override DifficultyAttributes DifficultySectionRating(IBeatmap beatmap, double timeRate) => throw new NotImplementedException();
+            protected override List<double> DifficultySectionRating(IBeatmap beatmap, double timeRate) => throw new NotImplementedException();
         }
     }
 }
