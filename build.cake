@@ -1,7 +1,7 @@
+#addin "nuget:?package=CodeFileSanity"
 #addin "nuget:?package=JetBrains.ReSharper.CommandLineTools"
 #tool "nuget:?package=NVika.MSBuild"
-#addin "nuget:?package=CodeFileSanity"
-var NVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
+#tool "nuget:?package=NuGet.CommandLine"
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -38,13 +38,17 @@ Task("Test")
     });
 });
 
-Task("Restore Nuget")
-.Does(() => NuGetRestore(osuSolution));
-
+// windows only because both inspectcore and nvike depend on net45
+// will be ignored on linux
 Task("InspectCode")
-.IsDependentOn("Restore Nuget")
+.WithCriteria(IsRunningOnWindows())
 .IsDependentOn("Compile")
 .Does(() => {
+    var NVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
+    var NugetToolPath = GetFiles("./tools/NuGet.CommandLine.*/tools/NuGet.exe").First();
+
+    StartProcess(NugetToolPath, $"restore {osuSolution}");
+
     InspectCode(osuSolution, new InspectCodeSettings {
         CachesHome = "inspectcode",
         OutputFile = "inspectcodereport.xml",
