@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     continue;
 
                 double time = osuHit.Clock.CurrentTime;
+                double relativetime = time - osuHit.HitObject.StartTime;
 
                 if (osuHit.IsAlive && time >= osuHit.HitObject.StartTime - relax_leniency)
                 {
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                     hitStill |= osuHit is DrawableSlider slider && (slider.Ball.IsHovered || osuHit.IsHovered) || osuHit is DrawableSpinner;
 
-                    hitOnce |= osuHit is DrawableHitCircle && osuHit.IsHovered;
+                    hitOnce |= osuHit is DrawableHitCircle && osuHit.IsHovered && osuHit.HitObject.HitWindows.CanBeHit(relativetime);
                 }
             }
 
