@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Play
                 else
                     Progress.StrainStep = 1;
             }
-            else 
+            else
             {
                 Progress.StrainStep = 750;
             }
