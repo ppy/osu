@@ -69,6 +69,12 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public Playfield Playfield => playfield.Value;
 
+        private readonly Container overlays;
+        /// <summary>
+        /// Place to put drawables above hit objects but below UI.
+        /// </summary>
+        public Container Overlays => overlays;
+
         /// <summary>
         /// The cursor provided by this <see cref="RulesetContainer"/>. May be null if no cursor is provided.
         /// </summary>
@@ -88,6 +94,12 @@ namespace osu.Game.Rulesets.UI
         {
             Ruleset = ruleset;
             playfield = new Lazy<Playfield>(CreatePlayfield);
+            overlays = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+                Width = 1,
+                Height = 1
+            };
 
             IsPaused.ValueChanged += paused =>
             {

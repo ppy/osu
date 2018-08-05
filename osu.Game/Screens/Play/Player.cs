@@ -178,6 +178,7 @@ namespace osu.Game.Screens.Play
                             RelativeSizeAxes = Axes.Both,
                             Child = RulesetContainer
                         },
+                        RulesetContainer.Overlays,
                         new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                         {
                             Anchor = Anchor.Centre,
