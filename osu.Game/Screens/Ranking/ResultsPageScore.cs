@@ -47,9 +47,9 @@ namespace osu.Game.Screens.Ranking
             var difficultyCalculator = this.score.Ruleset.CreateInstance().CreateDifficultyCalculator(this.working);
 
             double strainStep = 1;
-            if (this.score.Ruleset.LegacyID!=0)
+            if (this.score.Ruleset.CreateInstance().LegacyID!=0)
             {
-                if (this.score.Ruleset.LegacyID!=2)
+                if (this.score.Ruleset.CreateInstance().LegacyID!=2)
                 {
                     strainStep = 400;
                 }

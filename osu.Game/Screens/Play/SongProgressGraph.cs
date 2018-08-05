@@ -52,6 +52,15 @@ namespace osu.Game.Screens.Play
                         Strains[x] = 0;
                     }
                 }
+                else
+                {
+                    if (Strains.Count==0)
+                    {
+                        Strains.Add(1);
+                        Update();
+                        return;
+                    }
+                }
 
                 var values = new List<int>();
 
@@ -83,15 +92,22 @@ namespace osu.Game.Screens.Play
                     for (int i = startRange; i <= endRange && i < values.Count; i++)
                         values[i]++;
                 }
-                // zrób manipulację z values oraz Strains (zwróć uwagę na wielkość liter)
+
                 Debug.Assert(values.Count == Strains.Count);
 
                 for (int x = 0; x < Strains.Count; x++)
                 {
                     if (values[x]==0)
                         Strains[x] = 0;
-                    //dodaj if-a dla spinnerów
+                    else
+                    {
+                        if (Strains[x]<0.01)
+                        {
+                            Strains[x]=0.01;
+                        }
+                    }
                 }
+                Update();
             }
         }
 

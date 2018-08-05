@@ -17,8 +17,6 @@ namespace osu.Game.Screens.Play
 {
     public class SquareGraph : BufferedContainer
     {
-        //to do: on catch taiko and mania entry with skipping, spinners in osu!, TIMING
-        //add some scaling. easy beatmaps have to have got small, static amount of cubes, and harder more cubes more dynamical
         private Column[] columns = { };
 
         public int ColumnCount => columns.Length;
@@ -116,7 +114,7 @@ namespace osu.Game.Screens.Play
         {
             var newValues = new List<double>();
 
-            if (values == null)
+            if (values.Count == 0)
             {
                 for (float i = 0; i < ColumnCount; i++)
                     newValues.Add(0);
@@ -239,19 +237,10 @@ namespace osu.Game.Screens.Play
                 fillActive();
             }
 
-            //There to apply some changes changes
             private void fillActive()
             {
                 Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
 
-                //this change was bad
-               // double amount = MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
-
-                //while (!((amount % 1) == 0))
-                //{
-                //    amount = Math.Ceiling(amount);
-                //}
-                //int countFilled = (int) amount;
                 int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 1, drawableRows.Count);
 
                 if (filled<0.01)
