@@ -31,9 +31,9 @@ namespace osu.Game.Screens.Ranking
     {
         private ScoreCounter scoreCounter;
 
-        private WorkingBeatmap working;
+        private readonly WorkingBeatmap working;
 
-        private Score score;
+        private readonly Score score;
 
         public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap) { this.score=score; working = beatmap; }
 
@@ -44,19 +44,25 @@ namespace osu.Game.Screens.Ranking
         {
             const float user_header_height = 120;
 
-            var difficultyCalculator = score.Ruleset.CreateInstance().CreateDifficultyCalculator(this.working);
+            var difficultyCalculator = score.Ruleset.CreateInstance().CreateDifficultyCalculator(working);
 
             double strainStep = 1;
-            if (score.Ruleset.CreateInstance().LegacyID!=0)
+            switch (score.Ruleset.CreateInstance().LegacyID)
             {
-                if (score.Ruleset.CreateInstance().LegacyID!=2)
-                {
+                case 0:
+                    break;
+                case 1:
                     strainStep = 400;
-                }
-                else
-                {
+                    break;
+                case 2:
                     strainStep = 750;
-                }
+                    break;
+                case 3:
+                    strainStep = 400;
+                    break;
+                default:
+                    strainStep = 400;
+                    break;
             }
 
             Children = new Drawable[]
