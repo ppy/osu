@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input.States;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -14,48 +13,45 @@ using static osu.Game.Input.Handlers.ReplayInputHandler;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModRelax : ModRelax, IApplicableFailOverride, IUpdatableByHitObject, IUpdatableByPlayfield
+    public class OsuModRelax : ModRelax, IApplicableFailOverride, IUpdatableByPlayfield
     {
         public override string Description => @"You don't need to click. Give your clicking/tapping fingers a break from the heat of things.";
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
 
         public bool AllowFail => false;
 
-        private bool hitStill;
-        private bool hitOnce;
-
-        public void Update(DrawableHitObject drawable)
-        {
-            const float relax_leniency = 3;
-
-            if (!(drawable is DrawableOsuHitObject osuHit))
-                return;
-
-            double time = osuHit.Clock.CurrentTime;
-
-            if (time >= osuHit.HitObject.StartTime - relax_leniency)
-            {
-                if (osuHit.HitObject is IHasEndTime hasEnd && time > hasEnd.EndTime || osuHit.IsHit)
-                    return;
-
-                hitStill |= osuHit is DrawableSlider slider && (slider.Ball.IsHovered || osuHit.IsHovered) || osuHit is DrawableSpinner;
-
-                hitOnce |= osuHit is DrawableHitCircle && osuHit.IsHovered;
-            }
-        }
-
         public void Update(Playfield playfield)
         {
-            var osuHit = playfield.HitObjects.Objects.First(d => d is DrawableOsuHitObject) as DrawableOsuHitObject;
+            bool hitStill = false;
+            bool hitOnce = false;
+
+            const float relax_leniency = 3;
+
+            foreach (var drawable in playfield.HitObjects.Objects)
+            {
+                if (!(drawable is DrawableOsuHitObject osuHit))
+                    continue;
+
+                double time = osuHit.Clock.CurrentTime;
+
+                if (osuHit.IsAlive && time >= osuHit.HitObject.StartTime - relax_leniency)
+                {
+                    if (osuHit.HitObject is IHasEndTime hasEnd && time > hasEnd.EndTime || osuHit.IsHit)
+                        continue;
+
+                    hitStill |= osuHit is DrawableSlider slider && (slider.Ball.IsHovered || osuHit.IsHovered) || osuHit is DrawableSpinner;
+
+                    hitOnce |= osuHit is DrawableHitCircle && osuHit.IsHovered;
+                }
+            }
+
+            var osuHitSample = playfield.HitObjects.Objects.First(d => d is DrawableOsuHitObject) as DrawableOsuHitObject;
             if (hitOnce)
             {
-                hit(osuHit, false);
-                hit(osuHit, true);
+                hit(osuHitSample, false);
+                hit(osuHitSample, true);
             }
-            hit(osuHit, hitStill);
-
-            hitOnce = false;
-            hitStill = false;
+            hit(osuHitSample, hitStill);
         }
 
         private bool wasHit;
