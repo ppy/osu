@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 drawable
                     .MoveTo(originalPosition, hitObject.TimeFadeIn + pre_time_offset, Easing.InOutSine);
-                    .MoveToOffset(new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * appearDistance)
+                    .MoveToOffset(new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * appearDistance);
             }
 
             // That way slider ticks come all from the same direction.
