@@ -34,6 +34,8 @@ namespace osu.Game.Screens.Play
         public override bool HandleKeyboardInput => AllowSeeking;
         public override bool HandleMouseInput => AllowSeeking;
 
+        public List<double> Strains{ set { graph.Strains = value; } }
+
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = info.AudioClock = value; } }
 
@@ -55,6 +57,16 @@ namespace osu.Game.Screens.Play
                 bar.StartTime = firstHitTime;
                 bar.EndTime = lastHitTime;
             }
+        }
+
+        private double strainStep;
+
+        public double StrainStep
+        {
+            get
+            {return strainStep;}
+            set
+            {graph.StrainStep = strainStep = value;}
         }
 
         private readonly BindableBool replayLoaded = new BindableBool();

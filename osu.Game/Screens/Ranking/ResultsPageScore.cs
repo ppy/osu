@@ -31,7 +31,11 @@ namespace osu.Game.Screens.Ranking
     {
         private ScoreCounter scoreCounter;
 
-        public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap) { }
+        private readonly WorkingBeatmap working;
+
+        private readonly Score score;
+
+        public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap) { this.score=score; working = beatmap; }
 
         private FillFlowContainer<DrawableScoreStatistic> statisticsContainer;
 
@@ -39,6 +43,27 @@ namespace osu.Game.Screens.Ranking
         private void load(OsuColour colours)
         {
             const float user_header_height = 120;
+
+            var difficultyCalculator = score.Ruleset.CreateInstance().CreateDifficultyCalculator(working);
+
+            double strainStep = 1;
+            switch (score.Ruleset.CreateInstance().LegacyID)
+            {
+                case 0:
+                    break;
+                case 1:
+                    strainStep = 400;
+                    break;
+                case 2:
+                    strainStep = 750;
+                    break;
+                case 3:
+                    strainStep = 400;
+                    break;
+                default:
+                    strainStep = 400;
+                    break;
+            }
 
             Children = new Drawable[]
             {
@@ -88,7 +113,9 @@ namespace osu.Game.Screens.Ranking
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     Alpha = 0.5f,
-                                    Objects = Beatmap.Beatmap.HitObjects,
+                                    Strains = difficultyCalculator.DifficultySectionRating(),
+                                    StrainStep = strainStep,
+                                    Objects = working.Beatmap.HitObjects,
                                 },
                                 scoreCounter = new SlowScoreCounter(6)
                                 {

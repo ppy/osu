@@ -34,6 +34,49 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
+        protected override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
+        {
+            if (!beatmap.HitObjects.Any())
+                return new List<double>();
+
+            var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty);
+            float halfCatchWidth = catcher.CatchWidth * 0.5f;
+
+            var difficultyHitObjects = new List<CatchDifficultyHitObject>();
+
+            foreach (var hitObject in beatmap.HitObjects)
+            {
+                switch (hitObject)
+                {
+                    //idk about this, maybe use all hitobjects in the same way
+                    // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
+                    case Fruit fruit:
+                        difficultyHitObjects.Add(new CatchDifficultyHitObject(fruit, halfCatchWidth));
+                        break;
+                    case JuiceStream _:
+                        difficultyHitObjects.AddRange(hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)).Select(o => new CatchDifficultyHitObject(o, halfCatchWidth)));
+                        break;
+                }
+            }
+
+            difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
+
+            if (!calculateStrainValues(difficultyHitObjects, timeRate))
+                return new List<double>();
+
+            var highestStrains = calculateDifficulty(difficultyHitObjects, timeRate);
+            var catchDifficultySectionRating = new List<double>();
+            var startAt = difficultyHitObjects[0].BaseHitObject.StartTime / (strain_step * timeRate);
+
+            for (int x = 0; x < highestStrains.Count; x++)
+            {
+                if (x > startAt)
+                    catchDifficultySectionRating.Add(Math.Sqrt(highestStrains[x]) * star_scaling_factor);
+            }
+
+            return catchDifficultySectionRating;
+        }
+
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
@@ -63,9 +106,22 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             if (!calculateStrainValues(difficultyHitObjects, timeRate))
                 return new CatchDifficultyAttributes(mods, 0);
 
+            var highestStrains = calculateDifficulty(difficultyHitObjects, timeRate);
+
+            // Build the weighted sum over the highest strains for each interval
+            double difficulty = 0;
+            double weight = 1;
+            highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
+
+            foreach (double strain in highestStrains)
+            {
+                difficulty += weight * strain;
+                weight *= decay_weight;
+            }
+
             // this is the same as osu!, so there's potential to share the implementation... maybe
             double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
-            double starRating = Math.Sqrt(calculateDifficulty(difficultyHitObjects, timeRate)) * star_scaling_factor;
+            double starRating = Math.Sqrt(difficulty) * star_scaling_factor;
 
             return new CatchDifficultyAttributes(mods, starRating)
             {
@@ -92,7 +148,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             return true;
         }
 
-        private double calculateDifficulty(List<CatchDifficultyHitObject> objects, double timeRate)
+        private List<double> calculateDifficulty(List<CatchDifficultyHitObject> objects, double timeRate)
         {
             // The strain step needs to be adjusted for the algorithm to be considered equal with speed changing mods
             double actualStrainStep = strain_step * timeRate;
@@ -132,18 +188,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 previousHitObject = hitObject;
             }
 
-            // Build the weighted sum over the highest strains for each interval
-            double difficulty = 0;
-            double weight = 1;
-            highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
-
-            foreach (double strain in highestStrains)
-            {
-                difficulty += weight * strain;
-                weight *= decay_weight;
-            }
-
-            return difficulty;
+            return highestStrains;
         }
     }
 }

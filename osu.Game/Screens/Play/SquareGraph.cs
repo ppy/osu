@@ -36,10 +36,10 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        private float[] calculatedValues = { }; // values but adjusted to fit the amount of columns
+        private List<double> calculatedValues = new List<double>(); // values but adjusted to fit the amount of columns
 
-        private int[] values;
-        public int[] Values
+        private List<double> values = new List<double>();
+        public List<double> Values
         {
             get { return values; }
             set
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Play
         private void redrawFilled()
         {
             for (int i = 0; i < ColumnCount; i++)
-                columns[i].Filled = calculatedValues.ElementAtOrDefault(i);
+                columns[i].Filled = (float) calculatedValues.ElementAtOrDefault(i);
             ForceRedraw();
         }
 
@@ -112,25 +112,32 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private void recalculateValues()
         {
-            var newValues = new List<float>();
+            var newValues = new List<double>();
 
-            if (values == null)
+            if (values.Count == 0)
             {
                 for (float i = 0; i < ColumnCount; i++)
                     newValues.Add(0);
-
                 return;
             }
 
             var max = values.Max();
 
-            float step = values.Length / (float)ColumnCount;
-            for (float i = 0; i < values.Length; i += step)
+            float step = values.Count / (float)ColumnCount;
+            for (float i = 0; i < values.Count; i += step)
             {
-                newValues.Add((float)values[(int)i] / max);
+                double sum = 0;
+                float iteration = 0;
+                for (float x = i; x < i+step && x < values.Count; x++)
+                {
+                    sum += values[(int) x];
+                    iteration = x - i + 1;
+                }
+                sum = sum / iteration;
+                newValues.Add(sum / max);
             }
 
-            calculatedValues = newValues.ToArray();
+            calculatedValues = newValues;
         }
 
         /// <summary>
@@ -167,7 +174,7 @@ namespace osu.Game.Screens.Play
             public Color4 LitColour = Color4.LightBlue;
             protected readonly Color4 DimmedColour = Color4.White.Opacity(140);
 
-            private float cubeCount => DrawHeight / WIDTH;
+            private float cubeCount => Math.Max(DrawHeight / WIDTH, 1);
             private const float cube_size = 4;
             private const float padding = 2;
             public const float WIDTH = cube_size + padding;
@@ -234,7 +241,10 @@ namespace osu.Game.Screens.Play
             {
                 Color4 colour = State == ColumnState.Lit ? LitColour : DimmedColour;
 
-                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 0, drawableRows.Count);
+                int countFilled = (int)MathHelper.Clamp(filled * drawableRows.Count, 1, drawableRows.Count);
+
+                if (filled<0.01)
+                    countFilled = 0;
 
                 for (int i = 0; i < drawableRows.Count; i++)
                     drawableRows[i].Colour = i < countFilled ? colour : EmptyColour;
