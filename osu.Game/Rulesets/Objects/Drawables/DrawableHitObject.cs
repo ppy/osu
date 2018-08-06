@@ -67,6 +67,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public bool Judged => Result?.HasResult ?? true;
 
+        /// <summary>
+        /// The scoring result of this <see cref="DrawableHitObject"/>.
+        /// </summary>
         public readonly JudgementResult Result;
 
         private bool judgementOccurred;
@@ -177,9 +180,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Notifies that a new judgement has occurred for this <see cref="DrawableHitObject"/>.
+        /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
+        /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
         /// </summary>
-        /// <param name="judgement">The <see cref="Judgement"/>.</param>
+        /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
         protected void ApplyResult(Action<JudgementResult> application)
         {
             application?.Invoke(Result);
@@ -240,6 +244,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
         }
 
+        /// <summary>
+        /// Creates the <see cref="JudgementResult"/> that represents the scoring result for this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
         protected virtual JudgementResult CreateJudgementResult(Judgement judgement) => new JudgementResult(judgement);
     }
 

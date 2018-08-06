@@ -108,9 +108,13 @@ namespace osu.Game.Rulesets.Objects
         {
         }
 
-        protected virtual Judgement CreateJudgement() => null;
-
         protected void AddNested(HitObject hitObject) => nestedHitObjects.Value.Add(hitObject);
+
+        /// <summary>
+        /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
+        /// May be null.
+        /// </summary>
+        protected virtual Judgement CreateJudgement() => null;
 
         /// <summary>
         /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.
