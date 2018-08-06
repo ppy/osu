@@ -238,6 +238,9 @@ namespace osu.Game.Rulesets.Scoring
                     return;
 
                 var result = CreateResult(judgement);
+                if (result == null)
+                    throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
+
                 result.Type = judgement.MaxResult;
 
                 applyResult(result);
