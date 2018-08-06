@@ -183,14 +183,14 @@ namespace osu.Game.Rulesets.UI
         where TObject : HitObject
     {
         /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> has been applied by any <see cref="DrawableHitObject"/>.
+        /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
         /// </summary>
         public event Action<JudgementResult> OnNewResult;
 
         /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> has been reset by any <see cref="DrawableHitObject"/>.
+        /// Invoked when a <see cref="JudgementResult"/> is being reverted by a <see cref="DrawableHitObject"/>.
         /// </summary>
-        public event Action<JudgementResult> OnResultReset;
+        public event Action<JudgementResult> OnRevertResult;
 
         /// <summary>
         /// The Beatmap
@@ -298,7 +298,7 @@ namespace osu.Game.Rulesets.UI
                     continue;
 
                 drawableObject.OnNewResult += (_, r) => OnNewResult?.Invoke(r);
-                drawableObject.OnResultReset += (_, r) => OnResultReset?.Invoke(r);
+                drawableObject.OnRevertResult += (_, r) => OnRevertResult?.Invoke(r);
 
                 Playfield.Add(drawableObject);
             }

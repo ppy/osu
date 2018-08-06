@@ -42,9 +42,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public event Action<DrawableHitObject, JudgementResult> OnNewResult;
 
         /// <summary>
-        /// Invoked when a <see cref="JudgementResult"/> has been reset by this <see cref="DrawableHitObject"/> or a nested <see cref="DrawableHitObject"/>.
+        /// Invoked when a <see cref="JudgementResult"/> is being reverted by this <see cref="DrawableHitObject"/> or a nested <see cref="DrawableHitObject"/>.
         /// </summary>
-        public event Action<DrawableHitObject, JudgementResult> OnResultReset;
+        public event Action<DrawableHitObject, JudgementResult> OnRevertResult;
 
         /// <summary>
         /// Whether a visual indicator should be displayed when a scoring result occurs.
@@ -159,7 +159,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
                 if (Result.TimeOffset + endTime < Time.Current)
                 {
-                    OnResultReset?.Invoke(this, Result);
+                    OnRevertResult?.Invoke(this, Result);
 
                     Result.Type = HitResult.None;
                     State.Value = ArmedState.Idle;
@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected virtual void AddNested(DrawableHitObject h)
         {
             h.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
-            h.OnResultReset += (d, r) => OnResultReset?.Invoke(d, r);
+            h.OnRevertResult += (d, r) => OnRevertResult?.Invoke(d, r);
             h.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
 
             nestedHitObjects.Value.Add(h);
