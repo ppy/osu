@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -196,7 +197,7 @@ namespace osu.Game.Rulesets.Scoring
             Debug.Assert(base_portion + combo_portion == 1.0);
 
             rulesetContainer.OnNewResult += applyResult;
-            rulesetContainer.OnResultReset += resetResult;
+            rulesetContainer.OnRevertResult += revertResult;
 
             SimulateAutoplay(rulesetContainer.Beatmap);
             Reset(true);
@@ -261,13 +262,13 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Resets the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
+        /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="judgement">The judgement to remove.</param>
         /// <param name="result">The judgement scoring result.</param>
-        private void resetResult(JudgementResult result)
+        private void revertResult(JudgementResult result)
         {
-            ResetResult(result);
+            RevertResult(result);
             updateScore();
         }
 
@@ -310,11 +311,11 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Resets the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
+        /// Reverts the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="judgement">The judgement to remove.</param>
         /// <param name="result">The judgement scoring result.</param>
-        protected virtual void ResetResult(JudgementResult result)
+        protected virtual void RevertResult(JudgementResult result)
         {
             Combo.Value = result.ComboAtJudgement;
             HighestCombo.Value = result.HighestComboAtJudgement;
