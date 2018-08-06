@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private DrawableCatchHitObject lastPlateableFruit;
 
-        public void OnJudgement(DrawableCatchHitObject fruit, JudgementResult result)
+        public void OnResult(DrawableCatchHitObject fruit, JudgementResult result)
         {
             void runAfterLoaded(Action action)
             {

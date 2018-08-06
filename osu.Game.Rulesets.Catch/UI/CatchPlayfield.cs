@@ -68,6 +68,6 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
-            => catcherArea.OnJudgement((DrawableCatchHitObject)judgedObject, result);
+            => catcherArea.OnResult((DrawableCatchHitObject)judgedObject, result);
     }
 }
