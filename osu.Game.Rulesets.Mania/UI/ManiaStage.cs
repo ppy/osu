@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    internal class ManiaStage : ManiaScrollingPlayfield
+    public class ManiaStage : ManiaScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
 
