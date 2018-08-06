@@ -45,7 +45,7 @@ Task("InspectCode")
     var nugetToolPath = GetFiles("./tools/NuGet.CommandLine.*/tools/NuGet.exe").First();
 
     if (!IsRunningOnWindows()) {
-        RunInpectCodeInMono(nVikaToolPath, nugetToolPath);
+        RunInpectCodeInMono(nugetToolPath, nVikaToolPath);
         return;
     }
 
@@ -62,20 +62,14 @@ Task("InspectCode")
 void RunInpectCodeInMono(FilePath nugetToolPath, FilePath nVikaToolPath) {
     var inspectcodeToolPath = GetFiles("./tools/NuGet.CommandLine.*/tools/NuGet.exe").First();
 
-    if (!FileExists("mono")) {
+    if (!StartProcess("mono", "--version") != 0) {
         Information("Running on an os other than windows and mono is not installed. Skipping InpectCode.");
         return;
     }
 
     StartProcess("mono", $"{nugetToolPath} restore {osuSolution}");
 
-    StartProcess("mono", @"--o=""inspectcodereport.xml"" --caches-home=""inspectcode"" ");
-
-    InspectCode(osuSolution, new InspectCodeSettings {
-        CachesHome = "inspectcode",
-        OutputFile = "inspectcodereport.xml",
-
-    });
+    StartProcess("mono", $@"{inspectcodeToolPath} --o=""inspectcodereport.xml"" --caches-home=""inspectcode"" ");
 
     StartProcess("mono", $@"{nVikaToolPath} parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
 }
