@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override void Add(DrawableHitObject h)
         {
-            h.OnJudgement += onJudgement;
+            h.OnNewResult += onNewResult;
 
             var c = h as IDrawableHitObjectWithProxiedApproach;
             if (c != null)
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.UI
             connectionLayer.HitObjects = HitObjects.Objects.Select(d => d.HitObject).OfType<OsuHitObject>();
         }
 
-        private void onJudgement(DrawableHitObject judgedObject, JudgementResult result)
+        private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             if (!judgedObject.DisplayJudgement || !DisplayJudgements)
                 return;

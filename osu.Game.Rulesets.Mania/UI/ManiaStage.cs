@@ -156,12 +156,12 @@ namespace osu.Game.Rulesets.Mania.UI
             var maniaObject = (ManiaHitObject)h.HitObject;
             int columnIndex = maniaObject.Column - firstColumnIndex;
             Columns.ElementAt(columnIndex).Add(h);
-            h.OnJudgement += OnJudgement;
+            h.OnNewResult += OnNewResult;
         }
 
         public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));
 
-        internal void OnJudgement(DrawableHitObject judgedObject, JudgementResult result)
+        internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             if (!judgedObject.DisplayJudgement || !DisplayJudgements)
                 return;

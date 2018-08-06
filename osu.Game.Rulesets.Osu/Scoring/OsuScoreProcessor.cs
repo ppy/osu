@@ -51,9 +51,9 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private const double harshness = 0.01;
 
-        protected override void OnNewJudgement(JudgementResult result)
+        protected override void ApplyResult(JudgementResult result)
         {
-            base.OnNewJudgement(result);
+            base.ApplyResult(result);
 
             var osuResult = (OsuJudgementResult)result;
 

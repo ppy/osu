@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
             {
                 var newTick = new DrawableDrumRollTick(tick);
-                newTick.OnJudgement += onTickJudgement;
+                newTick.OnNewResult += onNewTickResult;
 
                 AddNested(newTick);
                 tickContainer.Add(newTick);
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             colourEngaged = colours.YellowDarker;
         }
 
-        private void onTickJudgement(DrawableHitObject obj, JudgementResult result)
+        private void onNewTickResult(DrawableHitObject obj, JudgementResult result)
         {
             if (result.Type > HitResult.Miss)
                 rollingHits++;

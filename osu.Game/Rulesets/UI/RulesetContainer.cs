@@ -182,8 +182,15 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetContainer<TObject> : RulesetContainer
         where TObject : HitObject
     {
-        public event Action<JudgementResult> OnJudgement;
-        public event Action<JudgementResult> OnJudgementRemoved;
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> has been applied by any <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public event Action<JudgementResult> OnNewResult;
+
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> has been reset by any <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public event Action<JudgementResult> OnResultReset;
 
         /// <summary>
         /// The Beatmap
@@ -290,8 +297,8 @@ namespace osu.Game.Rulesets.UI
                 if (drawableObject == null)
                     continue;
 
-                drawableObject.OnJudgement += (_, r) => OnJudgement?.Invoke(r);
-                drawableObject.OnJudgementRemoved += (_, r) => OnJudgementRemoved?.Invoke(r);
+                drawableObject.OnNewResult += (_, r) => OnNewResult?.Invoke(r);
+                drawableObject.OnResultReset += (_, r) => OnResultReset?.Invoke(r);
 
                 Playfield.Add(drawableObject);
             }

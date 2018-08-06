@@ -29,9 +29,9 @@ namespace osu.Game.Rulesets.Catch.Scoring
 
         private const double harshness = 0.01;
 
-        protected override void OnNewJudgement(JudgementResult result)
+        protected override void ApplyResult(JudgementResult result)
         {
-            base.OnNewJudgement(result);
+            base.ApplyResult(result);
 
             if (result.Type == HitResult.Miss)
             {

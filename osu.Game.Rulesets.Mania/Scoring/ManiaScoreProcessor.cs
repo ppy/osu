@@ -121,9 +121,9 @@ namespace osu.Game.Rulesets.Mania.Scoring
             }
         }
 
-        protected override void OnNewJudgement(JudgementResult result)
+        protected override void ApplyResult(JudgementResult result)
         {
-            base.OnNewJudgement(result);
+            base.ApplyResult(result);
 
             bool isTick = result.Judgement is HoldNoteTickJudgement;
 

@@ -35,8 +35,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
         public IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : Enumerable.Empty<DrawableHitObject>();
 
-        public event Action<DrawableHitObject, JudgementResult> OnJudgement;
-        public event Action<DrawableHitObject, JudgementResult> OnJudgementRemoved;
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> has been applied by this <see cref="DrawableHitObject"/> or a nested <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public event Action<DrawableHitObject, JudgementResult> OnNewResult;
+
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> has been reset by this <see cref="DrawableHitObject"/> or a nested <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public event Action<DrawableHitObject, JudgementResult> OnResultReset;
 
         /// <summary>
         /// Whether a visible judgement should be displayed when this representation is hit.
@@ -143,7 +150,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
                 if (Result.TimeOffset + endTime < Time.Current)
                 {
-                    OnJudgementRemoved?.Invoke(this, Result);
+                    OnResultReset?.Invoke(this, Result);
 
                     Result.Type = HitResult.None;
                     State.Value = ArmedState.Idle;
@@ -162,8 +169,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         protected virtual void AddNested(DrawableHitObject h)
         {
-            h.OnJudgement += (d, r) => OnJudgement?.Invoke(d, r);
-            h.OnJudgementRemoved += (d, r) => OnJudgementRemoved?.Invoke(d, r);
+            h.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
+            h.OnResultReset += (d, r) => OnResultReset?.Invoke(d, r);
             h.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
 
             nestedHitObjects.Value.Add(h);
@@ -195,7 +202,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     break;
             }
 
-            OnJudgement?.Invoke(this, Result);
+            OnNewResult?.Invoke(this, Result);
         }
 
         /// <summary>
