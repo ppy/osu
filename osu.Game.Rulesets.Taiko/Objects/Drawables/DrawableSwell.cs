@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Width *= Parent.RelativeChildSize.X;
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (userTriggered)
             {
@@ -231,7 +231,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return false;
             lastWasCentre = isCentre;
 
-            UpdateJudgement(true);
+            UpdateResult(true);
 
             return true;
         }

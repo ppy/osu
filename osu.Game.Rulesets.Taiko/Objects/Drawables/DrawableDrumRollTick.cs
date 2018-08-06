@@ -17,14 +17,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
-        public override bool DisplayJudgement => false;
+        public override bool DisplayResult => false;
 
         protected override TaikoPiece CreateMainPiece() => new TickPiece
         {
             Filled = HitObject.FirstTick
         };
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        public override bool OnPressed(TaikoAction action) => UpdateJudgement(true);
+        public override bool OnPressed(TaikoAction action) => UpdateResult(true);
 
         protected override DrawableStrongHandler CreateStrongHandler(StrongHitObject hitObject) => new StrongHandler(hitObject, this);
 
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             {
             }
 
-            protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
                 if (!MainObject.Judged)
                     return;

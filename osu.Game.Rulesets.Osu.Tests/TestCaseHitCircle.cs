@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 this.auto = auto;
             }
 
-            protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
                 if (auto && !userTriggered && timeOffset > 0)
                 {
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     ApplyResult(r => r.Type = HitResult.Great);
                 }
                 else
-                    base.CheckForJudgements(userTriggered, timeOffset);
+                    base.CheckForResult(userTriggered, timeOffset);
             }
         }
     }

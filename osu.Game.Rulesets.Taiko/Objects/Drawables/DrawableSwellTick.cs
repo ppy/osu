@@ -8,7 +8,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableSwellTick : DrawableTaikoHitObject
     {
-        public override bool DisplayJudgement => false;
+        public override bool DisplayResult => false;
 
         public DrawableSwellTick(TaikoHitObject hitObject)
             : base(hitObject)
@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public void TriggerResult(HitResult type) => ApplyResult(r => r.Type = type);
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
         }
 

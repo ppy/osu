@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// The judgement text is provided by the <see cref="DrawableSlider"/>.
         /// </summary>
-        public override bool DisplayJudgement => false;
+        public override bool DisplayResult => false;
 
         public bool Tracking { get; set; }
 
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Position = HitObject.Position - slider.Position;
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered && timeOffset >= 0)
                 ApplyResult(r => r.Type = Tracking ? HitResult.Great : HitResult.Miss);

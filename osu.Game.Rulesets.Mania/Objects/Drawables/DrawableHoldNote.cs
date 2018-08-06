@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableHoldNote : DrawableManiaHitObject<HoldNote>, IKeyBindingHandler<ManiaAction>
     {
-        public override bool DisplayJudgement => false;
+        public override bool DisplayResult => false;
 
         private readonly DrawableNote head;
         private readonly DrawableNote tail;
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (tail.AllJudged)
                 ApplyResult(r => r.Type = HitResult.Perfect);
@@ -196,7 +196,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 this.holdNote = holdNote;
             }
 
-            protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
                 // Factor in the release lenience
                 timeOffset /= release_window_lenience;
@@ -233,7 +233,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (action != Action.Value)
                     return false;
 
-                UpdateJudgement(true);
+                UpdateResult(true);
 
                 // Handled by the hold note, which will set holding = false
                 return false;

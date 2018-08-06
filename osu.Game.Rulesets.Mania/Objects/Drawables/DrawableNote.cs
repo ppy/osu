@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (action != Action.Value)
                 return false;
 
-            return UpdateJudgement(true);
+            return UpdateResult(true);
         }
 
         public virtual bool OnReleased(ManiaAction action) => false;

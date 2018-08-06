@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
 
         public Func<CatchHitObject, bool> CheckPosition;
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (CheckPosition == null) return;
 

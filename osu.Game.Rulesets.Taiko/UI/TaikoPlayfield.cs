@@ -229,7 +229,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             if (!DisplayJudgements)
                 return;
 
-            if (!judgedObject.DisplayJudgement)
+            if (!judgedObject.DisplayResult)
                 return;
 
             switch (result.Judgement)

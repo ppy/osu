@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// Whether a visible judgement should be displayed when this representation is hit.
         /// </summary>
-        public virtual bool DisplayJudgement => true;
+        public virtual bool DisplayResult => true;
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
@@ -173,7 +173,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.UpdateAfterChildren();
 
-            UpdateJudgement(false);
+            UpdateResult(false);
         }
 
         protected virtual void AddNested(DrawableHitObject h)
@@ -223,7 +223,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         /// <param name="userTriggered">Whether the user triggered this process.</param>
         /// <returns>Whether a judgement has occurred from this <see cref="DrawableHitObject"/> or any nested <see cref="DrawableHitObject"/>s.</returns>
-        protected bool UpdateJudgement(bool userTriggered)
+        protected bool UpdateResult(bool userTriggered)
         {
             judgementOccurred = false;
 
@@ -231,13 +231,13 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 return false;
 
             foreach (var d in NestedHitObjects)
-                judgementOccurred |= d.UpdateJudgement(userTriggered);
+                judgementOccurred |= d.UpdateResult(userTriggered);
 
             if (judgementOccurred || Judged)
                 return judgementOccurred;
 
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-            CheckForJudgements(userTriggered, Time.Current - endTime);
+            CheckForResult(userTriggered, Time.Current - endTime);
 
             return judgementOccurred;
         }
@@ -249,7 +249,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <param name="userTriggered">Whether the user triggered this check.</param>
         /// <param name="timeOffset">The offset from the <see cref="HitObject"/> end time at which this check occurred. A <paramref name="timeOffset"/> &gt; 0
         /// implies that this check occurred after the end time of <see cref="HitObject"/>. </param>
-        protected virtual void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected virtual void CheckForResult(bool userTriggered, double timeOffset)
         {
         }
 
