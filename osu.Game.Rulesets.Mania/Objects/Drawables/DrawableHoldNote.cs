@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     {
         public override bool DisplayResult => false;
 
-        private readonly DrawableNote head;
-        private readonly DrawableNote tail;
+        public readonly DrawableNote Head;
+        public readonly DrawableNote Tail;
 
         private readonly BodyPiece bodyPiece;
 
@@ -56,12 +56,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                         HoldStartTime = () => holdStartTime
                     })
                 },
-                head = new DrawableHeadNote(this)
+                Head = new DrawableHeadNote(this)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 },
-                tail = new DrawableTailNote(this)
+                Tail = new DrawableTailNote(this)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
@@ -71,8 +71,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             foreach (var tick in tickContainer)
                 AddNested(tick);
 
-            AddNested(head);
-            AddNested(tail);
+            AddNested(Head);
+            AddNested(Tail);
         }
 
         protected override void OnDirectionChanged(ScrollingDirection direction)
@@ -90,15 +90,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 base.AccentColour = value;
 
                 bodyPiece.AccentColour = value;
-                head.AccentColour = value;
-                tail.AccentColour = value;
+                Head.AccentColour = value;
+                Tail.AccentColour = value;
                 tickContainer.ForEach(t => t.AccentColour = value);
             }
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (tail.AllJudged)
+            if (Tail.AllJudged)
                 ApplyResult(r => r.Type = HitResult.Perfect);
         }
 
@@ -107,8 +107,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.Update();
 
             // Make the body piece not lie under the head note
-            bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * head.Height / 2;
-            bodyPiece.Height = DrawHeight - head.Height / 2 + tail.Height / 2;
+            bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
+            bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
         }
 
         public bool OnPressed(ManiaAction action)
@@ -140,7 +140,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             holdStartTime = null;
 
             // If the key has been released too early, the user should not receive full score for the release
-            if (!tail.IsHit)
+            if (!Tail.IsHit)
                 hasBroken = true;
 
             return true;
