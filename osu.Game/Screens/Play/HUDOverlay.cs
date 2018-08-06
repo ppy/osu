@@ -78,6 +78,7 @@ namespace osu.Game.Screens.Play
 
             BindProcessor(scoreProcessor);
             BindRulesetContainer(rulesetContainer);
+            Progress.AudioClock = offsetClock;
             switch (rulesetContainer.Ruleset.LegacyID)
             {
                 case 0:
@@ -91,15 +92,14 @@ namespace osu.Game.Screens.Play
                     break;
                 case 3:
                     Progress.StrainStep = 400;
+                    break;
                 default:
                     Progress.StrainStep = 400;
                     break;
             }
-
             var difficultyCalculator = rulesetContainer.Ruleset.CreateDifficultyCalculator(working);
             Progress.Strains = difficultyCalculator.DifficultySectionRating();
             Progress.Objects = rulesetContainer.Objects;
-            Progress.AudioClock = offsetClock;
             Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
             Progress.OnSeek = pos => adjustableClock.Seek(pos);
 

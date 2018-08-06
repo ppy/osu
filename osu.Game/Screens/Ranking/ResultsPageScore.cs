@@ -14,6 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Localisation;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -115,6 +116,7 @@ namespace osu.Game.Screens.Ranking
                                     Alpha = 0.5f,
                                     Strains = difficultyCalculator.DifficultySectionRating(),
                                     StrainStep = strainStep,
+                                    AudioClock = new StopwatchClock(),
                                     Objects = working.Beatmap.HitObjects,
                                 },
                                 scoreCounter = new SlowScoreCounter(6)

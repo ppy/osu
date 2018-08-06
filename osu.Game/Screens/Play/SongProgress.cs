@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Play
         public List<double> Strains{ set { graph.Strains = value; } }
 
         private IClock audioClock;
-        public IClock AudioClock { set { audioClock = info.AudioClock = value; } }
+        public IClock AudioClock { set { audioClock = graph.AudioClock = info.AudioClock = value; } }
 
         private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
 

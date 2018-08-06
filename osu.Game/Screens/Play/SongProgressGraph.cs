@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Objects;
+using osu.Framework.Timing;
 
 namespace osu.Game.Screens.Play
 {
@@ -69,7 +70,7 @@ namespace osu.Game.Screens.Play
                     values.Add(0);
                 }
 
-                var startOfLists = (objects.First().StartTime - objects.First().StartTime % strainStep)/strainStep;
+                var startOfLists = (objects.First().StartTime - objects.First().StartTime % (strainStep * audioClock.Rate))/(strainStep * audioClock.Rate);
                 if (strainStep==1)
                 {
                     startOfLists = objects.First().StartTime;
@@ -80,6 +81,7 @@ namespace osu.Game.Screens.Play
                 {
                     interval = 400;
                 }
+                interval = interval * audioClock.Rate;
 
                 foreach (var h in objects)
                 {
@@ -98,12 +100,12 @@ namespace osu.Game.Screens.Play
                 for (int x = 0; x < Strains.Count; x++)
                 {
                     if (values[x]==0)
-                        Strains[x] = 0;
+                        Strains[x] = Strains.Max() * (-1);
                     else
                     {
                         if (Strains[x]<0.01)
                         {
-                            Strains[x]=0.01;
+                            Strains[x]=0.1;
                         }
                     }
                 }
@@ -120,6 +122,14 @@ namespace osu.Game.Screens.Play
             {
                 strainStep = value;
             }
+        }
+
+        private IClock audioClock;
+
+        public IClock AudioClock
+        {
+            get { return audioClock; }
+            set { audioClock = value; }
         }
     }
 }
