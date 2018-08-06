@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             validActionPressed = HitActions.Contains(action);
 
             // Only count this as handled if the new judgement is a hit
-            var result = UpdateJudgement(true);
+            var result = UpdateResult(true);
 
             if (IsHit)
                 HitAction = action;
@@ -144,11 +144,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             {
             }
 
-            protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
                 if (!MainObject.Result.HasResult)
                 {
-                    base.CheckForJudgements(userTriggered, timeOffset);
+                    base.CheckForResult(userTriggered, timeOffset);
                     return;
                 }
 
@@ -183,7 +183,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 if (!MainObject.HitActions.Contains(action))
                     return false;
 
-                return UpdateJudgement(true);
+                return UpdateResult(true);
             }
         }
     }

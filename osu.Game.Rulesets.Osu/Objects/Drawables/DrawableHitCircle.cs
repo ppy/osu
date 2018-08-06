@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         if (AllJudged)
                             return false;
 
-                        UpdateJudgement(true);
+                        UpdateResult(true);
                         return true;
                     },
                 },
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {

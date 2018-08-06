@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             MainPiece.FadeAccent(newColour, 100);
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (userTriggered)
                 return;
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             {
             }
 
-            protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
                 if (!MainObject.Judged)
                     return;

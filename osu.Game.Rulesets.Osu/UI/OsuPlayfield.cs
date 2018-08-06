@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!judgedObject.DisplayJudgement || !DisplayJudgements)
+            if (!judgedObject.DisplayResult || !DisplayJudgements)
                 return;
 
             DrawableOsuJudgement explosion = new DrawableOsuJudgement(result, judgedObject)
