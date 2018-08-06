@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public event Action<DrawableHitObject, JudgementResult> OnResultReset;
 
         /// <summary>
-        /// Whether a visible judgement should be displayed when this representation is hit.
+        /// Whether a visual indicator should be displayed when a scoring result occurs.
         /// </summary>
         public virtual bool DisplayResult => true;
 
@@ -219,10 +219,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Processes this <see cref="DrawableHitObject"/>, checking if any judgements have occurred.
+        /// Processes this <see cref="DrawableHitObject"/>, checking if a scoring result has occurred.
         /// </summary>
         /// <param name="userTriggered">Whether the user triggered this process.</param>
-        /// <returns>Whether a judgement has occurred from this <see cref="DrawableHitObject"/> or any nested <see cref="DrawableHitObject"/>s.</returns>
+        /// <returns>Whether a scoring result has occurred from this <see cref="DrawableHitObject"/> or any nested <see cref="DrawableHitObject"/>.</returns>
         protected bool UpdateResult(bool userTriggered)
         {
             judgementOccurred = false;
@@ -243,12 +243,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Checks if any judgements have occurred for this <see cref="DrawableHitObject"/>. This method must construct
-        /// all <see cref="Judgement"/>s and notify of them through <see cref="ApplyResult{T}"/>.
+        /// Checks if a scoring result has occurred for this <see cref="DrawableHitObject"/>.
         /// </summary>
+        /// <remarks>
+        /// If a scoring result has occurred, this method must invoke <see cref="ApplyResult"/> to update the result and notify responders.
+        /// </remarks>
         /// <param name="userTriggered">Whether the user triggered this check.</param>
-        /// <param name="timeOffset">The offset from the <see cref="HitObject"/> end time at which this check occurred. A <paramref name="timeOffset"/> &gt; 0
-        /// implies that this check occurred after the end time of <see cref="HitObject"/>. </param>
+        /// <param name="timeOffset">The offset from the end time of the <see cref="HitObject"/> at which this check occurred.
+        /// A <paramref name="timeOffset"/> &gt; 0 implies that this check occurred after the end time of the <see cref="HitObject"/>. </param>
         protected virtual void CheckForResult(bool userTriggered, double timeOffset)
         {
         }

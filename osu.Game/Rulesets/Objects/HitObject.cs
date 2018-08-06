@@ -63,6 +63,12 @@ namespace osu.Game.Rulesets.Objects
         [JsonIgnore]
         public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects.Value;
 
+        /// <summary>
+        /// The judgement information provided by this <see cref="HitObject"/>.
+        /// </summary>
+        /// <remarks>
+        /// Only populated after <see cref="ApplyDefaults"/> is invoked.
+        /// </remarks>
         public Judgement Judgement { get; private set; }
 
         /// <summary>
