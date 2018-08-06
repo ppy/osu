@@ -1,10 +1,14 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Judgements
 {
+    /// <summary>
+    /// The scoring result of a <see cref="DrawableHitObject"/>.
+    /// </summary>
     public class JudgementResult
     {
         /// <summary>
@@ -19,22 +23,22 @@ namespace osu.Game.Rulesets.Judgements
 
         /// <summary>
         /// The offset from a perfect hit at which this <see cref="JudgementResult"/> occurred.
-        /// Populated when added via <see cref="DrawableHitObject.ApplyJudgement"/>.
+        /// Populated when this <see cref="JudgementResult"/> is applied via <see cref="DrawableHitObject.ApplyResult"/>.
         /// </summary>
         public double TimeOffset { get; internal set; }
 
         /// <summary>
-        /// The combo prior to this judgement occurring.
+        /// The combo prior to this <see cref="JudgementResult"/> occurring.
         /// </summary>
         public int ComboAtJudgement { get; internal set; }
 
         /// <summary>
-        /// The highest combo achieved prior to this judgement occurring.
+        /// The highest combo achieved prior to this <see cref="JudgementResult"/> occurring.
         /// </summary>
         public int HighestComboAtJudgement { get; internal set; }
 
         /// <summary>
-        /// Whether this <see cref="Judgement"/> has a result.
+        /// Whether a miss or hit occurred.
         /// </summary>
         public bool HasResult => Type > HitResult.None;
 
@@ -43,6 +47,10 @@ namespace osu.Game.Rulesets.Judgements
         /// </summary>
         public bool IsHit => Type > HitResult.Miss;
 
+        /// <summary>
+        /// Creates a new <see cref="JudgementResult"/>.
+        /// </summary>
+        /// <param name="judgement">The <see cref="Judgement"/> to refer to for scoring information.</param>
         public JudgementResult(Judgement judgement)
         {
             Judgement = judgement;

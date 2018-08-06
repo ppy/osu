@@ -1,10 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Judgements
 {
+    /// <summary>
+    /// The scoring information provided by a <see cref="HitObject"/>.
+    /// </summary>
     public class Judgement
     {
         /// <summary>
