@@ -199,6 +199,7 @@ namespace osu.Game.Rulesets.Scoring
             rulesetContainer.OnNewResult += applyResult;
             rulesetContainer.OnRevertResult += revertResult;
 
+            ApplyBeatmap(rulesetContainer.Beatmap);
             SimulateAutoplay(rulesetContainer.Beatmap);
             Reset(true);
 
