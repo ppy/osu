@@ -13,6 +13,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         {
         }
 
-        protected override Judgement CreateJudgement() => new OsuSliderTailJudgement();
+        public override Judgement CreateJudgement() => new OsuSliderTailJudgement();
     }
 }

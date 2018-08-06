@@ -93,10 +93,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
-            if (HitObject.Judgement != null)
+            var judgement = HitObject.CreateJudgement();
+            if (judgement != null)
             {
-                Result = CreateResult(HitObject.Judgement);
-
+                Result = CreateResult(judgement);
                 if (Result == null)
                     throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
             }

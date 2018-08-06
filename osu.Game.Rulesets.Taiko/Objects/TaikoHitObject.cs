@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 AddNested(new StrongHitObject { StartTime = (this as IHasEndTime)?.EndTime ?? StartTime });
         }
 
-        protected override Judgement CreateJudgement() => new TaikoJudgement();
+        public override Judgement CreateJudgement() => new TaikoJudgement();
 
         protected override HitWindows CreateHitWindows() => new TaikoHitWindows();
     }

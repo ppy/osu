@@ -64,14 +64,6 @@ namespace osu.Game.Rulesets.Objects
         public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects.Value;
 
         /// <summary>
-        /// The judgement information provided by this <see cref="HitObject"/>.
-        /// </summary>
-        /// <remarks>
-        /// Only populated after <see cref="ApplyDefaults"/> is invoked.
-        /// </remarks>
-        public Judgement Judgement { get; private set; }
-
-        /// <summary>
         /// Applies default values to this HitObject.
         /// </summary>
         /// <param name="controlPointInfo">The control points.</param>
@@ -79,8 +71,6 @@ namespace osu.Game.Rulesets.Objects
         public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
-
-            Judgement = CreateJudgement();
 
             if (nestedHitObjects.IsValueCreated)
                 nestedHitObjects.Value.Clear();
@@ -120,7 +110,7 @@ namespace osu.Game.Rulesets.Objects
         /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
         /// May be null.
         /// </summary>
-        protected virtual Judgement CreateJudgement() => null;
+        public virtual Judgement CreateJudgement() => null;
 
         /// <summary>
         /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.

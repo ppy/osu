@@ -11,6 +11,6 @@ namespace osu.Game.Rulesets.Mania.Objects
     /// </summary>
     public class HoldNoteTick : ManiaHitObject
     {
-        protected override Judgement CreateJudgement() => new HoldNoteTickJudgement();
+        public override Judgement CreateJudgement() => new HoldNoteTickJudgement();
     }
 }

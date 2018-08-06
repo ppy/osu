@@ -97,6 +97,6 @@ namespace osu.Game.Rulesets.Mania.Objects
             }
         }
 
-        protected override Judgement CreateJudgement() => new HoldNoteJudgement();
+        public override Judgement CreateJudgement() => new HoldNoteJudgement();
     }
 }

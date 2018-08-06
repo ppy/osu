@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Catch.Objects
     {
         public override FruitVisualRepresentation VisualRepresentation => FruitVisualRepresentation.Banana;
 
-        protected override Judgement CreateJudgement() => new CatchBananaJudgement();
+        public override Judgement CreateJudgement() => new CatchBananaJudgement();
     }
 }

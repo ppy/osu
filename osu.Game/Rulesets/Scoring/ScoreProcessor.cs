@@ -233,11 +233,12 @@ namespace osu.Game.Rulesets.Scoring
                 foreach (var nested in obj.NestedHitObjects)
                     simulate(nested);
 
-                if (obj.Judgement == null)
+                var judgement = obj.CreateJudgement();
+                if (judgement == null)
                     return;
 
-                var result = CreateResult(obj.Judgement);
-                result.Type = obj.Judgement.MaxResult;
+                var result = CreateResult(judgement);
+                result.Type = judgement.MaxResult;
 
                 applyResult(result);
             }
