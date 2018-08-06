@@ -24,6 +24,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// </summary>
         public double HitWindow => TickSpacing / 2;
 
-        protected override Judgement CreateJudgement() => new TaikoDrumRollTickJudgement();
+        public override Judgement CreateJudgement() => new TaikoDrumRollTickJudgement();
     }
 }

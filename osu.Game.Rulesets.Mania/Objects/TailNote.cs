@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Mania.Objects
 {
     public class TailNote : Note
     {
-        protected override Judgement CreateJudgement() => new ManiaJudgement();
+        public override Judgement CreateJudgement() => new ManiaJudgement();
     }
 }

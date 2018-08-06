@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class StrongHitObject : TaikoHitObject
     {
-        protected override Judgement CreateJudgement() => new TaikoStrongJudgement();
+        public override Judgement CreateJudgement() => new TaikoStrongJudgement();
     }
 }

@@ -27,6 +27,6 @@ namespace osu.Game.Rulesets.Osu.Objects
                 TimePreempt = Math.Min(SpanDuration * 2, TimePreempt);
         }
 
-        protected override Judgement CreateJudgement() => new OsuJudgement();
+        public override Judgement CreateJudgement() => new OsuJudgement();
     }
 }

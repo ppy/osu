@@ -32,6 +32,6 @@ namespace osu.Game.Rulesets.Osu.Objects
             SpinsRequired = (int)Math.Max(1, SpinsRequired * 0.6);
         }
 
-        protected override Judgement CreateJudgement() => new OsuJudgement();
+        public override Judgement CreateJudgement() => new OsuJudgement();
     }
 }

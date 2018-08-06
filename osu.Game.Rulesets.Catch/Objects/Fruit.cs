@@ -8,6 +8,6 @@ namespace osu.Game.Rulesets.Catch.Objects
 {
     public class Fruit : CatchHitObject
     {
-        protected override Judgement CreateJudgement() => new CatchJudgement();
+        public override Judgement CreateJudgement() => new CatchJudgement();
     }
 }
