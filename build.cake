@@ -62,7 +62,12 @@ Task("InspectCode")
 void RunInpectCodeInMono(FilePath nugetToolPath, FilePath nVikaToolPath) {
     var inspectcodeToolPath = GetFiles("./tools/NuGet.CommandLine.*/tools/NuGet.exe").First();
 
-    if (StartProcess("mono", "--version") != 0) {
+    var testMonoArguments = new ProcessArgumentBuilder();
+    testMonoArguments.AppendSwitch("version", "");
+
+    if (StartProcess("mono", new ProcessSettings { 
+        Silent = true, Arguments = testMonoArguments }
+    ) != 0) {
         Information("Running on an os other than windows and mono is not installed. Skipping InpectCode.");
         return;
     }
