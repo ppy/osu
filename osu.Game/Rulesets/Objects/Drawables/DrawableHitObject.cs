@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
@@ -70,7 +71,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// <summary>
         /// The scoring result of this <see cref="DrawableHitObject"/>.
         /// </summary>
-        public readonly JudgementResult Result;
+        public JudgementResult Result { get; private set; }
 
         private bool judgementOccurred;
 
@@ -87,14 +88,19 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected DrawableHitObject(HitObject hitObject)
         {
             HitObject = hitObject;
-
-            if (hitObject.Judgement != null)
-                Result = CreateJudgementResult(hitObject.Judgement);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            if (HitObject.Judgement != null)
+            {
+                Result = CreateJudgementResult(HitObject.Judgement);
+
+                if (Result == null)
+                    throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateJudgementResult)}.");
+            }
+
             var samples = GetSamples().ToArray();
 
             if (samples.Any())
@@ -187,6 +193,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         protected void ApplyResult(Action<JudgementResult> application)
         {
             application?.Invoke(Result);
+
+            if (!Result.HasResult)
+                throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
 
             judgementOccurred = true;
 
