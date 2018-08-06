@@ -95,10 +95,10 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             if (HitObject.Judgement != null)
             {
-                Result = CreateJudgementResult(HitObject.Judgement);
+                Result = CreateResult(HitObject.Judgement);
 
                 if (Result == null)
-                    throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateJudgementResult)}.");
+                    throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
             }
 
             var samples = GetSamples().ToArray();
@@ -257,7 +257,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// Creates the <see cref="JudgementResult"/> that represents the scoring result for this <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
-        protected virtual JudgementResult CreateJudgementResult(Judgement judgement) => new JudgementResult(judgement);
+        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(judgement);
     }
 
     public abstract class DrawableHitObject<TObject> : DrawableHitObject

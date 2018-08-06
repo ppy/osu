@@ -68,6 +68,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
 
-        protected override JudgementResult CreateJudgementResult(Judgement judgement) => new OsuJudgementResult(judgement);
+        protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(judgement);
     }
 }
