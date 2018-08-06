@@ -1,4 +1,4 @@
-#addin "nuget:?package=CodeFileSanity"
+#addin "nuget:http://localhost:8081/repository/hm?package=CodeFileSanity&version=1.0.10"
 #addin "nuget:?package=JetBrains.ReSharper.CommandLineTools"
 #tool "nuget:?package=NVika.MSBuild"
 #tool "nuget:?package=NuGet.CommandLine"
@@ -38,23 +38,47 @@ Task("Test")
     });
 });
 
-// windows only because both inspectcore and nvike depend on net45
 Task("InspectCode")
-.WithCriteria(IsRunningOnWindows())
 .IsDependentOn("Compile")
 .Does(() => {
-    var NVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
-    var NugetToolPath = GetFiles("./tools/NuGet.CommandLine.*/tools/NuGet.exe").First();
+    var nVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
+    var nugetToolPath = GetFiles("./tools/NuGet.CommandLine.*/tools/NuGet.exe").First();
 
-    StartProcess(NugetToolPath, $"restore {osuSolution}");
+    if (!IsRunningOnWindows()) {
+        RunInpectCodeInMono(nVikaToolPath, nugetToolPath);
+        return;
+    }
+
+    StartProcess(nugetToolPath, $"restore {osuSolution}");
 
     InspectCode(osuSolution, new InspectCodeSettings {
         CachesHome = "inspectcode",
         OutputFile = "inspectcodereport.xml",
     });
 
-    StartProcess(NVikaToolPath, @"parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
+    StartProcess(nVikaToolPath, @"parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
 });
+
+void RunInpectCodeInMono(FilePath nugetToolPath, FilePath nVikaToolPath) {
+    var inspectcodeToolPath = GetFiles("./tools/NuGet.CommandLine.*/tools/NuGet.exe").First();
+
+    if (!FileExists("mono")) {
+        Information("Running on an os other than windows and mono is not installed. Skipping InpectCode.");
+        return;
+    }
+
+    StartProcess("mono", $"{nugetToolPath} restore {osuSolution}");
+
+    StartProcess("mono", @"--o=""inspectcodereport.xml"" --caches-home=""inspectcode"" ");
+
+    InspectCode(osuSolution, new InspectCodeSettings {
+        CachesHome = "inspectcode",
+        OutputFile = "inspectcodereport.xml",
+
+    });
+
+    StartProcess("mono", $@"{nVikaToolPath} parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
+}
 
 Task("CodeFileSanity")
 .Does(() => {
