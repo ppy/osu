@@ -195,8 +195,8 @@ namespace osu.Game.Rulesets.Scoring
         {
             Debug.Assert(base_portion + combo_portion == 1.0);
 
-            rulesetContainer.OnJudgement += AddJudgement;
-            rulesetContainer.OnJudgementRemoved += RemoveJudgement;
+            rulesetContainer.OnNewResult += applyResult;
+            rulesetContainer.OnResultReset += resetResult;
 
             SimulateAutoplay(rulesetContainer.Beatmap);
             Reset(true);
@@ -210,10 +210,19 @@ namespace osu.Game.Rulesets.Scoring
             Mode.ValueChanged += _ => updateScore();
         }
 
+        /// <summary>
+        /// Applies any properties of the <see cref="Beatmap{TObject}"/> which affect scoring to this <see cref="ScoreProcessor{TObject}"/>.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="Beatmap{TObject}"/> to read properties from.</param>
         protected virtual void ApplyBeatmap(Beatmap<TObject> beatmap)
         {
         }
 
+        /// <summary>
+        /// Simulates an autoplay of the <see cref="Beatmap{TObject}"/> to determine scoring values.
+        /// </summary>
+        /// <remarks>This provided temporarily. DO NOT USE.</remarks>
+        /// <param name="beatmap">The <see cref="Beatmap{TObject}"/> to simulate.</param>
         protected virtual void SimulateAutoplay(Beatmap<TObject> beatmap)
         {
             foreach (var obj in beatmap.HitObjects)
@@ -230,18 +239,17 @@ namespace osu.Game.Rulesets.Scoring
                 var result = CreateJudgementResult(obj.Judgement);
                 result.Type = obj.Judgement.MaxResult;
 
-                AddJudgement(result);
+                applyResult(result);
             }
         }
 
         /// <summary>
-        /// Adds a judgement to this ScoreProcessor.
+        /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="ScoreProcessor"/>.
         /// </summary>
-        /// <param name="judgement">The judgement to add.</param>
-        /// <param name="result">The judgement scoring result.</param>
-        protected void AddJudgement(JudgementResult result)
+        /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
+        private void applyResult(JudgementResult result)
         {
-            OnNewJudgement(result);
+            ApplyResult(result);
             updateScore();
 
             UpdateFailed();
@@ -249,22 +257,21 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Removes a judgement from this ScoreProcessor.
+        /// Resets the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="judgement">The judgement to remove.</param>
         /// <param name="result">The judgement scoring result.</param>
-        protected void RemoveJudgement(JudgementResult result)
+        private void resetResult(JudgementResult result)
         {
-            OnJudgementRemoved(result);
+            ResetResult(result);
             updateScore();
         }
 
         /// <summary>
-        /// Applies a judgement.
+        /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="ScoreProcessor"/>.
         /// </summary>
-        /// <param name="judgement">The judgement to apply/</param>
-        /// <param name="result">The judgement scoring result.</param>
-        protected virtual void OnNewJudgement(JudgementResult result)
+        /// <param name="result">The <see cref="JudgementResult"/> to apply.</param>
+        protected virtual void ApplyResult(JudgementResult result)
         {
             result.ComboAtJudgement = Combo;
             result.HighestComboAtJudgement = HighestCombo;
@@ -299,11 +306,11 @@ namespace osu.Game.Rulesets.Scoring
         }
 
         /// <summary>
-        /// Removes a judgement. This should reverse everything in <see cref="OnNewJudgement(Judgement)"/>.
+        /// Resets the score change of a <see cref="JudgementResult"/> that was applied to this <see cref="ScoreProcessor"/>.
         /// </summary>
         /// <param name="judgement">The judgement to remove.</param>
         /// <param name="result">The judgement scoring result.</param>
-        protected virtual void OnJudgementRemoved(JudgementResult result)
+        protected virtual void ResetResult(JudgementResult result)
         {
             Combo.Value = result.ComboAtJudgement;
             HighestCombo.Value = result.HighestComboAtJudgement;
@@ -356,6 +363,10 @@ namespace osu.Game.Rulesets.Scoring
             bonusScore = 0;
         }
 
+        /// <summary>
+        /// Creates the <see cref="JudgementResult"/> that represents the scoring result for a <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
         protected virtual JudgementResult CreateJudgementResult(Judgement judgement) => new JudgementResult(judgement);
     }
 

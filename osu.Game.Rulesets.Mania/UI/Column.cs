@@ -131,12 +131,12 @@ namespace osu.Game.Rulesets.Mania.UI
         public override void Add(DrawableHitObject hitObject)
         {
             hitObject.AccentColour = AccentColour;
-            hitObject.OnJudgement += OnJudgement;
+            hitObject.OnNewResult += OnNewResult;
 
             HitObjects.Add(hitObject);
         }
 
-        internal void OnJudgement(DrawableHitObject judgedObject, JudgementResult result)
+        internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             if (!result.IsHit || !judgedObject.DisplayJudgement || !DisplayJudgements)
                 return;

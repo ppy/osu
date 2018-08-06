@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public override void Add(DrawableHitObject h)
         {
-            h.OnJudgement += onJudgement;
+            h.OnNewResult += onNewResult;
 
             base.Add(h);
 
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Catch.UI
             fruit.CheckPosition = CheckIfWeCanCatch;
         }
 
-        private void onJudgement(DrawableHitObject judgedObject, JudgementResult result)
+        private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
             => catcherArea.OnJudgement((DrawableCatchHitObject)judgedObject, result);
     }
 }

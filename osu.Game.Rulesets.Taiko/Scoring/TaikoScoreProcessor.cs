@@ -76,9 +76,9 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
         }
 
-        protected override void OnNewJudgement(JudgementResult result)
+        protected override void ApplyResult(JudgementResult result)
         {
-            base.OnNewJudgement(result);
+            base.ApplyResult(result);
 
             bool isTick = result.Judgement is TaikoDrumRollTickJudgement;
 

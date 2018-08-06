@@ -304,13 +304,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
-            drawable.OnJudgement += onJudgement;
+            drawable.OnNewResult += onNewResult;
 
             Add(drawable);
         }
 
         private float judgementOffsetDirection = 1;
-        private void onJudgement(DrawableHitObject judgedObject, JudgementResult result)
+        private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             var osuObject = judgedObject as DrawableOsuHitObject;
             if (osuObject == null)
