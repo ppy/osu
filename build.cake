@@ -63,7 +63,7 @@ void RunInpectCodeInMono(FilePath nugetToolPath, FilePath nVikaToolPath) {
     var inspectcodeToolPath = GetFiles("./tools/NuGet.CommandLine.*/tools/NuGet.exe").First();
 
     var testMonoArguments = new ProcessArgumentBuilder();
-    testMonoArguments.AppendSwitch("version", "");
+    testMonoArguments.AppendSwitch("--version", "");
 
     if (StartProcess("mono", new ProcessSettings { 
         Silent = true, Arguments = testMonoArguments }
