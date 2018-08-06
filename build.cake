@@ -60,7 +60,7 @@ Task("InspectCode")
 });
 
 void RunInpectCodeInMono(FilePath nugetToolPath, FilePath nVikaToolPath) {
-    var inspectcodeToolPath = GetFiles("./tools/NuGet.CommandLine.*/tools/NuGet.exe").First();
+    var inspectcodeToolPath = GetFiles("./tools/Addins/JetBrains.Resharper.CommandLineTools.*/**/inspectcode.exe").First();
 
     var testMonoArguments = new ProcessArgumentBuilder();
     testMonoArguments.AppendSwitch("--version", "");
