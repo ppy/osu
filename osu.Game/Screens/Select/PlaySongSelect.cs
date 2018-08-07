@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Select
 
         private SampleChannel sampleConfirm;
 
-        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new List<Mod>());
+        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, DialogOverlay dialogOverlay, Bindable<IEnumerable<Mod>> selectedMods)
