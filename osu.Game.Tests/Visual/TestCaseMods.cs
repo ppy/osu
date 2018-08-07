@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using System.Linq;
 using System.Collections.Generic;
+using osu.Framework.Configuration;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
@@ -237,6 +238,8 @@ namespace osu.Game.Tests.Visual
 
         private class TestModSelectOverlay : ModSelectOverlay
         {
+            public new Bindable<IEnumerable<Mod>> SelectedMods => base.SelectedMods;
+
             public ModButton GetModButton(Mod mod)
             {
                 var section = ModSectionsContainer.Children.Single(s => s.ModType == mod.Type);
