@@ -99,7 +99,7 @@ namespace osu.Game
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
-        public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new List<Mod>());
+        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new List<Mod>());
 
         public OsuGame(string[] args = null)
         {
@@ -152,6 +152,9 @@ namespace osu.Game
 
             dependencies.CacheAs(ruleset);
             dependencies.CacheAs<IBindable<RulesetInfo>>(ruleset);
+
+            dependencies.CacheAs(selectedMods);
+            dependencies.CacheAs<IBindable<IEnumerable<Mod>>>(selectedMods);
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
