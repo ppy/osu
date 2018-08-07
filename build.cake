@@ -1,4 +1,4 @@
-#addin "nuget:http://localhost:8081/repository/hm?package=CodeFileSanity&version=1.0.10"
+#addin "nuget:?package=CodeFileSanity"
 #addin "nuget:?package=JetBrains.ReSharper.CommandLineTools"
 #tool "nuget:?package=NVika.MSBuild"
 #tool "nuget:?package=NuGet.CommandLine"
@@ -38,16 +38,13 @@ Task("Test")
     });
 });
 
+// windows only because both inspectcore and nvika depend on net45
 Task("InspectCode")
+.WithCriteria(IsRunningOnWindows())
 .IsDependentOn("Compile")
 .Does(() => {
     var nVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
     var nugetToolPath = GetFiles("./tools/NuGet.CommandLine.*/tools/NuGet.exe").First();
-
-    if (!IsRunningOnWindows()) {
-        RunInpectCodeInMono(nugetToolPath, nVikaToolPath);
-        return;
-    }
 
     StartProcess(nugetToolPath, $"restore {osuSolution}");
 
@@ -58,26 +55,6 @@ Task("InspectCode")
 
     StartProcess(nVikaToolPath, @"parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
 });
-
-void RunInpectCodeInMono(FilePath nugetToolPath, FilePath nVikaToolPath) {
-    var inspectcodeToolPath = GetFiles("./tools/Addins/JetBrains.Resharper.CommandLineTools.*/**/inspectcode.exe").First();
-
-    var testMonoArguments = new ProcessArgumentBuilder();
-    testMonoArguments.AppendSwitch("--version", "");
-
-    if (StartProcess("mono", new ProcessSettings { 
-        Silent = true, Arguments = testMonoArguments }
-    ) != 0) {
-        Information("Running on an os other than windows and mono is not installed. Skipping InpectCode.");
-        return;
-    }
-
-    StartProcess("mono", $"{nugetToolPath} restore {osuSolution}");
-
-    StartProcess("mono", $@"{inspectcodeToolPath} --o=""inspectcodereport.xml"" --caches-home=""inspectcode"" ");
-
-    StartProcess("mono", $@"{nVikaToolPath} parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
-}
 
 Task("CodeFileSanity")
 .Does(() => {
