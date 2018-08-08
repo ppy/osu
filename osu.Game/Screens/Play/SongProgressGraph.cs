@@ -205,7 +205,7 @@ namespace osu.Game.Screens.Play
                                 Strains[x] = Strains.Max() * (-1);
                                 //^^maybe -1000
                             }
-                        } 
+                        }
                     }
                 }
             }
