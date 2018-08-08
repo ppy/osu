@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private Drawable createHoldNoteDisplay(ScrollingDirection direction)
         {
-            var note = new HoldNote { StartTime = 999999999, Duration = 1000 };
+            var note = new HoldNote { StartTime = 999999999, Duration = 5000 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             return new ScrollingTestContainer(direction)
