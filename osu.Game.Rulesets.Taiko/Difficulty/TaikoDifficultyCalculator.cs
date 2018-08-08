@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
+        protected override double strainStep() { return strain_step; }
+
         protected override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
         {
             if (!beatmap.HitObjects.Any())

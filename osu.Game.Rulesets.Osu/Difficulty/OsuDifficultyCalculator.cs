@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
+        protected override double strainStep() { return section_length; }
+
         //Throws list of difficulty values at sections. First value is possesed by two sections.
         protected override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
         {

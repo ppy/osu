@@ -116,5 +116,12 @@ namespace osu.Game.Rulesets.Difficulty
         /// Creates list containing difficulty values for each section in <see cref="Beatmap"/>. First value is used for first and second section.
         /// </summary>
         protected abstract List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate);
+
+        public double StrainStep()
+        {
+            return strainStep();
+        }
+
+        protected abstract double strainStep();
     }
 }

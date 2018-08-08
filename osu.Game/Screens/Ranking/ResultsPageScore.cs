@@ -47,24 +47,9 @@ namespace osu.Game.Screens.Ranking
 
             var difficultyCalculator = score.Ruleset.CreateInstance().CreateDifficultyCalculator(working);
 
-            double strainStep = 1;
-            switch (score.Ruleset.CreateInstance().LegacyID)
-            {
-                case 0:
-                    break;
-                case 1:
-                    strainStep = 400;
-                    break;
-                case 2:
-                    strainStep = 750;
-                    break;
-                case 3:
-                    strainStep = 400;
-                    break;
-                default:
-                    strainStep = 400;
-                    break;
-            }
+            double strainStep = difficultyCalculator.StrainStep();
+            if (score.Ruleset.CreateInstance().LegacyID==0)
+                strainStep = 1;
 
             Children = new Drawable[]
             {
