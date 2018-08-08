@@ -50,6 +50,8 @@ namespace osu.Game.Screens.Select
 
         private SampleChannel sampleConfirm;
 
+        [Cached]
+        [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
         private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
         [BackgroundDependencyLoader(true)]
