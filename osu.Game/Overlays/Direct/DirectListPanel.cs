@@ -12,7 +12,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
 using osu.Framework.Localisation;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.States;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Direct
@@ -26,12 +25,14 @@ namespace osu.Game.Overlays.Direct
 
         private PlayButton playButton;
         private Box progressBar;
-        private Container downloadContainer;
+
+        protected override bool FadePlayButton => false;
 
         protected override PlayButton PlayButton => playButton;
         protected override Box PreviewBar => progressBar;
 
-        public DirectListPanel(BeatmapSetInfo beatmap) : base(beatmap)
+        public DirectListPanel(BeatmapSetInfo beatmap)
+            : base(beatmap)
         {
             RelativeSizeAxes = Axes.X;
             Height = height;
@@ -66,30 +67,45 @@ namespace osu.Game.Overlays.Direct
                             Spacing = new Vector2(10, 0),
                             Children = new Drawable[]
                             {
-                                playButton = new PlayButton(SetInfo)
-                                {
-                                    Origin = Anchor.CentreLeft,
-                                    Anchor = Anchor.CentreLeft,
-                                    Size = new Vector2(height / 2),
-                                    FillMode = FillMode.Fit,
-                                    Alpha = 0,
-                                },
                                 new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        new OsuSpriteText
+                                        new FillFlowContainer
                                         {
-                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
-                                            TextSize = 18,
-                                            Font = @"Exo2.0-BoldItalic",
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
-                                            Font = @"Exo2.0-BoldItalic",
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Children = new Drawable[]
+                                            {
+                                                playButton = new PlayButton(SetInfo)
+                                                {
+                                                    Origin = Anchor.CentreLeft,
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Size = new Vector2(height / 2),
+                                                    FillMode = FillMode.Fit,
+                                                },
+                                                new FillFlowContainer
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Direction = FillDirection.Vertical,
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new OsuSpriteText
+                                                        {
+                                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
+                                                            TextSize = 18,
+                                                            Font = @"Exo2.0-BoldItalic",
+                                                        },
+                                                        new OsuSpriteText
+                                                        {
+                                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
+                                                            Font = @"Exo2.0-BoldItalic",
+                                                        },
+                                                    }
+                                                },
+                                            }
                                         },
                                         new FillFlowContainer
                                         {
@@ -108,16 +124,13 @@ namespace osu.Game.Overlays.Direct
                             Origin = Anchor.TopRight,
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
-                            LayoutEasing = Easing.OutQuint,
-                            LayoutDuration = transition_duration,
                             Children = new Drawable[]
                             {
-                                downloadContainer = new Container
+                                new Container
                                 {
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
                                     AutoSizeAxes = Axes.Both,
-                                    Alpha = 0,
                                     Child = new DownloadButton(SetInfo)
                                     {
                                         Size = new Vector2(height - vertical_padding * 3),
@@ -183,18 +196,6 @@ namespace osu.Game.Overlays.Direct
                     Colour = colours.Yellow,
                 },
             });
-        }
-
-        protected override bool OnHover(InputState state)
-        {
-            downloadContainer.FadeIn(transition_duration, Easing.InOutQuint);
-            return base.OnHover(state);
-        }
-
-        protected override void OnHoverLost(InputState state)
-        {
-            downloadContainer.FadeOut(transition_duration, Easing.InOutQuint);
-            base.OnHoverLost(state);
         }
     }
 }
