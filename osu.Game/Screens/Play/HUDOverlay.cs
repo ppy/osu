@@ -100,6 +100,7 @@ namespace osu.Game.Screens.Play
             var difficultyCalculator = rulesetContainer.Ruleset.CreateDifficultyCalculator(working);
             Progress.Strains = difficultyCalculator.DifficultySectionRating();
             Progress.Objects = rulesetContainer.Objects;
+            Progress.Breaks = working.GetPlayableBeatmap(rulesetContainer.Ruleset.RulesetInfo).Breaks;
             Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
             Progress.OnSeek = pos => adjustableClock.Seek(pos);
 

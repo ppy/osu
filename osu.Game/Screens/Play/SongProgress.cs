@@ -14,6 +14,7 @@ using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.UI;
+using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Screens.Play
 {
@@ -67,6 +68,14 @@ namespace osu.Game.Screens.Play
             {return strainStep;}
             set
             {graph.StrainStep = strainStep = value;}
+        }
+
+        public List<BreakPeriod> Breaks
+        {
+            set
+            {
+                graph.Breaks = value;
+            }
         }
 
         private readonly BindableBool replayLoaded = new BindableBool();

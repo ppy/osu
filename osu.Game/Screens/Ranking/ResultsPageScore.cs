@@ -118,6 +118,7 @@ namespace osu.Game.Screens.Ranking
                                     StrainStep = strainStep,
                                     AudioClock = new StopwatchClock(),
                                     Objects = working.Beatmap.HitObjects,
+                                    Breaks = working.GetPlayableBeatmap(score.Ruleset).Breaks,
                                 },
                                 scoreCounter = new SlowScoreCounter(6)
                                 {
