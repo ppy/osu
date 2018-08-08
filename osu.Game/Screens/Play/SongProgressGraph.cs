@@ -203,6 +203,7 @@ namespace osu.Game.Screens.Play
                             if (endOfTouch - startOfTouch >= interval / 2)
                             {
                                 Strains[x] = Strains.Max() * (-1);
+                                //^^maybe -1000
                             }
                         } 
                     }
