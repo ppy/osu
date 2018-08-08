@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.Direct
             content.TweenEdgeEffectTo(edgeEffectHovered, hover_transition_time, Easing.OutQuint);
             content.MoveToY(-4, hover_transition_time, Easing.OutQuint);
             if (FadePlayButton)
-            PlayButton.FadeIn(120, Easing.InOutQuint);
+                PlayButton.FadeIn(120, Easing.InOutQuint);
 
             return base.OnHover(state);
         }
