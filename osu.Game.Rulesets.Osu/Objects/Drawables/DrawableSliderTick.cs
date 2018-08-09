@@ -8,6 +8,8 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -22,23 +24,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {
             Size = new Vector2(16) * sliderTick.Scale;
-
-            Masking = true;
-            CornerRadius = Size.X / 2;
-
             Origin = Anchor.Centre;
-
-            BorderThickness = 2;
-            BorderColour = Color4.White;
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                new SkinnableDrawable("Play/osu/sliderscorepoint", _ => new Container
                 {
+                    Masking = true,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = AccentColour,
-                    Alpha = 0.3f,
-                }
+                    Origin = Anchor.Centre,
+                    CornerRadius = Size.X / 2,
+
+                    BorderThickness = 2,
+                    BorderColour = Color4.White,
+
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = AccentColour,
+                        Alpha = 0.3f,
+                    }
+                }, restrictSize: false)
             };
         }
 

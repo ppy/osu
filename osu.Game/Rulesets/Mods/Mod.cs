@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// The type of this mod.
         /// </summary>
-        public virtual ModType Type => ModType.Special;
+        public virtual ModType Type => ModType.Fun;
 
         /// <summary>
         /// The user readable description of this mod.

@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Menus
             TabContainer.AutoSizeAxes = Axes.X;
             TabContainer.Padding = new MarginPadding();
 
-            Add(new Box
+            AddInternal(new Box
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,

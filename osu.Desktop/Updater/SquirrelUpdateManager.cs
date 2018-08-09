@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-#if NET_FRAMEWORK
 using System;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -162,4 +161,3 @@ namespace osu.Desktop.Updater
         }
     }
 }
-#endif
