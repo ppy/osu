@@ -20,20 +20,18 @@ namespace osu.Game.Screens.Play
             get { return strains; }
             set
             {
-                for(int x = 0; x < value.Count; x++)
+                for (int x = 0; x < value.Count; x++)
                 {
-                    if (x == 0)
+                    if (!strains.Any())
                     {
-                        strains.Add(value[x]);
-                        strains.Add(value[x]);
-                        Values.Add(value[x]);
-                        Values.Add(value[x]);
+                        if (x == 0)
+                        {
+                            strains.Add(value[x]);
+                            Values.Add(value[x]);    
+                        }
                     }
-                    else
-                    {
-                        strains.Add(value[x]);
-                        Values.Add(value[x]);
-                    }
+                    strains.Add(value[x]);
+                    Values.Add(value[x]);
                 }
             }
         }
@@ -50,13 +48,11 @@ namespace osu.Game.Screens.Play
                 if (!objects.Any())
                 {
                     for (int x = 0; x < Strains.Count; x++)
-                    {
                         Strains[x] = 0;
-                    }
                 }
                 else
                 {
-                    if (Strains.Count==0)
+                    if (!Strains.Any())
                     {
                         Strains.Add(1);
                         Update();
@@ -67,21 +63,15 @@ namespace osu.Game.Screens.Play
                 var values = new List<int>();
 
                 for (int x = 0; x < strains.Count; x++)
-                {
                     values.Add(0);
-                }
 
                 var startOfLists = (objects.First().StartTime - objects.First().StartTime % (strainStep * audioClock.Rate))/(strainStep * audioClock.Rate);
-                if (strainStep==1)
-                {
+                if (strainStep == 1)
                     startOfLists = objects.First().StartTime;
-                }
 
                 var interval = strainStep;
-                if (interval==1)
-                {
+                if (interval == 1)
                     interval = 400;
-                }
                 interval = interval * audioClock.Rate;
 
                 foreach (var h in objects)
@@ -101,7 +91,7 @@ namespace osu.Game.Screens.Play
                 for (int x = 0; x < Strains.Count; x++)
                 {
                     if (values[x]==0)
-                        Strains[x] = Strains.Max() * (-1);
+                        Strains[x] = Strains.Max() * -1;
                     else
                     {
                         if (Strains[x]<0.01)
@@ -143,35 +133,38 @@ namespace osu.Game.Screens.Play
                 breaks = value;
 
                 var startOfLists = (objects.First().StartTime - objects.First().StartTime % (strainStep * audioClock.Rate))/(strainStep * audioClock.Rate);
-                if (strainStep==1)
+                if (strainStep == 1)
                 {
                     startOfLists = objects.First().StartTime;
                 }
 
                 var interval = strainStep;
-                if (interval==1)
+                if (interval == 1)
                 {
                     strainStep = 400;
                 }
 
                 for (int x = 0; x < strains.Count; x++)
                 {
-                    for (int i = 0; i < breaks.Count; i++)
+                    foreach (var br in breaks)
                     {
-                        if ( breaks[i].Duration >= interval / 2)
+                        if ( br.Duration >= interval / 2)
                         {
-                            double startOfTouch = -1;
-                            if ( x * interval + startOfLists >= breaks[i].StartTime && x * interval + startOfLists < breaks[i].EndTime)
+                            double strainStart = x * interval + startOfLists;
+                            double strainEnd = (x+1) * interval + startOfLists;
+
+                            double startOfTouch = new double();
+                            if (strainStart >= br.StartTime && strainStart < br.EndTime)
                             {
-                                startOfTouch = x * interval + startOfLists;
+                                startOfTouch = strainStart;
                             }
                             else
                             {
-                                if ( x * interval + startOfLists < breaks[i].StartTime)
+                                if (strainStart < br.StartTime)
                                 {
-                                    if (breaks[i].StartTime - (x * interval + startOfLists) < interval /2)
+                                    if (br.StartTime - strainStart < interval /2)
                                     {
-                                        startOfTouch = breaks[i].StartTime;
+                                        startOfTouch = br.StartTime;
                                     }
                                     else
                                         continue;
@@ -180,18 +173,18 @@ namespace osu.Game.Screens.Play
                                     continue;
                             }
 
-                            double endOfTouch = -1;
-                            if ( (x+1) * interval + startOfLists >= breaks[i].StartTime && (x+1) * interval + startOfLists < breaks[i].EndTime)
+                            double endOfTouch = new double();
+                            if (strainEnd >= br.StartTime && strainEnd < br.EndTime)
                             {
-                                endOfTouch = (x+1) * interval + startOfLists;
+                                endOfTouch = strainEnd;
                             }
                             else
                             {
-                                if ( (x+1) * interval + startOfLists > breaks[i].EndTime)
+                                if (strainEnd > br.EndTime)
                                 {
-                                    if ( ((x+1) * interval + startOfLists) - breaks[i].EndTime < interval /2)
+                                    if (strainEnd - br.EndTime < interval /2)
                                     {
-                                        endOfTouch = breaks[i].EndTime;
+                                        endOfTouch = br.EndTime;
                                     }
                                     else
                                         continue;
@@ -202,7 +195,7 @@ namespace osu.Game.Screens.Play
 
                             if (endOfTouch - startOfTouch >= interval / 2)
                             {
-                                Strains[x] = Strains.Max() * (-1);
+                                Strains[x] = Strains.Max() * -1;
                                 //^^maybe -1000
                             }
                         }

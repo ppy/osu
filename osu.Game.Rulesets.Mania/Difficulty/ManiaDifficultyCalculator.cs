@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
         }
 
-        protected override double strainStep() { return strain_step; }
+        protected override double AbstractStrainStep() { return strain_step; }
 
         protected override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
         {

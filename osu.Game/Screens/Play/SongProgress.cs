@@ -64,10 +64,8 @@ namespace osu.Game.Screens.Play
 
         public double StrainStep
         {
-            get
-            {return strainStep;}
-            set
-            {graph.StrainStep = strainStep = value;}
+            get { return strainStep; }
+            set { graph.StrainStep = strainStep = value; }
         }
 
         public List<BreakPeriod> Breaks

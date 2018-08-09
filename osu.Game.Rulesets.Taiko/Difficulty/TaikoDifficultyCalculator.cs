@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override double strainStep() { return strain_step; }
+        protected override double AbstractStrainStep() { return strain_step; }
 
         protected override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
         {
@@ -56,10 +56,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             var startAt = difficultyHitObjects[0].BaseHitObject.StartTime / (strain_step * timeRate);
 
             for (int x = 0; x < highestStrains.Count; x++)
-            {
                 if (x > startAt)
                     taikoDifficultySectionRating.Add(highestStrains[x] * star_scaling_factor);
-            }
 
             return taikoDifficultySectionRating;
         }

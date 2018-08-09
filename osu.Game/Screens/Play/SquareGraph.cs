@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Play
         {
             var newValues = new List<double>();
 
-            if (values.Count == 0)
+            if (!values.Any())
             {
                 for (float i = 0; i < ColumnCount; i++)
                     newValues.Add(0);
@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Play
                 float iteration = 0;
                 for (float x = i; x < i+step && x < values.Count; x++)
                 {
-                    sum += values[(int) x];
+                    sum += values[(int)x];
                     iteration = x - i + 1;
                 }
                 sum = sum / iteration;

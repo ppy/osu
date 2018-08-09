@@ -104,24 +104,24 @@ namespace osu.Game.Rulesets.Difficulty
         /// <returns>A structure containing the difficulty attributes.</returns>
         protected abstract DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate);
 
-        public List<double> DifficultySectionRating ()
+        public List<double> DifficultySectionRating()
         {
             IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
             var clock = new StopwatchClock();
 
-            return DifficultySectionRating (playableBeatmap, clock.Rate);
+            return DifficultySectionRating(playableBeatmap, clock.Rate);
         }
 
         /// <summary>
         /// Creates list containing difficulty values for each section in <see cref="Beatmap"/>. First value is used for first and second section.
         /// </summary>
-        protected abstract List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate);
+        protected abstract List<double> DifficultySectionRating(IBeatmap beatmap, double timeRate);
 
         public double StrainStep()
         {
-            return strainStep();
+            return AbstractStrainStep();
         }
 
-        protected abstract double strainStep();
+        protected abstract double AbstractStrainStep();
     }
 }

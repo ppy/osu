@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
-        protected override double strainStep() { return strain_step; }
+        protected override double AbstractStrainStep() { return strain_step; }
 
         protected override List<double> DifficultySectionRating (IBeatmap beatmap, double timeRate)
         {

@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Play
             Progress.AudioClock = offsetClock;
             var difficultyCalculator = rulesetContainer.Ruleset.CreateDifficultyCalculator(working);
             Progress.StrainStep = difficultyCalculator.StrainStep();
-            if (rulesetContainer.Ruleset.LegacyID==0)
+            if (rulesetContainer.Ruleset.LegacyID == 0)
                 Progress.StrainStep = 1;
             Progress.Strains = difficultyCalculator.DifficultySectionRating();
             Progress.Objects = rulesetContainer.Objects;

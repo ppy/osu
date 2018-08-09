@@ -36,7 +36,8 @@ namespace osu.Game.Screens.Ranking
 
         private readonly Score score;
 
-        public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap) { this.score=score; working = beatmap; }
+        public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap)
+        { this.score=score; working = beatmap; }
 
         private FillFlowContainer<DrawableScoreStatistic> statisticsContainer;
 
