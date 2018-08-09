@@ -99,7 +99,9 @@ namespace osu.Game
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
-        public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new List<Mod>());
+        [Cached]
+        [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
+        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
         public OsuGame(string[] args = null)
         {
@@ -197,7 +199,13 @@ namespace osu.Game
                     return;
                 }
 
-                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(beatmap.Beatmaps.First());
+                var databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID);
+
+                // Use first beatmap available for current ruleset, else switch ruleset.
+                var first = databasedSet.Beatmaps.FirstOrDefault(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
+
+                ruleset.Value = first.Ruleset;
+                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
             }
 
             switch (currentScreen)
@@ -580,10 +588,10 @@ namespace osu.Game
 
             // we only want to apply these restrictions when we are inside a screen stack.
             // the use case for not applying is in visual/unit tests.
-            bool applyRestrictions = !currentScreen?.AllowBeatmapRulesetChange ?? false;
+            bool applyBeatmapRulesetRestrictions = !currentScreen?.AllowBeatmapRulesetChange ?? false;
 
-            ruleset.Disabled = applyRestrictions;
-            Beatmap.Disabled = applyRestrictions;
+            ruleset.Disabled = applyBeatmapRulesetRestrictions;
+            Beatmap.Disabled = applyBeatmapRulesetRestrictions;
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 

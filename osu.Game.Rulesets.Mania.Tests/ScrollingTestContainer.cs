@@ -14,24 +14,20 @@ namespace osu.Game.Rulesets.Mania.Tests
     /// </summary>
     public class ScrollingTestContainer : Container
     {
-        private readonly ScrollingDirection direction;
+        [Cached(Type = typeof(IScrollingInfo))]
+        private readonly TestScrollingInfo scrollingInfo = new TestScrollingInfo();
 
         public ScrollingTestContainer(ScrollingDirection direction)
         {
-            this.direction = direction;
+            scrollingInfo.Direction.Value = direction;
         }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IScrollingInfo>(new ScrollingInfo { Direction = { Value = direction }});
-            return dependencies;
-        }
+        public void Flip() => scrollingInfo.Direction.Value = scrollingInfo.Direction.Value == ScrollingDirection.Up ? ScrollingDirection.Down : ScrollingDirection.Up;
+    }
 
-        private class ScrollingInfo : IScrollingInfo
-        {
-            public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
-            IBindable<ScrollingDirection> IScrollingInfo.Direction => Direction;
-        }
+    public class TestScrollingInfo : IScrollingInfo
+    {
+        public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+        IBindable<ScrollingDirection> IScrollingInfo.Direction => Direction;
     }
 }
