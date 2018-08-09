@@ -108,26 +108,39 @@ namespace osu.Game.Beatmaps
             IBeatmap converted = converter.Convert();
 
             // Apply difficulty mods
-            if (Mods.Value.Any(m => m is IApplicableToDifficulty))
+            try
             {
-                converted.BeatmapInfo = converted.BeatmapInfo.Clone();
-                converted.BeatmapInfo.BaseDifficulty = converted.BeatmapInfo.BaseDifficulty.Clone();
+                if (Mods.Value.Any(m => m is IApplicableToDifficulty))
+                {
+                    converted.BeatmapInfo = converted.BeatmapInfo.Clone();
+                    converted.BeatmapInfo.BaseDifficulty = converted.BeatmapInfo.BaseDifficulty.Clone();
 
-                foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
+                    foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
+                        mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
+                }
+            }
+            catch
+            {
+                // A mod failed to apply, do nothing
             }
 
             IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
-
             processor?.PreProcess();
 
             // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
             foreach (var obj in converted.HitObjects)
                 obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
 
-            foreach (var mod in Mods.Value.OfType<IApplicableToHitObject>())
-            foreach (var obj in converted.HitObjects)
-                mod.ApplyToHitObject(obj);
+            try
+            {
+                foreach (IApplicableToHitObject mod in Mods.Value.OfType<IApplicableToHitObject>())
+                    foreach (var obj in converted.HitObjects)
+                        mod.ApplyToHitObject(obj);
+            }
+            catch
+            {
+                // A mod failed, do nothing
+            }
 
             processor?.PostProcess();
 

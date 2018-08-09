@@ -23,6 +23,7 @@ using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using OpenTK;
+using osu.Framework.Logging;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -220,6 +221,7 @@ namespace osu.Game.Rulesets.UI
         protected RulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap)
             : base(ruleset)
         {
+            Logger.Log($"RulesetContainer initialized with {ruleset.ShortName}");
             Debug.Assert(workingBeatmap != null, "RulesetContainer initialized with a null beatmap.");
 
             WorkingBeatmap = workingBeatmap;
