@@ -22,6 +22,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods.Sections;
+using osu.Framework.Logging;
 
 namespace osu.Game.Overlays.Mods
 {

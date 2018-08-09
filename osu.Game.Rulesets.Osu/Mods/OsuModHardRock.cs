@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Framework.Logging;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
@@ -19,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToHitObject(HitObject hitObject)
         {
-            var osuObject = (OsuHitObject)hitObject;
+            var osuObject = (OsuHitObject)(hitObject);
 
             osuObject.Position = new Vector2(osuObject.Position.X, OsuPlayfield.BASE_SIZE.Y - osuObject.Y);
 

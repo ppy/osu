@@ -17,6 +17,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
+using osu.Framework.Logging;
 
 namespace osu.Game.Beatmaps
 {
@@ -92,46 +93,52 @@ namespace osu.Game.Beatmaps
         /// <exception cref="BeatmapInvalidForRulesetException">If <see cref="Beatmap"/> could not be converted to <paramref name="ruleset"/>.</exception>
         public IBeatmap GetPlayableBeatmap(RulesetInfo ruleset)
         {
-            var rulesetInstance = ruleset.CreateInstance();
-
-            IBeatmapConverter converter = rulesetInstance.CreateBeatmapConverter(Beatmap);
-
-            // Check if the beatmap can be converted
-            if (!converter.CanConvert)
-                throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset.InstantiationInfo}, converter: {converter}).");
-
-            // Apply conversion mods
-            foreach (var mod in Mods.Value.OfType<IApplicableToBeatmapConverter>())
-                mod.ApplyToBeatmapConverter(converter);
-
-            // Convert
-            IBeatmap converted = converter.Convert();
-
-            // Apply difficulty mods
-            if (Mods.Value.Any(m => m is IApplicableToDifficulty))
+            try
             {
-                converted.BeatmapInfo = converted.BeatmapInfo.Clone();
-                converted.BeatmapInfo.BaseDifficulty = converted.BeatmapInfo.BaseDifficulty.Clone();
+                var rulesetInstance = ruleset.CreateInstance();
 
-                foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
-                    mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
+                IBeatmapConverter converter = rulesetInstance.CreateBeatmapConverter(Beatmap);
+
+                // Check if the beatmap can be converted
+                if (!converter.CanConvert)
+                    throw new BeatmapInvalidForRulesetException($"{nameof(Beatmaps.Beatmap)} can not be converted for the ruleset (ruleset: {ruleset.InstantiationInfo}, converter: {converter}).");
+
+                // Apply conversion mods
+                foreach (var mod in Mods.Value.OfType<IApplicableToBeatmapConverter>())
+                    mod.ApplyToBeatmapConverter(converter);
+
+                // Convert
+                IBeatmap converted = converter.Convert();
+
+                // Apply difficulty mods
+                if (Mods.Value.Any(m => m is IApplicableToDifficulty))
+                {
+                    converted.BeatmapInfo = converted.BeatmapInfo.Clone();
+                    converted.BeatmapInfo.BaseDifficulty = converted.BeatmapInfo.BaseDifficulty.Clone();
+
+                    foreach (var mod in Mods.Value.OfType<IApplicableToDifficulty>())
+                        mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
+                }
+
+                IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
+                processor?.PreProcess();
+
+                // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
+                foreach (var obj in converted.HitObjects)
+                    obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
+
+                foreach (IApplicableToHitObject mod in Mods.Value.OfType<IApplicableToHitObject>())
+                    foreach (var obj in converted.HitObjects)
+                        mod.ApplyToHitObject(obj);
+
+                processor?.PostProcess();
+
+                return converted;
             }
-
-            IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
-
-            processor?.PreProcess();
-
-            // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
-            foreach (var obj in converted.HitObjects)
-                obj.ApplyDefaults(converted.ControlPointInfo, converted.BeatmapInfo.BaseDifficulty);
-
-            foreach (var mod in Mods.Value.OfType<IApplicableToHitObject>())
-            foreach (var obj in converted.HitObjects)
-                mod.ApplyToHitObject(obj);
-
-            processor?.PostProcess();
-
-            return converted;
+            catch
+            {
+                return null;
+            }
         }
 
         public override string ToString() => BeatmapInfo.ToString();
