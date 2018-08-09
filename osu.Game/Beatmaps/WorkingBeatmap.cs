@@ -17,7 +17,6 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
-using osu.Framework.Logging;
 
 namespace osu.Game.Beatmaps
 {

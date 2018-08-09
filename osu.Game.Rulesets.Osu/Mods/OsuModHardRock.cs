@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToHitObject(HitObject hitObject)
         {
-            var osuObject = (OsuHitObject)(hitObject);
+            var osuObject = (OsuHitObject)hitObject;
 
             osuObject.Position = new Vector2(osuObject.Position.X, OsuPlayfield.BASE_SIZE.Y - osuObject.Y);
 
