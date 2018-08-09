@@ -13,7 +13,7 @@ namespace osu.Game.Screens.Play
 {
     public class SongProgressGraph : SquareGraph
     {
-        private List<double> strains = new List<double>();
+        private readonly List<double> strains = new List<double>();
 
         public List<double> Strains
         {
@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play
                         if (x == 0)
                         {
                             strains.Add(value[x]);
-                            Values.Add(value[x]);    
+                            Values.Add(value[x]);
                         }
                     }
                     strains.Add(value[x]);
