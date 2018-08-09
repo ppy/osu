@@ -8,7 +8,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Framework.Logging;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
