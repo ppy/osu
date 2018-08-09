@@ -1,7 +1,6 @@
 #addin "nuget:?package=CodeFileSanity"
 #addin "nuget:?package=JetBrains.ReSharper.CommandLineTools"
 #tool "nuget:?package=NVika.MSBuild"
-#tool "nuget:?package=NuGet.CommandLine"
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -44,9 +43,8 @@ Task("InspectCode")
 .IsDependentOn("Compile")
 .Does(() => {
     var nVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
-    var nugetToolPath = GetFiles("./tools/NuGet.CommandLine.*/tools/NuGet.exe").First();
-
-    StartProcess(nugetToolPath, $"restore {osuSolution}");
+  
+    DotNetCoreRestore(osuSolution.FullPath);
 
     InspectCode(osuSolution, new InspectCodeSettings {
         CachesHome = "inspectcode",
