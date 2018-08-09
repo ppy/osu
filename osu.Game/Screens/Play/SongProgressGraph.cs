@@ -153,7 +153,7 @@ namespace osu.Game.Screens.Play
                             double strainStart = x * interval + startOfLists;
                             double strainEnd = (x+1) * interval + startOfLists;
 
-                            double startOfTouch = new double();
+                            double startOfTouch;
                             if (strainStart >= br.StartTime && strainStart < br.EndTime)
                             {
                                 startOfTouch = strainStart;
@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Play
                                     continue;
                             }
 
-                            double endOfTouch = new double();
+                            double endOfTouch;
                             if (strainEnd >= br.StartTime && strainEnd < br.EndTime)
                             {
                                 endOfTouch = strainEnd;
