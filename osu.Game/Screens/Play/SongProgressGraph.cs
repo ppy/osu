@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Play
                         if (x == 0)
                         {
                             strains.Add(value[x]);
-                            Values.Add(value[x]);    
+                            Values.Add(value[x]);
                         }
                     }
                     strains.Add(value[x]);
