@@ -49,6 +49,7 @@ namespace osu.Game.Screens.Play
                 {
                     for (int x = 0; x < Strains.Count; x++)
                         Strains[x] = 0;
+                    return;
                 }
                 else
                 {
@@ -131,6 +132,9 @@ namespace osu.Game.Screens.Play
             set
             {
                 breaks = value;
+
+                if (!objects.Any())
+                    return;
 
                 var startOfLists = (objects.First().StartTime - objects.First().StartTime % (strainStep * audioClock.Rate))/(strainStep * audioClock.Rate);
                 if (strainStep == 1)

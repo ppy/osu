@@ -151,7 +151,7 @@ namespace osu.Game.Tests.NonVisual
 
             protected override List<double> DifficultySectionRating(IBeatmap beatmap, double timeRate) => new List<double>();
 
-            protected override double AbstractStrainStep() => new double();
+            protected override double AbstractStrainStep() => 1;
         }
     }
 }
