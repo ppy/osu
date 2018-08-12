@@ -32,7 +32,6 @@ namespace osu.Game.Rulesets.Judgements
 
         protected SpriteText JudgementText;
 
-        private bool hitErrorJudgements;
 
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
@@ -51,13 +50,12 @@ namespace osu.Game.Rulesets.Judgements
         private void load(OsuConfigManager config, OsuColour colours)
         {
             this.colours = colours;
-            hitErrorJudgements = config.GetBindable<bool>(OsuSetting.HitErrorJudgments);
 
             Child = new SkinnableDrawable($"Play/{Judgement.Result}", _ => JudgementText = new OsuSpriteText
             {
                 Text = Judgement.Result.GetDescription().ToUpperInvariant(),
                 Font = @"Venera",
-                Colour = hitErrorJudgements ? JudgementColour(Judgement) : judgementColour(Judgement.Result),
+                Colour = config.GetBindable<bool>(OsuSetting.HitErrorJudgments) ? JudgementColour(Judgement) : judgementColour(Judgement.Result),
                 Scale = new Vector2(0.85f, 1),
                 TextSize = 12
             }, restrictSize: false);
@@ -116,13 +114,9 @@ namespace osu.Game.Rulesets.Judgements
         private readonly Vector4 maxFastColor = new Vector4(0.5f, 1.0f, 0.5f, 1);
         private readonly Vector4 baseSlowColor = new Vector4(0.0f, 0.0f, 1.0f, 1);
         private readonly Vector4 maxSlowColor = new Vector4(0.0f, 1.0f, 0.5f, 1);
-        protected Color4 JudgementColour(Judgement judgement)
-        {
-            if (judgement.TimeOffset >= 0)
-                return Color4.FromHcy(baseSlowColor + (maxSlowColor - baseSlowColor) * (float)(judgement.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh)));
-            else if (judgement.TimeOffset < 0)
-                return Color4.FromHcy(baseFastColor + (maxFastColor - baseFastColor) * (float)(-judgement.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh)));
-            return Color4.White;
-        }
+
+        protected Color4 JudgementColour(Judgement judgement) => judgement.TimeOffset >= 0 ?
+        Color4.FromHcy(baseSlowColor + (maxSlowColor - baseSlowColor) * (float)(judgement.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh))) : 
+        Color4.FromHcy(baseFastColor + (maxFastColor - baseFastColor) * (float)(-judgement.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh)));
     }
 }
