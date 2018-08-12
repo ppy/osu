@@ -79,6 +79,8 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ShowInterface, true);
             Set(OsuSetting.KeyOverlay, false);
 
+            Set(OsuSetting.HitErrorJudgments, false);
+
             Set(OsuSetting.FloatingComments, false);
 
             Set(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
@@ -119,6 +121,7 @@ namespace osu.Game.Configuration
         BlurLevel,
         ShowStoryboard,
         KeyOverlay,
+        HitErrorJudgments,
         FloatingComments,
         ShowInterface,
         MouseDisableButtons,

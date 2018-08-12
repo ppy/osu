@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Judgements
 {
@@ -31,6 +32,8 @@ namespace osu.Game.Rulesets.Judgements
 
         protected SpriteText JudgementText;
 
+        private bool HitErrorJudgements;
+
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
@@ -45,15 +48,16 @@ namespace osu.Game.Rulesets.Judgements
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuConfigManager config, OsuColour colours)
         {
             this.colours = colours;
+            HitErrorJudgements = config.GetBindable<bool>(OsuSetting.HitErrorJudgments);
 
             Child = new SkinnableDrawable($"Play/{Judgement.Result}", _ => JudgementText = new OsuSpriteText
             {
                 Text = Judgement.Result.GetDescription().ToUpperInvariant(),
                 Font = @"Venera",
-                Colour = judgementColour(Judgement),
+                Colour = HitErrorJudgements ? judgementColour(Judgement) : judgementColour(Judgement.Result),
                 Scale = new Vector2(0.85f, 1),
                 TextSize = 12
             }, restrictSize: false);

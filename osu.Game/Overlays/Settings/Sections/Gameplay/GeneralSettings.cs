@@ -39,6 +39,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Color Judgments with hit error",
+                    Bindable = config.GetBindable<bool>(OsuSetting.HitErrorJudgments)
+                },
                 new SettingsEnumDropdown<ScoringMode>
                 {
                     LabelText = "Score display mode",
