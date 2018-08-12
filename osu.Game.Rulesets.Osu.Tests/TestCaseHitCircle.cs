@@ -18,9 +18,7 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Osu.Replays;
-using osu.Framework.Input;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -95,8 +93,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
         private void testOffstream(float circleSize, double hitError, double hitErrorDelta)
         {
-            RemoveAll(new Predicate<Drawable>(Drawable => true));
-            testStream(circleSize, false);
+            RemoveAll((drawable => true));
+            testStream(circleSize);
 
             List<ReplayFrame> replayFrames = new List<ReplayFrame>();
             IEnumerable<DrawableHitCircle> hitCircles = Children.OfType<DrawableHitCircle>().Reverse();
@@ -107,10 +105,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 replayFrames.Add(new OsuReplayFrame(hitCircle.HitObject.StartTime + hitError + 1, new Vector2(hitCircle.Position.X, hitCircle.Position.Y)));
                 hitError += hitErrorDelta;
             }
-            Replay replay = new Replay();
-            replay.Frames = replayFrames;
-            OsuReplayInputHandler replayHandler = new OsuReplayInputHandler(replay);
-            replayHandler.GamefieldToScreenSpace = clickPos => ToScreenSpace(hitCircles.First().AnchorPosition + clickPos + new Vector2(StepsContainer.DrawWidth, 0));
+            Replay replay = new Replay() { Frames = replayFrames };
+            OsuReplayInputHandler replayHandler = new OsuReplayInputHandler(replay)
+                { GamefieldToScreenSpace = clickPos => ToScreenSpace(hitCircles.First().AnchorPosition + clickPos + new Vector2(StepsContainer.DrawWidth, 0)) };
             Children.OfType<DrawableHitCircle>().First().OsuActionInputManager.ReplayInputHandler = replayHandler;
         }
         private void testUnderstream(float circleSize)
@@ -134,10 +131,12 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             private void onJudgement(DrawableHitObject judegedObject, Judgement judgement)
             {
-                DrawableOsuJudgement drawable = new DrawableOsuJudgement(judgement, judegedObject);
-                drawable.RelativeAnchorPosition = new Vector2(0.5f, 0.5f);
-                drawable.Origin = Anchor.Centre;
-                drawable.Position = Position;
+                DrawableOsuJudgement drawable = new DrawableOsuJudgement(judgement, judegedObject)
+                {
+                    RelativeAnchorPosition = new Vector2(0.5f, 0.5f),
+                    Origin = Anchor.Centre,
+                    Position = Position,
+                };
                 ((Container)Parent).Add(drawable);
             }
 
