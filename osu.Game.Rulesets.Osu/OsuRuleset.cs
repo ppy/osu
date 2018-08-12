@@ -104,6 +104,7 @@ namespace osu.Game.Rulesets.Osu
                         new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
                         new OsuModHidden(),
                         new OsuModFlashlight(),
+                        new OsuModTaiko(),
                     };
                 case ModType.Conversion:
                     return new Mod[]

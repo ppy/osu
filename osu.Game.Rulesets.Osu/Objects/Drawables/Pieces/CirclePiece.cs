@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class CirclePiece : Container, IKeyBindingHandler<OsuAction>
     {
-        public Func<bool> Hit;
+        public Func<OsuAction, bool> Hit;
 
         public CirclePiece()
         {
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
-                    return IsHovered && (Hit?.Invoke() ?? false);
+                    return IsHovered && (Hit?.Invoke(action) ?? false);
             }
 
             return false;

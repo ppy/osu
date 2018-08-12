@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
@@ -22,9 +23,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
+        private bool validKeyPressed;
+
         public DrawableHitCircle(HitCircle h)
             : base(h)
         {
+            validKeyPressed = true;
+
             Origin = Anchor.Centre;
 
             Position = HitObject.StackedPosition;
@@ -35,10 +40,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 glow = new GlowPiece(),
                 circle = new CirclePiece
                 {
-                    Hit = () =>
+                    Hit = (action) =>
                     {
                         if (AllJudged)
                             return false;
+
+                        validKeyPressed = Array.IndexOf(HitObject.HitActions, action)!=-1;
 
                         UpdateJudgement(true);
                         return true;
@@ -90,6 +97,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (result == HitResult.None)
                 return;
 
+            if (!validKeyPressed)
+                result = HitResult.Miss;
             AddJudgement(new OsuJudgement
             {
                 Result = result,

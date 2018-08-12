@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
@@ -229,9 +230,12 @@ namespace osu.Game.Rulesets.Osu.Replays
         // Add frames to click the hitobject
         private void addHitObjectClickFrames(OsuHitObject h, Vector2 startPosition, float spinnerDirection)
         {
+            bool taiko = h.HitActions.Length == 1;
+
             // Time to insert the first frame which clicks the object
             // Here we mainly need to determine which button to use
-            var action = buttonIndex % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton;
+            OsuAction action = buttonIndex % 2 == 0 ? OsuAction.LeftButton : OsuAction.RightButton;
+            action = taiko ? h.HitActions[0] : action;
 
             var startFrame = new OsuReplayFrame(h.StartTime, new Vector2(startPosition.X, startPosition.Y), action);
 

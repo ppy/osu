@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 {
     public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasEditablePosition
     {
+        public OsuAction[] HitActions = new OsuAction[] { OsuAction.LeftButton, OsuAction.RightButton };
+
         public const double OBJECT_RADIUS = 64;
 
         public event Action<Vector2> PositionChanged;
