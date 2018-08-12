@@ -112,10 +112,10 @@ namespace osu.Game.Rulesets.Judgements
             return Color4.White;
         }
 
-        readonly Vector4 baseFastColor = new Vector4(0.5f, 0.0f, 1.0f, 1);
-        readonly Vector4 maxFastColor = new Vector4(0.5f, 1.0f, 0.5f, 1);
-        readonly Vector4 baseSlowColor = new Vector4(0.0f, 0.0f, 1.0f, 1);
-        readonly Vector4 maxSlowColor = new Vector4(0.0f, 1.0f, 0.5f, 1);
+        private readonly Vector4 baseFastColor = new Vector4(0.5f, 0.0f, 1.0f, 1);
+        private readonly Vector4 maxFastColor = new Vector4(0.5f, 1.0f, 0.5f, 1);
+        private readonly Vector4 baseSlowColor = new Vector4(0.0f, 0.0f, 1.0f, 1);
+        private readonly Vector4 maxSlowColor = new Vector4(0.0f, 1.0f, 0.5f, 1);
         protected Color4 JudgementColour(Judgement judgement)
         {
             if (judgement.TimeOffset >= 0)

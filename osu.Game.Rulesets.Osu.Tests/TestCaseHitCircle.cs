@@ -93,7 +93,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
         private void testOffstream(float circleSize, double hitError, double hitErrorDelta)
         {
-            RemoveAll((drawable => true));
+            RemoveAll(drawable => true);
             testStream(circleSize);
 
             List<ReplayFrame> replayFrames = new List<ReplayFrame>();
@@ -105,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 replayFrames.Add(new OsuReplayFrame(hitCircle.HitObject.StartTime + hitError + 1, new Vector2(hitCircle.Position.X, hitCircle.Position.Y)));
                 hitError += hitErrorDelta;
             }
-            Replay replay = new Replay() { Frames = replayFrames };
+            Replay replay = new Replay { Frames = replayFrames };
             OsuReplayInputHandler replayHandler = new OsuReplayInputHandler(replay)
                 { GamefieldToScreenSpace = clickPos => ToScreenSpace(hitCircles.First().AnchorPosition + clickPos + new Vector2(StepsContainer.DrawWidth, 0)) };
             Children.OfType<DrawableHitCircle>().First().OsuActionInputManager.ReplayInputHandler = replayHandler;
