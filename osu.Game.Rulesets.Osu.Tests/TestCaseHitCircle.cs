@@ -17,6 +17,11 @@ using osu.Game.Rulesets.Mods;
 using System.Linq;
 using NUnit.Framework;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.Osu.Replays;
+using osu.Framework.Input;
+using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -50,6 +55,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Hit Big Stream", () => testStream(2, true));
             AddStep("Hit Medium Stream", () => testStream(5, true));
             AddStep("Hit Small Stream", () => testStream(7, true));
+            AddStep("Understream Medium Stream", () => testUnderstream(5));
+            AddStep("Overstream Medium Stream", () => testOverstream(5));
         }
 
         private void testSingle(float circleSize, bool auto = false, double timeOffset = 0, Vector2? positionOffset = null)
@@ -86,6 +93,34 @@ namespace osu.Game.Rulesets.Osu.Tests
                 pos.X += 50;
             }
         }
+        private void testOffstream(float circleSize, double hitError, double hitErrorDelta)
+        {
+            RemoveAll(new Predicate<Drawable>(Drawable => true));
+            testStream(circleSize, false);
+
+            List<ReplayFrame> replayFrames = new List<ReplayFrame>();
+            IEnumerable<DrawableHitCircle> hitCircles = Children.OfType<DrawableHitCircle>().Reverse();
+            replayFrames.Add(new OsuReplayFrame(hitCircles.First().HitObject.StartTime + hitError - 1, Children.OfType<DrawableHitCircle>().Last().Position));
+            foreach (var hitCircle in hitCircles)
+            {
+                replayFrames.Add(new OsuReplayFrame(hitCircle.HitObject.StartTime + hitError, new Vector2(hitCircle.Position.X, hitCircle.Position.Y), OsuAction.LeftButton));
+                replayFrames.Add(new OsuReplayFrame(hitCircle.HitObject.StartTime + hitError + 1, new Vector2(hitCircle.Position.X, hitCircle.Position.Y)));
+                hitError += hitErrorDelta;
+            }
+            Replay replay = new Replay();
+            replay.Frames = replayFrames;
+            OsuReplayInputHandler replayHandler = new OsuReplayInputHandler(replay);
+            replayHandler.GamefieldToScreenSpace = clickPos => ToScreenSpace(hitCircles.First().AnchorPosition + clickPos + new Vector2(StepsContainer.DrawWidth, 0));
+            Children.OfType<DrawableHitCircle>().First().OsuActionInputManager.ReplayInputHandler = replayHandler;
+        }
+        private void testUnderstream(float circleSize)
+        {
+            testOffstream(circleSize, -125, 30);
+        }
+        private void testOverstream(float circleSize)
+        {
+            testOffstream(circleSize, 125, -30);
+        }
 
         private class TestDrawableHitCircle : DrawableHitCircle
         {
@@ -94,6 +129,16 @@ namespace osu.Game.Rulesets.Osu.Tests
             public TestDrawableHitCircle(HitCircle h, bool auto) : base(h)
             {
                 this.auto = auto;
+                OnJudgement += onJudgement;
+            }
+
+            private void onJudgement(DrawableHitObject judegedObject, Judgement judgement)
+            {
+                DrawableOsuJudgement drawable = new DrawableOsuJudgement(judgement, judegedObject);
+                drawable.RelativeAnchorPosition = new Vector2(0.5f, 0.5f);
+                drawable.Origin = Anchor.Centre;
+                drawable.Position = Position;
+                ((Container)Parent).Add(drawable);
             }
 
             protected override void CheckForJudgements(bool userTriggered, double timeOffset)
