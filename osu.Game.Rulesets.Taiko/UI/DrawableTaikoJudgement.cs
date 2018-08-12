@@ -7,6 +7,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Configuration;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -26,7 +27,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuConfigManager config, OsuColour colours)
         {
             switch (Judgement.Result)
             {
@@ -36,6 +37,10 @@ namespace osu.Game.Rulesets.Taiko.UI
                 case HitResult.Great:
                     Colour = colours.BlueLight;
                     break;
+            }
+            if (config.GetBindable<bool>(OsuSetting.HitErrorJudgments))
+            {
+                Colour = judgementColour(Judgement);
             }
         }
 

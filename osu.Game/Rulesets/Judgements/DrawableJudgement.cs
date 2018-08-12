@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Judgements
         Vector4 maxFastColor = new Vector4(0.5f, 1.0f, 0.5f, 1);
         Vector4 baseSlowColor = new Vector4(0.0f, 0.0f, 1.0f, 1);
         Vector4 maxSlowColor = new Vector4(0.0f, 1.0f, 0.5f, 1);
-        private Color4 judgementColour(Judgement judgement)
+        protected Color4 judgementColour(Judgement judgement)
         {
             if (judgement.TimeOffset >= 0)
                 return Color4.FromHcy(baseSlowColor + (maxSlowColor - baseSlowColor) * (float)(judgement.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh)));
