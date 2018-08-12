@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Judgements
             {
                 Text = Judgement.Result.GetDescription().ToUpperInvariant(),
                 Font = @"Venera",
-                Colour = judgementColour(Judgement.Result),
+                Colour = judgementColour(Judgement),
                 Scale = new Vector2(0.85f, 1),
                 TextSize = 12
             }, restrictSize: false);
@@ -105,6 +105,19 @@ namespace osu.Game.Rulesets.Judgements
                     return colours.Red;
             }
 
+            return Color4.White;
+        }
+
+        Vector4 baseFastColor = new Vector4(0.5f, 0.0f, 1.0f, 1);
+        Vector4 maxFastColor = new Vector4(0.5f, 1.0f, 0.5f, 1);
+        Vector4 baseSlowColor = new Vector4(0.0f, 0.0f, 1.0f, 1);
+        Vector4 maxSlowColor = new Vector4(0.0f, 1.0f, 0.5f, 1);
+        private Color4 judgementColour(Judgement judgement)
+        {
+            if (judgement.TimeOffset >= 0)
+                return Color4.FromHcy(baseSlowColor + (maxSlowColor - baseSlowColor) * (float)(judgement.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh)));
+            else if (judgement.TimeOffset < 0)
+                return Color4.FromHcy(baseFastColor + (maxFastColor - baseFastColor) * (float)(-judgement.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh)));
             return Color4.White;
         }
     }
