@@ -115,8 +115,11 @@ namespace osu.Game.Rulesets.Judgements
         private readonly Vector4 baseSlowColor = new Vector4(0.0f, 0.0f, 1.0f, 1);
         private readonly Vector4 maxSlowColor = new Vector4(0.0f, 1.0f, 0.5f, 1);
 
-        protected Color4 JudgementColour(Judgement judgement) => judgement.TimeOffset >= 0 ?
-        Color4.FromHcy(baseSlowColor + (maxSlowColor - baseSlowColor) * (float)(judgement.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh))) : 
-        Color4.FromHcy(baseFastColor + (maxFastColor - baseFastColor) * (float)(-judgement.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh)));
+        protected Color4 JudgementColour(Judgement judgement)
+        {
+            return judgement.TimeOffset >= 0 ?
+            Color4.FromHcy(baseSlowColor + (maxSlowColor - baseSlowColor) * (float)(judgement.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh))) :
+            Color4.FromHcy(baseFastColor + (maxFastColor - baseFastColor) * (float)(-judgement.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh)));
+        }
     }
 }
