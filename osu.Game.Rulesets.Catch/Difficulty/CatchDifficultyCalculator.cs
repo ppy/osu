@@ -46,13 +46,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             foreach (var hitObject in beatmap.HitObjects)
             {
-                // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
-                if (hitObject is Fruit)
+                switch (hitObject)
                 {
-                    difficultyHitObjects.Add(new CatchDifficultyHitObject((CatchHitObject)hitObject, halfCatchWidth));
+                    // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
+                    case Fruit fruit:
+                        difficultyHitObjects.Add(new CatchDifficultyHitObject(fruit, halfCatchWidth));
+                        break;
+                    case JuiceStream _:
+                        difficultyHitObjects.AddRange(hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)).Select(o => new CatchDifficultyHitObject(o, halfCatchWidth)));
+                        break;
                 }
-                if (hitObject is JuiceStream)
-                    difficultyHitObjects.AddRange(hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)).Select(o => new CatchDifficultyHitObject(o, halfCatchWidth)));
             }
 
             difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
@@ -61,12 +64,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 return new CatchDifficultyAttributes(mods, 0);
 
             // this is the same as osu!, so there's potential to share the implementation... maybe
-            double preEmpt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
+            double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
             double starRating = Math.Sqrt(calculateDifficulty(difficultyHitObjects, timeRate)) * star_scaling_factor;
 
             return new CatchDifficultyAttributes(mods, starRating)
             {
-                ApproachRate = preEmpt > 1200.0 ? -(preEmpt - 1800.0) / 120.0 : -(preEmpt - 1200.0) / 150.0 + 5.0,
+                ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
                 MaxCombo = difficultyHitObjects.Count
             };
         }

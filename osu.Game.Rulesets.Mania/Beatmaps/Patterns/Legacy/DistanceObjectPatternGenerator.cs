@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.MathUtils;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.MathUtils;
@@ -24,8 +25,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// </summary>
         private const float osu_base_scoring_distance = 100;
 
-        private readonly double endTime;
-        private readonly double segmentDuration;
+        public readonly double EndTime;
+        public readonly double SegmentDuration;
+
         private readonly int spanCount;
 
         private PatternType convertType;
@@ -52,77 +54,105 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             // The duration of the osu! hit object
             double osuDuration = distance / osuVelocity;
 
-            endTime = hitObject.StartTime + osuDuration;
-            segmentDuration = (endTime - HitObject.StartTime) / spanCount;
+            EndTime = hitObject.StartTime + osuDuration;
+            SegmentDuration = (EndTime - HitObject.StartTime) / spanCount;
         }
 
-        public override Pattern Generate()
+        public override IEnumerable<Pattern> Generate()
+        {
+            var originalPattern = generate();
+
+            if (originalPattern.HitObjects.Count() == 1)
+            {
+                yield return originalPattern;
+                yield break;
+            }
+
+            // We need to split the intermediate pattern into two new patterns:
+            // 1. A pattern containing all objects that do not end at our EndTime.
+            // 2. A pattern containing all objects that end at our EndTime. This will be used for further pattern generation.
+            var intermediatePattern = new Pattern();
+            var endTimePattern = new Pattern();
+
+            foreach (var obj in originalPattern.HitObjects)
+            {
+                if (!Precision.AlmostEquals(EndTime, (obj as IHasEndTime)?.EndTime ?? obj.StartTime))
+                    intermediatePattern.Add(obj);
+                else
+                    endTimePattern.Add(obj);
+            }
+
+            yield return intermediatePattern;
+            yield return endTimePattern;
+        }
+
+        private Pattern generate()
         {
             if (TotalColumns == 1)
             {
                 var pattern = new Pattern();
-                addToPattern(pattern, 0, HitObject.StartTime, endTime);
+                addToPattern(pattern, 0, HitObject.StartTime, EndTime);
                 return pattern;
             }
 
             if (spanCount > 1)
             {
-                if (segmentDuration <= 90)
+                if (SegmentDuration <= 90)
                     return generateRandomHoldNotes(HitObject.StartTime, 1);
 
-                if (segmentDuration <= 120)
+                if (SegmentDuration <= 120)
                 {
                     convertType |= PatternType.ForceNotStack;
                     return generateRandomNotes(HitObject.StartTime, spanCount + 1);
                 }
 
-                if (segmentDuration <= 160)
+                if (SegmentDuration <= 160)
                     return generateStair(HitObject.StartTime);
 
-                if (segmentDuration <= 200 && ConversionDifficulty > 3)
+                if (SegmentDuration <= 200 && ConversionDifficulty > 3)
                     return generateRandomMultipleNotes(HitObject.StartTime);
 
-                double duration = endTime - HitObject.StartTime;
+                double duration = EndTime - HitObject.StartTime;
                 if (duration >= 4000)
                     return generateNRandomNotes(HitObject.StartTime, 0.23, 0, 0);
 
-                if (segmentDuration > 400 && spanCount < TotalColumns - 1 - RandomStart)
+                if (SegmentDuration > 400 && spanCount < TotalColumns - 1 - RandomStart)
                     return generateTiledHoldNotes(HitObject.StartTime);
 
                 return generateHoldAndNormalNotes(HitObject.StartTime);
             }
 
-            if (segmentDuration <= 110)
+            if (SegmentDuration <= 110)
             {
                 if (PreviousPattern.ColumnWithObjects < TotalColumns)
                     convertType |= PatternType.ForceNotStack;
                 else
                     convertType &= ~PatternType.ForceNotStack;
-                return generateRandomNotes(HitObject.StartTime, segmentDuration < 80 ? 1 : 2);
+                return generateRandomNotes(HitObject.StartTime, SegmentDuration < 80 ? 1 : 2);
             }
 
             if (ConversionDifficulty > 6.5)
             {
-                if ((convertType & PatternType.LowProbability) > 0)
+                if (convertType.HasFlag(PatternType.LowProbability))
                     return generateNRandomNotes(HitObject.StartTime, 0.78, 0.3, 0);
                 return generateNRandomNotes(HitObject.StartTime, 0.85, 0.36, 0.03);
             }
 
             if (ConversionDifficulty > 4)
             {
-                if ((convertType & PatternType.LowProbability) > 0)
+                if (convertType.HasFlag(PatternType.LowProbability))
                     return generateNRandomNotes(HitObject.StartTime, 0.43, 0.08, 0);
                 return generateNRandomNotes(HitObject.StartTime, 0.56, 0.18, 0);
             }
 
             if (ConversionDifficulty > 2.5)
             {
-                if ((convertType & PatternType.LowProbability) > 0)
+                if (convertType.HasFlag(PatternType.LowProbability))
                     return generateNRandomNotes(HitObject.StartTime, 0.3, 0, 0);
                 return generateNRandomNotes(HitObject.StartTime, 0.37, 0.08, 0);
             }
 
-            if ((convertType & PatternType.LowProbability) > 0)
+            if (convertType.HasFlag(PatternType.LowProbability))
                 return generateNRandomNotes(HitObject.StartTime, 0.17, 0, 0);
             return generateNRandomNotes(HitObject.StartTime, 0.27, 0, 0);
         }
@@ -148,7 +178,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 while (pattern.ColumnHasObject(nextColumn) || PreviousPattern.ColumnHasObject(nextColumn))  //find available column
                     nextColumn = Random.Next(RandomStart, TotalColumns);
-                addToPattern(pattern, nextColumn, startTime, endTime);
+                addToPattern(pattern, nextColumn, startTime, EndTime);
             }
 
             // This is can't be combined with the above loop due to RNG
@@ -156,7 +186,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             {
                 while (pattern.ColumnHasObject(nextColumn))
                     nextColumn = Random.Next(RandomStart, TotalColumns);
-                addToPattern(pattern, nextColumn, startTime, endTime);
+                addToPattern(pattern, nextColumn, startTime, EndTime);
             }
 
             return pattern;
@@ -179,7 +209,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             var pattern = new Pattern();
 
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
-            if ((convertType & PatternType.ForceNotStack) > 0 && PreviousPattern.ColumnWithObjects < TotalColumns)
+            if (convertType.HasFlag(PatternType.ForceNotStack) && PreviousPattern.ColumnWithObjects < TotalColumns)
             {
                 while (PreviousPattern.ColumnHasObject(nextColumn))
                     nextColumn = Random.Next(RandomStart, TotalColumns);
@@ -193,7 +223,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     nextColumn = Random.Next(RandomStart, TotalColumns);
 
                 lastColumn = nextColumn;
-                startTime += segmentDuration;
+                startTime += SegmentDuration;
             }
 
             return pattern;
@@ -223,7 +253,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             for (int i = 0; i <= spanCount; i++)
             {
                 addToPattern(pattern, column, startTime, startTime);
-                startTime += segmentDuration;
+                startTime += SegmentDuration;
 
                 // Check if we're at the borders of the stage, and invert the pattern if so
                 if (increasing)
@@ -284,7 +314,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     addToPattern(pattern, nextColumn, startTime, startTime);
 
                 nextColumn = Random.Next(RandomStart, TotalColumns);
-                startTime += segmentDuration;
+                startTime += SegmentDuration;
             }
 
             return pattern;
@@ -331,7 +361,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 
             bool isDoubleSample(SampleInfo sample) => sample.Name == SampleInfo.HIT_CLAP || sample.Name == SampleInfo.HIT_FINISH;
 
-            bool canGenerateTwoNotes = (convertType & PatternType.LowProbability) == 0;
+            bool canGenerateTwoNotes = !convertType.HasFlag(PatternType.LowProbability);
             canGenerateTwoNotes &= HitObject.Samples.Any(isDoubleSample) || sampleInfoListAt(HitObject.StartTime).Any(isDoubleSample);
 
             if (canGenerateTwoNotes)
@@ -361,7 +391,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int columnRepeat = Math.Min(spanCount, TotalColumns);
 
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
-            if ((convertType & PatternType.ForceNotStack) > 0 && PreviousPattern.ColumnWithObjects < TotalColumns)
+            if (convertType.HasFlag(PatternType.ForceNotStack) && PreviousPattern.ColumnWithObjects < TotalColumns)
             {
                 while (PreviousPattern.ColumnHasObject(nextColumn))
                     nextColumn = Random.Next(RandomStart, TotalColumns);
@@ -372,8 +402,8 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 while (pattern.ColumnHasObject(nextColumn))
                     nextColumn = Random.Next(RandomStart, TotalColumns);
 
-                addToPattern(pattern, nextColumn, startTime, endTime);
-                startTime += segmentDuration;
+                addToPattern(pattern, nextColumn, startTime, EndTime);
+                startTime += SegmentDuration;
             }
 
             return pattern;
@@ -395,14 +425,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             var pattern = new Pattern();
 
             int holdColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
-            if ((convertType & PatternType.ForceNotStack) > 0 && PreviousPattern.ColumnWithObjects < TotalColumns)
+            if (convertType.HasFlag(PatternType.ForceNotStack) && PreviousPattern.ColumnWithObjects < TotalColumns)
             {
                 while (PreviousPattern.ColumnHasObject(holdColumn))
                     holdColumn = Random.Next(RandomStart, TotalColumns);
             }
 
             // Create the hold note
-            addToPattern(pattern, holdColumn, startTime, endTime);
+            addToPattern(pattern, holdColumn, startTime, EndTime);
 
             int nextColumn = Random.Next(RandomStart, TotalColumns);
             int noteCount;
@@ -434,7 +464,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 pattern.Add(rowPattern);
                 rowPattern.Clear();
 
-                startTime += segmentDuration;
+                startTime += SegmentDuration;
             }
 
             return pattern;
@@ -452,7 +482,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             if (curveData == null)
                 return HitObject.Samples;
 
-            double segmentTime = (endTime - HitObject.StartTime) / spanCount;
+            double segmentTime = (EndTime - HitObject.StartTime) / spanCount;
 
             int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
             return curveData.RepeatSamples[index];

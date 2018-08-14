@@ -14,6 +14,7 @@ using osu.Framework.IO.File;
 using System.IO;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 
@@ -132,6 +133,8 @@ namespace osu.Game.Beatmaps
 
             return converted;
         }
+
+        public override string ToString() => BeatmapInfo.ToString();
 
         public bool BackgroundLoaded => background.IsResultAvailable;
         public Texture Background => background.Value.Result;

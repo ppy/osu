@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Osu
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
-            new KeyBinding(InputKey.Z, OsuAction.LeftButton),
-            new KeyBinding(InputKey.X, OsuAction.RightButton),
+            new KeyBinding(InputKey.A, OsuAction.LeftButton),
+            new KeyBinding(InputKey.S, OsuAction.RightButton),
             new KeyBinding(InputKey.MouseLeft, OsuAction.LeftButton),
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
@@ -94,6 +94,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModEasy(),
                         new OsuModNoFail(),
                         new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
+                        new OsuModSpunOut(),
                     };
                 case ModType.DifficultyIncrease:
                     return new Mod[]
@@ -104,14 +105,17 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModHidden(),
                         new OsuModFlashlight(),
                     };
-                case ModType.Special:
+                case ModType.Conversion:
                     return new Mod[]
                     {
+                        new OsuModTarget(),
+                    };
+                case ModType.Automation:
+                    return new Mod[]
+                    {
+                        new MultiMod(new OsuModAutoplay(), new ModCinema()),
                         new OsuModRelax(),
                         new OsuModAutopilot(),
-                        new OsuModSpunOut(),
-                        new MultiMod(new OsuModAutoplay(), new ModCinema()),
-                        new OsuModTarget(),
                     };
                 default:
                     return new Mod[] { };

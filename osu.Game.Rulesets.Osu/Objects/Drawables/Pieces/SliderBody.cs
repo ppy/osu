@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             var spanProgress = slider.ProgressAt(completionProgress);
 
             double start = 0;
-            double end = SnakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadein, 0, 1) : 1;
+            double end = SnakingIn ? MathHelper.Clamp((Time.Current - (slider.StartTime - slider.TimePreempt)) / slider.TimeFadeIn, 0, 1) : 1;
 
             if (span >= slider.SpanCount() - 1)
             {

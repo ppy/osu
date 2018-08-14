@@ -12,7 +12,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -138,10 +138,9 @@ namespace osu.Game.Screens.Play
             sourceClock = (IAdjustableClock)working.Track ?? new StopwatchClock();
             adjustableClock = new DecoupleableInterpolatingFramedClock { IsCoupled = false };
 
-            var firstObjectTime = RulesetContainer.Objects.First().StartTime;
             adjustableClock.Seek(AllowLeadIn
-                ? Math.Min(0, firstObjectTime - Math.Max(beatmap.ControlPointInfo.TimingPointAt(firstObjectTime).BeatLength * 4, beatmap.BeatmapInfo.AudioLeadIn))
-                : firstObjectTime);
+                ? Math.Min(0, RulesetContainer.GameplayStartTime - beatmap.BeatmapInfo.AudioLeadIn)
+                : RulesetContainer.GameplayStartTime);
 
             adjustableClock.ProcessFrame();
 
@@ -163,15 +162,10 @@ namespace osu.Game.Screens.Play
             {
                 pauseContainer = new PauseContainer(offsetClock, adjustableClock)
                 {
+                    Retries = RestartCount,
                     OnRetry = Restart,
                     OnQuit = Exit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
-                    OnPause = () =>
-                    {
-                        pauseContainer.Retries = RestartCount;
-                        hudOverlay.KeyCounter.IsCounting = pauseContainer.IsPaused;
-                    },
-                    OnResume = () => hudOverlay.KeyCounter.IsCounting = true,
                     Children = new[]
                     {
                         storyboardContainer = new Container
@@ -199,7 +193,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre
                         },
-                        new SkipOverlay(firstObjectTime)
+                        new SkipOverlay(RulesetContainer.GameplayStartTime)
                         {
                             Clock = Clock, // skip button doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
@@ -219,9 +213,7 @@ namespace osu.Game.Screens.Play
                     {
                         if (!IsCurrentScreen) return;
 
-                        //we want to hide the hitrenderer immediately (looks better).
-                        //we may be able to remove this once the mouse cursor trail is improved.
-                        RulesetContainer?.Hide();
+                        fadeOut(true);
                         Restart();
                     },
                 }
@@ -229,6 +221,8 @@ namespace osu.Game.Screens.Play
 
             hudOverlay.HoldToQuit.Action = Exit;
             hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
+
+            RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
 
             if (ShowStoryboard)
                 initializeStoryboard(false);
@@ -284,6 +278,8 @@ namespace osu.Game.Screens.Play
                     ScoreProcessor.PopulateScore(score);
                     score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
                     Push(new Results(score));
+
+                    onCompletionEvent = null;
                 });
             }
         }
@@ -346,6 +342,13 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(Screen next)
         {
+            if (onCompletionEvent != null)
+            {
+                // Proceed to result screen if beatmap already finished playing
+                onCompletionEvent.RunTask();
+                return true;
+            }
+
             if ((!AllowPause || HasFailed || !ValidForResume || pauseContainer?.IsPaused != false || RulesetContainer?.HasReplayLoaded != false) && (!pauseContainer?.IsResuming ?? true))
             {
                 // In the case of replays, we may have changed the playback rate.
@@ -361,16 +364,10 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
-        private void fadeOut()
+        private void fadeOut(bool instant = false)
         {
-            const float fade_out_duration = 250;
-
-            RulesetContainer?.FadeOut(fade_out_duration);
-            Content.FadeOut(fade_out_duration);
-
-            hudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, Easing.In);
-
-            Background?.FadeTo(1f, fade_out_duration);
+            float fadeOutDuration = instant ? 0 : 250;
+            Content.FadeOut(fadeOutDuration);
         }
 
         protected override bool OnScroll(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
