@@ -11,7 +11,6 @@ using OpenTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
 
@@ -117,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public float Progress => MathHelper.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (Time.Current < HitObject.StartTime) return;
 
@@ -136,17 +135,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 glow.FadeColour(completeColour, duration);
             }
 
-            if (!userTriggered && Time.Current >= Spinner.EndTime)
+            if (userTriggered || Time.Current < Spinner.EndTime)
+                return;
+
+            ApplyResult(r =>
             {
                 if (Progress >= 1)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Great });
+                    r.Type = HitResult.Great;
                 else if (Progress > .9)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Good });
+                    r.Type = HitResult.Good;
                 else if (Progress > .75)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Meh });
+                    r.Type = HitResult.Meh;
                 else if (Time.Current >= Spinner.EndTime)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Miss });
-            }
+                    r.Type = HitResult.Miss;
+            });
         }
 
         [BackgroundDependencyLoader]

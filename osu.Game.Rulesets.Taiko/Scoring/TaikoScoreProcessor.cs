@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
@@ -60,63 +59,31 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         private double hpIncreaseGood;
         private double hpIncreaseMiss;
 
-        public TaikoScoreProcessor()
-        {
-        }
-
         public TaikoScoreProcessor(RulesetContainer<TaikoHitObject> rulesetContainer)
             : base(rulesetContainer)
         {
         }
 
-        protected override void SimulateAutoplay(Beatmap<TaikoHitObject> beatmap)
+        protected override void ApplyBeatmap(Beatmap<TaikoHitObject> beatmap)
         {
+            base.ApplyBeatmap(beatmap);
+
             double hpMultiplierNormal = 1 / (hp_hit_great * beatmap.HitObjects.FindAll(o => o is Hit).Count * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98));
 
             hpIncreaseTick = hp_hit_tick;
             hpIncreaseGreat = hpMultiplierNormal * hp_hit_great;
             hpIncreaseGood = hpMultiplierNormal * hp_hit_good;
             hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
-
-            foreach (var obj in beatmap.HitObjects)
-            {
-                switch (obj)
-                {
-                    case Hit _:
-                        AddJudgement(new TaikoJudgement { Result = HitResult.Great });
-                        if (obj.IsStrong)
-                            AddJudgement(new TaikoStrongHitJudgement());
-                        break;
-                    case DrumRoll drumRoll:
-                        var count = drumRoll.NestedHitObjects.OfType<DrumRollTick>().Count();
-                        for (int i = 0; i < count; i++)
-                        {
-                            AddJudgement(new TaikoDrumRollTickJudgement { Result = HitResult.Great });
-
-                            if (obj.IsStrong)
-                                AddJudgement(new TaikoStrongHitJudgement());
-                        }
-
-                        AddJudgement(new TaikoJudgement { Result = HitResult.Great });
-
-                        if (obj.IsStrong)
-                            AddJudgement(new TaikoStrongHitJudgement());
-                        break;
-                    case Swell _:
-                        AddJudgement(new TaikoJudgement { Result = HitResult.Great });
-                        break;
-                }
-            }
         }
 
-        protected override void OnNewJudgement(Judgement judgement)
+        protected override void ApplyResult(JudgementResult result)
         {
-            base.OnNewJudgement(judgement);
+            base.ApplyResult(result);
 
-            bool isTick = judgement is TaikoDrumRollTickJudgement;
+            bool isTick = result.Judgement is TaikoDrumRollTickJudgement;
 
             // Apply HP changes
-            switch (judgement.Result)
+            switch (result.Type)
             {
                 case HitResult.Miss:
                     // Missing ticks shouldn't drop HP
