@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,30 +8,24 @@ using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
     public class HitObjectMaskLayer : CompositeDrawable
     {
-        private readonly Playfield playfield;
-        private readonly HitObjectComposer composer;
-
         private MaskContainer maskContainer;
+        private HitObjectComposer composer;
 
-        public HitObjectMaskLayer(Playfield playfield, HitObjectComposer composer)
+        public HitObjectMaskLayer()
         {
-            // we need the playfield as HitObjects may not be initialised until its BDL.
-            this.playfield = playfield;
-
-            this.composer = composer;
-
             RelativeSizeAxes = Axes.Both;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(HitObjectComposer composer)
         {
+            this.composer = composer;
+
             maskContainer = new MaskContainer();
 
             var maskSelection = composer.CreateMaskSelection();
@@ -55,7 +48,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 dragLayer.CreateProxy()
             };
 
-            foreach (var obj in playfield.HitObjects.Objects)
+            foreach (var obj in composer.HitObjects)
                 addMask(obj);
         }
 
@@ -76,19 +69,6 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 return;
 
             maskContainer.Add(mask);
-        }
-
-        /// <summary>
-        /// Removes the mask for a <see cref="DrawableHitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to remove the mask for.</param>
-        private void removeMask(DrawableHitObject hitObject)
-        {
-            var mask = maskContainer.FirstOrDefault(h => h.HitObject == hitObject);
-            if (mask == null)
-                return;
-
-            maskContainer.Remove(mask);
         }
     }
 }

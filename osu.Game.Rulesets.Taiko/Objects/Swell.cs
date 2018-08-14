@@ -15,5 +15,13 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// The number of hits required to complete the swell successfully.
         /// </summary>
         public int RequiredHits = 10;
+
+        protected override void CreateNestedHitObjects()
+        {
+            base.CreateNestedHitObjects();
+
+            for (int i = 0; i < RequiredHits; i++)
+                AddNested(new SwellTick());
+        }
     }
 }
