@@ -2,13 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
@@ -26,28 +24,11 @@ namespace osu.Game.Rulesets.Osu.Scoring
         private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
         private readonly Dictionary<ComboResult, int> comboResultCounts = new Dictionary<ComboResult, int>();
 
-        protected override void SimulateAutoplay(Beatmap<OsuHitObject> beatmap)
+        protected override void ApplyBeatmap(Beatmap<OsuHitObject> beatmap)
         {
+            base.ApplyBeatmap(beatmap);
+
             hpDrainRate = beatmap.BeatmapInfo.BaseDifficulty.DrainRate;
-
-            foreach (var obj in beatmap.HitObjects)
-            {
-                if (obj is Slider slider)
-                {
-                    // Head
-                    AddJudgement(new OsuJudgement { Result = HitResult.Great });
-
-                    // Ticks
-                    foreach (var unused in slider.NestedHitObjects.OfType<SliderTick>())
-                        AddJudgement(new OsuJudgement { Result = HitResult.Great });
-
-                    //Repeats
-                    foreach (var unused in slider.NestedHitObjects.OfType<RepeatPoint>())
-                        AddJudgement(new OsuJudgement { Result = HitResult.Great });
-                }
-
-                AddJudgement(new OsuJudgement { Result = HitResult.Great });
-            }
         }
 
         protected override void Reset(bool storeResults)
@@ -70,19 +51,19 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private const double harshness = 0.01;
 
-        protected override void OnNewJudgement(Judgement judgement)
+        protected override void ApplyResult(JudgementResult result)
         {
-            base.OnNewJudgement(judgement);
+            base.ApplyResult(result);
 
-            var osuJudgement = (OsuJudgement)judgement;
+            var osuResult = (OsuJudgementResult)result;
 
-            if (judgement.Result != HitResult.None)
+            if (result.Type != HitResult.None)
             {
-                scoreResultCounts[judgement.Result] = scoreResultCounts.GetOrDefault(judgement.Result) + 1;
-                comboResultCounts[osuJudgement.Combo] = comboResultCounts.GetOrDefault(osuJudgement.Combo) + 1;
+                scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
+                comboResultCounts[osuResult.ComboType] = comboResultCounts.GetOrDefault(osuResult.ComboType) + 1;
             }
 
-            switch (judgement.Result)
+            switch (result.Type)
             {
                 case HitResult.Great:
                     Health.Value += (10.2 - hpDrainRate) * harshness;
@@ -105,5 +86,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
                     break;
             }
         }
+
+        protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(judgement);
     }
 }
