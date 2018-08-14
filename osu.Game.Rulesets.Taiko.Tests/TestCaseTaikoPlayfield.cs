@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
             ((TaikoPlayfield)rulesetContainer.Playfield).OnNewResult(h, new JudgementResult(new TaikoJudgement()) { Type = hitResult });
-            ((TaikoPlayfield)rulesetContainer.Playfield).OnNewResult(new TestStrongHandler(h), new JudgementResult(new TaikoStrongJudgement()) { Type = HitResult.Great });
+            ((TaikoPlayfield)rulesetContainer.Playfield).OnNewResult(new TestStrongNestedHit(h), new JudgementResult(new TaikoStrongJudgement()) { Type = HitResult.Great });
         }
 
         private void addMissJudgement()
@@ -226,9 +226,9 @@ namespace osu.Game.Rulesets.Taiko.Tests
             rulesetContainer.Playfield.Add(new DrawableRimHit(h));
         }
 
-        private class TestStrongHandler : DrawableStrongHandler
+        private class TestStrongNestedHit : DrawableStrongNestedHit
         {
-            public TestStrongHandler(DrawableHitObject mainObject)
+            public TestStrongNestedHit(DrawableHitObject mainObject)
                 : base(null, mainObject)
             {
             }
