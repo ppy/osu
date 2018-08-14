@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             : base(strong)
         {
             MainObject = mainObject;
-
-            AlwaysPresent = true;
         }
 
         protected override void UpdateState(ArmedState state)
