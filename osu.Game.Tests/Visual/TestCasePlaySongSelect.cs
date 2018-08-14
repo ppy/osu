@@ -131,7 +131,7 @@ namespace osu.Game.Tests.Visual
 
         [Test]
         [Ignore("needs fixing")]
-        public void ImportUnderDifferentRuleset()
+        public void TestImportUnderDifferentRuleset()
         {
             changeRuleset(2);
             importForRuleset(0);
@@ -139,7 +139,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [Test]
-        public void ImportUnderCurrentRuleset()
+        public void TestImportUnderCurrentRuleset()
         {
             changeRuleset(2);
             importForRuleset(2);
