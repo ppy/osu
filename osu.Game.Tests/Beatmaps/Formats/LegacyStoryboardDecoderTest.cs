@@ -86,5 +86,19 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(78993, animation.StartTime);
             }
         }
+
+        [Test]
+        public void TestDecodeVariableWithSuffix()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+            using (var resStream = Resource.OpenResource("variable-with-suffix.osb"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
+                Assert.AreEqual(123456, ((StoryboardSprite)background.Elements.Single()).InitialPosition.X);
+            }
+        }
     }
 }
