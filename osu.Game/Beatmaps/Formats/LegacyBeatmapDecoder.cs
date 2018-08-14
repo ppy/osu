@@ -354,6 +354,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleTimingControlPoint(TimingControlPoint newPoint)
         {
+            var existing = beatmap.ControlPointInfo.TimingPointAt(newPoint.Time);
+
+            if (existing.Time == newPoint.Time)
+                beatmap.ControlPointInfo.TimingPoints.Remove(existing);
+
             beatmap.ControlPointInfo.TimingPoints.Add(newPoint);
         }
 
@@ -364,7 +369,9 @@ namespace osu.Game.Beatmaps.Formats
             if (newPoint.EquivalentTo(existing))
                 return;
 
-            beatmap.ControlPointInfo.DifficultyPoints.RemoveAll(x => x.Time == newPoint.Time);
+            if (existing.Time == newPoint.Time)
+                beatmap.ControlPointInfo.DifficultyPoints.Remove(existing);
+
             beatmap.ControlPointInfo.DifficultyPoints.Add(newPoint);
         }
 
@@ -375,6 +382,9 @@ namespace osu.Game.Beatmaps.Formats
             if (newPoint.EquivalentTo(existing))
                 return;
 
+            if (existing.Time == newPoint.Time)
+                beatmap.ControlPointInfo.EffectPoints.Remove(existing);
+
             beatmap.ControlPointInfo.EffectPoints.Add(newPoint);
         }
 
@@ -384,6 +394,9 @@ namespace osu.Game.Beatmaps.Formats
 
             if (newPoint.EquivalentTo(existing))
                 return;
+
+            if (existing.Time == newPoint.Time)
+                beatmap.ControlPointInfo.SamplePoints.Remove(existing);
 
             beatmap.ControlPointInfo.SamplePoints.Add(newPoint);
         }

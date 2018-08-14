@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public ManiaScrollingInfo(ManiaConfigManager config)
         {
             config.BindWith(ManiaSetting.ScrollDirection, configDirection);
-            configDirection.BindValueChanged(v => Direction.Value = (ScrollingDirection)v);
+            configDirection.BindValueChanged(v => Direction.Value = (ScrollingDirection)v, true);
         }
     }
 }
