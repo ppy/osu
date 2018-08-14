@@ -27,6 +27,7 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModSelectOverlay : WaveOverlayContainer
     {
+        private const float overflow_padding = 50;
         private const float content_width = 0.8f;
 
         protected Color4 LowMultiplierColour, HighMultiplierColour;
@@ -199,6 +200,11 @@ namespace osu.Game.Overlays.Mods
             Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
             Height = 510;
+            Padding = new MarginPadding
+            {
+                Left = -overflow_padding,
+                Right = -overflow_padding
+            };
 
             Children = new Drawable[]
             {
@@ -258,6 +264,11 @@ namespace osu.Game.Overlays.Mods
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical,
                                         Width = content_width,
+                                        Padding = new MarginPadding
+                                        {
+                                            Left = overflow_padding,
+                                            Right = overflow_padding
+                                        },
                                         Children = new Drawable[]
                                         {
                                             new OsuSpriteText
@@ -295,7 +306,12 @@ namespace osu.Game.Overlays.Mods
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Vertical = 10 },
+                                Padding = new MarginPadding
+                                {
+                                    Vertical = 10,
+                                    Left = overflow_padding,
+                                    Right = overflow_padding
+                                },
                                 Child = ModSectionsContainer = new FillFlowContainer<ModSection>
                                 {
                                     Origin = Anchor.TopCentre,
@@ -341,7 +357,9 @@ namespace osu.Game.Overlays.Mods
                                         Direction = FillDirection.Horizontal,
                                         Padding = new MarginPadding
                                         {
-                                            Vertical = 15
+                                            Vertical = 15,
+                                            Left = overflow_padding,
+                                            Right = overflow_padding
                                         },
                                         Children = new Drawable[]
                                         {
