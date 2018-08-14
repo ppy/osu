@@ -30,10 +30,10 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
         private readonly Container content;
         private readonly OsuSpriteText typeLabel;
 
-        protected readonly OsuTextBox Name, MaxParticipants;
-        protected readonly RoomAvailabilityPicker Availability;
-        protected readonly GameTypePicker Type;
-        protected readonly TriangleButton Apply;
+        protected readonly OsuTextBox NameField, MaxParticipantsField;
+        protected readonly RoomAvailabilityPicker AvailabilityPicker;
+        protected readonly GameTypePicker TypePicker;
+        protected readonly TriangleButton ApplyButton;
 
         public RoomSettingsOverlay(Room room)
         {
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                 {
                                     new Section("ROOM NAME")
                                     {
-                                        Child = Name = new SettingsTextBox
+                                        Child = NameField = new SettingsTextBox
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             OnCommit = (sender, text) => apply(),
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                     },
                                     new Section("ROOM VISIBILITY")
                                     {
-                                        Child = Availability = new RoomAvailabilityPicker(),
+                                        Child = AvailabilityPicker = new RoomAvailabilityPicker(),
                                     },
                                     new Section("GAME TYPE")
                                     {
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                             Spacing = new Vector2(7),
                                             Children = new Drawable[]
                                             {
-                                                Type = new GameTypePicker
+                                                TypePicker = new GameTypePicker
                                                 {
                                                     RelativeSizeAxes = Axes.X,
                                                 },
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                 {
                                     new Section("MAX PARTICIPANTS")
                                     {
-                                        Child = MaxParticipants = new SettingsTextBox
+                                        Child = MaxParticipantsField = new SettingsTextBox
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             OnCommit = (sender, text) => apply(),
@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                             },
                         },
                     },
-                    Apply = new ApplyButton
+                    ApplyButton = new ApplySettingsButton
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
@@ -135,12 +135,12 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                 },
             };
 
-            Type.Current.ValueChanged += t => typeLabel.Text = t.Name;
+            TypePicker.Current.ValueChanged += t => typeLabel.Text = t.Name;
 
-            nameBind.ValueChanged += n => Name.Text = n;
-            availabilityBind.ValueChanged += a => Availability.Current.Value = a;
-            typeBind.ValueChanged += t => Type.Current.Value = t;
-            maxParticipantsBind.ValueChanged += m => MaxParticipants.Text = m?.ToString();
+            nameBind.ValueChanged += n => NameField.Text = n;
+            availabilityBind.ValueChanged += a => AvailabilityPicker.Current.Value = a;
+            typeBind.ValueChanged += t => TypePicker.Current.Value = t;
+            maxParticipantsBind.ValueChanged += m => MaxParticipantsField.Text = m?.ToString();
 
             nameBind.BindTo(room.Name);
             availabilityBind.BindTo(room.Availability);
@@ -177,12 +177,12 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
         {
             if (room != null)
             {
-                room.Name.Value = Name.Text;
-                room.Availability.Value = Availability.Current.Value;
-                room.Type.Value = Type.Current.Value;
+                room.Name.Value = NameField.Text;
+                room.Availability.Value = AvailabilityPicker.Current.Value;
+                room.Type.Value = TypePicker.Current.Value;
 
                 int max;
-                if (int.TryParse(MaxParticipants.Text, out max))
+                if (int.TryParse(MaxParticipantsField.Text, out max))
                     room.MaxParticipants.Value = max;
                 else
                     room.MaxParticipants.Value = null;
@@ -249,9 +249,9 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
             }
         }
 
-        private class ApplyButton : TriangleButton
+        private class ApplySettingsButton : TriangleButton
         {
-            public ApplyButton()
+            public ApplySettingsButton()
             {
                 Text = "Apply";
             }

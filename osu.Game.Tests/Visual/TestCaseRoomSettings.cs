@@ -7,6 +7,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Screens.Match.Settings;
 using OpenTK.Input;
+using osu.Framework.Testing.Input;
 
 namespace osu.Game.Tests.Visual
 {
@@ -61,8 +62,7 @@ namespace osu.Game.Tests.Visual
         {
             AddStep(@"apply", () =>
             {
-                InputManager.MoveMouseTo(overlay.ApplyButton);
-                InputManager.Click(MouseButton.Left);
+                overlay.ClickApplyButton(InputManager);
             });
         }
 
@@ -78,8 +78,8 @@ namespace osu.Game.Tests.Visual
         {
             public string CurrentName
             {
-                get => Name.Text;
-                set => Name.Text = value;
+                get => NameField.Text;
+                set => NameField.Text = value;
             }
 
             public int? CurrentMaxParticipants
@@ -87,30 +87,34 @@ namespace osu.Game.Tests.Visual
                 get
                 {
                     int max;
-                    if (int.TryParse(MaxParticipants.Text, out max))
+                    if (int.TryParse(MaxParticipantsField.Text, out max))
                         return max;
 
                     return null;
                 }
-                set => MaxParticipants.Text = value?.ToString();
+                set => MaxParticipantsField.Text = value?.ToString();
             }
 
             public RoomAvailability CurrentAvailability
             {
-                get => Availability.Current.Value;
-                set => Availability.Current.Value = value;
+                get => AvailabilityPicker.Current.Value;
+                set => AvailabilityPicker.Current.Value = value;
             }
 
             public GameType CurrentType
             {
-                get => Type.Current.Value;
-                set => Type.Current.Value = value;
+                get => TypePicker.Current.Value;
+                set => TypePicker.Current.Value = value;
             }
-
-            public TriangleButton ApplyButton => Apply;
 
             public TestRoomSettingsOverlay(Room room) : base(room)
             {
+            }
+
+            public void ClickApplyButton(ManualInputManager inputManager)
+            {
+                inputManager.MoveMouseTo(ApplyButton);
+                inputManager.Click(MouseButton.Left);
             }
         }
     }
