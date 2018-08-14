@@ -67,6 +67,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                         Child = NameField = new SettingsTextBox
                                         {
                                             RelativeSizeAxes = Axes.X,
+                                            TabbableContentContainer = this,
                                             OnCommit = (sender, text) => apply(),
                                         },
                                     },
@@ -109,6 +110,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                         Child = MaxParticipantsField = new SettingsTextBox
                                         {
                                             RelativeSizeAxes = Axes.X,
+                                            TabbableContentContainer = this,
                                             OnCommit = (sender, text) => apply(),
                                         },
                                     },
@@ -117,6 +119,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                         Child = new SettingsTextBox
                                         {
                                             RelativeSizeAxes = Axes.X,
+                                            TabbableContentContainer = this,
                                             OnCommit = (sender, text) => apply(),
                                         },
                                     },
