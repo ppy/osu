@@ -62,28 +62,30 @@ namespace osu.Game.Beatmaps.Formats
 
         protected override void ParseLine(Beatmap beatmap, Section section, string line)
         {
+            var strippedLine = StripComments(line);
+
             switch (section)
             {
                 case Section.General:
-                    handleGeneral(line);
+                    handleGeneral(strippedLine);
                     return;
                 case Section.Editor:
-                    handleEditor(line);
+                    handleEditor(strippedLine);
                     return;
                 case Section.Metadata:
                     handleMetadata(line);
                     return;
                 case Section.Difficulty:
-                    handleDifficulty(line);
+                    handleDifficulty(strippedLine);
                     return;
                 case Section.Events:
-                    handleEvent(line);
+                    handleEvent(strippedLine);
                     return;
                 case Section.TimingPoints:
-                    handleTimingPoint(line);
+                    handleTimingPoint(strippedLine);
                     return;
                 case Section.HitObjects:
-                    handleHitObject(line);
+                    handleHitObject(strippedLine);
                     return;
             }
 
@@ -305,12 +307,12 @@ namespace osu.Game.Beatmaps.Formats
                 bool omitFirstBarSignature = false;
                 if (split.Length >= 8)
                 {
-                    int effectFlags = int.Parse(split[7]);
-                    kiaiMode = (effectFlags & 1) > 0;
-                    omitFirstBarSignature = (effectFlags & 8) > 0;
+                    EffectFlags effectFlags = (EffectFlags)int.Parse(split[7]);
+                    kiaiMode = effectFlags.HasFlag(EffectFlags.Kiai);
+                    omitFirstBarSignature = effectFlags.HasFlag(EffectFlags.OmitFirstBarLine);
                 }
 
-                string stringSampleSet = sampleSet.ToString().ToLower();
+                string stringSampleSet = sampleSet.ToString().ToLowerInvariant();
                 if (stringSampleSet == @"none")
                     stringSampleSet = @"normal";
 
@@ -352,6 +354,11 @@ namespace osu.Game.Beatmaps.Formats
 
         private void handleTimingControlPoint(TimingControlPoint newPoint)
         {
+            var existing = beatmap.ControlPointInfo.TimingPointAt(newPoint.Time);
+
+            if (existing.Time == newPoint.Time)
+                beatmap.ControlPointInfo.TimingPoints.Remove(existing);
+
             beatmap.ControlPointInfo.TimingPoints.Add(newPoint);
         }
 
@@ -362,7 +369,9 @@ namespace osu.Game.Beatmaps.Formats
             if (newPoint.EquivalentTo(existing))
                 return;
 
-            beatmap.ControlPointInfo.DifficultyPoints.RemoveAll(x => x.Time == newPoint.Time);
+            if (existing.Time == newPoint.Time)
+                beatmap.ControlPointInfo.DifficultyPoints.Remove(existing);
+
             beatmap.ControlPointInfo.DifficultyPoints.Add(newPoint);
         }
 
@@ -373,6 +382,9 @@ namespace osu.Game.Beatmaps.Formats
             if (newPoint.EquivalentTo(existing))
                 return;
 
+            if (existing.Time == newPoint.Time)
+                beatmap.ControlPointInfo.EffectPoints.Remove(existing);
+
             beatmap.ControlPointInfo.EffectPoints.Add(newPoint);
         }
 
@@ -382,6 +394,9 @@ namespace osu.Game.Beatmaps.Formats
 
             if (newPoint.EquivalentTo(existing))
                 return;
+
+            if (existing.Time == newPoint.Time)
+                beatmap.ControlPointInfo.SamplePoints.Remove(existing);
 
             beatmap.ControlPointInfo.SamplePoints.Add(newPoint);
         }
@@ -405,5 +420,13 @@ namespace osu.Game.Beatmaps.Formats
         private double getOffsetTime() => ApplyOffsets ? offset : 0;
 
         private double getOffsetTime(double time) => time + (ApplyOffsets ? offset : 0);
+
+        [Flags]
+        internal enum EffectFlags
+        {
+            None = 0,
+            Kiai = 1,
+            OmitFirstBarLine = 8
+        }
     }
 }

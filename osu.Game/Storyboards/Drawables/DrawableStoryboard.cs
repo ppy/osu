@@ -36,8 +36,8 @@ namespace osu.Game.Storyboards.Drawables
         public override bool RemoveCompletedTransforms => false;
 
         private DependencyContainer dependencies;
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         public DrawableStoryboard(Storyboard storyboard)
         {

@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Name => "Spun Out";
         public override string ShortenedName => "SO";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_spunout;
+        public override ModType Type => ModType.DifficultyReduction;
         public override string Description => @"Spinners will be automatically completed.";
         public override double ScoreMultiplier => 0.9;
         public override bool Ranked => true;

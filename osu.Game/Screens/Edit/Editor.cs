@@ -12,7 +12,7 @@ using osu.Game.Screens.Edit.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
@@ -42,8 +42,8 @@ namespace osu.Game.Screens.Edit
         private DependencyContainer dependencies;
         private GameHost host;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+            => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, GameHost host)

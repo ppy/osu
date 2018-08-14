@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public event Action<Vector2> PositionChanged;
 
         public double TimePreempt = 600;
-        public double TimeFadein = 400;
+        public double TimeFadeIn = 400;
 
         private Vector2 position;
 
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimePreempt = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
-            TimeFadein = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1200, 800, 300);
+            TimeFadeIn = (float)BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1200, 800, 300);
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }

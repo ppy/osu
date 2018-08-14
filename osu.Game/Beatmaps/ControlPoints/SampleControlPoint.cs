@@ -40,7 +40,6 @@ namespace osu.Game.Beatmaps.ControlPoints
         {
             var newSampleInfo = sampleInfo.Clone();
             newSampleInfo.Bank = sampleInfo.Bank ?? SampleBank;
-            newSampleInfo.Name = sampleInfo.Name;
             newSampleInfo.Volume = sampleInfo.Volume > 0 ? sampleInfo.Volume : SampleVolume;
             return newSampleInfo;
         }
