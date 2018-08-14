@@ -10,6 +10,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using OpenTK;
+using osu.Framework.Input.States;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Screens.Match.Settings
 {
@@ -34,7 +36,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
         {
             private const float transition_duration = 200;
 
-            private readonly Box selection;
+            private readonly Box hover, selection;
 
             public RoomAvailabilityPickerItem(RoomAvailability value) : base(value)
             {
@@ -55,6 +57,12 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
                     },
+                    hover = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = Color4.White,
+                        Alpha = 0,
+                    },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
@@ -69,6 +77,18 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
             private void load(OsuColour colours)
             {
                 selection.Colour = colours.GreenLight;
+            }
+
+            protected override bool OnHover(InputState state)
+            {
+                hover.FadeTo(0.05f, transition_duration, Easing.OutQuint);
+                return base.OnHover(state);
+            }
+
+            protected override void OnHoverLost(InputState state)
+            {
+                hover.FadeOut(transition_duration, Easing.OutQuint);
+                base.OnHoverLost(state);
             }
 
             protected override void OnActivated()

@@ -10,6 +10,8 @@ using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 using OpenTK;
+using OpenTK.Graphics;
+using osu.Framework.Input.States;
 
 namespace osu.Game.Screens.Multi.Screens.Match.Settings
 {
@@ -36,7 +38,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
         {
             private const float transition_duration = 200;
 
-            private readonly Container selection;
+            private readonly CircularContainer hover, selection;
 
             public GameTypePickerItem(GameType value) : base(value)
             {
@@ -58,16 +60,42 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                     icon = new DrawableGameType(Value)
                     {
                         Size = new Vector2(height),
+                        Margin = new MarginPadding(selection_width),
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding(selection_width),
+                        Child = hover = new CircularContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Masking = true,
+                            Alpha = 0,
+                            Child = new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            },
+                        },
                     },
                 };
-
-                icon.Margin = new MarginPadding(selection_width);
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
                 selection.Colour = colours.Yellow;
+            }
+
+            protected override bool OnHover(InputState state)
+            {
+                hover.FadeTo(0.05f, transition_duration, Easing.OutQuint);
+                return base.OnHover(state);
+            }
+
+            protected override void OnHoverLost(InputState state)
+            {
+                hover.FadeOut(transition_duration, Easing.OutQuint);
+                base.OnHoverLost(state);
             }
 
             protected override void OnActivated()
