@@ -54,12 +54,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         protected override void CreateNestedHitObjects()
         {
-            base.CreateNestedHitObjects();
-
             createTicks();
 
             RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
             RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
+
+            base.CreateNestedHitObjects();
         }
 
         private void createTicks()
