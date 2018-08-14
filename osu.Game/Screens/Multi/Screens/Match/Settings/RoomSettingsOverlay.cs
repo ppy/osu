@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                     },
                                     new Section("PASSWORD (OPTIONAL)")
                                     {
-                                        Child = new SettingsTextBox
+                                        Child = new SettingsPasswordTextBox
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             TabbableContentContainer = this,
@@ -198,12 +198,12 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
         {
             protected override Color4 BackgroundUnfocused => Color4.Black;
             protected override Color4 BackgroundFocused => Color4.Black;
+        }
 
-            protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText
-            {
-                Text = c.ToString(),
-                TextSize = 18,
-            };
+        private class SettingsPasswordTextBox : OsuPasswordTextBox
+        {
+            protected override Color4 BackgroundUnfocused => Color4.Black;
+            protected override Color4 BackgroundFocused => Color4.Black;
         }
 
         private class SectionContainer : FillFlowContainer<Section>
