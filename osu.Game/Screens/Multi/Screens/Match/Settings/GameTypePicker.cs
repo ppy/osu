@@ -11,7 +11,6 @@ using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 using OpenTK;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Screens.Match.Settings
 {
@@ -44,7 +43,6 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
             {
                 AutoSizeAxes = Axes.Both;
 
-                DrawableGameType icon;
                 Children = new Drawable[]
                 {
                     selection = new CircularContainer
@@ -57,7 +55,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                             RelativeSizeAxes = Axes.Both,
                         },
                     },
-                    icon = new DrawableGameType(Value)
+                    new DrawableGameType(Value)
                     {
                         Size = new Vector2(height),
                         Margin = new MarginPadding(selection_width),

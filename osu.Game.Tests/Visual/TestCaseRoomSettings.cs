@@ -4,7 +4,6 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Testing.Input;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Screens.Match.Settings;
 using OpenTK.Input;
