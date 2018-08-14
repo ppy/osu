@@ -16,6 +16,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
     {
         private readonly Room room;
         private readonly Participants participants;
+        private readonly Info info;
+        private readonly Settings settings;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
@@ -30,11 +32,12 @@ namespace osu.Game.Screens.Multi.Screens.Match
         public override string Type => "room";
         public override string Title => room.Name.Value;
 
+        private MatchHeaderPage currentPage = MatchHeaderPage.Room;
+
         public Match(Room room)
         {
             this.room = room;
             Header header;
-            Info info;
 
             Children = new Drawable[]
             {
@@ -48,6 +51,13 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = Header.HEIGHT + Info.HEIGHT },
                 },
+                settings = new Settings
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Top = Header.HEIGHT },
+                    Alpha = 0,
+                    X = -600,
+                },
             };
 
             header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect());
@@ -60,22 +70,82 @@ namespace osu.Game.Screens.Multi.Screens.Match
             }, true);
 
             nameBind.BindTo(room.Name);
-            nameBind.BindValueChanged(n => info.Name = n, true);
+            settings.RoomName.BindTo(nameBind);
+            nameBind.BindValueChanged(n =>
+            {
+                info.Name = n;
+                settings.RoomName.Value = n;
+            }, true);
 
             statusBind.BindTo(room.Status);
             statusBind.BindValueChanged(s => info.Status = s, true);
 
             availabilityBind.BindTo(room.Availability);
-            availabilityBind.BindValueChanged(a => info.Availability = a, true);
+            settings.RoomAvailability.BindTo(availabilityBind);
+            availabilityBind.BindValueChanged(a =>
+            {
+                info.Availability = a;
+                settings.RoomAvailability.Value = a;
+            }, true);
 
             typeBind.BindTo(room.Type);
-            typeBind.BindValueChanged(t => info.Type = t, true);
+            settings.GameType.BindTo(typeBind);
+            typeBind.BindValueChanged(t =>
+            {
+                info.Type = t;
+                settings.GameType.Value = t;
+            }, true);
 
             maxParticipantsBind.BindTo(room.MaxParticipants);
-            maxParticipantsBind.BindValueChanged(m => { participants.Max = m; }, true);
+            settings.MaxParticipants.BindTo(maxParticipantsBind);
+            maxParticipantsBind.BindValueChanged(m => {
+                participants.Max = m;
+                settings.MaxParticipants.Value = m;
+            }, true);
 
             participantsBind.BindTo(room.Participants);
             participantsBind.BindValueChanged(p => participants.Users = p, true);
+
+            header.Tabs.Current.BindValueChanged(onPageChanged);
+        }
+
+        private const int page_transition_duration = 500;
+
+        private void onPageChanged(MatchHeaderPage page)
+        {
+            if (page == currentPage) return;
+
+            // probably need to make left/right move logic generic in some kind of PageContainer to go with PageTabControl, but we have only 2 pages for now /shrug
+            switch (page)
+            {
+                case MatchHeaderPage.Settings:
+                    info
+                        .MoveToX(600, page_transition_duration, Easing.OutExpo)
+                        .FadeOutFromOne(300);
+                    participants
+                        .MoveToX(600, page_transition_duration, Easing.OutExpo)
+                        .FadeOutFromOne(300);
+                    settings
+                        .MoveToX(0, page_transition_duration, Easing.OutExpo)
+                        .FadeInFromZero(300);
+
+                    break;
+
+                case MatchHeaderPage.Room:
+                    info
+                        .MoveToX(0, page_transition_duration, Easing.OutExpo)
+                        .FadeInFromZero(300);
+                    participants
+                        .MoveToX(0, page_transition_duration, Easing.OutExpo)
+                        .FadeInFromZero(300);
+                    settings
+                        .MoveToX(-600, page_transition_duration, Easing.OutExpo)
+                        .FadeOutFromOne(300);
+
+                    break;
+            }
+
+            currentPage = page;
         }
     }
 }

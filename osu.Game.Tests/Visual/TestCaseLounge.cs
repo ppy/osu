@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual
                     Host = { Value = new User { Username = @"DrabWeb", Id = 6946022, Country = new Country { FlagName = @"CA" } } },
                     Status = { Value = new RoomStatusPlaying() },
                     Availability = { Value = RoomAvailability.Public },
-                    Type = { Value = new GameTypeTagTeam() },
+                    Type = { Value = GameType.TagTeam },
                     Beatmap =
                     {
                         Value = new BeatmapInfo
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual
                     Host = { Value = new User { Username = @"Monstrata", Id = 2706438, Country = new Country { FlagName = @"CA" } } },
                     Status = { Value = new RoomStatusOpen() },
                     Availability = { Value = RoomAvailability.FriendsOnly },
-                    Type = { Value = new GameTypeTeamVersus() },
+                    Type = { Value = GameType.Versus },
                     Beatmap =
                     {
                         Value = new BeatmapInfo
@@ -121,7 +121,7 @@ namespace osu.Game.Tests.Visual
                     Host = { Value = new User { Username = @"Delis", Id = 1603923, Country = new Country { FlagName = @"JP" } } },
                     Status = { Value = new RoomStatusPlaying() },
                     Availability = { Value = RoomAvailability.Public },
-                    Type = { Value = new GameTypeTagTeam() },
+                    Type = { Value = GameType.TagTeam },
                     Beatmap =
                     {
                         Value = new BeatmapInfo
