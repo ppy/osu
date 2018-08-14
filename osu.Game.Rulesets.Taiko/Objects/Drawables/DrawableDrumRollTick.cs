@@ -51,11 +51,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool OnPressed(TaikoAction action) => UpdateResult(true);
 
-        protected override DrawableStrongHandler CreateStrongHandler(StrongHitObject hitObject) => new StrongHandler(hitObject, this);
+        protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
 
-        private class StrongHandler : DrawableStrongHandler
+        private class StrongNestedHit : DrawableStrongNestedHit
         {
-            public StrongHandler(StrongHitObject strong, DrawableDrumRollTick tick)
+            public StrongNestedHit(StrongHitObject strong, DrawableDrumRollTick tick)
                 : base(strong, tick)
             {
             }

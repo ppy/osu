@@ -127,9 +127,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override DrawableStrongHandler CreateStrongHandler(StrongHitObject hitObject) => new StrongHandler(hitObject, this);
+        protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
 
-        private class StrongHandler : DrawableStrongHandler
+        private class StrongNestedHit : DrawableStrongNestedHit
         {
             /// <summary>
             /// The lenience for the second key press.
@@ -139,7 +139,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             public new DrawableHit MainObject => (DrawableHit)base.MainObject;
 
-            public StrongHandler(StrongHitObject strong, DrawableHit hit)
+            public StrongNestedHit(StrongHitObject strong, DrawableHit hit)
                 : base(strong, hit)
             {
             }

@@ -99,11 +99,11 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
         }
 
-        protected override DrawableStrongHandler CreateStrongHandler(StrongHitObject hitObject) => new StrongHandler(hitObject, this);
+        protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
 
-        private class StrongHandler : DrawableStrongHandler
+        private class StrongNestedHit : DrawableStrongNestedHit
         {
-            public StrongHandler(StrongHitObject strong, DrawableDrumRoll drumRoll)
+            public StrongNestedHit(StrongHitObject strong, DrawableDrumRoll drumRoll)
                 : base(strong, drumRoll)
             {
             }
