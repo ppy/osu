@@ -105,12 +105,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             var strongObject = HitObject.NestedHitObjects.OfType<StrongHitObject>().FirstOrDefault();
             if (strongObject != null)
             {
-                var vis = CreateStrongHit(strongObject);
-                if (vis != null)
-                {
-                    AddNested(vis);
-                    AddInternal(vis);
-                }
+                var strongHit = CreateStrongHit(strongObject);
+
+                AddNested(strongHit);
+                AddInternal(strongHit);
             }
         }
 
