@@ -8,7 +8,6 @@ using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 
@@ -42,10 +41,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (repeatPoint.StartTime <= Time.Current)
-                AddJudgement(new OsuJudgement { Result = drawableSlider.Tracking ? HitResult.Great : HitResult.Miss });
+                ApplyResult(r => r.Type = drawableSlider.Tracking ? HitResult.Great : HitResult.Miss);
         }
 
         protected override void UpdatePreemptState()

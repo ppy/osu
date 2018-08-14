@@ -5,6 +5,8 @@ using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -29,5 +31,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             // spinning doesn't match 1:1 with stable, so let's fudge them easier for the time being.
             SpinsRequired = (int)Math.Max(1, SpinsRequired * 0.6);
         }
+
+        public override Judgement CreateJudgement() => new OsuJudgement();
     }
 }

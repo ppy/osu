@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Rulesets.Catch.Judgements;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -23,8 +22,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             Size = new Vector2((float)CatchHitObject.OBJECT_RADIUS) / 4;
             Masking = false;
         }
-
-        protected override CatchJudgement CreateJudgement() => new CatchDropletJudgement();
 
         [BackgroundDependencyLoader]
         private void load()
