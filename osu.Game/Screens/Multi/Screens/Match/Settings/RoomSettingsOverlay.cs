@@ -184,8 +184,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                 room.Availability.Value = AvailabilityPicker.Current.Value;
                 room.Type.Value = TypePicker.Current.Value;
 
-                int max;
-                if (int.TryParse(MaxParticipantsField.Text, out max))
+                if (int.TryParse(MaxParticipantsField.Text, out int max))
                     room.MaxParticipants.Value = max;
                 else
                     room.MaxParticipants.Value = null;

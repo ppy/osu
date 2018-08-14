@@ -3,11 +3,11 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Testing.Input;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Screens.Match.Settings;
 using OpenTK.Input;
-using osu.Framework.Testing.Input;
 
 namespace osu.Game.Tests.Visual
 {
@@ -86,8 +86,7 @@ namespace osu.Game.Tests.Visual
             {
                 get
                 {
-                    int max;
-                    if (int.TryParse(MaxParticipantsField.Text, out max))
+                    if (int.TryParse(MaxParticipantsField.Text, out int max))
                         return max;
 
                     return null;

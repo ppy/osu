@@ -6,11 +6,11 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using OpenTK;
-using osu.Framework.Input.States;
 using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Screens.Match.Settings
