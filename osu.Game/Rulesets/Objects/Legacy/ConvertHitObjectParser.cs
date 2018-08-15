@@ -27,12 +27,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <summary>
         /// The beatmap version.
         /// </summary>
-        public int FormatVersion = LegacyBeatmapDecoder.LATEST_VERSION;
+        public int FormatVersion;
 
         protected ConvertHitObjectParser(double offset, int formatVersion)
         {
             Offset = offset;
-            formatVersion = formatVersion;
+            FormatVersion = formatVersion;
         }
 
         public override HitObject Parse(string text)
