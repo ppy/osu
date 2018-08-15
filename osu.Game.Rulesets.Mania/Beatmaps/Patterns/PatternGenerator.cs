@@ -15,7 +15,11 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
     /// </summary>
     internal abstract class PatternGenerator
     {
-        private const int max_rng_iterations = 100;
+        /// <summary>
+        /// An arbitrary maximum amount of iterations to perform in <see cref="RunWhile"/>.
+        /// The specific value is not super important - enough such that no false-positives occur.
+        /// </summary>
+        private const int max_rng_iterations = 20;
 
         /// <summary>
         /// The last pattern.
@@ -59,7 +63,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
 
             // Generate + log an error/stacktrace
 
-            Logger.Log($"Allowable time exceeded for hitobject generation:\n{new StackTrace(0)}", level: LogLevel.Error);
+            Logger.Log($"Allowable iterations ({max_rng_iterations}) exceeded:\n{new StackTrace(0)}", level: LogLevel.Error);
         }
 
         /// <summary>
