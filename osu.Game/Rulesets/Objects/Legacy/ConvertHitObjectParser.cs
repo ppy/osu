@@ -29,6 +29,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// </summary>
         protected readonly int FormatVersion;
 
+        protected bool FirstObject { get; private set; } = true;
+
         protected ConvertHitObjectParser(double offset, int formatVersion)
         {
             Offset = offset;
@@ -193,6 +195,8 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture) + Offset;
                 result.Samples = convertSoundType(soundType, bankInfo);
+
+                FirstObject = false;
 
                 return result;
             }

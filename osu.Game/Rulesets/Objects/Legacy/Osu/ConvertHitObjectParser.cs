@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
             return new ConvertHit
             {
                 Position = position,
-                NewCombo = newCombo,
+                NewCombo = FirstObject || newCombo,
                 ComboOffset = comboOffset
             };
         }
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
             return new ConvertSlider
             {
                 Position = position,
-                NewCombo = newCombo,
+                NewCombo = FirstObject || newCombo,
                 ComboOffset = comboOffset,
                 ControlPoints = controlPoints,
                 Distance = Math.Max(0, length),
@@ -50,6 +50,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
             {
                 Position = position,
                 EndTime = endTime,
+                NewCombo = FormatVersion <= 8 || FirstObject || newCombo,
                 ComboOffset = comboOffset
             };
         }

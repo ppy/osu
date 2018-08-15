@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
             return new ConvertSlider
             {
                 X = position.X,
-                NewCombo = newCombo,
+                NewCombo = FirstObject || newCombo,
                 ComboOffset = comboOffset,
                 ControlPoints = controlPoints,
                 Distance = length,
@@ -48,6 +48,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
             return new ConvertSpinner
             {
                 EndTime = endTime,
+                NewCombo = FirstObject || newCombo,
                 ComboOffset = comboOffset
             };
         }
