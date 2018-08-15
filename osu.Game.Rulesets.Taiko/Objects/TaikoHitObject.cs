@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
         /// Whether this HitObject is a "strong" type.
         /// Strong hit objects give more points for hitting the hit object with both keys.
         /// </summary>
-        public bool IsStrong;
+        public virtual bool IsStrong { get; set; }
 
         protected override void CreateNestedHitObjects()
         {
