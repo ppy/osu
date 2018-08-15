@@ -20,17 +20,13 @@ namespace osu.Game.Rulesets.Objects.Legacy.Taiko
 
         protected override HitObject CreateHit(Vector2 position, bool newCombo, int comboOffset)
         {
-            return new ConvertHit
-            {
-                NewCombo = newCombo,
-            };
+            return new ConvertHit();
         }
 
         protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples)
         {
             return new ConvertSlider
             {
-                NewCombo = newCombo,
                 ControlPoints = controlPoints,
                 Distance = length,
                 CurveType = curveType,
