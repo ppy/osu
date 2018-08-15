@@ -187,6 +187,18 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
+        public void TestDecodeBeatmapComboOffsets()
+        {
+            var decoder = new LegacyBeatmapDecoder();
+            using (var resStream = Resource.OpenResource("hitobject-combo-offset.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+                Assert.AreEqual(3, ((IHasCombo)beatmap.HitObjects[0]).ComboOffset);
+            }
+        }
+
+        [Test]
         public void TestDecodeBeatmapHitObjects()
         {
             var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
