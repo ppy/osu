@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
         {
         }
 
-        protected override HitObject CreateHit(Vector2 position, bool newCombo)
+        protected override HitObject CreateHit(Vector2 position, bool newCombo, int comboOffset)
         {
             return new ConvertHit
             {
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
             };
         }
 
-        protected override HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples)
+        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples)
         {
             return new ConvertSlider
             {
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
             };
         }
 
-        protected override HitObject CreateSpinner(Vector2 position, double endTime)
+        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime)
         {
             return new ConvertSpinner
             {
@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
             };
         }
 
-        protected override HitObject CreateHold(Vector2 position, bool newCombo, double endTime)
+        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime)
         {
             return new ConvertHold
             {
