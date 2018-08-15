@@ -14,6 +14,11 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
     /// </summary>
     public class ConvertHitObjectParser : Legacy.ConvertHitObjectParser
     {
+        public ConvertHitObjectParser(double offset, int formatVersion)
+            : base(offset, formatVersion)
+        {
+        }
+
         protected override HitObject CreateHit(Vector2 position, bool newCombo)
         {
             return new ConvertHit

@@ -19,12 +19,23 @@ namespace osu.Game.Rulesets.Objects.Legacy
     /// </summary>
     public abstract class ConvertHitObjectParser : HitObjectParser
     {
-        public override HitObject Parse(string text)
+        /// <summary>
+        /// The offset to apply to all time values.
+        /// </summary>
+        public double Offset;
+
+        /// <summary>
+        /// The beatmap version.
+        /// </summary>
+        public int FormatVersion = LegacyBeatmapDecoder.LATEST_VERSION;
+
+        protected ConvertHitObjectParser(double offset, int formatVersion)
         {
-            return Parse(text, 0);
+            Offset = offset;
+            formatVersion = formatVersion;
         }
 
-        public HitObject Parse(string text, double offset)
+        public override HitObject Parse(string text)
         {
             try
             {
@@ -152,7 +163,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
                 else if (type.HasFlag(ConvertHitObjectType.Spinner))
                 {
-                    result = CreateSpinner(new Vector2(512, 384) / 2, Convert.ToDouble(split[5], CultureInfo.InvariantCulture) + offset);
+                    result = CreateSpinner(new Vector2(512, 384) / 2, Convert.ToDouble(split[5], CultureInfo.InvariantCulture) + Offset);
 
                     if (split.Length > 6)
                         readCustomSampleBanks(split[6], bankInfo);
@@ -170,13 +181,13 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
                     }
 
-                    result = CreateHold(pos, combo, endTime + offset);
+                    result = CreateHold(pos, combo, endTime + Offset);
                 }
 
                 if (result == null)
                     throw new InvalidOperationException($@"Unknown hit object type {type}.");
 
-                result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture) + offset;
+                result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture) + Offset;
                 result.Samples = convertSoundType(soundType, bankInfo);
 
                 return result;
