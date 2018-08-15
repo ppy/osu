@@ -22,8 +22,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
         {
             return new ConvertHit
             {
-                X = position.X,
-                NewCombo = newCombo,
+                X = position.X
             };
         }
 
@@ -32,7 +31,6 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
             return new ConvertSlider
             {
                 X = position.X,
-                NewCombo = newCombo,
                 ControlPoints = controlPoints,
                 Distance = length,
                 CurveType = curveType,
