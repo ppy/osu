@@ -7,6 +7,8 @@ namespace osu.Game.Rulesets.Mods
     {
         DifficultyReduction,
         DifficultyIncrease,
-        Special
+        Conversion,
+        Automation,
+        Fun
     }
 }

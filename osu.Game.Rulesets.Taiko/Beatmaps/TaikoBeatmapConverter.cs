@@ -168,7 +168,6 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
                 {
                     StartTime = obj.StartTime,
                     Samples = obj.Samples,
-                    IsStrong = strong,
                     Duration = endTimeData.Duration,
                     RequiredHits = (int)Math.Max(1, endTimeData.Duration / 1000 * hitMultiplier)
                 };

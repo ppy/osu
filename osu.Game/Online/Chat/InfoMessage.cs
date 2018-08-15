@@ -6,7 +6,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
 {
-    public class InfoMessage : Message
+    public class InfoMessage : LocalMessage
     {
         private static int infoID = -1;
 
