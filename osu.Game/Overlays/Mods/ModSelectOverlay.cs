@@ -27,7 +27,11 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModSelectOverlay : WaveOverlayContainer
     {
+        /// <summary>
+        /// How much this container should overflow the sides of the screen to account for parallax shifting.
+        /// </summary>
         private const float overflow_padding = 50;
+
         private const float content_width = 0.8f;
 
         protected Color4 LowMultiplierColour, HighMultiplierColour;
