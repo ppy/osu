@@ -52,7 +52,8 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     StartTime = original.StartTime,
                     Samples = original.Samples,
                     EndTime = endTimeData.EndTime,
-                    Position = positionData?.Position ?? OsuPlayfield.BASE_SIZE / 2
+                    Position = positionData?.Position ?? OsuPlayfield.BASE_SIZE / 2,
+                    NewCombo = comboData?.NewCombo ?? false,
                 };
             }
             else
@@ -62,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     StartTime = original.StartTime,
                     Samples = original.Samples,
                     Position = positionData?.Position ?? Vector2.Zero,
-                    NewCombo = comboData?.NewCombo ?? false
+                    NewCombo = comboData?.NewCombo ?? false,
                 };
             }
         }
