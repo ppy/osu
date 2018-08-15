@@ -412,7 +412,7 @@ namespace osu.Game.Database
         private ArchiveReader getReaderFrom(string path)
         {
             if (ZipUtils.IsZipArchive(path))
-                return new ZipArchiveReader(Files.Storage.GetStream(path), Path.GetFileName(path));
+                return new ZipArchiveReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read), Path.GetFileName(path));
             if (Directory.Exists(path))
                 return new LegacyFilesystemReader(path);
             throw new InvalidFormatException($"{path} is not a valid archive");
