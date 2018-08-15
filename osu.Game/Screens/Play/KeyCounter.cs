@@ -152,6 +152,15 @@ namespace osu.Game.Screens.Play
                 RestoreState(Clock.CurrentTime);
         }
 
-        public void RestoreState(double time) => CountPresses = states.LastOrDefault(state => state.Time <= time)?.Count ?? 0;
+        public void RestoreState(double time)
+        {
+            var targetState = states.LastOrDefault(state => state.Time <= time);
+            var targetIndex = states.IndexOf(targetState);
+
+            states.RemoveRange(targetIndex + 1, states.Count - (targetIndex + 1));
+
+            lastState = targetState;
+            CountPresses = targetState?.Count ?? 0;
+        }
     }
 }
