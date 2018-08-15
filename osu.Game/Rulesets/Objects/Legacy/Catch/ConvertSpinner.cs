@@ -15,5 +15,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
         public double Duration => EndTime - StartTime;
 
         public bool NewCombo { get; set; }
+
+        public int ComboOffset { get; set; }
     }
 }

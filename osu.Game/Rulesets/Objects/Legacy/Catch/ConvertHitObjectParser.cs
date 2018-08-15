@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
             {
                 X = position.X,
                 NewCombo = newCombo,
+                ComboOffset = comboOffset
             };
         }
 
@@ -33,6 +34,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
             {
                 X = position.X,
                 NewCombo = newCombo,
+                ComboOffset = comboOffset,
                 ControlPoints = controlPoints,
                 Distance = length,
                 CurveType = curveType,
@@ -45,7 +47,8 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
         {
             return new ConvertSpinner
             {
-                EndTime = endTime
+                EndTime = endTime,
+                ComboOffset = comboOffset
             };
         }
 

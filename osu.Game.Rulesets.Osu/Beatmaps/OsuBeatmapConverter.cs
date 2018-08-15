@@ -42,6 +42,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     RepeatCount = curveData.RepeatCount,
                     Position = positionData?.Position ?? Vector2.Zero,
                     NewCombo = comboData?.NewCombo ?? false,
+                    ComboOffset = comboData?.ComboOffset ?? 0,
                     LegacyLastTickOffset = legacyOffset?.LegacyLastTickOffset
                 };
             }
@@ -54,6 +55,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     EndTime = endTimeData.EndTime,
                     Position = positionData?.Position ?? OsuPlayfield.BASE_SIZE / 2,
                     NewCombo = comboData?.NewCombo ?? false,
+                    ComboOffset = comboData?.ComboOffset ?? 0,
                 };
             }
             else
@@ -64,6 +66,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     Samples = original.Samples,
                     Position = positionData?.Position ?? Vector2.Zero,
                     NewCombo = comboData?.NewCombo ?? false,
+                    ComboOffset = comboData?.ComboOffset ?? 0,
                 };
             }
         }

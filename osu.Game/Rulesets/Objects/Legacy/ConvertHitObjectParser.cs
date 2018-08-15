@@ -22,12 +22,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <summary>
         /// The offset to apply to all time values.
         /// </summary>
-        public double Offset;
+        protected readonly double Offset;
 
         /// <summary>
         /// The beatmap version.
         /// </summary>
-        public int FormatVersion;
+        protected readonly int FormatVersion;
 
         protected ConvertHitObjectParser(double offset, int formatVersion)
         {
@@ -43,11 +43,12 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 Vector2 pos = new Vector2((int)Convert.ToSingle(split[0], CultureInfo.InvariantCulture), (int)Convert.ToSingle(split[1], CultureInfo.InvariantCulture));
 
-                ConvertHitObjectType type = (ConvertHitObjectType)int.Parse(split[3]) & ~ConvertHitObjectType.ComboOffset;
+                ConvertHitObjectType type = (ConvertHitObjectType)int.Parse(split[3]);
+
+                int comboOffset = (int)(type & ConvertHitObjectType.ComboOffset) >> 4;
+                type &= ~ConvertHitObjectType.ComboOffset;
 
                 bool combo = type.HasFlag(ConvertHitObjectType.NewCombo);
-                int comboOffset = (int)(type & ConvertHitObjectType.ComboOffset) >> 4;
-
                 type &= ~ConvertHitObjectType.NewCombo;
 
                 var soundType = (LegacySoundType)int.Parse(split[4]);
