@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    internal class ManiaStage : ManiaScrollingPlayfield
+    public class ManiaStage : ManiaScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
 
@@ -156,18 +156,18 @@ namespace osu.Game.Rulesets.Mania.UI
             var maniaObject = (ManiaHitObject)h.HitObject;
             int columnIndex = maniaObject.Column - firstColumnIndex;
             Columns.ElementAt(columnIndex).Add(h);
-            h.OnJudgement += OnJudgement;
+            h.OnNewResult += OnNewResult;
         }
 
         public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));
 
-        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!judgedObject.DisplayJudgement || !DisplayJudgements)
+            if (!judgedObject.DisplayResult || !DisplayJudgements)
                 return;
 
             judgements.Clear();
-            judgements.Add(new DrawableManiaJudgement(judgement, judgedObject)
+            judgements.Add(new DrawableManiaJudgement(result, judgedObject)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

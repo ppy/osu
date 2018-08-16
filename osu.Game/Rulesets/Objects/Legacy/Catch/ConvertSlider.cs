@@ -13,5 +13,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
         public float X { get; set; }
 
         public bool NewCombo { get; set; }
+
+        public int ComboOffset { get; set; }
     }
 }
