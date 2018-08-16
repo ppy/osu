@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using OpenTK;
 using osu.Framework.Allocation;
@@ -116,7 +117,7 @@ namespace osu.Game.Tests.Visual
 
         private void testNullBeatmap()
         {
-            selectNullBeatmap();
+            selectBeatmap(null);
             AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Text));
             AddAssert("check default title", () => infoWedge.Info.TitleLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Title);
             AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Artist);
@@ -124,26 +125,17 @@ namespace osu.Game.Tests.Visual
             AddAssert("check no info labels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
         }
 
-        private void selectBeatmap(IBeatmap b)
+        private void selectBeatmap([CanBeNull] IBeatmap b)
         {
             BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
 
-            AddStep($"select {b.Metadata.Title} beatmap", () =>
+            AddStep($"select {b?.Metadata.Title ?? "null"} beatmap", () =>
             {
                 infoBefore = infoWedge.Info;
-                infoWedge.Beatmap = Beatmap.Value = new TestWorkingBeatmap(b);
+                infoWedge.Beatmap = Beatmap.Value = b == null ? Beatmap.Default : new TestWorkingBeatmap(b);
             });
 
             AddUntilStep(() => infoWedge.Info != infoBefore, "wait for async load");
-        }
-
-        private void selectNullBeatmap()
-        {
-            AddStep("select null beatmap", () =>
-            {
-                Beatmap.Value = Beatmap.Default;
-                infoWedge.Beatmap = Beatmap;
-            });
         }
 
         private IBeatmap createTestBeatmap(RulesetInfo ruleset)
