@@ -234,7 +234,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
             for (int i = 0; i < noteCount; i++)
             {
-                while (pattern.ColumnHasObject(nextColumn) || PreviousPattern.ColumnHasObject(nextColumn) && !allowStacking)
+                RunWhile(() => pattern.ColumnHasObject(nextColumn) || PreviousPattern.ColumnHasObject(nextColumn) && !allowStacking, () =>
                 {
                     if (convertType.HasFlag(PatternType.Gathered))
                     {
@@ -244,7 +244,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     }
                     else
                         nextColumn = Random.Next(RandomStart, TotalColumns);
-                }
+                });
 
                 addToPattern(pattern, nextColumn);
             }
@@ -295,8 +295,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int nextColumn = Random.Next(RandomStart, columnLimit);
             for (int i = 0; i < noteCount; i++)
             {
-                while (pattern.ColumnHasObject(nextColumn))
+                RunWhile(() => pattern.ColumnHasObject(nextColumn), () =>
+                {
                     nextColumn = Random.Next(RandomStart, columnLimit);
+                });
 
                 // Add normal note
                 addToPattern(pattern, nextColumn);

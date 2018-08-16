@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -15,17 +15,14 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        protected abstract TaikoAction[] HitActions { get; }
+        public abstract TaikoAction[] HitActions { get; }
 
         /// <summary>
-        /// Whether a second hit is allowed to be processed. This occurs once this hit object has been hit successfully.
+        /// The action that caused this <see cref="DrawableHit"/> to be hit.
         /// </summary>
-        protected bool SecondHitAllowed { get; private set; }
+        public TaikoAction? HitAction { get; private set; }
 
-        /// <summary>
-        /// Whether the last key pressed is a valid hit key.
-        /// </summary>
-        private bool validKeyPressed;
+        private bool validActionPressed;
 
         protected DrawableHit(Hit hit)
             : base(hit)
@@ -33,12 +30,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
+                    ApplyResult(r => r.Type = HitResult.Miss);
                 return;
             }
 
@@ -46,26 +43,33 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             if (result == HitResult.None)
                 return;
 
-            if (!validKeyPressed || result == HitResult.Miss)
-                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
+            if (!validActionPressed)
+                ApplyResult(r => r.Type = HitResult.Miss);
             else
-            {
-                AddJudgement(new TaikoJudgement
-                {
-                    Result = result,
-                    Final = !HitObject.IsStrong
-                });
-
-                SecondHitAllowed = true;
-            }
+                ApplyResult(r => r.Type = result);
         }
 
         public override bool OnPressed(TaikoAction action)
         {
-            validKeyPressed = HitActions.Contains(action);
+            if (Judged)
+                return false;
+
+            validActionPressed = HitActions.Contains(action);
 
             // Only count this as handled if the new judgement is a hit
-            return UpdateJudgement(true);
+            var result = UpdateResult(true);
+
+            if (IsHit)
+                HitAction = action;
+
+            return result;
+        }
+
+        public override bool OnReleased(TaikoAction action)
+        {
+            if (action == HitAction)
+                HitAction = null;
+            return base.OnReleased(action);
         }
 
         protected override void Update()
@@ -86,8 +90,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 switch (State.Value)
                 {
                     case ArmedState.Idle:
-                        SecondHitAllowed = false;
-                        validKeyPressed = false;
+                        validActionPressed = false;
 
                         UnproxyContent();
                         this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
@@ -121,6 +124,66 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                         break;
                 }
+            }
+        }
+
+        protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
+
+        private class StrongNestedHit : DrawableStrongNestedHit
+        {
+            /// <summary>
+            /// The lenience for the second key press.
+            /// This does not adjust by map difficulty in ScoreV2 yet.
+            /// </summary>
+            private const double second_hit_window = 30;
+
+            public new DrawableHit MainObject => (DrawableHit)base.MainObject;
+
+            public StrongNestedHit(StrongHitObject strong, DrawableHit hit)
+                : base(strong, hit)
+            {
+            }
+
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
+            {
+                if (!MainObject.Result.HasResult)
+                {
+                    base.CheckForResult(userTriggered, timeOffset);
+                    return;
+                }
+
+                if (!MainObject.Result.IsHit)
+                {
+                    ApplyResult(r => r.Type = HitResult.Miss);
+                    return;
+                }
+
+                if (!userTriggered)
+                {
+                    if (timeOffset > second_hit_window)
+                        ApplyResult(r => r.Type = HitResult.Miss);
+                    return;
+                }
+
+                if (Math.Abs(MainObject.Result.TimeOffset - timeOffset) < second_hit_window)
+                    ApplyResult(r => r.Type = HitResult.Great);
+            }
+
+            public override bool OnPressed(TaikoAction action)
+            {
+                // Don't process actions until the main hitobject is hit
+                if (!MainObject.IsHit)
+                    return false;
+
+                // Don't process actions if the pressed button was released
+                if (MainObject.HitAction == null)
+                    return false;
+
+                // Don't handle invalid hit action presses
+                if (!MainObject.HitActions.Contains(action))
+                    return false;
+
+                return UpdateResult(true);
             }
         }
     }

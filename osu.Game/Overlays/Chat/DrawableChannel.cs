@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Chat
 
             if (!IsLoaded) return;
 
-            if (scroll.IsScrolledToEnd(10) || !flow.Children.Any())
+            if (scroll.IsScrolledToEnd(10) || !flow.Children.Any() || newMessages.Any(m => m is LocalMessage))
                 scrollToEnd();
 
             var staleMessages = flow.Children.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();

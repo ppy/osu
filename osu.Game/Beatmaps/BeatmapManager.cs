@@ -329,7 +329,7 @@ namespace osu.Game.Beatmaps
                 return;
             }
 
-            await Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs")), TaskCreationOptions.LongRunning);
+            await Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs").Select(f => stable.GetFullPath(f)).ToArray()), TaskCreationOptions.LongRunning);
         }
 
         /// <summary>

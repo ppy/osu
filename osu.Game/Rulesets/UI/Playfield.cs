@@ -1,10 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.UI
@@ -12,15 +15,21 @@ namespace osu.Game.Rulesets.UI
     public abstract class Playfield : ScalableContainer
     {
         /// <summary>
-        /// The HitObjects contained in this Playfield.
+        /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
         public HitObjectContainer HitObjects { get; private set; }
 
         /// <summary>
-        /// All the <see cref="Playfield"/>s nested inside this playfield.
+        /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
         /// </summary>
-        public IReadOnlyList<Playfield> NestedPlayfields => nestedPlayfields;
-        private List<Playfield> nestedPlayfields;
+        public IEnumerable<DrawableHitObject> AllHitObjects => HitObjects?.Objects.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects)) ?? Enumerable.Empty<DrawableHitObject>();
+
+        /// <summary>
+        /// All <see cref="Playfield"/>s nested inside this <see cref="Playfield"/>.
+        /// </summary>
+        public IEnumerable<Playfield> NestedPlayfields => nestedPlayfields.IsValueCreated ? nestedPlayfields.Value : Enumerable.Empty<Playfield>();
+
+        private readonly Lazy<List<Playfield>> nestedPlayfields = new Lazy<List<Playfield>>();
 
         /// <summary>
         /// Whether judgements should be displayed by this and and all nested <see cref="Playfield"/>s.
@@ -54,7 +63,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Performs post-processing tasks (if any) after all DrawableHitObjects are loaded into this Playfield.
         /// </summary>
-        public virtual void PostProcess() => nestedPlayfields?.ForEach(p => p.PostProcess());
+        public virtual void PostProcess() => NestedPlayfields.ForEach(p => p.PostProcess());
 
         /// <summary>
         /// Adds a DrawableHitObject to this Playfield.
@@ -75,12 +84,8 @@ namespace osu.Game.Rulesets.UI
         /// <param name="otherPlayfield">The <see cref="Playfield"/> to add.</param>
         protected void AddNested(Playfield otherPlayfield)
         {
-            if (nestedPlayfields == null)
-                nestedPlayfields = new List<Playfield>();
-
-            nestedPlayfields.Add(otherPlayfield);
-
             otherPlayfield.DisplayJudgements.BindTo(DisplayJudgements);
+            nestedPlayfields.Value.Add(otherPlayfield);
         }
 
         /// <summary>

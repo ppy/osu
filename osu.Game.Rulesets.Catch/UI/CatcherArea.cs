@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private DrawableCatchHitObject lastPlateableFruit;
 
-        public void OnJudgement(DrawableCatchHitObject fruit, Judgement judgement)
+        public void OnResult(DrawableCatchHitObject fruit, JudgementResult result)
         {
             void runAfterLoaded(Action action)
             {
@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     lastPlateableFruit.OnLoadComplete = _ => action();
             }
 
-            if (judgement.IsHit && fruit.CanBePlated)
+            if (result.IsHit && fruit.CanBePlated)
             {
                 var caughtFruit = (DrawableCatchHitObject)GetVisualRepresentation?.Invoke(fruit.HitObject);
 
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (fruit.HitObject.LastInCombo)
             {
-                if (((CatchJudgement)judgement).ShouldExplode)
+                if (((CatchJudgement)result.Judgement).ShouldExplodeFor(result))
                     runAfterLoaded(() => MovableCatcher.Explode());
                 else
                     MovableCatcher.Drop();

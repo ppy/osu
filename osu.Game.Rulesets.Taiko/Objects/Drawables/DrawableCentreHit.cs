@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableCentreHit : DrawableHit
     {
-        protected override TaikoAction[] HitActions { get; } = { TaikoAction.LeftCentre, TaikoAction.RightCentre };
+        public override TaikoAction[] HitActions { get; } = { TaikoAction.LeftCentre, TaikoAction.RightCentre };
 
         public DrawableCentreHit(Hit hit)
             : base(hit)

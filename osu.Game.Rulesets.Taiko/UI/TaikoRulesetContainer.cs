@@ -100,12 +100,8 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             switch (h)
             {
-                case CentreHit centreHit when h.IsStrong:
-                    return new DrawableCentreHitStrong(centreHit);
                 case CentreHit centreHit:
                     return new DrawableCentreHit(centreHit);
-                case RimHit rimHit when h.IsStrong:
-                    return new DrawableRimHitStrong(rimHit);
                 case RimHit rimHit:
                     return new DrawableRimHit(rimHit);
                 case DrumRoll drumRoll:
