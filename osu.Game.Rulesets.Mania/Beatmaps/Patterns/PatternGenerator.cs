@@ -55,15 +55,18 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         {
             int iterations = 0;
 
-            while (condition() && iterations++ < max_rng_iterations)
+            while (condition())
+            {
+                if (iterations++ >= max_rng_iterations)
+                {
+                    // log an error but don't throw. we want to continue execution.
+                    Logger.Error(new ExceededAllowedIterationsException(new StackTrace(0)),
+                        "Conversion encountered errors. The beatmap may not be correctly converted.");
+                    return;
+                }
+
                 action();
-
-            if (iterations < max_rng_iterations)
-                return;
-
-            // Generate + log an error/stacktrace
-
-            Logger.Log($"Allowable iterations ({max_rng_iterations}) exceeded:\n{new StackTrace(0)}", level: LogLevel.Error);
+            }
         }
 
         /// <summary>
@@ -71,5 +74,20 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         /// </summary>
         /// <returns>The <see cref="Pattern"/>s containing the hit objects.</returns>
         public abstract IEnumerable<Pattern> Generate();
+
+        /// <summary>
+        /// Denotes when a single conversion operation is in an infinitely looping state.
+        /// </summary>
+        public class ExceededAllowedIterationsException : Exception
+        {
+            private readonly string stackTrace;
+
+            public ExceededAllowedIterationsException(StackTrace stackTrace)
+            {
+                this.stackTrace = stackTrace.ToString();
+            }
+
+            public override string StackTrace => stackTrace;
+        }
     }
 }
