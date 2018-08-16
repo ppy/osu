@@ -65,7 +65,7 @@ namespace osu.Desktop
             Logger.Log($"Unhandled exception has been {(continueExecution ? "allowed" : "denied")} with {allowableExceptions} more allowable exceptions.");
 
             Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
-            return Interlocked.Decrement(ref allowableExceptions) >= 0;
+            return continueExecution;
         }
     }
 }
