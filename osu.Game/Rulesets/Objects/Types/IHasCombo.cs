@@ -12,5 +12,10 @@ namespace osu.Game.Rulesets.Objects.Types
         /// Whether the HitObject starts a new combo.
         /// </summary>
         bool NewCombo { get; }
+
+        /// <summary>
+        /// When starting a new combo, the offset of the new combo relative to the current one.
+        /// </summary>
+        int ComboOffset { get; }
     }
 }
