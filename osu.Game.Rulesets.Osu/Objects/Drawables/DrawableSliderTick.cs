@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using osu.Framework.Graphics.Containers;
@@ -19,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public bool Tracking { get; set; }
 
-        public override bool DisplayJudgement => false;
+        public override bool DisplayResult => false;
 
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {
@@ -48,10 +47,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (timeOffset >= 0)
-                AddJudgement(new OsuJudgement { Result = Tracking ? HitResult.Great : HitResult.Miss });
+                ApplyResult(r => r.Type = Tracking ? HitResult.Great : HitResult.Miss);
         }
 
         protected override void UpdatePreemptState()

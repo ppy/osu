@@ -6,11 +6,8 @@ using osu.Game.Rulesets.Mania.Judgements;
 
 namespace osu.Game.Rulesets.Mania.Objects
 {
-    /// <summary>
-    /// A scoring tick of a hold note.
-    /// </summary>
-    public class HoldNoteTick : ManiaHitObject
+    public class TailNote : Note
     {
-        public override Judgement CreateJudgement() => new HoldNoteTickJudgement();
+        public override Judgement CreateJudgement() => new ManiaJudgement();
     }
 }
