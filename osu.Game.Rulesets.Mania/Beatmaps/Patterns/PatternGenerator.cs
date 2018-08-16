@@ -88,6 +88,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
             }
 
             public override string StackTrace => stackTrace;
+            public override string ToString() => $"{GetType().Name}: {Message}\r\n{StackTrace}";
         }
     }
 }
