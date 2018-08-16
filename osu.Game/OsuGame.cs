@@ -36,6 +36,8 @@ using osu.Game.Skinning;
 using OpenTK.Graphics;
 using osu.Game.Overlays.Volume;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
+using LogLevel = osu.Framework.Logging.LogLevel;
 
 namespace osu.Game
 {
@@ -64,6 +66,8 @@ namespace osu.Game
         private BeatmapSetOverlay beatmapSetOverlay;
 
         private ScreenshotManager screenshotManager;
+
+        protected RavenLogger RavenLogger;
 
         public virtual Storage GetStorageForStableInstall() => null;
 
@@ -108,6 +112,8 @@ namespace osu.Game
             this.args = args;
 
             forwardLoggedErrorsToNotifications();
+
+            RavenLogger = new RavenLogger(this);
         }
 
         public void ToggleSettings() => settings.ToggleVisibility();
@@ -151,6 +157,8 @@ namespace osu.Game
             }
 
             dependencies.CacheAs(this);
+
+            dependencies.Cache(RavenLogger);
 
             dependencies.CacheAs(ruleset);
             dependencies.CacheAs<IBindable<RulesetInfo>>(ruleset);
@@ -271,6 +279,12 @@ namespace osu.Game
             Beatmap.Value.Mods.Value = s.Mods;
 
             menu.Push(new PlayerLoader(new ReplayPlayer(s.Replay)));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            RavenLogger.Dispose();
         }
 
         protected override void LoadComplete()
@@ -449,7 +463,7 @@ namespace osu.Game
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
                         Icon = entry.Level == LogLevel.Important ? FontAwesome.fa_exclamation_circle : FontAwesome.fa_bomb,
-                        Text = entry.Message,
+                        Text = entry.Message + (entry.Exception != null ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
                     }));
                 }
                 else if (recentLogCount == short_term_display_limit)
@@ -601,6 +615,7 @@ namespace osu.Game
         private void screenAdded(Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
+            Logger.Log($"Screen changed → {currentScreen}");
 
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
@@ -609,6 +624,7 @@ namespace osu.Game
         private void screenRemoved(Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
+            Logger.Log($"Screen changed ← {currentScreen}");
 
             if (newScreen == null)
                 Exit();
