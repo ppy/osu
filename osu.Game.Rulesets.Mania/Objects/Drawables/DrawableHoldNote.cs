@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -19,10 +18,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableHoldNote : DrawableManiaHitObject<HoldNote>, IKeyBindingHandler<ManiaAction>
     {
-        public override bool DisplayJudgement => false;
+        public override bool DisplayResult => false;
 
-        private readonly DrawableNote head;
-        private readonly DrawableNote tail;
+        public readonly DrawableNote Head;
+        public readonly DrawableNote Tail;
 
         private readonly BodyPiece bodyPiece;
 
@@ -57,12 +56,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                         HoldStartTime = () => holdStartTime
                     })
                 },
-                head = new DrawableHeadNote(this)
+                Head = new DrawableHeadNote(this)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 },
-                tail = new DrawableTailNote(this)
+                Tail = new DrawableTailNote(this)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
@@ -72,8 +71,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             foreach (var tick in tickContainer)
                 AddNested(tick);
 
-            AddNested(head);
-            AddNested(tail);
+            AddNested(Head);
+            AddNested(Tail);
         }
 
         protected override void OnDirectionChanged(ScrollingDirection direction)
@@ -91,16 +90,16 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 base.AccentColour = value;
 
                 bodyPiece.AccentColour = value;
-                head.AccentColour = value;
-                tail.AccentColour = value;
+                Head.AccentColour = value;
+                Tail.AccentColour = value;
                 tickContainer.ForEach(t => t.AccentColour = value);
             }
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (tail.AllJudged)
-                AddJudgement(new HoldNoteJudgement { Result = HitResult.Perfect });
+            if (Tail.AllJudged)
+                ApplyResult(r => r.Type = HitResult.Perfect);
         }
 
         protected override void Update()
@@ -108,8 +107,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.Update();
 
             // Make the body piece not lie under the head note
-            bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * head.Height / 2;
-            bodyPiece.Height = DrawHeight - head.Height / 2 + tail.Height / 2;
+            bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
+            bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
         }
 
         public bool OnPressed(ManiaAction action)
@@ -141,7 +140,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             holdStartTime = null;
 
             // If the key has been released too early, the user should not receive full score for the release
-            if (!tail.IsHit)
+            if (!Tail.IsHit)
                 hasBroken = true;
 
             return true;
@@ -166,7 +165,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     return false;
 
                 // If the key has been released too early, the user should not receive full score for the release
-                if (Judgements.Any(j => j.Result == HitResult.Miss))
+                if (Result.Type == HitResult.Miss)
                     holdNote.hasBroken = true;
 
                 // The head note also handles early hits before the body, but we want accurate early hits to count as the body being held
@@ -197,7 +196,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 this.holdNote = holdNote;
             }
 
-            protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
                 // Factor in the release lenience
                 timeOffset /= release_window_lenience;
@@ -205,13 +204,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (!userTriggered)
                 {
                     if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    {
-                        AddJudgement(new HoldNoteTailJudgement
-                        {
-                            Result = HitResult.Miss,
-                            HasBroken = holdNote.hasBroken
-                        });
-                    }
+                        ApplyResult(r => r.Type = HitResult.Miss);
 
                     return;
                 }
@@ -220,10 +213,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (result == HitResult.None)
                     return;
 
-                AddJudgement(new HoldNoteTailJudgement
+                ApplyResult(r =>
                 {
-                    Result = result,
-                    HasBroken = holdNote.hasBroken
+                    if (holdNote.hasBroken && (result == HitResult.Perfect || result == HitResult.Perfect))
+                        result = HitResult.Good;
+
+                    r.Type = result;
                 });
             }
 
@@ -238,7 +233,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (action != Action.Value)
                     return false;
 
-                UpdateJudgement(true);
+                UpdateResult(true);
 
                 // Handled by the hold note, which will set holding = false
                 return false;

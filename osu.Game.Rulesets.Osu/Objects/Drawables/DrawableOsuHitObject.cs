@@ -2,11 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.ComponentModel;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics;
-using System.Linq;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 UpdatePreemptState();
 
-                var judgementOffset = Math.Min(HitObject.HitWindows.HalfWindowFor(HitResult.Miss), Judgements.FirstOrDefault()?.TimeOffset ?? 0);
+                var judgementOffset = Math.Min(HitObject.HitWindows.HalfWindowFor(HitResult.Miss), Result?.TimeOffset ?? 0);
 
                 using (BeginDelayedSequence(HitObject.TimePreempt + judgementOffset, true))
                     UpdateCurrentState(state);
@@ -57,20 +57,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         // Todo: At some point we need to move these to DrawableHitObject after ensuring that all other Rulesets apply
         // transforms in the same way and don't rely on them not being cleared
-        public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null) { }
-        public override void ApplyTransformsAt(double time, bool propagateChildren = false) { }
+        public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
+        {
+        }
+
+        public override void ApplyTransformsAt(double time, bool propagateChildren = false)
+        {
+        }
 
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
-    }
 
-    public enum ComboResult
-    {
-        [Description(@"")]
-        None,
-        [Description(@"Good")]
-        Good,
-        [Description(@"Amazing")]
-        Perfect
+        protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(judgement);
     }
 }
