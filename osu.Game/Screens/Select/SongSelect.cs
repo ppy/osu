@@ -314,13 +314,13 @@ namespace osu.Game.Screens.Select
             {
                 Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
 
-                WorkingBeatmap working = Beatmap.Value;
-
                 bool preview = false;
 
                 if (ruleset?.Equals(Ruleset.Value) == false)
                 {
                     Logger.Log($"ruleset changed from \"{Ruleset.Value}\" to \"{ruleset}\"");
+
+                    Beatmap.Value.Mods.Value = Enumerable.Empty<Mod>();
                     Ruleset.Value = ruleset;
 
                     // force a filter before attempting to change the beatmap.
@@ -340,7 +340,7 @@ namespace osu.Game.Screens.Select
                     Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
 
                     preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
-                    working = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
 
                     if (beatmap != null)
                     {
@@ -350,9 +350,6 @@ namespace osu.Game.Screens.Select
                             sampleChangeBeatmap.Play();
                     }
                 }
-
-                working.Mods.Value = Enumerable.Empty<Mod>();
-                Beatmap.Value = working;
 
                 ensurePlayingSelected(preview);
                 UpdateBeatmap(Beatmap.Value);
