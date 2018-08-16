@@ -151,9 +151,9 @@ namespace osu.Game
 
             if (args?.Length > 0)
             {
-                var paths = args.Where(a => !a.StartsWith(@"-"));
-
-                Task.Run(() => Import(paths.ToArray()));
+                var paths = args.Where(a => !a.StartsWith(@"-")).ToArray();
+                if (paths.Length > 0)
+                    Task.Run(() => Import(paths));
             }
 
             dependencies.CacheAs(this);
