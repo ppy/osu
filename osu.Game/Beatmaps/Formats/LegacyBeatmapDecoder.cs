@@ -126,16 +126,16 @@ namespace osu.Game.Beatmaps.Formats
                     switch (beatmap.BeatmapInfo.RulesetID)
                     {
                         case 0:
-                            parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser();
+                            parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
                             break;
                         case 1:
-                            parser = new Rulesets.Objects.Legacy.Taiko.ConvertHitObjectParser();
+                            parser = new Rulesets.Objects.Legacy.Taiko.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
                             break;
                         case 2:
-                            parser = new Rulesets.Objects.Legacy.Catch.ConvertHitObjectParser();
+                            parser = new Rulesets.Objects.Legacy.Catch.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
                             break;
                         case 3:
-                            parser = new Rulesets.Objects.Legacy.Mania.ConvertHitObjectParser();
+                            parser = new Rulesets.Objects.Legacy.Mania.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
                             break;
                     }
 
@@ -405,9 +405,9 @@ namespace osu.Game.Beatmaps.Formats
         {
             // If the ruleset wasn't specified, assume the osu!standard ruleset.
             if (parser == null)
-                parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser();
+                parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
 
-            var obj = parser.Parse(line, getOffsetTime());
+            var obj = parser.Parse(line);
 
             if (obj != null)
             {
