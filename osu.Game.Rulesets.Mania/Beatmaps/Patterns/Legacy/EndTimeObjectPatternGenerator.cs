@@ -59,8 +59,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         {
             int nextColumn = Random.Next(start, TotalColumns);
 
-            while (PreviousPattern.ColumnHasObject(nextColumn))
+            RunWhile(() => PreviousPattern.ColumnHasObject(nextColumn), () =>
+            {
                 nextColumn = Random.Next(start, TotalColumns);
+            });
 
             return nextColumn;
         }
