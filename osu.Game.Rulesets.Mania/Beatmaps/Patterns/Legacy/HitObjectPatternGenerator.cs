@@ -286,6 +286,9 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         /// <returns>The <see cref="Pattern"/> containing the hit objects.</returns>
         private Pattern generateRandomPatternWithMirrored(double centreProbability, double p2, double p3)
         {
+            if (convertType.HasFlag(PatternType.ForceNotStack))
+                return generateRandomPattern(1 / 2f + p2 / 2, p2, (p2 + p3) / 2, p3);
+
             var pattern = new Pattern();
 
             bool addToCentre;
@@ -369,9 +372,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         private int getRandomNoteCountMirrored(double centreProbability, double p2, double p3, out bool addToCentre)
         {
             addToCentre = false;
-
-            if (convertType.HasFlag(PatternType.ForceNotStack))
-                return getRandomNoteCount(1 / 2f + p2 / 2, p2, (p2 + p3) / 2, p3);
 
             switch (TotalColumns)
             {
