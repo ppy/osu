@@ -25,6 +25,8 @@ namespace osu.Game.Utils
         {
             raven.Release = game.Version;
 
+            if (!game.IsDeployedBuild) return;
+
             Logger.NewEntry += entry =>
             {
                 if (entry.Level < LogLevel.Verbose) return;
