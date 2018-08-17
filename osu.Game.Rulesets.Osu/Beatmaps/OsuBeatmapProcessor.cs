@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
 {
-    internal class OsuBeatmapProcessor : BeatmapProcessor
+    public class OsuBeatmapProcessor : BeatmapProcessor
     {
         public OsuBeatmapProcessor(IBeatmap beatmap)
             : base(beatmap)
