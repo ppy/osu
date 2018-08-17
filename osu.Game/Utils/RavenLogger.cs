@@ -19,6 +19,8 @@ namespace osu.Game.Utils
 
         private readonly List<Task> tasks = new List<Task>();
 
+        private Exception lastException;
+
         public RavenLogger(OsuGame game)
         {
             raven.Release = game.Version;
@@ -29,8 +31,20 @@ namespace osu.Game.Utils
             {
                 if (entry.Level < LogLevel.Verbose) return;
 
-                if (entry.Exception != null)
-                    queuePendingTask(raven.CaptureAsync(new SentryEvent(entry.Exception)));
+                var exception = entry.Exception;
+
+                if (exception != null)
+                {
+                    // since we let unhandled exceptions go ignored at times, we want to ensure they don't get submitted on subsequent reports.
+                    if (lastException != null &&
+                        lastException.Message == exception.Message && exception.StackTrace.StartsWith(lastException.StackTrace))
+                    {
+                        return;
+                    }
+
+                    lastException = exception;
+                    queuePendingTask(raven.CaptureAsync(new SentryEvent(exception)));
+                }
                 else
                     raven.AddTrail(new Breadcrumb(entry.Target.ToString(), BreadcrumbType.Navigation) { Message = entry.Message });
             };
