@@ -198,6 +198,8 @@ namespace osu.Game.Database
 
             try
             {
+                Logger.Log($"Importing {item}...", LoggingTarget.Database);
+
                 using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
                 {
                     try

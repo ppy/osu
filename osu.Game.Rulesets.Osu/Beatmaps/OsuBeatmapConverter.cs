@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
 {
-    internal class OsuBeatmapConverter : BeatmapConverter<OsuHitObject>
+    public class OsuBeatmapConverter : BeatmapConverter<OsuHitObject>
     {
         public OsuBeatmapConverter(IBeatmap beatmap)
             : base(beatmap)
