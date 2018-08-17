@@ -18,8 +18,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns
         /// <summary>
         /// An arbitrary maximum amount of iterations to perform in <see cref="RunWhile"/>.
         /// The specific value is not super important - enough such that no false-positives occur.
+        ///
+        /// /b/933228 requires at least 23 iterations.
         /// </summary>
-        private const int max_rng_iterations = 20;
+        private const int max_rng_iterations = 30;
 
         /// <summary>
         /// The last pattern.
