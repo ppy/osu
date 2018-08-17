@@ -84,6 +84,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             // grab the input manager for future use.
             osuInputManager = (OsuInputManager)rulesetContainer.KeyBindingInputManager;
+            osuInputManager.AllowUserPresses = false;
         }
     }
 }
