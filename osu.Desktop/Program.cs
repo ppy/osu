@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework;
+using osu.Framework.Development;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IPC;
@@ -51,7 +52,7 @@ namespace osu.Desktop
             }
         }
 
-        private static int allowableExceptions = 1;
+        private static int allowableExceptions = DebugUtils.IsDebugBuild ? 0 : 1;
 
         /// <summary>
         /// Allow a maximum of one unhandled exception, per second of execution.
