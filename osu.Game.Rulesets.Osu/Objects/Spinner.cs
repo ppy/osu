@@ -20,8 +20,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         public int SpinsRequired { get; protected set; } = 1;
 
-        public override bool NewCombo => true;
-
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
