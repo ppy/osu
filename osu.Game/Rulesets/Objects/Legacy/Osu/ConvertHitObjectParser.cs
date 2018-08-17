@@ -61,6 +61,8 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
 
         protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime)
         {
+            // Convert spinners don't create the new combo themselves, but force the next non-spinner hitobject to create a new combo
+            // Their combo offset is still added to that next hitobject's combo index
             forceNewCombo |= FormatVersion <= 8 || newCombo;
             extraComboOffset += comboOffset;
 
