@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             instance = newRuleset.CreateInstance();
 
-            if (Beatmap == null) return;
+            if (Beatmap == null || (beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID)) return;
 
             starCounter.CountStars = (float)(instance.CreateDifficultyCalculator(Beatmap).Calculate(Beatmap.Mods.Value.ToArray()).StarRating);
         }

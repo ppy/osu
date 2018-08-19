@@ -49,6 +49,7 @@ namespace osu.Game.Screens.Select.Details
                 accuracy.Value = Beatmap?.BaseDifficulty?.OverallDifficulty ?? 0;
                 approachRate.Value = Beatmap?.BaseDifficulty?.ApproachRate ?? 0;
                 WBeatmap = Manager.GetWorkingBeatmap(beatmap, WBeatmap);
+                if (WBeatmap == null || (beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID)) return;
                 starDifficulty.Value = (float)(instance.CreateDifficultyCalculator(WBeatmap)?.Calculate(SelectedMods.Value.ToArray()).StarRating ?? 0);
             }
         }
@@ -104,14 +105,14 @@ namespace osu.Game.Screens.Select.Details
 
             instance = newRuleset.CreateInstance();
 
-            if (WBeatmap == null) return;
+            if (WBeatmap == null || (beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID)) return;
 
             starDifficulty.Value = (float)(instance.CreateDifficultyCalculator(WBeatmap).Calculate(WBeatmap.Mods.Value.ToArray()).StarRating);
         }
 
             private void selectedModsChanged(IEnumerable<Mod> obj)
         {
-            if (WBeatmap == null || WBeatmap.Mods.Value==obj) return;
+            if (WBeatmap == null || WBeatmap.Mods.Value==obj || (beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID)) return;
 
             starDifficulty.Value = (float)(instance.CreateDifficultyCalculator(WBeatmap).Calculate(obj.ToArray()).StarRating);
         }
