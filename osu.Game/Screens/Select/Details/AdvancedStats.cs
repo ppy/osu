@@ -24,7 +24,6 @@ namespace osu.Game.Screens.Select.Details
     {
         private readonly StatisticRow firstValue, hpDrain, accuracy, approachRate, starDifficulty;
 
-        public WorkingBeatmap WBeatmap;
         private BeatmapInfo beatmap;
         public BeatmapInfo Beatmap
         {
@@ -49,7 +48,8 @@ namespace osu.Game.Screens.Select.Details
                 hpDrain.Value = Beatmap?.BaseDifficulty?.DrainRate ?? 0;
                 accuracy.Value = Beatmap?.BaseDifficulty?.OverallDifficulty ?? 0;
                 approachRate.Value = Beatmap?.BaseDifficulty?.ApproachRate ?? 0;
-                starDifficulty.Value = (float)(beatmap?.Ruleset?.CreateInstance()?.CreateDifficultyCalculator(WBeatmap)?.Calculate(WBeatmap?.Mods?.Value?.ToArray()).StarRating ?? 0);
+                WBeatmap = Manager.GetWorkingBeatmap(beatmap, WBeatmap);
+                starDifficulty.Value = (float)(instance.CreateDifficultyCalculator(WBeatmap)?.Calculate(SelectedMods.Value.ToArray()).StarRating ?? 0);
             }
         }
 
@@ -77,12 +77,17 @@ namespace osu.Game.Screens.Select.Details
 
         protected readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
+        protected WorkingBeatmap WBeatmap;
+
+        protected BeatmapManager Manager;
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset, Bindable<IEnumerable<Mod>> selectedMods)
+        private void load(OsuColour colours, BeatmapManager manager, IBindable<RulesetInfo> ruleset, Bindable<IEnumerable<Mod>> selectedMods)
         {
             starDifficulty.AccentColour = colours.Yellow;
             Ruleset.BindTo(ruleset);
             if (selectedMods != null) SelectedMods.BindTo(selectedMods);
+            Manager = manager;
         }
 
         protected override void LoadComplete()

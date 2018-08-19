@@ -39,7 +39,6 @@ namespace osu.Game.Screens.Select
 
         private ScheduledDelegate pendingBeatmapSwitch;
 
-        public WorkingBeatmap WBeatmap;
         private BeatmapInfo beatmap;
         public BeatmapInfo Beatmap
         {
@@ -180,7 +179,6 @@ namespace osu.Game.Screens.Select
             }
 
             ratingsContainer.FadeIn(transition_duration);
-            advanced.WBeatmap = WBeatmap;
             advanced.Beatmap = Beatmap;
             description.Text = Beatmap.Version;
             source.Text = Beatmap.Metadata.Source;
