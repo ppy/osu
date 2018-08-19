@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -13,34 +14,23 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Taiko.Judgements;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableSwell : DrawableTaikoHitObject<Swell>
     {
-        /// <summary>
-        /// Invoked when the swell has reached the hit target, i.e. when CurrentTime >= StartTime.
-        /// This is only ever invoked once.
-        /// </summary>
-        public event Action OnStart;
-
         private const float target_ring_thick_border = 1.4f;
         private const float target_ring_thin_border = 1f;
         private const float target_ring_scale = 5f;
         private const float inner_ring_alpha = 0.65f;
 
+        private readonly List<DrawableSwellTick> ticks = new List<DrawableSwellTick>();
+
         private readonly Container bodyContainer;
         private readonly CircularContainer targetRing;
         private readonly CircularContainer expandingRing;
 
-        /// <summary>
-        /// The amount of times the user has hit this swell.
-        /// </summary>
-        private int userHits;
-
-        private bool hasStarted;
         private readonly SwellSymbolPiece symbol;
 
         public DrawableSwell(Swell swell)
@@ -48,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             FillMode = FillMode.Fit;
 
-            AddInternal(bodyContainer = new Container
+            Content.Add(bodyContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Depth = 1,
@@ -114,6 +104,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             });
 
             MainPiece.Add(symbol = new SwellSymbolPiece());
+
+            foreach (var tick in HitObject.NestedHitObjects.OfType<SwellTick>())
+            {
+                var vis = new DrawableSwellTick(tick);
+
+                ticks.Add(vis);
+                AddInternal(vis);
+                AddNested(vis);
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -132,13 +131,17 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             Width *= Parent.RelativeChildSize.X;
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (userTriggered)
             {
-                userHits++;
+                var nextTick = ticks.FirstOrDefault(j => !j.IsHit);
 
-                var completion = (float)userHits / HitObject.RequiredHits;
+                nextTick?.TriggerResult(HitResult.Great);
+
+                var numHits = ticks.Count(r => r.IsHit);
+
+                var completion = (float)numHits / HitObject.RequiredHits;
 
                 expandingRing
                     .FadeTo(expandingRing.Alpha + MathHelper.Clamp(completion / 16, 0.1f, 0.6f), 50)
@@ -149,18 +152,30 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 expandingRing.ScaleTo(1f + Math.Min(target_ring_scale - 1f, (target_ring_scale - 1f) * completion * 1.3f), 260, Easing.OutQuint);
 
-                if (userHits == HitObject.RequiredHits)
-                    AddJudgement(new TaikoJudgement { Result = HitResult.Great });
+                if (numHits == HitObject.RequiredHits)
+                    ApplyResult(r => r.Type = HitResult.Great);
             }
             else
             {
                 if (timeOffset < 0)
                     return;
 
-                //TODO: THIS IS SHIT AND CAN'T EXIST POST-TAIKO WORLD CUP
-                AddJudgement(userHits > HitObject.RequiredHits / 2
-                    ? new TaikoJudgement { Result = HitResult.Good }
-                    : new TaikoJudgement { Result = HitResult.Miss });
+                int numHits = 0;
+
+                foreach (var tick in ticks)
+                {
+                    if (tick.IsHit)
+                    {
+                        numHits++;
+                        continue;
+                    }
+
+                    tick.TriggerResult(HitResult.Miss);
+                }
+
+                var hitResult = numHits > HitObject.RequiredHits / 2 ? HitResult.Good : HitResult.Miss;
+
+                ApplyResult(r => r.Type = hitResult);
             }
         }
 
@@ -169,20 +184,22 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             const float preempt = 100;
             const float out_transition_time = 300;
 
-            double untilStartTime = HitObject.StartTime - Time.Current;
-            double untilJudgement = untilStartTime + (Judgements.FirstOrDefault()?.TimeOffset ?? 0) + HitObject.Duration;
-
-            targetRing.Delay(untilStartTime - preempt).ScaleTo(target_ring_scale, preempt * 4, Easing.OutQuint);
-            this.Delay(untilJudgement).FadeOut(out_transition_time, Easing.Out);
-
             switch (state)
             {
+                case ArmedState.Idle:
+                    UnproxyContent();
+                    expandingRing.FadeTo(0);
+                    using (BeginAbsoluteSequence(HitObject.StartTime - preempt, true))
+                        targetRing.ScaleTo(target_ring_scale, preempt * 4, Easing.OutQuint);
+                    break;
+                case ArmedState.Miss:
                 case ArmedState.Hit:
-                    bodyContainer.Delay(untilJudgement).ScaleTo(1.4f, out_transition_time);
+                    this.FadeOut(out_transition_time, Easing.Out);
+                    bodyContainer.ScaleTo(1.4f, out_transition_time);
+
+                    Expire();
                     break;
             }
-
-            Expire();
         }
 
         protected override void Update()
@@ -195,11 +212,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             X = Math.Max(0, X);
 
             double t = Math.Min(HitObject.StartTime, Time.Current);
-            if (t == HitObject.StartTime && !hasStarted)
-            {
-                OnStart?.Invoke();
-                hasStarted = true;
-            }
+            if (t == HitObject.StartTime)
+                ProxyContent();
         }
 
         private bool? lastWasCentre;
@@ -217,7 +231,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 return false;
             lastWasCentre = isCentre;
 
-            UpdateJudgement(true);
+            UpdateResult(true);
 
             return true;
         }

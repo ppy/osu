@@ -56,7 +56,14 @@ namespace osu.Game.Rulesets.UI
 
         public abstract IEnumerable<HitObject> Objects { get; }
 
+        /// <summary>
+        /// The point in time at which gameplay starts, including any required lead-in for display purposes.
+        /// Defaults to two seconds before the first <see cref="HitObject"/>. Override as necessary.
+        /// </summary>
+        public virtual double GameplayStartTime => Objects.First().StartTime - 2000;
+
         private readonly Lazy<Playfield> playfield;
+
         /// <summary>
         /// The playfield.
         /// </summary>
@@ -69,13 +76,9 @@ namespace osu.Game.Rulesets.UI
 
         protected readonly Ruleset Ruleset;
 
-        private IRulesetConfigManager rulesetConfig;
+        protected IRulesetConfigManager Config { get; private set; }
+
         private OnScreenDisplay onScreenDisplay;
-
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
-            => dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
 
         /// <summary>
         /// A visual representation of a <see cref="Rulesets.Ruleset"/>.
@@ -86,21 +89,31 @@ namespace osu.Game.Rulesets.UI
             Ruleset = ruleset;
             playfield = new Lazy<Playfield>(CreatePlayfield);
 
+            IsPaused.ValueChanged += paused =>
+            {
+                if (HasReplayLoaded)
+                    return;
+
+                KeyBindingInputManager.UseParentInput = !paused;
+            };
+
             Cursor = CreateCursor();
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OnScreenDisplay onScreenDisplay, SettingsStore settings)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            this.onScreenDisplay = onScreenDisplay;
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
-            rulesetConfig = CreateConfig(Ruleset, settings);
+            onScreenDisplay = dependencies.Get<OnScreenDisplay>();
 
-            if (rulesetConfig != null)
+            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
+            if (Config != null)
             {
-                dependencies.Cache(rulesetConfig);
-                onScreenDisplay?.BeginTracking(this, rulesetConfig);
+                dependencies.Cache(Config);
+                onScreenDisplay?.BeginTracking(this, Config);
             }
+
+            return dependencies;
         }
 
         public abstract ScoreProcessor CreateScoreProcessor();
@@ -114,6 +127,11 @@ namespace osu.Game.Rulesets.UI
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
         public Replay Replay { get; private set; }
+
+        /// <summary>
+        /// Whether the game is paused. Used to block user input.
+        /// </summary>
+        public readonly BindableBool IsPaused = new BindableBool();
 
         /// <summary>
         /// Sets a replay to be used, overriding local input.
@@ -130,13 +148,10 @@ namespace osu.Game.Rulesets.UI
             HasReplayLoaded.Value = ReplayInputManager.ReplayInputHandler != null;
         }
 
-
         /// <summary>
         /// Creates the cursor. May be null if the <see cref="RulesetContainer"/> doesn't provide a custom cursor.
         /// </summary>
         protected virtual CursorContainer CreateCursor() => null;
-
-        protected virtual IRulesetConfigManager CreateConfig(Ruleset ruleset, SettingsStore settings) => null;
 
         /// <summary>
         /// Creates a Playfield.
@@ -148,10 +163,10 @@ namespace osu.Game.Rulesets.UI
         {
             base.Dispose(isDisposing);
 
-            if (rulesetConfig != null)
+            if (Config != null)
             {
-                onScreenDisplay?.StopTracking(this, rulesetConfig);
-                rulesetConfig = null;
+                onScreenDisplay?.StopTracking(this, Config);
+                Config = null;
             }
         }
     }
@@ -160,15 +175,22 @@ namespace osu.Game.Rulesets.UI
     /// RulesetContainer that applies conversion to Beatmaps. Does not contain a Playfield
     /// and does not load drawable hit objects.
     /// <para>
-    /// Should not be derived - derive <see cref="RulesetContainer{TObject}"/> instead.
+    /// Should not be derived - derive <see cref="RulesetContainer{TPlayfield, TObject}"/> instead.
     /// </para>
     /// </summary>
     /// <typeparam name="TObject">The type of HitObject contained by this RulesetContainer.</typeparam>
     public abstract class RulesetContainer<TObject> : RulesetContainer
         where TObject : HitObject
     {
-        public event Action<Judgement> OnJudgement;
-        public event Action<Judgement> OnJudgementRemoved;
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public event Action<JudgementResult> OnNewResult;
+
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> is being reverted by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public event Action<JudgementResult> OnRevertResult;
 
         /// <summary>
         /// The Beatmap
@@ -194,6 +216,7 @@ namespace osu.Game.Rulesets.UI
 
         protected override Container<Drawable> Content => content;
         private Container content;
+        private IEnumerable<Mod> mods;
 
         /// <summary>
         /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
@@ -216,13 +239,10 @@ namespace osu.Game.Rulesets.UI
 
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
-
-            // Add mods, should always be the last thing applied to give full control to mods
-            applyMods(Mods);
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(OsuConfigManager config)
         {
             KeyBindingInputManager.Add(content = new Container
             {
@@ -235,6 +255,9 @@ namespace osu.Game.Rulesets.UI
             if (Cursor != null)
                 KeyBindingInputManager.Add(Cursor);
 
+            // Apply mods
+            applyMods(Mods, config);
+
             loadObjects();
         }
 
@@ -242,13 +265,16 @@ namespace osu.Game.Rulesets.UI
         /// Applies the active mods to this RulesetContainer.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyMods(IEnumerable<Mod> mods)
+        private void applyMods(IEnumerable<Mod> mods, OsuConfigManager config)
         {
             if (mods == null)
                 return;
 
             foreach (var mod in mods.OfType<IApplicableToRulesetContainer<TObject>>())
                 mod.ApplyToRulesetContainer(this);
+
+            foreach (var mod in mods.OfType<IReadFromConfig>())
+                mod.ReadFromConfig(config);
         }
 
         public override void SetReplay(Replay replay)
@@ -271,8 +297,8 @@ namespace osu.Game.Rulesets.UI
                 if (drawableObject == null)
                     continue;
 
-                drawableObject.OnJudgement += (d, j) => OnJudgement?.Invoke(j);
-                drawableObject.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(j);
+                drawableObject.OnNewResult += (_, r) => OnNewResult?.Invoke(r);
+                drawableObject.OnRevertResult += (_, r) => OnRevertResult?.Invoke(r);
 
                 Playfield.Add(drawableObject);
             }

@@ -3,10 +3,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using NUnit.Framework;
 using OpenTK;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -29,14 +29,11 @@ namespace osu.Game.Tests.Visual
         private RulesetStore rulesets;
         private TestBeatmapInfoWedge infoWedge;
         private readonly List<IBeatmap> beatmaps = new List<IBeatmap>();
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, RulesetStore rulesets)
+        private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
-
-            beatmap.BindTo(game.Beatmap);
         }
 
         protected override void LoadComplete()
@@ -53,11 +50,11 @@ namespace osu.Game.Tests.Visual
             AddStep("show", () =>
             {
                 infoWedge.State = Visibility.Visible;
-                infoWedge.UpdateBeatmap(beatmap);
+                infoWedge.Beatmap = Beatmap;
             });
 
             // select part is redundant, but wait for load isn't
-            selectBeatmap(beatmap.Value.Beatmap);
+            selectBeatmap(Beatmap.Value.Beatmap);
 
             AddWaitStep(3);
 
@@ -69,17 +66,19 @@ namespace osu.Game.Tests.Visual
 
             foreach (var rulesetInfo in rulesets.AvailableRulesets)
             {
-                var ruleset = rulesetInfo.CreateInstance();
+                var instance = rulesetInfo.CreateInstance();
                 var testBeatmap = createTestBeatmap(rulesetInfo);
 
                 beatmaps.Add(testBeatmap);
 
+                AddStep("set ruleset", () => Ruleset.Value = rulesetInfo);
+
                 selectBeatmap(testBeatmap);
 
-                testBeatmapLabels(ruleset);
+                testBeatmapLabels(instance);
 
                 // TODO: adjust cases once more info is shown for other gamemodes
-                switch (ruleset)
+                switch (instance)
                 {
                     case OsuRuleset _:
                         testInfoLabels(5);
@@ -112,40 +111,31 @@ namespace osu.Game.Tests.Visual
 
         private void testInfoLabels(int expectedCount)
         {
-            AddAssert("check infolabels exists", () => infoWedge.Info.InfoLabelContainer.Children.Any());
-            AddAssert("check infolabels count", () => infoWedge.Info.InfoLabelContainer.Children.Count == expectedCount);
+            AddAssert("check info labels exists", () => infoWedge.Info.InfoLabelContainer.Children.Any());
+            AddAssert("check info labels count", () => infoWedge.Info.InfoLabelContainer.Children.Count == expectedCount);
         }
 
         private void testNullBeatmap()
         {
-            selectNullBeatmap();
+            selectBeatmap(null);
             AddAssert("check empty version", () => string.IsNullOrEmpty(infoWedge.Info.VersionLabel.Text));
-            AddAssert("check default title", () => infoWedge.Info.TitleLabel.Text == beatmap.Default.BeatmapInfo.Metadata.Title);
-            AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Text == beatmap.Default.BeatmapInfo.Metadata.Artist);
+            AddAssert("check default title", () => infoWedge.Info.TitleLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Title);
+            AddAssert("check default artist", () => infoWedge.Info.ArtistLabel.Text == Beatmap.Default.BeatmapInfo.Metadata.Artist);
             AddAssert("check empty author", () => !infoWedge.Info.MapperContainer.Children.Any());
-            AddAssert("check no infolabels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
+            AddAssert("check no info labels", () => !infoWedge.Info.InfoLabelContainer.Children.Any());
         }
 
-        private void selectBeatmap(IBeatmap b)
+        private void selectBeatmap([CanBeNull] IBeatmap b)
         {
             BeatmapInfoWedge.BufferedWedgeInfo infoBefore = null;
 
-            AddStep($"select {b.Metadata.Title} beatmap", () =>
+            AddStep($"select {b?.Metadata.Title ?? "null"} beatmap", () =>
             {
                 infoBefore = infoWedge.Info;
-                infoWedge.UpdateBeatmap(beatmap.Value = new TestWorkingBeatmap(b));
+                infoWedge.Beatmap = Beatmap.Value = b == null ? Beatmap.Default : new TestWorkingBeatmap(b);
             });
 
             AddUntilStep(() => infoWedge.Info != infoBefore, "wait for async load");
-        }
-
-        private void selectNullBeatmap()
-        {
-            AddStep("select null beatmap", () =>
-            {
-                beatmap.Value = beatmap.Default;
-                infoWedge.UpdateBeatmap(beatmap);
-            });
         }
 
         private IBeatmap createTestBeatmap(RulesetInfo ruleset)

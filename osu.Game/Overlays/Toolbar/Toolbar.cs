@@ -6,10 +6,12 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using OpenTK;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
+using osu.Framework.Input.States;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -29,6 +31,8 @@ namespace osu.Game.Overlays.Toolbar
         private const float alpha_hovering = 0.8f;
         private const float alpha_normal = 0.6f;
 
+        private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
+
         public Toolbar()
         {
             Children = new Drawable[]
@@ -46,7 +50,7 @@ namespace osu.Game.Overlays.Toolbar
                         {
                             Action = () => OnHome?.Invoke()
                         },
-                        new ToolbarModeSelector()
+                        new ToolbarRulesetSelector()
                     }
                 },
                 new FillFlowContainer
@@ -74,6 +78,19 @@ namespace osu.Game.Overlays.Toolbar
 
             RelativeSizeAxes = Axes.X;
             Size = new Vector2(1, HEIGHT);
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame osuGame)
+        {
+            if (osuGame != null)
+                overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
+
+            StateChanged += visibility =>
+            {
+                if (overlayActivationMode == OverlayActivation.Disabled)
+                    State = Visibility.Hidden;
+            };
         }
 
         public class ToolbarBackground : Container

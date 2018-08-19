@@ -26,9 +26,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
             var positionData = obj as IHasXPosition;
             var comboData = obj as IHasCombo;
             var endTime = obj as IHasEndTime;
-
-            if (positionData == null)
-                yield break;
+            var legacyOffset = obj as IHasLegacyLastTickOffset;
 
             if (curveData != null)
             {
@@ -41,33 +39,34 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     Distance = curveData.Distance,
                     RepeatSamples = curveData.RepeatSamples,
                     RepeatCount = curveData.RepeatCount,
-                    X = positionData.X / CatchPlayfield.BASE_WIDTH,
-                    NewCombo = comboData?.NewCombo ?? false
+                    X = (positionData?.X ?? 0) / CatchPlayfield.BASE_WIDTH,
+                    NewCombo = comboData?.NewCombo ?? false,
+                    ComboOffset = comboData?.ComboOffset ?? 0,
+                    LegacyLastTickOffset = legacyOffset?.LegacyLastTickOffset ?? 0
                 };
-
-                yield break;
             }
-
-            if (endTime != null)
+            else if (endTime != null)
             {
                 yield return new BananaShower
                 {
                     StartTime = obj.StartTime,
                     Samples = obj.Samples,
                     Duration = endTime.Duration,
-                    NewCombo = comboData?.NewCombo ?? false
+                    NewCombo = comboData?.NewCombo ?? false,
+                    ComboOffset = comboData?.ComboOffset ?? 0,
                 };
-
-                yield break;
             }
-
-            yield return new Fruit
+            else
             {
-                StartTime = obj.StartTime,
-                Samples = obj.Samples,
-                NewCombo = comboData?.NewCombo ?? false,
-                X = positionData.X / CatchPlayfield.BASE_WIDTH
-            };
+                yield return new Fruit
+                {
+                    StartTime = obj.StartTime,
+                    Samples = obj.Samples,
+                    NewCombo = comboData?.NewCombo ?? false,
+                    ComboOffset = comboData?.ComboOffset ?? 0,
+                    X = (positionData?.X ?? 0) / CatchPlayfield.BASE_WIDTH
+                };
+            }
         }
 
         protected override Beatmap<CatchHitObject> CreateBeatmap() => new CatchBeatmap();

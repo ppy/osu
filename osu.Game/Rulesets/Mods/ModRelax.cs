@@ -11,7 +11,8 @@ namespace osu.Game.Rulesets.Mods
         public override string Name => "Relax";
         public override string ShortenedName => "RX";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_relax;
-        public override double ScoreMultiplier => 0;
+        public override ModType Type => ModType.Automation;
+        public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(ModAutoplay), typeof(ModNoFail), typeof(ModSuddenDeath) };
     }
 }

@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 using OpenTK;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -15,7 +16,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// </summary>
     public abstract class TimelinePart : CompositeDrawable
     {
-        public Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         private readonly Container timeline;
 
@@ -30,6 +31,12 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(IBindableBeatmap beatmap)
+        {
+            Beatmap.BindTo(beatmap);
+        }
+
         private void updateRelativeChildSize()
         {
             // the track may not be loaded completely (only has a length once it is).
@@ -40,8 +47,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 return;
             }
 
-            // Todo: This should be handled more gracefully
-            timeline.RelativeChildSize = Beatmap.Value.Track.Length == double.PositiveInfinity ? Vector2.One : new Vector2((float)Math.Max(1, Beatmap.Value.Track.Length), 1);
+            timeline.RelativeChildSize = new Vector2((float)Math.Max(1, Beatmap.Value.Track.Length), 1);
         }
 
         protected void Add(Drawable visualisation) => timeline.Add(visualisation);

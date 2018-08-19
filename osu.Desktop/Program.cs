@@ -4,12 +4,13 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using osu.Framework;
+using osu.Framework.Development;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.IPC;
-#if NET_FRAMEWORK
-using System.Runtime;
-#endif
 
 namespace osu.Desktop
 {
@@ -18,16 +19,13 @@ namespace osu.Desktop
         [STAThread]
         public static int Main(string[] args)
         {
-            // required to initialise native SQLite libraries on some platforms.
-
-            if (!RuntimeInfo.IsMono)
-                useMulticoreJit();
-
             // Back up the cwd before DesktopGameHost changes it
             var cwd = Environment.CurrentDirectory;
 
             using (DesktopGameHost host = Host.GetSuitableHost(@"osu", true))
             {
+                host.ExceptionThrown += handleException;
+
                 if (!host.IsPrimaryInstance)
                 {
                     var importer = new ArchiveImportIPCChannel(host);
@@ -54,13 +52,23 @@ namespace osu.Desktop
             }
         }
 
-        private static void useMulticoreJit()
+        private static int allowableExceptions = DebugUtils.IsDebugBuild ? 0 : 1;
+
+        /// <summary>
+        /// Allow a maximum of one unhandled exception, per second of execution.
+        /// </summary>
+        /// <param name="arg"></param>
+        /// <returns></returns>
+        private static bool handleException(Exception arg)
         {
-#if NET_FRAMEWORK
-            var directory = Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Profiles"));
-            ProfileOptimization.SetProfileRoot(directory.FullName);
-            ProfileOptimization.StartProfile("Startup.Profile");
-#endif
+            bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
+
+            Logger.Log($"Unhandled exception has been {(continueExecution ? "allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
+
+            // restore the stock of allowable exceptions after a short delay.
+            Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));
+
+            return continueExecution;
         }
     }
 }

@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Rulesets.Osu.Beatmaps
 {
-    internal class OsuBeatmapConverter : BeatmapConverter<OsuHitObject>
+    public class OsuBeatmapConverter : BeatmapConverter<OsuHitObject>
     {
         public OsuBeatmapConverter(IBeatmap beatmap)
             : base(beatmap)
@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
             var endTimeData = original as IHasEndTime;
             var positionData = original as IHasPosition;
             var comboData = original as IHasCombo;
+            var legacyOffset = original as IHasLegacyLastTickOffset;
 
             if (curveData != null)
             {
@@ -40,7 +41,9 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     RepeatSamples = curveData.RepeatSamples,
                     RepeatCount = curveData.RepeatCount,
                     Position = positionData?.Position ?? Vector2.Zero,
-                    NewCombo = comboData?.NewCombo ?? false
+                    NewCombo = comboData?.NewCombo ?? false,
+                    ComboOffset = comboData?.ComboOffset ?? 0,
+                    LegacyLastTickOffset = legacyOffset?.LegacyLastTickOffset
                 };
             }
             else if (endTimeData != null)
@@ -50,7 +53,9 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     StartTime = original.StartTime,
                     Samples = original.Samples,
                     EndTime = endTimeData.EndTime,
-                    Position = positionData?.Position ?? OsuPlayfield.BASE_SIZE / 2
+                    Position = positionData?.Position ?? OsuPlayfield.BASE_SIZE / 2,
+                    NewCombo = comboData?.NewCombo ?? false,
+                    ComboOffset = comboData?.ComboOffset ?? 0,
                 };
             }
             else
@@ -60,7 +65,8 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     StartTime = original.StartTime,
                     Samples = original.Samples,
                     Position = positionData?.Position ?? Vector2.Zero,
-                    NewCombo = comboData?.NewCombo ?? false
+                    NewCombo = comboData?.NewCombo ?? false,
+                    ComboOffset = comboData?.ComboOffset ?? 0,
                 };
             }
         }

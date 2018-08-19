@@ -6,7 +6,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -51,8 +52,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             if (Beatmap.Value == null)
                 return;
-
-            if (Beatmap.Value.Track.Length == double.PositiveInfinity) return;
 
             float markerPos = MathHelper.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
             adjustableClock.Seek(markerPos / DrawWidth * Beatmap.Value.Track.Length);

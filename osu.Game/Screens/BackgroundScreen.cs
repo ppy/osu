@@ -5,7 +5,8 @@ using System;
 using System.Threading;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using OpenTK;
 
 namespace osu.Game.Screens
@@ -40,7 +41,14 @@ namespace osu.Game.Screens
             while (screen.LoadState < LoadState.Ready)
                 Thread.Sleep(1);
 
-            base.Push(screen);
+            try
+            {
+                base.Push(screen);
+            }
+            catch (ScreenAlreadyExitedException)
+            {
+                // screen may have exited before the push was successful.
+            }
         }
 
         protected override void Update()

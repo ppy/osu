@@ -13,14 +13,14 @@ using osu.Game.Storyboards;
 using osu.Framework.IO.File;
 using System.IO;
 using osu.Game.IO.Serialization;
-using System.Diagnostics;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Skinning;
 
 namespace osu.Game.Beatmaps
 {
-    public abstract class WorkingBeatmap : IDisposable
+    public abstract partial class WorkingBeatmap : IDisposable
     {
         public readonly BeatmapInfo BeatmapInfo;
 
@@ -49,12 +49,13 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// Saves the <see cref="Beatmaps.Beatmap"/>.
         /// </summary>
-        public void Save()
+        /// <returns>The absolute path of the output file.</returns>
+        public string Save()
         {
             var path = FileSafety.GetTempPath(Guid.NewGuid().ToString().Replace("-", string.Empty) + ".json");
             using (var sw = new StreamWriter(path))
                 sw.WriteLine(Beatmap.Serialize());
-            Process.Start(path);
+            return path;
         }
 
         protected abstract IBeatmap GetBeatmap();
@@ -116,8 +117,9 @@ namespace osu.Game.Beatmaps
                     mod.ApplyToDifficulty(converted.BeatmapInfo.BaseDifficulty);
             }
 
-            // Post-process
-            rulesetInstance.CreateBeatmapProcessor(converted)?.PostProcess();
+            IBeatmapProcessor processor = rulesetInstance.CreateBeatmapProcessor(converted);
+
+            processor?.PreProcess();
 
             // Compute default values for hitobjects, including creating nested hitobjects in-case they're needed
             foreach (var obj in converted.HitObjects)
@@ -127,8 +129,12 @@ namespace osu.Game.Beatmaps
             foreach (var obj in converted.HitObjects)
                 mod.ApplyToHitObject(obj);
 
+            processor?.PostProcess();
+
             return converted;
         }
+
+        public override string ToString() => BeatmapInfo.ToString();
 
         public bool BackgroundLoaded => background.IsResultAvailable;
         public Texture Background => background.Value.Result;
@@ -145,7 +151,7 @@ namespace osu.Game.Beatmaps
         private Track populateTrack()
         {
             // we want to ensure that we always have a track, even if it's a fake one.
-            var t = GetTrack() ?? new TrackVirtual();
+            var t = GetTrack() ?? new VirtualBeatmapTrack(Beatmap);
             applyRateAdjustments(t);
             return t;
         }

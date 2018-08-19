@@ -54,11 +54,11 @@ namespace osu.Game.Tests.Visual
 
             breadcrumbs.Current.TriggerChange();
 
-            assertCurrent();
+            waitForCurrent();
             pushNext();
-            assertCurrent();
+            waitForCurrent();
             pushNext();
-            assertCurrent();
+            waitForCurrent();
 
             AddStep(@"make start current", () =>
             {
@@ -66,8 +66,9 @@ namespace osu.Game.Tests.Visual
                 currentScreen = startScreen;
             });
 
-            assertCurrent();
+            waitForCurrent();
             pushNext();
+            waitForCurrent();
             AddAssert(@"only 2 items", () => breadcrumbs.Items.Count() == 2);
             AddStep(@"exit current", () => changedScreen.Exit());
             AddAssert(@"current screen is first", () => startScreen == changedScreen);
@@ -80,15 +81,12 @@ namespace osu.Game.Tests.Visual
         }
 
         private void pushNext() => AddStep(@"push next screen", () => currentScreen = ((TestScreen)currentScreen).PushNext());
-        private void assertCurrent() => AddAssert(@"changedScreen correct", () => currentScreen == changedScreen);
+        private void waitForCurrent() => AddUntilStep(() => currentScreen.IsCurrentScreen, "current screen");
 
         private abstract class TestScreen : OsuScreen
         {
-            protected abstract string Title { get; }
             protected abstract string NextTitle { get; }
             protected abstract TestScreen CreateNextScreen();
-
-            public override string ToString() => Title;
 
             public TestScreen PushNext()
             {
@@ -130,14 +128,14 @@ namespace osu.Game.Tests.Visual
 
         private class TestScreenOne : TestScreen
         {
-            protected override string Title => @"Screen One";
+            public override string Title => @"Screen One";
             protected override string NextTitle => @"Two";
             protected override TestScreen CreateNextScreen() => new TestScreenTwo();
         }
 
         private class TestScreenTwo : TestScreen
         {
-            protected override string Title => @"Screen Two";
+            public override string Title => @"Screen Two";
             protected override string NextTitle => @"One";
             protected override TestScreen CreateNextScreen() => new TestScreenOne();
         }

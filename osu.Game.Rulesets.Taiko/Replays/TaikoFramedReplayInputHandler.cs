@@ -4,7 +4,7 @@
 using osu.Game.Rulesets.Replays;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Input;
+using osu.Framework.Input.StateChanges;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
@@ -17,6 +17,6 @@ namespace osu.Game.Rulesets.Taiko.Replays
 
         protected override bool IsImportant(TaikoReplayFrame frame) => frame.Actions.Any();
 
-        public override List<InputState> GetPendingStates() => new List<InputState> { new ReplayState<TaikoAction> { PressedActions = CurrentFrame.Actions } };
+        public override List<IInput> GetPendingInputs() => new List<IInput> { new ReplayState<TaikoAction> { PressedActions = CurrentFrame.Actions } };
     }
 }

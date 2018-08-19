@@ -8,7 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using OpenTK;
@@ -73,13 +73,13 @@ namespace osu.Game.Overlays.Music
             }
 
             [BackgroundDependencyLoader]
-            private void load(BeatmapManager beatmaps, OsuGameBase osuGame)
+            private void load(BeatmapManager beatmaps, IBindableBeatmap beatmap)
             {
                 beatmaps.GetAllUsableBeatmapSets().ForEach(addBeatmapSet);
                 beatmaps.ItemAdded += addBeatmapSet;
                 beatmaps.ItemRemoved += removeBeatmapSet;
 
-                beatmapBacking.BindTo(osuGame.Beatmap);
+                beatmapBacking.BindTo(beatmap);
                 beatmapBacking.ValueChanged += _ => updateSelectedSet();
             }
 
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Music
             private void updateSelectedSet()
             {
                 foreach (PlaylistItem s in items.Children)
-                    s.Selected = s.BeatmapSetInfo.ID == beatmapBacking.Value.BeatmapSetInfo.ID;
+                    s.Selected = s.BeatmapSetInfo.ID == beatmapBacking.Value.BeatmapSetInfo?.ID;
             }
 
             public string SearchTerm

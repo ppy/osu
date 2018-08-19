@@ -5,11 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
@@ -25,20 +23,15 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    internal class ManiaStage : ScrollingPlayfield
+    public class ManiaStage : ManiaScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
-
-        /// <summary>
-        /// Whether this playfield should be inverted. This flips everything inside the playfield.
-        /// </summary>
-        public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
 
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
 
-        protected override Container<Drawable> Content => content;
-        private readonly Container<Drawable> content;
+        protected override Container<Drawable> Content => barLineContainer;
+        private readonly Container<Drawable> barLineContainer;
 
         public Container<DrawableManiaJudgement> Judgements => judgements;
         private readonly JudgementContainer<DrawableManiaJudgement> judgements;
@@ -51,7 +44,6 @@ namespace osu.Game.Rulesets.Mania.UI
         private readonly int firstColumnIndex;
 
         public ManiaStage(int firstColumnIndex, StageDefinition definition, ref ManiaAction normalColumnStartAction, ref ManiaAction specialColumnStartAction)
-            : base(ScrollingDirection.Up)
         {
             this.firstColumnIndex = firstColumnIndex;
 
@@ -78,6 +70,7 @@ namespace osu.Game.Rulesets.Mania.UI
                             RelativeSizeAxes = Axes.Y,
                             AutoSizeAxes = Axes.X,
                             Masking = true,
+                            CornerRadius = 5,
                             Children = new Drawable[]
                             {
                                 new Box
@@ -106,13 +99,12 @@ namespace osu.Game.Rulesets.Mania.UI
                             Width = 1366, // Bar lines should only be masked on the vertical axis
                             BypassAutoSizeAxes = Axes.Both,
                             Masking = true,
-                            Child = content = new Container
+                            Child = barLineContainer = new Container
                             {
                                 Name = "Bar lines",
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
-                                Padding = new MarginPadding { Top = HIT_TARGET_POSITION }
                             }
                         },
                         judgements = new JudgementContainer<DrawableManiaJudgement>
@@ -134,20 +126,20 @@ namespace osu.Game.Rulesets.Mania.UI
                 var column = new Column
                 {
                     IsSpecial = isSpecial,
-                    Action = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++
+                    Action = { Value = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++ }
                 };
 
                 AddColumn(column);
             }
 
-            Inverted.ValueChanged += invertedChanged;
-            Inverted.TriggerChange();
-        }
-
-        private void invertedChanged(bool newValue)
-        {
-            Scale = new Vector2(1, newValue ? -1 : 1);
-            Judgements.Scale = Scale;
+            Direction.BindValueChanged(d =>
+            {
+                barLineContainer.Padding = new MarginPadding
+                {
+                    Top = d == ScrollingDirection.Up ? HIT_TARGET_POSITION : 0,
+                    Bottom = d == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
+                };
+            }, true);
         }
 
         public void AddColumn(Column c)
@@ -164,15 +156,18 @@ namespace osu.Game.Rulesets.Mania.UI
             var maniaObject = (ManiaHitObject)h.HitObject;
             int columnIndex = maniaObject.Column - firstColumnIndex;
             Columns.ElementAt(columnIndex).Add(h);
-            h.OnJudgement += OnJudgement;
+            h.OnNewResult += OnNewResult;
         }
 
         public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));
 
-        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
+            if (!judgedObject.DisplayResult || !DisplayJudgements)
+                return;
+
             judgements.Clear();
-            judgements.Add(new DrawableManiaJudgement(judgement, judgedObject)
+            judgements.Add(new DrawableManiaJudgement(result, judgedObject)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -180,15 +175,15 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
             normalColumnColours = new List<Color4>
             {
-                colours.RedDark,
-                colours.GreenDark
+                new Color4(94, 0, 57, 255),
+                new Color4(6, 84, 0, 255)
             };
 
-            specialColumnColour = colours.BlueDark;
+            specialColumnColour = new Color4(0, 48, 63, 255);
 
             // Set the special column + colour + key
             foreach (var column in Columns)
@@ -215,7 +210,7 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             // Due to masking differences, it is not possible to get the width of the columns container automatically
             // While masking on effectively only the Y-axis, so we need to set the width of the bar line container manually
-            content.Width = columnFlow.Width;
+            barLineContainer.Width = columnFlow.Width;
         }
     }
 }

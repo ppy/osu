@@ -20,9 +20,16 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public virtual bool NewCombo { get; set; }
 
+        public int ComboOffset { get; set; }
+
         public int IndexInCurrentCombo { get; set; }
 
         public int ComboIndex { get; set; }
+
+        /// <summary>
+        /// The distance for a fruit to to next hyper if it's not a hyper.
+        /// </summary>
+        public float DistanceToHyperDash { get; set; }
 
         /// <summary>
         /// The next fruit starts a new combo. Used for explodey.

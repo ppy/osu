@@ -18,21 +18,25 @@ namespace osu.Game.Overlays.Direct
 {
     public class DirectListPanel : DirectPanel
     {
+        private const float transition_duration = 120;
         private const float horizontal_padding = 10;
         private const float vertical_padding = 5;
         private const float height = 70;
 
-        public DirectListPanel(BeatmapSetInfo beatmap) : base(beatmap)
+        private PlayButton playButton;
+        private Box progressBar;
+
+        protected override bool FadePlayButton => false;
+
+        protected override PlayButton PlayButton => playButton;
+        protected override Box PreviewBar => progressBar;
+
+        public DirectListPanel(BeatmapSetInfo beatmap)
+            : base(beatmap)
         {
             RelativeSizeAxes = Axes.X;
             Height = height;
         }
-
-        private PlayButton playButton;
-        private Box progressBar;
-
-        protected override PlayButton PlayButton => playButton;
-        protected override Box PreviewBar => progressBar;
 
         [BackgroundDependencyLoader]
         private void load(LocalisationEngine localisation, OsuColour colours)
@@ -59,34 +63,49 @@ namespace osu.Game.Overlays.Direct
                             AutoSizeAxes = Axes.Both,
                             Direction = FillDirection.Horizontal,
                             LayoutEasing = Easing.OutQuint,
-                            LayoutDuration = 120,
+                            LayoutDuration = transition_duration,
                             Spacing = new Vector2(10, 0),
                             Children = new Drawable[]
                             {
-                                playButton = new PlayButton(SetInfo)
-                                {
-                                    Origin = Anchor.CentreLeft,
-                                    Anchor = Anchor.CentreLeft,
-                                    Size = new Vector2(height / 2),
-                                    FillMode = FillMode.Fit,
-                                    Alpha = 0,
-                                },
                                 new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        new OsuSpriteText
+                                        new FillFlowContainer
                                         {
-                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
-                                            TextSize = 18,
-                                            Font = @"Exo2.0-BoldItalic",
-                                        },
-                                        new OsuSpriteText
-                                        {
-                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
-                                            Font = @"Exo2.0-BoldItalic",
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Children = new Drawable[]
+                                            {
+                                                playButton = new PlayButton(SetInfo)
+                                                {
+                                                    Origin = Anchor.CentreLeft,
+                                                    Anchor = Anchor.CentreLeft,
+                                                    Size = new Vector2(height / 2),
+                                                    FillMode = FillMode.Fit,
+                                                },
+                                                new FillFlowContainer
+                                                {
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Direction = FillDirection.Vertical,
+                                                    Children = new Drawable[]
+                                                    {
+                                                        new OsuSpriteText
+                                                        {
+                                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
+                                                            TextSize = 18,
+                                                            Font = @"Exo2.0-BoldItalic",
+                                                        },
+                                                        new OsuSpriteText
+                                                        {
+                                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
+                                                            Font = @"Exo2.0-BoldItalic",
+                                                        },
+                                                    }
+                                                },
+                                            }
                                         },
                                         new FillFlowContainer
                                         {
@@ -104,52 +123,65 @@ namespace osu.Game.Overlays.Direct
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Vertical,
-                            Margin = new MarginPadding { Right = height - vertical_padding * 2 + vertical_padding },
+                            Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
                             {
-                                new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0)
+                                new Container
                                 {
-                                    Margin = new MarginPadding { Right = 1 },
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    AutoSizeAxes = Axes.Both,
+                                    Child = new DownloadButton(SetInfo)
+                                    {
+                                        Size = new Vector2(height - vertical_padding * 3),
+                                        Margin = new MarginPadding { Left = vertical_padding, Right = vertical_padding },
+                                    },
                                 },
-                                new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
                                 new FillFlowContainer
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
-                                    Children = new[]
+                                    Direction = FillDirection.Vertical,
+                                    Children = new Drawable[]
                                     {
-                                        new OsuSpriteText
+                                        new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0)
                                         {
-                                            Text = "mapped by ",
-                                            TextSize = 14,
+                                            Margin = new MarginPadding { Right = 1 },
+                                        },
+                                        new Statistic(FontAwesome.fa_heart, SetInfo.OnlineInfo?.FavouriteCount ?? 0),
+                                        new FillFlowContainer
+                                        {
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
+                                            AutoSizeAxes = Axes.Both,
+                                            Direction = FillDirection.Horizontal,
+                                            Children = new[]
+                                            {
+                                                new OsuSpriteText
+                                                {
+                                                    Text = "mapped by ",
+                                                    TextSize = 14,
+                                                },
+                                                new OsuSpriteText
+                                                {
+                                                    Text = SetInfo.Metadata.Author.Username,
+                                                    TextSize = 14,
+                                                    Font = @"Exo2.0-SemiBoldItalic",
+                                                },
+                                            },
                                         },
                                         new OsuSpriteText
                                         {
-                                            Text = SetInfo.Metadata.Author.Username,
+                                            Text = SetInfo.Metadata.Source,
+                                            Anchor = Anchor.TopRight,
+                                            Origin = Anchor.TopRight,
                                             TextSize = 14,
-                                            Font = @"Exo2.0-SemiBoldItalic",
+                                            Alpha = string.IsNullOrEmpty(SetInfo.Metadata.Source) ? 0f : 1f,
                                         },
                                     },
                                 },
-                                new OsuSpriteText
-                                {
-                                    Text = $"from {SetInfo.Metadata.Source}",
-                                    Anchor = Anchor.TopRight,
-                                    Origin = Anchor.TopRight,
-                                    TextSize = 14,
-                                    Alpha = string.IsNullOrEmpty(SetInfo.Metadata.Source) ? 0f : 1f,
-                                },
                             },
-                        },
-                        new DownloadButton
-                        {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            Size = new Vector2(height - vertical_padding * 2),
-                            Action = StartDownload
                         },
                     },
                 },

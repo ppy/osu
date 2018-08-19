@@ -58,8 +58,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         public TaikoPlayfield(ControlPointInfo controlPoints)
-            : base(ScrollingDirection.Left)
         {
+            Direction.Value = ScrollingDirection.Left;
+
             AddRangeInternal(new Drawable[]
             {
                 backgroundContainer = new Container
@@ -208,59 +209,55 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override void Add(DrawableHitObject h)
         {
-            h.OnJudgement += OnJudgement;
+            h.OnNewResult += OnNewResult;
 
             base.Add(h);
 
-            var barline = h as DrawableBarLine;
-            if (barline != null)
-                barlineContainer.Add(barline.CreateProxy());
-
-            // Swells should be moved at the very top of the playfield when they reach the hit target
-            var swell = h as DrawableSwell;
-            if (swell != null)
-                swell.OnStart += () => topLevelHitContainer.Add(swell.CreateProxy());
+            switch (h)
+            {
+                case DrawableBarLine barline:
+                    barlineContainer.Add(barline.CreateProxy());
+                    break;
+                case DrawableTaikoHitObject taikoObject:
+                    topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
+                    break;
+            }
         }
 
-        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (judgedObject.DisplayJudgement && judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
-            {
-                judgementContainer.Add(new DrawableTaikoJudgement(judgement, judgedObject)
-                {
-                    Anchor = judgement.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
-                    Origin = judgement.IsHit ? Anchor.BottomCentre : Anchor.Centre,
-                    RelativePositionAxes = Axes.X,
-                    X = judgement.IsHit ? judgedObject.Position.X : 0,
-                });
-            }
-
-            if (!judgement.IsHit)
+            if (!DisplayJudgements)
                 return;
 
-            bool isRim = judgedObject.HitObject is RimHit;
+            if (!judgedObject.DisplayResult)
+                return;
 
-            if (judgement is TaikoStrongHitJudgement)
-                hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == judgedObject)?.VisualiseSecondHit();
-            else
+            switch (result.Judgement)
             {
-                if (judgedObject.X >= -0.05f && judgedObject is DrawableHit)
-                {
-                    // If we're far enough away from the left stage, we should bring outselves in front of it
-                    // Todo: The following try-catch is temporary for replay rewinding support
-                    try
+                case TaikoStrongJudgement _:
+                    if (result.IsHit)
+                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
+                    break;
+                default:
+                    judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
                     {
-                        topLevelHitContainer.Add(judgedObject.CreateProxy());
-                    }
-                    catch
-                    {
-                    }
-                }
+                        Anchor = result.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
+                        Origin = result.IsHit ? Anchor.BottomCentre : Anchor.Centre,
+                        RelativePositionAxes = Axes.X,
+                        X = result.IsHit ? judgedObject.Position.X : 0,
+                    });
 
-                hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
+                    if (!result.IsHit)
+                        break;
 
-                if (judgedObject.HitObject.Kiai)
-                    kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
+                    bool isRim = judgedObject.HitObject is RimHit;
+
+                    hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
+
+                    if (judgedObject.HitObject.Kiai)
+                        kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
+
+                    break;
             }
         }
     }

@@ -6,9 +6,10 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK.Graphics;
-using osu.Framework.Input;
 using osu.Framework.Configuration;
 using osu.Framework.Allocation;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Configuration;
 using OpenTK;
 
@@ -18,7 +19,8 @@ namespace osu.Game.Screens.Play
     {
         private const int duration = 100;
 
-        private Bindable<bool> showKeyCounter;
+        public readonly Bindable<bool> Visible = new Bindable<bool>(true);
+        private readonly Bindable<bool> configVisibility = new Bindable<bool>();
 
         public KeyCounterCollection()
         {
@@ -46,13 +48,13 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            showKeyCounter = config.GetBindable<bool>(OsuSetting.KeyOverlay);
-            showKeyCounter.ValueChanged += keyCounterVisibility => this.FadeTo(keyCounterVisibility ? 1 : 0, duration);
-            showKeyCounter.TriggerChange();
+            config.BindWith(OsuSetting.KeyOverlay, configVisibility);
+
+            Visible.BindValueChanged(_ => updateVisibility());
+            configVisibility.BindValueChanged(_ => updateVisibility(), true);
         }
 
-        //further: change default values here and in KeyCounter if needed, instead of passing them in every constructor
-        private bool isCounting;
+        private bool isCounting = true;
         public bool IsCounting
         {
             get { return isCounting; }
@@ -110,6 +112,8 @@ namespace osu.Game.Screens.Play
                 }
             }
         }
+
+        private void updateVisibility() => this.FadeTo(Visible.Value || configVisibility.Value ? 1 : 0, duration);
 
         public override bool HandleKeyboardInput => receptor == null;
         public override bool HandleMouseInput => receptor == null;

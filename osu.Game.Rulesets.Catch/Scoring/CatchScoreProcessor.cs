@@ -1,10 +1,11 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
@@ -17,28 +18,30 @@ namespace osu.Game.Rulesets.Catch.Scoring
         {
         }
 
-        protected override void SimulateAutoplay(Beatmap<CatchHitObject> beatmap)
+        private float hpDrainRate;
+
+        protected override void ApplyBeatmap(Beatmap<CatchHitObject> beatmap)
         {
-            foreach (var obj in beatmap.HitObjects)
+            base.ApplyBeatmap(beatmap);
+
+            hpDrainRate = beatmap.BeatmapInfo.BaseDifficulty.DrainRate;
+        }
+
+        private const double harshness = 0.01;
+
+        protected override void ApplyResult(JudgementResult result)
+        {
+            base.ApplyResult(result);
+
+            if (result.Type == HitResult.Miss)
             {
-                switch (obj)
-                {
-                    case JuiceStream stream:
-                        foreach (var _ in stream.NestedHitObjects.Cast<CatchHitObject>())
-                            AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-                        break;
-                    case BananaShower shower:
-                        foreach (var _ in shower.NestedHitObjects.Cast<CatchHitObject>())
-                            AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-                        AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-                        break;
-                    case Fruit _:
-                        AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-                        break;
-                }
+                if (!result.Judgement.IsBonus)
+                    Health.Value -= hpDrainRate * (harshness * 2);
+                return;
             }
 
-            base.SimulateAutoplay(beatmap);
+            if (result.Judgement is CatchJudgement catchJudgement)
+                Health.Value += Math.Max(catchJudgement.HealthIncreaseFor(result) - hpDrainRate, 0) * harshness;
         }
     }
 }

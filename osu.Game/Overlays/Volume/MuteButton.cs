@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Volume
         protected override bool OnHover(InputState state)
         {
             this.TransformTo<MuteButton, SRGBColour>("BorderColour", hoveredColour, 500, Easing.OutQuint);
-            return true;
+            return false;
         }
 
         protected override void OnHoverLost(InputState state)

@@ -4,9 +4,10 @@
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
@@ -17,6 +18,8 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
@@ -213,16 +216,20 @@ namespace osu.Game.Screens.Play
             private Box background;
             private AspectContainer aspect;
 
+            private SampleChannel sampleConfirm;
+
             public Button()
             {
                 RelativeSizeAxes = Axes.Both;
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, AudioManager audio)
             {
                 colourNormal = colours.Yellow;
                 colourHover = colours.YellowDark;
+
+                sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
 
                 Children = new Drawable[]
                 {
@@ -309,6 +316,8 @@ namespace osu.Game.Screens.Play
             {
                 if (!Enabled)
                     return false;
+
+                sampleConfirm.Play();
 
                 box.FlashColour(Color4.White, 500, Easing.OutQuint);
                 aspect.ScaleTo(1.2f, 2000, Easing.OutQuint);

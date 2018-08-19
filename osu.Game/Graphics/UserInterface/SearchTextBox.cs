@@ -2,7 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Input;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using OpenTK;
 using OpenTK.Input;
 
@@ -34,8 +35,6 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
-            if (HandlePendingText(state)) return true;
-
             if (!state.Keyboard.ControlPressed && !state.Keyboard.ShiftPressed)
             {
                 switch (args.Key)

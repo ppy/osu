@@ -35,15 +35,13 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, RulesetStore rulesets, OsuColour colours)
+        private void load(RulesetStore rulesets, OsuColour colours, Bindable<RulesetInfo> ruleset)
         {
             DisplayStyleControl.Dropdown.AccentColour = colours.BlueDark;
 
-            Ruleset.Value = game?.Ruleset.Value ?? rulesets.GetRuleset(0);
+            Ruleset.Value = ruleset ?? rulesets.GetRuleset(0);
             foreach (var r in rulesets.AvailableRulesets)
-            {
                 modeButtons.Add(new RulesetToggleButton(Ruleset, r));
-            }
         }
 
         private class RulesetToggleButton : OsuClickableContainer
