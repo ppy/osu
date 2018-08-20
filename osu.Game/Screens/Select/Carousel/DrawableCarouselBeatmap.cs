@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Select.Carousel
             float starCount = (float)beatmap.StarDifficulty;
             if (!(Beatmap == null || (beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID)))
             {
-                starCount = (float)(instance.CreateDifficultyCalculator(Beatmap).Calculate(Beatmap.Mods.Value.ToArray()).StarRating);
+                starCount = (float)(instance.CreateDifficultyCalculator(Beatmap).Calculate(SelectedMods.Value.ToArray()).StarRating);
             }
             Children = new Drawable[]
             {
