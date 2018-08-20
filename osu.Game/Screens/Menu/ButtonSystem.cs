@@ -278,7 +278,7 @@ namespace osu.Game.Screens.Menu
 
             if (logo != null)
             {
-                if (logoTracking && iconFacade.IsLoaded)
+                if (logoTracking && logo.RelativePositionAxes == Axes.None && iconFacade.IsLoaded)
                     logo.Position = logoTrackingPosition;
 
                 iconFacade.Width = logo.SizeForFlow * 0.5f;
