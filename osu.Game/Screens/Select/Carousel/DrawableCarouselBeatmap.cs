@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         private void selectedModsChanged(IEnumerable<Mod> obj)
         {
-            if (Beatmap == null || Beatmap.Mods.Value == obj) return;
+            if (Beatmap == null || (beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID)) return;
 
             starCounter.CountStars = (float)(instance.CreateDifficultyCalculator(Beatmap).Calculate(obj.ToArray()).StarRating);
         }
