@@ -6,14 +6,20 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play.Break;
 
 namespace osu.Game.Screens.Play
 {
-    public class BreakOverlay : Container
+    public class BreakOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
+        public IAdjustableClock AdjustableClock;
+
+        private const double skip_required_cutoff = 3000;
         private const double fade_duration = BreakPeriod.MIN_BREAK_DURATION / 2;
         private const float remaining_time_container_max_size = 0.3f;
         private const int vertical_margin = 25;
@@ -151,5 +157,30 @@ namespace osu.Game.Screens.Play
             info.AccuracyDisplay.Current.BindTo(processor.Accuracy);
             info.GradeDisplay.Current.BindTo(processor.Rank);
         }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.SkipCutscene:
+                    double startTime = -1;
+                    foreach (var b in breaks)
+                    {
+                        if(Time.Current > b.StartTime && (Time.Current + skip_required_cutoff + fade_duration) < b.EndTime)
+                        {
+                            startTime = b.EndTime;
+                            break;
+                        }
+                    }
+                    if (startTime == -1)
+                        return false;
+                    AdjustableClock?.Seek(startTime - skip_required_cutoff - fade_duration);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => false;
     }
 }
