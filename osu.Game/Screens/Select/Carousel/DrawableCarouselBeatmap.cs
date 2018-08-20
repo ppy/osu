@@ -71,6 +71,16 @@ namespace osu.Game.Screens.Select.Carousel
             if (manager != null)
                 hideRequested = manager.Hide;
 
+            Ruleset.BindTo(ruleset);
+            if (selectedMods != null) SelectedMods.BindTo(selectedMods);
+            Beatmap = manager.GetWorkingBeatmap(beatmap, Beatmap);
+            instance = Ruleset.Value.CreateInstance();
+
+            float starCount = (float)beatmap.StarDifficulty;
+            if (!(Beatmap == null || (beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID)))
+            {
+                starCount = (float)(instance.CreateDifficultyCalculator(Beatmap).Calculate(Beatmap.Mods.Value.ToArray()).StarRating);
+            }
             Children = new Drawable[]
             {
                 background = new Box
@@ -139,7 +149,7 @@ namespace osu.Game.Screens.Select.Carousel
                                 },
                                 starCounter = new StarCounter
                                 {
-                                    CountStars = (float)beatmap.StarDifficulty,
+                                    CountStars = starCount,
                                     Scale = new Vector2(0.8f),
                                 }
                             }
@@ -147,9 +157,6 @@ namespace osu.Game.Screens.Select.Carousel
                     }
                 }
             };
-            Ruleset.BindTo(ruleset);
-            if (selectedMods != null) SelectedMods.BindTo(selectedMods);
-            Beatmap = manager.GetWorkingBeatmap(beatmap, Beatmap);
         }
 
         protected override void LoadComplete()
