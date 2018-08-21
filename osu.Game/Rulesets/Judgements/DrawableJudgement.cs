@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Judgements
 
         private OsuColour colours;
 
-        protected readonly Judgement Judgement;
+        protected readonly JudgementResult Result;
 
         public readonly DrawableHitObject JudgedObject;
 
@@ -36,11 +36,11 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
-        /// <param name="judgement">The judgement to visualise.</param>
+        /// <param name="result">The judgement to visualise.</param>
         /// <param name="judgedObject">The object which was judged.</param>
-        public DrawableJudgement(Judgement judgement, DrawableHitObject judgedObject)
+        public DrawableJudgement(JudgementResult result, DrawableHitObject judgedObject)
         {
-            Judgement = judgement;
+            Result = result;
             JudgedObject = judgedObject;
 
             Size = new Vector2(judgement_size);
@@ -51,11 +51,11 @@ namespace osu.Game.Rulesets.Judgements
         {
             this.colours = colours;
 
-            Child = new SkinnableDrawable($"Play/{Judgement.Result}", _ => JudgementText = new OsuSpriteText
+            Child = new SkinnableDrawable($"Play/{Result.Type}", _ => JudgementText = new OsuSpriteText
             {
-                Text = Judgement.Result.GetDescription().ToUpperInvariant(),
+                Text = Result.Type.GetDescription().ToUpperInvariant(),
                 Font = @"Venera",
-                Colour = config.GetBindable<bool>(OsuSetting.HitErrorJudgments) ? JudgementColour(Judgement) : judgementColour(Judgement.Result),
+                Colour = config.GetBindable<bool>(OsuSetting.HitErrorJudgments) ? JudgementColour(Result) : judgementColour(Result.Type),
                 Scale = new Vector2(0.85f, 1),
                 TextSize = 12
             }, restrictSize: false);
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Judgements
 
             this.FadeInFromZero(100, Easing.OutQuint);
 
-            switch (Judgement.Result)
+            switch (Result.Type)
             {
                 case HitResult.None:
                     break;
@@ -115,11 +115,11 @@ namespace osu.Game.Rulesets.Judgements
         private readonly Vector4 baseSlowColor = new Vector4(0.0f, 0.0f, 1.0f, 1);
         private readonly Vector4 maxSlowColor = new Vector4(0.0f, 1.0f, 0.5f, 1);
 
-        protected Color4 JudgementColour(Judgement judgement)
+        protected Color4 JudgementColour(JudgementResult result)
         {
-            return judgement.TimeOffset >= 0 ?
-            Color4.FromHcy(baseSlowColor + (maxSlowColor - baseSlowColor) * (float)(judgement.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh))) :
-            Color4.FromHcy(baseFastColor + (maxFastColor - baseFastColor) * (float)(-judgement.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh)));
+            return result.TimeOffset >= 0 ?
+            Color4.FromHcy(baseSlowColor + (maxSlowColor - baseSlowColor) * (float)(result.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh))) :
+            Color4.FromHcy(baseFastColor + (maxFastColor - baseFastColor) * (float)(-result.TimeOffset / JudgedObject.HitObject.HitWindows.HalfWindowFor(HitResult.Meh)));
         }
     }
 }

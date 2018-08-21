@@ -63,6 +63,12 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            mods.UnbindAll();
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();

@@ -5,12 +5,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
 using OpenTK;
-using osu.Game.Rulesets.Osu.Judgements;
 using System.Collections.Generic;
 using System;
 using osu.Game.Rulesets.Mods;
@@ -20,6 +18,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
@@ -126,12 +125,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             public TestDrawableHitCircle(HitCircle h, bool auto) : base(h)
             {
                 this.auto = auto;
-                OnJudgement += onJudgement;
+                OnNewResult += onNewResult;
             }
 
-            private void onJudgement(DrawableHitObject judegedObject, Judgement judgement)
+            private void onNewResult(DrawableHitObject judegedObject, JudgementResult result)
             {
-                DrawableOsuJudgement drawable = new DrawableOsuJudgement(judgement, judegedObject)
+                DrawableOsuJudgement drawable = new DrawableOsuJudgement(result, judegedObject)
                 {
                     RelativeAnchorPosition = new Vector2(0.5f, 0.5f),
                     Origin = Anchor.Centre,
@@ -140,19 +139,15 @@ namespace osu.Game.Rulesets.Osu.Tests
                 ((Container)Parent).Add(drawable);
             }
 
-            protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
                 if (auto && !userTriggered && timeOffset > 0)
                 {
                     // force success
-                    AddJudgement(new OsuJudgement
-                    {
-                        Result = HitResult.Great
-                    });
-                    State.Value = ArmedState.Hit;
+                    ApplyResult(r => r.Type = HitResult.Great);
                 }
                 else
-                    base.CheckForJudgements(userTriggered, timeOffset);
+                    base.CheckForResult(userTriggered, timeOffset);
             }
         }
     }
