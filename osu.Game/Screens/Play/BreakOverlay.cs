@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Play
                     double startTime = -1;
                     foreach (var b in breaks)
                     {
-                        if(Time.Current > b.StartTime && (Time.Current + skip_required_cutoff + fade_duration) < b.EndTime)
+                        if(Time.Current > b.StartTime && Time.Current + skip_required_cutoff + fade_duration < b.EndTime)
                         {
                             startTime = b.EndTime;
                             break;
