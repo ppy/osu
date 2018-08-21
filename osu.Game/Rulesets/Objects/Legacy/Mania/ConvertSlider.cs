@@ -8,11 +8,9 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
     /// <summary>
     /// Legacy osu!mania Slider-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasXPosition, IHasCombo
+    internal sealed class ConvertSlider : Legacy.ConvertSlider, IHasXPosition
     {
         public float X { get; set; }
-
-        public bool NewCombo { get; set; }
 
         protected override HitWindows CreateHitWindows() => null;
     }

@@ -36,6 +36,8 @@ using osu.Game.Skinning;
 using OpenTK.Graphics;
 using osu.Game.Overlays.Volume;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
+using LogLevel = osu.Framework.Logging.LogLevel;
 
 namespace osu.Game
 {
@@ -64,6 +66,8 @@ namespace osu.Game
         private BeatmapSetOverlay beatmapSetOverlay;
 
         private ScreenshotManager screenshotManager;
+
+        protected RavenLogger RavenLogger;
 
         public virtual Storage GetStorageForStableInstall() => null;
 
@@ -108,6 +112,8 @@ namespace osu.Game
             this.args = args;
 
             forwardLoggedErrorsToNotifications();
+
+            RavenLogger = new RavenLogger(this);
         }
 
         public void ToggleSettings() => settings.ToggleVisibility();
@@ -145,12 +151,14 @@ namespace osu.Game
 
             if (args?.Length > 0)
             {
-                var paths = args.Where(a => !a.StartsWith(@"-"));
-
-                Task.Run(() => Import(paths.ToArray()));
+                var paths = args.Where(a => !a.StartsWith(@"-")).ToArray();
+                if (paths.Length > 0)
+                    Task.Run(() => Import(paths));
             }
 
             dependencies.CacheAs(this);
+
+            dependencies.Cache(RavenLogger);
 
             dependencies.CacheAs(ruleset);
             dependencies.CacheAs<IBindable<RulesetInfo>>(ruleset);
@@ -271,6 +279,12 @@ namespace osu.Game
             Beatmap.Value.Mods.Value = s.Mods;
 
             menu.Push(new PlayerLoader(new ReplayPlayer(s.Replay)));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            RavenLogger.Dispose();
         }
 
         protected override void LoadComplete()
@@ -449,7 +463,7 @@ namespace osu.Game
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
                         Icon = entry.Level == LogLevel.Important ? FontAwesome.fa_exclamation_circle : FontAwesome.fa_bomb,
-                        Text = entry.Message,
+                        Text = entry.Message + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
                     }));
                 }
                 else if (recentLogCount == short_term_display_limit)
@@ -490,7 +504,25 @@ namespace osu.Game
             // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
             // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
             // we could avoid the need for scheduling altogether.
-            Schedule(() => { asyncLoadStream = asyncLoadStream?.ContinueWith(t => LoadComponentAsync(d, add).Wait()) ?? LoadComponentAsync(d, add); });
+            Schedule(() =>
+            {
+                if (asyncLoadStream != null)
+                {
+                    //chain with existing load stream
+                    asyncLoadStream = asyncLoadStream.ContinueWith(async t =>
+                    {
+                        try
+                        {
+                            await LoadComponentAsync(d, add);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                        }
+                    });
+                }
+                else
+                    asyncLoadStream = LoadComponentAsync(d, add);
+            });
         }
 
         public bool OnPressed(GlobalAction action)
@@ -601,6 +633,7 @@ namespace osu.Game
         private void screenAdded(Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
+            Logger.Log($"Screen changed → {currentScreen}");
 
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
@@ -609,6 +642,7 @@ namespace osu.Game
         private void screenRemoved(Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
+            Logger.Log($"Screen changed ← {currentScreen}");
 
             if (newScreen == null)
                 Exit();
