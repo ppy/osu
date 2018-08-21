@@ -31,7 +31,7 @@ namespace osu.Game.Beatmaps.Formats
                 if (ShouldSkipLine(line))
                     continue;
 
-                if (line.StartsWith(@"[") && line.EndsWith(@"]"))
+                if (line.StartsWith(@"[", StringComparison.Ordinal) && line.EndsWith(@"]", StringComparison.Ordinal))
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
                     {
@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//");
+        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//", StringComparison.Ordinal);
 
         protected virtual void ParseLine(T output, Section section, string line)
         {
