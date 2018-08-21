@@ -9,6 +9,8 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Configuration;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -51,9 +53,13 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
         }
 
+        private WorkingBeatmap beatmap;
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IBindableBeatmap beatmap)
         {
+            this.beatmap = beatmap.Value;
+
             HitObjects = CreateHitObjectContainer();
             HitObjects.RelativeSizeAxes = Axes.Both;
 
@@ -92,5 +98,15 @@ namespace osu.Game.Rulesets.UI
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
         /// </summary>
         protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (beatmap != null)
+                foreach (var mod in beatmap.Mods.Value)
+                    if (mod is IUpdatableByPlayfield updatable)
+                        updatable.Update(this);
+        }
     }
 }
