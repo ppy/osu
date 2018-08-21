@@ -54,6 +54,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public virtual bool NewCombo { get; set; }
 
+        public int ComboOffset { get; set; }
+
         public virtual int IndexInCurrentCombo { get; set; }
 
         public virtual int ComboIndex { get; set; }

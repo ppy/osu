@@ -13,21 +13,43 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
     /// </summary>
     public class ConvertHitObjectParser : Legacy.ConvertHitObjectParser
     {
-        protected override HitObject CreateHit(Vector2 position, bool newCombo)
+        public ConvertHitObjectParser(double offset, int formatVersion)
+            : base(offset, formatVersion)
         {
+        }
+
+        private bool forceNewCombo;
+        private int extraComboOffset;
+
+        protected override HitObject CreateHit(Vector2 position, bool newCombo, int comboOffset)
+        {
+            newCombo |= forceNewCombo;
+            comboOffset += extraComboOffset;
+
+            forceNewCombo = false;
+            extraComboOffset = 0;
+
             return new ConvertHit
             {
                 X = position.X,
                 NewCombo = newCombo,
+                ComboOffset = comboOffset
             };
         }
 
-        protected override HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples)
+        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples)
         {
+            newCombo |= forceNewCombo;
+            comboOffset += extraComboOffset;
+
+            forceNewCombo = false;
+            extraComboOffset = 0;
+
             return new ConvertSlider
             {
                 X = position.X,
-                NewCombo = newCombo,
+                NewCombo = FirstObject || newCombo,
+                ComboOffset = comboOffset,
                 ControlPoints = controlPoints,
                 Distance = length,
                 CurveType = curveType,
@@ -36,15 +58,20 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
             };
         }
 
-        protected override HitObject CreateSpinner(Vector2 position, double endTime)
+        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime)
         {
+            // Convert spinners don't create the new combo themselves, but force the next non-spinner hitobject to create a new combo
+            // Their combo offset is still added to that next hitobject's combo index
+            forceNewCombo |= FormatVersion <= 8 || newCombo;
+            extraComboOffset += comboOffset;
+
             return new ConvertSpinner
             {
                 EndTime = endTime
             };
         }
 
-        protected override HitObject CreateHold(Vector2 position, bool newCombo, double endTime)
+        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime)
         {
             return null;
         }

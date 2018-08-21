@@ -27,11 +27,10 @@ namespace osu.Game.Beatmaps
                 if (obj.NewCombo)
                 {
                     obj.IndexInCurrentCombo = 0;
+                    obj.ComboIndex = (lastObj?.ComboIndex ?? 0) + obj.ComboOffset + 1;
+
                     if (lastObj != null)
-                    {
                         lastObj.LastInCombo = true;
-                        obj.ComboIndex = lastObj.ComboIndex + 1;
-                    }
                 }
                 else if (lastObj != null)
                 {

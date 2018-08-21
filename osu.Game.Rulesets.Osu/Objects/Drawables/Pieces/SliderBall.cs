@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Skinning;
 
@@ -121,9 +120,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return base.OnMouseMove(state);
         }
 
-        // If the current time is between the start and end of the slider, we should track mouse input regardless of the cursor position.
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => canCurrentlyTrack || base.ReceiveMouseInputAt(screenSpacePos);
-
         public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
         {
             // Consider the case of rewinding - children's transforms are handled internally, so propagating down
@@ -158,7 +154,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 // Make sure to use the base version of ReceiveMouseInputAt so that we correctly check the position.
                 Tracking = canCurrentlyTrack
                            && lastState != null
-                           && base.ReceiveMouseInputAt(lastState.Mouse.NativeState.Position)
+                           && ReceiveMouseInputAt(lastState.Mouse.NativeState.Position)
                            && ((Parent as DrawableSlider)?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
             }
         }

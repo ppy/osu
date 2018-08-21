@@ -6,7 +6,6 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -56,12 +55,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    AddJudgement(new ManiaJudgement { Result = HitResult.Miss });
+                    ApplyResult(r => r.Type = HitResult.Miss);
                 return;
             }
 
@@ -69,7 +68,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (result == HitResult.None)
                 return;
 
-            AddJudgement(new ManiaJudgement { Result = result });
+            ApplyResult(r => r.Type = result);
         }
 
         public virtual bool OnPressed(ManiaAction action)
@@ -77,7 +76,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (action != Action.Value)
                 return false;
 
-            return UpdateJudgement(true);
+            return UpdateResult(true);
         }
 
         public virtual bool OnReleased(ManiaAction action) => false;

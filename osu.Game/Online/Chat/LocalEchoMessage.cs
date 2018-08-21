@@ -3,7 +3,7 @@
 
 namespace osu.Game.Online.Chat
 {
-    public class LocalEchoMessage : Message
+    public class LocalEchoMessage : LocalMessage
     {
         public LocalEchoMessage() : base(null)
         {
