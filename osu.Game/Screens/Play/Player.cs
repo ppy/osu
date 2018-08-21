@@ -213,7 +213,7 @@ namespace osu.Game.Screens.Play
                     {
                         if (!IsCurrentScreen) return;
 
-                        pauseContainer.Hide();
+                        fadeOut(true);
                         Restart();
                     },
                 }
@@ -278,6 +278,8 @@ namespace osu.Game.Screens.Play
                     ScoreProcessor.PopulateScore(score);
                     score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
                     Push(new Results(score));
+
+                    onCompletionEvent = null;
                 });
             }
         }
@@ -340,6 +342,13 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnExiting(Screen next)
         {
+            if (onCompletionEvent != null)
+            {
+                // Proceed to result screen if beatmap already finished playing
+                onCompletionEvent.RunTask();
+                return true;
+            }
+
             if ((!AllowPause || HasFailed || !ValidForResume || pauseContainer?.IsPaused != false || RulesetContainer?.HasReplayLoaded != false) && (!pauseContainer?.IsResuming ?? true))
             {
                 // In the case of replays, we may have changed the playback rate.
@@ -355,16 +364,10 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
-        private void fadeOut()
+        private void fadeOut(bool instant = false)
         {
-            const float fade_out_duration = 250;
-
-            RulesetContainer?.FadeOut(fade_out_duration);
-            Content.FadeOut(fade_out_duration);
-
-            hudOverlay?.ScaleTo(0.7f, fade_out_duration * 3, Easing.In);
-
-            Background?.FadeTo(1f, fade_out_duration);
+            float fadeOutDuration = instant ? 0 : 250;
+            Content.FadeOut(fadeOutDuration);
         }
 
         protected override bool OnScroll(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;

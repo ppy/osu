@@ -93,13 +93,11 @@ namespace osu.Game.Rulesets.Taiko
                         new TaikoModHidden(),
                         new TaikoModFlashlight(),
                     };
-                case ModType.Special:
+                case ModType.Automation:
                     return new Mod[]
                     {
-                        new TaikoModRelax(),
-                        null,
-                        null,
                         new MultiMod(new TaikoModAutoplay(), new ModCinema()),
+                        new TaikoModRelax(),
                     };
                 default:
                     return new Mod[] { };

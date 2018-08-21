@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
     public class DrawableRimHit : DrawableHit
     {
-        protected override TaikoAction[] HitActions { get; } = { TaikoAction.LeftRim, TaikoAction.RightRim };
+        public override TaikoAction[] HitActions { get; } = { TaikoAction.LeftRim, TaikoAction.RightRim };
 
         public DrawableRimHit(Hit hit)
             : base(hit)
