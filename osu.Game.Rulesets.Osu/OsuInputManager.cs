@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Osu
     {
         public IEnumerable<OsuAction> PressedActions => KeyBindingContainer.PressedActions;
 
-        public OsuInputManager(RulesetInfo ruleset) : base(ruleset, 0, SimultaneousBindingMode.Unique)
+        public OsuInputManager(RulesetInfo ruleset) : base(ruleset, 0, SimultaneousBindingMode.All)
         {
         }
     }
