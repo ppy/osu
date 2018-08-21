@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using System;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
@@ -24,8 +25,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         private const float base_height = 40;
         private const float label_horizontal_offset = 15;
         private const float label_vertical_offset = 12;
-        private const float switch_horizontal_offset = 15;
-        private const float switch_vertical_offset = 10;
 
         protected bool HasBottomText => true;
 
@@ -40,6 +39,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             get => bottomText.Text;
             set
             {
+                if (!HasBottomText)
+                    throw new InvalidOperationException("This component does not accept bottom text.");
+
                 bottomText.Text = value;
                 Height = base_height + (value != "" ? 20 : 0);
             }
