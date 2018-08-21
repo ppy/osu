@@ -56,9 +56,10 @@ namespace osu.Game.Rulesets.UI
         private WorkingBeatmap beatmap;
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap bBeatmap)
+        private void load(IBindableBeatmap beatmap)
         {
-            beatmap = bBeatmap.Value;
+            this.beatmap = beatmap.Value;
+
             HitObjects = CreateHitObjectContainer();
             HitObjects.RelativeSizeAxes = Axes.Both;
 
