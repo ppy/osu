@@ -5,7 +5,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Screens.Edit.Screens.Setup.Components;
+using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents;
 using System;
 using System.Collections.Generic;

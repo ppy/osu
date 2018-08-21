@@ -13,7 +13,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 
-namespace osu.Game.Screens.Edit.Screens.Setup.Components
+namespace osu.Game.Screens.Edit.Components
 {
     public class SwitchButton : CompositeDrawable, IHasCurrentValue<bool>, IHasAccentColour
     {
