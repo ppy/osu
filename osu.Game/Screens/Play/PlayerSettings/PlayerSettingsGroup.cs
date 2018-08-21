@@ -128,6 +128,27 @@ namespace osu.Game.Screens.Play.PlayerSettings
             };
         }
 
+        private const float fade_duration = 800;
+        private const float inactive_alpha = 0.5f;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+        }
+
+        protected override bool OnHover(InputState state)
+        {
+            this.FadeIn(fade_duration, Easing.OutQuint);
+            return true;
+        }
+
+        protected override void OnHoverLost(InputState state)
+        {
+            this.FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+            base.OnHoverLost(state);
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -140,7 +161,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         protected override Container<Drawable> Content => content;
 
-        protected override bool OnHover(InputState state) => true;
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
     }
 }

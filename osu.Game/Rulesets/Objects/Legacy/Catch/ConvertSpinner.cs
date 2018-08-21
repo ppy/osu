@@ -8,10 +8,14 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
     /// <summary>
     /// Legacy osu!catch Spinner-type, used for parsing Beatmaps.
     /// </summary>
-    internal sealed class ConvertSpinner : HitObject, IHasEndTime
+    internal sealed class ConvertSpinner : HitObject, IHasEndTime, IHasCombo
     {
         public double EndTime { get; set; }
 
         public double Duration => EndTime - StartTime;
+
+        public bool NewCombo { get; set; }
+
+        public int ComboOffset { get; set; }
     }
 }
