@@ -46,15 +46,20 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Spacing = new Vector2(20),
                 Children = new[]
                 {
-                    createNoteDisplay(ScrollingDirection.Down),
-                    createNoteDisplay(ScrollingDirection.Up),
-                    createHoldNoteDisplay(ScrollingDirection.Down),
-                    createHoldNoteDisplay(ScrollingDirection.Up),
+                    createNoteDisplay(ScrollingDirection.Down, 1, out var note1),
+                    createNoteDisplay(ScrollingDirection.Up, 2, out var note2),
+                    createHoldNoteDisplay(ScrollingDirection.Down, 1, out var holdNote1),
+                    createHoldNoteDisplay(ScrollingDirection.Up, 2, out var holdNote2),
                 }
             };
+
+            AddAssert("note 1 facing downwards", () => verifyAnchors(note1, Anchor.y2));
+            AddAssert("note 2 facing upwards", () => verifyAnchors(note2, Anchor.y0));
+            AddAssert("hold note 1 facing downwards", () => verifyAnchors(holdNote1, Anchor.y2));
+            AddAssert("hold note 2 facing upwards", () => verifyAnchors(holdNote2, Anchor.y0));
         }
 
-        private Drawable createNoteDisplay(ScrollingDirection direction)
+        private Drawable createNoteDisplay(ScrollingDirection direction, int identifier, out DrawableNote hitObject)
         {
             var note = new Note { StartTime = 999999999 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
@@ -62,24 +67,24 @@ namespace osu.Game.Rulesets.Mania.Tests
             return new ScrollingTestContainer(direction)
             {
                 AutoSizeAxes = Axes.Both,
-                Child = new NoteContainer(direction, $"note, scrolling {direction.ToString().ToLowerInvariant()}")
+                Child = new NoteContainer(direction, $"note {identifier}, scrolling {direction.ToString().ToLowerInvariant()}")
                 {
-                    Child = new DrawableNote(note) { AccentColour = Color4.OrangeRed }
+                    Child = hitObject = new DrawableNote(note) { AccentColour = Color4.OrangeRed }
                 }
             };
         }
 
-        private Drawable createHoldNoteDisplay(ScrollingDirection direction)
+        private Drawable createHoldNoteDisplay(ScrollingDirection direction, int identifier, out DrawableHoldNote hitObject)
         {
-            var note = new HoldNote { StartTime = 999999999, Duration = 1000 };
+            var note = new HoldNote { StartTime = 999999999, Duration = 5000 };
             note.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
             return new ScrollingTestContainer(direction)
             {
                 AutoSizeAxes = Axes.Both,
-                Child = new NoteContainer(direction, $"hold note, scrolling {direction.ToString().ToLowerInvariant()}")
+                Child = new NoteContainer(direction, $"hold note {identifier}, scrolling {direction.ToString().ToLowerInvariant()}")
                 {
-                    Child = new DrawableHoldNote(note)
+                    Child = hitObject = new DrawableHoldNote(note)
                     {
                         RelativeSizeAxes = Axes.Both,
                         AccentColour = Color4.OrangeRed,
@@ -87,6 +92,12 @@ namespace osu.Game.Rulesets.Mania.Tests
                 }
             };
         }
+
+        private bool verifyAnchors(DrawableHitObject hitObject, Anchor expectedAnchor)
+            => hitObject.Anchor.HasFlag(expectedAnchor) && hitObject.Origin.HasFlag(expectedAnchor);
+
+        private bool verifyAnchors(DrawableHoldNote holdNote, Anchor expectedAnchor)
+            => verifyAnchors((DrawableHitObject)holdNote, expectedAnchor) && holdNote.NestedHitObjects.All(n => verifyAnchors(n, expectedAnchor));
 
         private class NoteContainer : Container
         {

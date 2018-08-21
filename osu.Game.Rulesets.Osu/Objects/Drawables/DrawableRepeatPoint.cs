@@ -8,8 +8,8 @@ using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -33,18 +33,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
-                new SpriteIcon
+                new SkinnableDrawable("Play/osu/reversearrow", _ => new SpriteIcon
                 {
                     RelativeSizeAxes = Axes.Both,
                     Icon = FontAwesome.fa_chevron_right
-                }
+                }, restrictSize: false)
             };
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (repeatPoint.StartTime <= Time.Current)
-                AddJudgement(new OsuJudgement { Result = drawableSlider.Tracking ? HitResult.Great : HitResult.Miss });
+                ApplyResult(r => r.Type = drawableSlider.Tracking ? HitResult.Great : HitResult.Miss);
         }
 
         protected override void UpdatePreemptState()
@@ -74,6 +74,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        private bool hasRotation;
+
         public void UpdateSnakingPosition(Vector2 start, Vector2 end)
         {
             bool isRepeatAtEnd = repeatPoint.RepeatIndex % 2 == 0;
@@ -87,14 +89,32 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             int searchStart = isRepeatAtEnd ? curve.Count - 1 : 0;
             int direction = isRepeatAtEnd ? -1 : 1;
 
+            Vector2 aimRotationVector = Vector2.Zero;
+
             // find the next vector2 in the curve which is not equal to our current position to infer a rotation.
             for (int i = searchStart; i >= 0 && i < curve.Count; i += direction)
             {
                 if (Precision.AlmostEquals(curve[i], Position))
                     continue;
 
-                Rotation = MathHelper.RadiansToDegrees((float)Math.Atan2(curve[i].Y - Position.Y, curve[i].X - Position.X));
+                aimRotationVector = curve[i];
                 break;
+            }
+
+
+            float aimRotation = MathHelper.RadiansToDegrees((float)Math.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
+            while (Math.Abs(aimRotation - Rotation) > 180)
+                aimRotation += aimRotation < Rotation ? 360 : -360;
+
+            if (!hasRotation)
+            {
+                Rotation = aimRotation;
+                hasRotation = true;
+            }
+            else
+            {
+                // If we're already snaking, interpolate to smooth out sharp curves (linear sliders, mainly).
+                Rotation = Interpolation.ValueAt(MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 100), Rotation, aimRotation, 0, 50, Easing.OutQuint);
             }
         }
     }
