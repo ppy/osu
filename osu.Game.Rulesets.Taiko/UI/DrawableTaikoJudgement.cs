@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
             if (config.GetBindable<bool>(OsuSetting.HitErrorJudgments))
             {
-                Colour = JudgementColour(Judgement);
+                Colour = JudgementColour(Result);
             }
         }
 
