@@ -60,7 +60,7 @@ namespace osu.Game.Beatmaps.Formats
         private void handleEvents(string line)
         {
             var depth = 0;
-            while (line.StartsWith(" ") || line.StartsWith("_"))
+            while (line.StartsWith(" ", StringComparison.Ordinal) || line.StartsWith("_", StringComparison.Ordinal))
             {
                 ++depth;
                 line = line.Substring(1);
