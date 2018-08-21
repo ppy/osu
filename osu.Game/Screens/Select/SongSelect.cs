@@ -460,6 +460,8 @@ namespace osu.Game.Screens.Select
         {
             base.Dispose(isDisposing);
 
+            Ruleset.UnbindAll();
+
             if (beatmaps != null)
             {
                 beatmaps.ItemAdded -= onBeatmapSetAdded;
