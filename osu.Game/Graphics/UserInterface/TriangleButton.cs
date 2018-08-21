@@ -27,7 +27,6 @@ namespace osu.Game.Graphics.UserInterface
             });
         }
 
-
         public IEnumerable<string> FilterTerms => new[] { Text };
 
         public bool MatchingFilter
@@ -37,6 +36,5 @@ namespace osu.Game.Graphics.UserInterface
                 this.FadeTo(value ? 1 : 0);
             }
         }
-
     }
 }
