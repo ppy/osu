@@ -6,6 +6,11 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Graphics.UserInterface
 {
+    /// <summary>
+    /// A simple rounded expandable line. Set its <see cref="Anchor"/>
+    /// property to the center of the edge it's meant stick with. By default,
+    /// takes up the full parent's axis defined by <see cref="IsHorizontal"/>.
+    /// </summary>
     public class LineBadge : Circle
     {
         public float UncollapsedSize;
@@ -39,11 +44,6 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        /// <summary>
-        /// A simple rounded expandable line. Set its <see cref="Anchor"/>
-        /// property to the center of the edge it's meant stick with. By default,
-        /// takes up the full parent's axis defined by <see cref="IsHorizontal"/>.
-        /// </summary>
         /// <param name="startCollapsed">Whether to initialize with the
         /// <see cref="CollapsedSize"/> or the <see cref="UncollapsedSize"/>.</param>
         public LineBadge(bool startCollapsed = true)
