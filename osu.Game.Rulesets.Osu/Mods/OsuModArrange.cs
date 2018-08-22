@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     internal class OsuModArrange : Mod, IApplicableToDrawableHitObjects
     {
-        public override string Name => "Arrange";
-        public override string ShortenedName => "Arrange";
+        public override string Name => "Transform";
+        public override string ShortenedName => "TR";
         public override FontAwesome Icon => FontAwesome.fa_arrows;
         public override ModType Type => ModType.Fun;
         public override string Description => "Everything rotates. EVERYTHING.";
