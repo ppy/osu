@@ -408,11 +408,8 @@ namespace osu.Game.Beatmaps.Formats
                 parser = new Rulesets.Objects.Legacy.Osu.ConvertHitObjectParser(getOffsetTime(), FormatVersion);
 
             var obj = parser.Parse(line);
-
             if (obj != null)
-            {
                 beatmap.HitObjects.Add(obj);
-            }
         }
 
         private int getOffsetTime(int time) => time + (ApplyOffsets ? offset : 0);

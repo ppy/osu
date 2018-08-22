@@ -10,6 +10,8 @@ using System.IO;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
 using System.Linq;
+using JetBrains.Annotations;
+using osu.Framework.Logging;
 using osu.Framework.MathUtils;
 
 namespace osu.Game.Rulesets.Objects.Legacy
@@ -37,6 +39,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
             FormatVersion = formatVersion;
         }
 
+        [CanBeNull]
         public override HitObject Parse(string text)
         {
             try
@@ -191,7 +194,10 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 if (result == null)
-                    throw new InvalidOperationException($@"Unknown hit object type {type}.");
+                {
+                    Logger.Log($"Unknown hit object type: {type}. Skipped.", level: LogLevel.Error);
+                    return null;
+                }
 
                 result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture) + Offset;
                 result.Samples = convertSoundType(soundType, bankInfo);
