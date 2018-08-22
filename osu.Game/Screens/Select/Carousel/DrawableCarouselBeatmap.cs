@@ -77,9 +77,9 @@ namespace osu.Game.Screens.Select.Carousel
             instance = Ruleset.Value.CreateInstance();
 
             float starCount = (float)beatmap.StarDifficulty;
-            if (!(Beatmap == null || (beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID)))
+            if (!(Beatmap == null || beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID))
             {
-                starCount = (float)(instance.CreateDifficultyCalculator(Beatmap).Calculate(SelectedMods.Value.ToArray()).StarRating);
+                starCount = (float)instance.CreateDifficultyCalculator(Beatmap).Calculate(SelectedMods.Value.ToArray()).StarRating;
             }
             Children = new Drawable[]
             {
@@ -173,16 +173,16 @@ namespace osu.Game.Screens.Select.Carousel
 
             instance = newRuleset.CreateInstance();
 
-            if (Beatmap == null || (beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID)) return;
+            if (Beatmap == null || beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID) return;
 
-            starCounter.CountStars = (float)(instance.CreateDifficultyCalculator(Beatmap).Calculate(Beatmap.Mods.Value.ToArray()).StarRating);
+            starCounter.CountStars = (float)instance.CreateDifficultyCalculator(Beatmap).Calculate(Beatmap.Mods.Value.ToArray()).StarRating;
         }
 
         private void selectedModsChanged(IEnumerable<Mod> obj)
         {
-            if (Beatmap == null || (beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID)) return;
+            if (Beatmap == null || beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID) return;
 
-            starCounter.CountStars = (float)(instance.CreateDifficultyCalculator(Beatmap).Calculate(obj.ToArray()).StarRating);
+            starCounter.CountStars = (float)instance.CreateDifficultyCalculator(Beatmap).Calculate(obj.ToArray()).StarRating;
         }
 
         protected override void Selected()
