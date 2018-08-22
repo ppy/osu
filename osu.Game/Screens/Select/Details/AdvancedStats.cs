@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Select.Details
                 approachRate.Value = Beatmap?.BaseDifficulty?.ApproachRate ?? 0;
                 WBeatmap = Manager.GetWorkingBeatmap(beatmap, WBeatmap);
                 if (WBeatmap == null || beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID)) return;
-                starDifficulty.Value = (float)(instance.CreateDifficultyCalculator(WBeatmap)?.Calculate(SelectedMods.Value.ToArray()).StarRating ?? 0);
+                starDifficulty.Value = (float)(Instance.CreateDifficultyCalculator(WBeatmap)?.Calculate(SelectedMods.Value.ToArray()).StarRating ?? 0);
             }
         }
 
@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Select.Details
             };
         }
 
-        protected Ruleset instance;
+        protected Ruleset Instance;
 
         protected readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
@@ -96,25 +96,25 @@ namespace osu.Game.Screens.Select.Details
             base.LoadComplete();
 
             Ruleset.BindValueChanged(rulesetChanged, true);
-            SelectedMods.BindValueChanged(selectedModsChanged, false);
+            SelectedMods.BindValueChanged(selectedModsChanged);
         }
 
         private void rulesetChanged(RulesetInfo newRuleset)
         {
             if (newRuleset == null) return;
 
-            instance = newRuleset.CreateInstance();
+            Instance = newRuleset.CreateInstance();
 
             if (WBeatmap == null || (beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID)) return;
 
-            starDifficulty.Value = (float)instance.CreateDifficultyCalculator(WBeatmap).Calculate(WBeatmap.Mods.Value.ToArray()).StarRating;
+            starDifficulty.Value = (float)Instance.CreateDifficultyCalculator(WBeatmap).Calculate(WBeatmap.Mods.Value.ToArray()).StarRating;
         }
 
             private void selectedModsChanged(IEnumerable<Mod> obj)
         {
-            if (WBeatmap == null || WBeatmap.Mods.Value==obj || beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID) return;
+            if (WBeatmap == null || WBeatmap.Mods.Value.Equals(obj) || beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID) return;
 
-            starDifficulty.Value = (float)instance.CreateDifficultyCalculator(WBeatmap).Calculate(obj.ToArray()).StarRating;
+            starDifficulty.Value = (float)Instance.CreateDifficultyCalculator(WBeatmap).Calculate(obj.ToArray()).StarRating;
         }
 
         private class StatisticRow : Container, IHasAccentColour
