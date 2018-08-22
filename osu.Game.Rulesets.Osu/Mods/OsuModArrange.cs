@@ -24,7 +24,13 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            drawables.ForEach(drawable => drawable.ApplyCustomUpdateState += drawableOnApplyCustomUpdateState);
+            drawables.Where(drawable => (
+                drawable is DrawableHitCircle ||
+                drawable is DrawableSlider ||
+                drawable is DrawableSpinner
+            )).ForEach(drawable => 
+                drawable.ApplyCustomUpdateState += drawableOnApplyCustomUpdateState
+            );
         }
 
         private float theta;
@@ -33,13 +39,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var hitObject = (OsuHitObject) drawable.HitObject;
 
-            // repeat points get their position data from the slider.
-            if (hitObject is RepeatPoint)
-                return;
+            float appear_distance = (float)hitObject.TimePreempt * 0.5f;
 
             Vector2 originalPosition = drawable.Position;
-
-            const float appear_distance = 250;
+            Vector2 appearOffset = new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * appear_distance;
 
             //the - 1 and + 1 prevents the hit explosion to appear in the wrong position.
             double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
@@ -48,13 +51,11 @@ namespace osu.Game.Rulesets.Osu.Mods
             using (drawable.BeginAbsoluteSequence(appearTime, true))
             {
                 drawable
-                    .MoveToOffset(new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * appear_distance)
+                    .MoveToOffset(appearOffset)
                     .MoveTo(originalPosition, moveDuration, Easing.InOutSine);
             }
 
-            // That way slider ticks come all from the same direction.
-            if (hitObject is HitCircle || hitObject is Slider)
-                theta += 0.4f;
+            theta += 0.4f;
         }
     }
 }
