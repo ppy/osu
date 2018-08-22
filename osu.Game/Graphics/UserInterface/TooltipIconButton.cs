@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// An icon with an action upon click that can be disabled.
     /// </summary>
-    public class TooltipIconButton : ClickableContainer, IHasTooltip
+    public class TooltipIconButton : Container, IHasTooltip
     {
         private readonly SpriteIcon icon;
         private SampleChannel sampleHover;
