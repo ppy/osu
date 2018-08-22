@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace osu.Game.Graphics.UserInterface
@@ -161,9 +160,9 @@ namespace osu.Game.Graphics.UserInterface
             {
                 star.Icon.Colour = modNewValue > newValue ? new OsuColour().Yellow : new OsuColour().Green;
             }
-            if (modNewValue < newValue && Children.First<Drawable>() == modStars)
+            if (modNewValue < newValue && Children.First() == modStars)
                 ChangeChildDepth(modStars,-1);
-            else if (modNewValue >= newValue && Children.First<Drawable>() == stars)
+            else if (modNewValue >= newValue && Children.First() == stars)
                 ChangeChildDepth(modStars, 0);
 
             int i = 0;
