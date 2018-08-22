@@ -289,15 +289,10 @@ namespace osu.Game.Beatmaps.Formats
             while (line.IndexOf('$') >= 0)
             {
                 string origLine = line;
-                string[] split = line.Split(',');
-                for (int i = 0; i < split.Length; i++)
-                {
-                    var item = split[i];
-                    if (item.StartsWith("$") && variables.ContainsKey(item))
-                        split[i] = variables[item];
-                }
 
-                line = string.Join(",", split);
+                foreach (var v in variables)
+                    line = line.Replace(v.Key, v.Value);
+
                 if (line == origLine)
                     break;
             }
