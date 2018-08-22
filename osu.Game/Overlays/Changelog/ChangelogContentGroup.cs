@@ -35,7 +35,6 @@ namespace osu.Game.Overlays.Changelog
             Padding = new MarginPadding { Horizontal = 70 };
             Children = new Drawable[]
             {
-                // build version, arrows
                 new FillFlowContainer
                 {
                     Anchor = Anchor.TopCentre,
@@ -176,7 +175,7 @@ namespace osu.Game.Overlays.Changelog
                 },
             };
 
-            // we may not want double clicks to make it double the work
+            // we may not want double clicks,
             // can be clicked again only after a delay
             clickableBuildText.Action += () =>
             {

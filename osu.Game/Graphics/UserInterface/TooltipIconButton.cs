@@ -14,8 +14,6 @@ using System;
 
 namespace osu.Game.Graphics.UserInterface
 {
-    // not inheriting osuclickablecontainer/osuhovercontainer
-    // because click/hover sounds cannot be disabled
     /// <summary>
     /// An icon with an action upon click that can be disabled.
     /// </summary>
@@ -26,14 +24,14 @@ namespace osu.Game.Graphics.UserInterface
         private SampleChannel sampleClick;
 
         /// <summary>
-        /// The action to fire upon click, if <see cref="IsEnabled"/> is set to true.
+        /// The action to fire upon click if <see cref="IsEnabled"/> is set to true.
         /// </summary>
         public Action Action;
 
         private bool isEnabled;
 
         /// <summary>
-        /// If set to true, upon click the <see cref="Action"/> will execute. It wont otherwise.
+        /// If set to true, upon click the <see cref="Action"/> will execute.
         /// </summary>
         public bool IsEnabled
         {

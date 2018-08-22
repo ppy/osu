@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.UserInterface
         private bool isHorizontal;
 
         /// <summary>
-        /// Automatically sets the RelativeSizeAxes and switches X and Y components when changed.
+        /// Automatically sets the RelativeSizeAxes and switches X and Y size components when changed.
         /// </summary>
         public bool IsHorizontal
         {
