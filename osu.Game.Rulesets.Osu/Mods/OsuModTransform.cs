@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Everything rotates. EVERYTHING.";
         public override double ScoreMultiplier => 1;
 
-        private readonly IReadOnlyList<Type> targetHitObjectTypes = new List<Type>() {
+        private readonly IReadOnlyList<Type> targetHitObjectTypes = new List<Type> {
             typeof(HitCircle),
             typeof(Slider),
             typeof(Spinner),
