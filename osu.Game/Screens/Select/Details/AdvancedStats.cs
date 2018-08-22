@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Select.Details
 
         protected BeatmapManager Manager;
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, BeatmapManager manager, IBindable<RulesetInfo> ruleset, Bindable<IEnumerable<Mod>> selectedMods)
         {
             starDifficulty.AccentColour = colours.Yellow;
