@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Select.Carousel
 
             Ruleset.BindTo(ruleset);
             if (selectedMods != null) SelectedMods.BindTo(selectedMods);
-            Beatmap = manager.GetWorkingBeatmap(beatmap, Beatmap);
+            Beatmap = manager?.GetWorkingBeatmap(beatmap, Beatmap);
             Instance = Ruleset.Value.CreateInstance();
 
             float starCount = (float)beatmap.StarDifficulty;
