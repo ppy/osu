@@ -11,9 +11,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using OpenTK;
-using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -26,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Everything rotates. EVERYTHING.";
         public override double ScoreMultiplier => 1;
 
-        private readonly IReadOnlyList<Type> TargetHitObjectTypes = new List<Type>() {
+        private readonly IReadOnlyList<Type> targetHitObjectTypes = new List<Type>() {
             typeof(HitCircle),
             typeof(Slider),
             typeof(Spinner),
@@ -34,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            drawables.ForEach(drawable => 
+            drawables.ForEach(drawable =>
                 drawable.ApplyCustomUpdateState += drawableOnApplyCustomUpdateState
             );
         }
@@ -45,13 +42,13 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var hitObject = (OsuHitObject) drawable.HitObject;
 
-            if (!TargetHitObjectTypes.Contains(hitObject.GetType()))
+            if (!targetHitObjectTypes.Contains(hitObject.GetType()))
                 return;
 
-            float appear_distance = (float)hitObject.TimePreempt * 0.5f;
+            float appearDistance = (float)hitObject.TimePreempt * 0.5f;
 
             Vector2 originalPosition = drawable.Position;
-            Vector2 appearOffset = new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * appear_distance;
+            Vector2 appearOffset = new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * appearDistance;
 
             //the - 1 and + 1 prevents the hit explosion to appear in the wrong position.
             double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
