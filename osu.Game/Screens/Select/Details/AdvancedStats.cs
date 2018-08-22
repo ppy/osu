@@ -105,7 +105,7 @@ namespace osu.Game.Screens.Select.Details
 
             Instance = newRuleset.CreateInstance();
 
-            if (WBeatmap == null || (beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID)) return;
+            if (WBeatmap == null || beatmap.RulesetID != 0 && beatmap.RulesetID != Ruleset.Value.ID) return;
 
             starDifficulty.Value = (float)Instance.CreateDifficultyCalculator(WBeatmap).Calculate(WBeatmap.Mods.Value.ToArray()).StarRating;
         }
