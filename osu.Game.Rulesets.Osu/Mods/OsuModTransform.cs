@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -10,10 +11,13 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using OpenTK;
+using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    internal class OsuModArrange : Mod, IApplicableToDrawableHitObjects
+    internal class OsuModTransform : Mod, IApplicableToDrawableHitObjects
     {
         public override string Name => "Transform";
         public override string ShortenedName => "TR";
