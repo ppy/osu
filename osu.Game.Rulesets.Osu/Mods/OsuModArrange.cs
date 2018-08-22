@@ -22,13 +22,15 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "Everything rotates. EVERYTHING.";
         public override double ScoreMultiplier => 1;
 
+        private readonly IReadOnlyList<Type> TargetHitObjectTypes = new List<Type>() {
+            typeof(HitCircle),
+            typeof(Slider),
+            typeof(Spinner),
+        };
+
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            drawables.Where(drawable => (
-                drawable is DrawableHitCircle ||
-                drawable is DrawableSlider ||
-                drawable is DrawableSpinner
-            )).ForEach(drawable => 
+            drawables.ForEach(drawable => 
                 drawable.ApplyCustomUpdateState += drawableOnApplyCustomUpdateState
             );
         }
@@ -38,6 +40,9 @@ namespace osu.Game.Rulesets.Osu.Mods
         private void drawableOnApplyCustomUpdateState(DrawableHitObject drawable, ArmedState state)
         {
             var hitObject = (OsuHitObject) drawable.HitObject;
+
+            if (!TargetHitObjectTypes.Contains(hitObject.GetType()))
+                return;
 
             float appear_distance = (float)hitObject.TimePreempt * 0.5f;
 
