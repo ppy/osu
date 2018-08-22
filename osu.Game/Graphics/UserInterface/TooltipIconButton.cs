@@ -16,6 +16,9 @@ namespace osu.Game.Graphics.UserInterface
 {
     // not inheriting osuclickablecontainer/osuhovercontainer
     // because click/hover sounds cannot be disabled
+    /// <summary>
+    /// An icon with an action upon click that can be disabled.
+    /// </summary>
     public class TooltipIconButton : ClickableContainer, IHasTooltip
     {
         private readonly SpriteIcon icon;
@@ -48,9 +51,6 @@ namespace osu.Game.Graphics.UserInterface
             set { icon.Icon = value; }
         }
 
-        /// <summary>
-        /// A simple icon that has an action upon click and can be disabled.
-        /// </summary>
         public TooltipIconButton()
         {
             isEnabled = true;
