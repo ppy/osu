@@ -85,12 +85,10 @@ namespace osu.Game.Skinning
         private void load(OsuConfigManager config)
         {
             beatmapSkins = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
-            beatmapSkins.ValueChanged += val => onSourceChanged();
-            beatmapSkins.TriggerChange();
+            beatmapSkins.BindValueChanged(_ => onSourceChanged());
 
             beatmapHitsounds = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
-            beatmapHitsounds.ValueChanged += val => onSourceChanged();
-            beatmapHitsounds.TriggerChange();
+            beatmapHitsounds.BindValueChanged(_ => onSourceChanged(), true);
         }
 
         protected override void LoadComplete()
