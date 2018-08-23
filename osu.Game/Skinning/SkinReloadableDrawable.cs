@@ -57,7 +57,8 @@ namespace osu.Game.Skinning
         {
             base.Dispose(isDisposing);
 
-            skin.SourceChanged -= onChange;
+            if (skin != null)
+                skin.SourceChanged -= onChange;
         }
     }
 }
