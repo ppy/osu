@@ -178,7 +178,8 @@ namespace osu.Game.Database
         {
             try
             {
-                return Import(CreateModel(archive), archive);
+                var model = CreateModel(archive);
+                return model == null ? null : Import(model, archive);
             }
             catch (Exception e)
             {
