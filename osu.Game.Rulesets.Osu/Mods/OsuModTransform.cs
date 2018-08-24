@@ -22,46 +22,35 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override ModType Type => ModType.Fun;
         public override string Description => "Everything rotates. EVERYTHING.";
         public override double ScoreMultiplier => 1;
-
-        private readonly IReadOnlyList<Type> targetHitObjectTypes = new List<Type> {
-            typeof(HitCircle),
-            typeof(Slider),
-            typeof(Spinner),
-        };
+        private float theta;
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            drawables.ForEach(drawable =>
-                drawable.ApplyCustomUpdateState += drawableOnApplyCustomUpdateState
-            );
-        }
-
-        private float theta;
-
-        private void drawableOnApplyCustomUpdateState(DrawableHitObject drawable, ArmedState state)
-        {
-            var hitObject = (OsuHitObject) drawable.HitObject;
-
-            if (!targetHitObjectTypes.Contains(hitObject.GetType()))
-                return;
-
-            float appearDistance = (float)hitObject.TimePreempt * 0.5f;
-
-            Vector2 originalPosition = drawable.Position;
-            Vector2 appearOffset = new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * appearDistance;
-
-            //the - 1 and + 1 prevents the hit explosion to appear in the wrong position.
-            double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
-            double moveDuration = hitObject.TimePreempt + 1;
-
-            using (drawable.BeginAbsoluteSequence(appearTime, true))
+            foreach (var drawable in drawables)
             {
-                drawable
-                    .MoveToOffset(appearOffset)
-                    .MoveTo(originalPosition, moveDuration, Easing.InOutSine);
-            }
+                var hitObject = (OsuHitObject) drawable.HitObject;
 
-            theta += 0.4f;
+                float appearDistance = (float)(hitObject.TimePreempt - hitObject.TimeFadeIn) / 2;
+
+                Vector2 originalPosition = drawable.Position;
+                Vector2 appearOffset = new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)) * appearDistance;
+
+                //the - 1 and + 1 prevents the hit explosion to appear in the wrong position.
+                double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
+                double moveDuration = hitObject.TimePreempt + 1;
+
+                using (drawable.BeginAbsoluteSequence(appearTime, true))
+                {
+                    drawable
+                        .MoveToOffset(appearOffset)
+                        .MoveTo(originalPosition, moveDuration, Easing.InOutSine);
+                }
+
+                theta += (float) hitObject.TimeFadeIn / 1000;
+            }
         }
+
+
+
     }
 }
