@@ -178,17 +178,14 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
 
         private void apply()
         {
-            if (room != null)
-            {
-                room.Name.Value = NameField.Text;
-                room.Availability.Value = AvailabilityPicker.Current.Value;
-                room.Type.Value = TypePicker.Current.Value;
+            nameBind.Value = NameField.Text;
+            availabilityBind.Value = AvailabilityPicker.Current.Value;
+            typeBind.Value = TypePicker.Current.Value;
 
-                if (int.TryParse(MaxParticipantsField.Text, out int max))
-                    room.MaxParticipants.Value = max;
-                else
-                    room.MaxParticipants.Value = null;
-            }
+            if (int.TryParse(MaxParticipantsField.Text, out int max))
+                maxParticipantsBind.Value = max;
+            else
+                maxParticipantsBind.Value = null;
 
             Hide();
         }
