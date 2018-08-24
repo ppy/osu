@@ -19,9 +19,11 @@ using osu.Game.Configuration;
 using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Difficulty;
+using osu.Game.Rulesets.Mania.Edit;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Mania
@@ -31,6 +33,8 @@ namespace osu.Game.Rulesets.Mania
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new ManiaRulesetContainer(this, beatmap);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, Score score) => new ManiaPerformanceCalculator(this, beatmap, score);
+
+        public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
 
         public override IEnumerable<Mod> ConvertLegacyMods(LegacyMods mods)
         {
@@ -120,7 +124,7 @@ namespace osu.Game.Rulesets.Mania
                         new MultiMod(new ManiaModFadeIn(), new ManiaModHidden()),
                         new ManiaModFlashlight(),
                     };
-                case ModType.Special:
+                case ModType.Conversion:
                     return new Mod[]
                     {
                         new MultiMod(new ManiaModKey4(),
@@ -135,6 +139,10 @@ namespace osu.Game.Rulesets.Mania
                         new ManiaModRandom(),
                         new ManiaModDualStages(),
                         new ManiaModMirror(),
+                    };
+                case ModType.Automation:
+                    return new Mod[]
+                    {
                         new MultiMod(new ManiaModAutoplay(), new ModCinema()),
                     };
                 default:

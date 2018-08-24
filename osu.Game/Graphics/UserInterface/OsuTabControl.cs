@@ -14,7 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics.Sprites;
 
@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             TabContainer.Spacing = new Vector2(10f, 0f);
 
-            Add(strip = new Box
+            AddInternal(strip = new Box
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,

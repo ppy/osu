@@ -103,17 +103,14 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 HitObject lastObject = OriginalBeatmap.HitObjects.LastOrDefault();
                 HitObject firstObject = OriginalBeatmap.HitObjects.FirstOrDefault();
 
-                double drainTime = (lastObject?.StartTime ?? 0) - (firstObject?.StartTime ?? 0);
-                drainTime -= OriginalBeatmap.TotalBreakTime;
+                // Drain time in seconds
+                int drainTime = (int)(((lastObject?.StartTime ?? 0) - (firstObject?.StartTime ?? 0) - OriginalBeatmap.TotalBreakTime) / 1000);
 
                 if (drainTime == 0)
-                    drainTime = 10000000;
-
-                // We need this in seconds
-                drainTime /= 1000;
+                    drainTime = 10000;
 
                 BeatmapDifficulty difficulty = OriginalBeatmap.BeatmapInfo.BaseDifficulty;
-                conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + OriginalBeatmap.HitObjects.Count() / drainTime * 9f) / 38f * 5f / 1.15;
+                conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + (double)OriginalBeatmap.HitObjects.Count() / drainTime * 9f) / 38f * 5f / 1.15;
                 conversionDifficulty = Math.Min(conversionDifficulty.Value, 12);
 
                 return conversionDifficulty.Value;

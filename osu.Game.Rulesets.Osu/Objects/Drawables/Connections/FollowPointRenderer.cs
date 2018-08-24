@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                     Vector2 distanceVector = endPosition - startPosition;
                     int distance = (int)distanceVector.Length;
-                    float rotation = (float)Math.Atan2(distanceVector.Y, distanceVector.X);
+                    float rotation = (float)(Math.Atan2(distanceVector.Y, distanceVector.X) * (180 / Math.PI));
                     double duration = endTime - startTime;
 
                     for (int d = (int)(PointDistance * 1.5); d < distance - PointDistance; d += PointDistance)
@@ -96,12 +96,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                         using (fp.BeginAbsoluteSequence(fadeInTime))
                         {
-                            fp.FadeIn(currHitObject.TimeFadein);
-                            fp.ScaleTo(1, currHitObject.TimeFadein, Easing.Out);
+                            fp.FadeIn(currHitObject.TimeFadeIn);
+                            fp.ScaleTo(1, currHitObject.TimeFadeIn, Easing.Out);
 
-                            fp.MoveTo(pointEndPosition, currHitObject.TimeFadein, Easing.Out);
+                            fp.MoveTo(pointEndPosition, currHitObject.TimeFadeIn, Easing.Out);
 
-                            fp.Delay(fadeOutTime - fadeInTime).FadeOut(currHitObject.TimeFadein);
+                            fp.Delay(fadeOutTime - fadeInTime).FadeOut(currHitObject.TimeFadeIn);
                         }
 
                         fp.Expire(true);

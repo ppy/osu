@@ -3,12 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Input;
+using osu.Framework.Input.StateChanges;
 using osu.Game.Input.Handlers;
 using OpenTK;
 using OpenTK.Input;
-using KeyboardState = osu.Framework.Input.KeyboardState;
-using MouseState = osu.Framework.Input.MouseState;
 
 namespace osu.Game.Rulesets.Replays
 {
@@ -107,7 +105,7 @@ namespace osu.Game.Rulesets.Replays
             return CurrentTime = time;
         }
 
-        protected class ReplayMouseState : MouseState
+        protected class ReplayMouseState : osu.Framework.Input.States.MouseState
         {
             public ReplayMouseState(Vector2 position)
             {
@@ -115,7 +113,7 @@ namespace osu.Game.Rulesets.Replays
             }
         }
 
-        protected class ReplayKeyboardState : KeyboardState
+        protected class ReplayKeyboardState : osu.Framework.Input.States.KeyboardState
         {
             public ReplayKeyboardState(List<Key> keys)
             {

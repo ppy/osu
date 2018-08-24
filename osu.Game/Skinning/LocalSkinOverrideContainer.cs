@@ -71,9 +71,9 @@ namespace osu.Game.Skinning
 
         private void onSourceChanged() => SourceChanged?.Invoke();
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             fallbackSource = dependencies.Get<ISkinSource>();
             dependencies.CacheAs<ISkinSource>(this);
@@ -85,12 +85,10 @@ namespace osu.Game.Skinning
         private void load(OsuConfigManager config)
         {
             beatmapSkins = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
-            beatmapSkins.ValueChanged += val => onSourceChanged();
-            beatmapSkins.TriggerChange();
+            beatmapSkins.BindValueChanged(_ => onSourceChanged());
 
             beatmapHitsounds = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
-            beatmapHitsounds.ValueChanged += val => onSourceChanged();
-            beatmapHitsounds.TriggerChange();
+            beatmapHitsounds.BindValueChanged(_ => onSourceChanged(), true);
         }
 
         protected override void LoadComplete()

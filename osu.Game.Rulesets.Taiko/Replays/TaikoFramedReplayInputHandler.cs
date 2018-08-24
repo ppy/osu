@@ -4,7 +4,7 @@
 using osu.Game.Rulesets.Replays;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Input;
+using osu.Framework.Input.StateChanges;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {

@@ -20,8 +20,6 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
-        protected virtual bool DisplayJudgements => true;
-
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
         public OsuPlayfield()
@@ -52,7 +50,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override void Add(DrawableHitObject h)
         {
-            h.OnJudgement += onJudgement;
+            h.OnNewResult += onNewResult;
 
             var c = h as IDrawableHitObjectWithProxiedApproach;
             if (c != null)
@@ -66,12 +64,12 @@ namespace osu.Game.Rulesets.Osu.UI
             connectionLayer.HitObjects = HitObjects.Objects.Select(d => d.HitObject).OfType<OsuHitObject>();
         }
 
-        private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!judgedObject.DisplayJudgement || !DisplayJudgements)
+            if (!judgedObject.DisplayResult || !DisplayJudgements)
                 return;
 
-            DrawableOsuJudgement explosion = new DrawableOsuJudgement(judgement, judgedObject)
+            DrawableOsuJudgement explosion = new DrawableOsuJudgement(result, judgedObject)
             {
                 Origin = Anchor.Centre,
                 Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition
