@@ -32,8 +32,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         protected override Container<Drawable> Content => hitObjectArea;
 
-        public Column(ScrollingDirection direction)
-            : base(direction)
+        public Column()
         {
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
@@ -118,9 +117,9 @@ namespace osu.Game.Rulesets.Mania.UI
             }
         }
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent)
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            var dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
             dependencies.CacheAs<IBindable<ManiaAction>>(Action);
             return dependencies;
         }
@@ -132,14 +131,14 @@ namespace osu.Game.Rulesets.Mania.UI
         public override void Add(DrawableHitObject hitObject)
         {
             hitObject.AccentColour = AccentColour;
-            hitObject.OnJudgement += OnJudgement;
+            hitObject.OnNewResult += OnNewResult;
 
             HitObjects.Add(hitObject);
         }
 
-        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!judgement.IsHit || !judgedObject.DisplayJudgement)
+            if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements)
                 return;
 
             explosionContainer.Add(new HitExplosion(judgedObject)

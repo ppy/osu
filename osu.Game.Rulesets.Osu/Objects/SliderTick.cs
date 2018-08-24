@@ -3,6 +3,8 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -22,9 +24,11 @@ namespace osu.Game.Rulesets.Osu.Objects
                 // This is so on repeats ticks don't appear too late to be visually processed by the player.
                 offset = 200;
             else
-                offset = TimeFadein * 0.66f;
+                offset = TimeFadeIn * 0.66f;
 
             TimePreempt = (StartTime - SpanStartTime) / 2 + offset;
         }
+
+        public override Judgement CreateJudgement() => new OsuJudgement();
     }
 }

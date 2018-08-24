@@ -52,5 +52,13 @@ namespace osu.Game.Skinning
         protected virtual void SkinChanged(ISkinSource skin, bool allowFallback)
         {
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (skin != null)
+                skin.SourceChanged -= onChange;
+        }
     }
 }

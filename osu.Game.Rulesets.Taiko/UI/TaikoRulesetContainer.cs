@@ -98,31 +98,17 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override DrawableHitObject<TaikoHitObject> GetVisualRepresentation(TaikoHitObject h)
         {
-            var centreHit = h as CentreHit;
-            if (centreHit != null)
+            switch (h)
             {
-                if (h.IsStrong)
-                    return new DrawableCentreHitStrong(centreHit);
-                return new DrawableCentreHit(centreHit);
+                case CentreHit centreHit:
+                    return new DrawableCentreHit(centreHit);
+                case RimHit rimHit:
+                    return new DrawableRimHit(rimHit);
+                case DrumRoll drumRoll:
+                    return new DrawableDrumRoll(drumRoll);
+                case Swell swell:
+                    return new DrawableSwell(swell);
             }
-
-            var rimHit = h as RimHit;
-            if (rimHit != null)
-            {
-                if (h.IsStrong)
-                    return new DrawableRimHitStrong(rimHit);
-                return new DrawableRimHit(rimHit);
-            }
-
-            var drumRoll = h as DrumRoll;
-            if (drumRoll != null)
-            {
-                return new DrawableDrumRoll(drumRoll);
-            }
-
-            var swell = h as Swell;
-            if (swell != null)
-                return new DrawableSwell(swell);
 
             return null;
         }

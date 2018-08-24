@@ -9,6 +9,7 @@ using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Objects
@@ -104,6 +105,12 @@ namespace osu.Game.Rulesets.Objects
         }
 
         protected void AddNested(HitObject hitObject) => nestedHitObjects.Value.Add(hitObject);
+
+        /// <summary>
+        /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
+        /// May be null.
+        /// </summary>
+        public virtual Judgement CreateJudgement() => null;
 
         /// <summary>
         /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.

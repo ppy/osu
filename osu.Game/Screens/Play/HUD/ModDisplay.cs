@@ -10,9 +10,9 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using OpenTK;
-using osu.Framework.Input;
 using osu.Game.Graphics.Containers;
 using System.Linq;
+using osu.Framework.Input.States;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -61,6 +61,12 @@ namespace osu.Game.Screens.Play.HUD
                 if (IsLoaded)
                     appearTransform();
             };
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            mods.UnbindAll();
         }
 
         protected override void LoadComplete()

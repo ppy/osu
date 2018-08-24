@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Framework.Timing;
 using OpenTK;
 using OpenTK.Graphics;
@@ -196,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 if (Shared.VertexBuffer == null)
                     Shared.VertexBuffer = new QuadVertexBuffer<TexturedTrailVertex>(max_sprites, BufferUsageHint.DynamicDraw);
 
-                Shader.GetUniform<float>("g_FadeClock").Value = Time;
+                Shader.GetUniform<float>("g_FadeClock").UpdateValue(ref Time);
 
                 int updateStart = -1, updateEnd = 0;
                 for (int i = 0; i < Parts.Length; ++i)

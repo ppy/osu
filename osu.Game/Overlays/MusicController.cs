@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input;
+using osu.Framework.Input.States;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -142,14 +142,14 @@ namespace osu.Game.Overlays
                                             Anchor = Anchor.Centre,
                                             Children = new[]
                                             {
-                                                prevButton = new IconButton
+                                                prevButton = new MusicIconButton
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
                                                     Action = prev,
                                                     Icon = FontAwesome.fa_step_backward,
                                                 },
-                                                playButton = new IconButton
+                                                playButton = new MusicIconButton
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
@@ -158,7 +158,7 @@ namespace osu.Game.Overlays
                                                     Action = play,
                                                     Icon = FontAwesome.fa_play_circle_o,
                                                 },
-                                                nextButton = new IconButton
+                                                nextButton = new MusicIconButton
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
@@ -167,7 +167,7 @@ namespace osu.Game.Overlays
                                                 },
                                             }
                                         },
-                                        playlistButton = new IconButton
+                                        playlistButton = new MusicIconButton
                                         {
                                             Origin = Anchor.Centre,
                                             Anchor = Anchor.CentreRight,
@@ -183,7 +183,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomCentre,
                                     Height = progress_height,
                                     FillColour = colours.Yellow,
-                                    OnSeek = progress => current?.Track.Seek(progress)
+                                    OnSeek = attemptSeek
                                 }
                             },
                         },
@@ -196,6 +196,12 @@ namespace osu.Game.Overlays
             beatmaps.ItemRemoved += handleBeatmapRemoved;
 
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
+        }
+
+        private void attemptSeek(double progress)
+        {
+            if (!beatmap.Disabled)
+                current?.Track.Seek(progress);
         }
 
         private void playlistOrderChanged(BeatmapSetInfo beatmapSetInfo, int index)
@@ -219,6 +225,7 @@ namespace osu.Game.Overlays
             if (disabled)
                 playlist.Hide();
 
+            playButton.Enabled.Value = !disabled;
             prevButton.Enabled.Value = !disabled;
             nextButton.Enabled.Value = !disabled;
             playlistButton.Enabled.Value = !disabled;
@@ -403,6 +410,16 @@ namespace osu.Game.Overlays
             None,
             Next,
             Prev
+        }
+
+        private class MusicIconButton : IconButton
+        {
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                HoverColour = colours.YellowDark.Opacity(0.6f);
+                FlashColour = colours.Yellow;
+            }
         }
 
         private class Background : BufferedContainer
