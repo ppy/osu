@@ -23,21 +23,10 @@ namespace osu.Game.Rulesets.Catch.Judgements
         }
 
         /// <summary>
-        /// The base health increase for the result achieved.
+        /// Retrieves the numeric health increase of a <see cref="HitResult"/>.
         /// </summary>
-        public float HealthIncrease => HealthIncreaseFor(Result);
-
-        /// <summary>
-        /// Whether fruit on the platter should explode or drop.
-        /// Note that this is only checked if the owning object is also <see cref="IHasComboInformation.LastInCombo" />
-        /// </summary>
-        public virtual bool ShouldExplode => IsHit;
-
-        /// <summary>
-        /// Convert a <see cref="HitResult"/> to a base health increase.
-        /// </summary>
-        /// <param name="result">The value to convert.</param>
-        /// <returns>The base health increase.</returns>
+        /// <param name="result">The <see cref="HitResult"/> to find the numeric health increase for.</param>
+        /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
         protected virtual float HealthIncreaseFor(HitResult result)
         {
             switch (result)
@@ -48,5 +37,18 @@ namespace osu.Game.Rulesets.Catch.Judgements
                     return 10.2f;
             }
         }
+
+        /// <summary>
+        /// Retrieves the numeric health increase of a <see cref="JudgementResult"/>.
+        /// </summary>
+        /// <param name="result">The <see cref="JudgementResult"/> to find the numeric health increase for.</param>
+        /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
+        public float HealthIncreaseFor(JudgementResult result) => HealthIncreaseFor(result.Type);
+
+        /// <summary>
+        /// Whether fruit on the platter should explode or drop.
+        /// Note that this is only checked if the owning object is also <see cref="IHasComboInformation.LastInCombo" />
+        /// </summary>
+        public virtual bool ShouldExplodeFor(JudgementResult result) => result.IsHit;
     }
 }

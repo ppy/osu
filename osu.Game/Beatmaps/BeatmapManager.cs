@@ -329,7 +329,7 @@ namespace osu.Game.Beatmaps
                 return;
             }
 
-            await Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs")), TaskCreationOptions.LongRunning);
+            await Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs").Select(f => stable.GetFullPath(f)).ToArray()), TaskCreationOptions.LongRunning);
         }
 
         /// <summary>
@@ -350,7 +350,12 @@ namespace osu.Game.Beatmaps
         {
             // let's make sure there are actually .osu files to import.
             string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
-            if (string.IsNullOrEmpty(mapName)) throw new InvalidOperationException("No beatmap files found in this beatmap archive.");
+            if (string.IsNullOrEmpty(mapName))
+            {
+                // Todo: This is temporary for debugging purposes
+                var files = reader.Filenames.ToList();
+                throw new InvalidOperationException($"No beatmap files found in this beatmap archive. Files ({files.Count}): {string.Join(", ", files)}");
+            }
 
             Beatmap beatmap;
             using (var stream = new StreamReader(reader.GetStream(mapName)))

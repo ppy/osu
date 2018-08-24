@@ -19,16 +19,16 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// Creates a new judgement text.
         /// </summary>
         /// <param name="judgedObject">The object which is being judged.</param>
-        /// <param name="judgement">The judgement to visualise.</param>
-        public DrawableTaikoJudgement(Judgement judgement, DrawableHitObject judgedObject)
-            : base(judgement, judgedObject)
+        /// <param name="result">The judgement to visualise.</param>
+        public DrawableTaikoJudgement(JudgementResult result, DrawableHitObject judgedObject)
+            : base(result, judgedObject)
         {
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            switch (Judgement.Result)
+            switch (Result.Type)
             {
                 case HitResult.Good:
                     Colour = colours.GreenLight;
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override void LoadComplete()
         {
-            if (Judgement.IsHit)
+            if (Result.IsHit)
                 this.MoveToY(-100, 500);
 
             base.LoadComplete();
