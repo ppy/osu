@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                 {
                                     new Section("MAX PARTICIPANTS")
                                     {
-                                        Child = MaxParticipantsField = new SettingsTextBox
+                                        Child = MaxParticipantsField = new SettingsNumberTextBox
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             TabbableContentContainer = this,
@@ -197,6 +197,11 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
         {
             protected override Color4 BackgroundUnfocused => Color4.Black;
             protected override Color4 BackgroundFocused => Color4.Black;
+        }
+
+        private class SettingsNumberTextBox : SettingsTextBox
+        {
+            protected override bool CanAddCharacter(char character) => char.IsNumber(character);
         }
 
         private class SettingsPasswordTextBox : OsuPasswordTextBox
