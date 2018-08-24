@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         }
 
         /// <summary>
-        /// Returns a random column index in the range [RandomStart, TotalColumns).
+        /// Returns a random column index in the range [<paramref name="lowerBound"/>, <paramref name="upperBound"/>).
         /// </summary>
         /// <param name="lowerBound">The minimum column index. If null, <see cref="RandomStart"/> is used.</param>
         /// <param name="upperBound">The maximum column index. If null, <see cref="PatternGenerator.TotalColumns"/> is used.</param>
