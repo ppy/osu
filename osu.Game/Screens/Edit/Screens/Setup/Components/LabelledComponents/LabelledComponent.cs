@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
-    public class LabelledComponent : CompositeDrawable
+    public abstract class LabelledComponent : CompositeDrawable
     {
         private const float corner_radius = 15;
         private const float content_padding = 10;
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             set => background.Colour = value;
         }
 
-        public LabelledComponent()
+        protected LabelledComponent()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -109,6 +109,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             bottomText.Colour = osuColour.Yellow;
         }
 
-        protected virtual Drawable CreateComponent() => null;
+        protected abstract Drawable CreateComponent();
     }
 }
