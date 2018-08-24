@@ -49,8 +49,5 @@ namespace osu.Game.Rulesets.Osu.Mods
                 theta += (float) hitObject.TimeFadeIn / 1000;
             }
         }
-
-
-
     }
 }
