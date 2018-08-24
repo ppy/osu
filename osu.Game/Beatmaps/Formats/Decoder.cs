@@ -57,7 +57,7 @@ namespace osu.Game.Beatmaps.Formats
             if (line == null)
                 throw new IOException(@"Unknown file format (null)");
 
-            var decoder = typedDecoders.Select(d => line.StartsWith(d.Key) ? d.Value : null).FirstOrDefault();
+            var decoder = typedDecoders.Select(d => line.StartsWith(d.Key, StringComparison.InvariantCulture) ? d.Value : null).FirstOrDefault();
             if (decoder == null)
                 throw new IOException($@"Unknown file format ({line})");
 
