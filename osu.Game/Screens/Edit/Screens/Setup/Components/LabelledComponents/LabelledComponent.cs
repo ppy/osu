@@ -14,11 +14,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
     public abstract class LabelledComponent : CompositeDrawable
     {
-        private const float corner_radius = 15;
-        private const float content_padding = 10;
-        private const float content_spacing = 12;
-        private const float label_text_size = 16;
-        private const float bottom_label_text_size = 12;
+        protected const float CONTENT_PADDING = 10;
+        protected const float CORNER_RADIUS = 15;
 
         private readonly Box background;
         private readonly OsuSpriteText label;
@@ -59,7 +56,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            CornerRadius = corner_radius;
+            CornerRadius = CORNER_RADIUS;
             Masking = true;
 
             Drawable component;
@@ -74,8 +71,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding(content_padding),
-                    Spacing = new Vector2(0, content_spacing),
+                    Padding = new MarginPadding(CONTENT_PADDING),
+                    Spacing = new Vector2(0, 12),
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
@@ -88,7 +85,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                                 label = new OsuSpriteText
                                 {
                                     Colour = Color4.White,
-                                    TextSize = label_text_size,
                                     Font = @"Exo2.0-Bold",
                                 },
                                 component = CreateComponent(),
@@ -96,7 +92,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                         },
                         bottomText = new OsuSpriteText
                         {
-                            TextSize = bottom_label_text_size,
+                            TextSize = 12,
                             Font = @"Exo2.0-BoldItalic",
                         },
                     }
