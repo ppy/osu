@@ -24,7 +24,7 @@ Clone the repository including submodules
 Build and run
 
 - Using Visual Studio 2017, Rider or Visual Studio Code (configurations are included)
-- From command line using `dotnet run --project osu.Desktop --framework netcoreapp2.1`
+- From command line using `dotnet run --project osu.Desktop`
 
 If you run into issues building you may need to restore nuget packages (commonly via `dotnet restore`). Visual Studio Code users must run `Restore` task from debug tab before attempt to build.
 
