@@ -9,24 +9,20 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using System;
 
 namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
     public class LabelledComponent : CompositeDrawable
     {
+        private const float corner_radius = 15;
+        private const float content_padding = 10;
+        private const float content_spacing = 12;
+        private const float label_text_size = 16;
+        private const float bottom_label_text_size = 12;
+
         private readonly Box background;
         private readonly OsuSpriteText label;
         private readonly OsuSpriteText bottomText;
-
-        private const float corner_radius = 15;
-        private const float label_text_size = 16;
-        private const float bottom_label_text_size = 12;
-        private const float base_height = 40;
-        private const float label_horizontal_offset = 15;
-        private const float label_vertical_offset = 12;
-
-        protected bool HasBottomText => true;
 
         public string LabelText
         {
@@ -37,14 +33,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         public string BottomLabelText
         {
             get => bottomText.Text;
-            set
-            {
-                if (!HasBottomText)
-                    throw new InvalidOperationException("This component does not accept bottom text.");
-
-                bottomText.Text = value;
-                Height = base_height + (value != "" ? 20 : 0);
-            }
+            set => bottomText.Text = value;
         }
 
         public float LabelTextSize
@@ -68,7 +57,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
         public LabelledComponent()
         {
             RelativeSizeAxes = Axes.X;
-            Height = base_height;
+            AutoSizeAxes = Axes.Y;
+
             CornerRadius = corner_radius;
             Masking = true;
 
@@ -79,21 +69,23 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.FromHex("1c2125"),
                 },
-                new Container
+                new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding(content_padding),
+                    Spacing = new Vector2(0, content_spacing),
+                    Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
                         new Container
                         {
-                            RelativeSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
                             Children = new[]
                             {
                                 label = new OsuSpriteText
                                 {
-                                    Anchor = Anchor.TopLeft,
-                                    Origin = Anchor.TopLeft,
-                                    Position = new Vector2(label_horizontal_offset, label_vertical_offset),
                                     Colour = Color4.White,
                                     TextSize = label_text_size,
                                     Font = @"Exo2.0-Bold",
@@ -103,9 +95,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                         },
                         bottomText = new OsuSpriteText
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            Position = new Vector2(label_horizontal_offset, -label_vertical_offset),
                             TextSize = bottom_label_text_size,
                             Font = @"Exo2.0-BoldItalic",
                         },
