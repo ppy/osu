@@ -14,9 +14,11 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -69,8 +71,10 @@ namespace osu.Game.Screens.Play
                 }
             });
 
-            loadTask = LoadComponentAsync(player);
+            loadTask = LoadComponentAsync(player, playerLoaded);
         }
+
+        private void playerLoaded(Player player) => info.Loading = false;
 
         protected override void OnResuming(Screen last)
         {
@@ -78,12 +82,14 @@ namespace osu.Game.Screens.Play
 
             contentIn();
 
+            info.Loading = true;
+
             //we will only be resumed if the player has requested a re-run (see ValidForResume setting above)
             loadTask = LoadComponentAsync(player = new Player
             {
                 RestartCount = player.RestartCount + 1,
                 RestartRequested = player.RestartRequested,
-            });
+            }, playerLoaded);
 
             this.Delay(400).Schedule(pushWhenLoaded);
         }
@@ -258,6 +264,25 @@ namespace osu.Game.Screens.Play
             }
 
             private readonly WorkingBeatmap beatmap;
+            private LoadingAnimation loading;
+            private Sprite backgroundSprite;
+
+            public bool Loading
+            {
+                set
+                {
+                    if (value)
+                    {
+                        loading.Show();
+                        backgroundSprite.FadeColour(OsuColour.Gray(0.5f), 400, Easing.OutQuint);
+                    }
+                    else
+                    {
+                        loading.Hide();
+                        backgroundSprite.FadeColour(Color4.White, 400, Easing.OutQuint);
+                    }
+                }
+            }
 
             public BeatmapMetadataDisplay(WorkingBeatmap beatmap)
             {
@@ -304,9 +329,9 @@ namespace osu.Game.Screens.Play
                                 Anchor = Anchor.TopCentre,
                                 CornerRadius = 10,
                                 Masking = true,
-                                Children = new[]
+                                Children = new Drawable[]
                                 {
-                                    new Sprite
+                                    backgroundSprite = new Sprite
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         Texture = beatmap?.Background,
@@ -314,6 +339,7 @@ namespace osu.Game.Screens.Play
                                         Anchor = Anchor.Centre,
                                         FillMode = FillMode.Fill,
                                     },
+                                    loading = new LoadingAnimation { Scale = new Vector2(1.3f) }
                                 }
                             },
                             new OsuSpriteText
@@ -341,6 +367,8 @@ namespace osu.Game.Screens.Play
                         },
                     }
                 };
+
+                Loading = true;
             }
         }
     }
