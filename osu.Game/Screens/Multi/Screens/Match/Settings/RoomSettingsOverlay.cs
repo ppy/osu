@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
 {
     public class RoomSettingsOverlay : FocusedOverlayContainer
     {
-        private const float transition_duration = 500;
+        private const float transition_duration = 350;
         private const float field_padding = 45;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
