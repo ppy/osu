@@ -123,15 +123,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             foreach (var t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
 
             Size = Body.Size;
-            OriginPosition = Body.PathOffset;
-
-            if (DrawSize != Vector2.Zero)
-            {
-                var childAnchorPosition = Vector2.Divide(OriginPosition, DrawSize);
-                foreach (var obj in NestedHitObjects)
-                    obj.RelativeAnchorPosition = childAnchorPosition;
-                Ball.RelativeAnchorPosition = childAnchorPosition;
-            }
+            Body.OriginPosition = Body.PathOffset;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
