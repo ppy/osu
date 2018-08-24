@@ -14,7 +14,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
 {
     public abstract class LabelledComponent : CompositeDrawable
     {
-        protected const float CONTENT_PADDING = 10;
+        protected const float CONTENT_PADDING_VERTICAL = 10;
+        protected const float CONTENT_PADDING_HORIZONTAL = 15;
         protected const float CORNER_RADIUS = 15;
 
         private readonly Box background;
@@ -71,8 +72,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding(CONTENT_PADDING),
-                    Spacing = new Vector2(0, 12),
+                    Padding = new MarginPadding { Horizontal = CONTENT_PADDING_HORIZONTAL, Vertical = CONTENT_PADDING_VERTICAL },
+                    Spacing = new Vector2(0, 10),
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
@@ -84,6 +85,8 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                             {
                                 label = new OsuSpriteText
                                 {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
                                     Colour = Color4.White,
                                     Font = @"Exo2.0-Bold",
                                 },
