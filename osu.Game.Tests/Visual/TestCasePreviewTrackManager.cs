@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(trackManager);
+            Add(trackManager);
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace osu.Game.Tests.Visual
             TestTrackOwner owner = null;
             PreviewTrack track = null;
 
-            AddStep("get track", () => AddInternal(owner = new TestTrackOwner(track = getTrack())));
+            AddStep("get track", () => Add(owner = new TestTrackOwner(track = getTrack())));
             AddStep("start", () => track.Start());
             AddStep("attempt stop", () => trackManager.StopAnyPlaying(this));
             AddAssert("not stopped", () => track.IsRunning);
@@ -89,7 +89,7 @@ namespace osu.Game.Tests.Visual
         {
             var track = getTrack();
 
-            AddInternal(track);
+            Add(track);
 
             return track;
         }
