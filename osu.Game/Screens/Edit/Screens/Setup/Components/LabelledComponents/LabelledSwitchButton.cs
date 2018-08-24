@@ -21,10 +21,6 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             Current.BindTo(switchButton.Current);
         }
 
-        protected override Drawable CreateComponent() => switchButton = new SwitchButton
-        {
-            Anchor = Anchor.TopRight,
-            Origin = Anchor.TopRight,
-        };
+        protected override Drawable CreateComponent() => switchButton = new SwitchButton();
     }
 }

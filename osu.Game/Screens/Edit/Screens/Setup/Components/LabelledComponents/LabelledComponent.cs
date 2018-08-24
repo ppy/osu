@@ -62,6 +62,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
             CornerRadius = corner_radius;
             Masking = true;
 
+            Drawable component;
             InternalChildren = new Drawable[]
             {
                 background = new Box
@@ -90,7 +91,7 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                                     TextSize = label_text_size,
                                     Font = @"Exo2.0-Bold",
                                 },
-                                CreateComponent(),
+                                component = CreateComponent(),
                             },
                         },
                         bottomText = new OsuSpriteText
@@ -101,6 +102,9 @@ namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
                     }
                 }
             };
+
+            component.Anchor = Anchor.TopRight;
+            component.Origin = Anchor.TopRight;
         }
 
         [BackgroundDependencyLoader]
