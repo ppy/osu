@@ -352,9 +352,8 @@ namespace osu.Game.Beatmaps
             string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
             if (string.IsNullOrEmpty(mapName))
             {
-                // Todo: This is temporary for debugging purposes
-                var files = reader.Filenames.ToList();
-                throw new InvalidOperationException($"No beatmap files found in this beatmap archive. Files ({files.Count}): {string.Join(", ", files)}");
+                Logger.Log($"No beatmap files found in the beatmap archive ({reader.Name}).", LoggingTarget.Database);
+                return null;
             }
 
             Beatmap beatmap;
