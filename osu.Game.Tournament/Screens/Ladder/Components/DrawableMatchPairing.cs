@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using OpenTK;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
@@ -23,6 +24,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
+                Spacing = new Vector2(2)
             };
 
             pairing.Team1.BindValueChanged(_ => updateTeams());
