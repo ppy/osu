@@ -390,7 +390,7 @@ namespace osu.Game.Database
         /// Actual expensive population should be done in <see cref="Populate"/>; this should just prepare for duplicate checking.
         /// </summary>
         /// <param name="archive">The archive to create the model for.</param>
-        /// <returns>A model populated with minimal information.</returns>
+        /// <returns>A model populated with minimal information. Returning a null will abort importing silently.</returns>
         protected abstract TModel CreateModel(ArchiveReader archive);
 
         /// <summary>
