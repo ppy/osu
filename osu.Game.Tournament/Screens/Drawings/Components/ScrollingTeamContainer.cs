@@ -13,18 +13,17 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Threading;
-using osu.Game.Screens.Tournament.Teams;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Tournament
+namespace osu.Game.Tournament.Screens.Drawings.Components
 {
     public class ScrollingTeamContainer : Container
     {
         public event Action OnScrollStarted;
-        public event Action<DrawingsTeam> OnSelected;
+        public event Action<TournamentTeam> OnSelected;
 
-        private readonly List<DrawingsTeam> availableTeams = new List<DrawingsTeam>();
+        private readonly List<TournamentTeam> availableTeams = new List<TournamentTeam>();
 
         private readonly Container tracker;
 
@@ -84,6 +83,7 @@ namespace osu.Game.Screens.Tournament
         }
 
         private ScrollState _scrollState;
+
         private ScrollState scrollState
         {
             get { return _scrollState; }
@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        public void AddTeam(DrawingsTeam team)
+        public void AddTeam(TournamentTeam team)
         {
             if (availableTeams.Contains(team))
                 return;
@@ -177,12 +177,12 @@ namespace osu.Game.Screens.Tournament
             scrollState = ScrollState.Idle;
         }
 
-        public void AddTeams(IEnumerable<DrawingsTeam> teams)
+        public void AddTeams(IEnumerable<TournamentTeam> teams)
         {
             if (teams == null)
                 return;
 
-            foreach (DrawingsTeam t in teams)
+            foreach (TournamentTeam t in teams)
                 AddTeam(t);
         }
 
@@ -193,7 +193,7 @@ namespace osu.Game.Screens.Tournament
             scrollState = ScrollState.Idle;
         }
 
-        public void RemoveTeam(DrawingsTeam team)
+        public void RemoveTeam(TournamentTeam team)
         {
             availableTeams.Remove(team);
 
@@ -278,7 +278,7 @@ namespace osu.Game.Screens.Tournament
 
         private void addFlags()
         {
-            foreach (DrawingsTeam t in availableTeams)
+            foreach (TournamentTeam t in availableTeams)
             {
                 Add(new ScrollingTeam(t)
                 {
@@ -320,12 +320,13 @@ namespace osu.Game.Screens.Tournament
             public const float WIDTH = 58;
             public const float HEIGHT = 41;
 
-            public DrawingsTeam Team;
+            public TournamentTeam Team;
 
             private readonly Sprite flagSprite;
             private readonly Box outline;
 
             private bool selected;
+
             public bool Selected
             {
                 get { return selected; }
@@ -341,7 +342,7 @@ namespace osu.Game.Screens.Tournament
                 }
             }
 
-            public ScrollingTeam(DrawingsTeam team)
+            public ScrollingTeam(TournamentTeam team)
             {
                 Team = team;
 

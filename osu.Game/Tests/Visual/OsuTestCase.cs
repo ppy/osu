@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual
         {
             beatmap.SetAudioManager(audioManager);
 
-            Ruleset.Value = rulesets.AvailableRulesets.First();
+            Ruleset.Value = rulesets.AvailableRulesets.FirstOrDefault();
         }
 
         protected override void Dispose(bool isDisposing)
