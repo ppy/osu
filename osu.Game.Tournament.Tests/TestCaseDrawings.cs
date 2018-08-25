@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Game.Tests.Visual;
+using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Drawings;
 using osu.Game.Tournament.Screens.Drawings.Components;
 

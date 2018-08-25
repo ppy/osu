@@ -7,9 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Tournament.Screens.Drawings.Components;
 
-namespace osu.Game.Tournament.Screens.Ladder.Components
+namespace osu.Game.Tournament.Components
 {
     public abstract class DrawableTournamentTeam : CompositeDrawable
     {

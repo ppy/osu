@@ -4,13 +4,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Tournament.Components;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -119,21 +117,26 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             return sb.ToString();
         }
 
-        private class GroupTeam : Container
+        private class GroupTeam : DrawableTournamentTeam
         {
-            public readonly TournamentTeam Team;
-
             private readonly FillFlowContainer innerContainer;
-            private readonly Sprite flagSprite;
 
-            public GroupTeam(TournamentTeam team)
+            public GroupTeam(TournamentTeam team) : base(team)
             {
-                Team = team;
-
                 Width = 36;
                 AutoSizeAxes = Axes.Y;
 
-                Children = new Drawable[]
+
+                Flag.Anchor = Anchor.TopCentre;
+                Flag.Origin = Anchor.TopCentre;
+
+                AcronymText.Anchor = Anchor.TopCentre;
+                AcronymText.Origin = Anchor.TopCentre;
+                AcronymText.Text = team.Acronym.ToUpperInvariant();
+                AcronymText.TextSize = 10f;
+                AcronymText.Font = @"Exo2.0-Bold";
+
+                InternalChildren = new Drawable[]
                 {
                     innerContainer = new FillFlowContainer
                     {
@@ -148,22 +151,8 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                         Children = new Drawable[]
                         {
-                            flagSprite = new Sprite
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-                                FillMode = FillMode.Fit
-                            },
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.TopCentre,
-                                Origin = Anchor.TopCentre,
-
-                                Text = team.Acronym.ToUpperInvariant(),
-                                TextSize = 10f,
-                                Font = @"Exo2.0-Bold"
-                            }
+                            Flag,
+                            AcronymText
                         }
                     }
                 };
@@ -174,12 +163,6 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                 base.LoadComplete();
                 innerContainer.ScaleTo(1.5f);
                 innerContainer.ScaleTo(1f, 200);
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                flagSprite.Texture = textures.Get($@"Flags/{Team.FlagName}");
             }
         }
     }

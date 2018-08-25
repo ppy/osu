@@ -19,6 +19,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Drawings.Components;
 using OpenTK;
 using OpenTK.Graphics;

@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Tournament.Screens.Drawings.Components;
+using osu.Game.Tournament.Components;
 using OpenTK;
 using OpenTK.Graphics;
 
