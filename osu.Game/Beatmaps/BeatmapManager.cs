@@ -352,7 +352,7 @@ namespace osu.Game.Beatmaps
             string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
             if (string.IsNullOrEmpty(mapName))
             {
-                Logger.Log($"No beatmap files found in the beatmap archive ({reader.Name}).");
+                Logger.Log($"No beatmap files found in the beatmap archive ({reader.Name}).", LoggingTarget.Database);
                 return null;
             }
 
