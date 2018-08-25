@@ -10,8 +10,10 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
@@ -78,6 +80,8 @@ namespace osu.Game.Tests.Visual
             testHiding();
             testSelectingFilteredRuleset();
             testCarouselRootIsRandom();
+
+            testModifiedDifficulty();
         }
 
         private void loadBeatmaps(List<BeatmapSetInfo> beatmapSets)
@@ -440,7 +444,35 @@ namespace osu.Game.Tests.Visual
             AddAssert("Selection was random", () => eagerSelectedIDs.Count > 1);
         }
 
-        private BeatmapSetInfo createTestBeatmapSet(int id)
+        private void testModifiedDifficulty()
+        {
+            AddStep("Set mods to difficulty increase", () =>
+            {
+                foreach (DrawableCarouselBeatmap drawable in carousel.Items.OfType<DrawableCarouselBeatmap>())
+                {
+                    StarCounter starCounter = (StarCounter)((FillFlowContainer)((FillFlowContainer)drawable.Children[2]).Children[1]).Children[1];
+                    starCounter.ModCountStars = starCounter.CountStars + 1.4f;
+                }
+            });
+            AddStep("Set mods to difficulty decrease", () =>
+            {
+                foreach (DrawableCarouselBeatmap drawable in carousel.Items.OfType<DrawableCarouselBeatmap>())
+                {
+                    StarCounter starCounter = (StarCounter)((FillFlowContainer)((FillFlowContainer)drawable.Children[2]).Children[1]).Children[1];
+                    starCounter.ModCountStars = starCounter.CountStars - 1.4f;
+                }
+            });
+            AddStep("Set mods to no difficulty change", () =>
+            {
+                foreach (DrawableCarouselBeatmap drawable in carousel.Items.OfType<DrawableCarouselBeatmap>())
+                {
+                    StarCounter starCounter = (StarCounter)((FillFlowContainer)((FillFlowContainer)drawable.Children[2]).Children[1]).Children[1];
+                    starCounter.ModCountStars = starCounter.CountStars;
+                }
+            });
+        }
+
+            private BeatmapSetInfo createTestBeatmapSet(int id)
         {
             return new BeatmapSetInfo
             {
