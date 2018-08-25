@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.TypeExtensions;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
@@ -35,34 +36,44 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private readonly Lazy<List<DrawableHitObject>> nestedHitObjects = new Lazy<List<DrawableHitObject>>();
         public IEnumerable<DrawableHitObject> NestedHitObjects => nestedHitObjects.IsValueCreated ? nestedHitObjects.Value : Enumerable.Empty<DrawableHitObject>();
 
-        public event Action<DrawableHitObject, Judgement> OnJudgement;
-        public event Action<DrawableHitObject, Judgement> OnJudgementRemoved;
-
-        public IReadOnlyList<Judgement> Judgements => judgements;
-        private readonly List<Judgement> judgements = new List<Judgement>();
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> has been applied by this <see cref="DrawableHitObject"/> or a nested <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public event Action<DrawableHitObject, JudgementResult> OnNewResult;
 
         /// <summary>
-        /// Whether a visible judgement should be displayed when this representation is hit.
+        /// Invoked when a <see cref="JudgementResult"/> is being reverted by this <see cref="DrawableHitObject"/> or a nested <see cref="DrawableHitObject"/>.
         /// </summary>
-        public virtual bool DisplayJudgement => true;
+        public event Action<DrawableHitObject, JudgementResult> OnRevertResult;
 
         /// <summary>
-        /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been hit.
+        /// Whether a visual indicator should be displayed when a scoring result occurs.
         /// </summary>
-        public bool IsHit => Judgements.Any(j => j.Final && j.IsHit) && NestedHitObjects.All(n => n.IsHit);
+        public virtual bool DisplayResult => true;
 
         /// <summary>
         /// Whether this <see cref="DrawableHitObject"/> and all of its nested <see cref="DrawableHitObject"/>s have been judged.
         /// </summary>
-        public bool AllJudged => (!ProvidesJudgement || judgementFinalized) && NestedHitObjects.All(h => h.AllJudged);
+        public bool AllJudged => Judged && NestedHitObjects.All(h => h.AllJudged);
 
         /// <summary>
-        /// Whether this <see cref="DrawableHitObject"/> can be judged.
+        /// Whether this <see cref="DrawableHitObject"/> has been hit. This occurs if <see cref="Result.IsHit"/> is <see cref="true"/>.
+        /// Note: This does NOT include nested hitobjects.
         /// </summary>
-        protected virtual bool ProvidesJudgement => true;
+        public bool IsHit => Result?.IsHit ?? false;
+
+        /// <summary>
+        /// Whether this <see cref="DrawableHitObject"/> has been judged.
+        /// Note: This does NOT include nested hitobjects.
+        /// </summary>
+        public bool Judged => Result?.HasResult ?? true;
+
+        /// <summary>
+        /// The scoring result of this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public JudgementResult Result { get; private set; }
 
         private bool judgementOccurred;
-        private bool judgementFinalized => judgements.LastOrDefault()?.Final == true;
 
         public bool Interactive = true;
         public override bool HandleKeyboardInput => Interactive;
@@ -82,6 +93,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
         [BackgroundDependencyLoader]
         private void load()
         {
+            var judgement = HitObject.CreateJudgement();
+            if (judgement != null)
+            {
+                Result = CreateResult(judgement);
+                if (Result == null)
+                    throw new InvalidOperationException($"{GetType().ReadableName()} must provide a {nameof(JudgementResult)} through {nameof(CreateResult)}.");
+            }
+
             var samples = GetSamples().ToArray();
 
             if (samples.Any())
@@ -132,18 +151,17 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.Update();
 
-            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-
-            while (judgements.Count > 0)
+            if (Result != null && Result.HasResult)
             {
-                var lastJudgement = judgements[judgements.Count - 1];
-                if (lastJudgement.TimeOffset + endTime <= Time.Current)
-                    break;
+                var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 
-                judgements.RemoveAt(judgements.Count - 1);
-                State.Value = ArmedState.Idle;
+                if (Result.TimeOffset + endTime > Time.Current)
+                {
+                    OnRevertResult?.Invoke(this, Result);
 
-                OnJudgementRemoved?.Invoke(this, lastJudgement);
+                    Result.Type = HitResult.None;
+                    State.Value = ArmedState.Idle;
+                }
             }
         }
 
@@ -151,33 +169,37 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.UpdateAfterChildren();
 
-            UpdateJudgement(false);
+            UpdateResult(false);
         }
 
         protected virtual void AddNested(DrawableHitObject h)
         {
-            h.OnJudgement += (d, j) => OnJudgement?.Invoke(d, j);
-            h.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(d, j);
+            h.OnNewResult += (d, r) => OnNewResult?.Invoke(d, r);
+            h.OnRevertResult += (d, r) => OnRevertResult?.Invoke(d, r);
             h.ApplyCustomUpdateState += (d, j) => ApplyCustomUpdateState?.Invoke(d, j);
 
             nestedHitObjects.Value.Add(h);
         }
 
         /// <summary>
-        /// Notifies that a new judgement has occurred for this <see cref="DrawableHitObject"/>.
+        /// Applies the <see cref="Result"/> of this <see cref="DrawableHitObject"/>, notifying responders such as
+        /// the <see cref="ScoreProcessor"/> of the <see cref="JudgementResult"/>.
         /// </summary>
-        /// <param name="judgement">The <see cref="Judgement"/>.</param>
-        protected void AddJudgement(Judgement judgement)
+        /// <param name="application">The callback that applies changes to the <see cref="JudgementResult"/>.</param>
+        protected void ApplyResult(Action<JudgementResult> application)
         {
+            application?.Invoke(Result);
+
+            if (!Result.HasResult)
+                throw new InvalidOperationException($"{GetType().ReadableName()} applied a {nameof(JudgementResult)} but did not update {nameof(JudgementResult.Type)}.");
+
             judgementOccurred = true;
 
             // Ensure that the judgement is given a valid time offset, because this may not get set by the caller
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-            judgement.TimeOffset = Time.Current - endTime;
+            Result.TimeOffset = Time.Current - endTime;
 
-            judgements.Add(judgement);
-
-            switch (judgement.Result)
+            switch (Result.Type)
             {
                 case HitResult.None:
                     break;
@@ -189,15 +211,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     break;
             }
 
-            OnJudgement?.Invoke(this, judgement);
+            OnNewResult?.Invoke(this, Result);
         }
 
         /// <summary>
-        /// Processes this <see cref="DrawableHitObject"/>, checking if any judgements have occurred.
+        /// Processes this <see cref="DrawableHitObject"/>, checking if a scoring result has occurred.
         /// </summary>
         /// <param name="userTriggered">Whether the user triggered this process.</param>
-        /// <returns>Whether a judgement has occurred from this <see cref="DrawableHitObject"/> or any nested <see cref="DrawableHitObject"/>s.</returns>
-        protected bool UpdateJudgement(bool userTriggered)
+        /// <returns>Whether a scoring result has occurred from this <see cref="DrawableHitObject"/> or any nested <see cref="DrawableHitObject"/>.</returns>
+        protected bool UpdateResult(bool userTriggered)
         {
             judgementOccurred = false;
 
@@ -205,27 +227,35 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 return false;
 
             foreach (var d in NestedHitObjects)
-                judgementOccurred |= d.UpdateJudgement(userTriggered);
+                judgementOccurred |= d.UpdateResult(userTriggered);
 
-            if (!ProvidesJudgement || judgementFinalized || judgementOccurred)
+            if (judgementOccurred || Judged)
                 return judgementOccurred;
 
             var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
-            CheckForJudgements(userTriggered, Time.Current - endTime);
+            CheckForResult(userTriggered, Time.Current - endTime);
 
             return judgementOccurred;
         }
 
         /// <summary>
-        /// Checks if any judgements have occurred for this <see cref="DrawableHitObject"/>. This method must construct
-        /// all <see cref="Judgement"/>s and notify of them through <see cref="AddJudgement"/>.
+        /// Checks if a scoring result has occurred for this <see cref="DrawableHitObject"/>.
         /// </summary>
+        /// <remarks>
+        /// If a scoring result has occurred, this method must invoke <see cref="ApplyResult"/> to update the result and notify responders.
+        /// </remarks>
         /// <param name="userTriggered">Whether the user triggered this check.</param>
-        /// <param name="timeOffset">The offset from the <see cref="HitObject"/> end time at which this check occurred. A <paramref name="timeOffset"/> &gt; 0
-        /// implies that this check occurred after the end time of <see cref="HitObject"/>. </param>
-        protected virtual void CheckForJudgements(bool userTriggered, double timeOffset)
+        /// <param name="timeOffset">The offset from the end time of the <see cref="HitObject"/> at which this check occurred.
+        /// A <paramref name="timeOffset"/> &gt; 0 implies that this check occurred after the end time of the <see cref="HitObject"/>. </param>
+        protected virtual void CheckForResult(bool userTriggered, double timeOffset)
         {
         }
+
+        /// <summary>
+        /// Creates the <see cref="JudgementResult"/> that represents the scoring result for this <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="judgement">The <see cref="Judgement"/> that provides the scoring information.</param>
+        protected virtual JudgementResult CreateResult(Judgement judgement) => new JudgementResult(judgement);
     }
 
     public abstract class DrawableHitObject<TObject> : DrawableHitObject
