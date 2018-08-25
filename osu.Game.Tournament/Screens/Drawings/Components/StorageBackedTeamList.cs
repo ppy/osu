@@ -7,7 +7,7 @@ using System.IO;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 
-namespace osu.Game.Screens.Tournament.Teams
+namespace osu.Game.Tournament.Screens.Drawings.Components
 {
     public class StorageBackedTeamList : ITeamList
     {
@@ -20,11 +20,11 @@ namespace osu.Game.Screens.Tournament.Teams
             this.storage = storage;
         }
 
-        public IEnumerable<DrawingsTeam> Teams
+        public IEnumerable<TournamentTeam> Teams
         {
             get
             {
-                var teams = new List<DrawingsTeam>();
+                var teams = new List<TournamentTeam>();
 
                 try
                 {
@@ -47,17 +47,11 @@ namespace osu.Game.Screens.Tournament.Teams
                                 continue;
                             }
 
-                            string flagName = split[0].Trim();
-                            string teamName = split[1].Trim();
-
-                            string acronym = split.Length >= 3 ? split[2].Trim() : teamName;
-                            acronym = acronym.Substring(0, Math.Min(3, acronym.Length));
-
-                            teams.Add(new DrawingsTeam
+                            teams.Add(new TournamentTeam
                             {
-                                FlagName = flagName,
-                                FullName = teamName,
-                                Acronym = acronym
+                                FlagName = split[0].Trim(),
+                                FullName = split[1].Trim(),
+                                Acronym = split.Length >= 3 ? split[2].Trim() : null
                             });
                         }
                     }

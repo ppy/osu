@@ -8,9 +8,8 @@ using System.Text;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using OpenTK;
-using osu.Game.Screens.Tournament.Teams;
 
-namespace osu.Game.Screens.Tournament
+namespace osu.Game.Tournament.Screens.Drawings.Components
 {
     public class GroupContainer : Container
     {
@@ -64,7 +63,7 @@ namespace osu.Game.Screens.Tournament
             }
         }
 
-        public void AddTeam(DrawingsTeam team)
+        public void AddTeam(TournamentTeam team)
         {
             if (groups[currentGroup].TeamsCount == maxTeams)
                 return;

@@ -3,10 +3,10 @@
 
 using System.Collections.Generic;
 
-namespace osu.Game.Screens.Tournament.Teams
+namespace osu.Game.Tournament.Screens.Drawings.Components
 {
     public interface ITeamList
     {
-        IEnumerable<DrawingsTeam> Teams { get; }
+        IEnumerable<TournamentTeam> Teams { get; }
     }
 }

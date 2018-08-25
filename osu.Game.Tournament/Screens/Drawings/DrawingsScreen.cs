@@ -9,23 +9,23 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Tournament.Components;
-using osu.Game.Screens.Tournament.Teams;
+using osu.Game.Tournament.Screens.Drawings.Components;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Framework.IO.Stores;
-using osu.Framework.Graphics.Shapes;
 
-namespace osu.Game.Screens.Tournament
+namespace osu.Game.Tournament.Screens.Drawings
 {
-    public class Drawings : OsuScreen
+    public class DrawingsScreen : OsuScreen
     {
         private const string results_filename = "drawings_results.txt";
 
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Tournament
         private GroupContainer groupsContainer;
         private OsuSpriteText fullTeamNameText;
 
-        private readonly List<DrawingsTeam> allTeams = new List<DrawingsTeam>();
+        private readonly List<TournamentTeam> allTeams = new List<TournamentTeam>();
 
         private DrawingsConfigManager drawingsConfig;
 
@@ -253,7 +253,7 @@ namespace osu.Game.Screens.Tournament
             reset(true);
         }
 
-        private void onTeamSelected(DrawingsTeam team)
+        private void onTeamSelected(TournamentTeam team)
         {
             groupsContainer.AddTeam(team);
 
@@ -290,7 +290,7 @@ namespace osu.Game.Screens.Tournament
             teamsContainer.ClearTeams();
             allTeams.Clear();
 
-            foreach (DrawingsTeam t in TeamList.Teams)
+            foreach (TournamentTeam t in TeamList.Teams)
             {
                 if (groupsContainer.ContainsTeam(t.FullName))
                     continue;
@@ -327,7 +327,7 @@ namespace osu.Game.Screens.Tournament
                                 continue;
 
                             // ReSharper disable once AccessToModifiedClosure
-                            DrawingsTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
+                            TournamentTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
 
                             if (teamToAdd == null)
                                 continue;

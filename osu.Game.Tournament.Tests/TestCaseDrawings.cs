@@ -2,18 +2,17 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.ComponentModel;
-using osu.Game.Screens.Tournament;
-using osu.Game.Screens.Tournament.Teams;
+using osu.Game.Tests.Visual;
+using osu.Game.Tournament.Screens.Drawings;
+using osu.Game.Tournament.Screens.Drawings.Components;
 
-namespace osu.Game.Tests.Visual
+namespace osu.Game.Tournament.Tests
 {
-    [Description("for tournament use")]
     public class TestCaseDrawings : OsuTestCase
     {
         public TestCaseDrawings()
         {
-            Add(new Drawings
+            Add(new DrawingsScreen
             {
                 TeamList = new TestTeamList(),
             });
@@ -21,57 +20,57 @@ namespace osu.Game.Tests.Visual
 
         private class TestTeamList : ITeamList
         {
-            public IEnumerable<DrawingsTeam> Teams { get; } = new[]
+            public IEnumerable<TournamentTeam> Teams { get; } = new[]
             {
-                new DrawingsTeam
+                new TournamentTeam
                 {
                     FlagName = "GB",
                     FullName = "United Kingdom",
                     Acronym = "UK"
                 },
-                new DrawingsTeam
+                new TournamentTeam
                 {
                     FlagName = "FR",
                     FullName = "France",
                     Acronym = "FRA"
                 },
-                new DrawingsTeam
+                new TournamentTeam
                 {
                     FlagName = "CN",
                     FullName = "China",
                     Acronym = "CHN"
                 },
-                new DrawingsTeam
+                new TournamentTeam
                 {
                     FlagName = "AU",
                     FullName = "Australia",
                     Acronym = "AUS"
                 },
-                new DrawingsTeam
+                new TournamentTeam
                 {
                     FlagName = "JP",
                     FullName = "Japan",
                     Acronym = "JPN"
                 },
-                new DrawingsTeam
+                new TournamentTeam
                 {
                     FlagName = "RO",
                     FullName = "Romania",
                     Acronym = "ROM"
                 },
-                new DrawingsTeam
+                new TournamentTeam
                 {
                     FlagName = "IT",
                     FullName = "Italy",
                     Acronym = "PIZZA"
                 },
-                new DrawingsTeam
+                new TournamentTeam
                 {
                     FlagName = "VE",
                     FullName = "Venezuela",
                     Acronym = "VNZ"
                 },
-                new DrawingsTeam
+                new TournamentTeam
                 {
                     FlagName = "US",
                     FullName = "United States of America",

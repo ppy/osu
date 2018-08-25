@@ -7,15 +7,14 @@ using System.Text;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
-using osu.Game.Screens.Tournament.Teams;
-using osu.Framework.Graphics.Shapes;
 
-namespace osu.Game.Screens.Tournament
+namespace osu.Game.Tournament.Screens.Drawings.Components
 {
     public class Group : Container
     {
@@ -73,7 +72,7 @@ namespace osu.Game.Screens.Tournament
             };
         }
 
-        public void AddTeam(DrawingsTeam team)
+        public void AddTeam(TournamentTeam team)
         {
             GroupTeam gt = new GroupTeam(team);
 
@@ -91,7 +90,7 @@ namespace osu.Game.Screens.Tournament
             return allTeams.Any(t => t.Team.FullName == fullName);
         }
 
-        public bool RemoveTeam(DrawingsTeam team)
+        public bool RemoveTeam(TournamentTeam team)
         {
             allTeams.RemoveAll(gt => gt.Team == team);
 
@@ -122,12 +121,12 @@ namespace osu.Game.Screens.Tournament
 
         private class GroupTeam : Container
         {
-            public readonly DrawingsTeam Team;
+            public readonly TournamentTeam Team;
 
             private readonly FillFlowContainer innerContainer;
             private readonly Sprite flagSprite;
 
-            public GroupTeam(DrawingsTeam team)
+            public GroupTeam(TournamentTeam team)
             {
                 Team = team;
 

@@ -3,11 +3,8 @@
 
 using OpenTK;
 using OpenTK.Graphics;
-using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -18,7 +15,6 @@ using osu.Game.Screens.Direct;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
-using osu.Game.Screens.Tournament;
 
 namespace osu.Game.Screens.Menu
 {
@@ -198,17 +194,6 @@ namespace osu.Game.Screens.Menu
             buttons.State = ButtonSystemState.Exit;
             Content.FadeOut(3000);
             return base.OnExiting(next);
-        }
-
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            if (!args.Repeat && state.Keyboard.ControlPressed && state.Keyboard.ShiftPressed && args.Key == Key.D)
-            {
-                Push(new Drawings());
-                return true;
-            }
-
-            return base.OnKeyDown(state, args);
         }
     }
 }
