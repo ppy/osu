@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Tournament.Components;
 
 namespace osu.Game.Tournament.Screens.Drawings.Components
 {

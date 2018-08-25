@@ -5,14 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Threading;
+using osu.Game.Tournament.Components;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -315,14 +313,11 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             Scrolling
         }
 
-        public class ScrollingTeam : Container
+        public class ScrollingTeam : DrawableTournamentTeam
         {
             public const float WIDTH = 58;
             public const float HEIGHT = 41;
 
-            public TournamentTeam Team;
-
-            private readonly Sprite flagSprite;
             private readonly Box outline;
 
             private bool selected;
@@ -343,9 +338,8 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
             }
 
             public ScrollingTeam(TournamentTeam team)
+                : base(team)
             {
-                Team = team;
-
                 Anchor = Anchor.CentreLeft;
                 Origin = Anchor.CentreLeft;
 
@@ -355,27 +349,19 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                 Alpha = 0;
 
-                Children = new Drawable[]
+                Flag.Anchor = Anchor.Centre;
+                Flag.Origin = Anchor.Centre;
+                Flag.Scale = new Vector2(0.9f);
+
+                InternalChildren = new Drawable[]
                 {
                     outline = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0
                     },
-                    flagSprite = new Sprite
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-
-                        Size = new Vector2(WIDTH, HEIGHT) - new Vector2(8)
-                    }
+                    Flag
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
-            {
-                flagSprite.Texture = textures.Get($@"Flags/{Team.FlagName}");
             }
         }
     }

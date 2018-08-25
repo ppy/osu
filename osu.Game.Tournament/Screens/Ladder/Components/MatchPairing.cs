@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Configuration;
-using osu.Game.Tournament.Screens.Drawings.Components;
+using osu.Game.Tournament.Components;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {

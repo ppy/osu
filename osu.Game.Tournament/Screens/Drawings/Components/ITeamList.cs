@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Game.Tournament.Components;
 
 namespace osu.Game.Tournament.Screens.Drawings.Components
 {
