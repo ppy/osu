@@ -7,16 +7,20 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Components;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
     public class DrawableMatchTeam : DrawableTournamentTeam
     {
+        private readonly MatchPairing pairing;
         private OsuSpriteText scoreText;
         private Box background;
 
@@ -31,6 +35,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         public DrawableMatchTeam(TournamentTeam team, MatchPairing pairing)
             : base(team)
         {
+            this.pairing = pairing;
             Size = new Vector2(150, 40);
 
             Masking = true;
@@ -48,7 +53,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 isWinner = () => pairing.Winner == Team;
 
                 completed.BindTo(pairing.Completed);
-                score.BindTo(team == pairing.Team1.Value ? pairing.Team1Score : pairing.Team2Score);
+                if (team != null)
+                    score.BindTo(team == pairing.Team1.Value ? pairing.Team1Score : pairing.Team2Score);
             }
         }
 
@@ -107,6 +113,30 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 scoreText.Text = val?.ToString() ?? string.Empty;
                 updateWinStyle();
             }, true);
+        }
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            if (Team == null) return true;
+
+            if (args.Button == MouseButton.Left)
+            {
+                if (score.Value == null)
+                {
+                    pairing.StartMatch();
+                }
+                else if (!pairing.Completed)
+                    score.Value++;
+            }
+            else
+            {
+                if (score.Value > 0)
+                    score.Value--;
+                else
+                    pairing.CancelMatchStart();
+            }
+
+            return true;
         }
 
         private void updateWinStyle()
