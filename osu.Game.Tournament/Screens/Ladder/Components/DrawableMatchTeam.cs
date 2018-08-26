@@ -45,18 +45,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             if (pairing != null)
             {
-                completed.BindTo(pairing.Completed);
+                isWinner = () => pairing.Winner == Team;
 
-                if (team == pairing.Team1.Value)
-                {
-                    score.BindTo(pairing.Team1Score);
-                    isWinner = () => pairing.Team1Score.Value > pairing.Team2Score.Value;
-                }
-                else
-                {
-                    score.BindTo(pairing.Team2Score);
-                    isWinner = () => pairing.Team2Score.Value > pairing.Team1Score.Value;
-                }
+                completed.BindTo(pairing.Completed);
+                score.BindTo(team == pairing.Team1.Value ? pairing.Team1Score : pairing.Team2Score);
             }
         }
 
