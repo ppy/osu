@@ -27,5 +27,13 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             Team1Score.ValueChanged += _ => Completed.Value = false;
             Team2Score.ValueChanged += _ => Completed.Value = false;
         }
+
+        public TournamentTeam Winner => !Completed.Value ? null : (Team1Score.Value > Team2Score.Value ? Team1.Value : Team2.Value);
+
+        public void ResetScores()
+        {
+            Team1Score.Value = 0;
+            Team2Score.Value = 0;
+        }
     }
 }
