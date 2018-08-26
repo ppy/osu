@@ -7,7 +7,6 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using OpenTK.Graphics;
 
@@ -47,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
                         validKeyPressed = Array.IndexOf(HitObject.HitActions, action)!=-1;
 
-                        UpdateJudgement(true);
+                        UpdateResult(true);
                         return true;
                     },
                 },
@@ -84,12 +83,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    AddJudgement(new OsuJudgement { Result = HitResult.Miss });
+                    ApplyResult(r => r.Type = HitResult.Miss);
+
                 return;
             }
 
@@ -99,10 +99,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (!validKeyPressed)
                 result = HitResult.Miss;
-            AddJudgement(new OsuJudgement
-            {
-                Result = result,
-            });
+
+            ApplyResult(r => r.Type = result);
         }
 
         protected override void UpdatePreemptState()
