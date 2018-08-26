@@ -3,6 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Tests.Visual;
@@ -21,6 +23,9 @@ namespace osu.Game.Tournament.Tests
             typeof(DrawableTournamentTeam),
         };
 
+        [Cached]
+        private Bindable<TournamentConditions> conditions = new Bindable<TournamentConditions>(new TournamentConditions { BestOf = 9 });
+
         public TestCaseMatchPairings()
         {
             FillFlowContainer<DrawableMatchPairing> level1;
@@ -30,8 +35,8 @@ namespace osu.Game.Tournament.Tests
                 new TournamentTeam { FlagName = "AU", FullName = "Australia", },
                 new TournamentTeam { FlagName = "JP", FullName = "Japan", Acronym = "JPN" })
             {
-                Team1Score = { Value = 8 },
-                Team2Score = { Value = 6 },
+                Team1Score = { Value = 4 },
+                Team2Score = { Value = 1 },
             };
 
             var pairing2 = new MatchPairing(
@@ -76,21 +81,19 @@ namespace osu.Game.Tournament.Tests
             level1.Children[0].Progression = level2.Children[0];
             level1.Children[1].Progression = level2.Children[0];
 
-            AddStep("mark complete", () => pairing1.Completed.Value = true);
-            AddRepeatStep("change scores", () => pairing1.Team2Score.Value++, 5);
-            AddStep("mark complete", () => pairing1.Completed.Value = true);
+            AddRepeatStep("change scores", () => pairing1.Team2Score.Value++, 4);
             AddStep("add new team", () => pairing2.Team2.Value = new TournamentTeam { FlagName = "PT", FullName = "Portugal" });
             AddStep("Add progression", () => level1.Children[2].Progression = level2.Children[1]);
 
-            AddStep("start match", () => pairing2.ResetScores());
+            AddStep("start match", () => pairing2.StartMatch());
 
-            AddRepeatStep("change scores", () => pairing2.Team1Score.Value++, 5);
-            AddStep("mark complete", () => pairing2.Completed.Value = true);
+            AddRepeatStep("change scores", () => pairing2.Team1Score.Value++, 10);
 
-            AddStep("start submatch", () => level2.Children[0].Pairing.ResetScores());
+            AddStep("start submatch", () => level2.Children[0].Pairing.StartMatch());
 
             AddRepeatStep("change scores", () => level2.Children[0].Pairing.Team1Score.Value++, 5);
-            AddStep("mark complete", () => level2.Children[0].Pairing.Completed.Value = true);
+
+            AddRepeatStep("change scores", () => level2.Children[0].Pairing.Team2Score.Value++, 4);
         }
     }
 }

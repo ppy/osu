@@ -23,15 +23,27 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             Team1.Value = team1;
             Team2.Value = team2;
-
-            Team1Score.ValueChanged += _ => Completed.Value = false;
-            Team2Score.ValueChanged += _ => Completed.Value = false;
         }
 
         public TournamentTeam Winner => !Completed.Value ? null : (Team1Score.Value > Team2Score.Value ? Team1.Value : Team2.Value);
 
-        public void ResetScores()
+        /// <summary>
+        /// Remove scores from the match, in case of a false click or false start.
+        /// </summary>
+        public void CancelMatchStart()
         {
+            Team1Score.Value = null;
+            Team2Score.Value = null;
+        }
+
+        /// <summary>
+        /// Initialise this match with zeroed scores. Will be a noop if either team is not present.
+        /// </summary>
+        public void StartMatch()
+        {
+            if (Team1.Value == null || Team2.Value == null)
+                return;
+
             Team1Score.Value = 0;
             Team2Score.Value = 0;
         }

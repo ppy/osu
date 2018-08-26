@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
@@ -14,8 +16,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     {
         public readonly MatchPairing Pairing;
         private readonly FillFlowContainer<DrawableMatchTeam> flow;
-
         private DrawableMatchPairing progression;
+
+        private readonly Bindable<TournamentConditions> conditions = new Bindable<TournamentConditions>();
 
         private readonly Path path;
 
@@ -38,6 +41,51 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private Vector2 progressionEnd;
 
         private const float line_width = 2;
+
+        public DrawableMatchPairing(MatchPairing pairing)
+        {
+            Pairing = pairing;
+
+            AutoSizeAxes = Axes.Both;
+
+            Margin = new MarginPadding(5);
+
+            InternalChildren = new Drawable[]
+            {
+                flow = new FillFlowContainer<DrawableMatchTeam>
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(2)
+                },
+                path = new Path
+                {
+                    Alpha = 0,
+                    BypassAutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.CentreRight,
+                    PathWidth = line_width,
+                },
+            };
+
+            pairing.Team1.BindValueChanged(_ => updateTeams());
+            pairing.Team2.BindValueChanged(_ => updateTeams());
+
+            pairing.Team1Score.BindValueChanged(_ => updateWinConditions());
+            pairing.Team2Score.BindValueChanged(_ => updateWinConditions());
+
+            pairing.Completed.BindValueChanged(_ => updateProgression());
+
+            updateTeams();
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(Bindable<TournamentConditions> conditions)
+        {
+            this.conditions.BindValueChanged(_ => updateWinConditions());
+
+            if (conditions != null)
+                this.conditions.BindTo(conditions);
+        }
 
         private void updateProgression()
         {
@@ -83,37 +131,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             destinationForWinner.Value = Pairing.Winner;
         }
 
-        public DrawableMatchPairing(MatchPairing pairing)
+        private void updateWinConditions()
         {
-            Pairing = pairing;
+            if (conditions.Value == null) return;
 
-            AutoSizeAxes = Axes.Both;
-
-            Margin = new MarginPadding(5);
-
-            InternalChildren = new Drawable[]
-            {
-                flow = new FillFlowContainer<DrawableMatchTeam>
-                {
-                    AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
-                    Spacing = new Vector2(2)
-                },
-                path = new Path
-                {
-                    Alpha = 0,
-                    BypassAutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.CentreRight,
-                    PathWidth = line_width,
-                },
-            };
-
-            pairing.Team1.BindValueChanged(_ => updateTeams());
-            pairing.Team2.BindValueChanged(_ => updateTeams());
-
-            pairing.Completed.BindValueChanged(_ => updateProgression());
-
-            updateTeams();
+            Pairing.Completed.Value = Pairing.Team1Score.Value + Pairing.Team2Score.Value >= conditions.Value.BestOf;
         }
 
         protected override void LoadComplete()
@@ -136,6 +158,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             // todo: teams may need to be bindable for transitions at a later point.
 
+            if (Pairing.Team1.Value == null || Pairing.Team2.Value == null)
+                Pairing.CancelMatchStart();
+
             flow.Children = new[]
             {
                 new DrawableMatchTeam(Pairing.Team1, Pairing),
@@ -143,6 +168,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             };
 
             updateProgression();
+            updateWinConditions();
         }
     }
 }
