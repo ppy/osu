@@ -1,47 +1,148 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Lines;
+using osu.Framework.MathUtils;
 using OpenTK;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
     public class DrawableMatchPairing : CompositeDrawable
     {
-        private readonly MatchPairing pairing;
+        public readonly MatchPairing Pairing;
         private readonly FillFlowContainer<DrawableMatchTeam> flow;
+
+        private DrawableMatchPairing progression;
+
+        private readonly Path path;
+
+        public DrawableMatchPairing Progression
+        {
+            get => progression;
+            set
+            {
+                if (progression == value) return;
+                progression = value;
+
+                if (LoadState == LoadState.Loaded)
+                    updateProgression();
+
+                path.FadeInFromZero(200);
+            }
+        }
+
+        private Vector2 progressionStart;
+        private Vector2 progressionEnd;
+
+        private const float line_width = 2;
+
+        private void updateProgression()
+        {
+            if (progression == null)
+            {
+                path.Positions = new List<Vector2>();
+                return;
+            }
+
+            Vector2 getCenteredVector(Vector2 top, Vector2 bottom) => new Vector2(top.X, top.Y + (bottom.Y - top.Y) / 2);
+
+            const float padding = 5;
+
+            var start = getCenteredVector(ScreenSpaceDrawQuad.TopRight, ScreenSpaceDrawQuad.BottomRight);
+            var end = getCenteredVector(progression.ScreenSpaceDrawQuad.TopLeft, progression.ScreenSpaceDrawQuad.BottomLeft);
+
+            bool progressionAbove = progression.ScreenSpaceDrawQuad.TopLeft.Y < ScreenSpaceDrawQuad.TopLeft.Y;
+
+            if (!Precision.AlmostEquals(progressionStart, start) || !Precision.AlmostEquals(progressionEnd, end))
+            {
+                progressionStart = start;
+                progressionEnd = end;
+
+                path.Origin = progressionAbove ? Anchor.BottomLeft : Anchor.TopLeft;
+                path.Y = progressionAbove ? line_width : -line_width;
+
+                Vector2 startPosition = path.ToLocalSpace(start) + new Vector2(padding, 0);
+                Vector2 endPosition = path.ToLocalSpace(end) + new Vector2(-padding, 0);
+                Vector2 intermediate1 = startPosition + new Vector2(padding, 0);
+                Vector2 intermediate2 = new Vector2(intermediate1.X, endPosition.Y);
+
+                path.Positions = new List<Vector2>
+                {
+                    startPosition,
+                    intermediate1,
+                    intermediate2,
+                    endPosition
+                };
+            }
+
+            var destinationForWinner = progressionAbove ? progression.Pairing.Team2 : progression.Pairing.Team1;
+
+            destinationForWinner.Value = Pairing.Winner;
+        }
 
         public DrawableMatchPairing(MatchPairing pairing)
         {
-            this.pairing = pairing;
+            Pairing = pairing;
 
             AutoSizeAxes = Axes.Both;
 
             Margin = new MarginPadding(5);
 
-            InternalChild = flow = new FillFlowContainer<DrawableMatchTeam>
+            InternalChildren = new Drawable[]
             {
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(2)
+                flow = new FillFlowContainer<DrawableMatchTeam>
+                {
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Spacing = new Vector2(2)
+                },
+                path = new Path
+                {
+                    Alpha = 0,
+                    BypassAutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.CentreRight,
+                    PathWidth = line_width,
+                },
             };
 
             pairing.Team1.BindValueChanged(_ => updateTeams());
             pairing.Team2.BindValueChanged(_ => updateTeams());
 
+            pairing.Completed.BindValueChanged(_ => updateProgression());
+
             updateTeams();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateTeams();
+        }
+
+        protected override void UpdateAfterAutoSize()
+        {
+            // required because the lines rely on flow being completed by other elements.
+            base.UpdateAfterAutoSize();
+            updateProgression();
         }
 
         private void updateTeams()
         {
+            if (LoadState != LoadState.Loaded)
+                return;
+
             // todo: teams may need to be bindable for transitions at a later point.
 
             flow.Children = new[]
             {
-                new DrawableMatchTeam(pairing.Team1, pairing),
-                new DrawableMatchTeam(pairing.Team2, pairing)
+                new DrawableMatchTeam(Pairing.Team1, Pairing),
+                new DrawableMatchTeam(Pairing.Team2, Pairing)
             };
+
+            updateProgression();
         }
     }
 }
