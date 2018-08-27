@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual
                     Ruleset = new TaikoRuleset().RulesetInfo,
                 },
             });
-            
+
             progress.AudioClock = clock;
             graph.AudioClock = clock;
             progress.Strains = ruleset.CreateDifficultyCalculator(beatmap).DifficultySectionRating();
