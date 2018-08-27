@@ -144,13 +144,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             updateTeams();
         }
 
-        protected override void UpdateAfterAutoSize()
-        {
-            // required because the lines rely on flow being completed by other elements.
-            base.UpdateAfterAutoSize();
-            updateProgression();
-        }
-
         private void updateTeams()
         {
             if (LoadState != LoadState.Loaded)
@@ -167,7 +160,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 new DrawableMatchTeam(Pairing.Team2, Pairing)
             };
 
-            updateProgression();
+            SchedulerAfterChildren.Add(() => Scheduler.Add(updateProgression));
             updateWinConditions();
         }
     }
