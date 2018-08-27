@@ -8,6 +8,9 @@ using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Play;
+using osu.Game.Beatmaps;
+using osu.Game.Tests.Beatmaps;
+using osu.Game.Rulesets.Taiko;
 
 namespace osu.Game.Tests.Visual
 {
@@ -54,10 +57,35 @@ namespace osu.Game.Tests.Visual
             for (double i = 0; i < 5000; i += RNG.NextDouble() * 10 + i / 1000)
                 objects.Add(new HitObject { StartTime = i });
 
+            var ruleset = new TaikoRuleset();
+
+            WorkingBeatmap beatmap = new TestWorkingBeatmap(new Beatmap
+            {
+                HitObjects = objects,
+                BeatmapInfo = new BeatmapInfo
+                {
+                    BaseDifficulty = new BeatmapDifficulty(),
+                    Metadata = new BeatmapMetadata
+                    {
+                        Artist = @"Unknown",
+                        Title = @"Sample Beatmap",
+                        AuthorString = @"peppy",
+                    },
+                    Ruleset = new TaikoRuleset().RulesetInfo,
+                },
+            });
+            
+            progress.AudioClock = clock;
+            graph.AudioClock = clock;
+            progress.Strains = ruleset.CreateDifficultyCalculator(beatmap).DifficultySectionRating();
+            graph.Strains = ruleset.CreateDifficultyCalculator(beatmap).DifficultySectionRating();
+            progress.StrainStep = ruleset.CreateDifficultyCalculator(beatmap).StrainStep();
+            graph.StrainStep = ruleset.CreateDifficultyCalculator(beatmap).StrainStep();
+            if (ruleset.LegacyID == 0)
+                progress.StrainStep = 1;
+                graph.StrainStep = 1;
             progress.Objects = objects;
             graph.Objects = objects;
-
-            progress.AudioClock = clock;
             progress.OnSeek = pos => clock.Seek(pos);
         }
     }
