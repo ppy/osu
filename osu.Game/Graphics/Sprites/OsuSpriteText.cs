@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.Sprites
 
         protected override Drawable CreateFallbackCharacterDrawable()
         {
-            var tex = GetTextureForCharacter('?');
+            var tex = GetTextureForCharacter('?').Result;
 
             if (tex != null)
             {
