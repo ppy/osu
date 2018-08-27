@@ -256,8 +256,8 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private async Task load(TextureStore textures, AudioManager audio)
         {
-            sampleClick = audio.Sample.Get(@"Menu/osu-logo-select");
-            sampleBeat = audio.Sample.Get(@"Menu/osu-logo-heartbeat");
+            sampleClick = await audio.Sample.GetAsync(@"Menu/osu-logo-select");
+            sampleBeat = await audio.Sample.GetAsync(@"Menu/osu-logo-heartbeat");
 
             logo.Texture = await textures.GetAsync(@"Menu/logo");
             ripple.Texture = await textures.GetAsync(@"Menu/logo");
