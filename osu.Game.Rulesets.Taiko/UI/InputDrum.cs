@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Threading.Tasks;
 using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -130,12 +131,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures, OsuColour colours)
+            private async Task load(TextureStore textures, OsuColour colours)
             {
-                rim.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer");
-                rimHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-outer-hit");
-                centre.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner");
-                centreHit.Texture = textures.Get(@"Play/Taiko/taiko-drum-inner-hit");
+                rim.Texture = await textures.GetAsync(@"Play/Taiko/taiko-drum-outer");
+                rimHit.Texture = await textures.GetAsync(@"Play/Taiko/taiko-drum-outer-hit");
+                centre.Texture = await textures.GetAsync(@"Play/Taiko/taiko-drum-inner");
+                centreHit.Texture = await textures.GetAsync(@"Play/Taiko/taiko-drum-inner-hit");
 
                 rimHit.Colour = colours.Blue;
                 centreHit.Colour = colours.Pink;

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -42,9 +43,9 @@ namespace osu.Game.Overlays.Profile.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private async Task load(TextureStore textures)
         {
-            badge.Texture = textures.Get($"Grades/{grade}");
+            badge.Texture = await textures.GetAsync($"Grades/{grade}");
         }
     }
 }

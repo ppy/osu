@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -44,7 +45,7 @@ namespace osu.Game.Users
                 country = value;
 
                 if (LoadState >= LoadState.Ready)
-                    sprite.Texture = getFlagTexture();
+                    sprite.Texture = getFlagTexture().Result;
             }
         }
 
@@ -64,15 +65,15 @@ namespace osu.Game.Users
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore ts)
+        private async Task load(TextureStore ts)
         {
             if (ts == null)
                 throw new ArgumentNullException(nameof(ts));
 
             textures = ts;
-            sprite.Texture = getFlagTexture();
+            sprite.Texture = await getFlagTexture();
         }
 
-        private Texture getFlagTexture() => textures.Get($@"Flags/{country?.FlagName ?? @"__"}");
+        private async Task<Texture> getFlagTexture() => await textures.GetAsync($@"Flags/{country?.FlagName ?? @"__"}");
     }
 }
