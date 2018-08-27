@@ -55,11 +55,11 @@ namespace osu.Game.Screens.Select
         private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, DialogOverlay dialogOverlay, Bindable<IEnumerable<Mod>> selectedMods)
+        private async Task load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, DialogOverlay dialogOverlay, Bindable<IEnumerable<Mod>> selectedMods)
         {
             if (selectedMods != null) this.selectedMods.BindTo(selectedMods);
 
-            sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
+            sampleConfirm = await audio.Sample.GetAsync(@"SongSelect/confirm-selection");
 
             Footer.AddButton(@"mods", colours.Yellow, modSelect, Key.F1, float.MaxValue);
 

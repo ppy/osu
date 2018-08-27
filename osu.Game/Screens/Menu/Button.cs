@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -179,11 +180,11 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private async Task load(AudioManager audio)
         {
-            sampleHover = audio.Sample.Get(@"Menu/button-hover");
+            sampleHover = await audio.Sample.GetAsync(@"Menu/button-hover");
             if (!string.IsNullOrEmpty(sampleName))
-                sampleClick = audio.Sample.Get($@"Menu/{sampleName}");
+                sampleClick = await audio.Sample.GetAsync($@"Menu/{sampleName}");
         }
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)

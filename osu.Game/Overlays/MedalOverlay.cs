@@ -146,7 +146,7 @@ namespace osu.Game.Overlays
         [BackgroundDependencyLoader]
         private async Task load(OsuColour colours, TextureStore textures, AudioManager audio)
         {
-            getSample = audio.Sample.Get(@"MedalSplash/medal-get");
+            getSample = await audio.Sample.GetAsync(@"MedalSplash/medal-get");
             innerSpin.Texture = outerSpin.Texture = await textures.GetAsync(@"MedalSplash/disc-spin");
 
             disc.EdgeEffect = leftStrip.EdgeEffect = rightStrip.EdgeEffect = new EdgeEffectParameters
