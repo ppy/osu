@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Tournament
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, Storage storage)
+        private async Task load(TextureStore textures, Storage storage)
         {
             this.storage = storage;
 
@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Tournament
                 {
                     RelativeSizeAxes = Axes.Both,
                     FillMode = FillMode.Fill,
-                    Texture = textures.Get(@"Backgrounds/Drawings/background.png")
+                    Texture = await textures.GetAsync(@"Backgrounds/Drawings/background.png")
                 },
                 new FillFlowContainer
                 {

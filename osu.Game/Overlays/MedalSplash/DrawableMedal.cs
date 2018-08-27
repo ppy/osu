@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Threading.Tasks;
 using osu.Framework;
 using OpenTK;
 using osu.Framework.Allocation;
@@ -118,10 +119,10 @@ namespace osu.Game.Overlays.MedalSplash
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures)
+        private async Task load(OsuColour colours, TextureStore textures)
         {
-            medalSprite.Texture = textures.Get(medal.ImageUrl);
-            medalGlow.Texture = textures.Get(@"MedalSplash/medal-glow");
+            medalSprite.Texture = await textures.GetAsync(medal.ImageUrl);
+            medalGlow.Texture = await textures.GetAsync(@"MedalSplash/medal-glow");
             description.Colour = colours.BlueLight;
         }
 

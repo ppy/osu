@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -61,19 +62,19 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private async Task load(TextureStore textures)
         {
             Children = new Drawable[]
             {
                 buttonSprite = new Sprite
                 {
-                    Texture = textures.Get(@"KeyCounter/key-up"),
+                    Texture = await textures.GetAsync(@"KeyCounter/key-up"),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                 },
                 glowSprite = new Sprite
                 {
-                    Texture = textures.Get(@"KeyCounter/key-glow"),
+                    Texture = await textures.GetAsync(@"KeyCounter/key-glow"),
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Alpha = 0

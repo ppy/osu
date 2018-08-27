@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -35,20 +36,20 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private async Task load(TextureStore textures)
         {
             this.textures = textures;
-            updateTexture();
+            await updateTexture();
         }
 
-        private void updateTexture() => rankSprite.Texture = textures.Get($@"Grades/{Rank.GetDescription()}");
+        private async Task updateTexture() => rankSprite.Texture = await textures.GetAsync($@"Grades/{Rank.GetDescription()}");
 
         public void UpdateRank(ScoreRank newRank)
         {
             Rank = newRank;
 
             if (LoadState >= LoadState.Ready)
-                updateTexture();
+                updateTexture().Wait();
         }
     }
 }

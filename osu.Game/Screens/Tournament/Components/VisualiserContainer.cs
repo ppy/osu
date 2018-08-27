@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.MathUtils;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace osu.Game.Screens.Tournament.Components
 {
@@ -75,9 +76,9 @@ namespace osu.Game.Screens.Tournament.Components
             private int expiredCount;
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private async Task load(TextureStore textures)
             {
-                texture = textures.Get("Drawings/visualiser-line");
+                texture = await textures.GetAsync("Drawings/visualiser-line");
             }
 
             protected override void UpdateAfterChildren()
