@@ -222,7 +222,7 @@ namespace osu.Game.Screens.Select
             sampleChangeDifficulty = await audio.Sample.GetAsync(@"SongSelect/select-difficulty");
             sampleChangeBeatmap = await audio.Sample.GetAsync(@"SongSelect/select-expand");
 
-            Carousel.BeatmapSets = this.beatmaps.GetAllUsableBeatmapSetsEnumerable();
+            Carousel.LoadBeatmapSetsFromManager(this.beatmaps);
         }
 
         public void Edit(BeatmapInfo beatmap)

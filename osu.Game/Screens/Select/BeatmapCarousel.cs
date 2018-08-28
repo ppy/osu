@@ -64,32 +64,36 @@ namespace osu.Game.Screens.Select
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
-            get { return beatmapSets.Select(g => g.BeatmapSet); }
-            set
+            get => beatmapSets.Select(g => g.BeatmapSet);
+            set => loadBeatmapSets(() => value);
+        }
+
+        public void LoadBeatmapSetsFromManager(BeatmapManager manager) => loadBeatmapSets(manager.GetAllUsableBeatmapSetsEnumerable);
+
+        private void loadBeatmapSets(Func<IEnumerable<BeatmapSetInfo>> beatmapSets)
+        {
+            CarouselRoot newRoot = new CarouselRoot(this);
+
+            Task.Run(() =>
             {
-                CarouselRoot newRoot = new CarouselRoot(this);
+                beatmapSets().Select(createCarouselSet).Where(g => g != null).ForEach(newRoot.AddChild);
+                newRoot.Filter(activeCriteria);
 
-                Task.Run(() =>
+                // preload drawables as the ctor overhead is quite high currently.
+                var _ = newRoot.Drawables;
+            }).ContinueWith(_ => Schedule(() =>
+            {
+                root = newRoot;
+                scrollableContent.Clear(false);
+                itemsCache.Invalidate();
+                scrollPositionCache.Invalidate();
+
+                Schedule(() =>
                 {
-                    value.Select(createCarouselSet).Where(g => g != null).ForEach(newRoot.AddChild);
-                    newRoot.Filter(activeCriteria);
-
-                    // preload drawables as the ctor overhead is quite high currently.
-                    var _ = newRoot.Drawables;
-                }).ContinueWith(_ => Schedule(() =>
-                {
-                    root = newRoot;
-                    scrollableContent.Clear(false);
-                    itemsCache.Invalidate();
-                    scrollPositionCache.Invalidate();
-
-                    Schedule(() =>
-                    {
-                        BeatmapSetsChanged?.Invoke();
-                        initialLoadComplete = true;
-                    });
-                }));
-            }
+                    BeatmapSetsChanged?.Invoke();
+                    initialLoadComplete = true;
+                });
+            }));
         }
 
         private readonly List<float> yPositions = new List<float>();
