@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -24,7 +25,7 @@ namespace osu.Game.Graphics
         private FontStore store;
 
         [BackgroundDependencyLoader]
-        private void load(FontStore store)
+        private async Task load(FontStore store)
         {
             this.store = store;
 
@@ -55,23 +56,23 @@ namespace osu.Game.Graphics
                 },
             };
 
-            updateTexture();
+            await updateTexture();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            updateTexture();
+            updateTexture().Wait();
         }
 
         private FontAwesome loadedIcon;
-        private void updateTexture()
+        private async Task updateTexture()
         {
             var loadableIcon = icon;
 
             if (loadableIcon == loadedIcon) return;
 
-            var texture = store?.Get(((char)loadableIcon).ToString());
+            var texture = await store.GetAsync(((char)loadableIcon).ToString());
 
             spriteMain.Texture = texture;
             spriteShadow.Texture = texture;
@@ -129,8 +130,8 @@ namespace osu.Game.Graphics
                 if (icon == value) return;
 
                 icon = value;
-                if (IsLoaded)
-                    updateTexture();
+                if (LoadState == LoadState.Loaded)
+                    updateTexture().Wait();
             }
         }
     }
