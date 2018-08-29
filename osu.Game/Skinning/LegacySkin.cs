@@ -111,10 +111,10 @@ namespace osu.Game.Skinning
 
             byte[] IResourceStore<byte[]>.Get(string name) => GetAsync(name).Result;
 
-            public async Task<byte[]> GetAsync(string name)
+            public Task<byte[]> GetAsync(string name)
             {
                 string path = getPathForFile(name);
-                return path == null ? null : await underlyingStore.GetAsync(path);
+                return path == null ? Task.FromResult<byte[]>(null) : underlyingStore.GetAsync(path);
             }
 
             #region IDisposable Support
