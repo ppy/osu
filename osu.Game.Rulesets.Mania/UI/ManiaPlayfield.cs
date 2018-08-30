@@ -26,11 +26,11 @@ namespace osu.Game.Rulesets.Mania.UI
                 throw new ArgumentException("Can't have zero or fewer stages.");
 
             GridContainer playfieldGrid;
-            InternalChild = playfieldGrid = new GridContainer
+            AddInternal(playfieldGrid = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Content = new[] { new Drawable[stageDefinitions.Count] }
-            };
+            });
 
             var normalColumnAction = ManiaAction.Key1;
             var specialColumnAction = ManiaAction.Special1;
