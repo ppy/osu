@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -24,14 +25,14 @@ namespace osu.Game.Users
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private async Task load(TextureStore textures)
         {
             if (textures == null)
                 throw new ArgumentNullException(nameof(textures));
 
             Texture texture = null;
-            if (user != null && user.Id > 1) texture = textures.Get($@"https://a.ppy.sh/{user.Id}");
-            if (texture == null) texture = textures.Get(@"Online/avatar-guest");
+            if (user != null && user.Id > 1) texture = await textures.GetAsync($@"https://a.ppy.sh/{user.Id}");
+            if (texture == null) texture = await textures.GetAsync(@"Online/avatar-guest");
 
             Add(new Sprite
             {

@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Input;
 using osu.Framework.Allocation;
@@ -198,7 +199,7 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours)
+        private async Task load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours)
         {
             if (Footer != null)
             {
@@ -218,10 +219,10 @@ namespace osu.Game.Screens.Select
 
             dialogOverlay = dialog;
 
-            sampleChangeDifficulty = audio.Sample.Get(@"SongSelect/select-difficulty");
-            sampleChangeBeatmap = audio.Sample.Get(@"SongSelect/select-expand");
+            sampleChangeDifficulty = await audio.Sample.GetAsync(@"SongSelect/select-difficulty");
+            sampleChangeBeatmap = await audio.Sample.GetAsync(@"SongSelect/select-expand");
 
-            Carousel.BeatmapSets = this.beatmaps.GetAllUsableBeatmapSetsEnumerable();
+            Carousel.LoadBeatmapSetsFromManager(this.beatmaps);
         }
 
         public void Edit(BeatmapInfo beatmap)

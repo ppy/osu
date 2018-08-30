@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -311,9 +312,9 @@ namespace osu.Game.Overlays.Profile
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private async Task load(TextureStore textures)
         {
-            levelBadge.Texture = textures.Get(@"Profile/levelbadge");
+            levelBadge.Texture = await textures.GetAsync(@"Profile/levelbadge");
         }
 
         private User user;

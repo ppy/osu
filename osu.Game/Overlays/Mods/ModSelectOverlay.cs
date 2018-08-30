@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics.Shapes;
@@ -49,7 +50,7 @@ namespace osu.Game.Overlays.Mods
         protected readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset, AudioManager audio, Bindable<IEnumerable<Mod>> selectedMods)
+        private async Task load(OsuColour colours, IBindable<RulesetInfo> ruleset, AudioManager audio, Bindable<IEnumerable<Mod>> selectedMods)
         {
             LowMultiplierColour = colours.Red;
             HighMultiplierColour = colours.Green;
@@ -58,8 +59,8 @@ namespace osu.Game.Overlays.Mods
             Ruleset.BindTo(ruleset);
             if (selectedMods != null) SelectedMods.BindTo(selectedMods);
 
-            sampleOn = audio.Sample.Get(@"UI/check-on");
-            sampleOff = audio.Sample.Get(@"UI/check-off");
+            sampleOn = await audio.Sample.GetAsync(@"UI/check-on");
+            sampleOff = await audio.Sample.GetAsync(@"UI/check-off");
         }
 
         protected override void LoadComplete()

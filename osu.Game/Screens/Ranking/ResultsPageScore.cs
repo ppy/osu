@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -368,10 +369,10 @@ namespace osu.Game.Screens.Ranking
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private async Task load(TextureStore textures)
             {
                 if (!string.IsNullOrEmpty(user.CoverUrl))
-                    cover.Texture = textures.Get(user.CoverUrl);
+                    cover.Texture = await textures.GetAsync(user.CoverUrl);
             }
         }
 
