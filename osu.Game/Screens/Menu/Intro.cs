@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -48,7 +47,7 @@ namespace osu.Game.Screens.Menu
         private WorkingBeatmap introBeatmap;
 
         [BackgroundDependencyLoader]
-        private async Task load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game, BindableBeatmap beatmap)
+        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game, BindableBeatmap beatmap)
         {
             this.beatmap.BindTo(beatmap);
 
@@ -81,8 +80,8 @@ namespace osu.Game.Screens.Menu
             introBeatmap = beatmaps.GetWorkingBeatmap(setInfo.Beatmaps[0]);
             track = introBeatmap.Track;
 
-            welcome = await audio.Sample.GetAsync(@"welcome");
-            seeya = await audio.Sample.GetAsync(@"seeya");
+            welcome = audio.Sample.Get(@"welcome");
+            seeya = audio.Sample.Get(@"seeya");
         }
 
         private const double delay_step_one = 2300;

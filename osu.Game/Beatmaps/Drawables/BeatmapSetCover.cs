@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -24,7 +23,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private async Task load(TextureStore textures)
+        private void load(TextureStore textures)
         {
             string resource = null;
 
@@ -42,7 +41,7 @@ namespace osu.Game.Beatmaps.Drawables
             }
 
             if (resource != null)
-                Texture = await textures.GetAsync(resource);
+                Texture = textures.Get(resource);
         }
     }
 

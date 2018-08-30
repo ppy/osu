@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -29,9 +28,9 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private async Task load(AudioManager audio)
+        private void load(AudioManager audio)
         {
-            sampleClick = await audio.Sample.GetAsync($@"UI/generic-select{SampleSet.GetDescription()}");
+            sampleClick = audio.Sample.Get($@"UI/generic-select{SampleSet.GetDescription()}");
         }
     }
 }
