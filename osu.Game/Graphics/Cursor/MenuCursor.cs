@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Configuration;
 using System;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.EventArgs;
@@ -133,7 +132,7 @@ namespace osu.Game.Graphics.Cursor
             }
 
             [BackgroundDependencyLoader]
-            private async Task load(OsuConfigManager config, TextureStore textures, OsuColour colour)
+            private void load(OsuConfigManager config, TextureStore textures, OsuColour colour)
             {
                 Children = new Drawable[]
                 {
@@ -144,14 +143,14 @@ namespace osu.Game.Graphics.Cursor
                         {
                             new Sprite
                             {
-                                Texture = await textures.GetAsync(@"Cursor/menu-cursor"),
+                                Texture = textures.Get(@"Cursor/menu-cursor"),
                             },
                             AdditiveLayer = new Sprite
                             {
                                 Blending = BlendingMode.Additive,
                                 Colour = colour.Pink,
                                 Alpha = 0,
-                                Texture = await textures.GetAsync(@"Cursor/menu-cursor-additive"),
+                                Texture = textures.Get(@"Cursor/menu-cursor-additive"),
                             },
                         }
                     }
