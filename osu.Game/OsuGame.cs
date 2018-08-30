@@ -516,9 +516,9 @@ namespace osu.Game
 
                     try
                     {
-                        Logger.Log($"{d}...", LoggingTarget.Debug);
+                        Logger.Log($"Loading {d}...", LoggingTarget.Debug);
                         await LoadComponentAsync(d, add);
-                        Logger.Log($"{d} ✓", LoggingTarget.Debug);
+                        Logger.Log($"Loaded {d}!", LoggingTarget.Debug);
                     }
                     catch (OperationCanceledException)
                     {
