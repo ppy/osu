@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -34,10 +35,10 @@ namespace osu.Game.Graphics.Backgrounds
         }
 
         [BackgroundDependencyLoader]
-        private void load(LargeTextureStore textures)
+        private async Task load(LargeTextureStore textures)
         {
             if (!string.IsNullOrEmpty(textureName))
-                Sprite.Texture = textures.Get(textureName);
+                Sprite.Texture = await textures.GetAsync(textureName);
         }
     }
 }

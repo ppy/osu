@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -45,7 +46,7 @@ namespace osu.Game.Screens.Select.Carousel
         private SampleChannel sampleHover;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuColour colours)
+        private async Task load(AudioManager audio, OsuColour colours)
         {
             InternalChild = borderContainer = new Container
             {
@@ -68,7 +69,7 @@ namespace osu.Game.Screens.Select.Carousel
                 }
             };
 
-            sampleHover = audio.Sample.Get($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
+            sampleHover = await audio.Sample.GetAsync($@"SongSelect/song-ping-variation-{RNG.Next(1, 5)}");
             hoverLayer.Colour = colours.Blue.Opacity(0.1f);
         }
 

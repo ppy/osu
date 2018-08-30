@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
@@ -75,9 +76,9 @@ namespace osu.Game.Screens.Backgrounds
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private async Task load(TextureStore textures)
             {
-                Sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg1");
+                Sprite.Texture = beatmap?.Background ?? await textures.GetAsync(@"Backgrounds/bg1");
             }
         }
     }

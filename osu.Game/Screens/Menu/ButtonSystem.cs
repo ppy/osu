@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -102,10 +103,10 @@ namespace osu.Game.Screens.Menu
         private OsuGame game;
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuGame game)
+        private async Task load(AudioManager audio, OsuGame game)
         {
             this.game = game;
-            sampleBack = audio.Sample.Get(@"Menu/button-back-select");
+            sampleBack = await audio.Sample.GetAsync(@"Menu/button-back-select");
         }
 
         public bool OnPressed(GlobalAction action)

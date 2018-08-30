@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.ComponentModel;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -35,9 +36,9 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private async Task load(AudioManager audio)
         {
-            sampleHover = audio.Sample.Get($@"UI/generic-hover{SampleSet.GetDescription()}");
+            sampleHover = await audio.Sample.GetAsync($@"UI/generic-hover{SampleSet.GetDescription()}");
         }
     }
 

@@ -20,6 +20,7 @@ using OpenTK.Input;
 using osu.Framework.Graphics.Shapes;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Input.States;
 using osu.Framework.MathUtils;
 
@@ -143,10 +144,10 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures, AudioManager audio)
+        private async Task load(OsuColour colours, TextureStore textures, AudioManager audio)
         {
-            getSample = audio.Sample.Get(@"MedalSplash/medal-get");
-            innerSpin.Texture = outerSpin.Texture = textures.Get(@"MedalSplash/disc-spin");
+            getSample = await audio.Sample.GetAsync(@"MedalSplash/medal-get");
+            innerSpin.Texture = outerSpin.Texture = await textures.GetAsync(@"MedalSplash/disc-spin");
 
             disc.EdgeEffect = leftStrip.EdgeEffect = rightStrip.EdgeEffect = new EdgeEffectParameters
             {
