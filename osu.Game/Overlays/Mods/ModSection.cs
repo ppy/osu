@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using osu.Framework.Graphics.Transforms;
 using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
 
@@ -33,23 +34,32 @@ namespace osu.Game.Overlays.Mods
 
         public IEnumerable<Mod> SelectedMods => buttons.Select(b => b.SelectedMod).Where(m => m != null);
 
+        private TransformSequence<FillFlowContainer<ModButtonEmpty>> switchSequence;
+
         public IEnumerable<Mod> Mods
         {
             set
             {
-                var modContainers = value.Select(m =>
+                switchSequence = ButtonsContainer.FadeOut(200, Easing.OutQuint);
+                switchSequence.OnComplete(_ =>
                 {
-                    if (m == null)
-                        return new ModButtonEmpty();
 
-                    return new ModButton(m)
+                    var modContainers = value.Select(m =>
                     {
-                        SelectionChanged = Action,
-                    };
-                }).ToArray();
+                        if (m == null)
+                            return new ModButtonEmpty();
 
-                ButtonsContainer.Children = modContainers;
-                buttons = modContainers.OfType<ModButton>().ToArray();
+                        return new ModButton(m)
+                        {
+                            SelectionChanged = Action,
+                        };
+                    }).ToArray();
+
+                    ButtonsContainer.Children = modContainers;
+                    buttons = modContainers.OfType<ModButton>().ToArray();
+
+                    ButtonsContainer.Show();
+                });
             }
         }
 
