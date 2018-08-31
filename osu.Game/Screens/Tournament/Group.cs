@@ -4,7 +4,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -179,9 +178,9 @@ namespace osu.Game.Screens.Tournament
             }
 
             [BackgroundDependencyLoader]
-            private async Task load(TextureStore textures)
+            private void load(TextureStore textures)
             {
-                flagSprite.Texture = await textures.GetAsync($@"Flags/{Team.FlagName}");
+                flagSprite.Texture = textures.Get($@"Flags/{Team.FlagName}");
             }
         }
     }

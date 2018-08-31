@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -254,13 +253,13 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private async Task load(TextureStore textures, AudioManager audio)
+        private void load(TextureStore textures, AudioManager audio)
         {
-            sampleClick = await audio.Sample.GetAsync(@"Menu/osu-logo-select");
-            sampleBeat = await audio.Sample.GetAsync(@"Menu/osu-logo-heartbeat");
+            sampleClick = audio.Sample.Get(@"Menu/osu-logo-select");
+            sampleBeat = audio.Sample.Get(@"Menu/osu-logo-heartbeat");
 
-            logo.Texture = await textures.GetAsync(@"Menu/logo");
-            ripple.Texture = await textures.GetAsync(@"Menu/logo");
+            logo.Texture = textures.Get(@"Menu/logo");
+            ripple.Texture = textures.Get(@"Menu/logo");
         }
 
         private int lastBeatIndex;
