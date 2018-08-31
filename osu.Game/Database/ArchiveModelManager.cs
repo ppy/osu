@@ -168,6 +168,7 @@ namespace osu.Game.Database
             }
 
             notification.Text = errors > 0 ? $"Import complete with {errors} errors" : "Import successful!";
+            notification.CompletionText = $"Imported {current} {typeof(TModel).Name.Replace("Info", "").ToLower()}s!";
             notification.State = ProgressNotificationState.Completed;
         }
 
@@ -284,7 +285,7 @@ namespace osu.Game.Database
             var notification = new ProgressNotification
             {
                 Progress = 0,
-                CompletionText = $"Deleted all {typeof(TModel)}s!",
+                CompletionText = $"Deleted all {typeof(TModel).Name.Replace("Info", "").ToLower()}s!",
                 State = ProgressNotificationState.Active,
             };
 
