@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -38,15 +37,15 @@ namespace osu.Game.Graphics.Containers
         }
 
         [BackgroundDependencyLoader(true)]
-        private async Task load(OsuGame osuGame, AudioManager audio, PreviewTrackManager previewTrackManager)
+        private void load(OsuGame osuGame, AudioManager audio, PreviewTrackManager previewTrackManager)
         {
             this.previewTrackManager = previewTrackManager;
 
             if (osuGame != null)
                 OverlayActivationMode.BindTo(osuGame.OverlayActivationMode);
 
-            samplePopIn = await audio.Sample.GetAsync(@"UI/overlay-pop-in");
-            samplePopOut = await audio.Sample.GetAsync(@"UI/overlay-pop-out");
+            samplePopIn = audio.Sample.Get(@"UI/overlay-pop-in");
+            samplePopOut = audio.Sample.Get(@"UI/overlay-pop-out");
 
             StateChanged += onStateChanged;
         }

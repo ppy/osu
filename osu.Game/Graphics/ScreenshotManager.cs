@@ -42,7 +42,7 @@ namespace osu.Game.Graphics
         private SampleChannel shutter;
 
         [BackgroundDependencyLoader]
-        private async Task load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio)
+        private void load(GameHost host, OsuConfigManager config, Storage storage, NotificationOverlay notificationOverlay, AudioManager audio)
         {
             this.host = host;
             this.storage = storage.GetStorageForDirectory(@"screenshots");
@@ -51,7 +51,7 @@ namespace osu.Game.Graphics
             screenshotFormat = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat);
             captureMenuCursor = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor);
 
-            shutter = await audio.Sample.GetAsync("UI/shutter");
+            shutter = audio.Sample.Get("UI/shutter");
         }
 
         public bool OnPressed(GlobalAction action)

@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -177,13 +176,13 @@ namespace osu.Game.Overlays.Profile.Header
             }
 
             [BackgroundDependencyLoader]
-            private async Task load(TextureStore textures)
+            private void load(TextureStore textures)
             {
                 Child = new Sprite
                 {
                     FillMode = FillMode.Fit,
                     RelativeSizeAxes = Axes.Both,
-                    Texture = await textures.GetAsync(badge.ImageUrl),
+                    Texture = textures.Get(badge.ImageUrl),
                 };
             }
 

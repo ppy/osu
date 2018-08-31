@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -449,9 +448,9 @@ namespace osu.Game.Rulesets.Catch.UI
                 }
 
                 [BackgroundDependencyLoader]
-                private async Task load(TextureStore textures)
+                private void load(TextureStore textures)
                 {
-                    Texture = await textures.GetAsync(@"Play/Catch/fruit-catcher-idle");
+                    Texture = textures.Get(@"Play/Catch/fruit-catcher-idle");
                 }
             }
         }

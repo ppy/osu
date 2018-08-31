@@ -4,7 +4,6 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.OpenGL.Buffers;
@@ -80,10 +79,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
         [BackgroundDependencyLoader]
-        private async Task load(ShaderManager shaders, TextureStore textures)
+        private void load(ShaderManager shaders, TextureStore textures)
         {
             shader = shaders?.Load(@"CursorTrail", FragmentShaderDescriptor.TEXTURE);
-            texture = await textures.GetAsync(@"Cursor/cursortrail");
+            texture = textures.Get(@"Cursor/cursortrail");
             Scale = new Vector2(1 / texture.ScaleAdjust);
         }
 

@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -19,13 +18,13 @@ namespace osu.Game.Users
         }
 
         [BackgroundDependencyLoader]
-        private async Task load(TextureStore textures)
+        private void load(TextureStore textures)
         {
             if (textures == null)
                 throw new ArgumentNullException(nameof(textures));
 
             if (!string.IsNullOrEmpty(user.CoverUrl))
-                Texture = await textures.GetAsync(user.CoverUrl);
+                Texture = textures.Get(user.CoverUrl);
         }
     }
 }

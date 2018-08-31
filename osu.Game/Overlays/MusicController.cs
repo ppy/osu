@@ -454,9 +454,9 @@ namespace osu.Game.Overlays
             }
 
             [BackgroundDependencyLoader]
-            private async Task load(TextureStore textures)
+            private void load(TextureStore textures)
             {
-                sprite.Texture = beatmap?.Background ?? await textures.GetAsync(@"Backgrounds/bg4");
+                sprite.Texture = beatmap?.Background ?? textures.Get(@"Backgrounds/bg4");
             }
         }
 

@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Threading.Tasks;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -225,12 +224,12 @@ namespace osu.Game.Screens.Play
             }
 
             [BackgroundDependencyLoader]
-            private async Task load(OsuColour colours, AudioManager audio)
+            private void load(OsuColour colours, AudioManager audio)
             {
                 colourNormal = colours.Yellow;
                 colourHover = colours.YellowDark;
 
-                sampleConfirm = await audio.Sample.GetAsync(@"SongSelect/confirm-selection");
+                sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
 
                 Children = new Drawable[]
                 {
