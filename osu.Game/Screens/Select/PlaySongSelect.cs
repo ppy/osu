@@ -19,6 +19,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
+using osu.Game.Skinning;
 
 namespace osu.Game.Screens.Select
 {
@@ -54,7 +55,7 @@ namespace osu.Game.Screens.Select
         private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, DialogOverlay dialogOverlay, Bindable<IEnumerable<Mod>> selectedMods)
+        private void load(OsuColour colours, AudioManager audio, BeatmapManager beatmaps, SkinManager skins, DialogOverlay dialogOverlay, Bindable<IEnumerable<Mod>> selectedMods)
         {
             if (selectedMods != null) this.selectedMods.BindTo(selectedMods);
 
@@ -76,7 +77,11 @@ namespace osu.Game.Screens.Select
                 {
                     // if we have no beatmaps but osu-stable is found, let's prompt the user to import.
                     if (!beatmaps.GetAllUsableBeatmapSets().Any() && beatmaps.StableInstallationAvailable)
-                        dialogOverlay.Push(new ImportFromStablePopup(() => beatmaps.ImportFromStableAsync()));
+                        dialogOverlay.Push(new ImportFromStablePopup(() =>
+                        {
+                            beatmaps.ImportFromStableAsync();
+                            skins.ImportFromStableAsync();
+                        }));
                 });
             }
         }
