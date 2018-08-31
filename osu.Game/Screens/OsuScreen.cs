@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -81,7 +80,7 @@ namespace osu.Game.Screens
         private SampleChannel sampleExit;
 
         [BackgroundDependencyLoader(true)]
-        private async Task load(BindableBeatmap beatmap, OsuGame osu, AudioManager audio, Bindable<RulesetInfo> ruleset)
+        private void load(BindableBeatmap beatmap, OsuGame osu, AudioManager audio, Bindable<RulesetInfo> ruleset)
         {
             Beatmap.BindTo(beatmap);
             Ruleset.BindTo(ruleset);
@@ -99,7 +98,7 @@ namespace osu.Game.Screens
                 };
             }
 
-            sampleExit = await audio.Sample.GetAsync(@"UI/screen-back");
+            sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
 
         public virtual bool OnPressed(GlobalAction action)

@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -32,7 +31,7 @@ namespace osu.Desktop.Overlays
         public override bool HandleMouseInput => false;
 
         [BackgroundDependencyLoader]
-        private async Task load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game, OsuConfigManager config, GameHost host)
+        private void load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game, OsuConfigManager config, GameHost host)
         {
             notificationOverlay = notification;
             this.config = config;
@@ -87,7 +86,7 @@ namespace osu.Desktop.Overlays
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Texture = await textures.GetAsync(@"Menu/dev-build-footer"),
+                            Texture = textures.Get(@"Menu/dev-build-footer"),
                         },
                     }
                 }

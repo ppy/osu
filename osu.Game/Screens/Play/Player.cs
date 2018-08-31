@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Play
         public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
 
         [BackgroundDependencyLoader]
-        private async Task load(AudioManager audio, APIAccess api, OsuConfigManager config)
+        private void load(AudioManager audio, APIAccess api, OsuConfigManager config)
         {
             this.api = api;
 
@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play
             if (working is DummyWorkingBeatmap)
                 return;
 
-            sampleRestart = await audio.Sample.GetAsync(@"Gameplay/restart");
+            sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
             mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
             userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
