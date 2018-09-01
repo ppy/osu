@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
@@ -54,7 +53,13 @@ namespace osu.Game.Online.API
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
-            Task.Factory.StartNew(run, cancellationToken.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            var thread = new Thread(run)
+            {
+                Name = "APIAccess",
+                IsBackground = true
+            };
+
+            thread.Start();
         }
 
         private void onTokenChanged(OAuthToken token) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
