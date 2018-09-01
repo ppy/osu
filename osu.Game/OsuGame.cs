@@ -506,22 +506,24 @@ namespace osu.Game
             // we could avoid the need for scheduling altogether.
             Schedule(() =>
             {
-                if (asyncLoadStream != null)
+                var previousLoadStream = asyncLoadStream;
+
+                //chain with existing load stream
+                asyncLoadStream = Task.Run(async () =>
                 {
-                    //chain with existing load stream
-                    asyncLoadStream = asyncLoadStream.ContinueWith(async t =>
+                    if (previousLoadStream != null)
+                        await previousLoadStream;
+
+                    try
                     {
-                        try
-                        {
-                            await LoadComponentAsync(d, add);
-                        }
-                        catch (OperationCanceledException)
-                        {
-                        }
-                    });
-                }
-                else
-                    asyncLoadStream = LoadComponentAsync(d, add);
+                        Logger.Log($"Loading {d}...", LoggingTarget.Debug);
+                        await LoadComponentAsync(d, add);
+                        Logger.Log($"Loaded {d}!", LoggingTarget.Debug);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                    }
+                });
             });
         }
 
