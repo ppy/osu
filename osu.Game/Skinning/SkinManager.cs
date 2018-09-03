@@ -93,6 +93,12 @@ namespace osu.Game.Skinning
         {
             this.audio = audio;
 
+            ItemRemoved += removedInfo => {
+                // check the removed skin is not the current user choice. if it is, switch back to default.
+                if (removedInfo.ID == CurrentSkinInfo.Value.ID)
+                    CurrentSkinInfo.Value = SkinInfo.Default;
+            };
+
             CurrentSkinInfo.ValueChanged += info => CurrentSkin.Value = GetSkin(info);
             CurrentSkin.ValueChanged += skin =>
             {
