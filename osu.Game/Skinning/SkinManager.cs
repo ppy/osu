@@ -101,16 +101,6 @@ namespace osu.Game.Skinning
 
                 SourceChanged?.Invoke();
             };
-
-            // migrate older imports which didn't have access to skin.ini
-            using (ContextFactory.GetForWrite())
-            {
-                foreach (var skinInfo in ModelStore.ConsumableItems.Where(s => s.Name.EndsWith(".osk")))
-                {
-                    populate(skinInfo);
-                    Update(skinInfo);
-                }
-            }
         }
 
         /// <summary>
