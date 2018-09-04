@@ -195,7 +195,7 @@ namespace osu.Game.Overlays
                 TabContainer.AutoSizeAxes |= Axes.X;
                 TabContainer.Anchor |= Anchor.x1;
                 TabContainer.Origin |= Anchor.x1;
-                Add(bottom = new Box
+                AddInternal(bottom = new Box
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 1,

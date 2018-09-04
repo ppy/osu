@@ -240,6 +240,15 @@ namespace osu.Game.Overlays
             });
         }
 
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            // Queries are allowed to be run only on the first pop-in
+            if (getSetsRequest == null)
+                Scheduler.AddOnce(updateSearch);
+        }
+
         private SearchBeatmapSetsRequest getSetsRequest;
 
         private readonly Bindable<string> currentQuery = new Bindable<string>();
@@ -251,16 +260,22 @@ namespace osu.Game.Overlays
         {
             queryChangedDebounce?.Cancel();
 
-            if (!IsLoaded) return;
+            if (!IsLoaded)
+                return;
+
+            if (State == Visibility.Hidden)
+                return;
 
             BeatmapSets = null;
             ResultAmounts = null;
 
             getSetsRequest?.Cancel();
 
-            if (api == null) return;
+            if (api == null)
+                return;
 
-            if (Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || currentQuery == string.Empty)) return;
+            if (Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || currentQuery == string.Empty))
+                return;
 
             previewTrackManager.StopAnyPlaying(this);
 

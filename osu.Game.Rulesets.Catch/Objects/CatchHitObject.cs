@@ -20,6 +20,8 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public virtual bool NewCombo { get; set; }
 
+        public int ComboOffset { get; set; }
+
         public int IndexInCurrentCombo { get; set; }
 
         public int ComboIndex { get; set; }

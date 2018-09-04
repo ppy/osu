@@ -36,6 +36,8 @@ using osu.Game.Skinning;
 using OpenTK.Graphics;
 using osu.Game.Overlays.Volume;
 using osu.Game.Screens.Select;
+using osu.Game.Utils;
+using LogLevel = osu.Framework.Logging.LogLevel;
 
 namespace osu.Game
 {
@@ -65,16 +67,18 @@ namespace osu.Game
 
         private ScreenshotManager screenshotManager;
 
+        protected RavenLogger RavenLogger;
+
         public virtual Storage GetStorageForStableInstall() => null;
 
         private Intro intro
         {
             get
             {
-                Screen s = screenStack;
-                while (s != null && !(s is Intro))
-                    s = s.ChildScreen;
-                return s as Intro;
+                Screen screen = screenStack;
+                while (screen != null && !(screen is Intro))
+                    screen = screen.ChildScreen;
+                return screen as Intro;
             }
         }
 
@@ -99,13 +103,17 @@ namespace osu.Game
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
-        public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new List<Mod>());
+        [Cached]
+        [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
+        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
         public OsuGame(string[] args = null)
         {
             this.args = args;
 
             forwardLoggedErrorsToNotifications();
+
+            RavenLogger = new RavenLogger(this);
         }
 
         public void ToggleSettings() => settings.ToggleVisibility();
@@ -118,8 +126,8 @@ namespace osu.Game
         /// <param name="toolbar">Whether the toolbar should also be hidden.</param>
         public void CloseAllOverlays(bool toolbar = true)
         {
-            foreach (var o in overlays)
-                o.State = Visibility.Hidden;
+            foreach (var overlay in overlays)
+                overlay.State = Visibility.Hidden;
             if (toolbar) Toolbar.State = Visibility.Hidden;
         }
 
@@ -143,12 +151,14 @@ namespace osu.Game
 
             if (args?.Length > 0)
             {
-                var paths = args.Where(a => !a.StartsWith(@"-"));
-
-                Task.Run(() => Import(paths.ToArray()));
+                var paths = args.Where(a => !a.StartsWith(@"-")).ToArray();
+                if (paths.Length > 0)
+                    Task.Run(() => Import(paths));
             }
 
             dependencies.CacheAs(this);
+
+            dependencies.Cache(RavenLogger);
 
             dependencies.CacheAs(ruleset);
             dependencies.CacheAs<IBindable<RulesetInfo>>(ruleset);
@@ -197,7 +207,13 @@ namespace osu.Game
                     return;
                 }
 
-                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(beatmap.Beatmaps.First());
+                var databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID);
+
+                // Use first beatmap available for current ruleset, else switch ruleset.
+                var first = databasedSet.Beatmaps.FirstOrDefault(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
+
+                ruleset.Value = first.Ruleset;
+                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
             }
 
             switch (currentScreen)
@@ -228,7 +244,7 @@ namespace osu.Game
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId);
 
-        protected void LoadScore(Score s)
+        protected void LoadScore(Score score)
         {
             scoreLoad?.Cancel();
 
@@ -236,18 +252,18 @@ namespace osu.Game
 
             if (menu == null)
             {
-                scoreLoad = Schedule(() => LoadScore(s));
+                scoreLoad = Schedule(() => LoadScore(score));
                 return;
             }
 
             if (!menu.IsCurrentScreen)
             {
                 menu.MakeCurrent();
-                this.Delay(500).Schedule(() => LoadScore(s), out scoreLoad);
+                this.Delay(500).Schedule(() => LoadScore(score), out scoreLoad);
                 return;
             }
 
-            if (s.Beatmap == null)
+            if (score.Beatmap == null)
             {
                 notifications.Post(new SimpleNotification
                 {
@@ -257,12 +273,18 @@ namespace osu.Game
                 return;
             }
 
-            ruleset.Value = s.Ruleset;
+            ruleset.Value = score.Ruleset;
 
-            Beatmap.Value = BeatmapManager.GetWorkingBeatmap(s.Beatmap);
-            Beatmap.Value.Mods.Value = s.Mods;
+            Beatmap.Value = BeatmapManager.GetWorkingBeatmap(score.Beatmap);
+            Beatmap.Value.Mods.Value = score.Mods;
 
-            menu.Push(new PlayerLoader(new ReplayPlayer(s.Replay)));
+            menu.Push(new PlayerLoader(new ReplayPlayer(score.Replay)));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            RavenLogger.Dispose();
         }
 
         protected override void LoadComplete()
@@ -441,7 +463,7 @@ namespace osu.Game
                     Schedule(() => notifications.Post(new SimpleNotification
                     {
                         Icon = entry.Level == LogLevel.Important ? FontAwesome.fa_exclamation_circle : FontAwesome.fa_bomb,
-                        Text = entry.Message,
+                        Text = entry.Message + (entry.Exception != null && IsDeployedBuild ? "\n\nThis error has been automatically reported to the devs." : string.Empty),
                     }));
                 }
                 else if (recentLogCount == short_term_display_limit)
@@ -482,7 +504,27 @@ namespace osu.Game
             // schedule is here to ensure that all component loads are done after LoadComplete is run (and thus all dependencies are cached).
             // with some better organisation of LoadComplete to do construction and dependency caching in one step, followed by calls to loadComponentSingleFile,
             // we could avoid the need for scheduling altogether.
-            Schedule(() => { asyncLoadStream = asyncLoadStream?.ContinueWith(t => LoadComponentAsync(d, add).Wait()) ?? LoadComponentAsync(d, add); });
+            Schedule(() =>
+            {
+                var previousLoadStream = asyncLoadStream;
+
+                //chain with existing load stream
+                asyncLoadStream = Task.Run(async () =>
+                {
+                    if (previousLoadStream != null)
+                        await previousLoadStream;
+
+                    try
+                    {
+                        Logger.Log($"Loading {d}...", LoggingTarget.Debug);
+                        await LoadComponentAsync(d, add);
+                        Logger.Log($"Loaded {d}!", LoggingTarget.Debug);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                    }
+                });
+            });
         }
 
         public bool OnPressed(GlobalAction action)
@@ -580,10 +622,10 @@ namespace osu.Game
 
             // we only want to apply these restrictions when we are inside a screen stack.
             // the use case for not applying is in visual/unit tests.
-            bool applyRestrictions = !currentScreen?.AllowBeatmapRulesetChange ?? false;
+            bool applyBeatmapRulesetRestrictions = !currentScreen?.AllowBeatmapRulesetChange ?? false;
 
-            ruleset.Disabled = applyRestrictions;
-            Beatmap.Disabled = applyRestrictions;
+            ruleset.Disabled = applyBeatmapRulesetRestrictions;
+            Beatmap.Disabled = applyBeatmapRulesetRestrictions;
 
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
@@ -593,6 +635,7 @@ namespace osu.Game
         private void screenAdded(Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
+            Logger.Log($"Screen changed → {currentScreen}");
 
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
@@ -601,6 +644,7 @@ namespace osu.Game
         private void screenRemoved(Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
+            Logger.Log($"Screen changed ← {currentScreen}");
 
             if (newScreen == null)
                 Exit();

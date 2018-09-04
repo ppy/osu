@@ -67,7 +67,7 @@ namespace osu.Game.Beatmaps
 
         public bool BeatmapLoaded => beatmap.IsResultAvailable;
         public IBeatmap Beatmap => beatmap.Value.Result;
-        public async Task<IBeatmap> GetBeatmapAsync() => await beatmap.Value;
+        public Task<IBeatmap> GetBeatmapAsync() => beatmap.Value;
         private readonly AsyncLazy<IBeatmap> beatmap;
 
         private IBeatmap populateBeatmap()
@@ -134,16 +134,18 @@ namespace osu.Game.Beatmaps
             return converted;
         }
 
+        public override string ToString() => BeatmapInfo.ToString();
+
         public bool BackgroundLoaded => background.IsResultAvailable;
         public Texture Background => background.Value.Result;
-        public async Task<Texture> GetBackgroundAsync() => await background.Value;
+        public Task<Texture> GetBackgroundAsync() => background.Value;
         private AsyncLazy<Texture> background;
 
         private Texture populateBackground() => GetBackground();
 
         public bool TrackLoaded => track.IsResultAvailable;
         public Track Track => track.Value.Result;
-        public async Task<Track> GetTrackAsync() => await track.Value;
+        public Task<Track> GetTrackAsync() => track.Value;
         private AsyncLazy<Track> track;
 
         private Track populateTrack()
@@ -156,21 +158,21 @@ namespace osu.Game.Beatmaps
 
         public bool WaveformLoaded => waveform.IsResultAvailable;
         public Waveform Waveform => waveform.Value.Result;
-        public async Task<Waveform> GetWaveformAsync() => await waveform.Value;
+        public Task<Waveform> GetWaveformAsync() => waveform.Value;
         private readonly AsyncLazy<Waveform> waveform;
 
         private Waveform populateWaveform() => GetWaveform();
 
         public bool StoryboardLoaded => storyboard.IsResultAvailable;
         public Storyboard Storyboard => storyboard.Value.Result;
-        public async Task<Storyboard> GetStoryboardAsync() => await storyboard.Value;
+        public Task<Storyboard> GetStoryboardAsync() => storyboard.Value;
         private readonly AsyncLazy<Storyboard> storyboard;
 
         private Storyboard populateStoryboard() => GetStoryboard();
 
         public bool SkinLoaded => skin.IsResultAvailable;
         public Skin Skin => skin.Value.Result;
-        public async Task<Skin> GetSkinAsync() => await skin.Value;
+        public Task<Skin> GetSkinAsync() => skin.Value;
         private readonly AsyncLazy<Skin> skin;
 
         private Skin populateSkin() => GetSkin();
