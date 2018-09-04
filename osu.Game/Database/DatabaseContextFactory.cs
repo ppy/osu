@@ -5,7 +5,6 @@ using System;
 using System.Linq;
 using System.Threading;
 using Microsoft.EntityFrameworkCore.Storage;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Platform;
 
 namespace osu.Game.Database
@@ -118,7 +117,9 @@ namespace osu.Game.Database
 
         private void recycleThreadContexts()
         {
-            threadContexts?.Values.ForEach(c => c.Dispose());
+            // Contexts for other threads are not disposed as they may be in use elsewhere. Instead, fresh contexts are exposed
+            // for other threads to use, and we rely on the finalizer inside OsuDbContext to handle their previous contexts
+            threadContexts?.Value.Dispose();
             threadContexts = new ThreadLocal<OsuDbContext>(CreateContext, true);
         }
 

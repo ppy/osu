@@ -19,12 +19,12 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
-        public HitObjectContainer HitObjects { get; private set; }
+        public HitObjectContainer HitObjectContainer { get; private set; }
 
         /// <summary>
         /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
         /// </summary>
-        public IEnumerable<DrawableHitObject> AllHitObjects => HitObjects?.Objects.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects)) ?? Enumerable.Empty<DrawableHitObject>();
+        public IEnumerable<DrawableHitObject> AllHitObjects => HitObjectContainer?.Objects.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects)) ?? Enumerable.Empty<DrawableHitObject>();
 
         /// <summary>
         /// All <see cref="Playfield"/>s nested inside this <see cref="Playfield"/>.
@@ -60,10 +60,10 @@ namespace osu.Game.Rulesets.UI
         {
             this.beatmap = beatmap.Value;
 
-            HitObjects = CreateHitObjectContainer();
-            HitObjects.RelativeSizeAxes = Axes.Both;
+            HitObjectContainer = CreateHitObjectContainer();
+            HitObjectContainer.RelativeSizeAxes = Axes.Both;
 
-            Add(HitObjects);
+            Add(HitObjectContainer);
         }
 
         /// <summary>
@@ -75,13 +75,13 @@ namespace osu.Game.Rulesets.UI
         /// Adds a DrawableHitObject to this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to add.</param>
-        public virtual void Add(DrawableHitObject h) => HitObjects.Add(h);
+        public virtual void Add(DrawableHitObject h) => HitObjectContainer.Add(h);
 
         /// <summary>
         /// Remove a DrawableHitObject from this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
-        public virtual void Remove(DrawableHitObject h) => HitObjects.Remove(h);
+        public virtual void Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
