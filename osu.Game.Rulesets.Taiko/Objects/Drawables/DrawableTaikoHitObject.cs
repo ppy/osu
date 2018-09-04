@@ -101,6 +101,15 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             Content.Add(MainPiece = CreateMainPiece());
             MainPiece.KiaiMode = HitObject.Kiai;
+
+            var strongObject = HitObject.NestedHitObjects.OfType<StrongHitObject>().FirstOrDefault();
+            if (strongObject != null)
+            {
+                var strongHit = CreateStrongHit(strongObject);
+
+                AddNested(strongHit);
+                AddInternal(strongHit);
+            }
         }
 
         // Normal and clap samples are handled by the drum
@@ -109,5 +118,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override string SampleNamespace => "Taiko";
 
         protected virtual TaikoPiece CreateMainPiece() => new CirclePiece();
+
+        /// <summary>
+        /// Creates the handler for this <see cref="DrawableHitObject"/>'s <see cref="StrongHitObject"/>.
+        /// This is only invoked if <see cref="TaikoHitObject.IsStrong"/> is true for <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The strong hitobject.</param>
+        /// <returns>The strong hitobject handler.</returns>
+        protected virtual DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => null;
     }
 }

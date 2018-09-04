@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
@@ -21,55 +20,28 @@ namespace osu.Game.Rulesets.Catch.Scoring
 
         private float hpDrainRate;
 
-        protected override void SimulateAutoplay(Beatmap<CatchHitObject> beatmap)
+        protected override void ApplyBeatmap(Beatmap<CatchHitObject> beatmap)
         {
-            hpDrainRate = beatmap.BeatmapInfo.BaseDifficulty.DrainRate;
+            base.ApplyBeatmap(beatmap);
 
-            foreach (var obj in beatmap.HitObjects)
-            {
-                switch (obj)
-                {
-                    case JuiceStream stream:
-                        foreach (var nestedObject in stream.NestedHitObjects)
-                            switch (nestedObject)
-                            {
-                                case TinyDroplet _:
-                                    AddJudgement(new CatchTinyDropletJudgement { Result = HitResult.Perfect });
-                                    break;
-                                case Droplet _:
-                                    AddJudgement(new CatchDropletJudgement { Result = HitResult.Perfect });
-                                    break;
-                                case Fruit _:
-                                    AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-                                    break;
-                            }
-                        break;
-                    case BananaShower shower:
-                        foreach (var _ in shower.NestedHitObjects.Cast<CatchHitObject>())
-                            AddJudgement(new CatchBananaJudgement { Result = HitResult.Perfect });
-                        break;
-                    case Fruit _:
-                        AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-                        break;
-                }
-            }
+            hpDrainRate = beatmap.BeatmapInfo.BaseDifficulty.DrainRate;
         }
 
         private const double harshness = 0.01;
 
-        protected override void OnNewJudgement(Judgement judgement)
+        protected override void ApplyResult(JudgementResult result)
         {
-            base.OnNewJudgement(judgement);
+            base.ApplyResult(result);
 
-            if (judgement.Result == HitResult.Miss)
+            if (result.Type == HitResult.Miss)
             {
-                if (!judgement.IsBonus)
+                if (!result.Judgement.IsBonus)
                     Health.Value -= hpDrainRate * (harshness * 2);
                 return;
             }
 
-            if (judgement is CatchJudgement catchJudgement)
-                Health.Value += Math.Max(catchJudgement.HealthIncrease - hpDrainRate, 0) * harshness;
+            if (result.Judgement is CatchJudgement catchJudgement)
+                Health.Value += Math.Max(catchJudgement.HealthIncreaseFor(result) - hpDrainRate, 0) * harshness;
         }
     }
 }

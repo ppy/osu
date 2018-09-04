@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Shaders;
 using osu.Game.Screens.Menu;
 using OpenTK;
 using osu.Framework.Screens;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens
 {
@@ -17,6 +18,8 @@ namespace osu.Game.Screens
         private bool showDisclaimer;
 
         protected override bool HideOverlaysOnEnter => true;
+
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
         protected override bool AllowBackButton => false;
 

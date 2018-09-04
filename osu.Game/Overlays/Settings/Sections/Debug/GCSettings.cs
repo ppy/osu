@@ -13,15 +13,18 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
     {
         protected override string Header => "Garbage Collector";
 
+        private readonly Bindable<LatencyMode> latencyMode = new Bindable<LatencyMode>();
+        private Bindable<GCLatencyMode> configLatencyMode;
+
         [BackgroundDependencyLoader]
         private void load(FrameworkDebugConfigManager config)
         {
             Children = new Drawable[]
             {
-                new SettingsEnumDropdown<GCLatencyMode>
+                new SettingsEnumDropdown<LatencyMode>
                 {
                     LabelText = "Active mode",
-                    Bindable = config.GetBindable<GCLatencyMode>(DebugSetting.ActiveGCMode)
+                    Bindable = latencyMode
                 },
                 new SettingsButton
                 {
@@ -29,6 +32,18 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
                     Action = GC.Collect
                 },
             };
+
+            configLatencyMode = config.GetBindable<GCLatencyMode>(DebugSetting.ActiveGCMode);
+            configLatencyMode.BindValueChanged(v => latencyMode.Value = (LatencyMode)v, true);
+            latencyMode.BindValueChanged(v => configLatencyMode.Value = (GCLatencyMode)v);
+        }
+
+        private enum LatencyMode
+        {
+            Batch = GCLatencyMode.Batch,
+            Interactive = GCLatencyMode.Interactive,
+            LowLatency = GCLatencyMode.LowLatency,
+            SustainedLowLatency = GCLatencyMode.SustainedLowLatency
         }
     }
 }

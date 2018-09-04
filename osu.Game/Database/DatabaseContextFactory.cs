@@ -115,7 +115,13 @@ namespace osu.Game.Database
             }
         }
 
-        private void recycleThreadContexts() => threadContexts = new ThreadLocal<OsuDbContext>(CreateContext);
+        private void recycleThreadContexts()
+        {
+            // Contexts for other threads are not disposed as they may be in use elsewhere. Instead, fresh contexts are exposed
+            // for other threads to use, and we rely on the finalizer inside OsuDbContext to handle their previous contexts
+            threadContexts?.Value.Dispose();
+            threadContexts = new ThreadLocal<OsuDbContext>(CreateContext, true);
+        }
 
         protected virtual OsuDbContext CreateContext() => new OsuDbContext(storage.GetDatabaseConnectionString(database_name))
         {
@@ -127,8 +133,6 @@ namespace osu.Game.Database
             lock (writeLock)
             {
                 recycleThreadContexts();
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
                 storage.DeleteDatabase(database_name);
             }
         }

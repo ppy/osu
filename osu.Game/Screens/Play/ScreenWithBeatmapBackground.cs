@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Play
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
+        protected new BackgroundScreenBeatmap Background => (BackgroundScreenBeatmap)base.Background;
+
         public override bool AllowBeatmapRulesetChange => false;
 
         protected const float BACKGROUND_FADE_DURATION = 800;
@@ -43,21 +45,30 @@ namespace osu.Game.Screens.Play
             DimLevel.ValueChanged += _ => UpdateBackgroundElements();
             BlurLevel.ValueChanged += _ => UpdateBackgroundElements();
             ShowStoryboard.ValueChanged += _ => UpdateBackgroundElements();
-            UpdateBackgroundElements();
+            InitializeBackgroundElements();
         }
 
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
-            UpdateBackgroundElements();
+            InitializeBackgroundElements();
         }
 
+        /// <summary>
+        /// Called once on entering screen. By Default, performs a full <see cref="UpdateBackgroundElements"/> call.
+        /// </summary>
+        protected virtual void InitializeBackgroundElements() => UpdateBackgroundElements();
+
+        /// <summary>
+        /// Called wen background elements require updates, usually due to a user changing a setting.
+        /// </summary>
+        /// <param name="userChange"></param>
         protected virtual void UpdateBackgroundElements()
         {
             if (!IsCurrentScreen) return;
 
             Background?.FadeTo(BackgroundOpacity, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-            (Background as BackgroundScreenBeatmap)?.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            Background?.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
 }

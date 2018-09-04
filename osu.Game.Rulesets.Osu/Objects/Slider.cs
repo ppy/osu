@@ -10,6 +10,8 @@ using System.Linq;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -94,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double TickDistance;
 
         public HitCircle HeadCircle;
-        public HitCircle TailCircle;
+        public SliderTailCircle TailCircle;
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
@@ -133,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 ComboIndex = ComboIndex,
             };
 
-            TailCircle = new SliderCircle(this)
+            TailCircle = new SliderTailCircle(this)
             {
                 StartTime = EndTime,
                 Position = EndPosition,
@@ -211,5 +213,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 });
             }
         }
+
+        public override Judgement CreateJudgement() => new OsuJudgement();
     }
 }

@@ -12,6 +12,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
 using osu.Framework.Screens;
@@ -199,10 +200,6 @@ namespace osu.Game.Screens.Select
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours)
         {
-            // manual binding to parent ruleset to allow for delayed load in the incoming direction.
-            base.Ruleset.ValueChanged += r => updateSelectedBeatmap(beatmapNoDebounce);
-            Ruleset.ValueChanged += r => base.Ruleset.Value = r;
-
             if (Footer != null)
             {
                 Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
@@ -224,16 +221,7 @@ namespace osu.Game.Screens.Select
             sampleChangeDifficulty = audio.Sample.Get(@"SongSelect/select-difficulty");
             sampleChangeBeatmap = audio.Sample.Get(@"SongSelect/select-expand");
 
-            Carousel.BeatmapSets = this.beatmaps.GetAllUsableBeatmapSetsEnumerable();
-
-            Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
-            Beatmap.BindValueChanged(workingBeatmapChanged);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            base.Ruleset.ValueChanged += r => updateSelectedBeatmap(beatmapNoDebounce);
+            Carousel.LoadBeatmapSetsFromManager(this.beatmaps);
         }
 
         public void Edit(BeatmapInfo beatmap)
@@ -296,59 +284,83 @@ namespace osu.Game.Screens.Select
         private BeatmapInfo beatmapNoDebounce;
         private RulesetInfo rulesetNoDebounce;
 
+        private void updateSelectedBeatmap(BeatmapInfo beatmap)
+        {
+            if (beatmap?.Equals(beatmapNoDebounce) == true)
+                return;
+
+            beatmapNoDebounce = beatmap;
+            performUpdateSelected();
+        }
+
+        private void updateSelectedRuleset(RulesetInfo ruleset)
+        {
+            if (ruleset?.Equals(rulesetNoDebounce) == true)
+                return;
+
+            rulesetNoDebounce = ruleset;
+            performUpdateSelected();
+        }
+
         /// <summary>
         /// selection has been changed as the result of a user interaction.
         /// </summary>
-        private void updateSelectedBeatmap(BeatmapInfo beatmap)
+        private void performUpdateSelected()
         {
-            var ruleset = base.Ruleset.Value;
+            var beatmap = beatmapNoDebounce;
+            var ruleset = rulesetNoDebounce;
 
-            void performLoad()
+            void run()
             {
-                WorkingBeatmap working = Beatmap.Value;
+                Logger.Log($"updating selection with beatmap:{beatmap?.ID.ToString() ?? "null"} ruleset:{ruleset?.ID.ToString() ?? "null"}");
+
                 bool preview = false;
+
+                if (ruleset?.Equals(Ruleset.Value) == false)
+                {
+                    Logger.Log($"ruleset changed from \"{Ruleset.Value}\" to \"{ruleset}\"");
+
+                    Beatmap.Value.Mods.Value = Enumerable.Empty<Mod>();
+                    Ruleset.Value = ruleset;
+
+                    // force a filter before attempting to change the beatmap.
+                    // we may still be in the wrong ruleset as there is a debounce delay on ruleset changes.
+                    Carousel.Filter(null, false);
+
+                    // Filtering only completes after the carousel runs Update.
+                    // If we also have a pending beatmap change we should delay it one frame.
+                    selectionChangedDebounce = Schedule(run);
+                    return;
+                }
 
                 // We may be arriving here due to another component changing the bindable Beatmap.
                 // In these cases, the other component has already loaded the beatmap, so we don't need to do so again.
-                if (beatmap?.Equals(Beatmap.Value.BeatmapInfo) != true)
+                if (!Equals(beatmap, Beatmap.Value.BeatmapInfo))
                 {
+                    Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
+
                     preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
-                    working = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
+                    Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
+
+                    if (beatmap != null)
+                    {
+                        if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
+                            sampleChangeDifficulty.Play();
+                        else
+                            sampleChangeBeatmap.Play();
+                    }
                 }
 
-
-                working.Mods.Value = Enumerable.Empty<Mod>();
-
-                Beatmap.Value = working;
-                Ruleset.Value = ruleset;
-
                 ensurePlayingSelected(preview);
-
                 UpdateBeatmap(Beatmap.Value);
             }
 
-            if (beatmap?.Equals(beatmapNoDebounce) == true && ruleset?.Equals(rulesetNoDebounce) == true)
-                return;
-
             selectionChangedDebounce?.Cancel();
 
-            beatmapNoDebounce = beatmap;
-            rulesetNoDebounce = ruleset;
-
             if (beatmap == null)
-                performLoad();
+                run();
             else
-            {
-                if (beatmap.BeatmapSetInfoID == beatmapNoDebounce?.BeatmapSetInfoID)
-                    sampleChangeDifficulty.Play();
-                else
-                    sampleChangeBeatmap.Play();
-
-                if (beatmap == Beatmap.Value.BeatmapInfo)
-                    performLoad();
-                else
-                    selectionChangedDebounce = Scheduler.AddDelayed(performLoad, 200);
-            }
+                selectionChangedDebounce = Scheduler.AddDelayed(run, 200);
         }
 
         private void triggerRandom()
@@ -448,6 +460,8 @@ namespace osu.Game.Screens.Select
         {
             base.Dispose(isDisposing);
 
+            Ruleset.UnbindAll();
+
             if (beatmaps != null)
             {
                 beatmaps.ItemAdded -= onBeatmapSetAdded;
@@ -464,6 +478,8 @@ namespace osu.Game.Screens.Select
         /// <param name="beatmap">The working beatmap.</param>
         protected virtual void UpdateBeatmap(WorkingBeatmap beatmap)
         {
+            Logger.Log($"working beatmap updated to {beatmap}");
+
             if (Background is BackgroundScreenBeatmap backgroundModeBeatmap)
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
@@ -495,6 +511,17 @@ namespace osu.Game.Screens.Select
 
         private void carouselBeatmapsLoaded()
         {
+            if (rulesetNoDebounce == null)
+            {
+                // manual binding to parent ruleset to allow for delayed load in the incoming direction.
+                rulesetNoDebounce = Ruleset.Value = base.Ruleset.Value;
+                base.Ruleset.ValueChanged += updateSelectedRuleset;
+                Ruleset.ValueChanged += r => base.Ruleset.Value = r;
+
+                Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
+                Beatmap.BindValueChanged(workingBeatmapChanged);
+            }
+
             if (!Beatmap.IsDefault && Beatmap.Value.BeatmapSetInfo?.DeletePending == false && Beatmap.Value.BeatmapSetInfo?.Protected == false
                 && Carousel.SelectBeatmap(Beatmap.Value.BeatmapInfo, false))
                 return;
@@ -503,7 +530,7 @@ namespace osu.Game.Screens.Select
             {
                 // in the case random selection failed, we want to trigger selectionChanged
                 // to show the dummy beatmap (we have nothing else to display).
-                updateSelectedBeatmap(null);
+                performUpdateSelected();
             }
         }
 
