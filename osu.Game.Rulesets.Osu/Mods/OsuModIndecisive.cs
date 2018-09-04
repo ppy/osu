@@ -12,7 +12,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModindecisive : Mod, IApplicableToDrawableHitObjects
+    public class OsuModIndecisive : Mod, IApplicableToDrawableHitObjects
     {
         public override string Name => "Indecisive";
         public override string ShortenedName => "ID";
