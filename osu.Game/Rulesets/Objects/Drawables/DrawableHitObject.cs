@@ -147,17 +147,15 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public void PlaySamples() => Samples?.Play();
 
-        private double lastUpdateTime;
-
         protected override void Update()
         {
             base.Update();
 
-            if (Result != null && lastUpdateTime > Time.Current)
+            if (Result != null && Result.HasResult)
             {
                 var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
 
-                if (Result.TimeOffset + endTime < Time.Current)
+                if (Result.TimeOffset + endTime > Time.Current)
                 {
                     OnRevertResult?.Invoke(this, Result);
 
@@ -165,8 +163,6 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     State.Value = ArmedState.Idle;
                 }
             }
-
-            lastUpdateTime = Time.Current;
         }
 
         protected override void UpdateAfterChildren()

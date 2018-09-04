@@ -178,7 +178,8 @@ namespace osu.Game.Database
         {
             try
             {
-                return Import(CreateModel(archive), archive);
+                var model = CreateModel(archive);
+                return model == null ? null : Import(model, archive);
             }
             catch (Exception e)
             {
@@ -198,6 +199,8 @@ namespace osu.Game.Database
 
             try
             {
+                Logger.Log($"Importing {item}...", LoggingTarget.Database);
+
                 using (var write = ContextFactory.GetForWrite()) // used to share a context for full import. keep in mind this will block all writes.
                 {
                     try
@@ -387,7 +390,7 @@ namespace osu.Game.Database
         /// Actual expensive population should be done in <see cref="Populate"/>; this should just prepare for duplicate checking.
         /// </summary>
         /// <param name="archive">The archive to create the model for.</param>
-        /// <returns>A model populated with minimal information.</returns>
+        /// <returns>A model populated with minimal information. Returning a null will abort importing silently.</returns>
         protected abstract TModel CreateModel(ArchiveReader archive);
 
         /// <summary>
@@ -412,7 +415,7 @@ namespace osu.Game.Database
         private ArchiveReader getReaderFrom(string path)
         {
             if (ZipUtils.IsZipArchive(path))
-                return new ZipArchiveReader(Files.Storage.GetStream(path), Path.GetFileName(path));
+                return new ZipArchiveReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read), Path.GetFileName(path));
             if (Directory.Exists(path))
                 return new LegacyFilesystemReader(path);
             throw new InvalidFormatException($"{path} is not a valid archive");
