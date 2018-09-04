@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <summary>
         /// The container that contains the <see cref="DrawableHitObject"/>s.
         /// </summary>
-        public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)base.HitObjects;
+        public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)HitObjectContainer;
 
         /// <summary>
         /// The direction in which <see cref="DrawableHitObject"/>s in this <see cref="ScrollingPlayfield"/> should scroll.

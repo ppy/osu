@@ -319,17 +319,17 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public async Task ImportFromStable()
+        public Task ImportFromStable()
         {
             var stable = GetStableStorage?.Invoke();
 
             if (stable == null)
             {
                 Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
-                return;
+                return Task.CompletedTask;
             }
 
-            await Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs").Select(f => stable.GetFullPath(f)).ToArray()), TaskCreationOptions.LongRunning);
+            return Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs").Select(f => stable.GetFullPath(f)).ToArray()), TaskCreationOptions.LongRunning);
         }
 
         /// <summary>
@@ -352,9 +352,8 @@ namespace osu.Game.Beatmaps
             string mapName = reader.Filenames.FirstOrDefault(f => f.EndsWith(".osu"));
             if (string.IsNullOrEmpty(mapName))
             {
-                // Todo: This is temporary for debugging purposes
-                var files = reader.Filenames.ToList();
-                throw new InvalidOperationException($"No beatmap files found in this beatmap archive. Files ({files.Count}): {string.Join(", ", files)}");
+                Logger.Log($"No beatmap files found in the beatmap archive ({reader.Name}).", LoggingTarget.Database);
+                return null;
             }
 
             Beatmap beatmap;
