@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             const float relax_leniency = 3;
 
-            foreach (var drawable in playfield.HitObjects.AliveObjects)
+            foreach (var drawable in playfield.HitObjectContainer.AliveObjects)
             {
                 if (!(drawable is DrawableOsuHitObject osuHit))
                     continue;
