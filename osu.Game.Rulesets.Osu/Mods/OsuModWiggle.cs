@@ -4,7 +4,6 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Osu.Objects;
 using OpenTK;
 
@@ -25,9 +24,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             foreach(var drawable in drawables)
-            {
                 drawable.ApplyCustomUpdateState += drawableOnApplyCustomUpdateState;
-            }
         }
 
         private void drawableOnApplyCustomUpdateState(DrawableHitObject drawable, ArmedState state)

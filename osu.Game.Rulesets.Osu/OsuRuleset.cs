@@ -120,7 +120,9 @@ namespace osu.Game.Rulesets.Osu
                 case ModType.Fun:
                     return new Mod[]
                     {
-                    	new OsuModWiggle(),
+                        new OsuModTransform(),
+                        new OsuModWiggle(),
+                        new OsuModReveal(),
                     };
                 default:
                     return new Mod[] { };
