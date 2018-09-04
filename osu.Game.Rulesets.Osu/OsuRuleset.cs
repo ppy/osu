@@ -123,6 +123,7 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModTransform(),
                         new OsuModWiggle(),
                         new OsuModReveal(),
+                        new OsuModindecisive(),
                     };
                 default:
                     return new Mod[] { };
