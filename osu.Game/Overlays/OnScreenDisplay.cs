@@ -176,9 +176,9 @@ namespace osu.Game.Overlays
         {
             Schedule(() =>
             {
-                textLine1.Text = description.Name.ToUpper();
+                textLine1.Text = description.Name.ToUpperInvariant();
                 textLine2.Text = description.Value;
-                textLine3.Text = description.Shortcut.ToUpper();
+                textLine3.Text = description.Shortcut.ToUpperInvariant();
 
                 if (string.IsNullOrEmpty(textLine3.Text))
                     textLine3.Text = "NO KEY BOUND";
@@ -188,16 +188,17 @@ namespace osu.Game.Overlays
                 int optionCount = 0;
                 int selectedOption = -1;
 
-                if (description.RawValue is bool)
+                switch (description.RawValue)
                 {
-                    optionCount = 1;
-                    if ((bool)description.RawValue) selectedOption = 0;
-                }
-                else if (description.RawValue is Enum)
-                {
-                    var values = Enum.GetValues(description.RawValue.GetType());
-                    optionCount = values.Length;
-                    selectedOption = Convert.ToInt32(description.RawValue);
+                    case bool val:
+                        optionCount = 1;
+                        if (val) selectedOption = 0;
+                        break;
+                    case Enum _:
+                        var values = Enum.GetValues(description.RawValue.GetType());
+                        optionCount = values.Length;
+                        selectedOption = Convert.ToInt32(description.RawValue);
+                        break;
                 }
 
                 textLine2.Origin = optionCount > 0 ? Anchor.BottomCentre : Anchor.Centre;

@@ -9,6 +9,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.StateChanges;
+using osu.Framework.Input.States;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
@@ -222,23 +225,16 @@ namespace osu.Game.Rulesets.UI
             mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
         }
 
-        protected override void TransformState(InputState state)
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            base.TransformState(state);
+            if (mouseDisabled.Value && (args.Button == MouseButton.Left || args.Button == MouseButton.Right)) return false;
+            return base.OnMouseDown(state, args);
+        }
 
-            // we don't want to transform the state if a replay is present (for now, at least).
-            if (replayInputHandler != null) return;
-
-            var mouse = state.Mouse as Framework.Input.MouseState;
-
-            if (mouse != null)
-            {
-                if (mouseDisabled.Value)
-                {
-                    mouse.SetPressed(MouseButton.Left, false);
-                    mouse.SetPressed(MouseButton.Right, false);
-                }
-            }
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        {
+            if (!CurrentState.Mouse.IsPressed(args.Button)) return false;
+            return base.OnMouseUp(state, args);
         }
 
         #endregion

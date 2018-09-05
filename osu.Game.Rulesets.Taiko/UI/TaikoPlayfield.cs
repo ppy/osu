@@ -58,8 +58,9 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Box background;
 
         public TaikoPlayfield(ControlPointInfo controlPoints)
-            : base(ScrollingDirection.Left)
         {
+            Direction.Value = ScrollingDirection.Left;
+
             AddRangeInternal(new Drawable[]
             {
                 backgroundContainer = new Container
@@ -208,45 +209,55 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public override void Add(DrawableHitObject h)
         {
-            h.OnJudgement += OnJudgement;
+            h.OnNewResult += OnNewResult;
 
             base.Add(h);
 
-            var barline = h as DrawableBarLine;
-            if (barline != null)
-                barlineContainer.Add(barline.CreateProxy());
-
-            var taikoObject = h as DrawableTaikoHitObject;
-            if (taikoObject != null)
-                topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
+            switch (h)
+            {
+                case DrawableBarLine barline:
+                    barlineContainer.Add(barline.CreateProxy());
+                    break;
+                case DrawableTaikoHitObject taikoObject:
+                    topLevelHitContainer.Add(taikoObject.CreateProxiedContent());
+                    break;
+            }
         }
 
-        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (judgedObject.DisplayJudgement && judgementContainer.FirstOrDefault(j => j.JudgedObject == judgedObject) == null)
-            {
-                judgementContainer.Add(new DrawableTaikoJudgement(judgement, judgedObject)
-                {
-                    Anchor = judgement.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
-                    Origin = judgement.IsHit ? Anchor.BottomCentre : Anchor.Centre,
-                    RelativePositionAxes = Axes.X,
-                    X = judgement.IsHit ? judgedObject.Position.X : 0,
-                });
-            }
-
-            if (!judgement.IsHit)
+            if (!DisplayJudgements)
                 return;
 
-            bool isRim = judgedObject.HitObject is RimHit;
+            if (!judgedObject.DisplayResult)
+                return;
 
-            if (judgement is TaikoStrongHitJudgement)
-                hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == judgedObject)?.VisualiseSecondHit();
-            else
+            switch (result.Judgement)
             {
-                hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
+                case TaikoStrongJudgement _:
+                    if (result.IsHit)
+                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
+                    break;
+                default:
+                    judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
+                    {
+                        Anchor = result.IsHit ? Anchor.TopLeft : Anchor.CentreLeft,
+                        Origin = result.IsHit ? Anchor.BottomCentre : Anchor.Centre,
+                        RelativePositionAxes = Axes.X,
+                        X = result.IsHit ? judgedObject.Position.X : 0,
+                    });
 
-                if (judgedObject.HitObject.Kiai)
-                    kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
+                    if (!result.IsHit)
+                        break;
+
+                    bool isRim = judgedObject.HitObject is RimHit;
+
+                    hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
+
+                    if (judgedObject.HitObject.Kiai)
+                        kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
+
+                    break;
             }
         }
     }

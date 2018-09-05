@@ -31,7 +31,7 @@ namespace osu.Game.Beatmaps.Formats
                 if (ShouldSkipLine(line))
                     continue;
 
-                if (line.StartsWith(@"[") && line.EndsWith(@"]"))
+                if (line.StartsWith(@"[", StringComparison.Ordinal) && line.EndsWith(@"]", StringComparison.Ordinal))
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
                     {
@@ -53,16 +53,26 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//");
+        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//", StringComparison.Ordinal);
 
         protected virtual void ParseLine(T output, Section section, string line)
         {
+            line = StripComments(line);
+
             switch (section)
             {
                 case Section.Colours:
                     handleColours(output, line);
                     return;
             }
+        }
+
+        protected string StripComments(string line)
+        {
+            var index = line.IndexOf("//", StringComparison.Ordinal);
+            if (index > 0)
+                return line.Substring(0, index);
+            return line;
         }
 
         private bool hasComboColours;
@@ -178,8 +188,8 @@ namespace osu.Game.Beatmaps.Formats
             {
                 var baseInfo = base.ApplyTo(sampleInfo);
 
-                if (CustomSampleBank > 1)
-                    baseInfo.Name += CustomSampleBank;
+                if (string.IsNullOrEmpty(baseInfo.Suffix) && CustomSampleBank > 1)
+                    baseInfo.Suffix = CustomSampleBank.ToString();
 
                 return baseInfo;
             }

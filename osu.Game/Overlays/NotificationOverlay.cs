@@ -96,8 +96,7 @@ namespace osu.Game.Overlays
             base.LoadComplete();
 
             StateChanged += _ => updateProcessingMode();
-            OverlayActivationMode.ValueChanged += _ => updateProcessingMode();
-            OverlayActivationMode.TriggerChange();
+            OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
 
         private int totalCount => sections.Select(c => c.DisplayedCount).Sum();
@@ -128,7 +127,8 @@ namespace osu.Game.Overlays
             var section = sections.Children.FirstOrDefault(s => s.AcceptTypes.Any(accept => accept.IsAssignableFrom(ourType)));
             section?.Add(notification, notification.DisplayOnTop ? -runningDepth : runningDepth);
 
-            State = Visibility.Visible;
+            if (notification.IsImportant)
+                State = Visibility.Visible;
 
             updateCounts();
         });

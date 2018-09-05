@@ -28,18 +28,20 @@ namespace osu.Game.Rulesets.Catch.Tests
 
         protected override IEnumerable<ConvertValue> CreateConvertValue(HitObject hitObject)
         {
-            if (hitObject is JuiceStream stream)
+            switch (hitObject)
             {
-                foreach (var nested in stream.NestedHitObjects)
-                    yield return new ConvertValue((CatchHitObject)nested);
+                case JuiceStream stream:
+                    foreach (var nested in stream.NestedHitObjects)
+                        yield return new ConvertValue((CatchHitObject)nested);
+                    break;
+                case BananaShower shower:
+                    foreach (var nested in shower.NestedHitObjects)
+                        yield return new ConvertValue((CatchHitObject)nested);
+                    break;
+                default:
+                    yield return new ConvertValue((CatchHitObject)hitObject);
+                    break;
             }
-            else if (hitObject is BananaShower shower)
-            {
-                foreach (var nested in shower.NestedHitObjects)
-                    yield return new ConvertValue((CatchHitObject)nested);
-            }
-            else
-                yield return new ConvertValue((CatchHitObject)hitObject);
         }
 
         protected override Ruleset CreateRuleset() => new CatchRuleset();
