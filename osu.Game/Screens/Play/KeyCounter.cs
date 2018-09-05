@@ -136,7 +136,11 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public void ResetCount() => CountPresses = 0;
+        public void ResetCount()
+        {
+            CountPresses = 0;
+            states.Clear();
+        }
 
         public void SaveState()
         {
@@ -155,6 +159,12 @@ namespace osu.Game.Screens.Play
         public void RestoreState(double time)
         {
             var targetState = states.LastOrDefault(state => state.Time <= time);
+            if (targetState == null)
+            {
+                ResetCount();
+                return;
+            }
+
             var targetIndex = states.IndexOf(targetState);
 
             states.RemoveRange(targetIndex + 1, states.Count - (targetIndex + 1));
