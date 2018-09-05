@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     adjustFadeIn(h);
             }
 
-            foreach (var drawable in drawables.Where((x, i) => i % 2 == 0))
+            foreach (var drawable in drawables.Where((x, i) => i % 2 == 1))
                 drawable.ApplyCustomUpdateState += ApplyHiddenState;
         }
 
