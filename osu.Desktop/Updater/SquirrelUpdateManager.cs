@@ -26,7 +26,7 @@ namespace osu.Desktop.Updater
         public void PrepareUpdate()
         {
             // Squirrel returns execution to us after the update process is started, so it's safe to use Wait() here
-            UpdateManager.RestartAppWhenExited().Wait();
+            UpdateManager.RestartAppWhenExited("osu!.exe").Wait();
         }
 
         [BackgroundDependencyLoader]
