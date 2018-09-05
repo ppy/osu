@@ -4,7 +4,6 @@
 using System;
 using Humanizer;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 
@@ -16,7 +15,6 @@ namespace osu.Game.Graphics
 
         public DrawableDate(DateTimeOffset date)
         {
-            AutoSizeAxes = Axes.Both;
             Font = "Exo2.0-RegularItalic";
 
             Date = date.ToLocalTime();
