@@ -257,4 +257,3 @@ paket-files/
 __pycache__/
 *.pyc
 Staging/
-/osu.Game.Rulesets.Osu/Mods/OsuModDonut.cs
