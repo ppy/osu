@@ -19,12 +19,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private Bindable<bool> letterboxing;
         private Bindable<Size> sizeFullscreen;
-        private readonly BindableInt resolutionDropdownBindable = new BindableInt();
 
         private OsuGameBase game;
-        private SettingsDropdown<int> resolutionDropdown;
+        private SettingsDropdown<Size> resolutionDropdown;
         private SettingsEnumDropdown<WindowMode> windowModeDropdown;
-
 
         private const int transition_duration = 400;
 
@@ -36,25 +34,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             letterboxing = config.GetBindable<bool>(FrameworkSetting.Letterboxing);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
 
-            sizeFullscreen.ValueChanged += size =>
-            {
-                KeyValuePair<string, int> valuePair = getResolutions().FirstOrDefault(r => r.Key.StartsWith($"{size.Width}x{size.Height}"));
-
-                resolutionDropdownBindable.Value = valuePair.Value;
-            };
-
-            resolutionDropdownBindable.ValueChanged += resolution =>
-            {
-                var newSelection = getResolutions().First(r => r.Value == resolution);
-                var newSelectionParts = newSelection.Key.Split('x');
-
-                var newSelectionWidth = int.Parse(newSelectionParts.First());
-                var newSelectionHeight = int.Parse(newSelectionParts.Last());
-
-                if (sizeFullscreen.Value.Width != newSelectionWidth || sizeFullscreen.Value.Height != newSelectionHeight)
-                    sizeFullscreen.Value = new Size(newSelectionWidth, newSelectionHeight);
-            };
-
             Children = new Drawable[]
             {
                 windowModeDropdown = new SettingsEnumDropdown<WindowMode>
@@ -62,11 +41,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Screen mode",
                     Bindable = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
                 },
-                resolutionDropdown = new SettingsDropdown<int>
+                resolutionDropdown = new SettingsDropdown<Size>
                 {
                     LabelText = "Resolution",
+                    ShowsDefaultIndicator = false,
                     Items = getResolutions(),
-                    Bindable = resolutionDropdownBindable
+                    Bindable = sizeFullscreen
                 },
                 new SettingsCheckbox
                 {
@@ -100,7 +80,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
             };
 
-            windowModeDropdown.Bindable.ValueChanged += windowMode =>
+            windowModeDropdown.Bindable.BindValueChanged(windowMode =>
             {
                 if (windowMode == WindowMode.Fullscreen)
                 {
@@ -109,31 +89,30 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 }
                 else
                     resolutionDropdown.Hide();
-            };
-            windowModeDropdown.Bindable.TriggerChange();
+            }, true);
 
-            letterboxing.ValueChanged += isVisible =>
+            letterboxing.BindValueChanged(isVisible =>
             {
                 letterboxSettings.ClearTransforms();
                 letterboxSettings.AutoSizeAxes = isVisible ? Axes.Y : Axes.None;
 
                 if (!isVisible)
                     letterboxSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
-            };
-            letterboxing.TriggerChange();
+            }, true);
         }
 
-        private List<KeyValuePair<string, int>> getResolutions()
+        private List<KeyValuePair<string, Size>> getResolutions()
         {
-            var availableDisplayResolutions = game.Window?.GetCurrentDisplay().AvailableResolutions
-                                                  .Where(r => r.Width >= 800 && r.Height >= 600)
-                                                  .OrderByDescending(r => r.Width).ThenByDescending(r => r.Height);
+            if (game.Window == null)
+                return new List<KeyValuePair<string, Size>>();
 
-            if (availableDisplayResolutions == null)
-                return new List<KeyValuePair<string, int>>();
-
-            var availableDisplayResolutionsStr = availableDisplayResolutions.Select(r => $"{r.Width}x{r.Height}").Distinct();
-            return availableDisplayResolutionsStr.Select((t, i) => new KeyValuePair<string, int>(t, i)).ToList();
+            return game.Window?.AvailableResolutions
+                       .Where(r => r.Width >= 800 && r.Height >= 600)
+                       .OrderByDescending(r => r.Width)
+                       .ThenByDescending(r => r.Height)
+                       .Select(res => new KeyValuePair<string, Size>($"{res.Width}x{res.Height}", new Size(res.Width, res.Height)))
+                       .Distinct()
+                       .ToList();
         }
     }
 }
