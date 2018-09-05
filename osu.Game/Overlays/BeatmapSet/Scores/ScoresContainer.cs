@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 loading = true;
 
                 getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
-                getScoresRequest.Success += r => Scores = r.Scores;
+                getScoresRequest.Success += r => Schedule(() => Scores = r.Scores);
                 api.Queue(getScoresRequest);
             }
         }
