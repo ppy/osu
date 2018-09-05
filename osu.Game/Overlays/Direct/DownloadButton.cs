@@ -1,76 +1,112 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 using OpenTK;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class DownloadButton : OsuClickableContainer
+    public class DownloadButton : OsuAnimatedButton
     {
+        private readonly BeatmapSetInfo beatmapSet;
         private readonly SpriteIcon icon;
+        private readonly SpriteIcon checkmark;
+        private readonly BeatmapSetDownloader downloader;
+        private readonly Box background;
 
-        public DownloadButton(BeatmapSetInfo set, bool noVideo = false)
+        private OsuColour colours;
+
+        public DownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
         {
-            BeatmapSetDownloader downloader;
-            Children = new Drawable[]
+            this.beatmapSet = beatmapSet;
+
+            AddRange(new Drawable[]
             {
-                downloader = new BeatmapSetDownloader(set, noVideo),
+                downloader = new BeatmapSetDownloader(beatmapSet, noVideo),
+                background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Depth = float.MaxValue
+                },
                 icon = new SpriteIcon
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(30),
-                    Icon = FontAwesome.fa_osu_chevron_down_o,
+                    Size = new Vector2(13),
+                    Icon = FontAwesome.fa_download,
                 },
-            };
+                checkmark = new SpriteIcon
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    X = 8,
+                    Size = Vector2.Zero,
+                    Icon = FontAwesome.fa_check,
+                }
+            });
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            downloader.DownloadState.BindValueChanged(updateState, true);
+            FinishTransforms(true);
+        }
+
+        [BackgroundDependencyLoader(permitNulls: true)]
+        private void load(OsuColour colours, OsuGame game)
+        {
+            this.colours = colours;
 
             Action = () =>
             {
-                if (!downloader.Download())
+                switch (downloader.DownloadState.Value)
                 {
-                    Content.MoveToX(-5, 50, Easing.OutSine).Then()
-                           .MoveToX(5, 100, Easing.InOutSine).Then()
-                           .MoveToX(-5, 100, Easing.InOutSine).Then()
-                           .MoveToX(0, 50, Easing.InSine);
+                    case BeatmapSetDownloader.DownloadStatus.Downloading:
+                        // todo: replace with ShakeContainer after https://github.com/ppy/osu/pull/2909 is merged.
+                        Content.MoveToX(-5, 50, Easing.OutSine).Then()
+                               .MoveToX(5, 100, Easing.InOutSine).Then()
+                               .MoveToX(-5, 100, Easing.InOutSine).Then()
+                               .MoveToX(0, 50, Easing.InSine);
+                        break;
+                    case BeatmapSetDownloader.DownloadStatus.Downloaded:
+                        game.PresentBeatmap(beatmapSet);
+                        break;
+                    default:
+                        downloader.Download();
+                        break;
                 }
             };
+        }
 
-            downloader.Downloaded.ValueChanged += d =>
+        private void updateState(BeatmapSetDownloader.DownloadStatus state)
+        {
+            switch (state)
             {
-                if (d)
-                    this.FadeOut(200);
-                else
-                    this.FadeIn(200);
-            };
-        }
+                case BeatmapSetDownloader.DownloadStatus.NotDownloaded:
+                    background.FadeColour(colours.Gray4, 500, Easing.InOutExpo);
+                    icon.MoveToX(0, 500, Easing.InOutExpo);
+                    checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
+                    break;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-        {
-            icon.ScaleTo(0.9f, 1000, Easing.Out);
-            return base.OnMouseDown(state, args);
-        }
+                case BeatmapSetDownloader.DownloadStatus.Downloading:
+                    background.FadeColour(colours.Blue, 500, Easing.InOutExpo);
+                    icon.MoveToX(0, 500, Easing.InOutExpo);
+                    checkmark.ScaleTo(Vector2.Zero, 500, Easing.InOutExpo);
+                    break;
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-        {
-            icon.ScaleTo(1f, 500, Easing.OutElastic);
-            return base.OnMouseUp(state, args);
-        }
-
-        protected override bool OnHover(InputState state)
-        {
-            icon.ScaleTo(1.1f, 500, Easing.OutElastic);
-            return base.OnHover(state);
-        }
-
-        protected override void OnHoverLost(InputState state)
-        {
-            icon.ScaleTo(1f, 500, Easing.OutElastic);
+                case BeatmapSetDownloader.DownloadStatus.Downloaded:
+                    background.FadeColour(colours.Green, 500, Easing.InOutExpo);
+                    icon.MoveToX(-8, 500, Easing.InOutExpo);
+                    checkmark.ScaleTo(new Vector2(13), 500, Easing.InOutExpo);
+                    break;
+            }
         }
     }
 }

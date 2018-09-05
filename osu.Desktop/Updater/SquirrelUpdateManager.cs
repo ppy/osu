@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-#if NET_FRAMEWORK
 using System;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -16,7 +16,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using Squirrel;
 
-namespace osu.Desktop.Overlays
+namespace osu.Desktop.Updater
 {
     public class SquirrelUpdateManager : Component
     {
@@ -35,7 +35,7 @@ namespace osu.Desktop.Overlays
             notificationOverlay = notification;
 
             if (game.IsDeployedBuild)
-                Schedule(() => checkForUpdateAsync());
+                Schedule(() => Task.Run(() => checkForUpdateAsync()));
         }
 
         private async void checkForUpdateAsync(bool useDeltaPatching = true, UpdateProgressNotification notification = null)
@@ -161,4 +161,3 @@ namespace osu.Desktop.Overlays
         }
     }
 }
-#endif

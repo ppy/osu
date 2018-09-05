@@ -6,8 +6,9 @@ using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -17,35 +18,39 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public bool Tracking { get; set; }
 
-        public override bool DisplayJudgement => false;
+        public override bool DisplayResult => false;
 
         public DrawableSliderTick(SliderTick sliderTick) : base(sliderTick)
         {
             Size = new Vector2(16) * sliderTick.Scale;
-
-            Masking = true;
-            CornerRadius = Size.X / 2;
-
             Origin = Anchor.Centre;
-
-            BorderThickness = 2;
-            BorderColour = Color4.White;
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                new SkinnableDrawable("Play/osu/sliderscorepoint", _ => new Container
                 {
+                    Masking = true,
                     RelativeSizeAxes = Axes.Both,
-                    Colour = AccentColour,
-                    Alpha = 0.3f,
-                }
+                    Origin = Anchor.Centre,
+                    CornerRadius = Size.X / 2,
+
+                    BorderThickness = 2,
+                    BorderColour = Color4.White,
+
+                    Child = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Colour = AccentColour,
+                        Alpha = 0.3f,
+                    }
+                }, restrictSize: false)
             };
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (timeOffset >= 0)
-                AddJudgement(new OsuJudgement { Result = Tracking ? HitResult.Great : HitResult.Miss });
+                ApplyResult(r => r.Type = Tracking ? HitResult.Great : HitResult.Miss);
         }
 
         protected override void UpdatePreemptState()

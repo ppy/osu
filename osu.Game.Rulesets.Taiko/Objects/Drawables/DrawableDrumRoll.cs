@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Judgements;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
@@ -40,7 +39,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
             {
                 var newTick = new DrawableDrumRollTick(tick);
-                newTick.OnJudgement += onTickJudgement;
+                newTick.OnNewResult += onNewTickResult;
 
                 AddNested(newTick);
                 tickContainer.Add(newTick);
@@ -61,9 +60,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             colourEngaged = colours.YellowDarker;
         }
 
-        private void onTickJudgement(DrawableHitObject obj, Judgement judgement)
+        private void onNewTickResult(DrawableHitObject obj, JudgementResult result)
         {
-            if (judgement.Result > HitResult.Miss)
+            if (result.Type > HitResult.Miss)
                 rollingHits++;
             else
                 rollingHits--;
@@ -74,7 +73,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             MainPiece.FadeAccent(newColour, 100);
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (userTriggered)
                 return;
@@ -84,13 +83,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             int countHit = NestedHitObjects.Count(o => o.IsHit);
             if (countHit >= HitObject.RequiredGoodHits)
-            {
-                AddJudgement(new TaikoJudgement { Result = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good });
-                if (HitObject.IsStrong)
-                    AddJudgement(new TaikoStrongHitJudgement());
-            }
+                ApplyResult(r => r.Type = countHit >= HitObject.RequiredGreatHits ? HitResult.Great : HitResult.Good);
             else
-                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
+                ApplyResult(r => r.Type = HitResult.Miss);
         }
 
         protected override void UpdateState(ArmedState state)
@@ -102,6 +97,26 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     this.FadeOut(100).Expire();
                     break;
             }
+        }
+
+        protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
+
+        private class StrongNestedHit : DrawableStrongNestedHit
+        {
+            public StrongNestedHit(StrongHitObject strong, DrawableDrumRoll drumRoll)
+                : base(strong, drumRoll)
+            {
+            }
+
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
+            {
+                if (!MainObject.Judged)
+                    return;
+
+                ApplyResult(r => r.Type = MainObject.IsHit ? HitResult.Great : HitResult.Miss);
+            }
+
+            public override bool OnPressed(TaikoAction action) => false;
         }
     }
 }

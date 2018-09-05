@@ -71,7 +71,7 @@ namespace osu.Game.Graphics
 
             if (loadableIcon == loadedIcon) return;
 
-            var texture = store?.Get(((char)loadableIcon).ToString());
+            var texture = store.Get(((char)loadableIcon).ToString());
 
             spriteMain.Texture = texture;
             spriteShadow.Texture = texture;
@@ -129,7 +129,7 @@ namespace osu.Game.Graphics
                 if (icon == value) return;
 
                 icon = value;
-                if (IsLoaded)
+                if (LoadState == LoadState.Loaded)
                     updateTexture();
             }
         }

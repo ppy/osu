@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
                 {
                     LabelText = "Audio Offset",
                     Bindable = config.GetBindable<double>(OsuSetting.AudioOffset),
-                    KeyboardStep = 100f
+                    KeyboardStep = 1f
                 },
                 new SettingsButton
                 {

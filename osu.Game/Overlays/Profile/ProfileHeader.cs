@@ -158,6 +158,13 @@ namespace osu.Game.Overlays.Profile
                         }
                     }
                 },
+                new Box // this is a temporary workaround for incorrect masking behaviour of FillMode.Fill used in UserCoverBackground (see https://github.com/ppy/osu-framework/issues/1675)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = 1,
+                    Y = cover_height,
+                    Colour = OsuColour.Gray(34),
+                },
                 infoTextLeft = new LinkFlowContainer(t => t.TextSize = 14)
                 {
                     X = UserProfileOverlay.CONTENT_X_MARGIN,
