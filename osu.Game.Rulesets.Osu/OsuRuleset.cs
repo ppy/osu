@@ -120,7 +120,6 @@ namespace osu.Game.Rulesets.Osu
                 case ModType.Fun:
                     return new Mod[]
                     {
-                        new OsuModTransform(),
                         new OsuModWiggle(),
                         new OsuModReveal(),
                         new OsuModIndecisive(),
