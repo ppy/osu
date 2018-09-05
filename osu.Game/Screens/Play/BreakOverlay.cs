@@ -163,18 +163,11 @@ namespace osu.Game.Screens.Play
             switch (action)
             {
                 case GlobalAction.SkipCutscene:
-                    double startTime = -1;
-                    foreach (var b in breaks)
-                    {
-                        if(Time.Current > b.StartTime && Time.Current + skip_required_cutoff + fade_duration < b.EndTime)
-                        {
-                            startTime = b.EndTime;
-                            break;
-                        }
-                    }
+                    BreakPeriod activeBreak = breaks.Find(b => b.StartTime < Time.Current && b.EndTime > Time.Current + skip_required_cutoff);
+                    double startTime = activeBreak?.EndTime ?? -1;
                     if (startTime == -1)
                         return false;
-                    AdjustableClock?.Seek(startTime - skip_required_cutoff - fade_duration);
+                    AdjustableClock?.Seek(startTime - skip_required_cutoff/2 - fade_duration);
                     return true;
             }
 
