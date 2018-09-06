@@ -407,9 +407,7 @@ namespace osu.Game.Rulesets.Catch.UI
             /// </summary>
             public void Explode()
             {
-                var fruit = caughtFruit.ToArray();
-
-                foreach (var f in fruit)
+                foreach (var f in caughtFruit.ToArray())
                     Explode(f);
             }
 
@@ -422,15 +420,15 @@ namespace osu.Game.Rulesets.Catch.UI
                     fruit.Anchor = Anchor.TopLeft;
                     fruit.Position = caughtFruit.ToSpaceOfOtherDrawable(fruit.DrawPosition, ExplodingFruitTarget);
 
-                    caughtFruit.Remove(fruit);
+                    if (!caughtFruit.Remove(fruit))
+                        // we may have already been removed by a previous operation (due to the weird OnLoadComplete scheduling).
+                        // this avoids a crash on potentially attempting to Add a fruit to ExplodingFruitTarget twice.
+                        return;
 
                     ExplodingFruitTarget.Add(fruit);
                 }
 
-                fruit.MoveToY(fruit.Y - 50, 250, Easing.OutSine)
-                 .Then()
-                 .MoveToY(fruit.Y + 50, 500, Easing.InSine);
-
+                fruit.MoveToY(fruit.Y - 50, 250, Easing.OutSine).Then().MoveToY(fruit.Y + 50, 500, Easing.InSine);
                 fruit.MoveToX(fruit.X + originalX * 6, 1000);
                 fruit.FadeOut(750);
 
