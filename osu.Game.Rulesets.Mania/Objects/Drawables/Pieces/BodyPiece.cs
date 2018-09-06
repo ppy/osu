@@ -32,6 +32,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                 background = new Box { RelativeSizeAxes = Axes.Both },
                 foreground = new BufferedContainer
                 {
+                    Blending = BlendingMode.Additive,
                     RelativeSizeAxes = Axes.Both,
                     CacheDrawnFrameBuffer = true,
                     Children = new Drawable[]
@@ -73,6 +74,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
             get { return accentColour; }
@@ -82,6 +84,16 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                     return;
                 accentColour = value;
 
+                updateAccentColour();
+            }
+        }
+
+        public bool Hitting
+        {
+            get { return hitting; }
+            set
+            {
+                hitting = value;
                 updateAccentColour();
             }
         }
@@ -118,13 +130,22 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             }
         }
 
+        private bool hitting;
+
         private void updateAccentColour()
         {
             if (!IsLoaded)
                 return;
 
-            foreground.Colour = AccentColour.Opacity(0.9f);
-            background.Colour = AccentColour.Opacity(0.6f);
+            foreground.Colour = AccentColour.Opacity(0.5f);
+            background.Colour = AccentColour.Opacity(0.7f);
+
+            if (hitting)
+                foreground.FadeColour(AccentColour.Lighten(0.3f), 50).Then().FadeColour(foreground.Colour, 50).Loop();
+            else
+            {
+                foreground.ClearTransforms(false, nameof(foreground.Colour));
+            }
 
             subtractionCache.Invalidate();
         }
