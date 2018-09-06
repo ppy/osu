@@ -163,14 +163,16 @@ namespace osu.Game.Online.API
                     continue;
                 }
 
-                APIRequest req = null;
-
-                lock (queue)
-                    if (queue.Count > 0)
-                        req = queue.Dequeue();
-
-                if (req != null)
+                while (true)
                 {
+                    APIRequest req;
+
+                    lock (queue)
+                    {
+                        if (queue.Count == 0) break;
+                        req = queue.Dequeue();
+                    }
+
                     // TODO: handle failures better
                     handleRequest(req);
                 }
