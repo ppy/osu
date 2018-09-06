@@ -103,6 +103,11 @@ namespace osu.Game.Beatmaps
                 b.BeatmapSet = beatmapSet;
             }
 
+            validateOnlineIds(beatmapSet.Beatmaps);
+
+            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
+                fetchAndPopulateOnlineIDs(b, beatmapSet.Beatmaps);
+
             // check if a set already exists with the same online id, delete if it does.
             if (beatmapSet.OnlineBeatmapSetID != null)
             {
@@ -114,11 +119,6 @@ namespace osu.Game.Beatmaps
                     Logger.Log($"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been purged.", LoggingTarget.Database);
                 }
             }
-
-            validateOnlineIds(beatmapSet.Beatmaps);
-
-            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
-                fetchAndPopulateOnlineIDs(b, beatmapSet.Beatmaps);
         }
 
         private void validateOnlineIds(List<BeatmapInfo> beatmaps)
@@ -319,17 +319,17 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
         /// </summary>
-        public async Task ImportFromStable()
+        public Task ImportFromStable()
         {
             var stable = GetStableStorage?.Invoke();
 
             if (stable == null)
             {
                 Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
-                return;
+                return Task.CompletedTask;
             }
 
-            await Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs").Select(f => stable.GetFullPath(f)).ToArray()), TaskCreationOptions.LongRunning);
+            return Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs").Select(f => stable.GetFullPath(f)).ToArray()), TaskCreationOptions.LongRunning);
         }
 
         /// <summary>

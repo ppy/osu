@@ -24,7 +24,9 @@ Clone the repository including submodules
 Build and run
 
 - Using Visual Studio 2017, Rider or Visual Studio Code (configurations are included)
-- From command line using `dotnet run --project osu.Desktop`
+- From command line using `dotnet run --project osu.Desktop`. When building for non-development purposes, add `-c Release` to gain higher performance.
+
+Note: If you run from command line under linux, you will need to prefix the output folder to your `LD_LIBRARY_PATH`. See `.vscode/launch.json` for an example
 
 If you run into issues building you may need to restore nuget packages (commonly via `dotnet restore`). Visual Studio Code users must run `Restore` task from debug tab before attempt to build.
 
