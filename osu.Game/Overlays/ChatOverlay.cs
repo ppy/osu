@@ -339,11 +339,24 @@ namespace osu.Game.Overlays
             this.channelManager = channelManager;
             channelManager.CurrentChannel.ValueChanged += currentChannelChanged;
             channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
-            channelManager.AvailableChannels.CollectionChanged += (sender, args) => channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
+            channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
 
             //for the case that channelmanager was faster at fetching the channels than our attachment to CollectionChanged.
             channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
             joinedChannelsChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, channelManager.JoinedChannels));
+        }
+
+        private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            channelManager.CurrentChannel.ValueChanged -= currentChannelChanged;
+            channelManager.JoinedChannels.CollectionChanged -= joinedChannelsChanged;
+            channelManager.AvailableChannels.CollectionChanged -= availableChannelsChanged;
         }
 
         private void postMessage(TextBox textbox, bool newText)
