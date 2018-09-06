@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Settings
                     },
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Children = new[]
+                    Children = new Drawable[]
                     {
                         new OsuSpriteText
                         {
