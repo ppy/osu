@@ -12,6 +12,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
 {
     public class PaginatedRecentActivityContainer : PaginatedContainer
     {
+        private GetUserRecentActivitiesRequest request;
+
         public PaginatedRecentActivityContainer(Bindable<User> user, string header, string missing)
             : base(user, header, missing)
         {
@@ -22,9 +24,8 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         {
             base.ShowMore();
 
-            var req = new GetUserRecentActivitiesRequest(User.Value.Id, VisiblePages++ * ItemsPerPage);
-
-            req.Success += activities =>
+            request = new GetUserRecentActivitiesRequest(User.Value.Id, VisiblePages++ * ItemsPerPage);
+            request.Success += activities => Schedule(() =>
             {
                 ShowMoreButton.FadeTo(activities.Count == ItemsPerPage ? 1 : 0);
                 ShowMoreLoading.Hide();
@@ -41,9 +42,15 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
                 {
                     ItemsContainer.Add(new DrawableRecentActivity(activity));
                 }
-            };
+            });
 
-            Api.Queue(req);
+            Api.Queue(request);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            request?.Cancel();
         }
     }
 }
