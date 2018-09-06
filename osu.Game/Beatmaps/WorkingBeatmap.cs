@@ -199,7 +199,7 @@ namespace osu.Game.Beatmaps
             private readonly Func<T> valueFactory;
             private readonly Func<T, bool> stillValidFunction;
 
-            private readonly object initLock = new object();
+            private readonly object fetchLock = new object();
 
             public RecyclableLazy(Func<T> valueFactory, Func<T, bool> stillValidFunction = null)
             {
@@ -223,28 +223,16 @@ namespace osu.Game.Beatmaps
             {
                 get
                 {
-                    recreateIfInvalid();
-                    return lazy.Value;
+                    lock (fetchLock)
+                    {
+                        if (!stillValid)
+                            recreate();
+                        return lazy.Value;
+                    }
                 }
             }
 
             private bool stillValid => lazy.IsValueCreated && (stillValidFunction?.Invoke(lazy.Value) ?? true);
-
-            private void recreateIfInvalid()
-            {
-                lock (initLock)
-                {
-                    if (!lazy.IsValueCreated)
-                        // we have not yet been initialised or haven't run the task.
-                        return;
-
-                    if (stillValid)
-                        // we are still in a valid state.
-                        return;
-
-                    recreate();
-                }
-            }
 
             private void recreate() => lazy = new Lazy<T>(valueFactory, LazyThreadSafetyMode.ExecutionAndPublication);
         }
