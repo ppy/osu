@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             base.FadeActive();
 
-            this.ResizeWidthTo(200, TRANSITION_LENGTH * 2, Easing.OutQuint);
+            this.ResizeWidthTo(200, TRANSITION_LENGTH, Easing.OutQuint);
             CloseButton.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
         }
 
