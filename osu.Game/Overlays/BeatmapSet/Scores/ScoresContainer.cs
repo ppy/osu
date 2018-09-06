@@ -134,5 +134,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             this.api = api;
             updateDisplay();
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            getScoresRequest?.Cancel();
+        }
     }
 }
