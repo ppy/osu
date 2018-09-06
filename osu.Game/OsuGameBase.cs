@@ -24,7 +24,6 @@ using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
-using osu.Game.Graphics.Textures;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
@@ -115,9 +114,8 @@ namespace osu.Game
             dependencies.Cache(LocalConfig);
 
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 });
+            dependencies.Cache(Fonts = new FontStore(new GlyphStore(Resources, @"Fonts/FontAwesome")));
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
