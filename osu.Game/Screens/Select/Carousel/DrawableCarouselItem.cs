@@ -24,11 +24,6 @@ namespace osu.Game.Screens.Select.Carousel
 
         public override bool IsPresent => base.IsPresent || Item.Visible;
 
-        /// <summary>
-        /// Whether this item can be removed from the scroll container (usually due to being off-screen).
-        /// </summary>
-        public virtual bool CanBeRemoved => true;
-
         public readonly CarouselItem Item;
 
         private Container nestedContainer;
@@ -91,13 +86,7 @@ namespace osu.Game.Screens.Select.Carousel
             base.OnHoverLost(state);
         }
 
-        protected bool VisibleInCarousel;
-
-        public void SetMultiplicativeAlpha(float alpha)
-        {
-            borderContainer.Alpha = alpha;
-            VisibleInCarousel = alpha > 0;
-        }
+        public void SetMultiplicativeAlpha(float alpha) => borderContainer.Alpha = alpha;
 
         protected override void LoadComplete()
         {
