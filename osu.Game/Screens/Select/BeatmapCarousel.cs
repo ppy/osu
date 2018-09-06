@@ -424,7 +424,7 @@ namespace osu.Game.Screens.Select
             float drawHeight = DrawHeight;
 
             // Remove all items that should no longer be on-screen
-            scrollableContent.RemoveAll(p => p.Y < Current - p.DrawHeight || p.Y > Current + drawHeight || !p.IsPresent);
+            scrollableContent.RemoveAll(p => p.CanBeRemoved && (p.Y < Current - p.DrawHeight || p.Y > Current + drawHeight || !p.IsPresent));
 
             // Find index range of all items that should be on-screen
             Trace.Assert(Items.Count == yPositions.Count);
@@ -484,6 +484,15 @@ namespace osu.Game.Screens.Select
             float halfHeight = drawHeight / 2;
             foreach (DrawableCarouselItem p in scrollableContent.Children)
                 updateItem(p, halfHeight);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // aggressively dispose "off-screen" items to reduce GC pressure.
+            foreach (var i in Items)
+                i.Dispose();
         }
 
         private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
