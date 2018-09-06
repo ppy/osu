@@ -7,14 +7,15 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Textures;
-using OpenTK;
 using OpenTK.Graphics.ES30;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Objects.Types;
+using OpenTK;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -43,6 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public double? SnakedEnd { get; private set; }
 
         private Color4 accentColour = Color4.White;
+
         /// <summary>
         /// Used to colour the path.
         /// </summary>
@@ -61,6 +63,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private Color4 borderColour = Color4.White;
+
         /// <summary>
         /// Used to colour the path border.
         /// </summary>
@@ -85,6 +88,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private Vector2 topLeftOffset;
 
         private readonly Slider slider;
+
         public SliderBody(Slider s)
         {
             slider = s;
@@ -139,8 +143,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             var texture = new Texture(textureWidth, 1);
 
             //initialise background
-            var raw = new RawTexture(textureWidth, 1);
-            var bytes = raw.Data;
+            var raw = new Image<Rgba32>(textureWidth, 1);
 
             const float aa_portion = 0.02f;
             const float border_portion = 0.128f;
@@ -155,19 +158,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
                 if (progress <= border_portion)
                 {
-                    bytes[i * 4] = (byte)(BorderColour.R * 255);
-                    bytes[i * 4 + 1] = (byte)(BorderColour.G * 255);
-                    bytes[i * 4 + 2] = (byte)(BorderColour.B * 255);
-                    bytes[i * 4 + 3] = (byte)(Math.Min(progress / aa_portion, 1) * (BorderColour.A * 255));
+                    raw[i, 0] = new Rgba32(BorderColour.R, BorderColour.G, BorderColour.B, Math.Min(progress / aa_portion, 1) * BorderColour.A);
                 }
                 else
                 {
                     progress -= border_portion;
-
-                    bytes[i * 4] = (byte)(AccentColour.R * 255);
-                    bytes[i * 4 + 1] = (byte)(AccentColour.G * 255);
-                    bytes[i * 4 + 2] = (byte)(AccentColour.B * 255);
-                    bytes[i * 4 + 3] = (byte)((opacity_at_edge - (opacity_at_edge - opacity_at_centre) * progress / gradient_portion) * (AccentColour.A * 255));
+                    raw[i, 0] = new Rgba32(AccentColour.R, AccentColour.G, AccentColour.B,
+                        (opacity_at_edge - (opacity_at_edge - opacity_at_centre) * progress / gradient_portion) * AccentColour.A);
                 }
             }
 
