@@ -113,29 +113,6 @@ namespace osu.Game
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
 
-            runMigrations();
-
-            dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
-            dependencies.CacheAs<ISkinSource>(SkinManager);
-
-            var api = new APIAccess(LocalConfig);
-
-            dependencies.Cache(api);
-            dependencies.CacheAs<IAPIProvider>(api);
-
-            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
-            dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, api, Audio, Host));
-            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory, Host, BeatmapManager, RulesetStore));
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
-            dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
-            dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
-            dependencies.Cache(new OsuColour());
-
-            fileImporters.Add(BeatmapManager);
-            fileImporters.Add(ScoreStore);
-            fileImporters.Add(SkinManager);
-
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
             dependencies.Cache(Fonts = new FontStore(new GlyphStore(Resources, @"Fonts/FontAwesome")));
 
@@ -161,6 +138,29 @@ namespace osu.Game
 
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
+
+            runMigrations();
+
+            dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
+            dependencies.CacheAs<ISkinSource>(SkinManager);
+
+            var api = new APIAccess(LocalConfig);
+
+            dependencies.Cache(api);
+            dependencies.CacheAs<IAPIProvider>(api);
+
+            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
+            dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, api, Audio, Host));
+            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory, Host, BeatmapManager, RulesetStore));
+            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
+            dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
+            dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
+            dependencies.Cache(new OsuColour());
+
+            fileImporters.Add(BeatmapManager);
+            fileImporters.Add(ScoreStore);
+            fileImporters.Add(SkinManager);
 
             var defaultBeatmap = new DummyWorkingBeatmap(this);
             beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
