@@ -83,14 +83,14 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame osuGame)
         {
-            if (osuGame != null)
-                overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
-
             StateChanged += visibility =>
             {
                 if (overlayActivationMode == OverlayActivation.Disabled)
                     State = Visibility.Hidden;
             };
+
+            if (osuGame != null)
+                overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
         }
 
         public class ToolbarBackground : Container
