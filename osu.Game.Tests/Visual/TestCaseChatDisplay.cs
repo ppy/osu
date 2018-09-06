@@ -1,15 +1,31 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Chat;
+using osu.Game.Overlays.Chat.Tabs;
 
 namespace osu.Game.Tests.Visual
 {
     [Description("Testing chat api and overlay")]
     public class TestCaseChatDisplay : OsuTestCase
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(ChatOverlay),
+            typeof(ChatLine),
+            typeof(DrawableChannel),
+            typeof(ChannelSelectorTabItem),
+            typeof(ChannelTabControl),
+            typeof(ChannelTabItem),
+            typeof(PrivateChannelTabItem),
+            typeof(TabCloseButton)
+        };
+
         public TestCaseChatDisplay()
         {
             Add(new ChatOverlay
