@@ -354,9 +354,13 @@ namespace osu.Game.Overlays
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            channelManager.CurrentChannel.ValueChanged -= currentChannelChanged;
-            channelManager.JoinedChannels.CollectionChanged -= joinedChannelsChanged;
-            channelManager.AvailableChannels.CollectionChanged -= availableChannelsChanged;
+
+            if (channelManager != null)
+            {
+                channelManager.CurrentChannel.ValueChanged -= currentChannelChanged;
+                channelManager.JoinedChannels.CollectionChanged -= joinedChannelsChanged;
+                channelManager.AvailableChannels.CollectionChanged -= availableChannelsChanged;
+            }
         }
 
         private void postMessage(TextBox textbox, bool newText)
