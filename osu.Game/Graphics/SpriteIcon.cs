@@ -95,7 +95,7 @@ namespace osu.Game.Graphics
             {
                 //adjust shadow alpha based on highest component intensity to avoid muddy display of darker text.
                 //squared result for quadratic fall-off seems to give the best result.
-                var avgColour = (Color4)DrawInfo.Colour.AverageColour;
+                var avgColour = (Color4)DrawColourInfo.Colour.AverageColour;
 
                 spriteShadow.Alpha = (float)Math.Pow(Math.Max(Math.Max(avgColour.R, avgColour.G), avgColour.B), 2);
 
