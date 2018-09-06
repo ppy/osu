@@ -187,7 +187,7 @@ namespace osu.Game.Overlays.Direct
             base.LoadComplete();
             this.FadeInFromZero(200, Easing.Out);
 
-            PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered ? 1 : 0, 120, Easing.InOutQuint);
+            PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered || !FadePlayButton ? 1 : 0, 120, Easing.InOutQuint);
             PreviewPlaying.ValueChanged += newValue => PreviewBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
         }
 
