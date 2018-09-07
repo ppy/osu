@@ -63,6 +63,8 @@ namespace osu.Game.Beatmaps
 
         public override string[] HandledExtensions => new[] { ".osz" };
 
+        protected override string ImportFromStablePath => "Songs";
+
         private readonly RulesetStore rulesets;
 
         private readonly BeatmapStore beatmaps;
@@ -72,11 +74,6 @@ namespace osu.Game.Beatmaps
         private readonly AudioManager audioManager;
 
         private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
-
-        /// <summary>
-        /// Set a storage with access to an osu-stable install for import purposes.
-        /// </summary>
-        public Func<Storage> GetStableStorage { private get; set; }
 
         public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, IIpcHost importHost = null)
             : base(storage, contextFactory, new BeatmapStore(contextFactory), importHost)
@@ -317,27 +314,6 @@ namespace osu.Game.Beatmaps
         /// <param name="query">The query.</param>
         /// <returns>Results from the provided query.</returns>
         public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
-
-        /// <summary>
-        /// Denotes whether an osu-stable installation is present to perform automated imports from.
-        /// </summary>
-        public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
-
-        /// <summary>
-        /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
-        /// </summary>
-        public Task ImportFromStable()
-        {
-            var stable = GetStableStorage?.Invoke();
-
-            if (stable == null)
-            {
-                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
-                return Task.CompletedTask;
-            }
-
-            return Task.Factory.StartNew(() => Import(stable.GetDirectories("Songs").Select(f => stable.GetFullPath(f)).ToArray()), TaskCreationOptions.LongRunning);
-        }
 
         /// <summary>
         /// Create a SHA-2 hash from the provided archive based on contained beatmap (.osu) file content.
