@@ -90,7 +90,7 @@ namespace osu.Game
 
         private VolumeOverlay volume;
         private OnScreenDisplay onscreenDisplay;
-        private MusicNotificationOverlay notification;
+        private MusicNotificationDisplay notification;
 
         private Bindable<int> configRuleset;
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
@@ -340,7 +340,7 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
-            loadComponentSingleFile(notification = new MusicNotificationOverlay(), Add);
+            loadComponentSingleFile(notification = new MusicNotificationDisplay(), Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 

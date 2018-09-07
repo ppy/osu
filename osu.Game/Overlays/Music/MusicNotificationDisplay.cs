@@ -21,7 +21,7 @@ using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays
 {
-    public class MusicNotificationOverlay : Container
+    public class MusicNotificationDisplay : Container
     {
         private readonly Container box;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays
         private const float height = 52;
         private const float height_contracted = height * 0.9f;
 
-        public MusicNotificationOverlay()
+        public MusicNotificationDisplay()
         {
             RelativeSizeAxes = Axes.Both;
 
