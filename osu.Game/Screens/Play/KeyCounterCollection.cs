@@ -38,8 +38,9 @@ namespace osu.Game.Screens.Play
             key.FadeTime = FadeTime;
             key.KeyDownTextColor = KeyDownTextColor;
             key.KeyUpTextColor = KeyUpTextColor;
-            if (AudioClock != null && AudioClock is IFrameBasedClock basedClock)
-                key.Clock = basedClock;
+            // Use the same clock object as SongProgress for saving KeyCounter state
+            if (AudioClock != null)
+                key.Clock = AudioClock;
         }
 
         public void ResetCount()
@@ -121,7 +122,7 @@ namespace osu.Game.Screens.Play
         public override bool HandleKeyboardInput => receptor == null;
         public override bool HandleMouseInput => receptor == null;
 
-        public IClock AudioClock { get; set; }
+        public IFrameBasedClock AudioClock { get; set; }
 
         private Receptor receptor;
 
