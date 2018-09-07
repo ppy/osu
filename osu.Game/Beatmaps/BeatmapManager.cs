@@ -100,6 +100,11 @@ namespace osu.Game.Beatmaps
                 b.BeatmapSet = beatmapSet;
             }
 
+            validateOnlineIds(beatmapSet.Beatmaps);
+
+            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
+                fetchAndPopulateOnlineIDs(b, beatmapSet.Beatmaps);
+
             // check if a set already exists with the same online id, delete if it does.
             if (beatmapSet.OnlineBeatmapSetID != null)
             {
@@ -111,11 +116,6 @@ namespace osu.Game.Beatmaps
                     Logger.Log($"Found existing beatmap set with same OnlineBeatmapSetID ({beatmapSet.OnlineBeatmapSetID}). It has been purged.", LoggingTarget.Database);
                 }
             }
-
-            validateOnlineIds(beatmapSet.Beatmaps);
-
-            foreach (BeatmapInfo b in beatmapSet.Beatmaps)
-                fetchAndPopulateOnlineIDs(b, beatmapSet.Beatmaps);
         }
 
         private void validateOnlineIds(List<BeatmapInfo> beatmaps)
