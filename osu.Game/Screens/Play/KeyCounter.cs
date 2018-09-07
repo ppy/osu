@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Play
             states.RemoveRange(targetIndex + 1, states.Count - (targetIndex + 1));
 
             lastState = targetState;
-            CountPresses = targetState?.Count ?? 0;
+            CountPresses = targetState.Count;
         }
     }
 }
