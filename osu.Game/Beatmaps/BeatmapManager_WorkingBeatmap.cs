@@ -55,7 +55,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return (textureStore ?? (textureStore = new LargeTextureStore(new RawTextureLoaderStore(store)))).Get(getPathForFile(Metadata.BackgroundFile));
+                    return (textureStore ?? (textureStore = new LargeTextureStore(new TextureLoaderStore(store)))).Get(getPathForFile(Metadata.BackgroundFile));
                 }
                 catch
                 {

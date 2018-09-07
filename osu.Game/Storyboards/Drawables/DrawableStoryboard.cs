@@ -22,7 +22,6 @@ namespace osu.Game.Storyboards.Drawables
         public override bool HandleMouseInput => false;
 
         private bool passing = true;
-
         public bool Passing
         {
             get { return passing; }
@@ -37,7 +36,6 @@ namespace osu.Game.Storyboards.Drawables
         public override bool RemoveCompletedTransforms => false;
 
         private DependencyContainer dependencies;
-
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
             dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
@@ -59,7 +57,7 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader]
         private void load(FileStore fileStore)
         {
-            dependencies.Cache(new TextureStore(new RawTextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
+            dependencies.Cache(new TextureStore(new TextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
 
             foreach (var layer in Storyboard.Layers)
                 Add(layer.CreateDrawable());
