@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Play
                         Direction = FillDirection.Vertical,
                         Children = new Drawable[]
                         {
-                            KeyCounter = CreateKeyCounter(adjustableClock),
+                            KeyCounter = CreateKeyCounter(adjustableClock as IFrameBasedClock),
                             HoldToQuit = CreateQuitButton(),
                         }
                     }
@@ -194,7 +194,7 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Top = 20 }
         };
 
-        protected virtual KeyCounterCollection CreateKeyCounter(IClock offsetClock) => new KeyCounterCollection
+        protected virtual KeyCounterCollection CreateKeyCounter(IFrameBasedClock offsetClock) => new KeyCounterCollection
         {
             FadeTime = 50,
             Anchor = Anchor.BottomRight,
