@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -192,7 +193,7 @@ namespace osu.Game.Beatmaps
 
                     downloadNotification.CompletionClickAction = () =>
                     {
-                        PresentBeatmap?.Invoke(importedBeatmap);
+                        PresentCompletedImport(importedBeatmap.Yield());
                         return true;
                     };
                     downloadNotification.State = ProgressNotificationState.Completed;
@@ -226,6 +227,12 @@ namespace osu.Game.Beatmaps
             // don't run in the main api queue as this is a long-running task.
             Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
             BeatmapDownloadBegan?.Invoke(request);
+        }
+
+        protected override void PresentCompletedImport(IEnumerable<BeatmapSetInfo> imported)
+        {
+            base.PresentCompletedImport(imported);
+            PresentBeatmap?.Invoke(imported.LastOrDefault());
         }
 
         /// <summary>

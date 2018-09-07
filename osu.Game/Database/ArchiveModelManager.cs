@@ -173,8 +173,18 @@ namespace osu.Game.Database
             else
             {
                 notification.CompletionText = $"Imported {current} {typeof(TModel).Name.Replace("Info", "").ToLower()}s!";
+                notification.CompletionClickAction += () =>
+                {
+                    if (imported.Count > 0)
+                        PresentCompletedImport(imported);
+                    return true;
+                };
                 notification.State = ProgressNotificationState.Completed;
             }
+        }
+
+        protected virtual void PresentCompletedImport(IEnumerable<TModel> imported)
+        {
         }
 
         /// <summary>
