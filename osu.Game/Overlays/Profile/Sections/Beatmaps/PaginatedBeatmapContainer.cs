@@ -14,8 +14,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
     public class PaginatedBeatmapContainer : PaginatedContainer
     {
         private const float panel_padding = 10f;
-
         private readonly BeatmapSetType type;
+        private GetUserBeatmapsRequest request;
 
         public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "None... yet.")
             : base(user, header, missing)
@@ -31,9 +31,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         {
             base.ShowMore();
 
-            var req = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
-
-            req.Success += sets =>
+            request = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
+            request.Success += sets => Schedule(() =>
             {
                 ShowMoreButton.FadeTo(sets.Count == ItemsPerPage ? 1 : 0);
                 ShowMoreLoading.Hide();
@@ -52,9 +51,15 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
                     var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets));
                     ItemsContainer.Add(panel);
                 }
-            };
+            });
 
-            Api.Queue(req);
+            Api.Queue(request);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            request?.Cancel();
         }
     }
 }

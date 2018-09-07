@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections
         protected readonly Bindable<User> User = new Bindable<User>();
 
         protected APIAccess Api;
+        protected APIRequest RetrievalRequest;
         protected RulesetStore Rulesets;
 
         public PaginatedContainer(Bindable<User> user, string header, string missing)
