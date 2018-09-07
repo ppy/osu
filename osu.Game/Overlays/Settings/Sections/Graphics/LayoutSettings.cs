@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -108,6 +109,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 .ThenByDescending(r => r.Height)
                 .Select(res => new KeyValuePair<string, Size>($"{res.Width}x{res.Height}", new Size(res.Width, res.Height)))
                 .Distinct()
-                .ToList() ?? Enumerable.Empty<KeyValuePair<string, Size>>();
+                .ToList() ?? new KeyValuePair<string, Size>("Default", new Size(9999, 9999)).Yield();
     }
 }
