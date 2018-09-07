@@ -130,7 +130,6 @@ namespace osu.Game.Database
             List<TModel> imported = new List<TModel>();
 
             int current = 0;
-            int errors = 0;
             foreach (string path in paths)
             {
                 if (notification.State == ProgressNotificationState.Cancelled)
@@ -163,13 +162,19 @@ namespace osu.Game.Database
                 {
                     e = e.InnerException ?? e;
                     Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
-                    errors++;
                 }
             }
 
-            notification.Text = errors > 0 ? $"Import complete with {errors} errors" : "Import successful!";
-            notification.CompletionText = $"Imported {current} {typeof(TModel).Name.Replace("Info", "").ToLower()}s!";
-            notification.State = ProgressNotificationState.Completed;
+            if (imported.Count == 0)
+            {
+                notification.Text = "Import failed!";
+                notification.State = ProgressNotificationState.Cancelled;
+            }
+            else
+            {
+                notification.CompletionText = $"Imported {current} {typeof(TModel).Name.Replace("Info", "").ToLower()}s!";
+                notification.State = ProgressNotificationState.Completed;
+            }
         }
 
         /// <summary>
