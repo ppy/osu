@@ -102,13 +102,18 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }, true);
         }
 
-        private IEnumerable<KeyValuePair<string, Size>> getResolutions() =>
-            game.Window?.AvailableResolutions?
-                .Where(r => r.Width >= 800 && r.Height >= 600)
-                .OrderByDescending(r => r.Width)
-                .ThenByDescending(r => r.Height)
-                .Select(res => new KeyValuePair<string, Size>($"{res.Width}x{res.Height}", new Size(res.Width, res.Height)))
-                .Distinct()
-                .ToList() ?? new KeyValuePair<string, Size>("Default", new Size(9999, 9999)).Yield();
+        private IEnumerable<KeyValuePair<string, Size>> getResolutions()
+        {
+            var resolutions = new KeyValuePair<string, Size>("Default", new Size(9999, 9999)).Yield();
+
+            if (game.Window != null)
+                resolutions = resolutions.Concat(game.Window.AvailableResolutions
+                                                     .Where(r => r.Width >= 800 && r.Height >= 600)
+                                                     .OrderByDescending(r => r.Width)
+                                                     .ThenByDescending(r => r.Height)
+                                                     .Select(res => new KeyValuePair<string, Size>($"{res.Width}x{res.Height}", new Size(res.Width, res.Height)))
+                                                     .Distinct()).ToList();
+            return resolutions;
+        }
     }
 }
