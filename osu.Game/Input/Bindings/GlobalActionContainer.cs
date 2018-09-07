@@ -37,6 +37,10 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.Down, GlobalAction.DecreaseVolume),
             new KeyBinding(InputKey.MouseWheelDown, GlobalAction.DecreaseVolume),
             new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
+            new KeyBinding(InputKey.X, GlobalAction.Play),
+            new KeyBinding(InputKey.C, GlobalAction.Pause),
+            new KeyBinding(InputKey.Right, GlobalAction.Next),
+            new KeyBinding(InputKey.Left, GlobalAction.Previous),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
             new KeyBinding(InputKey.MouseButton1, GlobalAction.Back),
@@ -77,6 +81,14 @@ namespace osu.Game.Input.Bindings
         DecreaseVolume,
         [Description("Toggle mute")]
         ToggleMute,
+        [Description("Play")]
+        Play,
+        [Description("Pause")]
+        Pause,
+        [Description("Next music")]
+        Next,
+        [Description("Previous music")]
+        Previous,
 
         // In-Game Keybindings
         [Description("Skip Cutscene")]

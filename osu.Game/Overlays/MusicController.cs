@@ -257,7 +257,7 @@ namespace osu.Game.Overlays
                 playButton.Icon = FontAwesome.fa_play_circle_o;
         }
 
-        private void play()
+        public void play()
         {
             var track = current?.Track;
 
@@ -274,7 +274,30 @@ namespace osu.Game.Overlays
                 track.Start();
         }
 
-        private void prev()
+        public void reset()
+        {
+            var track = current?.Track;
+
+            if (track == null)
+                return;
+
+            if (track.IsRunning)
+                track.Restart();
+            else
+                track.Start();
+        }
+
+        public bool isPaused()
+        {
+            var track = current?.Track;
+
+            if (track == null)
+                return false;
+
+            return !track.IsRunning;
+        }
+
+        public void prev()
         {
             queuedDirection = TransformDirection.Prev;
 
@@ -286,7 +309,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        private void next(bool instant = false)
+        public void next(bool instant = false)
         {
             if (!instant)
                 queuedDirection = TransformDirection.Next;

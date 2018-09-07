@@ -90,6 +90,7 @@ namespace osu.Game
 
         private VolumeOverlay volume;
         private OnScreenDisplay onscreenDisplay;
+        private MusicNotificationOverlay notification;
 
         private Bindable<int> configRuleset;
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
@@ -339,6 +340,7 @@ namespace osu.Game
 
             loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
+            loadComponentSingleFile(notification = new MusicNotificationOverlay(), Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 
@@ -562,6 +564,28 @@ namespace osu.Game
                     return true;
                 case GlobalAction.ToggleGameplayMouseButtons:
                     LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
+                    return true;
+                case GlobalAction.Play:
+                    if (musicController.isPaused())
+                        notification.Display(@"Play", FontAwesome.fa_play);
+                    else
+                        notification.Display(@"Restart", FontAwesome.fa_refresh);
+                    musicController.reset();
+                    return true;
+                case GlobalAction.Pause:
+                    musicController.play();
+                    if (musicController.isPaused())
+                        notification.Display(@"Pause", FontAwesome.fa_pause);
+                    else
+                        notification.Display(@"Play", FontAwesome.fa_play);
+                    return true;
+                case GlobalAction.Next:
+                    musicController.next();
+                    notification.Display(@"Next", FontAwesome.fa_step_forward);
+                    return true;
+                case GlobalAction.Previous:
+                    musicController.prev();
+                    notification.Display(@"Previous", FontAwesome.fa_step_backward);
                     return true;
             }
 
