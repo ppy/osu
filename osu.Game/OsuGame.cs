@@ -566,25 +566,25 @@ namespace osu.Game
                     LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
                     return true;
                 case GlobalAction.Play:
-                    if (musicController.isPaused())
+                    if (musicController.IsPaused())
                         notification.Display(@"Play", FontAwesome.fa_play);
                     else
                         notification.Display(@"Restart", FontAwesome.fa_refresh);
-                    musicController.reset();
+                    musicController.Reset();
                     return true;
                 case GlobalAction.Pause:
-                    musicController.play();
-                    if (musicController.isPaused())
+                    musicController.Play();
+                    if (musicController.IsPaused())
                         notification.Display(@"Pause", FontAwesome.fa_pause);
                     else
                         notification.Display(@"Play", FontAwesome.fa_play);
                     return true;
                 case GlobalAction.Next:
-                    musicController.next();
+                    musicController.Next();
                     notification.Display(@"Next", FontAwesome.fa_step_forward);
                     return true;
                 case GlobalAction.Previous:
-                    musicController.prev();
+                    musicController.Prev();
                     notification.Display(@"Previous", FontAwesome.fa_step_backward);
                     return true;
             }

@@ -1,25 +1,10 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Configuration.Tracking;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Graphics.Transforms;
-using osu.Framework.Threading;
-using osu.Game.Configuration;
 using osu.Game.Graphics.Sprites;
 
-namespace osu.Game.Overlays
+namespace osu.Game.Overlays.Music
 {
     public class MusicNotificationDisplay : Container
     {
@@ -28,8 +13,8 @@ namespace osu.Game.Overlays
         public override bool HandleKeyboardInput => false;
         public override bool HandleMouseInput => false;
 
-        private readonly SpriteText text;
-        private readonly SpriteIcon icon;
+        private readonly SpriteText notificationText;
+        private readonly SpriteIcon notificationIcon;
 
         private const float height = 52;
         private const float height_contracted = height * 0.9f;
@@ -85,12 +70,12 @@ namespace osu.Game.Overlays
             };
         }
 
-        public void Display(string _text, FontAwesome _icon)
+        public void Display(string text, FontAwesome icon)
         {
             Schedule(() =>
             {
-                text.Text = _text;
-                icon.Icon = _icon;
+                notificationText.Text = _text;
+                notificationIcon.Icon = _icon;
 
                 DisplayTemporarily(box);
             });

@@ -146,7 +146,7 @@ namespace osu.Game.Overlays
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Action = prev,
+                                                    Action = Prev,
                                                     Icon = FontAwesome.fa_step_backward,
                                                 },
                                                 playButton = new MusicIconButton
@@ -155,14 +155,14 @@ namespace osu.Game.Overlays
                                                     Origin = Anchor.Centre,
                                                     Scale = new Vector2(1.4f),
                                                     IconScale = new Vector2(1.4f),
-                                                    Action = play,
+                                                    Action = Play,
                                                     Icon = FontAwesome.fa_play_circle_o,
                                                 },
                                                 nextButton = new MusicIconButton
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Action = () => next(),
+                                                    Action = () => Next(),
                                                     Icon = FontAwesome.fa_step_forward,
                                                 },
                                             }
@@ -257,7 +257,7 @@ namespace osu.Game.Overlays
                 playButton.Icon = FontAwesome.fa_play_circle_o;
         }
 
-        public void play()
+        public void Play()
         {
             var track = current?.Track;
 
@@ -274,7 +274,7 @@ namespace osu.Game.Overlays
                 track.Start();
         }
 
-        public void reset()
+        public void Reset()
         {
             var track = current?.Track;
 
@@ -287,7 +287,7 @@ namespace osu.Game.Overlays
                 track.Start();
         }
 
-        public bool isPaused()
+        public bool IsPaused()
         {
             var track = current?.Track;
 
@@ -297,7 +297,7 @@ namespace osu.Game.Overlays
             return !track.IsRunning;
         }
 
-        public void prev()
+        public void Prev()
         {
             queuedDirection = TransformDirection.Prev;
 
@@ -309,7 +309,7 @@ namespace osu.Game.Overlays
             }
         }
 
-        public void next(bool instant = false)
+        public void Next(bool instant = false)
         {
             if (!instant)
                 queuedDirection = TransformDirection.Next;
