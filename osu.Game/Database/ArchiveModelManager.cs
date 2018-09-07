@@ -166,8 +166,18 @@ namespace osu.Game.Database
                 }
             }
 
-            notification.Text = errors > 0 ? $"Import complete with {errors} errors" : "Import successful!";
+            notification.CompletionText = errors > 0 ? $"Import complete with {errors} errors" : "Import successful!";
+            notification.CompletionClickAction += () =>
+            {
+                if (imported.Count > 0)
+                    PresentCompletedImport(imported);
+                return true;
+            };
             notification.State = ProgressNotificationState.Completed;
+        }
+
+        protected virtual void PresentCompletedImport(IEnumerable<TModel> imported)
+        {
         }
 
         /// <summary>
