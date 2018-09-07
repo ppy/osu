@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Menu
 
                 Vector2 inflation = DrawInfo.MatrixInverse.ExtractScale().Xy;
 
-                ColourInfo colourInfo = DrawInfo.Colour;
+                ColourInfo colourInfo = DrawColourInfo.Colour;
                 colourInfo.ApplyChild(Colour);
 
                 if (AudioData != null)
