@@ -140,11 +140,15 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             foreground.Colour = AccentColour.Opacity(0.5f);
             background.Colour = AccentColour.Opacity(0.7f);
 
+            const float animation_length = 50;
+
+            foreground.ClearTransforms(false, nameof(foreground.Colour));
             if (hitting)
-                foreground.FadeColour(AccentColour.Lighten(0.3f), 50).Then().FadeColour(foreground.Colour, 50).Loop();
-            else
             {
-                foreground.ClearTransforms(false, nameof(foreground.Colour));
+                // wait for the next sync point
+                double synchronisedOffset = animation_length * 2 - Time.Current % (animation_length * 2);
+                using (foreground.BeginDelayedSequence(synchronisedOffset))
+                    foreground.FadeColour(AccentColour.Lighten(0.2f), animation_length).Then().FadeColour(foreground.Colour, animation_length).Loop();
             }
 
             subtractionCache.Invalidate();
