@@ -569,7 +569,7 @@ namespace osu.Game
                 case GlobalAction.Play:
                     try
                     {
-                        Screen temp = (MainMenu)currentScreen;
+                        currentScreen = (MainMenu)currentScreen;
                         if (musicController.IsPaused())
                             notification.Display(@"Play", FontAwesome.fa_play);
                         else
@@ -580,6 +580,7 @@ namespace osu.Game
                 case GlobalAction.Pause:
                     try
                     {
+                        currentScreen = (MainMenu)currentScreen;
                         musicController.Play();
                         if (musicController.IsPaused())
                             notification.Display(@"Pause", FontAwesome.fa_pause);
@@ -590,6 +591,7 @@ namespace osu.Game
                 case GlobalAction.Next:
                     try
                     {
+                        currentScreen = (MainMenu)currentScreen;
                         musicController.Next();
                         notification.Display(@"Next", FontAwesome.fa_step_forward);
                     } catch(InvalidCastException e) {}
@@ -597,6 +599,7 @@ namespace osu.Game
                 case GlobalAction.Previous:
                     try
                     {
+                        currentScreen = (MainMenu)currentScreen;
                         musicController.Prev();
                         notification.Display(@"Previous", FontAwesome.fa_step_backward);
                     } catch(InvalidCastException e) {}
