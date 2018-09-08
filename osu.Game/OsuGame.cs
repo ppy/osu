@@ -38,6 +38,7 @@ using osu.Game.Overlays.Volume;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
+using osu.Game.Overlays.Music;
 
 namespace osu.Game
 {

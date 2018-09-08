@@ -251,7 +251,7 @@ namespace osu.Game.Overlays
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
 
                 if (track.HasCompleted && !track.Looping && !beatmap.Disabled && beatmapSets.Any())
-                    next();
+                    Next();
             }
             else
                 playButton.Icon = FontAwesome.fa_play_circle_o;
@@ -264,7 +264,7 @@ namespace osu.Game.Overlays
             if (track == null)
             {
                 if (!beatmap.Disabled)
-                    next(true);
+                    Next(true);
                 return;
             }
 

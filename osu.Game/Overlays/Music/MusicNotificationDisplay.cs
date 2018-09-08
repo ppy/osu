@@ -1,6 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using OpenTK;
+using OpenTK.Graphics;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Transforms;
+using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
@@ -49,7 +57,7 @@ namespace osu.Game.Overlays.Music
                             Width = 80,
                             RelativeSizeAxes = Axes.Y,
                         },
-                        text = new OsuSpriteText
+                        notificationText = new OsuSpriteText
                         {
                             Padding = new MarginPadding(10),
                             Font = @"Exo2.0-Black",
@@ -58,7 +66,7 @@ namespace osu.Game.Overlays.Music
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                         },
-                        icon = new SpriteIcon
+                        notificationIcon = new SpriteIcon
                         {
                             Size = new Vector2(12),
                             Margin = new MarginPadding(16),
@@ -74,8 +82,8 @@ namespace osu.Game.Overlays.Music
         {
             Schedule(() =>
             {
-                notificationText.Text = _text;
-                notificationIcon.Icon = _icon;
+                notificationText.Text = text;
+                notificationIcon.Icon = icon;
 
                 DisplayTemporarily(box);
             });
