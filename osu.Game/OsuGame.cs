@@ -567,26 +567,39 @@ namespace osu.Game
                     LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
                     return true;
                 case GlobalAction.Play:
-                    if (musicController.IsPaused())
-                        notification.Display(@"Play", FontAwesome.fa_play);
-                    else
-                        notification.Display(@"Restart", FontAwesome.fa_refresh);
-                    musicController.Reset();
+                    try
+                    {
+                        Screen temp = (MainMenu)currentScreen;
+                        if (musicController.IsPaused())
+                            notification.Display(@"Play", FontAwesome.fa_play);
+                        else
+                            notification.Display(@"Restart", FontAwesome.fa_refresh);
+                        musicController.Reset();
+                    } catch(InvalidCastException e) {}
                     return true;
                 case GlobalAction.Pause:
-                    musicController.Play();
-                    if (musicController.IsPaused())
-                        notification.Display(@"Pause", FontAwesome.fa_pause);
-                    else
-                        notification.Display(@"Play", FontAwesome.fa_play);
-                    return true;
+                    try
+                    {
+                        musicController.Play();
+                        if (musicController.IsPaused())
+                            notification.Display(@"Pause", FontAwesome.fa_pause);
+                        else
+                            notification.Display(@"Play", FontAwesome.fa_play);
+                    } catch (InvalidCastException e) { }
+            return true;
                 case GlobalAction.Next:
-                    musicController.Next();
-                    notification.Display(@"Next", FontAwesome.fa_step_forward);
+                    try
+                    {
+                        musicController.Next();
+                        notification.Display(@"Next", FontAwesome.fa_step_forward);
+                    } catch(InvalidCastException e) {}
                     return true;
                 case GlobalAction.Previous:
-                    musicController.Prev();
-                    notification.Display(@"Previous", FontAwesome.fa_step_backward);
+                    try
+                    {
+                        musicController.Prev();
+                        notification.Display(@"Previous", FontAwesome.fa_step_backward);
+                    } catch(InvalidCastException e) {}
                     return true;
             }
 
