@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
 
@@ -28,5 +29,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!IsHit)
                 Position = slider.CurvePositionAt(completionProgress);
         }
+
+        public Action<double> OnShake;
+
+        protected override void Shake(double maximumLength) => OnShake?.Invoke(maximumLength);
     }
 }

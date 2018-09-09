@@ -9,6 +9,8 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Configuration;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -17,12 +19,12 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
-        public HitObjectContainer HitObjects { get; private set; }
+        public HitObjectContainer HitObjectContainer { get; private set; }
 
         /// <summary>
         /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
         /// </summary>
-        public IEnumerable<DrawableHitObject> AllHitObjects => HitObjects?.Objects.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects)) ?? Enumerable.Empty<DrawableHitObject>();
+        public IEnumerable<DrawableHitObject> AllHitObjects => HitObjectContainer?.Objects.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects)) ?? Enumerable.Empty<DrawableHitObject>();
 
         /// <summary>
         /// All <see cref="Playfield"/>s nested inside this <see cref="Playfield"/>.
@@ -51,13 +53,17 @@ namespace osu.Game.Rulesets.UI
             RelativeSizeAxes = Axes.Both;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            HitObjects = CreateHitObjectContainer();
-            HitObjects.RelativeSizeAxes = Axes.Both;
+        private WorkingBeatmap beatmap;
 
-            Add(HitObjects);
+        [BackgroundDependencyLoader]
+        private void load(IBindableBeatmap beatmap)
+        {
+            this.beatmap = beatmap.Value;
+
+            HitObjectContainer = CreateHitObjectContainer();
+            HitObjectContainer.RelativeSizeAxes = Axes.Both;
+
+            Add(HitObjectContainer);
         }
 
         /// <summary>
@@ -69,13 +75,13 @@ namespace osu.Game.Rulesets.UI
         /// Adds a DrawableHitObject to this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to add.</param>
-        public virtual void Add(DrawableHitObject h) => HitObjects.Add(h);
+        public virtual void Add(DrawableHitObject h) => HitObjectContainer.Add(h);
 
         /// <summary>
         /// Remove a DrawableHitObject from this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
-        public virtual void Remove(DrawableHitObject h) => HitObjects.Remove(h);
+        public virtual void Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
@@ -92,5 +98,15 @@ namespace osu.Game.Rulesets.UI
         /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
         /// </summary>
         protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (beatmap != null)
+                foreach (var mod in beatmap.Mods.Value)
+                    if (mod is IUpdatableByPlayfield updatable)
+                        updatable.Update(this);
+        }
     }
 }
