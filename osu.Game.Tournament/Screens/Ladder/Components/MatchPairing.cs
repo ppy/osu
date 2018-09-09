@@ -1,8 +1,10 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using Newtonsoft.Json;
 using osu.Framework.Configuration;
 using osu.Game.Tournament.Components;
+using SixLabors.Primitives;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
@@ -11,13 +13,22 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     /// </summary>
     public class MatchPairing
     {
-        public Bindable<TournamentTeam> Team1 = new Bindable<TournamentTeam>();
-        public Bindable<int?> Team1Score = new Bindable<int?>();
+        public readonly Bindable<TournamentTeam> Team1 = new Bindable<TournamentTeam>();
 
-        public Bindable<TournamentTeam> Team2 = new Bindable<TournamentTeam>();
-        public Bindable<int?> Team2Score = new Bindable<int?>();
+        public readonly Bindable<int?> Team1Score = new Bindable<int?>();
 
-        public Bindable<bool> Completed = new Bindable<bool>();
+        public readonly Bindable<TournamentTeam> Team2 = new Bindable<TournamentTeam>();
+
+        public readonly Bindable<int?> Team2Score = new Bindable<int?>();
+
+        public readonly Bindable<bool> Completed = new Bindable<bool>();
+
+        [JsonProperty]
+        public Point Position;
+
+        public MatchPairing()
+        {
+        }
 
         public MatchPairing(TournamentTeam team1 = null, TournamentTeam team2 = null)
         {

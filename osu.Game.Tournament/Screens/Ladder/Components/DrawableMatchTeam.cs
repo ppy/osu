@@ -2,11 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
@@ -18,8 +22,9 @@ using OpenTK.Input;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
-    public class DrawableMatchTeam : DrawableTournamentTeam
+    public class DrawableMatchTeam : DrawableTournamentTeam, IHasContextMenu
     {
+        private readonly Bindable<TournamentTeam> team;
         private readonly MatchPairing pairing;
         private OsuSpriteText scoreText;
         private Box background;
@@ -31,10 +36,12 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private Color4 colourNormal;
 
         private readonly Func<bool> isWinner;
+        private LadderManager manager;
 
-        public DrawableMatchTeam(TournamentTeam team, MatchPairing pairing)
+        public DrawableMatchTeam(Bindable<TournamentTeam> team, MatchPairing pairing)
             : base(team)
         {
+            this.team = team.GetBoundCopy();
             this.pairing = pairing;
             Size = new Vector2(150, 40);
 
@@ -53,14 +60,16 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 isWinner = () => pairing.Winner == Team;
 
                 completed.BindTo(pairing.Completed);
-                if (team != null)
-                    score.BindTo(team == pairing.Team1.Value ? pairing.Team1Score : pairing.Team2Score);
+                if (team.Value != null)
+                    score.BindTo(team.Value == pairing.Team1.Value ? pairing.Team1Score : pairing.Team2Score);
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuColour colours, LadderManager manager)
         {
+            this.manager = manager;
+
             colourWinner = colours.BlueDarker;
             colourNormal = OsuColour.Gray(0.2f);
 
@@ -117,7 +126,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (Team == null) return true;
+            if (Team == null) return false;
 
             if (args.Button == MouseButton.Left)
             {
@@ -136,7 +145,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     pairing.CancelMatchStart();
             }
 
-            return true;
+            return false;
         }
 
         private void updateWinStyle()
@@ -146,6 +155,28 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             background.FadeColour(winner ? colourWinner : colourNormal, winner ? 500 : 0, Easing.OutQuint);
 
             scoreText.Font = AcronymText.Font = winner ? "Exo2.0-Bold" : "Exo2.0-Regular";
+        }
+
+        public MenuItem[] ContextMenuItems => new[]
+        {
+            new MenuItem("Populate team", () => team.Value = manager.Teams.Random()),
+        };
+    }
+
+    internal static class Extensions
+    {
+        public static T Random<T>(this IEnumerable<T> enumerable)
+        {
+            if (enumerable == null)
+            {
+                throw new ArgumentNullException(nameof(enumerable));
+            }
+
+            // note: creating a Random instance each call may not be correct for you,
+            // consider a thread-safe static instance
+            var r = new Random();
+            var list = enumerable as IList<T> ?? enumerable.ToList();
+            return list.Count == 0 ? default(T) : list[r.Next(0, list.Count)];
         }
     }
 }

@@ -50,7 +50,6 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
 
                             teams.Add(new TournamentTeam
                             {
-                                FlagName = split[0].Trim(),
                                 FullName = split[1].Trim(),
                                 Acronym = split.Length >= 3 ? split[2].Trim() : null
                             });
