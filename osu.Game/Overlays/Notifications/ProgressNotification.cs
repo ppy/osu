@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Notifications
         public Action<Notification> CompletionTarget { get; set; }
 
         /// <summary>
-        /// An action to complete when the completion notification is clicked.
+        /// An action to complete when the completion notification is clicked. Return true to close.
         /// </summary>
         public Func<bool> CompletionClickAction;
 

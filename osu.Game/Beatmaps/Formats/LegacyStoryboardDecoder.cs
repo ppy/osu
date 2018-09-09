@@ -269,9 +269,9 @@ namespace osu.Game.Beatmaps.Formats
                     return Anchor.BottomCentre;
                 case LegacyOrigins.BottomRight:
                     return Anchor.BottomRight;
+                default:
+                    return Anchor.TopLeft;
             }
-
-            throw new InvalidDataException($@"Unknown origin: {value}");
         }
 
         private void handleVariables(string line)

@@ -118,7 +118,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             testOffstream(circleSize, 125, -30);
         }
 
-        private class TestDrawableHitCircle : DrawableHitCircle
+        protected class TestDrawableHitCircle : DrawableHitCircle
         {
             private readonly bool auto;
 
@@ -138,6 +138,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 };
                 ((Container)Parent).Add(drawable);
             }
+
+            public void TriggerJudgement() => UpdateResult(true);
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {

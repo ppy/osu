@@ -31,23 +31,30 @@ namespace osu.Game.Screens.Play.Break
             RelativeSizeAxes = Axes.Both;
             InternalChildren = new Drawable[]
             {
-                leftGlowIcon = new GlowIcon
+                new ParallaxContainer
                 {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.CentreRight,
-                    X = -glow_icon_offscreen_offset,
-                    Icon = Graphics.FontAwesome.fa_chevron_right,
-                    BlurSigma = new Vector2(glow_icon_blur_sigma),
-                    Size = new Vector2(glow_icon_size),
-                },
-                rightGlowIcon = new GlowIcon
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.CentreLeft,
-                    X = glow_icon_offscreen_offset,
-                    Icon = Graphics.FontAwesome.fa_chevron_left,
-                    BlurSigma = new Vector2(glow_icon_blur_sigma),
-                    Size = new Vector2(glow_icon_size),
+                    ParallaxAmount = -0.01f,
+                    Children = new Drawable[]
+                    {
+                        leftGlowIcon = new GlowIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreRight,
+                            X = -glow_icon_offscreen_offset,
+                            Icon = Graphics.FontAwesome.fa_chevron_right,
+                            BlurSigma = new Vector2(glow_icon_blur_sigma),
+                            Size = new Vector2(glow_icon_size),
+                        },
+                        rightGlowIcon = new GlowIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.CentreLeft,
+                            X = glow_icon_offscreen_offset,
+                            Icon = Graphics.FontAwesome.fa_chevron_left,
+                            BlurSigma = new Vector2(glow_icon_blur_sigma),
+                            Size = new Vector2(glow_icon_size),
+                        },
+                    }
                 },
                 new ParallaxContainer
                 {

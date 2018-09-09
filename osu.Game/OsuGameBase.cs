@@ -24,7 +24,6 @@ using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
-using osu.Game.Graphics.Textures;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
@@ -109,10 +108,36 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Host.Storage));
 
-            dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
+            dependencies.Cache(new LargeTextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
 
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
+
+            //this completely overrides the framework default. will need to change once we make a proper FontStore.
+            dependencies.Cache(Fonts = new FontStore(new GlyphStore(Resources, @"Fonts/FontAwesome")));
+
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
+
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-Basic"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-Hangul"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-CJK-Basic"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-CJK-Compatibility"));
+
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-RegularItalic"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBold"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBoldItalic"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Bold"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BoldItalic"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Light"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-LightItalic"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
+
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
 
             runMigrations();
 
@@ -136,33 +161,6 @@ namespace osu.Game
             fileImporters.Add(BeatmapManager);
             fileImporters.Add(ScoreStore);
             fileImporters.Add(SkinManager);
-
-            //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 });
-
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
-
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-Basic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-Hangul"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-CJK-Basic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Noto-CJK-Compatibility"));
-
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Regular"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-RegularItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBold"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-SemiBoldItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Bold"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BoldItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Light"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-LightItalic"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Black"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-BlackItalic"));
-
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera"));
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
 
             var defaultBeatmap = new DummyWorkingBeatmap(this);
             beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
