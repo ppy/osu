@@ -7,8 +7,12 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
+using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.States;
 using osu.Framework.MathUtils;
 using OpenTK;
+using OpenTK.Input;
+using SixLabors.Primitives;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
@@ -45,6 +49,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         public DrawableMatchPairing(MatchPairing pairing)
         {
             Pairing = pairing;
+
+            Position = new Vector2(pairing.Position.X, pairing.Position.Y);
 
             AutoSizeAxes = Axes.Both;
 
@@ -103,14 +109,18 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             var end = getCenteredVector(progression.ScreenSpaceDrawQuad.TopLeft, progression.ScreenSpaceDrawQuad.BottomLeft);
 
             bool progressionAbove = progression.ScreenSpaceDrawQuad.TopLeft.Y < ScreenSpaceDrawQuad.TopLeft.Y;
+            bool progressionToRight = progression.ScreenSpaceDrawQuad.TopLeft.X > ScreenSpaceDrawQuad.TopLeft.X;
 
             if (!Precision.AlmostEquals(progressionStart, start) || !Precision.AlmostEquals(progressionEnd, end))
             {
                 progressionStart = start;
                 progressionEnd = end;
 
-                path.Origin = progressionAbove ? Anchor.BottomLeft : Anchor.TopLeft;
+                path.Origin = progressionAbove ? Anchor.y2 : Anchor.y0;
                 path.Y = progressionAbove ? line_width : -line_width;
+
+                path.Origin |= progressionToRight ? Anchor.x0 : Anchor.x2;
+                //path.X = progressionToRight ? line_width : -line_width;
 
                 Vector2 startPosition = path.ToLocalSpace(start) + new Vector2(padding, 0);
                 Vector2 endPosition = path.ToLocalSpace(end) + new Vector2(-padding, 0);
@@ -129,6 +139,12 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             var destinationForWinner = progressionAbove ? progression.Pairing.Team2 : progression.Pairing.Team1;
 
             destinationForWinner.Value = Pairing.Winner;
+        }
+
+        protected override void UpdateAfterAutoSize()
+        {
+            base.UpdateAfterAutoSize();
+            updateProgression();
         }
 
         private void updateWinConditions()
@@ -162,6 +178,21 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             SchedulerAfterChildren.Add(() => Scheduler.Add(updateProgression));
             updateWinConditions();
+        }
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => args.Button == MouseButton.Left;
+
+        protected override bool OnDragStart(InputState state) => true;
+
+        protected override bool OnDrag(InputState state)
+        {
+            if (base.OnDrag(state)) return true;
+
+            this.MoveToOffset(state.Mouse.Delta);
+
+            var pos = Position;
+            Pairing.Position = new Point((int)pos.X, (int)pos.Y);
+            return true;
         }
     }
 }

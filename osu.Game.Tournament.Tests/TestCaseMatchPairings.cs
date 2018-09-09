@@ -28,8 +28,8 @@ namespace osu.Game.Tournament.Tests
 
         public TestCaseMatchPairings()
         {
-            FillFlowContainer<DrawableMatchPairing> level1;
-            FillFlowContainer<DrawableMatchPairing> level2;
+            Container<DrawableMatchPairing> level1;
+            Container<DrawableMatchPairing> level2;
 
             var pairing1 = new MatchPairing(
                 new TournamentTeam { FlagName = "AU", FullName = "Australia", },
@@ -47,16 +47,14 @@ namespace osu.Game.Tournament.Tests
                 }
             );
 
-            Child = new FillFlowContainer
+            Child = new Container
             {
                 AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
                 Children = new Drawable[]
                 {
-                    level1 = new FillFlowContainer<DrawableMatchPairing>
+                    level1 = new Container<DrawableMatchPairing>
                     {
                         AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
                         Children = new[]
                         {
                             new DrawableMatchPairing(pairing1),
@@ -64,10 +62,9 @@ namespace osu.Game.Tournament.Tests
                             new DrawableMatchPairing(new MatchPairing()),
                         }
                     },
-                    level2 = new FillFlowContainer<DrawableMatchPairing>
+                    level2 = new Container<DrawableMatchPairing>
                     {
                         AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
                         Margin = new MarginPadding(20),
                         Children = new[]
                         {
