@@ -21,7 +21,6 @@ namespace osu.Game.Graphics.UserInterface
 
         public PercentageCounter()
         {
-            DisplayedCountSpriteText.FixedWidth = true;
             Current.Value = DisplayedCount = 1.0f;
         }
 

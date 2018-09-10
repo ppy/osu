@@ -391,9 +391,17 @@ namespace osu.Game.Screens.Ranking
 
             public SlowScoreCounter(uint leading = 0) : base(leading)
             {
-                DisplayedCountSpriteText.Shadow = false;
-                DisplayedCountSpriteText.Font = @"Venera-Light";
                 UseCommaSeparator = true;
+            }
+
+            protected override SpriteText CreateDisplayedCountText()
+            {
+                var text = base.CreateDisplayedCountText();
+
+                text.Shadow = false;
+                text.Font = @"Venera-Light";
+
+                return text;
             }
         }
     }

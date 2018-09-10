@@ -90,7 +90,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Font = @"Venera",
                     RelativePositionAxes = Axes.X,
                     X = 0.75f,
-                    FixedWidth = true,
                 },
                 new OsuSpriteText
                 {

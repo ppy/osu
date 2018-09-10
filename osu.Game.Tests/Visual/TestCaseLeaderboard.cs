@@ -23,6 +23,7 @@ namespace osu.Game.Tests.Visual
             typeof(Placeholder),
             typeof(MessagePlaceholder),
             typeof(RetrievalFailurePlaceholder),
+            typeof(LeaderboardScore)
         };
 
         private RulesetStore rulesets;
