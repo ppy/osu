@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
+using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -175,6 +176,6 @@ namespace osu.Game.Graphics.UserInterface
             this.TransformTo(nameof(DisplayedCount), newValue, rollingTotalDuration, RollingEasing);
         }
 
-        protected virtual SpriteText CreateDisplayedCountText() => new ScoreText { Font = @"Venera" };
+        protected virtual SpriteText CreateDisplayedCountText() => new OsuSpriteText { Font = @"Venera" };
     }
 }

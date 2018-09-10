@@ -14,7 +14,6 @@ using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Users;
@@ -283,7 +282,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                         Size = new Vector2(3f),
                         Children = new[]
                         {
-                            new ScoreText
+                            new OsuSpriteText
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
@@ -296,7 +295,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             },
                         },
                     },
-                    new ScoreText
+                    new OsuSpriteText
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
