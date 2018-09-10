@@ -29,6 +29,7 @@ namespace osu.Game.Screens.Ranking
 {
     public class ResultsPageScore : ResultsPage
     {
+        private Container scoreContainer;
         private ScoreCounter scoreCounter;
 
         public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap) { }
@@ -76,7 +77,7 @@ namespace osu.Game.Screens.Ranking
                             Size = new Vector2(150, 60),
                             Margin = new MarginPadding(20),
                         },
-                        new Container
+                        scoreContainer = new Container
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -92,8 +93,8 @@ namespace osu.Game.Screens.Ranking
                                 },
                                 scoreCounter = new SlowScoreCounter(6)
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
                                     Colour = colours.PinkDarker,
                                     Y = 10,
                                     TextSize = 56,
@@ -183,6 +184,13 @@ namespace osu.Game.Screens.Ranking
                      .FadeIn(300 + delay, Easing.Out);
                 }
             });
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            scoreCounter.Scale = new Vector2(Math.Min(1f, (scoreContainer.DrawWidth - 20) / scoreCounter.DrawWidth));
         }
 
         private class DrawableScoreStatistic : Container
