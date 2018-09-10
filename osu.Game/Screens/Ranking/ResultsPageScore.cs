@@ -368,7 +368,7 @@ namespace osu.Game.Screens.Ranking
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(LargeTextureStore textures)
             {
                 if (!string.IsNullOrEmpty(user.CoverUrl))
                     cover.Texture = textures.Get(user.CoverUrl);
