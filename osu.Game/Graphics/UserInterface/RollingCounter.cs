@@ -5,7 +5,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Game.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
 using OpenTK.Graphics;
@@ -19,8 +18,6 @@ namespace osu.Game.Graphics.UserInterface
         /// The current value.
         /// </summary>
         public Bindable<T> Current = new Bindable<T>();
-
-        protected SpriteText DisplayedCountSpriteText;
 
         /// <summary>
         /// If true, the roll-up duration will be proportional to change in value.
@@ -55,7 +52,7 @@ namespace osu.Game.Graphics.UserInterface
                 if (EqualityComparer<T>.Default.Equals(displayedCount, value))
                     return;
                 displayedCount = value;
-                DisplayedCountSpriteText.Text = FormatCount(value);
+                displayedCountSpriteText.Text = FormatCount(value);
             }
         }
 
@@ -69,15 +66,17 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 textSize = value;
-                DisplayedCountSpriteText.TextSize = value;
+                displayedCountSpriteText.TextSize = value;
             }
         }
 
         public Color4 AccentColour
         {
-            get { return DisplayedCountSpriteText.Colour; }
-            set { DisplayedCountSpriteText.Colour = value; }
+            get { return displayedCountSpriteText.Colour; }
+            set { displayedCountSpriteText.Colour = value; }
         }
+
+        private readonly SpriteText displayedCountSpriteText;
 
         /// <summary>
         /// Skeleton of a numeric counter which value rolls over time.
@@ -86,10 +85,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             Children = new Drawable[]
             {
-                DisplayedCountSpriteText = new OsuSpriteText
-                {
-                    Font = @"Venera"
-                },
+                displayedCountSpriteText = CreateDisplayedCountText()
             };
 
             TextSize = 40;
@@ -107,7 +103,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            DisplayedCountSpriteText.Text = FormatCount(Current);
+            displayedCountSpriteText.Text = FormatCount(Current);
         }
 
         /// <summary>
@@ -178,5 +174,7 @@ namespace osu.Game.Graphics.UserInterface
 
             this.TransformTo(nameof(DisplayedCount), newValue, rollingTotalDuration, RollingEasing);
         }
+
+        protected virtual SpriteText CreateDisplayedCountText() => new ScoreText { Font = @"Venera" };
     }
 }
