@@ -79,7 +79,7 @@ namespace osu.Game.Overlays
         {
             Show();
 
-            if (user.Id == Header?.User.Id)
+            if (user.Id == Header?.User?.Id)
                 return;
 
             userReq?.Cancel();
