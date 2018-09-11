@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.IO.File;
@@ -129,7 +130,6 @@ namespace osu.Game.Database
             List<TModel> imported = new List<TModel>();
 
             int current = 0;
-            int errors = 0;
             foreach (string path in paths)
             {
                 if (notification.State == ProgressNotificationState.Cancelled)
@@ -162,12 +162,29 @@ namespace osu.Game.Database
                 {
                     e = e.InnerException ?? e;
                     Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
-                    errors++;
                 }
             }
 
-            notification.Text = errors > 0 ? $"Import complete with {errors} errors" : "Import successful!";
-            notification.State = ProgressNotificationState.Completed;
+            if (imported.Count == 0)
+            {
+                notification.Text = "Import failed!";
+                notification.State = ProgressNotificationState.Cancelled;
+            }
+            else
+            {
+                notification.CompletionText = $"Imported {current} {typeof(TModel).Name.Replace("Info", "").ToLower()}s!";
+                notification.CompletionClickAction += () =>
+                {
+                    if (imported.Count > 0)
+                        PresentCompletedImport(imported);
+                    return true;
+                };
+                notification.State = ProgressNotificationState.Completed;
+            }
+        }
+
+        protected virtual void PresentCompletedImport(IEnumerable<TModel> imported)
+        {
         }
 
         /// <summary>
@@ -283,7 +300,7 @@ namespace osu.Game.Database
             var notification = new ProgressNotification
             {
                 Progress = 0,
-                CompletionText = "Deleted all beatmaps!",
+                CompletionText = $"Deleted all {typeof(TModel).Name.Replace("Info", "").ToLower()}s!",
                 State = ProgressNotificationState.Active,
             };
 
@@ -384,6 +401,41 @@ namespace osu.Game.Database
 
             return fileInfos;
         }
+
+        #region osu-stable import
+
+        /// <summary>
+        /// Set a storage with access to an osu-stable install for import purposes.
+        /// </summary>
+        public Func<Storage> GetStableStorage { private get; set; }
+
+        /// <summary>
+        /// Denotes whether an osu-stable installation is present to perform automated imports from.
+        /// </summary>
+        public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
+
+        /// <summary>
+        /// The relative path from osu-stable's data directory to import items from.
+        /// </summary>
+        protected virtual string ImportFromStablePath => null;
+
+        /// <summary>
+        /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
+        /// </summary>
+        public Task ImportFromStableAsync()
+        {
+            var stable = GetStableStorage?.Invoke();
+
+            if (stable == null)
+            {
+                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
+                return Task.CompletedTask;
+            }
+
+            return Task.Factory.StartNew(() => Import(stable.GetDirectories(ImportFromStablePath).Select(f => stable.GetFullPath(f)).ToArray()), TaskCreationOptions.LongRunning);
+        }
+
+        #endregion
 
         /// <summary>
         /// Create a barebones model from the provided archive.
