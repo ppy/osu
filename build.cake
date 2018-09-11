@@ -32,7 +32,7 @@ Task("Test")
     DotNetCoreTest(testProject.FullPath, new DotNetCoreTestSettings {
         Framework = framework,
         Configuration = configuration,
-        Logger = $"trx;LogFileName={testProject.GetFilename()}.trx",
+        Logger = AppVeyor.IsRunningOnAppVeyor ? "Appveyor" : $"trx;LogFileName={testProject.GetFilename()}.trx",
         ResultsDirectory = "./TestResults/"
     });
 });
