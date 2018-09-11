@@ -30,7 +30,7 @@ namespace osu.Game.Overlays.Profile.Sections.Recent
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(LargeTextureStore textures)
         {
             sprite.Texture = textures.Get(url);
         }

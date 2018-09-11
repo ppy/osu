@@ -96,8 +96,7 @@ namespace osu.Game.Overlays
             base.LoadComplete();
 
             StateChanged += _ => updateProcessingMode();
-            OverlayActivationMode.ValueChanged += _ => updateProcessingMode();
-            OverlayActivationMode.TriggerChange();
+            OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
 
         private int totalCount => sections.Select(c => c.DisplayedCount).Sum();

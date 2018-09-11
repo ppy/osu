@@ -40,6 +40,8 @@ namespace osu.Game.Overlays.Direct
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
 
+        protected virtual bool FadePlayButton => true;
+
         protected override Container<Drawable> Content => content;
 
         protected DirectPanel(BeatmapSetInfo setInfo)
@@ -102,8 +104,6 @@ namespace osu.Game.Overlays.Direct
             beatmaps.ItemAdded += setAdded;
         }
 
-        public override bool DisposeOnDeathRemoval => true;
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -125,7 +125,8 @@ namespace osu.Game.Overlays.Direct
         {
             content.TweenEdgeEffectTo(edgeEffectHovered, hover_transition_time, Easing.OutQuint);
             content.MoveToY(-4, hover_transition_time, Easing.OutQuint);
-            PlayButton.FadeIn(120, Easing.InOutQuint);
+            if (FadePlayButton)
+                PlayButton.FadeIn(120, Easing.InOutQuint);
 
             return base.OnHover(state);
         }
@@ -134,7 +135,7 @@ namespace osu.Game.Overlays.Direct
         {
             content.TweenEdgeEffectTo(edgeEffectNormal, hover_transition_time, Easing.OutQuint);
             content.MoveToY(0, hover_transition_time, Easing.OutQuint);
-            if (!PreviewPlaying)
+            if (FadePlayButton && !PreviewPlaying)
                 PlayButton.FadeOut(120, Easing.InOutQuint);
 
             base.OnHoverLost(state);
@@ -184,7 +185,7 @@ namespace osu.Game.Overlays.Direct
             base.LoadComplete();
             this.FadeInFromZero(200, Easing.Out);
 
-            PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered ? 1 : 0, 120, Easing.InOutQuint);
+            PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered || !FadePlayButton ? 1 : 0, 120, Easing.InOutQuint);
             PreviewPlaying.ValueChanged += newValue => PreviewBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
         }
 

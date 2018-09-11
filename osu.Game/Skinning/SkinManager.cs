@@ -26,16 +26,24 @@ namespace osu.Game.Skinning
 
         public override string[] HandledExtensions => new[] { ".osk" };
 
+        protected override string ImportFromStablePath => "Skins";
+
         /// <summary>
-        /// Returns a list of all usable <see cref="SkinInfo"/>s.
+        /// Returns a list of all usable <see cref="SkinInfo"/>s. Includes the special default skin plus all skins from <see cref="GetAllUserSkins"/>.
         /// </summary>
         /// <returns>A list of available <see cref="SkinInfo"/>.</returns>
         public List<SkinInfo> GetAllUsableSkins()
         {
-            var userSkins = ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
+            var userSkins = GetAllUserSkins();
             userSkins.Insert(0, SkinInfo.Default);
             return userSkins;
         }
+
+        /// <summary>
+        /// Returns a list of all usable <see cref="SkinInfo"/>s that have been loaded by the user.
+        /// </summary>
+        /// <returns>A list of available <see cref="SkinInfo"/>.</returns>
+        public List<SkinInfo> GetAllUserSkins() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo
         {
@@ -85,6 +93,13 @@ namespace osu.Game.Skinning
         {
             this.audio = audio;
 
+            ItemRemoved += removedInfo =>
+            {
+                // check the removed skin is not the current user choice. if it is, switch back to default.
+                if (removedInfo.ID == CurrentSkinInfo.Value.ID)
+                    CurrentSkinInfo.Value = SkinInfo.Default;
+            };
+
             CurrentSkinInfo.ValueChanged += info => CurrentSkin.Value = GetSkin(info);
             CurrentSkin.ValueChanged += skin =>
             {
@@ -93,16 +108,6 @@ namespace osu.Game.Skinning
 
                 SourceChanged?.Invoke();
             };
-
-            // migrate older imports which didn't have access to skin.ini
-            using (ContextFactory.GetForWrite())
-            {
-                foreach (var skinInfo in ModelStore.ConsumableItems.Where(s => s.Name.EndsWith(".osk")))
-                {
-                    populate(skinInfo);
-                    Update(skinInfo);
-                }
-            }
         }
 
         /// <summary>

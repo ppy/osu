@@ -12,6 +12,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
 {
     public class PaginatedMostPlayedBeatmapContainer : PaginatedContainer
     {
+        private GetUserMostPlayedBeatmapsRequest request;
+
         public PaginatedMostPlayedBeatmapContainer(Bindable<User> user)
             :base(user, "Most Played Beatmaps", "No records. :(")
         {
@@ -24,9 +26,8 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
             base.ShowMore();
 
-            var req = new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++ * ItemsPerPage);
-
-            req.Success += beatmaps =>
+            request = new GetUserMostPlayedBeatmapsRequest(User.Value.Id, VisiblePages++ * ItemsPerPage);
+            request.Success += beatmaps => Schedule(() =>
             {
                 ShowMoreButton.FadeTo(beatmaps.Count == ItemsPerPage ? 1 : 0);
                 ShowMoreLoading.Hide();
@@ -43,9 +44,16 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 {
                     ItemsContainer.Add(new DrawableMostPlayedRow(beatmap.GetBeatmapInfo(Rulesets), beatmap.PlayCount));
                 }
-            };
+            });
 
-            Api.Queue(req);
+            Api.Queue(request);
+        }
+
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            request?.Cancel();
         }
     }
 }

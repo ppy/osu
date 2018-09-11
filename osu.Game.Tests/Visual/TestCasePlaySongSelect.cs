@@ -8,11 +8,15 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Rulesets.Taiko;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Select.Carousel;
 using osu.Game.Screens.Select.Filter;
@@ -28,6 +32,10 @@ namespace osu.Game.Tests.Visual
 
         private WorkingBeatmap defaultBeatmap;
         private DatabaseContextFactory factory;
+
+        [Cached]
+        [Cached(Type = typeof(IBindable<IEnumerable<Mod>>))]
+        private readonly Bindable<IEnumerable<Mod>> selectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -49,6 +57,8 @@ namespace osu.Game.Tests.Visual
 
         private class TestSongSelect : PlaySongSelect
         {
+            public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
+
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
             public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
             public new BeatmapCarousel Carousel => base.Carousel;
@@ -121,7 +131,7 @@ namespace osu.Game.Tests.Visual
 
         [Test]
         [Ignore("needs fixing")]
-        public void ImportUnderDifferentRuleset()
+        public void TestImportUnderDifferentRuleset()
         {
             changeRuleset(2);
             importForRuleset(0);
@@ -129,7 +139,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [Test]
-        public void ImportUnderCurrentRuleset()
+        public void TestImportUnderCurrentRuleset()
         {
             changeRuleset(2);
             importForRuleset(2);
@@ -143,10 +153,41 @@ namespace osu.Game.Tests.Visual
             AddUntilStep(() => songSelect.Carousel.SelectedBeatmap == null, "no selection");
         }
 
+        [Test]
+        public void TestRulesetChangeResetsMods()
+        {
+            changeRuleset(0);
+
+            changeMods(new OsuModHardRock());
+
+            int actionIndex = 0;
+            int modChangeIndex = 0;
+            int rulesetChangeIndex = 0;
+
+            AddStep("change ruleset", () =>
+            {
+                songSelect.CurrentBeatmap.Mods.ValueChanged += onModChange;
+                songSelect.Ruleset.ValueChanged += onRulesetChange;
+
+                Ruleset.Value = new TaikoRuleset().RulesetInfo;
+
+                songSelect.CurrentBeatmap.Mods.ValueChanged -= onModChange;
+                songSelect.Ruleset.ValueChanged -= onRulesetChange;
+            });
+
+            AddAssert("mods changed before ruleset", () => modChangeIndex < rulesetChangeIndex);
+            AddAssert("empty mods", () => !selectedMods.Value.Any());
+
+            void onModChange(IEnumerable<Mod> mods) => modChangeIndex = actionIndex++;
+            void onRulesetChange(RulesetInfo ruleset) => rulesetChangeIndex = actionIndex--;
+        }
+
         private void importForRuleset(int id) => AddStep($"import test map for ruleset {id}", () => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())));
 
         private static int importId;
         private int getImportId() => ++importId;
+
+        private void changeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.ShortenedName))}", () => selectedMods.Value = mods);
 
         private void changeRuleset(int id) => AddStep($"change ruleset to {id}", () => Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == id));
 

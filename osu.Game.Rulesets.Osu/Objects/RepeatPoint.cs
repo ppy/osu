@@ -4,6 +4,8 @@
 using System;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -24,5 +26,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             if (RepeatIndex > 0)
                 TimePreempt = Math.Min(SpanDuration * 2, TimePreempt);
         }
+
+        public override Judgement CreateJudgement() => new OsuJudgement();
     }
 }
