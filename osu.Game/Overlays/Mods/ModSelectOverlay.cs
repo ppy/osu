@@ -27,6 +27,11 @@ namespace osu.Game.Overlays.Mods
 {
     public class ModSelectOverlay : WaveOverlayContainer
     {
+        /// <summary>
+        /// How much this container should overflow the sides of the screen to account for parallax shifting.
+        /// </summary>
+        private const float overflow_padding = 50;
+
         private const float content_width = 0.8f;
 
         protected Color4 LowMultiplierColour, HighMultiplierColour;
@@ -39,9 +44,39 @@ namespace osu.Game.Overlays.Mods
 
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
-        public readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>();
+        protected readonly Bindable<IEnumerable<Mod>> SelectedMods = new Bindable<IEnumerable<Mod>>(new Mod[] { });
 
-        public readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        protected readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset, AudioManager audio, Bindable<IEnumerable<Mod>> selectedMods)
+        {
+            LowMultiplierColour = colours.Red;
+            HighMultiplierColour = colours.Green;
+            UnrankedLabel.Colour = colours.Blue;
+
+            Ruleset.BindTo(ruleset);
+            if (selectedMods != null) SelectedMods.BindTo(selectedMods);
+
+            sampleOn = audio.Sample.Get(@"UI/check-on");
+            sampleOff = audio.Sample.Get(@"UI/check-off");
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Ruleset.BindValueChanged(rulesetChanged, true);
+            SelectedMods.BindValueChanged(selectedModsChanged, true);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            Ruleset.UnbindAll();
+            SelectedMods.UnbindAll();
+        }
 
         private void rulesetChanged(RulesetInfo newRuleset)
         {
@@ -51,31 +86,14 @@ namespace osu.Game.Overlays.Mods
 
             foreach (ModSection section in ModSectionsContainer.Children)
                 section.Mods = instance.GetModsFor(section.ModType);
+
+            // attempt to re-select any already selected mods.
+            // this may be the first time we are receiving the ruleset, in which case they will still match.
+            selectedModsChanged(SelectedMods.Value);
+
+            // write the mods back to the SelectedMods bindable in the case a change was not applicable.
+            // this generally isn't required as the previous line will perform deselection; just here for safety.
             refreshSelectedMods();
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours, IBindable<RulesetInfo> ruleset, AudioManager audio)
-        {
-            SelectedMods.ValueChanged += selectedModsChanged;
-
-            LowMultiplierColour = colours.Red;
-            HighMultiplierColour = colours.Green;
-            UnrankedLabel.Colour = colours.Blue;
-
-            Ruleset.BindTo(ruleset);
-            Ruleset.BindValueChanged(rulesetChanged, true);
-
-            sampleOn = audio.Sample.Get(@"UI/check-on");
-            sampleOff = audio.Sample.Get(@"UI/check-off");
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            Ruleset.UnbindAll();
-            SelectedMods.UnbindAll();
         }
 
         private void selectedModsChanged(IEnumerable<Mod> obj)
@@ -176,10 +194,7 @@ namespace osu.Game.Overlays.Mods
             refreshSelectedMods();
         }
 
-        private void refreshSelectedMods()
-        {
-            SelectedMods.Value = ModSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
-        }
+        private void refreshSelectedMods() => SelectedMods.Value = ModSectionsContainer.Children.SelectMany(s => s.SelectedMods).ToArray();
 
         public ModSelectOverlay()
         {
@@ -189,6 +204,11 @@ namespace osu.Game.Overlays.Mods
             Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
             Height = 510;
+            Padding = new MarginPadding
+            {
+                Left = -overflow_padding,
+                Right = -overflow_padding
+            };
 
             Children = new Drawable[]
             {
@@ -248,6 +268,11 @@ namespace osu.Game.Overlays.Mods
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical,
                                         Width = content_width,
+                                        Padding = new MarginPadding
+                                        {
+                                            Left = overflow_padding,
+                                            Right = overflow_padding
+                                        },
                                         Children = new Drawable[]
                                         {
                                             new OsuSpriteText
@@ -285,7 +310,12 @@ namespace osu.Game.Overlays.Mods
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Both,
-                                Padding = new MarginPadding { Vertical = 10 },
+                                Padding = new MarginPadding
+                                {
+                                    Vertical = 10,
+                                    Left = overflow_padding,
+                                    Right = overflow_padding
+                                },
                                 Child = ModSectionsContainer = new FillFlowContainer<ModSection>
                                 {
                                     Origin = Anchor.TopCentre,
@@ -331,7 +361,9 @@ namespace osu.Game.Overlays.Mods
                                         Direction = FillDirection.Horizontal,
                                         Padding = new MarginPadding
                                         {
-                                            Vertical = 15
+                                            Vertical = 15,
+                                            Left = overflow_padding,
+                                            Right = overflow_padding
                                         },
                                         Children = new Drawable[]
                                         {

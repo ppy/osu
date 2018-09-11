@@ -197,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 if (Shared.VertexBuffer == null)
                     Shared.VertexBuffer = new QuadVertexBuffer<TexturedTrailVertex>(max_sprites, BufferUsageHint.DynamicDraw);
 
-                Shader.GetUniform<float>("g_FadeClock").Value = Time;
+                Shader.GetUniform<float>("g_FadeClock").UpdateValue(ref Time);
 
                 int updateStart = -1, updateEnd = 0;
                 for (int i = 0; i < Parts.Length; ++i)
@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                         Texture.DrawQuad(
                             new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
-                            DrawInfo.Colour,
+                            DrawColourInfo.Colour,
                             null,
                             v => Shared.VertexBuffer.Vertices[end++] = new TexturedTrailVertex
                             {

@@ -8,10 +8,10 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Game.Storyboards;
 using osu.Framework.IO.File;
 using System.IO;
+using System.Threading;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
@@ -38,12 +38,26 @@ namespace osu.Game.Beatmaps
 
             Mods.ValueChanged += mods => applyRateAdjustments();
 
-            beatmap = new AsyncLazy<IBeatmap>(populateBeatmap);
-            background = new AsyncLazy<Texture>(populateBackground, b => b == null || !b.IsDisposed);
-            track = new AsyncLazy<Track>(populateTrack);
-            waveform = new AsyncLazy<Waveform>(populateWaveform);
-            storyboard = new AsyncLazy<Storyboard>(populateStoryboard);
-            skin = new AsyncLazy<Skin>(populateSkin);
+            beatmap = new RecyclableLazy<IBeatmap>(() =>
+            {
+                var b = GetBeatmap() ?? new Beatmap();
+                // use the database-backed info.
+                b.BeatmapInfo = BeatmapInfo;
+                return b;
+            });
+
+            track = new RecyclableLazy<Track>(() =>
+            {
+                // we want to ensure that we always have a track, even if it's a fake one.
+                var t = GetTrack() ?? new VirtualBeatmapTrack(Beatmap);
+                applyRateAdjustments(t);
+                return t;
+            });
+
+            background = new RecyclableLazy<Texture>(GetBackground, BackgroundStillValid);
+            waveform = new RecyclableLazy<Waveform>(GetWaveform);
+            storyboard = new RecyclableLazy<Storyboard>(GetStoryboard);
+            skin = new RecyclableLazy<Skin>(GetSkin);
         }
 
         /// <summary>
@@ -56,28 +70,6 @@ namespace osu.Game.Beatmaps
             using (var sw = new StreamWriter(path))
                 sw.WriteLine(Beatmap.Serialize());
             return path;
-        }
-
-        protected abstract IBeatmap GetBeatmap();
-        protected abstract Texture GetBackground();
-        protected abstract Track GetTrack();
-        protected virtual Skin GetSkin() => new DefaultSkin();
-        protected virtual Waveform GetWaveform() => new Waveform();
-        protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
-
-        public bool BeatmapLoaded => beatmap.IsResultAvailable;
-        public IBeatmap Beatmap => beatmap.Value.Result;
-        public async Task<IBeatmap> GetBeatmapAsync() => await beatmap.Value;
-        private readonly AsyncLazy<IBeatmap> beatmap;
-
-        private IBeatmap populateBeatmap()
-        {
-            var b = GetBeatmap() ?? new Beatmap();
-
-            // use the database-backed info.
-            b.BeatmapInfo = BeatmapInfo;
-
-            return b;
         }
 
         /// <summary>
@@ -136,62 +128,53 @@ namespace osu.Game.Beatmaps
 
         public override string ToString() => BeatmapInfo.ToString();
 
-        public bool BackgroundLoaded => background.IsResultAvailable;
-        public Texture Background => background.Value.Result;
-        public async Task<Texture> GetBackgroundAsync() => await background.Value;
-        private AsyncLazy<Texture> background;
+        public bool BeatmapLoaded => beatmap.IsResultAvailable;
+        public IBeatmap Beatmap => beatmap.Value;
+        protected abstract IBeatmap GetBeatmap();
+        private readonly RecyclableLazy<IBeatmap> beatmap;
 
-        private Texture populateBackground() => GetBackground();
+        public bool BackgroundLoaded => background.IsResultAvailable;
+        public Texture Background => background.Value;
+        protected virtual bool BackgroundStillValid(Texture b) => b == null || !b.IsDisposed;
+        protected abstract Texture GetBackground();
+        private readonly RecyclableLazy<Texture> background;
 
         public bool TrackLoaded => track.IsResultAvailable;
-        public Track Track => track.Value.Result;
-        public async Task<Track> GetTrackAsync() => await track.Value;
-        private AsyncLazy<Track> track;
-
-        private Track populateTrack()
-        {
-            // we want to ensure that we always have a track, even if it's a fake one.
-            var t = GetTrack() ?? new VirtualBeatmapTrack(Beatmap);
-            applyRateAdjustments(t);
-            return t;
-        }
+        public Track Track => track.Value;
+        protected abstract Track GetTrack();
+        private RecyclableLazy<Track> track;
 
         public bool WaveformLoaded => waveform.IsResultAvailable;
-        public Waveform Waveform => waveform.Value.Result;
-        public async Task<Waveform> GetWaveformAsync() => await waveform.Value;
-        private readonly AsyncLazy<Waveform> waveform;
-
-        private Waveform populateWaveform() => GetWaveform();
+        public Waveform Waveform => waveform.Value;
+        protected virtual Waveform GetWaveform() => new Waveform();
+        private readonly RecyclableLazy<Waveform> waveform;
 
         public bool StoryboardLoaded => storyboard.IsResultAvailable;
-        public Storyboard Storyboard => storyboard.Value.Result;
-        public async Task<Storyboard> GetStoryboardAsync() => await storyboard.Value;
-        private readonly AsyncLazy<Storyboard> storyboard;
-
-        private Storyboard populateStoryboard() => GetStoryboard();
+        public Storyboard Storyboard => storyboard.Value;
+        protected virtual Storyboard GetStoryboard() => new Storyboard { BeatmapInfo = BeatmapInfo };
+        private readonly RecyclableLazy<Storyboard> storyboard;
 
         public bool SkinLoaded => skin.IsResultAvailable;
-        public Skin Skin => skin.Value.Result;
-        public async Task<Skin> GetSkinAsync() => await skin.Value;
-        private readonly AsyncLazy<Skin> skin;
+        public Skin Skin => skin.Value;
+        protected virtual Skin GetSkin() => new DefaultSkin();
+        private readonly RecyclableLazy<Skin> skin;
 
-        private Skin populateSkin() => GetSkin();
-
-        public void TransferTo(WorkingBeatmap other)
+        /// <summary>
+        /// Transfer pieces of a beatmap to a new one, where possible, to save on loading.
+        /// </summary>
+        /// <param name="other">The new beatmap which is being switched to.</param>
+        public virtual void TransferTo(WorkingBeatmap other)
         {
             if (track.IsResultAvailable && Track != null && BeatmapInfo.AudioEquals(other.BeatmapInfo))
                 other.track = track;
-
-            if (background.IsResultAvailable && Background != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
-                other.background = background;
         }
 
         public virtual void Dispose()
         {
-            if (BackgroundLoaded) Background?.Dispose();
-            if (WaveformLoaded) Waveform?.Dispose();
-            if (StoryboardLoaded) Storyboard?.Dispose();
-            if (SkinLoaded) Skin?.Dispose();
+            background.Recycle();
+            waveform.Recycle();
+            storyboard.Recycle();
+            skin.Recycle();
         }
 
         /// <summary>
@@ -210,15 +193,15 @@ namespace osu.Game.Beatmaps
                 mod.ApplyToClock(t);
         }
 
-        public class AsyncLazy<T>
+        public class RecyclableLazy<T>
         {
-            private Lazy<Task<T>> lazy;
+            private Lazy<T> lazy;
             private readonly Func<T> valueFactory;
             private readonly Func<T, bool> stillValidFunction;
 
-            private readonly object initLock = new object();
+            private readonly object fetchLock = new object();
 
-            public AsyncLazy(Func<T> valueFactory, Func<T, bool> stillValidFunction = null)
+            public RecyclableLazy(Func<T> valueFactory, Func<T, bool> stillValidFunction = null)
             {
                 this.valueFactory = valueFactory;
                 this.stillValidFunction = stillValidFunction;
@@ -230,45 +213,28 @@ namespace osu.Game.Beatmaps
             {
                 if (!IsResultAvailable) return;
 
-                (lazy.Value.Result as IDisposable)?.Dispose();
+                (lazy.Value as IDisposable)?.Dispose();
                 recreate();
             }
 
-            public bool IsResultAvailable
+            public bool IsResultAvailable => stillValid;
+
+            public T Value
             {
                 get
                 {
-                    recreateIfInvalid();
-                    return lazy.Value.IsCompleted;
+                    lock (fetchLock)
+                    {
+                        if (!stillValid)
+                            recreate();
+                        return lazy.Value;
+                    }
                 }
             }
 
-            public Task<T> Value
-            {
-                get
-                {
-                    recreateIfInvalid();
-                    return lazy.Value;
-                }
-            }
+            private bool stillValid => lazy.IsValueCreated && (stillValidFunction?.Invoke(lazy.Value) ?? true);
 
-            private void recreateIfInvalid()
-            {
-                lock (initLock)
-                {
-                    if (!lazy.IsValueCreated || !lazy.Value.IsCompleted)
-                        // we have not yet been initialised or haven't run the task.
-                        return;
-
-                    if (stillValidFunction?.Invoke(lazy.Value.Result) ?? true)
-                        // we are still in a valid state.
-                        return;
-
-                    recreate();
-                }
-            }
-
-            private void recreate() => lazy = new Lazy<Task<T>>(() => Task.Run(valueFactory));
+            private void recreate() => lazy = new Lazy<T>(valueFactory, LazyThreadSafetyMode.ExecutionAndPublication);
         }
     }
 }
