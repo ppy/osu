@@ -1,6 +1,6 @@
-#addin "nuget:?package=CodeFileSanity"
-#addin "nuget:?package=JetBrains.ReSharper.CommandLineTools"
-#tool "nuget:?package=NVika.MSBuild"
+#addin "nuget:?package=CodeFileSanity&version=0.0.21"
+#addin "nuget:?package=JetBrains.ReSharper.CommandLineTools&version=2018.2.2"
+#tool "nuget:?package=NVika.MSBuild&version=1.0.1"
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
