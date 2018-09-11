@@ -293,11 +293,13 @@ namespace osu.Game
             // This prevents the cursor from showing until we have a screen with CursorVisible = true
             MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
 
-            // hook up notifications to components.
+            // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => notifications?.Post(n);
-            BeatmapManager.PostNotification = n => notifications?.Post(n);
+            SkinManager.GetStableStorage = GetStorageForStableInstall;
 
+            BeatmapManager.PostNotification = n => notifications?.Post(n);
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
+
             BeatmapManager.PresentBeatmap = PresentBeatmap;
 
             AddRange(new Drawable[]

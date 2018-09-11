@@ -50,12 +50,12 @@ namespace osu.Game.Screens.Select.Carousel
 
             Children = new Drawable[]
             {
-                new DelayedLoadWrapper(
+                new DelayedLoadUnloadWrapper(() =>
                     new PanelBackground(manager.GetWorkingBeatmap(beatmapSet.Beatmaps.FirstOrDefault()))
                     {
                         RelativeSizeAxes = Axes.Both,
                         OnLoadComplete = d => d.FadeInFromZero(1000, Easing.OutQuint),
-                    }, 300
+                    }, 300, 5000
                 ),
                 new FillFlowContainer
                 {
