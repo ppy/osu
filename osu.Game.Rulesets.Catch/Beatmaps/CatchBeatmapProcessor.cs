@@ -74,42 +74,43 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         private void initialiseHyperDash(List<CatchHitObject> objects)
         {
-            // todo: add difficulty adjust.
-            double halfCatcherWidth = CatcherArea.CATCHER_SIZE * (objects.FirstOrDefault()?.Scale ?? 1) / CatchPlayfield.BASE_WIDTH / 2;
+            if (objects.Count == 0)
+                return;
 
+            List<CatchHitObject> objectWithDroplets = new List<CatchHitObject>();
+
+            foreach (var currentObject in objects)
+            {
+                if (currentObject is Fruit)
+                    objectWithDroplets.Add(currentObject);
+                if (currentObject is JuiceStream)
+                    foreach (var currentJuiceElement in currentObject.NestedHitObjects)
+                        if (!(currentJuiceElement is TinyDroplet))
+                            objectWithDroplets.Add((CatchHitObject)currentJuiceElement);
+            }
+
+            double halfCatcherWidth = CatcherArea.CATCHER_SIZE * objectWithDroplets[0].Scale / CatchPlayfield.BASE_WIDTH / 2;
             int lastDirection = 0;
             double lastExcess = halfCatcherWidth;
 
-            int objCount = objects.Count;
-
-            for (int i = 0; i < objCount - 1; i++)
+            for (int i = 0; i < objectWithDroplets.Count - 1; i++)
             {
-                CatchHitObject currentObject = objects[i];
-
-                // not needed?
-                // if (currentObject is TinyDroplet) continue;
-
-                CatchHitObject nextObject = objects[i + 1];
-
-                // while (nextObject is TinyDroplet)
-                // {
-                //     if (++i == objCount - 1) break;
-                //     nextObject = objects[i + 1];
-                // }
+                CatchHitObject currentObject = objectWithDroplets[i];
+                CatchHitObject nextObject = objectWithDroplets[i + 1];
 
                 int thisDirection = nextObject.X > currentObject.X ? 1 : -1;
-                double timeToNext = nextObject.StartTime - ((currentObject as IHasEndTime)?.EndTime ?? currentObject.StartTime) - 4;
+                double timeToNext = nextObject.StartTime - currentObject.StartTime;
                 double distanceToNext = Math.Abs(nextObject.X - currentObject.X) - (lastDirection == thisDirection ? lastExcess : halfCatcherWidth);
-
-                if (timeToNext * CatcherArea.Catcher.BASE_SPEED < distanceToNext)
+                float distanceToHyper = (float)(timeToNext * CatcherArea.Catcher.BASE_SPEED - distanceToNext);
+                if (distanceToHyper < 0)
                 {
                     currentObject.HyperDashTarget = nextObject;
                     lastExcess = halfCatcherWidth;
                 }
                 else
                 {
-                    //currentObject.DistanceToHyperDash = timeToNext - distanceToNext;
-                    lastExcess = MathHelper.Clamp(timeToNext - distanceToNext, 0, halfCatcherWidth);
+                    currentObject.DistanceToHyperDash = distanceToHyper;
+                    lastExcess = MathHelper.Clamp(distanceToHyper, 0, halfCatcherWidth);
                 }
 
                 lastDirection = thisDirection;
