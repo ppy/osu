@@ -84,6 +84,9 @@ namespace osu.Game
 
         public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
 
+        private InputManager inputManager;
+        public double IdleTime => inputManager?.IdleTime ?? 0;
+
         public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         private OsuScreen screenStack;
@@ -113,7 +116,7 @@ namespace osu.Game
 
             forwardLoggedErrorsToNotifications();
 
-            RavenLogger = new RavenLogger(this);
+            RavenLogger = new RavenLogger(this);            
         }
 
         public void ToggleSettings() => settings.ToggleVisibility();
@@ -446,6 +449,7 @@ namespace osu.Game
 
             settings.StateChanged += _ => updateScreenOffset();
             notifications.StateChanged += _ => updateScreenOffset();
+            inputManager = GetContainingInputManager();
         }
 
         private void forwardLoggedErrorsToNotifications()
