@@ -84,8 +84,8 @@ namespace osu.Game
 
         public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
 
-        private InputManager inputManager;
-        public double IdleTime => inputManager?.IdleTime ?? 0;
+        private IdleTracker idleTracker;
+        public double IdleTime => idleTracker?.IdleTime ?? 0;
 
         public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
@@ -116,7 +116,7 @@ namespace osu.Game
 
             forwardLoggedErrorsToNotifications();
 
-            RavenLogger = new RavenLogger(this);            
+            RavenLogger = new RavenLogger(this);
         }
 
         public void ToggleSettings() => settings.ToggleVisibility();
@@ -321,6 +321,7 @@ namespace osu.Game
                 },
                 mainContent = new Container { RelativeSizeAxes = Axes.Both },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
+                idleTracker = new IdleTracker() { RelativeSizeAxes = Axes.Both }
             });
 
             loadComponentSingleFile(screenStack = new Loader(), d =>
@@ -449,7 +450,6 @@ namespace osu.Game
 
             settings.StateChanged += _ => updateScreenOffset();
             notifications.StateChanged += _ => updateScreenOffset();
-            inputManager = GetContainingInputManager();
         }
 
         private void forwardLoggedErrorsToNotifications()
