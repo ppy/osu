@@ -16,6 +16,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public const double OBJECT_RADIUS = 64;
 
         public event Action<Vector2> PositionChanged;
+        public event Action<int> IndexInCurrentComboChanged;
 
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;
@@ -56,7 +57,20 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public int ComboOffset { get; set; }
 
-        public virtual int IndexInCurrentCombo { get; set; }
+        private int indexInCurrentCombo;
+
+        public virtual int IndexInCurrentCombo
+        {
+            get => indexInCurrentCombo;
+            set
+            {
+                if (indexInCurrentCombo == value)
+                    return;
+                indexInCurrentCombo = value;
+
+                IndexInCurrentComboChanged?.Invoke(value);
+            }
+        }
 
         public virtual int ComboIndex { get; set; }
 
