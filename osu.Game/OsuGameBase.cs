@@ -108,7 +108,9 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Host.Storage));
 
-            dependencies.Cache(new LargeTextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
+            var largeStore = new LargeTextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
+            largeStore.AddStore(new TextureLoaderStore(new OnlineStore()));
+            dependencies.Cache(largeStore);
 
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
