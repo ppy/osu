@@ -14,10 +14,10 @@ namespace osu.Game.Beatmaps.Drawables
     {
         private readonly OsuSpriteText statusText;
 
-        private BeatmapSetOnlineStatus status = BeatmapSetOnlineStatus.None;
+        private BeatmapSetOnlineStatus status;
         public BeatmapSetOnlineStatus Status
         {
-            get { return status; }
+            get => status;
             set
             {
                 if (value == status) return;
@@ -49,6 +49,8 @@ namespace osu.Game.Beatmaps.Drawables
                     Padding = textPadding,
                 },
             };
+
+            Status = BeatmapSetOnlineStatus.None;
         }
     }
 }
