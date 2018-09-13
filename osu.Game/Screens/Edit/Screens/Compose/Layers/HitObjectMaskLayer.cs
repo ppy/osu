@@ -49,26 +49,44 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             };
 
             foreach (var obj in composer.HitObjects)
-                addMask(obj);
-        }
-
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
-        {
-            maskContainer.DeselectAll();
-            return true;
+                AddMask(obj);
         }
 
         /// <summary>
         /// Adds a mask for a <see cref="DrawableHitObject"/> which adds movement support.
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create a mask for.</param>
-        private void addMask(DrawableHitObject hitObject)
+        public void AddMask(DrawableHitObject hitObject)
         {
             var mask = composer.CreateMaskFor(hitObject);
             if (mask == null)
                 return;
 
             maskContainer.Add(mask);
+        }
+
+        /// <summary>
+        /// Adds a mask for a <see cref="DrawableHitObject"/> which adds movement support.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create a mask for.</param>
+        public void RemoveMask(DrawableHitObject hitObject)
+        {
+            var mask = composer.CreateMaskFor(hitObject);
+            if (mask == null)
+                return;
+
+            maskContainer.Add(mask);
+        }
+
+        /// <summary>
+        /// Deselects all selected <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        public void DeselectAll() => maskContainer.DeselectAll();
+
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        {
+            maskContainer.DeselectAll();
+            return true;
         }
     }
 }

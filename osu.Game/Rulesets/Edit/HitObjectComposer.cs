@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.Edit
 
         protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
         private readonly List<Container> layerContainers = new List<Container>();
+
+        private HitObjectMaskLayer maskLayer;
         private Container placementLayer;
 
         private EditRulesetContainer rulesetContainer;
@@ -66,7 +68,7 @@ namespace osu.Game.Rulesets.Edit
             };
 
             var layerAboveRuleset = CreateLayerContainer();
-            layerAboveRuleset.Child = new HitObjectMaskLayer();
+            layerAboveRuleset.Child = maskLayer = new HitObjectMaskLayer();
             placementLayer = CreateLayerContainer();
 
             layerContainers.Add(layerBelowRuleset);
@@ -166,7 +168,11 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
-        private void onPlacementFinished(HitObject obj) => rulesetContainer.AddHitObject(obj);
+        private void onPlacementFinished(HitObject obj)
+        {
+            var drawableObject = rulesetContainer.AddHitObject(obj);
+            maskLayer.AddMask(drawableObject);
+        }
 
         protected abstract EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap);
 
