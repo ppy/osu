@@ -4,45 +4,35 @@
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.UI;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuEditRulesetContainer : OsuRulesetContainer, IEditRulesetContainer
+    public class OsuEditRulesetContainer : EditRulesetContainer<OsuHitObject>
     {
         public OsuEditRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
-            : base(ruleset, beatmap)
+            : this(ruleset, new RulesetContainer(ruleset, beatmap))
         {
         }
 
-        protected override Vector2 PlayfieldArea => Vector2.One;
-
-        protected override CursorContainer CreateCursor() => null;
-
-        public void AddObject(HitObject obj)
+        private OsuEditRulesetContainer(Ruleset ruleset, RulesetContainer<OsuHitObject> rulesetContainer)
+            : base(ruleset, rulesetContainer)
         {
-            var osuObject = (OsuHitObject)obj;
+        }
 
-            var insertionIndex = Beatmap.HitObjects.IndexOf(osuObject);
-            if (insertionIndex < 0)
-                insertionIndex = ~insertionIndex;
+        private class RulesetContainer : OsuRulesetContainer
+        {
+            public RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+                : base(ruleset, beatmap)
+            {
+            }
 
-            Beatmap.HitObjects.Insert(insertionIndex, osuObject);
+            protected override Vector2 PlayfieldArea => Vector2.One;
 
-            IBeatmapProcessor processor = new OsuBeatmapProcessor(Beatmap);
-
-            processor.PreProcess();
-            obj.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
-            processor.PostProcess();
-
-            var drawableObject = GetVisualRepresentation(osuObject);
-
-            Playfield.Add(drawableObject);
-            Playfield.PostProcess();
+            protected override CursorContainer CreateCursor() => null;
         }
     }
 }

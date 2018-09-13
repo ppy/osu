@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Tools
         protected override bool OnClick(InputState state)
         {
             FinishPlacement(new HitCircle { Position = Position });
-            return true;
+            return base.OnClick(state);
         }
 
         private class DrawableHitCircle : Objects.Drawables.DrawableHitCircle

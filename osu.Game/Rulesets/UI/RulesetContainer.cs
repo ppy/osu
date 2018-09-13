@@ -334,7 +334,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <param name="h">The HitObject to make drawable.</param>
         /// <returns>The DrawableHitObject.</returns>
-        protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
+        public abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
     }
 
     /// <summary>

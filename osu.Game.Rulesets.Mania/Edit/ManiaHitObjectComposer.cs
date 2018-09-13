@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.Configuration;
@@ -31,7 +30,10 @@ namespace osu.Game.Rulesets.Mania.Edit
             return dependencies;
         }
 
-        protected override RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new ManiaEditRulesetContainer(ruleset, beatmap);
+        protected override EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+        {
+            return null;
+        }
 
         protected override IReadOnlyList<ICompositionTool> CompositionTools { get; }
 

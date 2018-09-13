@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Edit
         private readonly List<Container> layerContainers = new List<Container>();
         private Container placementLayer;
 
-        private RulesetContainer rulesetContainer;
+        private EditRulesetContainer rulesetContainer;
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -166,9 +166,9 @@ namespace osu.Game.Rulesets.Edit
             }
         }
 
-        private void onPlacementFinished(HitObject obj) => (rulesetContainer as IEditRulesetContainer)?.AddObject(obj);
+        private void onPlacementFinished(HitObject obj) => rulesetContainer.AddHitObject(obj);
 
-        protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap);
+        protected abstract EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap);
 
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
 
