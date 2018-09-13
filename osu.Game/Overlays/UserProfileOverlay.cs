@@ -77,7 +77,7 @@ namespace osu.Game.Overlays
 
         public void ShowUser(User user, bool fetchOnline = true)
         {
-            if (user == User.SystemUser) return;
+            if (user == User.SYSTEM_USER) return;
 
             Show();
 

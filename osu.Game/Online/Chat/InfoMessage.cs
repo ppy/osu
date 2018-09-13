@@ -15,7 +15,7 @@ namespace osu.Game.Online.Chat
             Timestamp = DateTimeOffset.Now;
             Content = message;
 
-            Sender = User.SystemUser;
+            Sender = User.SYSTEM_USER;
         }
     }
 }
