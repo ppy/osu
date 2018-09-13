@@ -13,6 +13,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
@@ -29,8 +30,9 @@ namespace osu.Game.Rulesets.Edit
         protected ICompositionTool CurrentTool { get; private set; }
         protected IRulesetConfigManager Config { get; private set; }
 
+        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
         private readonly List<Container> layerContainers = new List<Container>();
-        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private Container placementLayer;
 
         private RulesetContainer rulesetContainer;
 
@@ -44,7 +46,7 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(IBindableBeatmap beatmap, IFrameBasedClock framedClock)
         {
-            this.beatmap.BindTo(beatmap);
+            Beatmap.BindTo(beatmap);
 
             try
             {
@@ -65,9 +67,11 @@ namespace osu.Game.Rulesets.Edit
 
             var layerAboveRuleset = CreateLayerContainer();
             layerAboveRuleset.Child = new HitObjectMaskLayer();
+            placementLayer = CreateLayerContainer();
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
+            layerContainers.Add(placementLayer);
 
             RadioButtonCollection toolboxCollection;
             InternalChild = new GridContainer
@@ -95,7 +99,8 @@ namespace osu.Game.Rulesets.Edit
                             {
                                 layerBelowRuleset,
                                 rulesetContainer,
-                                layerAboveRuleset
+                                layerAboveRuleset,
+                                placementLayer
                             }
                         }
                     },
@@ -144,7 +149,24 @@ namespace osu.Game.Rulesets.Edit
             });
         }
 
-        private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
+        private void setCompositionTool(ICompositionTool tool)
+        {
+            CurrentTool = tool;
+
+            placementLayer.Clear();
+
+            if (tool is HitObjectCompositionTool hitObjectTool)
+            {
+                var visualiser = hitObjectTool.CreatePlacementVisualiser();
+                if (visualiser != null)
+                {
+                    visualiser.PlacementFinished += onPlacementFinished;
+                    placementLayer.Child = visualiser;
+                }
+            }
+        }
+
+        private void onPlacementFinished(HitObject obj) => (rulesetContainer as IEditRulesetContainer)?.AddObject(obj);
 
         protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap);
 

@@ -3,12 +3,16 @@
 
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Beatmaps;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuEditRulesetContainer : OsuRulesetContainer
+    public class OsuEditRulesetContainer : OsuRulesetContainer, IEditRulesetContainer
     {
         public OsuEditRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -18,5 +22,27 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override Vector2 PlayfieldArea => Vector2.One;
 
         protected override CursorContainer CreateCursor() => null;
+
+        public void AddObject(HitObject obj)
+        {
+            var osuObject = (OsuHitObject)obj;
+
+            var insertionIndex = Beatmap.HitObjects.IndexOf(osuObject);
+            if (insertionIndex < 0)
+                insertionIndex = ~insertionIndex;
+
+            Beatmap.HitObjects.Insert(insertionIndex, osuObject);
+
+            IBeatmapProcessor processor = new OsuBeatmapProcessor(Beatmap);
+
+            processor.PreProcess();
+            obj.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
+            processor.PostProcess();
+
+            var drawableObject = GetVisualRepresentation(osuObject);
+
+            Playfield.Add(drawableObject);
+            Playfield.PostProcess();
+        }
     }
 }

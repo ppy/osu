@@ -5,7 +5,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -34,11 +33,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new ManiaEditRulesetContainer(ruleset, beatmap);
 
-        protected override IReadOnlyList<ICompositionTool> CompositionTools => new ICompositionTool[]
-        {
-            new HitObjectCompositionTool<Note>("Note"),
-            new HitObjectCompositionTool<HoldNote>("Hold"),
-        };
+        protected override IReadOnlyList<ICompositionTool> CompositionTools { get; }
 
         public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)
         {
