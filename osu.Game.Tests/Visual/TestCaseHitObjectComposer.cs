@@ -43,13 +43,13 @@ namespace osu.Game.Tests.Visual
                     new HitCircle { Position = new Vector2(344, 148), Scale = 0.5f },
                     new Slider
                     {
-                        Position = new Vector2(128, 256),
+                        Position = new Vector2(128, 264),
                         ControlPoints = new List<Vector2>
                         {
                             Vector2.Zero,
-                            new Vector2(216, 0),
+                            new Vector2(128, 0),
                         },
-                        Distance = 400,
+                        Distance = 128,
                         Velocity = 1,
                         TickDistance = 100,
                         Scale = 0.5f,
