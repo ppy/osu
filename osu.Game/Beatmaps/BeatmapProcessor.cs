@@ -44,6 +44,15 @@ namespace osu.Game.Beatmaps
 
         public virtual void PostProcess()
         {
+            foreach (var hitObject in Beatmap.HitObjects)
+            {
+                var objectComboInfo = (IHasComboInformation)hitObject;
+                foreach (var obj in hitObject.NestedHitObjects.OfType<IHasComboInformation>())
+                {
+                    obj.IndexInCurrentCombo = objectComboInfo.IndexInCurrentCombo;
+                    obj.ComboIndex = objectComboInfo.ComboIndex;
+                }
+            }
         }
     }
 }
