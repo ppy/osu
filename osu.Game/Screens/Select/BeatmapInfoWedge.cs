@@ -127,6 +127,7 @@ namespace osu.Game.Screens.Select
             public OsuSpriteText VersionLabel { get; private set; }
             public OsuSpriteText TitleLabel { get; private set; }
             public OsuSpriteText ArtistLabel { get; private set; }
+            public BeatmapSetOnlineStatusPill StatusPill { get; private set; }
             public FillFlowContainer MapperContainer { get; private set; }
             public FillFlowContainer InfoLabelContainer { get; private set; }
 
@@ -190,7 +191,7 @@ namespace osu.Game.Screens.Select
                     },
                     new FillFlowContainer
                     {
-                        Name = "Top-aligned metadata",
+                        Name = "Topleft-aligned metadata",
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
                         Direction = FillDirection.Vertical,
@@ -204,6 +205,22 @@ namespace osu.Game.Screens.Select
                                 Text = beatmapInfo.Version,
                                 TextSize = 24,
                             },
+                        }
+                    },
+                    new FillFlowContainer
+                    {
+                        Name = "Topright-aligned metadata",
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Direction = FillDirection.Vertical,
+                        Margin = new MarginPadding { Top = 14, Left = 10, Right = 18, Bottom = 20 },
+                        AutoSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            StatusPill = new BeatmapSetOnlineStatusPill(11, new MarginPadding { Horizontal = 8, Vertical = 2 })
+                            {
+                                Status = beatmapInfo.Status,
+                            }
                         }
                     },
                     new FillFlowContainer
