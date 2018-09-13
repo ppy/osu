@@ -74,9 +74,6 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
 
         private void initialiseHyperDash(List<CatchHitObject> objects)
         {
-            if (objects.Count == 0)
-                return;
-
             List<CatchHitObject> objectWithDroplets = new List<CatchHitObject>();
 
             foreach (var currentObject in objects)
@@ -89,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                             objectWithDroplets.Add((CatchHitObject)currentJuiceElement);
             }
 
-            double halfCatcherWidth = CatcherArea.CATCHER_SIZE * objectWithDroplets[0].Scale / CatchPlayfield.BASE_WIDTH / 2;
+            double halfCatcherWidth = CatcherArea.GetCatcherSize(Beatmap.BeatmapInfo.BaseDifficulty) / 2;
             int lastDirection = 0;
             double lastExcess = halfCatcherWidth;
 
