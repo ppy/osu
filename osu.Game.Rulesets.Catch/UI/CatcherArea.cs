@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public static float GetCatcherSize(BeatmapDifficulty difficulty)
         {
-            return (CATCHER_SIZE / CatchPlayfield.BASE_WIDTH) * (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
+            return CATCHER_SIZE / CatchPlayfield.BASE_WIDTH * (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
         }
 
         public class Catcher : Container, IKeyBindingHandler<CatchAction>
