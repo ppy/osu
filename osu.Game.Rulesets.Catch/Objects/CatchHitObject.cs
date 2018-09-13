@@ -27,9 +27,9 @@ namespace osu.Game.Rulesets.Catch.Objects
         public int ComboIndex { get; set; }
 
         /// <summary>
-        /// The difference between the distance of the next object 
-        /// and the distance that would have triggered hyper dashing.
-        /// A value close to 0 indicates a difficult jump (for SR calculation)
+        /// Difference between the distance to the next object
+        /// and the distance that would have triggered a hyper dash.
+        /// A value close to 0 indicates a difficult jump (for difficulty calculation).
         /// </summary>
         public float DistanceToHyperDash { get; set; }
 
