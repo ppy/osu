@@ -35,7 +35,7 @@ namespace osu.Game.Beatmaps
         public int BeatmapSetInfoID { get; set; }
 
         public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
-        
+
         [Required]
         public BeatmapSetInfo BeatmapSet { get; set; }
 
