@@ -148,7 +148,7 @@ namespace osu.Game.Users
         /// <summary>
         /// A user instance for displaying locally created system messages.
         /// </summary>
-        public static User SystemUser { get; } = new User
+        public static readonly User SYSTEM_USER = new User
         {
             Username = "system",
             Id = 0
