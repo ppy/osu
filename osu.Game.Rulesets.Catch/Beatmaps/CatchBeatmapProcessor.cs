@@ -86,6 +86,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                             objectWithDroplets.Add((CatchHitObject)currentJuiceElement);
             }
 
+            objectWithDroplets.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
+
             double halfCatcherWidth = CatcherArea.GetCatcherSize(Beatmap.BeatmapInfo.BaseDifficulty) / 2;
             int lastDirection = 0;
             double lastExcess = halfCatcherWidth;
