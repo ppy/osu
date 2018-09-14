@@ -57,7 +57,7 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader]
         private void load(FileStore fileStore)
         {
-            dependencies.Cache(new TextureStore(new RawTextureLoaderStore(fileStore.Store), false) { ScaleAdjust = 1, });
+            dependencies.Cache(new TextureStore(new TextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
 
             foreach (var layer in Storyboard.Layers)
                 Add(layer.CreateDrawable());
