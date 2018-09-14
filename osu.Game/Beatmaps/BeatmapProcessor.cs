@@ -44,7 +44,7 @@ namespace osu.Game.Beatmaps
 
         public virtual void PostProcess()
         {
-            void UpdateNestedCombo(Rulesets.Objects.HitObject obj, int comboIndex, int indexInCurrentCombo)
+            void updateNestedCombo(Rulesets.Objects.HitObject obj, int comboIndex, int indexInCurrentCombo)
             {
                 if (obj is IHasComboInformation)
                 {
@@ -52,7 +52,7 @@ namespace osu.Game.Beatmaps
                     objectComboInfo.ComboIndex = comboIndex;
                     objectComboInfo.IndexInCurrentCombo = indexInCurrentCombo;
                     foreach (var nestedObjet in obj.NestedHitObjects)
-                        UpdateNestedCombo(nestedObjet, comboIndex, indexInCurrentCombo);
+                        updateNestedCombo(nestedObjet, comboIndex, indexInCurrentCombo);
                 }
             }
             foreach (var hitObject in Beatmap.HitObjects)
@@ -60,7 +60,7 @@ namespace osu.Game.Beatmaps
                 {
                     var objectComboInfo = (IHasComboInformation)hitObject;
                     foreach (var nested in hitObject.NestedHitObjects)
-                        UpdateNestedCombo(nested, objectComboInfo.ComboIndex, objectComboInfo.IndexInCurrentCombo);
+                        updateNestedCombo(nested, objectComboInfo.ComboIndex, objectComboInfo.IndexInCurrentCombo);
                 }
         }
     }
