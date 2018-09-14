@@ -36,16 +36,15 @@ namespace osu.Game.Rulesets.Osu.Mods
             var osuObject = (OsuHitObject)drawable.HitObject;
             Vector2 origin = drawable.Position;
 
-            Random distRand = new Random(osuObject.ComboOffset);
-            Random angleRand = new Random(osuObject.IndexInCurrentCombo);
+            Random objRand = new Random((int)osuObject.StartTime);
 
             // Wiggle all objects during TimePreempt
             int amountWiggles = (int)osuObject.TimePreempt / wiggle_duration;
 
             void wiggle()
             {
-                float nextAngle = (float)(angleRand.NextDouble() * 2 * Math.PI);
-                float nextDist = (float)(distRand.NextDouble() * wiggle_strength);
+                float nextAngle = (float)(objRand.NextDouble() * 2 * Math.PI);
+                float nextDist = (float)(objRand.NextDouble() * wiggle_strength);
                 drawable.MoveTo(new Vector2((float)(nextDist * Math.Cos(nextAngle) + origin.X), (float)(nextDist * Math.Sin(nextAngle) + origin.Y)), wiggle_duration);
             }
 
