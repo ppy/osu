@@ -37,7 +37,7 @@ namespace osu.Game.Skinning
                 Configuration = new SkinConfiguration();
 
             Samples = audioManager.GetSampleManager(storage);
-            Textures = new TextureStore(new RawTextureLoaderStore(storage));
+            Textures = new TextureStore(new TextureLoaderStore(storage));
         }
 
         public override Drawable GetDrawableComponent(string componentName)
