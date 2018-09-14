@@ -56,14 +56,12 @@ namespace osu.Game.Beatmaps
                 }
             }
             foreach (var hitObject in Beatmap.HitObjects)
-            {
                 if (hitObject is IHasComboInformation)
                 {
                     var objectComboInfo = (IHasComboInformation)hitObject;
                     foreach (var nested in hitObject.NestedHitObjects)
                         UpdateNestedCombo(nested, objectComboInfo.ComboIndex, objectComboInfo.IndexInCurrentCombo);
                 }
-            }
         }
     }
 }
