@@ -27,7 +27,6 @@ using osu.Game.Database;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
-using osu.Game.Online.Chat;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -151,10 +150,6 @@ namespace osu.Game
 
             dependencies.Cache(api);
             dependencies.CacheAs<IAPIProvider>(api);
-
-            var channelManager = new ChannelManager();
-            dependencies.Cache(channelManager);
-            AddInternal(channelManager);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));

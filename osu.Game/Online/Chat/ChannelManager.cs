@@ -52,6 +52,17 @@ namespace osu.Game.Online.Chat
         private IAPIProvider api;
         private ScheduledDelegate fetchMessagesScheduleder;
 
+        public ChannelManager()
+        {
+            CurrentChannel.ValueChanged += currentChannelChanged;
+
+            channelMessagesHandler = new IncomingMessagesHandler(
+                lastId => new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), lastId), handleChannelMessages);
+
+            privateMessagesHandler = new IncomingMessagesHandler(
+                lastId => new GetPrivateMessagesRequest(lastId),handleUserMessages);
+        }
+
         /// <summary>
         /// Opens a channel or switches to the channel if already opened.
         /// </summary>
@@ -77,17 +88,6 @@ namespace osu.Game.Online.Chat
 
             CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Target == TargetType.User && c.Id == user.Id)
                                    ?? new PrivateChannel { User = user };
-        }
-
-        public ChannelManager()
-        {
-            CurrentChannel.ValueChanged += currentChannelChanged;
-
-            channelMessagesHandler = new IncomingMessagesHandler(
-                lastId => new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel), lastId), handleChannelMessages);
-
-            privateMessagesHandler = new IncomingMessagesHandler(
-                lastId => new GetPrivateMessagesRequest(lastId),handleUserMessages);
         }
 
         private void currentChannelChanged(Channel channel)
