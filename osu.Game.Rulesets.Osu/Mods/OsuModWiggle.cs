@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override string Name => "Wiggle";
         public override string ShortenedName => "WG";
-        public override FontAwesome Icon => FontAwesome.fa_arrows_alt;
+        public override FontAwesome Icon => FontAwesome.fa_certificate;
         public override ModType Type => ModType.Fun;
         public override string Description => "They just won't stay still...";
         public override double ScoreMultiplier => 1;
