@@ -21,12 +21,12 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string Description => "They just won't stay still...";
         public override double ScoreMultiplier => 1;
 
-        private readonly int wiggle_delay = 90;      // (ms) Higher = fewer wiggles
-        private readonly int wiggle_strength = 10;   // Higher = stronger wiggles
-        
+        private const int wiggle_delay = 90; // (ms) Higher = fewer wiggles
+        private const int wiggle_strength = 10; // Higher = stronger wiggles
+
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach(var drawable in drawables)
+            foreach (var drawable in drawables)
                 drawable.ApplyCustomUpdateState += drawableOnApplyCustomUpdateState;
         }
 
@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var hitObject = (OsuHitObject)drawable.HitObject;
             Vector2 origPos = drawable.Position;
-            
+
             Random distRand = new Random(hitObject.ComboOffset);
             Random angleRand = new Random(hitObject.IndexInCurrentCombo);
 
