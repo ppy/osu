@@ -86,11 +86,11 @@ namespace osu.Game.Graphics.Containers
                         case LinkAction.OpenChannel:
                             try
                             {
-                                channelManager.OpenChannel(linkArgument);
+                                channelManager?.OpenChannel(linkArgument);
                             }
                             catch (ChannelNotFoundException e)
                             {
-                                Logger.Error(e, "It should not be possible that the user is able to click a invalid channel link.");
+                                Logger.Log($"The requested channel \"{linkArgument}\" does not exist");
                             }
 
                             break;
