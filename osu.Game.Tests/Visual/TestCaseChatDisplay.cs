@@ -4,7 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Online.Chat;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Tabs;
@@ -26,12 +29,17 @@ namespace osu.Game.Tests.Visual
             typeof(TabCloseButton)
         };
 
-        public TestCaseChatDisplay()
+        [Cached]
+        private readonly ChannelManager channelManager = new ChannelManager();
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            Add(new ChatOverlay
+            Children = new Drawable[]
             {
-                State = Visibility.Visible
-            });
+                channelManager,
+                new ChatOverlay { State = Visibility.Visible }
+            };
         }
     }
 }
