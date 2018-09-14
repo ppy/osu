@@ -54,7 +54,7 @@ namespace osu.Game.Tests.Visual
                     AddStep(r.Name, () => p = loadPlayerFor(r));
                     AddUntilStep(() => ContinueCondition(p));
 
-                    AddAssert("no leaked beatmaps", () =>
+                    AddUntilStep(() =>
                     {
                         p = null;
 
@@ -64,9 +64,9 @@ namespace osu.Game.Tests.Visual
 
                         workingWeakReferences.ForEachAlive(_ => count++);
                         return count == 1;
-                    });
+                    }, "no leaked beatmaps");
 
-                    AddAssert("no leaked players", () =>
+                    AddUntilStep(() =>
                     {
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
@@ -74,7 +74,7 @@ namespace osu.Game.Tests.Visual
 
                         playerWeakReferences.ForEachAlive(_ => count++);
                         return count == 1;
-                    });
+                    }, "no leaked players");
                 }
             }
         }

@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                         Texture.DrawQuad(
                             new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
-                            DrawInfo.Colour,
+                            DrawColourInfo.Colour,
                             null,
                             v => Shared.VertexBuffer.Vertices[end++] = new TexturedTrailVertex
                             {
