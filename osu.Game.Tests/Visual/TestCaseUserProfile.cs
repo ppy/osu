@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual
             AddStep("Show offline dummy", () => profile.ShowUser(new User
             {
                 Username = @"Somebody",
-                Id = 1,
+                Id = 0,
                 Country = new Country { FullName = @"Alien" },
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
                 JoinDate = DateTimeOffset.Now.AddDays(-1),
@@ -80,7 +80,7 @@ namespace osu.Game.Tests.Visual
             AddStep("Show null dummy", () => profile.ShowUser(new User
             {
                 Username = @"Null",
-                Id = 1,
+                Id = 0,
             }, false));
 
             AddStep("Show ppy", () => profile.ShowUser(new User
