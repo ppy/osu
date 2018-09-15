@@ -26,12 +26,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Raw Input",
+                    LabelText = "Raw input",
                     Bindable = rawInputToggle
                 },
                 sensitivity = new SensitivitySetting
                 {
-                    LabelText = "Cursor Sensitivity",
+                    LabelText = "Cursor sensitivity",
                     Bindable = config.GetBindable<double>(FrameworkSetting.CursorSensitivity)
                 },
                 new SettingsCheckbox

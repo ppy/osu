@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
         /// <summary>
-        /// Plays all the hitsounds for this <see cref="DrawableHitObject"/>.
+        /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
         /// </summary>
         public void PlaySamples() => Samples?.Play();
 
