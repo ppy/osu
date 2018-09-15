@@ -328,6 +328,8 @@ namespace osu.Game.Rulesets.UI
             Playfield.Size = GetAspectAdjustedSize() * PlayfieldArea;
         }
 
+        public IEnumerable<Mod> ActiveMods { get => Mods; }
+
         /// <summary>
         /// Computes the size of the <see cref="Playfield"/> in relative coordinate space after aspect adjustments.
         /// </summary>
