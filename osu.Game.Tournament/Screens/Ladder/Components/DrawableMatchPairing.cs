@@ -1,15 +1,12 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Lines;
 using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
-using osu.Framework.MathUtils;
 using OpenTK;
 using OpenTK.Input;
 using SixLabors.Primitives;
@@ -20,31 +17,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     {
         public readonly MatchPairing Pairing;
         private readonly FillFlowContainer<DrawableMatchTeam> flow;
-        private DrawableMatchPairing progression;
-
         private readonly Bindable<TournamentConditions> conditions = new Bindable<TournamentConditions>();
-
-        private readonly Path path;
-
-        public DrawableMatchPairing Progression
-        {
-            get => progression;
-            set
-            {
-                if (progression == value) return;
-                progression = value;
-
-                if (LoadState == LoadState.Loaded)
-                    updateProgression();
-
-                path.FadeInFromZero(200);
-            }
-        }
-
-        private Vector2 progressionStart;
-        private Vector2 progressionEnd;
-
-        private const float line_width = 2;
 
         public DrawableMatchPairing(MatchPairing pairing)
         {
@@ -63,14 +36,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
                     Spacing = new Vector2(2)
-                },
-                path = new Path
-                {
-                    Alpha = 0,
-                    BypassAutoSizeAxes = Axes.Both,
-                    Anchor = Anchor.CentreRight,
-                    PathWidth = line_width,
-                },
+                }
             };
 
             pairing.Team1.BindValueChanged(_ => updateTeams());
@@ -80,6 +46,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             pairing.Team2Score.BindValueChanged(_ => updateWinConditions());
 
             pairing.Completed.BindValueChanged(_ => updateProgression());
+            pairing.Progression.BindValueChanged(_ => updateProgression());
 
             updateTeams();
         }
@@ -95,56 +62,14 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private void updateProgression()
         {
-            if (progression == null)
-            {
-                path.Positions = new List<Vector2>();
-                return;
-            }
+            var progression = Pairing.Progression?.Value;
 
-            Vector2 getCenteredVector(Vector2 top, Vector2 bottom) => new Vector2(top.X, top.Y + (bottom.Y - top.Y) / 2);
+            if (progression == null) return;
 
-            const float padding = 5;
+            bool progressionAbove = progression.ID < Pairing.ID;
 
-            var start = getCenteredVector(ScreenSpaceDrawQuad.TopRight, ScreenSpaceDrawQuad.BottomRight);
-            var end = getCenteredVector(progression.ScreenSpaceDrawQuad.TopLeft, progression.ScreenSpaceDrawQuad.BottomLeft);
-
-            bool progressionAbove = progression.ScreenSpaceDrawQuad.TopLeft.Y < ScreenSpaceDrawQuad.TopLeft.Y;
-            bool progressionToRight = progression.ScreenSpaceDrawQuad.TopLeft.X > ScreenSpaceDrawQuad.TopLeft.X;
-
-            if (!Precision.AlmostEquals(progressionStart, start) || !Precision.AlmostEquals(progressionEnd, end))
-            {
-                progressionStart = start;
-                progressionEnd = end;
-
-                path.Origin = progressionAbove ? Anchor.y2 : Anchor.y0;
-                path.Y = progressionAbove ? line_width : -line_width;
-
-                path.Origin |= progressionToRight ? Anchor.x0 : Anchor.x2;
-                //path.X = progressionToRight ? line_width : -line_width;
-
-                Vector2 startPosition = path.ToLocalSpace(start) + new Vector2(padding, 0);
-                Vector2 endPosition = path.ToLocalSpace(end) + new Vector2(-padding, 0);
-                Vector2 intermediate1 = startPosition + new Vector2(padding, 0);
-                Vector2 intermediate2 = new Vector2(intermediate1.X, endPosition.Y);
-
-                path.Positions = new List<Vector2>
-                {
-                    startPosition,
-                    intermediate1,
-                    intermediate2,
-                    endPosition
-                };
-            }
-
-            var destinationForWinner = progressionAbove ? progression.Pairing.Team2 : progression.Pairing.Team1;
-
+            var destinationForWinner = progressionAbove ? progression.Team2 : progression.Team1;
             destinationForWinner.Value = Pairing.Winner;
-        }
-
-        protected override void UpdateAfterAutoSize()
-        {
-            base.UpdateAfterAutoSize();
-            updateProgression();
         }
 
         private void updateWinConditions()

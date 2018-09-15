@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
@@ -15,6 +16,9 @@ namespace osu.Game.Tournament.Tests
     {
         [Cached]
         private readonly LadderManager manager;
+
+        [Cached]
+        private Bindable<TournamentConditions> conditions = new Bindable<TournamentConditions>(new TournamentConditions { BestOf = 9 });
 
         public TestCaseLadderManager()
         {
@@ -28,7 +32,7 @@ namespace osu.Game.Tournament.Tests
         {
             base.Dispose(isDisposing);
 
-            File.WriteAllText(@"bracket.json", JsonConvert.SerializeObject(manager.Info,
+            File.WriteAllText(@"bracket.json", JsonConvert.SerializeObject(manager.CreateInfo(),
                 new JsonSerializerSettings
                 {
                     NullValueHandling = NullValueHandling.Ignore,
