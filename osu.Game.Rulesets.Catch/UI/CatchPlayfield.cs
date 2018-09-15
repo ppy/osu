@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private readonly CatcherArea catcherArea;
 
+        protected override bool UserScrollSpeedAdjustment => false;
+
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation)
             : base(BASE_WIDTH)
         {
