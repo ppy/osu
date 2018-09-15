@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,6 +18,7 @@ using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using SixLabors.ImageSharp;
 
 namespace osu.Game.Graphics
 {
@@ -71,7 +71,7 @@ namespace osu.Game.Graphics
 
         private volatile int screenShotTasks;
 
-        public async Task TakeScreenshotAsync() => await Task.Run(async () =>
+        public Task TakeScreenshotAsync() => Task.Run(async () =>
         {
             Interlocked.Increment(ref screenShotTasks);
 
@@ -90,7 +90,7 @@ namespace osu.Game.Graphics
                 waitDelegate.Cancel();
             }
 
-            using (var bitmap = await host.TakeScreenshotAsync())
+            using (var image = await host.TakeScreenshotAsync())
             {
                 Interlocked.Decrement(ref screenShotTasks);
 
@@ -102,10 +102,10 @@ namespace osu.Game.Graphics
                 switch (screenshotFormat.Value)
                 {
                     case ScreenshotFormat.Png:
-                        bitmap.Save(stream, ImageFormat.Png);
+                        image.SaveAsPng(stream);
                         break;
                     case ScreenshotFormat.Jpg:
-                        bitmap.Save(stream, ImageFormat.Jpeg);
+                        image.SaveAsJpeg(stream);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(screenshotFormat));

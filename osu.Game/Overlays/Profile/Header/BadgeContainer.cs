@@ -176,7 +176,7 @@ namespace osu.Game.Overlays.Profile.Header
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(LargeTextureStore textures)
             {
                 Child = new Sprite
                 {

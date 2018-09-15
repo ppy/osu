@@ -92,9 +92,9 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
-        public void Flash(Judgement judgement)
+        public void Flash(JudgementResult result)
         {
-            if (judgement.Result == HitResult.Miss)
+            if (result.Type == HitResult.Miss)
                 return;
 
             fill.FadeEdgeEffectTo(Math.Min(1, fill.EdgeEffect.Colour.Linear.A + (1f - base_glow_opacity) / glow_max_hits), 50, Easing.OutQuint)
