@@ -1,6 +1,9 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Input.EventArgs;
@@ -30,12 +33,13 @@ namespace osu.Game.Tests.Visual
                 Anchor = Anchor.Centre,
                 Children = new KeyCounter[]
                 {
-                    rewindTestKeyCounterKeyboard = new KeyCounterKeyboard(rewind_test_key),
+                    rewindTestKeyCounterKeyboard = new KeyCounterKeyboard(Key.X),
                     new KeyCounterKeyboard(Key.X),
                     new KeyCounterMouse(MouseButton.Left),
                     new KeyCounterMouse(MouseButton.Right),
                 },
             };
+
 
             AddStep("Add random", () =>
             {
@@ -44,29 +48,57 @@ namespace osu.Game.Tests.Visual
             });
             AddSliderStep("Fade time", 0, 200, 50, v => kc.FadeTime = v);
 
-            var expectedCountPresses = rewindTestKeyCounterKeyboard.CountPresses + 1;
-            AddStep($"Press {rewind_test_key} key", () =>
+            Key testKey = ((KeyCounterKeyboard)kc.Children.First()).Key;
+            double time1 = 0;
+
+            AddStep($"Press {testKey} key", () =>
             {
-                rewindTestKeyCounterKeyboard.TriggerOnKeyDown(null, new KeyDownEventArgs { Key = rewind_test_key, Repeat = false });
-                rewindTestKeyCounterKeyboard.TriggerOnKeyUp(null, new KeyUpEventArgs { Key = rewind_test_key });
+                rewindTestKeyCounterKeyboard.TriggerOnKeyDown(null, new KeyDownEventArgs { Key = testKey, Repeat = false });
+                rewindTestKeyCounterKeyboard.TriggerOnKeyUp(null, new KeyUpEventArgs { Key = testKey });
             });
 
-            AddAssert($"Check {rewind_test_key} counter after keypress", () => rewindTestKeyCounterKeyboard.CountPresses == expectedCountPresses);
+            AddAssert($"Check {testKey} counter after keypress", () => rewindTestKeyCounterKeyboard.CountPresses == 1);
 
-            IFrameBasedClock counterClock = null;
-            AddStep($"Rewind {rewind_test_key} counter", () =>
+            AddStep($"Press {testKey} key", () =>
             {
-                counterClock = rewindTestKeyCounterKeyboard.Clock;
-                rewindTestKeyCounterKeyboard.Clock = new DecoupleableInterpolatingFramedClock();
+                rewindTestKeyCounterKeyboard.TriggerOnKeyDown(null, new KeyDownEventArgs { Key = testKey, Repeat = false });
+                rewindTestKeyCounterKeyboard.TriggerOnKeyUp(null, new KeyUpEventArgs { Key = testKey });
+                time1 = Clock.CurrentTime;
             });
 
-            AddAssert($"Check {rewind_test_key} counter after rewind", () =>
+            AddAssert($"Check {testKey} counter after keypress", () => rewindTestKeyCounterKeyboard.CountPresses == 2);
+
+            IFrameBasedClock oldClock = null;
+
+            AddStep($"Rewind {testKey} counter once", () =>
             {
-                rewindTestKeyCounterKeyboard.Clock = counterClock;
-                return rewindTestKeyCounterKeyboard.CountPresses == 0;
+                oldClock = rewindTestKeyCounterKeyboard.Clock;
+                rewindTestKeyCounterKeyboard.Clock = new FramedOffsetClock(new FixedClock(time1 - 10));
             });
+
+            AddAssert($"Check {testKey} counter after rewind", () => rewindTestKeyCounterKeyboard.CountPresses == 1);
+
+            AddStep($"Rewind {testKey} counter to zero", () => rewindTestKeyCounterKeyboard.Clock = new FramedOffsetClock(new FixedClock(0)));
+
+            AddAssert($"Check {testKey} counter after rewind", () => rewindTestKeyCounterKeyboard.CountPresses == 0);
+
+            AddStep("Restore clock", () => rewindTestKeyCounterKeyboard.Clock = oldClock);
 
             Add(kc);
+        }
+
+        private class FixedClock : IClock
+        {
+            private readonly double time;
+
+            public FixedClock(double time)
+            {
+                this.time = time;
+            }
+
+            public double CurrentTime => time;
+            public double Rate => 1;
+            public bool IsRunning => false;
         }
     }
 }
