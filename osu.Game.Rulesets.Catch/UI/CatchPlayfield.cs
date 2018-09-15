@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             base.Content.Anchor = Anchor.BottomLeft;
             base.Content.Origin = Anchor.BottomLeft;
-            base.Content.Position = new Vector2(0, 215);
+            base.Content.Position = new Vector2(0, 215); // matches stable's vertical offset for catcher plate
 
             base.Content.AddRange(new Drawable[]
             {
