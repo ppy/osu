@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Play
         private SpriteText countSpriteText;
 
         private readonly List<KeyCounterState> states = new List<KeyCounterState>();
-        private KeyCounterState lastState;
+        private KeyCounterState currentState;
 
         public bool IsCounting { get; set; } = true;
         private int countPresses;
@@ -144,33 +144,24 @@ namespace osu.Game.Screens.Play
 
         public void SaveState()
         {
-            if (lastState == null || lastState.Time < Clock.CurrentTime)
-                states.Add(lastState = new KeyCounterState(Clock.CurrentTime, CountPresses));
+            if (currentState == null || currentState.Time < Clock.CurrentTime)
+                states.Add(currentState = new KeyCounterState(Clock.CurrentTime, CountPresses));
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (lastState?.Time > Clock.CurrentTime)
-                RestoreState(Clock.CurrentTime);
+            if (currentState?.Time > Clock.CurrentTime)
+                restoreStateTo(Clock.CurrentTime);
         }
 
-        public void RestoreState(double time)
+        private void restoreStateTo(double time)
         {
-            var targetState = states.LastOrDefault(state => state.Time <= time);
-            if (targetState == null)
-            {
-                ResetCount();
-                return;
-            }
+            states.RemoveAll(state => state.Time > time);
 
-            var targetIndex = states.IndexOf(targetState);
-
-            states.RemoveRange(targetIndex + 1, states.Count - (targetIndex + 1));
-
-            lastState = targetState;
-            CountPresses = targetState.Count;
+            currentState = states.LastOrDefault();
+            CountPresses = currentState?.Count ?? 0;
         }
     }
 }
