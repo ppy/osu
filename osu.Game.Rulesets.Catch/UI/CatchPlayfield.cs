@@ -34,10 +34,10 @@ namespace osu.Game.Rulesets.Catch.UI
 
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
-            base.Content.Position = new Vector2(0, 215);
 
             base.Content.Anchor = Anchor.BottomLeft;
             base.Content.Origin = Anchor.BottomLeft;
+            base.Content.Position = new Vector2(0, 215);
 
             base.Content.AddRange(new Drawable[]
             {
