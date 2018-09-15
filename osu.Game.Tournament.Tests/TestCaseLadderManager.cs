@@ -19,7 +19,7 @@ namespace osu.Game.Tournament.Tests
         public TestCaseLadderManager()
         {
             var teams = JsonConvert.DeserializeObject<List<TournamentTeam>>(File.ReadAllText(@"teams.json"));
-            var ladder = JsonConvert.DeserializeObject<LadderInfo>(File.ReadAllText(@"bracket.json")) ?? new LadderInfo();
+            var ladder = File.Exists(@"bracket.json") ? JsonConvert.DeserializeObject<LadderInfo>(File.ReadAllText(@"bracket.json")) : new LadderInfo();
 
             Child = manager = new LadderManager(ladder, teams);
         }
@@ -28,7 +28,12 @@ namespace osu.Game.Tournament.Tests
         {
             base.Dispose(isDisposing);
 
-            File.WriteAllText(@"bracket.json", JsonConvert.SerializeObject(manager.Info));
+            File.WriteAllText(@"bracket.json", JsonConvert.SerializeObject(manager.Info,
+                new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    DefaultValueHandling = DefaultValueHandling.Ignore
+                }));
         }
     }
 }
