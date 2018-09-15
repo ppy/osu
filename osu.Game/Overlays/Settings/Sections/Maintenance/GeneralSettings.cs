@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Skinning;
 
 namespace osu.Game.Overlays.Settings.Sections.Maintenance
 {
@@ -20,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
         protected override string Header => "General";
 
         [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmaps, DialogOverlay dialogOverlay)
+        private void load(BeatmapManager beatmaps, SkinManager skins, DialogOverlay dialogOverlay)
         {
             Children = new Drawable[]
             {
@@ -30,7 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                     Action = () =>
                     {
                         importButton.Enabled.Value = false;
-                        beatmaps.ImportFromStable().ContinueWith(t => Schedule(() => importButton.Enabled.Value = true));
+                        beatmaps.ImportFromStableAsync().ContinueWith(t => Schedule(() => importButton.Enabled.Value = true));
                     }
                 },
                 deleteButton = new DangerousSettingsButton
@@ -42,6 +43,27 @@ namespace osu.Game.Overlays.Settings.Sections.Maintenance
                         {
                             deleteButton.Enabled.Value = false;
                             Task.Run(() => beatmaps.Delete(beatmaps.GetAllUsableBeatmapSets())).ContinueWith(t => Schedule(() => deleteButton.Enabled.Value = true));
+                        }));
+                    }
+                },
+                importButton = new SettingsButton
+                {
+                    Text = "Import skins from stable",
+                    Action = () =>
+                    {
+                        importButton.Enabled.Value = false;
+                        skins.ImportFromStableAsync().ContinueWith(t => Schedule(() => importButton.Enabled.Value = true));
+                    }
+                },
+                deleteButton = new DangerousSettingsButton
+                {
+                    Text = "Delete ALL skins",
+                    Action = () =>
+                    {
+                        dialogOverlay?.Push(new DeleteAllBeatmapsDialog(() =>
+                        {
+                            deleteButton.Enabled.Value = false;
+                            Task.Run(() => skins.Delete(skins.GetAllUserSkins())).ContinueWith(t => Schedule(() => deleteButton.Enabled.Value = true));
                         }));
                     }
                 },

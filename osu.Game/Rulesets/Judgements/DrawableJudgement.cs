@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Judgements
 
         private OsuColour colours;
 
-        protected readonly Judgement Judgement;
+        protected readonly JudgementResult Result;
 
         public readonly DrawableHitObject JudgedObject;
 
@@ -34,11 +34,11 @@ namespace osu.Game.Rulesets.Judgements
         /// <summary>
         /// Creates a drawable which visualises a <see cref="Judgements.Judgement"/>.
         /// </summary>
-        /// <param name="judgement">The judgement to visualise.</param>
+        /// <param name="result">The judgement to visualise.</param>
         /// <param name="judgedObject">The object which was judged.</param>
-        public DrawableJudgement(Judgement judgement, DrawableHitObject judgedObject)
+        public DrawableJudgement(JudgementResult result, DrawableHitObject judgedObject)
         {
-            Judgement = judgement;
+            Result = result;
             JudgedObject = judgedObject;
 
             Size = new Vector2(judgement_size);
@@ -49,11 +49,11 @@ namespace osu.Game.Rulesets.Judgements
         {
             this.colours = colours;
 
-            Child = new SkinnableDrawable($"Play/{Judgement.Result}", _ => JudgementText = new OsuSpriteText
+            Child = new SkinnableDrawable($"Play/{Result.Type}", _ => JudgementText = new OsuSpriteText
             {
-                Text = Judgement.Result.GetDescription().ToUpperInvariant(),
+                Text = Result.Type.GetDescription().ToUpperInvariant(),
                 Font = @"Venera",
-                Colour = judgementColour(Judgement.Result),
+                Colour = judgementColour(Result.Type),
                 Scale = new Vector2(0.85f, 1),
                 TextSize = 12
             }, restrictSize: false);
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Judgements
 
             this.FadeInFromZero(100, Easing.OutQuint);
 
-            switch (Judgement.Result)
+            switch (Result.Type)
             {
                 case HitResult.None:
                     break;

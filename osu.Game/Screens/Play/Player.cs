@@ -124,7 +124,7 @@ namespace osu.Game.Screens.Play
 
                 if (!RulesetContainer.Objects.Any())
                 {
-                    Logger.Error(new InvalidOperationException("Beatmap contains no hit objects!"), "Beatmap contains no hit objects!");
+                    Logger.Log("Beatmap contains no hit objects!", level: LogLevel.Error);
                     return;
                 }
             }

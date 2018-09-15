@@ -24,7 +24,7 @@ namespace osu.Game.Users
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(LargeTextureStore textures)
         {
             if (textures == null)
                 throw new ArgumentNullException(nameof(textures));

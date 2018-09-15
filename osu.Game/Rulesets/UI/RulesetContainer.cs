@@ -194,8 +194,15 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetContainer<TObject> : RulesetContainer
         where TObject : HitObject
     {
-        public event Action<Judgement> OnJudgement;
-        public event Action<Judgement> OnJudgementRemoved;
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> has been applied by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public event Action<JudgementResult> OnNewResult;
+
+        /// <summary>
+        /// Invoked when a <see cref="JudgementResult"/> is being reverted by a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        public event Action<JudgementResult> OnRevertResult;
 
         /// <summary>
         /// The Beatmap
@@ -302,8 +309,8 @@ namespace osu.Game.Rulesets.UI
                 if (drawableObject == null)
                     continue;
 
-                drawableObject.OnJudgement += (d, j) => OnJudgement?.Invoke(j);
-                drawableObject.OnJudgementRemoved += (d, j) => OnJudgementRemoved?.Invoke(j);
+                drawableObject.OnNewResult += (_, r) => OnNewResult?.Invoke(r);
+                drawableObject.OnRevertResult += (_, r) => OnRevertResult?.Invoke(r);
 
                 Playfield.Add(drawableObject);
             }
@@ -311,7 +318,7 @@ namespace osu.Game.Rulesets.UI
             Playfield.PostProcess();
 
             foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
-                mod.ApplyToDrawableHitObjects(Playfield.HitObjects.Objects);
+                mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
         }
 
         protected override void Update()

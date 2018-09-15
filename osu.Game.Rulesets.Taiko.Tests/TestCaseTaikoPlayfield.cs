@@ -8,9 +8,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
@@ -39,8 +39,10 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddStep("Hit!", () => addHitJudgement(false));
+            AddStep("Hit", () => addHitJudgement(false));
+            AddStep("Strong hit", () => addStrongHitJudgement(false));
             AddStep("Kiai hit", () => addHitJudgement(true));
+            AddStep("Strong kiai hit", () => addStrongHitJudgement(true));
             AddStep("Miss :(", addMissJudgement);
             AddStep("DrumRoll", () => addDrumRoll(false));
             AddStep("Strong DrumRoll", () => addDrumRoll(true));
@@ -78,15 +80,12 @@ namespace osu.Game.Rulesets.Taiko.Tests
                 ControlPointInfo = controlPointInfo
             });
 
-            var rateAdjustClock = new StopwatchClock(true) { Rate = 1 };
-
             Add(playfieldContainer = new Container
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.X,
                 Height = 768,
-                Clock = new FramedClock(rateAdjustClock),
                 Children = new[] { rulesetContainer = new TaikoRulesetContainer(new TaikoRuleset(), beatmap) }
             });
         }
@@ -133,28 +132,35 @@ namespace osu.Game.Rulesets.Taiko.Tests
             HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Good : HitResult.Great;
 
             var cpi = new ControlPointInfo();
-            cpi.EffectPoints.Add(new EffectControlPoint
-            {
-                KiaiMode = kiai
-            });
+            cpi.EffectPoints.Add(new EffectControlPoint { KiaiMode = kiai });
 
             Hit hit = new Hit();
             hit.ApplyDefaults(cpi, new BeatmapDifficulty());
 
             var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
 
-            ((TaikoPlayfield)rulesetContainer.Playfield).OnJudgement(h, new TaikoJudgement { Result = hitResult });
+            ((TaikoPlayfield)rulesetContainer.Playfield).OnNewResult(h, new JudgementResult(new TaikoJudgement()) { Type = hitResult });
+        }
 
-            if (RNG.Next(10) == 0)
-            {
-                ((TaikoPlayfield)rulesetContainer.Playfield).OnJudgement(h, new TaikoJudgement { Result = hitResult });
-                ((TaikoPlayfield)rulesetContainer.Playfield).OnJudgement(h, new TaikoStrongHitJudgement());
-            }
+        private void addStrongHitJudgement(bool kiai)
+        {
+            HitResult hitResult = RNG.Next(2) == 0 ? HitResult.Good : HitResult.Great;
+
+            var cpi = new ControlPointInfo();
+            cpi.EffectPoints.Add(new EffectControlPoint { KiaiMode = kiai });
+
+            Hit hit = new Hit();
+            hit.ApplyDefaults(cpi, new BeatmapDifficulty());
+
+            var h = new DrawableTestHit(hit) { X = RNG.NextSingle(hitResult == HitResult.Good ? -0.1f : -0.05f, hitResult == HitResult.Good ? 0.1f : 0.05f) };
+
+            ((TaikoPlayfield)rulesetContainer.Playfield).OnNewResult(h, new JudgementResult(new TaikoJudgement()) { Type = hitResult });
+            ((TaikoPlayfield)rulesetContainer.Playfield).OnNewResult(new TestStrongNestedHit(h), new JudgementResult(new TaikoStrongJudgement()) { Type = HitResult.Great });
         }
 
         private void addMissJudgement()
         {
-            ((TaikoPlayfield)rulesetContainer.Playfield).OnJudgement(new DrawableTestHit(new Hit()), new TaikoJudgement { Result = HitResult.Miss });
+            ((TaikoPlayfield)rulesetContainer.Playfield).OnNewResult(new DrawableTestHit(new Hit()), new JudgementResult(new TaikoJudgement()) { Type = HitResult.Miss });
         }
 
         private void addBarLine(bool major, double delay = scroll_time)
@@ -204,10 +210,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            if (strong)
-                rulesetContainer.Playfield.Add(new DrawableCentreHitStrong(h));
-            else
-                rulesetContainer.Playfield.Add(new DrawableCentreHit(h));
+            rulesetContainer.Playfield.Add(new DrawableCentreHit(h));
         }
 
         private void addRimHit(bool strong)
@@ -220,10 +223,17 @@ namespace osu.Game.Rulesets.Taiko.Tests
 
             h.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty());
 
-            if (strong)
-                rulesetContainer.Playfield.Add(new DrawableRimHitStrong(h));
-            else
-                rulesetContainer.Playfield.Add(new DrawableRimHit(h));
+            rulesetContainer.Playfield.Add(new DrawableRimHit(h));
+        }
+
+        private class TestStrongNestedHit : DrawableStrongNestedHit
+        {
+            public TestStrongNestedHit(DrawableHitObject mainObject)
+                : base(null, mainObject)
+            {
+            }
+
+            public override bool OnPressed(TaikoAction action) => false;
         }
 
         private class DrawableTestHit : DrawableHitObject<TaikoHitObject>

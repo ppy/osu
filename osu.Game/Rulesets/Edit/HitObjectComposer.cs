@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -23,12 +24,15 @@ namespace osu.Game.Rulesets.Edit
     {
         private readonly Ruleset ruleset;
 
+        public IEnumerable<DrawableHitObject> HitObjects => rulesetContainer.Playfield.AllHitObjects;
+
         protected ICompositionTool CurrentTool { get; private set; }
+        protected IRulesetConfigManager Config { get; private set; }
+
+        private readonly List<Container> layerContainers = new List<Container>();
+        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         private RulesetContainer rulesetContainer;
-        private readonly List<Container> layerContainers = new List<Container>();
-
-        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -60,7 +64,7 @@ namespace osu.Game.Rulesets.Edit
             };
 
             var layerAboveRuleset = CreateLayerContainer();
-            layerAboveRuleset.Child = new HitObjectMaskLayer(rulesetContainer.Playfield, this);
+            layerAboveRuleset.Child = new HitObjectMaskLayer();
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -108,6 +112,16 @@ namespace osu.Game.Rulesets.Edit
                 .ToList();
 
             toolboxCollection.Items[0].Select();
+        }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            dependencies.CacheAs(this);
+            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(ruleset);
+
+            return dependencies;
         }
 
         protected override void LoadComplete()
