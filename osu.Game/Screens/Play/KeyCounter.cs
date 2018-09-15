@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Play
                     if (value && IsCounting)
                     {
                         CountPresses++;
-                        SaveState();
+                        saveState();
                     }
                 }
             }
@@ -142,18 +142,18 @@ namespace osu.Game.Screens.Play
             states.Clear();
         }
 
-        public void SaveState()
-        {
-            if (currentState == null || currentState.Time < Clock.CurrentTime)
-                states.Add(currentState = new KeyCounterState(Clock.CurrentTime, CountPresses));
-        }
-
         protected override void Update()
         {
             base.Update();
 
             if (currentState?.Time > Clock.CurrentTime)
                 restoreStateTo(Clock.CurrentTime);
+        }
+
+        private void saveState()
+        {
+            if (currentState == null || currentState.Time < Clock.CurrentTime)
+                states.Add(currentState = new KeyCounterState(Clock.CurrentTime, CountPresses));
         }
 
         private void restoreStateTo(double time)
