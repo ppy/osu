@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Components
                 new OsuSpriteText
                 {
                     Origin = Anchor.BottomLeft,
-                    Text = "Playback Speed",
+                    Text = "Playback speed",
                     RelativePositionAxes = Axes.Y,
                     Y = 0.5f,
                     Padding = new MarginPadding { Left = 45 }
