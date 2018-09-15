@@ -160,6 +160,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         public MenuItem[] ContextMenuItems => new[]
         {
             new MenuItem("Populate team", () => team.Value = manager.Teams.Random()),
+            new MenuItem("Join with", () => manager.JoinRequest(pairing)),
         };
     }
 

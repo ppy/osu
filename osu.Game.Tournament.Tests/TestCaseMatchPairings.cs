@@ -75,12 +75,12 @@ namespace osu.Game.Tournament.Tests
                 }
             };
 
-            level1.Children[0].Progression = level2.Children[0];
-            level1.Children[1].Progression = level2.Children[0];
+            level1.Children[0].Pairing.Progression.Value = level2.Children[0].Pairing;
+            level1.Children[1].Pairing.Progression.Value = level2.Children[0].Pairing;
 
             AddRepeatStep("change scores", () => pairing1.Team2Score.Value++, 4);
             AddStep("add new team", () => pairing2.Team2.Value = new TournamentTeam { FlagName = "PT", FullName = "Portugal" });
-            AddStep("Add progression", () => level1.Children[2].Progression = level2.Children[1]);
+            AddStep("Add progression", () => level1.Children[2].Pairing.Progression.Value = level2.Children[1].Pairing);
 
             AddStep("start match", () => pairing2.StartMatch());
 
