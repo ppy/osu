@@ -283,6 +283,16 @@ namespace osu.Game.Rulesets.Osu.Replays
                 }
             }
 
+            // We need to move the cursor to the slider before we click the slider,
+            // because framework update the hovered information would delay one frame.
+            // TODO: The update CirclePiece.IsHovered of DrawableSlider will delay one frame, maybe the root problem is in framework
+            if (h is Slider && index >= 0)
+            {
+                var previousFrame = (OsuReplayFrame)Frames[index];
+                double preClickTime = Math.Max((previousFrame.Time + h.StartTime) / 2.0 , h.StartTime - 1);
+                AddFrameToReplay(new OsuReplayFrame(preClickTime, new Vector2(startPosition.X, startPosition.Y)));
+            }
+
             AddFrameToReplay(startFrame);
 
             switch (h)
