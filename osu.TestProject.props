@@ -11,7 +11,7 @@
     <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj" />
   </ItemGroup>
   <ItemGroup Label="Package References">
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.3" />
     <PackageReference Include="DeepEqual" Version="1.6.0" />
   </ItemGroup>
   <ItemGroup>
