@@ -6,6 +6,10 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Game.Skinning;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -14,10 +18,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
     /// </summary>
     public class DrawableOsuBlinds : Container
     {
+        /// <summary>
+        /// Black background boxes behind blind panel textures.
+        /// </summary>
         private Box box1, box2;
+        private Sprite panelLeft, panelRight;
+        private Sprite bgPanelLeft, bgPanelRight;
+        private ISkinSource skin;
+
         private float target = 1;
         private readonly float easing = 1;
+
         private readonly Container restrictTo;
+        private readonly bool hasEasy;
 
         /// <summary>
         /// <para>
@@ -30,15 +43,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// Infinity would mean the blinds are always outside the playfield except on 100% health.
         /// </para>
         /// </summary>
-        private const float leniency = 0.2f;
+        private const float leniency = 0.1f;
 
-        public DrawableOsuBlinds(Container restrictTo)
+        /// <summary>
+        /// Multiplier for adding a gap when the Easy mod is also currently applied.
+        /// </summary>
+        private const float easy_position_multiplier = 0.95f;
+
+        public DrawableOsuBlinds(Container restrictTo, bool hasEasy)
         {
             this.restrictTo = restrictTo;
+            this.hasEasy = hasEasy;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(ISkinSource skin, TextureStore textures)
         {
             RelativeSizeAxes = Axes.Both;
             Width = 1;
@@ -62,6 +81,36 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Width = 0,
                 Height = 1
             });
+
+            Add(bgPanelLeft = new ModBlindsPanelSprite {
+                Origin = Anchor.TopRight,
+                Colour = Color4.Gray
+            });
+            Add(bgPanelRight = new ModBlindsPanelSprite {
+                Origin = Anchor.TopLeft,
+                Colour = Color4.Gray
+            });
+
+            Add(panelLeft = new ModBlindsPanelSprite {
+                Origin = Anchor.TopRight
+            });
+            Add(panelRight = new ModBlindsPanelSprite {
+                Origin = Anchor.TopLeft
+            });
+
+            this.skin = skin;
+            skin.SourceChanged += skinChanged;
+            PanelTexture = textures.Get("Play/osu/blinds-panel");
+        }
+
+        private void skinChanged()
+        {
+            PanelTexture = skin.GetTexture("Play/osu/blinds-panel");
+        }
+
+        private static float applyAdjustmentCurve(float value)
+        {
+            return value * value;
         }
 
         protected override void Update()
@@ -71,10 +120,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             float rawWidth = end - start;
             start -= rawWidth * leniency * 0.5f;
             end += rawWidth * leniency * 0.5f;
-            float width = (end - start) * 0.5f * easing;
+
+            float width = (end - start) * 0.5f * applyAdjustmentCurve((hasEasy ? easy_position_multiplier : 1) * easing);
             // different values in case the playfield ever moves from center to somewhere else.
             box1.Width = start + width;
             box2.Width = DrawWidth - end + width;
+
+            panelLeft.X = start + width;
+            panelRight.X = end - width;
+            bgPanelLeft.X = start;
+            bgPanelRight.X = end;
         }
 
         /// <summary>
@@ -90,6 +145,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             get
             {
                 return target;
+            }
+        }
+
+        public Texture PanelTexture
+        {
+            set
+            {
+                panelLeft.Texture = value;
+                panelRight.Texture = value;
+                bgPanelLeft.Texture = value;
+                bgPanelRight.Texture = value;
             }
         }
     }

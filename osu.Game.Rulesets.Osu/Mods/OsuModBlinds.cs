@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -16,7 +17,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override void ApplyToRulesetContainer(RulesetContainer<OsuHitObject> rulesetContainer)
         {
-            rulesetContainer.Overlays.Add(flashlight = new DrawableOsuBlinds(restrictTo: rulesetContainer.Playfield));
+            bool hasEasy = rulesetContainer.ActiveMods.Count(mod => mod is ModEasy) > 0;
+            rulesetContainer.Overlays.Add(flashlight = new DrawableOsuBlinds(restrictTo: rulesetContainer.Playfield, hasEasy: hasEasy));
         }
 
         public override void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
