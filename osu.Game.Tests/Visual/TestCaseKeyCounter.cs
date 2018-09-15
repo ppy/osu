@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using NUnit.Framework;
@@ -14,7 +14,12 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseKeyCounter : OsuTestCase
     {
-        private const Key rewind_test_key = Key.Z;
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(KeyCounterKeyboard),
+            typeof(KeyCounterMouse),
+            typeof(KeyCounterCollection)
+        };
 
         public TestCaseKeyCounter()
         {
