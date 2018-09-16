@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Drawable randomNpc;
         private const float npc_movement_start = 1.5f;
         private float npcPosition = npc_movement_start;
-        private bool animatingNPC;
+        private bool animatingNpc;
         private Random random;
 
         private ISkinSource skin;
@@ -164,12 +164,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             float ret;
             if (modEasy)
             {
-                float multiplier = 0.95f;
+                const float multiplier = 0.95f;
                 ret = value * multiplier;
             }
             else if (modHardrock)
             {
-                float multiplier = 1.1f;
+                const float multiplier = 1.1f;
                 ret = value * multiplier;
             }
             else
@@ -215,9 +215,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             bgRandomNpc.X = adjustedNpcPosition;
         }
 
-        public void TriggerNPC()
+        public void TriggerNpc()
         {
-            if (animatingNPC)
+            if (animatingNpc)
                 return;
 
             bool left = (random.Next() & 1) != 0;
@@ -257,9 +257,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ChangeChildDepth(panelRight, fg_panel_depth);
             }
 
-            animatingNPC = true;
+            animatingNpc = true;
             npcPosition = start;
-            this.TransformTo(nameof(npcPosition), end, 3000, Easing.OutSine).Finally(_ => animatingNPC = false);
+            this.TransformTo(nameof(npcPosition), end, 3000, Easing.OutSine).Finally(_ => animatingNpc = false);
 
             targetClamp = 1;
             this.Delay(600).TransformTo(nameof(targetClamp), 0.6f, 300).Delay(500).TransformTo(nameof(targetClamp), 1f, 300);
