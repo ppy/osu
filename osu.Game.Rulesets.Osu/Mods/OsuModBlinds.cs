@@ -6,7 +6,6 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using System.Linq;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -17,14 +16,26 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public override void ApplyToRulesetContainer(RulesetContainer<OsuHitObject> rulesetContainer)
         {
-            bool hasEasy = rulesetContainer.ActiveMods.Count(mod => mod is ModEasy) > 0;
-            rulesetContainer.Overlays.Add(flashlight = new DrawableOsuBlinds(restrictTo: rulesetContainer.Playfield, hasEasy: hasEasy));
+            bool hasEasy = false;
+            bool hasHardrock = false;
+            foreach (var mod in rulesetContainer.ActiveMods)
+            {
+                if (mod is ModEasy)
+                    hasEasy = true;
+                if (mod is ModHardRock)
+                    hasHardrock = true;
+            }
+            rulesetContainer.Overlays.Add(flashlight = new DrawableOsuBlinds(restrictTo: rulesetContainer.Playfield, hasEasy: hasEasy, hasHardrock: hasHardrock));
         }
 
         public override void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             scoreProcessor.Health.ValueChanged += val => {
                 flashlight.Value = (float)val;
+            };
+            scoreProcessor.Combo.ValueChanged += val => {
+                if (val > 0 && val % 30 == 0)
+                    flashlight.TriggerNPC();
             };
         }
     }
