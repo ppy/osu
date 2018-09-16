@@ -16,11 +16,17 @@ var osuSolution = new FilePath("./osu.sln");
 // TASKS
 ///////////////////////////////////////////////////////////////////////////////
 
+Task("Restore")
+.Does(() => {
+    DotNetCoreRestore(osuSolution.FullPath);
+});
+
 Task("Compile")
+.IsDependentOn("Restore")
 .Does(() => {
     DotNetCoreBuild(osuSolution.FullPath, new DotNetCoreBuildSettings {
-        Framework = framework,
-        Configuration = configuration
+        Configuration = configuration,
+        NoRestore = true,
     });
 });
 
@@ -42,10 +48,6 @@ Task("InspectCode")
 .IsDependentOn("Compile")
 .Does(() => {
     var nVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
-  
-    DotNetCoreRestore(osuSolution.FullPath, new DotNetCoreRestoreSettings {
-        Verbosity = DotNetCoreVerbosity.Quiet
-    });
 
     InspectCode(osuSolution, new InspectCodeSettings {
         CachesHome = "inspectcode",
