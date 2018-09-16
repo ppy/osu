@@ -84,11 +84,10 @@ namespace osu.Game.Screens.Menu
 
         private const double early_activation = 60;
 
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
         public OsuLogo()
         {
-            // Required to make Schedule calls run in OsuScreen even when we are not visible.
-            AlwaysPresent = true;
-
             EarlyActivationMilliseconds = early_activation;
 
             Size = new Vector2(default_size);
