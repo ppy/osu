@@ -12,7 +12,6 @@ var configuration = Argument("configuration", "Release");
 
 var osuDesktop = new FilePath("./osu.Desktop/osu.Desktop.csproj");
 var osuSolution = new FilePath("./osu.sln");
-var testProjects = GetFiles("**/*.Tests.csproj");
 
 ///////////////////////////////////////////////////////////////////////////////
 // TASKS
@@ -27,13 +26,13 @@ Task("Compile")
 });
 
 Task("Test")
-.ContinueOnError()
-.DoesForEach(testProjects, testProject => {
-    DotNetCoreTest(testProject.FullPath, new DotNetCoreTestSettings {
-        Framework = framework,
-        Configuration = configuration,
-        Logger = AppVeyor.IsRunningOnAppVeyor ? "Appveyor" : $"trx;LogFileName={testProject.GetFilename()}.trx",
-        ResultsDirectory = "./TestResults/"
+.Does(() => {
+    var testAssemblies = GetFiles("**/*.Tests/bin/**/*.Tests.dll");
+
+    DotNetCoreVSTest(testAssemblies, new DotNetCoreVSTestSettings {
+        Logger = AppVeyor.IsRunningOnAppVeyor ? "Appveyor" : $"trx",
+        Parallel = true,
+        ToolTimeout = TimeSpan.FromMinutes(10),
     });
 });
 
