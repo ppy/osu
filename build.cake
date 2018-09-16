@@ -43,7 +43,9 @@ Task("InspectCode")
 .Does(() => {
     var nVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
   
-    DotNetCoreRestore(osuSolution.FullPath);
+    DotNetCoreRestore(osuSolution.FullPath, new DotNetCoreRestoreSettings {
+        Verbosity = DotNetCoreVerbosity.Quiet
+    });
 
     InspectCode(osuSolution, new InspectCodeSettings {
         CachesHome = "inspectcode",
