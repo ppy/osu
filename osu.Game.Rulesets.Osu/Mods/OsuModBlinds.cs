@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             };
             scoreProcessor.Combo.ValueChanged += val => {
                 if (val > 0 && val % 30 == 0)
-                    flashlight.TriggerNPC();
+                    flashlight.TriggerNpc();
             };
         }
     }
