@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using System;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// Black background boxes behind blind panel textures.
         /// </summary>
-        private Box box1, box2;
+        private Box blackBoxLeft, blackBoxRight;
         private Sprite panelLeft, panelRight;
         private Sprite bgPanelLeft, bgPanelRight;
 
@@ -30,12 +31,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Drawable randomNpc;
         private const float npc_movement_start = 1.5f;
         private float npcPosition = npc_movement_start;
-        private bool animatingNpc;
+        private bool animatingBlinds;
+        private Beatmap<OsuHitObject> beatmap;
         private Random random;
 
         private ISkinSource skin;
 
         private float targetClamp = 1;
+        private float targetBreakMultiplier = 0;
         private float target = 1;
         private readonly float easing = 1;
 
@@ -60,14 +63,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         private const float leniency = 0.1f;
 
-        /// <summary>
-        /// Multiplier for adding a gap when the Easy mod is also currently applied.
-        /// </summary>
-        private const float easy_position_multiplier = 0.95f;
-
-        public DrawableOsuBlinds(Container restrictTo, bool hasEasy, bool hasHardrock)
+        public DrawableOsuBlinds(Container restrictTo, bool hasEasy, bool hasHardrock, Beatmap<OsuHitObject> beatmap)
         {
             this.restrictTo = restrictTo;
+            this.beatmap = beatmap;
 
             modEasy = hasEasy;
             modHardrock = hasHardrock;
@@ -80,7 +79,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Width = 1;
             Height = 1;
 
-            Add(box1 = new Box
+            Add(blackBoxLeft = new Box
             {
                 Anchor = Anchor.TopLeft,
                 Origin = Anchor.TopLeft,
@@ -90,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Height = 1,
                 Depth = black_depth
             });
-            Add(box2 = new Box
+            Add(blackBoxRight = new Box
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -161,28 +160,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private float applyGap(float value)
         {
-            float ret;
+            const float easy_multiplier = 0.95f;
+            const float hardrock_multiplier = 1.1f;
+
+            float multiplier = 1;
             if (modEasy)
             {
-                const float multiplier = 0.95f;
-                ret = value * multiplier;
+                multiplier = easy_multiplier;
+                // TODO: include OD/CS
             }
             else if (modHardrock)
             {
-                const float multiplier = 1.1f;
-                ret = value * multiplier;
-            }
-            else
-            {
-                ret = value;
+                multiplier = hardrock_multiplier;
+                // TODO: include OD/CS
             }
 
-            if (ret > targetClamp)
-                return targetClamp;
-            else if (ret < 0)
-                return 0;
-            else
-                return ret;
+            return OpenTK.MathHelper.Clamp(value * multiplier, 0, targetClamp) * targetBreakMultiplier;
         }
 
         private static float applyAdjustmentCurve(float value)
@@ -201,8 +194,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             float width = (end - start) * 0.5f * applyAdjustmentCurve(applyGap(easing));
             // different values in case the playfield ever moves from center to somewhere else.
-            box1.Width = start + width;
-            box2.Width = DrawWidth - end + width;
+            blackBoxLeft.Width = start + width;
+            blackBoxRight.Width = DrawWidth - end + width;
 
             panelLeft.X = start + width;
             panelRight.X = end - width;
@@ -215,9 +208,45 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             bgRandomNpc.X = adjustedNpcPosition;
         }
 
+        protected override void LoadComplete()
+        {
+            const float break_open_early = 500;
+
+            base.LoadComplete();
+
+            var firstObj = beatmap.HitObjects[0];
+            var startDelay = firstObj.StartTime - firstObj.TimePreempt - firstObj.TimeFadeIn;
+
+            using (BeginAbsoluteSequence(startDelay, true))
+                LeaveBreak();
+
+            foreach (var breakInfo in beatmap.Breaks)
+            {
+                if (breakInfo.HasEffect)
+                {
+                    using (BeginAbsoluteSequence(breakInfo.StartTime - break_open_early, true))
+                    {
+                        EnterBreak();
+                        using (BeginDelayedSequence(breakInfo.Duration + break_open_early, true))
+                            LeaveBreak();
+                    }
+                }
+            }
+        }
+
+        public void EnterBreak()
+        {
+            this.TransformTo(nameof(targetBreakMultiplier), 0f, 1000, Easing.OutSine);
+        }
+
+        public void LeaveBreak()
+        {
+            this.TransformTo(nameof(targetBreakMultiplier), 1f, 2500, Easing.OutBounce);
+        }
+
         public void TriggerNpc()
         {
-            if (animatingNpc)
+            if (animatingBlinds)
                 return;
 
             bool left = (random.Next() & 1) != 0;
@@ -257,9 +286,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 ChangeChildDepth(panelRight, fg_panel_depth);
             }
 
-            animatingNpc = true;
+            animatingBlinds = true;
             npcPosition = start;
-            this.TransformTo(nameof(npcPosition), end, 3000, Easing.OutSine).Finally(_ => animatingNpc = false);
+            this.TransformTo(nameof(npcPosition), end, 3000, Easing.OutSine).Finally(_ => animatingBlinds = false);
 
             targetClamp = 1;
             this.Delay(600).TransformTo(nameof(targetClamp), 0.6f, 300).Delay(500).TransformTo(nameof(targetClamp), 1f, 300);

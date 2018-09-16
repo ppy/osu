@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         protected override void Update()
         {
             Height = Parent?.DrawHeight ?? 0;
-            if (Height == 0 || Texture is null)
+            if (Height == 0 || Texture == null)
                 Width = 0;
             else
                 Width = Texture.Width / (float)Texture.Height * Height;

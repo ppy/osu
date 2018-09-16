@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mods
     {
         public override string Name => "Blinds";
         public override string ShortenedName => "BL";
-        public override FontAwesome Icon => FontAwesome.fa_osu_mod_flashlight;
+        public override FontAwesome Icon => FontAwesome.fa_adjust;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Play with blinds on your screen.";
         public override bool Ranked => false;
