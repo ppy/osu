@@ -10,6 +10,7 @@ using osu.Game.Skinning;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using System;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -24,13 +25,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Box box1, box2;
         private Sprite panelLeft, panelRight;
         private Sprite bgPanelLeft, bgPanelRight;
+
+        private Drawable bgRandomNpc;
+        private Drawable randomNpc;
+        private const float npc_movement_start = 1.5f;
+        private float npcPosition = npc_movement_start;
+        private bool animatingNPC;
+        private Random random;
+
         private ISkinSource skin;
 
+        private float targetClamp = 1;
         private float target = 1;
         private readonly float easing = 1;
 
+        private const float black_depth = 10;
+        private const float bg_panel_depth = 8;
+        private const float fg_panel_depth = 4;
+        private const float npc_depth = 6;
+
         private readonly Container restrictTo;
-        private readonly bool hasEasy;
+        private readonly bool modEasy, modHardrock;
 
         /// <summary>
         /// <para>
@@ -50,10 +65,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         private const float easy_position_multiplier = 0.95f;
 
-        public DrawableOsuBlinds(Container restrictTo, bool hasEasy)
+        public DrawableOsuBlinds(Container restrictTo, bool hasEasy, bool hasHardrock)
         {
             this.restrictTo = restrictTo;
-            this.hasEasy = hasEasy;
+
+            modEasy = hasEasy;
+            modHardrock = hasHardrock;
         }
 
         [BackgroundDependencyLoader]
@@ -70,7 +87,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Colour = Color4.Black,
                 RelativeSizeAxes = Axes.Y,
                 Width = 0,
-                Height = 1
+                Height = 1,
+                Depth = black_depth
             });
             Add(box2 = new Box
             {
@@ -79,23 +97,56 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Colour = Color4.Black,
                 RelativeSizeAxes = Axes.Y,
                 Width = 0,
-                Height = 1
+                Height = 1,
+                Depth = black_depth
             });
 
             Add(bgPanelLeft = new ModBlindsPanelSprite {
                 Origin = Anchor.TopRight,
-                Colour = Color4.Gray
+                Colour = Color4.Gray,
+                Depth = bg_panel_depth + 1
             });
-            Add(bgPanelRight = new ModBlindsPanelSprite {
-                Origin = Anchor.TopLeft,
-                Colour = Color4.Gray
+            Add(panelLeft = new ModBlindsPanelSprite {
+                Origin = Anchor.TopRight,
+                Depth = bg_panel_depth
             });
 
-            Add(panelLeft = new ModBlindsPanelSprite {
-                Origin = Anchor.TopRight
+            Add(bgPanelRight = new ModBlindsPanelSprite {
+                Origin = Anchor.TopLeft,
+                Colour = Color4.Gray,
+                Depth = fg_panel_depth + 1
             });
             Add(panelRight = new ModBlindsPanelSprite {
-                Origin = Anchor.TopLeft
+                Origin = Anchor.TopLeft,
+                Depth = fg_panel_depth
+            });
+
+
+            random = new Random();
+            Add(bgRandomNpc = new Box
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Colour = Color4.Black,
+                Width = 512 * 0.4f,
+                Height = 512 * 0.95f,
+                RelativePositionAxes = Axes.Y,
+                X = -512,
+                Y = 0,
+                Depth = black_depth
+            });
+            Add(new SkinnableDrawable("Play/Catch/fruit-catcher-idle", name => randomNpc = new Sprite
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Texture = textures.Get(name),
+                Width = 512,
+                Height = 512,
+                RelativePositionAxes = Axes.Y,
+                X = -512,
+                Y = 0
+            }) {
+                Depth = npc_depth
             });
 
             this.skin = skin;
@@ -108,9 +159,36 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             PanelTexture = skin.GetTexture("Play/osu/blinds-panel");
         }
 
+        private float applyGap(float value)
+        {
+            float ret;
+            if (modEasy)
+            {
+                float multiplier = 0.95f;
+                ret = value * multiplier;
+            }
+            else if (modHardrock)
+            {
+                float multiplier = 1.1f;
+                ret = value * multiplier;
+            }
+            else
+            {
+                ret = value;
+            }
+
+            if (ret > targetClamp)
+                return targetClamp;
+            else if (ret < 0)
+                return 0;
+            else
+                return ret;
+        }
+
         private static float applyAdjustmentCurve(float value)
         {
-            return value * value;
+            // lagrange polinominal for (0,0) (0.5,0.35) (1,1) should make a good curve
+            return 0.6f * value * value + 0.4f * value;
         }
 
         protected override void Update()
@@ -121,7 +199,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             start -= rawWidth * leniency * 0.5f;
             end += rawWidth * leniency * 0.5f;
 
-            float width = (end - start) * 0.5f * applyAdjustmentCurve((hasEasy ? easy_position_multiplier : 1) * easing);
+            float width = (end - start) * 0.5f * applyAdjustmentCurve(applyGap(easing));
             // different values in case the playfield ever moves from center to somewhere else.
             box1.Width = start + width;
             box2.Width = DrawWidth - end + width;
@@ -130,6 +208,64 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             panelRight.X = end - width;
             bgPanelLeft.X = start;
             bgPanelRight.X = end;
+
+            float adjustedNpcPosition = npcPosition * rawWidth;
+            if (randomNpc != null)
+                randomNpc.X = adjustedNpcPosition;
+            bgRandomNpc.X = adjustedNpcPosition;
+        }
+
+        public void TriggerNPC()
+        {
+            if (animatingNPC)
+                return;
+
+            bool left = (random.Next() & 1) != 0;
+            bool exit = (random.Next() & 1) != 0;
+            float start, end;
+
+            if (left)
+            {
+                start = -npc_movement_start;
+                end = npc_movement_start;
+
+                randomNpc.Scale = new OpenTK.Vector2(1, 1);
+            }
+            else
+            {
+                start = npc_movement_start;
+                end = -npc_movement_start;
+
+                randomNpc.Scale = new OpenTK.Vector2(-1, 1);
+            }
+
+            // depths for exit from the left and entry from the right
+            if (left == exit)
+            {
+                ChangeChildDepth(bgPanelLeft, fg_panel_depth + 1);
+                ChangeChildDepth(panelLeft, fg_panel_depth);
+
+                ChangeChildDepth(bgPanelRight, bg_panel_depth + 1);
+                ChangeChildDepth(panelRight, bg_panel_depth);
+            }
+            else // depths for entry from the left or exit from the right
+            {
+                ChangeChildDepth(bgPanelLeft, bg_panel_depth + 1);
+                ChangeChildDepth(panelLeft, bg_panel_depth);
+
+                ChangeChildDepth(bgPanelRight, fg_panel_depth + 1);
+                ChangeChildDepth(panelRight, fg_panel_depth);
+            }
+
+            animatingNPC = true;
+            npcPosition = start;
+            this.TransformTo(nameof(npcPosition), end, 3000, Easing.OutSine).Finally(_ => animatingNPC = false);
+
+            targetClamp = 1;
+            this.Delay(600).TransformTo(nameof(targetClamp), 0.6f, 300).Delay(500).TransformTo(nameof(targetClamp), 1f, 300);
+
+            randomNpc?.FadeIn(250).Delay(2000).FadeOut(500);
+            bgRandomNpc.FadeIn(250).Delay(2000).FadeOut(500);
         }
 
         /// <summary>
