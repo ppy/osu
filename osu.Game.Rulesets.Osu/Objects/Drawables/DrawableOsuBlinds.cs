@@ -32,13 +32,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private const float npc_movement_start = 1.5f;
         private float npcPosition = npc_movement_start;
         private bool animatingBlinds;
-        private Beatmap<OsuHitObject> beatmap;
+
+        private readonly Beatmap<OsuHitObject> beatmap;
         private Random random;
 
         private ISkinSource skin;
 
         private float targetClamp = 1;
-        private float targetBreakMultiplier = 0;
+        private readonly float targetBreakMultiplier = 0;
         private float target = 1;
         private readonly float easing = 1;
 
