@@ -121,8 +121,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Depth = fg_panel_depth
             });
 
-
-            random = new Random();
+            // seed with unique seed per map so NPC always comes from the same sides for a same map for reproducible replays.
+            random = new Random(beatmap.Metadata.ToString().GetHashCode());
             Add(bgRandomNpc = new Box
             {
                 Anchor = Anchor.Centre,
@@ -133,7 +133,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 RelativePositionAxes = Axes.Y,
                 X = -512,
                 Y = 0,
-                Depth = black_depth
+                Depth = black_depth,
+                Alpha = 0
             });
             Add(new SkinnableDrawable("Play/Catch/fruit-catcher-idle", name => randomNpc = new Sprite
             {
@@ -144,7 +145,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Height = 512,
                 RelativePositionAxes = Axes.Y,
                 X = -512,
-                Y = 0
+                Y = 0,
+                Alpha = 0
             }) {
                 Depth = npc_depth
             });
