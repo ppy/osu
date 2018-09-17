@@ -94,32 +94,36 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
                     Vector2 getCenteredVector(Vector2 top, Vector2 bottom) => new Vector2(top.X, top.Y + (bottom.Y - top.Y) / 2);
 
-                    const float padding = 5;
+                    const float padding = 10;
 
-                    var start = getCenteredVector(pairing.ScreenSpaceDrawQuad.TopRight, pairing.ScreenSpaceDrawQuad.BottomRight);
-                    var end = getCenteredVector(progression.ScreenSpaceDrawQuad.TopLeft, progression.ScreenSpaceDrawQuad.BottomLeft);
+                    var q1 = pairing.ScreenSpaceDrawQuad;
+                    var q2 = progression.ScreenSpaceDrawQuad;
 
-                    bool progressionAbove = progression.ScreenSpaceDrawQuad.TopLeft.Y < pairing.ScreenSpaceDrawQuad.TopLeft.Y;
-                    bool progressionToRight = progression.ScreenSpaceDrawQuad.TopLeft.X > pairing.ScreenSpaceDrawQuad.TopLeft.X;
+                    bool progressionToRight = q2.TopLeft.X > q1.TopLeft.X;
 
-                    //if (!Precision.AlmostEquals(progressionStart, start) || !Precision.AlmostEquals(progressionEnd, end))
+                    if (!progressionToRight)
                     {
-                        // var progressionStart = start;
-                        // var progressionEnd = end;
-
-                        Vector2 startPosition = path.ToLocalSpace(start) + new Vector2(padding, 0);
-                        Vector2 endPosition = path.ToLocalSpace(end) + new Vector2(-padding, 0);
-                        Vector2 intermediate1 = startPosition + new Vector2(padding, 0);
-                        Vector2 intermediate2 = new Vector2(intermediate1.X, endPosition.Y);
-
-                        path.Positions = new List<Vector2>
-                        {
-                            startPosition,
-                            intermediate1,
-                            intermediate2,
-                            endPosition
-                        };
+                        var temp = q2;
+                        q2 = q1;
+                        q1 = temp;
                     }
+
+                    var c1 = getCenteredVector(q1.TopRight, q1.BottomRight) + new Vector2(padding, 0);
+                    var c2 = getCenteredVector(q2.TopLeft, q2.BottomLeft) - new Vector2(padding, 0);
+
+                    var p1 = c1;
+                    var p2 = p1 + new Vector2(padding, 0);
+
+                    if (p2.X > c2.X)
+                    {
+                        c2 = getCenteredVector(q2.TopRight, q2.BottomRight) + new Vector2(padding, 0);
+                        p2.X = c2.X + padding;
+                    }
+
+                    var p3 = new Vector2(p2.X, c2.Y);
+                    var p4 = new Vector2(c2.X, p3.Y);
+
+                    path.Positions = new[] { p1, p2, p3, p4 }.Select(p => path.ToLocalSpace(p)).ToList();
                 }
             }
         }
