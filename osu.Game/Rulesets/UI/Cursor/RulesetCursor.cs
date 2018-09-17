@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.UI.Cursor
         private StopwatchClock clock = new StopwatchClock(true);
         private double idleTime => clock.CurrentTime - lastActiveTime;
         ///<summary> 
-        ///Time of idling after which the cursor is hidden.true
+        ///Time of idling after which the cursor is hidden.
         ///<summary/>
         public double IdleDelay = 2000;
 
