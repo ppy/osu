@@ -1,3 +1,6 @@
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
 using osu.Game.Graphics.Cursor;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.States;
@@ -10,6 +13,10 @@ namespace osu.Game.Rulesets.UI.Cursor
         private double lastActiveTime = 0;
         private StopwatchClock clock = new StopwatchClock(true);
         private double idleTime => clock.CurrentTime - lastActiveTime;
+        ///<summary> 
+        ///Time of idling after which the cursor is hidden.true
+        ///<summary/>
+        public double IdleDelay = 2000;
 
         protected override bool OnMouseMove(InputState state)
         {
@@ -17,9 +24,7 @@ namespace osu.Game.Rulesets.UI.Cursor
             {
                 lastActiveTime = clock.CurrentTime;
                 if (State == Visibility.Hidden)
-                {
                     Show();
-                }
             }
 
             return base.OnMouseMove(state);
@@ -29,10 +34,8 @@ namespace osu.Game.Rulesets.UI.Cursor
         {
             base.Update();
 
-            if (State == Visibility.Visible && idleTime > 2000)
-            {
+            if (State == Visibility.Visible && idleTime > IdleDelay)
                 Hide();
-            }
         }
     }
 }
