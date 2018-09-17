@@ -19,7 +19,6 @@ namespace osu.Game.Rulesets.UI.Cursor
                 if (State == Visibility.Hidden)
                 {
                     Show();
-                    PopIn();
                 }
             }
 
@@ -33,7 +32,6 @@ namespace osu.Game.Rulesets.UI.Cursor
             if (State == Visibility.Visible && idleTime > 2000)
             {
                 Hide();
-                PopOut();
             }
         }
     }
