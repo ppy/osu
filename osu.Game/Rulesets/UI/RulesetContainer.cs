@@ -22,6 +22,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI.Cursor;
 using OpenTK;
 
 namespace osu.Game.Rulesets.UI
@@ -70,7 +71,8 @@ namespace osu.Game.Rulesets.UI
         public Playfield Playfield => playfield.Value;
 
         /// <summary>
-        /// The cursor provided by this <see cref="RulesetContainer"/>. May be null if no cursor is provided.
+        /// The cursor provided by this <see cref="RulesetContainer"/>.
+        /// Defaults to <see cref="RulesetCursor"/> if the <see cref="RulesetContainer"/> doesn't provide a custom cursor.
         /// </summary>
         public readonly CursorContainer Cursor;
 
@@ -149,9 +151,9 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
-        /// Creates the cursor. May be null if the <see cref="RulesetContainer"/> doesn't provide a custom cursor.
+        /// Creates the cursor. Defaults to <see cref="RulesetCursor"/> if the <see cref="RulesetContainer"/> doesn't provide a custom cursor.
         /// </summary>
-        protected virtual CursorContainer CreateCursor() => null;
+        protected virtual CursorContainer CreateCursor() => new RulesetCursor();
 
         /// <summary>
         /// Creates a Playfield.
