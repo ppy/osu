@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Edit.Tools
 {
-    public abstract class HitObjectCompositionTool : ICompositionTool
+    public abstract class HitObjectCompositionTool
     {
         public string Name { get; }
 

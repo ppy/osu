@@ -13,7 +13,6 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
@@ -27,7 +26,7 @@ namespace osu.Game.Rulesets.Edit
 
         public IEnumerable<DrawableHitObject> HitObjects => rulesetContainer.Playfield.AllHitObjects;
 
-        protected ICompositionTool CurrentTool { get; private set; }
+        protected HitObjectCompositionTool CurrentTool { get; private set; }
         protected IRulesetConfigManager Config { get; private set; }
 
         protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
@@ -151,32 +150,30 @@ namespace osu.Game.Rulesets.Edit
             });
         }
 
-        private void setCompositionTool(ICompositionTool tool)
+        private void setCompositionTool(HitObjectCompositionTool tool)
         {
             CurrentTool = tool;
 
             placementLayer.Clear();
 
-            if (tool is HitObjectCompositionTool hitObjectTool)
+            var visualiser = tool?.CreatePlacementVisualiser();
+            if (visualiser != null)
             {
-                var visualiser = hitObjectTool.CreatePlacementVisualiser();
-                if (visualiser != null)
+                visualiser.PlacementFinished += obj =>
                 {
-                    visualiser.PlacementFinished += onPlacementFinished;
-                    placementLayer.Child = visualiser;
-                }
-            }
-        }
+                    var drawableObject = rulesetContainer.AddHitObject(obj);
+                    maskLayer.AddMask(drawableObject);
 
-        private void onPlacementFinished(HitObject obj)
-        {
-            var drawableObject = rulesetContainer.AddHitObject(obj);
-            maskLayer.AddMask(drawableObject);
+                    setCompositionTool(tool);
+                };
+
+                placementLayer.Child = visualiser;
+            }
         }
 
         protected abstract EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap);
 
-        protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
+        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
         /// <summary>
         /// Creates a <see cref="HitObjectMask"/> for a specific <see cref="DrawableHitObject"/>.

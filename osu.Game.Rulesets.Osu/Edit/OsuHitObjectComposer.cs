@@ -24,9 +24,9 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new OsuEditRulesetContainer(ruleset, beatmap);
 
-        protected override IReadOnlyList<ICompositionTool> CompositionTools => new ICompositionTool[]
+        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new[]
         {
-            new HitCircleCompositionTool(Beatmap.Value.Beatmap),
+            new HitCircleCompositionTool(),
         };
 
         protected override ScalableContainer CreateLayerContainer() => new ScalableContainer(OsuPlayfield.BASE_SIZE.X) { RelativeSizeAxes = Axes.Both };
