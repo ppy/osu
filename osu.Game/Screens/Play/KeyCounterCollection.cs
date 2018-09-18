@@ -7,8 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
 using OpenTK;
@@ -152,13 +151,18 @@ namespace osu.Game.Screens.Play
 
             public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args) => Target.Children.Any(c => c.TriggerOnKeyDown(state, args));
-
-            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args) => Target.Children.Any(c => c.TriggerOnKeyUp(state, args));
-
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseDown(state, args));
-
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseUp(state, args));
+            protected override bool Handle(UIEvent e)
+            {
+                switch (e)
+                {
+                    case KeyDownEvent _:
+                    case KeyUpEvent _:
+                    case MouseDownEvent _:
+                    case MouseUpEvent _:
+                        return Target.Children.Any(c => c.TriggerEvent(e));
+                }
+                return base.Handle(e);
+            }
         }
     }
 }
