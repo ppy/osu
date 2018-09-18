@@ -27,9 +27,9 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="System.IO.Packaging" Version="4.5.0" />
-    <PackageReference Include="ppy.squirrel.windows" Version="1.8.0.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.2" />
+    <PackageReference Include="ppy.squirrel.windows" Version="1.8.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.3" />
   </ItemGroup>
   <ItemGroup Label="Resources">
     <EmbeddedResource Include="lazer.ico" />
