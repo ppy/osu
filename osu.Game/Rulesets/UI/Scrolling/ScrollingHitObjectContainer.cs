@@ -54,6 +54,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 case SpeedChangeVisualisationMethod.Overlapping:
                     speedChangeVisualiser = new OverlappingSpeedChangeVisualiser(ControlPoints);
                     break;
+                case SpeedChangeVisualisationMethod.Constant:
+                    speedChangeVisualiser = new ConstantSpeedChangeVisualiser();
+                    break;
             }
         }
 

@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 
             foreach (var obj in hitObjects)
             {
-                var finalPosition = hitObjectPositions[obj] - timelinePosition;
+                var finalPosition = (hitObjectPositions[obj] - timelinePosition);
 
                 switch (direction)
                 {
