@@ -22,7 +22,8 @@ namespace osu.Game.Rulesets.Edit.Tools
 
         public HitObject HitObject { get; private set; }
 
-        private IBindableBeatmap workingBeatmap;
+        protected IBeatmap Beatmap { get; private set; }
+
         private IAdjustableClock clock;
 
         private double? lastAppliedTime;
@@ -37,8 +38,9 @@ namespace osu.Game.Rulesets.Edit.Tools
         [BackgroundDependencyLoader]
         private void load(IBindableBeatmap workingBeatmap, IAdjustableClock clock)
         {
-            this.workingBeatmap = workingBeatmap;
             this.clock = clock;
+
+            Beatmap = workingBeatmap.Value.Beatmap;
         }
 
         protected override void Update()
@@ -48,7 +50,7 @@ namespace osu.Game.Rulesets.Edit.Tools
             if (clock.CurrentTime != lastAppliedTime)
             {
                 ApplyTime(clock.CurrentTime);
-                HitObject.ApplyDefaults(workingBeatmap.Value.Beatmap.ControlPointInfo, workingBeatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty);
+                HitObject.ApplyDefaults(Beatmap.ControlPointInfo, Beatmap.BeatmapInfo.BaseDifficulty);
 
                 lastAppliedTime = clock.CurrentTime;
             }
