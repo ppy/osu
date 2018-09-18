@@ -78,11 +78,26 @@ namespace osu.Game.Screens.Select.Carousel
                             TextSize = 17,
                             Shadow = true,
                         },
-                        new FillFlowContainer<FilterableDifficultyIcon>
+                        new FillFlowContainer
                         {
-                            Margin = new MarginPadding { Top = 5 },
+                            Direction = FillDirection.Horizontal,
                             AutoSizeAxes = Axes.Both,
-                            Children = ((CarouselBeatmapSet)Item).Beatmaps.Select(b => new FilterableDifficultyIcon(b)).ToList()
+                            Margin = new MarginPadding { Top = 5 },
+                            Children = new Drawable[]
+                            {
+                                new BeatmapSetOnlineStatusPill(11, new MarginPadding { Horizontal = 8, Vertical = 2 })
+                                {
+                                    Origin = Anchor.CentreLeft,
+                                    Anchor = Anchor.CentreLeft,
+                                    Margin = new MarginPadding{ Right = 5 },
+                                    Status = beatmapSet.Status
+                                },
+                                new FillFlowContainer<FilterableDifficultyIcon>
+                                {
+                                    AutoSizeAxes = Axes.Both,
+                                    Children = ((CarouselBeatmapSet)Item).Beatmaps.Select(b => new FilterableDifficultyIcon(b)).ToList()
+                                },
+                            }
                         }
                     }
                 }
