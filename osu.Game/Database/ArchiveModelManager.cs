@@ -438,19 +438,14 @@ namespace osu.Game.Database
                 return Task.CompletedTask;
             }
 
-            return Task.Factory.StartNew(() =>
+            if (!stable.ExistsDirectory(ImportFromStablePath))
             {
-                try
-                {
-                    Import(stable.GetDirectories(ImportFromStablePath).Select(f => stable.GetFullPath(f)).ToArray());
-                }
-                catch (DirectoryNotFoundException)
-                {
-                    // This handles situations like when the user does not have a Skins folder
-                    // which would have this exception thrown from stable.GetDirectories
-                    Logger.Log("No " + ImportFromStablePath + " folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
-                }
-            }, TaskCreationOptions.LongRunning);
+                // This handles situations like when the user does not have a Skins folder
+                Logger.Log("No " + ImportFromStablePath + " folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
+                return Task.CompletedTask;
+            }
+
+            return Task.Factory.StartNew(() => Import(stable.GetDirectories(ImportFromStablePath).Select(f => stable.GetFullPath(f)).ToArray()), TaskCreationOptions.LongRunning);
         }
 
         #endregion
