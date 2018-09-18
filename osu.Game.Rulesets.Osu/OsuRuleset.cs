@@ -117,6 +117,11 @@ namespace osu.Game.Rulesets.Osu
                         new OsuModRelax(),
                         new OsuModAutopilot(),
                     };
+                case ModType.Fun:
+                    return new Mod[] {
+                        new OsuModTransform(),
+                        new OsuModWiggle(),
+                    };
                 default:
                     return new Mod[] { };
             }
