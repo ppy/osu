@@ -55,6 +55,8 @@ namespace osu.Game.Rulesets.Catch.UI
                     RelativeSizeAxes = Axes.Both,
                 },
             });
+
+            VisibleTimeRange.Value = BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450) / 1.2;
         }
 
         public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.AttemptCatch(obj);
