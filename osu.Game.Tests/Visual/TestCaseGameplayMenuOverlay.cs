@@ -228,7 +228,7 @@ namespace osu.Game.Tests.Visual
                 var lastAction = pauseOverlay.OnRetry;
                 pauseOverlay.OnRetry = () => triggered = true;
 
-                retryButton.TriggerOnClick();
+                retryButton.Click();
                 pauseOverlay.OnRetry = lastAction;
             });
 
