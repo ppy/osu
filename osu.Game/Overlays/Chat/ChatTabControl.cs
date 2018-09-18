@@ -146,9 +146,10 @@ namespace osu.Game.Overlays.Chat
 
             protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
             {
-                if (args.Button == MouseButton.Middle)
+                var isMclick = args.Button == MouseButton.Middle;
+                if (isMclick)
                     closeButton.Action();
-                return true;
+                return isMclick;
             }
 
             protected override bool OnHover(InputState state)
