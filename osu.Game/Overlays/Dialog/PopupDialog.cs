@@ -199,7 +199,7 @@ namespace osu.Game.Overlays.Dialog
             switch (action)
             {
                 case GlobalAction.Select:
-                    Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerOnClick();
+                    Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.Click();
                     return true;
             }
 
@@ -252,7 +252,7 @@ namespace osu.Game.Overlays.Dialog
             if (!actionInvoked)
                 // In the case a user did not choose an action before a hide was triggered, press the last button.
                 // This is presumed to always be a sane default "cancel" action.
-                buttonsContainer.Last().TriggerOnClick();
+                buttonsContainer.Last().Click();
 
             base.PopOut();
             content.FadeOut(EXIT_DURATION, Easing.InSine);
@@ -261,7 +261,7 @@ namespace osu.Game.Overlays.Dialog
         private void pressButtonAtIndex(int index)
         {
             if (index < Buttons.Count())
-                Buttons.Skip(index).First().TriggerOnClick();
+                Buttons.Skip(index).First().Click();
         }
     }
 }
