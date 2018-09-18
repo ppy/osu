@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
@@ -130,40 +129,33 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public void JoinRequest(MatchPairing pairing)
         {
-            AddInternal(new JoinRequestHandler(pairing, handleProgression));
-        }
-
-        private bool handleProgression(JoinRequestHandler handler, InputState state)
-        {
-            var found = pairingsContainer.FirstOrDefault(d => d.ReceiveMouseInputAt(state.Mouse.NativeState.Position));
-
-            if (found != null)
-            {
-                handler.Source.Progression.Value = found.Pairing;
-                return true;
-            }
-
-            return false;
+            AddInternal(new JoinRequestHandler(pairingsContainer, pairing));
         }
 
         private class JoinRequestHandler : CompositeDrawable
         {
+            private readonly Container<DrawableMatchPairing> pairingsContainer;
             public readonly MatchPairing Source;
-            private readonly Func<JoinRequestHandler, InputState, bool> onClick;
 
-            public JoinRequestHandler(MatchPairing source, Func<JoinRequestHandler, InputState, bool> onClick)
+            public JoinRequestHandler(Container<DrawableMatchPairing> pairingsContainer, MatchPairing source)
             {
+                this.pairingsContainer = pairingsContainer;
                 Source = source;
-                this.onClick = onClick;
                 RelativeSizeAxes = Axes.Both;
             }
 
             protected override bool OnClick(InputState state)
             {
-                if (onClick(this, state))
-                    Expire();
+                var found = pairingsContainer.FirstOrDefault(d => d.ReceiveMouseInputAt(state.Mouse.NativeState.Position));
 
-                return true;
+                if (found != null)
+                {
+                    Source.Progression.Value = found.Pairing;
+                    Expire();
+                    return true;
+                }
+
+                return false;
             }
         }
     }
