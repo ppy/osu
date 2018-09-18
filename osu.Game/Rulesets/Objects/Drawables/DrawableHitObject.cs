@@ -7,6 +7,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.TypeExtensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
@@ -163,6 +165,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
                     State.Value = ArmedState.Idle;
                 }
             }
+        }
+
+        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds)
+        {
+            if (!AllJudged)
+                return false;
+
+            return base.UpdateSubTreeMasking(source, maskingBounds);
         }
 
         protected override void UpdateAfterChildren()
