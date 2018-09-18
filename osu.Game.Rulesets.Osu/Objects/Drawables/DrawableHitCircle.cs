@@ -61,6 +61,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = circle.DrawSize;
 
             HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
+            HitObject.ScaleChanged += scale => Scale = new Vector2(scale);
             HitObject.IndexInCurrentComboChanged += v => number.Text = (v + 1).ToString();
         }
 

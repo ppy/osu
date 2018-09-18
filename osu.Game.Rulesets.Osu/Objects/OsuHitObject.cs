@@ -16,6 +16,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public const double OBJECT_RADIUS = 64;
 
         public event Action<Vector2> PositionChanged;
+        public event Action<float> ScaleChanged;
         public event Action<int> IndexInCurrentComboChanged;
 
         public double TimePreempt = 600;
@@ -51,7 +52,20 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double Radius => OBJECT_RADIUS * Scale;
 
-        public float Scale { get; set; } = 1;
+        private float scale = 1;
+
+        public float Scale
+        {
+            get => scale;
+            set
+            {
+                if (scale == value)
+                    return;
+                scale = value;
+
+                ScaleChanged?.Invoke(value);
+            }
+        }
 
         public virtual bool NewCombo { get; set; }
 
