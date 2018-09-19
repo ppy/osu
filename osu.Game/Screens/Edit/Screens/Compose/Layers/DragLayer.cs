@@ -64,8 +64,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         protected override bool OnDrag(DragEvent e)
         {
-            var dragPosition = e.Mouse.NativeState.Position;
-            var dragStartPosition = e.Mouse.NativeState.PositionMouseDown ?? dragPosition;
+            var dragPosition = e.ScreenSpaceMousePosition;
+            var dragStartPosition = e.ScreenSpaceMouseDownPosition;
 
             var dragQuad = new Quad(dragStartPosition.X, dragStartPosition.Y, dragPosition.X - dragStartPosition.X, dragPosition.Y - dragStartPosition.Y);
 

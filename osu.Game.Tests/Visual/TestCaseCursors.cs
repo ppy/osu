@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         /// <param name="cursorContainer">The cursor to check.</param>
         private bool checkAtMouse(CursorContainer cursorContainer)
-            => Precision.AlmostEquals(InputManager.CurrentState.Mouse.NativeState.Position, cursorContainer.ToScreenSpace(cursorContainer.ActiveCursor.DrawPosition));
+            => Precision.AlmostEquals(InputManager.CurrentState.Mouse.Position, cursorContainer.ToScreenSpace(cursorContainer.ActiveCursor.DrawPosition));
 
         private class CustomCursorBox : Container, IProvideCursor
         {

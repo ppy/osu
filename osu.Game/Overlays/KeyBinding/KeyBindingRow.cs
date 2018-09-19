@@ -11,14 +11,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input;
 using OpenTK.Graphics;
 using OpenTK.Input;
-using JoystickEventArgs = osu.Framework.Input.EventArgs.JoystickEventArgs;
 
 namespace osu.Game.Overlays.KeyBinding
 {
@@ -166,14 +164,14 @@ namespace osu.Game.Overlays.KeyBinding
                 }
             }
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
             return true;
         }
 
         protected override bool OnMouseUp(MouseUpEvent e)
         {
             // don't do anything until the last button is released.
-            if (!HasFocus || state.Mouse.Buttons.Any())
+            if (!HasFocus || e.CurrentState.Mouse.HasAnyButtonPressed)
                 return base.OnMouseUp(e);
 
             if (bindTarget.IsHovered)
@@ -189,7 +187,7 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 if (bindTarget.IsHovered)
                 {
-                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e, e.Mouse.ScrollDelta));
+                    bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState, e.ScrollDelta));
                     finalise();
                     return true;
                 }
@@ -207,7 +205,7 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 case Key.Delete:
                 {
-                    if (state.Keyboard.ShiftPressed)
+                    if (e.CurrentState.Keyboard.ShiftPressed)
                     {
                         bindTarget.UpdateKeyCombination(InputKey.None);
                         finalise();
@@ -218,7 +216,7 @@ namespace osu.Game.Overlays.KeyBinding
                 }
             }
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
             if (!isModifier(e.Key)) finalise();
 
             return true;
@@ -232,21 +230,21 @@ namespace osu.Game.Overlays.KeyBinding
             return true;
         }
 
-        protected override bool OnJoystickPress(InputState state, JoystickEventArgs args)
+        protected override bool OnJoystickPress(JoystickPressEvent e)
         {
             if (!HasFocus)
                 return false;
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(state));
+            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
             finalise();
 
             return true;
         }
 
-        protected override bool OnJoystickRelease(InputState state, JoystickEventArgs args)
+        protected override bool OnJoystickRelease(JoystickReleaseEvent e)
         {
             if (!HasFocus)
-                return base.OnJoystickRelease(args);
+                return base.OnJoystickRelease(e);
 
             finalise();
             return true;

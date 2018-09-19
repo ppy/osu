@@ -457,20 +457,14 @@ namespace osu.Game.Overlays
 
         private class DragContainer : Container
         {
-            private Vector2 dragStart;
-
             protected override bool OnDragStart(DragStartEvent e)
             {
-                base.OnDragStart(e);
-                dragStart = e.Mouse.Position;
                 return true;
             }
 
             protected override bool OnDrag(DragEvent e)
             {
-                if (base.OnDrag(e)) return true;
-
-                Vector2 change = e.Mouse.Position - dragStart;
+                Vector2 change = e.MousePosition - e.MouseDownPosition;
 
                 // Diminish the drag distance as we go further to simulate "rubber band" feeling.
                 change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;

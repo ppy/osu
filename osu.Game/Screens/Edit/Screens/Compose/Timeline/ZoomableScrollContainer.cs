@@ -99,11 +99,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            if (e.Mouse.HasPreciseScroll)
+            if (e.IsPrecise)
                 // for now, we don't support zoom when using a precision scroll device. this needs gesture support.
                 return base.OnScroll(e);
 
-            setZoomTarget(zoomTarget + e.Mouse.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.Mouse.NativeState.Position).X);
+            setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
             return true;
         }
 

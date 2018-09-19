@@ -241,7 +241,7 @@ namespace osu.Game.Overlays.Volume
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            adjust(e.Mouse.ScrollDelta.Y, e.Mouse.HasPreciseScroll);
+            adjust(e.ScrollDelta.Y, e.IsPrecise);
             return true;
         }
 

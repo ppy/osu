@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Select
         {
             if (!e.Repeat && e.Key == Hotkey)
             {
-                OnClick(state);
+                Click();
                 return true;
             }
 

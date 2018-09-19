@@ -206,10 +206,7 @@ namespace osu.Game.Overlays
         {
             if (isDragging)
             {
-                Trace.Assert(e.Mouse.PositionMouseDown != null);
-
-                // ReSharper disable once PossibleInvalidOperationException
-                double targetChatHeight = startDragChatHeight - (e.Mouse.Position.Y - e.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
+                double targetChatHeight = startDragChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
 
                 // If the channel selection screen is shown, mind its minimum height
                 if (channelSelection.State == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)

@@ -159,7 +159,7 @@ namespace osu.Game.Overlays.Mods
             scaleContainer.ScaleTo(1, 500, Easing.OutElastic);
 
             // only trigger the event if we are inside the area of the button
-            if (Contains(ToScreenSpace(state.Mouse.Position - Position)))
+            if (Contains(e.ScreenSpaceMousePosition))
             {
                 switch (e.Button)
                 {

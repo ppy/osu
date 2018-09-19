@@ -34,7 +34,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (!state.Keyboard.ControlPressed && !state.Keyboard.ShiftPressed)
+            var keyboard = e.CurrentState.Keyboard;
+            if (!keyboard.ControlPressed && !keyboard.ShiftPressed)
             {
                 switch (e.Key)
                 {
@@ -56,7 +57,7 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            if (state.Keyboard.ShiftPressed)
+            if (keyboard.ShiftPressed)
             {
                 switch (e.Key)
                 {

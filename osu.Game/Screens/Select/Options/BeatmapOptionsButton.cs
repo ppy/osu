@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Select.Options
         {
             if (!e.Repeat && e.Key == HotKey)
             {
-                OnClick(state);
+                Click();
                 return true;
             }
 

@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.States;
 using osu.Game.Rulesets.Edit;
+using OpenTK;
 using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// <summary>
         /// Invoked when any <see cref="HitObjectMask"/> requests drag.
         /// </summary>
-        public event Action<HitObjectMask, InputState> MaskDragRequested;
+        public event Action<HitObjectMask, Vector2, InputState> MaskDragRequested;
 
         private IEnumerable<HitObjectMask> aliveMasks => AliveInternalChildren.Cast<HitObjectMask>();
 
@@ -103,7 +104,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         }
 
         private void onSelectionRequested(HitObjectMask mask, InputState state) => MaskSelectionRequested?.Invoke(mask, state);
-        private void onDragRequested(HitObjectMask mask, InputState state) => MaskDragRequested?.Invoke(mask, state);
+        private void onDragRequested(HitObjectMask mask, Vector2 delta, InputState state) => MaskDragRequested?.Invoke(mask, delta, state);
 
         protected override int Compare(Drawable x, Drawable y)
         {
