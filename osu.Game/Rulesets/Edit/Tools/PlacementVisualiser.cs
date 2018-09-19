@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Edit.Tools
     {
         public event Action<HitObject> PlacementFinished;
 
-        public HitObject HitObject { get; private set; }
+        public readonly HitObject HitObject;
 
         protected IBeatmap Beatmap { get; private set; }
 
@@ -41,6 +41,15 @@ namespace osu.Game.Rulesets.Edit.Tools
             this.clock = clock;
 
             Beatmap = workingBeatmap.Value.Beatmap;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // We'll only get a mouse move event in the next frame, so there's a 1-frame position discrepancy
+            // We can fix this by forcefully applying the current mouse position
+            ApplyPosition(GetContainingInputManager().CurrentState.Mouse.Position);
         }
 
         protected override void Update()
