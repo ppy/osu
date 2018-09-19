@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
@@ -264,20 +263,20 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 
             protected override bool OnClick(ClickEvent e)
             {
-                handleMouseInput(e);
+                handleMouseInput(e.ScreenSpaceMousePosition);
                 return true;
             }
 
             protected override bool OnDrag(DragEvent e)
             {
-                handleMouseInput(e);
+                handleMouseInput(e.ScreenSpaceMousePosition);
                 return true;
             }
 
-            private void handleMouseInput(InputState state)
+            private void handleMouseInput(Vector2 screenSpaceMousePosition)
             {
                 // copied from SliderBar so we can do custom spacing logic.
-                var xPosition = (ToLocalSpace(state?.Mouse.NativeState.Position ?? Vector2.Zero).X - RangePadding) / UsableWidth;
+                var xPosition = (ToLocalSpace(screenSpaceMousePosition).X - RangePadding) / UsableWidth;
 
                 CurrentNumber.Value = availableDivisors.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
                 OnUserChange();

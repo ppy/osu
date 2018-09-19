@@ -6,10 +6,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Input.States;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
 using osu.Game.Skinning;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -102,23 +102,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             };
         }
 
-        private InputState lastState;
+        private Vector2? lastScreenSpaceMousePosition;
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            lastState = state;
+            lastScreenSpaceMousePosition = e.ScreenSpaceMousePosition;
             return base.OnMouseDown(e);
         }
 
         protected override bool OnMouseUp(MouseUpEvent e)
         {
-            lastState = state;
+            lastScreenSpaceMousePosition = e.ScreenSpaceMousePosition;
             return base.OnMouseUp(e);
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            lastState = e;
+            lastScreenSpaceMousePosition = e.ScreenSpaceMousePosition;
             return base.OnMouseMove(e);
         }
 
@@ -155,8 +155,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 // Make sure to use the base version of ReceivePositionalInputAt so that we correctly check the position.
                 Tracking = canCurrentlyTrack
-                           && lastState != null
-                           && ReceivePositionalInputAt(lastState.Mouse.NativeState.Position)
+                           && lastScreenSpaceMousePosition.HasValue
+                           && ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value)
                            && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
             }
         }

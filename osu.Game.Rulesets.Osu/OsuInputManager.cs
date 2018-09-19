@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Input.States;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu
@@ -36,13 +35,11 @@ namespace osu.Game.Rulesets.Osu
             {
             }
 
-            protected override bool OnKeyDown(KeyDownEvent e) => AllowUserPresses && base.OnKeyDown(e);
-            protected override bool OnKeyUp(KeyUpEvent e) => AllowUserPresses && base.OnKeyUp(e);
-            protected override bool OnJoystickPress(InputState state, JoystickEventArgs args) => AllowUserPresses && base.OnJoystickPress(args);
-            protected override bool OnJoystickRelease(InputState state, JoystickEventArgs args) => AllowUserPresses && base.OnJoystickRelease(args);
-            protected override bool OnMouseDown(MouseDownEvent e) => AllowUserPresses && base.OnMouseDown(e);
-            protected override bool OnMouseUp(MouseUpEvent e) => AllowUserPresses && base.OnMouseUp(e);
-            protected override bool OnScroll(ScrollEvent e) => AllowUserPresses && base.OnScroll(e);
+            protected override bool Handle(UIEvent e)
+            {
+                if (!AllowUserPresses) return false;
+                return base.Handle(e);
+            }
         }
     }
 

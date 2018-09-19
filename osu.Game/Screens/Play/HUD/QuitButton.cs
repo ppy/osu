@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -62,7 +63,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            positionalAdjust = Vector2.Distance(e.Mouse.NativeState.Position, button.ScreenSpaceDrawQuad.Centre) / 200;
+            positionalAdjust = Vector2.Distance(e.ScreenSpaceMousePosition, button.ScreenSpaceDrawQuad.Centre) / 200;
             return base.OnMouseMove(e);
         }
 
@@ -182,14 +183,14 @@ namespace osu.Game.Screens.Play.HUD
 
             protected override bool OnMouseDown(MouseDownEvent e)
             {
-                if (!pendingAnimation && state.Mouse.Buttons.Count() == 1)
+                if (!pendingAnimation && e.CurrentState.Mouse.Buttons.Count() == 1)
                     BeginConfirm();
                 return true;
             }
 
             protected override bool OnMouseUp(MouseUpEvent e)
             {
-                if (!state.Mouse.Buttons.Any())
+                if (!e.CurrentState.Mouse.Buttons.Any())
                     AbortConfirm();
                 return true;
             }

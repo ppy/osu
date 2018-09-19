@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            if (e.Mouse.ScrollDelta.Y > 0)
+            if (e.ScrollDelta.Y > 0)
                 Clock.SeekBackward(true);
             else
                 Clock.SeekForward(true);

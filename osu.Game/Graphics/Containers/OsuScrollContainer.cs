@@ -3,7 +3,6 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using osu.Framework.Input.States;
 using OpenTK.Input;
 
 namespace osu.Game.Graphics.Containers
@@ -21,7 +20,7 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public double DistanceDecayOnRightMouseScrollbar = 0.02;
 
-        private bool shouldPerformRightMouseScroll(InputState state) => RightMouseScrollbar && state.Mouse.IsPressed(MouseButton.Right);
+        private bool shouldPerformRightMouseScroll(MouseButtonEvent e) => RightMouseScrollbar && e.Button == MouseButton.Right;
 
         private void scrollToRelative(float value) => ScrollTo(Clamp((value - Scrollbar.DrawSize[ScrollDim] / 2) / Scrollbar.Size[ScrollDim]), true, DistanceDecayOnRightMouseScrollbar);
 
@@ -31,9 +30,9 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (shouldPerformRightMouseScroll(state))
+            if (shouldPerformRightMouseScroll(e))
             {
-                scrollToRelative(state.Mouse.Position[ScrollDim]);
+                scrollToRelative(e.MousePosition[ScrollDim]);
                 return true;
             }
 
@@ -44,7 +43,7 @@ namespace osu.Game.Graphics.Containers
         {
             if (mouseScrollBarDragging)
             {
-                scrollToRelative(e.Mouse.Position[ScrollDim]);
+                scrollToRelative(e.MousePosition[ScrollDim]);
                 return true;
             }
 

@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             if (e.Repeat) return false;
 
-            if (state.Keyboard.ControlPressed)
+            if (e.CurrentState.Keyboard.ControlPressed)
             {
                 if (e.Key == Key.H && ReplayLoaded)
                 {

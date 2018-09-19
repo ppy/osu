@@ -201,7 +201,8 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (!e.Repeat && state.Keyboard.ControlPressed && state.Keyboard.ShiftPressed && e.Key == Key.D)
+            var keyboard = e.CurrentState.Keyboard;
+            if (!e.Repeat && keyboard.ControlPressed && keyboard.ShiftPressed && e.Key == Key.D)
             {
                 Push(new Drawings());
                 return true;

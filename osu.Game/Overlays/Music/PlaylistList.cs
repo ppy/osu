@@ -117,14 +117,14 @@ namespace osu.Game.Overlays.Music
 
             protected override bool OnDragStart(DragStartEvent e)
             {
-                nativeDragPosition = e.Mouse.NativeState.Position;
+                nativeDragPosition = e.ScreenSpaceMousePosition;
                 draggedItem = items.FirstOrDefault(d => d.IsDraggable);
                 return draggedItem != null || base.OnDragStart(e);
             }
 
             protected override bool OnDrag(DragEvent e)
             {
-                nativeDragPosition = e.Mouse.NativeState.Position;
+                nativeDragPosition = e.ScreenSpaceMousePosition;
                 if (draggedItem == null)
                     return base.OnDrag(e);
                 return true;
@@ -132,7 +132,7 @@ namespace osu.Game.Overlays.Music
 
             protected override bool OnDragEnd(DragEndEvent e)
             {
-                nativeDragPosition = e.Mouse.NativeState.Position;
+                nativeDragPosition = e.ScreenSpaceMousePosition;
                 var handled = draggedItem != null || base.OnDragEnd(e);
                 draggedItem = null;
 

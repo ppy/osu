@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            if (e.Mouse.ScrollDelta.X + e.Mouse.ScrollDelta.Y > 0)
+            if (e.ScrollDelta.X + e.ScrollDelta.Y > 0)
                 clock.SeekBackward(!clock.IsRunning);
             else
                 clock.SeekForward(!clock.IsRunning);

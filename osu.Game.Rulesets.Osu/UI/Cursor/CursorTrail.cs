@@ -119,7 +119,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            Vector2 pos = e.Mouse.NativeState.Position;
+            Vector2 pos = e.ScreenSpaceMousePosition;
 
             if (lastPosition == null)
             {

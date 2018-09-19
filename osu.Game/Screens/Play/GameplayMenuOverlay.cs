@@ -295,7 +295,7 @@ namespace osu.Game.Screens.Play
                 if (e.Repeat || e.Key != Key.Enter || !Selected)
                     return false;
 
-                OnClick(state);
+                Click();
                 return true;
             }
         }

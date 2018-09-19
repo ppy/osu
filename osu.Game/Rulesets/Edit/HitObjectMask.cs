@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Invoked when this <see cref="HitObjectMask"/> has requested drag.
         /// </summary>
-        public event Action<HitObjectMask, InputState> DragRequested;
+        public event Action<HitObjectMask, Vector2, InputState> DragRequested;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="HitObjectMask"/> applies to.
@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Edit
 
             if (State == SelectionState.NotSelected)
             {
-                SelectionRequested?.Invoke(this, state);
+                SelectionRequested?.Invoke(this, e.CurrentState);
                 selectionRequested = true;
             }
 
@@ -114,7 +114,7 @@ namespace osu.Game.Rulesets.Edit
             if (State == SelectionState.Selected && !selectionRequested)
             {
                 selectionRequested = true;
-                SelectionRequested?.Invoke(this, e);
+                SelectionRequested?.Invoke(this, e.CurrentState);
                 return true;
             }
 
@@ -125,7 +125,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnDrag(DragEvent e)
         {
-            DragRequested?.Invoke(this, e);
+            DragRequested?.Invoke(this, e.Delta, e.CurrentState);
             return true;
         }
 

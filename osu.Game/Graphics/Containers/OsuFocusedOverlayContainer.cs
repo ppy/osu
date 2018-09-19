@@ -61,7 +61,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (!base.ReceivePositionalInputAt(state.Mouse.NativeState.Position))
+            if (!base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
             {
                 State = Visibility.Hidden;
                 return true;

@@ -33,13 +33,13 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         protected override bool OnDragEnd(DragEndEvent e) => true;
         protected override bool OnDrag(DragEvent e)
         {
-            seekToPosition(e.Mouse.NativeState.Position);
+            seekToPosition(e.ScreenSpaceMousePosition);
             return true;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            seekToPosition(state.Mouse.NativeState.Position);
+            seekToPosition(e.ScreenSpaceMousePosition);
             return true;
         }
 
