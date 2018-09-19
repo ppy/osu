@@ -26,8 +26,6 @@ namespace osu.Game.Rulesets.Edit
         }
 
         public abstract DrawableHitObject AddHitObject(HitObject obj);
-
-        public abstract DrawableHitObject RemoveHitObject(HitObject obj);
     }
 
     public class EditRulesetContainer<T> : EditRulesetContainer
@@ -67,11 +65,6 @@ namespace osu.Game.Rulesets.Edit
             rulesetContainer.Playfield.PostProcess();
 
             return drawableObject;
-        }
-
-        public override DrawableHitObject RemoveHitObject(HitObject obj)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }
