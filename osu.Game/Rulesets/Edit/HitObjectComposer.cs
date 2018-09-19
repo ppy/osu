@@ -155,6 +155,7 @@ namespace osu.Game.Rulesets.Edit
             CurrentTool = tool;
 
             placementLayer.Clear();
+            maskLayer.DeselectAll();
 
             var visualiser = tool?.CreatePlacementVisualiser();
             if (visualiser != null)
