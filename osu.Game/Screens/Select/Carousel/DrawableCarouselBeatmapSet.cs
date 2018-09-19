@@ -38,11 +38,8 @@ namespace osu.Game.Screens.Select.Carousel
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(LocalisationEngine localisation, BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay)
+        private void load(BeatmapManager manager, BeatmapSetOverlay beatmapOverlay, DialogOverlay overlay)
         {
-            if (localisation == null)
-                throw new ArgumentNullException(nameof(localisation));
-
             restoreHiddenRequested = s => s.Beatmaps.ForEach(manager.Restore);
             dialogOverlay = overlay;
             if (beatmapOverlay != null)
@@ -67,14 +64,14 @@ namespace osu.Game.Screens.Select.Carousel
                         new OsuSpriteText
                         {
                             Font = @"Exo2.0-BoldItalic",
-                            Current = localisation.GetUnicodePreference(beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title),
+                            Text = new LocalisedString((beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title)),
                             TextSize = 22,
                             Shadow = true,
                         },
                         new OsuSpriteText
                         {
                             Font = @"Exo2.0-SemiBoldItalic",
-                            Current = localisation.GetUnicodePreference(beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist),
+                            Text = new LocalisedString((beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist)),
                             TextSize = 17,
                             Shadow = true,
                         },

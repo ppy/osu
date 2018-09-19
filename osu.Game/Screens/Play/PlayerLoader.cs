@@ -290,7 +290,7 @@ namespace osu.Game.Screens.Play
             }
 
             [BackgroundDependencyLoader]
-            private void load(LocalisationEngine localisation)
+            private void load()
             {
                 var metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
@@ -307,7 +307,7 @@ namespace osu.Game.Screens.Play
                         {
                             new OsuSpriteText
                             {
-                                Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title),
+                                Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
                                 TextSize = 36,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,
@@ -315,7 +315,7 @@ namespace osu.Game.Screens.Play
                             },
                             new OsuSpriteText
                             {
-                                Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist),
+                                Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
                                 TextSize = 26,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,
