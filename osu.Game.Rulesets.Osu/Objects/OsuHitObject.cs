@@ -102,6 +102,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
 
-        public virtual void AdjustPosition(Vector2 position) => Position = Position;
+        public virtual void AdjustPosition(Vector2 position) => Position = position;
     }
 }
