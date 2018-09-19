@@ -31,10 +31,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             return dependencies;
         }
 
-        protected override EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
-        {
-            return null;
-        }
+        protected override EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new ManiaEditRulesetContainer(ruleset, beatmap);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; } = Array.Empty<HitObjectCompositionTool>();
 
