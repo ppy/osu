@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays;
@@ -35,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             return null;
         }
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
+        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; } = Array.Empty<HitObjectCompositionTool>();
 
         public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)
         {

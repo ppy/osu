@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 switch (mask.HitObject.HitObject)
                 {
                     case IHasEditablePosition editablePosition:
-                        editablePosition.Position += state.Mouse.Delta;
+                        editablePosition.AdjustPosition(editablePosition.Position + state.Mouse.Delta);
                         break;
                 }
             }

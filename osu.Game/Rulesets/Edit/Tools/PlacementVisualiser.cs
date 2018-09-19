@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Edit.Tools
         protected virtual void ApplyPosition(Vector2 position)
         {
             if (HitObject is IHasEditablePosition editablePosition)
-                editablePosition.Position = position;
+                editablePosition.AdjustPosition(position);
         }
 
         /// <summary>
