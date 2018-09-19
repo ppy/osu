@@ -33,20 +33,14 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private Cached initialStateCache = new Cached();
 
-        public ScrollingHitObjectContainer()
+        public ScrollingHitObjectContainer(SpeedChangeVisualisationMethod visualisationMethod)
         {
             RelativeSizeAxes = Axes.Both;
 
             TimeRange.ValueChanged += _ => initialStateCache.Invalidate();
             Direction.ValueChanged += _ => initialStateCache.Invalidate();
-        }
 
-        private ISpeedChangeVisualiser speedChangeVisualiser;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            switch (config.Get<SpeedChangeVisualisationMethod>(OsuSetting.SpeedChangeVisualisation))
+            switch (visualisationMethod)
             {
                 case SpeedChangeVisualisationMethod.Sequential:
                     speedChangeVisualiser = new SequentialSpeedChangeVisualiser(ControlPoints);
@@ -59,6 +53,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     break;
             }
         }
+
+        private ISpeedChangeVisualiser speedChangeVisualiser;
 
         public override void Add(DrawableHitObject hitObject)
         {
