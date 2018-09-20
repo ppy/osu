@@ -2,13 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -31,25 +31,48 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected void ApplyBounceState(DrawableHitObject drawable, ArmedState state)
         {
-            if (!(drawable is DrawableOsuHitObject d))
-                return;
+            if (!(drawable is DrawableOsuHitObject)) return;
+            if (state != ArmedState.Idle) return;
 
             var h = (OsuHitObject)drawable.HitObject;
+            var appearTime = h.StartTime - h.TimePreempt;
+            var moveDuration = h.TimePreempt;
 
-            double appearTime = h.StartTime - h.TimePreempt;
-            double moveDuration = h.TimePreempt;
-
-            using (drawable.BeginAbsoluteSequence(appearTime, true))
+            switch (drawable)
             {
-                var origScale = drawable.Scale;
+                case DrawableHitCircle circle:
+                    foreach (var t in circle.Transforms.Where(t => t.TargetMember == "Alpha"))
+                        circle.RemoveTransform(t);
+                    using (circle.BeginAbsoluteSequence(appearTime, true))
+                    {
+                        var origScale = drawable.Scale;
 
-                drawable
-                    .ScaleTo(0.0f)
-                    .ScaleTo(origScale, moveDuration, Easing.InOutSine);
+                        circle
+                            .ScaleTo(0)
+                            .ScaleTo(origScale, moveDuration, Easing.OutSine)
+                            .FadeTo(1);
+                    }
+
+                    circle.ApproachCircle.Hide();
+
+                    break;
+
+                case DrawableSlider slider:
+                    foreach (var t in slider.Transforms.Where(t => t.TargetMember == "Alpha"))
+                        slider.RemoveTransform(t);
+
+                    using (slider.BeginAbsoluteSequence(appearTime, true))
+                    {
+                        var origScale = slider.Scale;
+
+                        slider
+                            .ScaleTo(0)
+                            .ScaleTo(origScale, moveDuration, Easing.OutSine)
+                            .FadeTo(1);
+                    }
+
+                    break;
             }
-
-            // Hide approach circle
-            (drawable as DrawableHitCircle)?.ApproachCircle.Hide();
         }
     }
 }
