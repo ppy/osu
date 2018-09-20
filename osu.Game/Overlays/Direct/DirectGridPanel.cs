@@ -217,8 +217,10 @@ namespace osu.Game.Overlays.Direct
                 statusContainer.Add(new IconPill(FontAwesome.fa_image));
             }
 
-            statusContainer.Add(new BeatmapSetOnlineStatusPill(12, new MarginPadding { Horizontal = 10, Vertical = 5 })
+            statusContainer.Add(new BeatmapSetOnlineStatusPill
             {
+                TextSize = 12,
+                TextPadding = new MarginPadding { Horizontal = 10, Vertical = 5 },
                 Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
             });
 
