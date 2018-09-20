@@ -131,8 +131,8 @@ namespace osu.Game.Screens.Select
             public FillFlowContainer MapperContainer { get; private set; }
             public FillFlowContainer InfoLabelContainer { get; private set; }
 
-            private UnicodeBindableString titleBinding;
-            private UnicodeBindableString artistBinding;
+            private ILocalisedBindableString titleBinding;
+            private ILocalisedBindableString artistBinding;
 
             private readonly WorkingBeatmap beatmap;
             private readonly RulesetInfo ruleset;
@@ -144,7 +144,7 @@ namespace osu.Game.Screens.Select
             }
 
             [BackgroundDependencyLoader]
-            private void load(LocalisationEngine localisation)
+            private void load(LocalisationManager localisation)
             {
                 var beatmapInfo = beatmap.BeatmapInfo;
                 var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
@@ -153,8 +153,8 @@ namespace osu.Game.Screens.Select
                 CacheDrawnFrameBuffer = true;
                 RelativeSizeAxes = Axes.Both;
 
-                titleBinding = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
-                artistBinding = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
+                titleBinding = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
+                artistBinding  = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
 
                 Children = new Drawable[]
                 {
@@ -217,8 +217,10 @@ namespace osu.Game.Screens.Select
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            StatusPill = new BeatmapSetOnlineStatusPill(11, new MarginPadding { Horizontal = 8, Vertical = 2 })
+                            StatusPill = new BeatmapSetOnlineStatusPill
                             {
+                                TextSize = 11,
+                                TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                 Status = beatmapInfo.Status,
                             }
                         }
