@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Back"/> is triggered.
         /// </summary>
-        protected virtual Action BackAction => () => InternalButtons.Children.Last().TriggerOnClick();
+        protected virtual Action BackAction => () => InternalButtons.Children.Last().Click();
 
         public abstract string Header { get; }
         public abstract string Description { get; }
