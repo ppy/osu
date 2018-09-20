@@ -32,6 +32,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private Cached initialStateCache = new Cached();
 
+        private readonly ISpeedChangeVisualiser speedChangeVisualiser;
+
         public ScrollingHitObjectContainer(SpeedChangeVisualisationMethod visualisationMethod)
         {
             RelativeSizeAxes = Axes.Both;
@@ -52,8 +54,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     break;
             }
         }
-
-        private readonly ISpeedChangeVisualiser speedChangeVisualiser;
 
         public override void Add(DrawableHitObject hitObject)
         {
