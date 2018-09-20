@@ -26,13 +26,16 @@ namespace osu.Game.Rulesets.Edit
 
         public IEnumerable<DrawableHitObject> HitObjects => rulesetContainer.Playfield.AllHitObjects;
 
-        protected ICompositionTool CurrentTool { get; private set; }
+        protected HitObjectCompositionTool CurrentTool { get; private set; }
         protected IRulesetConfigManager Config { get; private set; }
 
+        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
         private readonly List<Container> layerContainers = new List<Container>();
-        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
-        private RulesetContainer rulesetContainer;
+        private HitObjectMaskLayer maskLayer;
+        private Container placementLayer;
+
+        private EditRulesetContainer rulesetContainer;
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -44,7 +47,7 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(IBindableBeatmap beatmap, IFrameBasedClock framedClock)
         {
-            this.beatmap.BindTo(beatmap);
+            Beatmap.BindTo(beatmap);
 
             try
             {
@@ -64,10 +67,12 @@ namespace osu.Game.Rulesets.Edit
             };
 
             var layerAboveRuleset = CreateLayerContainer();
-            layerAboveRuleset.Child = new HitObjectMaskLayer();
+            layerAboveRuleset.Child = maskLayer = new HitObjectMaskLayer();
+            placementLayer = CreateLayerContainer();
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
+            layerContainers.Add(placementLayer);
 
             RadioButtonCollection toolboxCollection;
             InternalChild = new GridContainer
@@ -95,7 +100,8 @@ namespace osu.Game.Rulesets.Edit
                             {
                                 layerBelowRuleset,
                                 rulesetContainer,
-                                layerAboveRuleset
+                                layerAboveRuleset,
+                                placementLayer
                             }
                         }
                     },
@@ -144,11 +150,31 @@ namespace osu.Game.Rulesets.Edit
             });
         }
 
-        private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
+        private void setCompositionTool(HitObjectCompositionTool tool)
+        {
+            CurrentTool = tool;
 
-        protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap);
+            placementLayer.Clear();
+            maskLayer.DeselectAll();
 
-        protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
+            var visualiser = tool?.CreatePlacementVisualiser();
+            if (visualiser != null)
+            {
+                visualiser.PlacementFinished += obj =>
+                {
+                    var drawableObject = rulesetContainer.AddHitObject(obj);
+                    maskLayer.AddMask(drawableObject);
+
+                    setCompositionTool(tool);
+                };
+
+                placementLayer.Child = visualiser;
+            }
+        }
+
+        protected abstract EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap);
+
+        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
         /// <summary>
         /// Creates a <see cref="HitObjectMask"/> for a specific <see cref="DrawableHitObject"/>.

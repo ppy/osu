@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         public const double OBJECT_RADIUS = 64;
 
         public event Action<Vector2> PositionChanged;
+        public event Action<float> ScaleChanged;
+        public event Action<int> IndexInCurrentComboChanged;
 
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;
@@ -50,13 +52,39 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double Radius => OBJECT_RADIUS * Scale;
 
-        public float Scale { get; set; } = 1;
+        private float scale = 1;
+
+        public float Scale
+        {
+            get => scale;
+            set
+            {
+                if (scale == value)
+                    return;
+                scale = value;
+
+                ScaleChanged?.Invoke(value);
+            }
+        }
 
         public virtual bool NewCombo { get; set; }
 
         public int ComboOffset { get; set; }
 
-        public virtual int IndexInCurrentCombo { get; set; }
+        private int indexInCurrentCombo;
+
+        public virtual int IndexInCurrentCombo
+        {
+            get => indexInCurrentCombo;
+            set
+            {
+                if (indexInCurrentCombo == value)
+                    return;
+                indexInCurrentCombo = value;
+
+                IndexInCurrentComboChanged?.Invoke(value);
+            }
+        }
 
         public virtual int ComboIndex { get; set; }
 
@@ -72,8 +100,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }
 
-        public virtual void OffsetPosition(Vector2 offset) => Position += offset;
-
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
+
+        public virtual void AdjustPosition(Vector2 position) => Position = position;
     }
 }

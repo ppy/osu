@@ -8,7 +8,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays;
-using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Edit.Tools;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
@@ -22,13 +22,11 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        protected override RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new OsuEditRulesetContainer(ruleset, beatmap);
+        protected override EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new OsuEditRulesetContainer(ruleset, beatmap);
 
-        protected override IReadOnlyList<ICompositionTool> CompositionTools => new ICompositionTool[]
+        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new[]
         {
-            new HitObjectCompositionTool<HitCircle>(),
-            new HitObjectCompositionTool<Slider>(),
-            new HitObjectCompositionTool<Spinner>()
+            new HitCircleCompositionTool(),
         };
 
         protected override ScalableContainer CreateLayerContainer() => new ScalableContainer(OsuPlayfield.BASE_SIZE.X) { RelativeSizeAxes = Axes.Both };

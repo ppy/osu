@@ -85,6 +85,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
+            HitObject.ScaleChanged += scale => Body.PathWidth = scale * 64;
         }
 
         public override Color4 AccentColour
