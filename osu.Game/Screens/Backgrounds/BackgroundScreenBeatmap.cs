@@ -4,20 +4,14 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Transforms;
-using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenBeatmap : BackgroundScreen
+    public class BackgroundScreenBeatmap : BlurrableBackgroundScreen
     {
-        private Background background;
-
         private WorkingBeatmap beatmap;
-        private Vector2 blurTarget;
-
         public WorkingBeatmap Beatmap
         {
             get { return beatmap; }
@@ -33,17 +27,17 @@ namespace osu.Game.Screens.Backgrounds
                     LoadComponentAsync(new BeatmapBackground(beatmap), b =>
                     {
                         float newDepth = 0;
-                        if (background != null)
+                        if (Background != null)
                         {
-                            newDepth = background.Depth + 1;
-                            background.FinishTransforms();
-                            background.FadeOut(250);
-                            background.Expire();
+                            newDepth = Background.Depth + 1;
+                            Background.FinishTransforms();
+                            Background.FadeOut(250);
+                            Background.Expire();
                         }
 
                         b.Depth = newDepth;
-                        Add(background = b);
-                        background.BlurSigma = blurTarget;
+                        Add(Background = b);
+                        Background.BlurSigma = BlurTarget;
                     });
                 });
             }
@@ -53,9 +47,6 @@ namespace osu.Game.Screens.Backgrounds
         {
             Beatmap = beatmap;
         }
-
-        public TransformSequence<Background> BlurTo(Vector2 sigma, double duration, Easing easing = Easing.None)
-            => background?.BlurTo(blurTarget = sigma, duration, easing);
 
         public override bool Equals(BackgroundScreen other)
         {
