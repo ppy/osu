@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -25,7 +24,8 @@ namespace osu.Game.Beatmaps.Drawables
                     return;
                 status = value;
 
-                statusText.Text = Enum.GetName(typeof(BeatmapSetOnlineStatus), Status)?.ToUpperInvariant();
+                Alpha = value == BeatmapSetOnlineStatus.None ? 0 : 1;
+                statusText.Text = value.ToString().ToUpperInvariant();
             }
         }
 
