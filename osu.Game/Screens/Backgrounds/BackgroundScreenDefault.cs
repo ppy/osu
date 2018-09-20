@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
@@ -9,14 +9,12 @@ using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenDefault : BackgroundScreen
+    public class BackgroundScreenDefault : BlurrableBackgroundScreen
     {
         private int currentDisplay;
         private const int background_count = 5;
 
         private string backgroundName => $@"Menu/menu-background-{currentDisplay % background_count + 1}";
-
-        private Background current;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -27,10 +25,10 @@ namespace osu.Game.Screens.Backgrounds
 
         private void display(Background newBackground)
         {
-            current?.FadeOut(800, Easing.InOutSine);
-            current?.Expire();
+            Background?.FadeOut(800, Easing.InOutSine);
+            Background?.Expire();
 
-            Add(current = newBackground);
+            Add(Background = newBackground);
             currentDisplay++;
         }
 
