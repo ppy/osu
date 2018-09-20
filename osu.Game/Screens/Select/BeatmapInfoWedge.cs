@@ -127,11 +127,12 @@ namespace osu.Game.Screens.Select
             public OsuSpriteText VersionLabel { get; private set; }
             public OsuSpriteText TitleLabel { get; private set; }
             public OsuSpriteText ArtistLabel { get; private set; }
+            public BeatmapSetOnlineStatusPill StatusPill { get; private set; }
             public FillFlowContainer MapperContainer { get; private set; }
             public FillFlowContainer InfoLabelContainer { get; private set; }
 
-            private UnicodeBindableString titleBinding;
-            private UnicodeBindableString artistBinding;
+            private ILocalisedBindableString titleBinding;
+            private ILocalisedBindableString artistBinding;
 
             private readonly WorkingBeatmap beatmap;
             private readonly RulesetInfo ruleset;
@@ -143,7 +144,7 @@ namespace osu.Game.Screens.Select
             }
 
             [BackgroundDependencyLoader]
-            private void load(LocalisationEngine localisation)
+            private void load(LocalisationManager localisation)
             {
                 var beatmapInfo = beatmap.BeatmapInfo;
                 var metadata = beatmapInfo.Metadata ?? beatmap.BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
@@ -152,8 +153,8 @@ namespace osu.Game.Screens.Select
                 CacheDrawnFrameBuffer = true;
                 RelativeSizeAxes = Axes.Both;
 
-                titleBinding = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
-                artistBinding = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
+                titleBinding = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
+                artistBinding  = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
 
                 Children = new Drawable[]
                 {
@@ -190,7 +191,7 @@ namespace osu.Game.Screens.Select
                     },
                     new FillFlowContainer
                     {
-                        Name = "Top-aligned metadata",
+                        Name = "Topleft-aligned metadata",
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
                         Direction = FillDirection.Vertical,
@@ -204,6 +205,24 @@ namespace osu.Game.Screens.Select
                                 Text = beatmapInfo.Version,
                                 TextSize = 24,
                             },
+                        }
+                    },
+                    new FillFlowContainer
+                    {
+                        Name = "Topright-aligned metadata",
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        Direction = FillDirection.Vertical,
+                        Margin = new MarginPadding { Top = 14, Left = 10, Right = 18, Bottom = 20 },
+                        AutoSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            StatusPill = new BeatmapSetOnlineStatusPill
+                            {
+                                TextSize = 11,
+                                TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
+                                Status = beatmapInfo.Status,
+                            }
                         }
                     },
                     new FillFlowContainer
@@ -244,8 +263,13 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 };
-                artistBinding.ValueChanged += value => setMetadata(metadata.Source);
-                artistBinding.TriggerChange();
+
+                titleBinding.BindValueChanged(value => setMetadata(metadata.Source));
+                artistBinding.BindValueChanged(value => setMetadata(metadata.Source), true);
+
+                // no difficulty means it can't have a status to show
+                if (beatmapInfo.Version == null)
+                    StatusPill.Hide();
             }
 
             private void setMetadata(string source)
