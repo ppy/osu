@@ -230,10 +230,12 @@ namespace osu.Game.Overlays.BeatmapSet
                             Spacing = new Vector2(10),
                             Children = new Drawable[]
                             {
-                                onlineStatusPill = new BeatmapSetOnlineStatusPill(14, new MarginPadding { Horizontal = 25, Vertical = 8 })
+                                onlineStatusPill = new BeatmapSetOnlineStatusPill
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
+                                    TextSize = 14,
+                                    TextPadding = new MarginPadding { Horizontal = 25, Vertical = 8 }
                                 },
                                 Details = new Details(),
                             },
