@@ -82,11 +82,13 @@ namespace osu.Game.Screens.Select.Carousel
                             Margin = new MarginPadding { Top = 5 },
                             Children = new Drawable[]
                             {
-                                new BeatmapSetOnlineStatusPill(11, new MarginPadding { Horizontal = 8, Vertical = 2 })
+                                new BeatmapSetOnlineStatusPill
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    Margin = new MarginPadding{ Right = 5 },
+                                    Margin = new MarginPadding { Right = 5 },
+                                    TextSize = 11,
+                                    TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                     Status = beatmapSet.Status
                                 },
                                 new FillFlowContainer<FilterableDifficultyIcon>
