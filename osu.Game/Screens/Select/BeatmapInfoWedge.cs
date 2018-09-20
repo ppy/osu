@@ -217,8 +217,10 @@ namespace osu.Game.Screens.Select
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            StatusPill = new BeatmapSetOnlineStatusPill(11, new MarginPadding { Horizontal = 8, Vertical = 2 })
+                            StatusPill = new BeatmapSetOnlineStatusPill
                             {
+                                TextSize = 11,
+                                TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                 Status = beatmapInfo.Status,
                             }
                         }
@@ -261,6 +263,8 @@ namespace osu.Game.Screens.Select
                         }
                     }
                 };
+
+                titleBinding.BindValueChanged(value => setMetadata(metadata.Source));
                 artistBinding.BindValueChanged(value => setMetadata(metadata.Source), true);
 
                 // no difficulty means it can't have a status to show
