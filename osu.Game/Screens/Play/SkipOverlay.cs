@@ -141,7 +141,7 @@ namespace osu.Game.Screens.Play
             switch (action)
             {
                 case GlobalAction.SkipCutscene:
-                    button.TriggerOnClick();
+                    button.Click();
                     return true;
             }
 

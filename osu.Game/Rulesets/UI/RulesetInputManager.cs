@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -10,7 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.StateChanges;
+using osu.Framework.Input.StateChanges.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
@@ -56,33 +55,20 @@ namespace osu.Game.Rulesets.UI
 
         #region Action mapping (for replays)
 
-        private List<T> lastPressedActions = new List<T>();
-
-        public override void HandleCustomInput(InputState state, IInput input)
+        public override void HandleInputStateChange(InputStateChangeEvent inputStateChange)
         {
-            if (!(input is ReplayState<T> replayState))
+            if (inputStateChange is ReplayStateChangeEvent<T> replayStateChanged)
             {
-                base.HandleCustomInput(state, input);
-                return;
-            }
+                foreach (var action in replayStateChanged.ReleasedActions)
+                    KeyBindingContainer.TriggerReleased(action);
 
-            if (state is RulesetInputManagerInputState<T> inputState)
+                foreach (var action in replayStateChanged.PressedActions)
+                    KeyBindingContainer.TriggerPressed(action);
+            }
+            else
             {
-                inputState.LastReplayState = replayState;
+                base.HandleInputStateChange(inputStateChange);
             }
-
-            // Here we handle states specifically coming from a replay source.
-            // These have extra action information rather than keyboard keys or mouse buttons.
-
-            List<T> newActions = replayState.PressedActions;
-
-            foreach (var released in lastPressedActions.Except(newActions))
-                KeyBindingContainer.TriggerReleased(released);
-
-            foreach (var pressed in newActions.Except(lastPressedActions))
-                KeyBindingContainer.TriggerPressed(pressed);
-
-            lastPressedActions = newActions;
         }
 
         #endregion
