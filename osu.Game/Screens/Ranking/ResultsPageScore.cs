@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -24,6 +23,7 @@ using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -328,7 +328,7 @@ namespace osu.Game.Screens.Ranking
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, LocalisationEngine localisation)
+            private void load(OsuColour colours)
             {
                 title.Colour = artist.Colour = colours.BlueDarker;
                 versionMapper.Colour = colours.Gray8;
@@ -341,8 +341,8 @@ namespace osu.Game.Screens.Ranking
                         versionMapper.Text = $"{beatmap.Version} - " + versionMapper.Text;
                 }
 
-                title.Current = localisation.GetUnicodePreference(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title);
-                artist.Current = localisation.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist);
+                title.Text = new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title));
+                artist.Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist));
             }
         }
 
