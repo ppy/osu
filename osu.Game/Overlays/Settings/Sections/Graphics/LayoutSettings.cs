@@ -49,7 +49,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
-
                 new SettingsCheckbox
                 {
                     LabelText = "Letterboxing",
@@ -83,13 +82,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             };
 
             var resolutions = getResolutions();
+
             if (resolutions.Count > 1)
             {
                 resolutionSettingsContainer.Child = resolutionDropdown = new SettingsDropdown<Size>
                 {
                     LabelText = "Resolution",
                     ShowsDefaultIndicator = false,
-                    Items = getResolutions(),
+                    Items = resolutions,
                     Bindable = sizeFullscreen
                 };
 
