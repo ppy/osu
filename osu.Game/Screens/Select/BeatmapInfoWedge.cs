@@ -217,8 +217,10 @@ namespace osu.Game.Screens.Select
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
                         {
-                            StatusPill = new BeatmapSetOnlineStatusPill(11, new MarginPadding { Horizontal = 8, Vertical = 2 })
+                            StatusPill = new BeatmapSetOnlineStatusPill
                             {
+                                TextSize = 11,
+                                TextPadding = new MarginPadding { Horizontal = 8, Vertical = 2 },
                                 Status = beatmapInfo.Status,
                             }
                         }
