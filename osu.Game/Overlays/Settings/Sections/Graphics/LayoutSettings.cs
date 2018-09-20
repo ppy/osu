@@ -35,6 +35,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             letterboxing = config.GetBindable<bool>(FrameworkSetting.Letterboxing);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
 
+            Container resolutionSettingsContainer;
+
             Children = new Drawable[]
             {
                 windowModeDropdown = new SettingsEnumDropdown<WindowMode>
@@ -42,12 +44,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Screen mode",
                     Bindable = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
                 },
-                resolutionDropdown = new SettingsDropdown<Size>
+                resolutionSettingsContainer = new Container
                 {
-                    LabelText = "Resolution",
-                    ShowsDefaultIndicator = false,
-                    Items = getResolutions(),
-                    Bindable = sizeFullscreen
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y
                 },
                 new SettingsCheckbox
                 {
@@ -81,16 +81,29 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
             };
 
-            windowModeDropdown.Bindable.BindValueChanged(windowMode =>
+            var resolutions = getResolutions();
+
+            if (resolutions.Count > 1)
             {
-                if (windowMode == WindowMode.Fullscreen)
+                resolutionSettingsContainer.Child = resolutionDropdown = new SettingsDropdown<Size>
                 {
-                    resolutionDropdown.Show();
-                    sizeFullscreen.TriggerChange();
-                }
-                else
-                    resolutionDropdown.Hide();
-            }, true);
+                    LabelText = "Resolution",
+                    ShowsDefaultIndicator = false,
+                    Items = resolutions,
+                    Bindable = sizeFullscreen
+                };
+
+                windowModeDropdown.Bindable.BindValueChanged(windowMode =>
+                {
+                    if (windowMode == WindowMode.Fullscreen)
+                    {
+                        resolutionDropdown.Show();
+                        sizeFullscreen.TriggerChange();
+                    }
+                    else
+                        resolutionDropdown.Hide();
+                });
+            }
 
             letterboxing.BindValueChanged(isVisible =>
             {
@@ -102,7 +115,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }, true);
         }
 
-        private IEnumerable<KeyValuePair<string, Size>> getResolutions()
+        private IReadOnlyList<KeyValuePair<string, Size>> getResolutions()
         {
             var resolutions = new KeyValuePair<string, Size>("Default", new Size(9999, 9999)).Yield();
 
@@ -112,8 +125,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                                                      .OrderByDescending(r => r.Width)
                                                      .ThenByDescending(r => r.Height)
                                                      .Select(res => new KeyValuePair<string, Size>($"{res.Width}x{res.Height}", new Size(res.Width, res.Height)))
-                                                     .Distinct()).ToList();
-            return resolutions;
+                                                     .Distinct());
+            return resolutions.ToList();
         }
     }
 }
