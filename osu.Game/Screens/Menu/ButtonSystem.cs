@@ -266,7 +266,7 @@ namespace osu.Game.Screens.Menu
 
         protected override void Update()
         {
-            if (game.IdleTime > 6000 && State != ButtonSystemState.Exit)
+            if (game?.IdleTime > 6000 && State != ButtonSystemState.Exit)
                 State = ButtonSystemState.Initial;
 
             base.Update();
