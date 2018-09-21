@@ -28,11 +28,26 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [JsonIgnore]
         public readonly Bindable<MatchPairing> Progression = new Bindable<MatchPairing>();
 
+        [JsonIgnore]
+        public readonly Bindable<MatchPairing> ProgressionSource = new Bindable<MatchPairing>();
+
         [JsonProperty]
         public Point Position;
 
+        private MatchPairing lastProgression; // todo: fix if we ever get LastValue inside Bindable<>.
+
         public MatchPairing()
         {
+            Progression.ValueChanged += progression =>
+            {
+                if (lastProgression != null)
+                    lastProgression.ProgressionSource.Value = null;
+
+                if (progression != null)
+                    progression.ProgressionSource.Value = this;
+
+                lastProgression = progression;
+            };
         }
 
         public MatchPairing(TournamentTeam team1 = null, TournamentTeam team2 = null)

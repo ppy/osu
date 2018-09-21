@@ -15,6 +15,7 @@ using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using OpenTK;
 using OpenTK.Graphics;
@@ -157,10 +158,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             scoreText.Font = AcronymText.Font = winner ? "Exo2.0-Bold" : "Exo2.0-Regular";
         }
 
-        public MenuItem[] ContextMenuItems => new[]
+        public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            new MenuItem("Populate team", () => team.Value = manager.Teams.Random()),
-            new MenuItem("Join with", () => manager.JoinRequest(pairing)),
+            new OsuMenuItem("Populate team", MenuItemType.Standard, () => team.Value = manager.Teams.Random()),
+            new OsuMenuItem("Join with", MenuItemType.Standard, () => manager.RequestJoin(pairing)),
+            new OsuMenuItem("Remove", MenuItemType.Destructive, () => manager.Remove(pairing)),
         };
     }
 
