@@ -121,10 +121,10 @@ namespace osu.Game.Beatmaps.Formats
             var pair = SplitKeyVal(line);
 
             string font = pair.Value;
-            if (pair.Key.Equals(@"HitboxNumberFont"))
+            if (pair.Key.Equals(@"HitCircleNumberFont"))
             {
-                if (!(output is IHasHitboxNumberFont tHasHitboxNumberFont)) return;
-                tHasHitboxNumberFont.HitboxNumberFont = font;
+                if (!(output is IHasHitCircleNumberFont tHasHitCircleNumberFont)) return;
+                tHasHitCircleNumberFont.HitCircleNumberFont = font;
             }
         }
 

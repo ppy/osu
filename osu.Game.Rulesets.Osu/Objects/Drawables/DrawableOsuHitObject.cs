@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (HitObject is IHasComboInformation combo)
                 AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
-            Font = skin.GetValue<SkinConfiguration, string>(s => s.HitboxNumberFont) ?? @"Venera";
+            Font = skin.GetValue<SkinConfiguration, string>(s => s.HitCircleNumberFont) ?? @"Venera";
         }
 
         protected virtual void UpdatePreemptState() => this.FadeIn(HitObject.TimeFadeIn);
