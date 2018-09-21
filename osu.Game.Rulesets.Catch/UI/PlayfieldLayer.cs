@@ -6,23 +6,13 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    /// <summary>
-    /// A <see cref="Container"/> which scales its content relative to a target width.
-    /// </summary>
-    public class ScalingContainer : Container
+    public class PlayfieldLayer : Container
     {
-        private readonly float targetWidth;
-
-        public ScalingContainer(float targetWidth)
-        {
-            this.targetWidth = targetWidth;
-        }
-
         protected override void Update()
         {
             base.Update();
 
-            Scale = new Vector2(Parent.ChildSize.X / targetWidth);
+            Scale = new Vector2(Parent.ChildSize.X / CatchPlayfield.BASE_WIDTH);
             Size = Vector2.Divide(Vector2.One, Scale);
         }
     }
