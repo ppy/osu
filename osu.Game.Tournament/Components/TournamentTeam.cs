@@ -20,7 +20,7 @@ namespace osu.Game.Tournament.Components
         /// </summary>
         public string FlagName
         {
-            get { return flagName ?? Acronym.Substring(0, 2); }
+            get { return flagName ?? Acronym?.Substring(0, 2); }
             set { flagName = value; }
         }
 
@@ -31,10 +31,12 @@ namespace osu.Game.Tournament.Components
         /// </summary>
         public string Acronym
         {
-            get { return acronym ?? FullName.Substring(0, 3); }
+            get { return acronym ?? FullName?.Substring(0, 3); }
             set { acronym = value; }
         }
 
         public List<User> Players { get; set; }
+
+        public override string ToString() => FullName ?? Acronym;
     }
 }

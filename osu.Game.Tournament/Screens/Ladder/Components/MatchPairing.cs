@@ -25,38 +25,16 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public readonly Bindable<bool> Completed = new Bindable<bool>();
 
-        [JsonIgnore]
-        public readonly Bindable<MatchPairing> Progression = new Bindable<MatchPairing>();
+        public readonly BindableInt BestOf = new BindableInt(5);
 
         [JsonIgnore]
-        public readonly Bindable<MatchPairing> ProgressionSource = new Bindable<MatchPairing>();
+        public readonly Bindable<MatchPairing> Progression = new Bindable<MatchPairing>();
 
         [JsonProperty]
         public Point Position;
 
-        private MatchPairing lastProgression; // todo: fix if we ever get LastValue inside Bindable<>.
-
         public MatchPairing()
         {
-            Progression.ValueChanged += progression =>
-            {
-                if (lastProgression != null)
-                    // clear the source from the previous progression.
-                    lastProgression.ProgressionSource.Value = null;
-
-                if (progression != null)
-                    // set the source on the new progression.
-                    progression.ProgressionSource.Value = this;
-
-                lastProgression = progression;
-            };
-
-            ProgressionSource.ValueChanged += source =>
-            {
-                if (source != null)
-                    // ennsure no two-way progressions.
-                    Progression.Value = null;
-            };
         }
 
         public MatchPairing(TournamentTeam team1 = null, TournamentTeam team2 = null)

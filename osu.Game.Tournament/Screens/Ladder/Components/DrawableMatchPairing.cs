@@ -5,9 +5,11 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
 using OpenTK;
+using OpenTK.Graphics;
 using OpenTK.Input;
 using SixLabors.Primitives;
 
@@ -18,6 +20,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         public readonly MatchPairing Pairing;
         private readonly FillFlowContainer<DrawableMatchTeam> flow;
         private readonly Bindable<TournamentConditions> conditions = new Bindable<TournamentConditions>();
+        private readonly Drawable selectionBox;
+        private Bindable<MatchPairing> globalSelection;
+
+        [Resolved(CanBeNull = true)]
+        private LadderEditorInfo editorInfo { get; set; } = null;
 
         public DrawableMatchPairing(MatchPairing pairing)
         {
@@ -29,8 +36,20 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             Margin = new MarginPadding(5);
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
+                selectionBox = new Container
+                {
+                    CornerRadius = 5,
+                    Masking = true,
+                    Scale = new Vector2(1.05f),
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Alpha = 0,
+                    Colour = Color4.YellowGreen,
+                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                },
                 flow = new FillFlowContainer<DrawableMatchTeam>
                 {
                     AutoSizeAxes = Axes.Both,
@@ -38,13 +57,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Spacing = new Vector2(2)
                 }
             };
-
             pairing.Team1.BindValueChanged(_ => updateTeams());
             pairing.Team2.BindValueChanged(_ => updateTeams());
-
             pairing.Team1Score.BindValueChanged(_ => updateWinConditions());
             pairing.Team2Score.BindValueChanged(_ => updateWinConditions());
-
+            pairing.BestOf.BindValueChanged(_ => updateWinConditions());
             pairing.Completed.BindValueChanged(_ => updateProgression());
             pairing.Progression.BindValueChanged(_ => updateProgression());
 
@@ -58,6 +75,27 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             if (conditions != null)
                 this.conditions.BindTo(conditions);
+        }
+
+        private bool selected;
+
+        public bool Selected
+        {
+            get => selected;
+
+            set
+            {
+                if (value == selected) return;
+                selected = value;
+
+                if (selected)
+                {
+                    selectionBox.Show();
+                    editorInfo.Selected.Value = Pairing;
+                }
+                else
+                    selectionBox.Hide();
+            }
         }
 
         private void updateProgression()
@@ -76,13 +114,22 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             if (conditions.Value == null) return;
 
-            Pairing.Completed.Value = Pairing.Team1Score.Value + Pairing.Team2Score.Value >= conditions.Value.BestOf;
+            Pairing.Completed.Value = Pairing.Team1Score.Value + Pairing.Team2Score.Value >= Pairing.BestOf.Value;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             updateTeams();
+
+            if (editorInfo != null)
+            {
+                globalSelection = editorInfo.Selected.GetBoundCopy();
+                globalSelection.BindValueChanged(s =>
+                {
+                    if (s != Pairing) Selected = false;
+                });
+            }
         }
 
         private void updateTeams()
@@ -109,10 +156,34 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         protected override bool OnDragStart(InputState state) => true;
 
+        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        {
+            if (Selected && editorInfo.EditingEnabled && args.Key == Key.Delete)
+            {
+                Remove();
+                return true;
+            }
+
+            return base.OnKeyDown(state, args);
+        }
+
+        protected override bool OnClick(InputState state)
+        {
+            if (!editorInfo.EditingEnabled)
+                return false;
+
+            Selected = true;
+            return true;
+        }
+
         protected override bool OnDrag(InputState state)
         {
             if (base.OnDrag(state)) return true;
 
+            if (!editorInfo.EditingEnabled)
+                return false;
+
+            Selected = true;
             this.MoveToOffset(state.Mouse.Delta);
 
             var pos = Position;
@@ -122,10 +193,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public void Remove()
         {
-            if (Pairing.ProgressionSource.Value != null)
-                Pairing.ProgressionSource.Value.Progression.Value = null;
-
+            Selected = false;
             Pairing.Progression.Value = null;
+
             Expire();
         }
     }

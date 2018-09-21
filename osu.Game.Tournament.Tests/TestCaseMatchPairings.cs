@@ -24,7 +24,7 @@ namespace osu.Game.Tournament.Tests
         };
 
         [Cached]
-        private Bindable<TournamentConditions> conditions = new Bindable<TournamentConditions>(new TournamentConditions { BestOf = 9 });
+        private Bindable<TournamentConditions> conditions = new Bindable<TournamentConditions>(new TournamentConditions());
 
         public TestCaseMatchPairings()
         {
