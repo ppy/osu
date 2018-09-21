@@ -37,11 +37,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             double transformTime = HitObject.StartTime - HitObject.TimePreempt;
 
-            if (state == ArmedState.Idle)
-            {
-                base.ApplyTransformsAt(transformTime, true);
-                base.ClearTransformsAfter(transformTime, true);
-            }
+            base.ApplyTransformsAt(transformTime, true);
+            base.ClearTransformsAfter(transformTime, true);
 
             using (BeginAbsoluteSequence(transformTime, true))
             {
