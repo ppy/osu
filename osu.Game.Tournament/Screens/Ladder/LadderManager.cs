@@ -6,10 +6,10 @@ using osu.Framework.Graphics.Lines;
 using osu.Framework.Input.States;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Tournament.Components;
-using OpenTK;
+using osu.Game.Tournament.Screens.Ladder.Components;
 using SixLabors.Primitives;
 
-namespace osu.Game.Tournament.Screens.Ladder.Components
+namespace osu.Game.Tournament.Screens.Ladder
 {
     public class LadderManager : CompositeDrawable
     {
@@ -78,75 +78,51 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 pairing.Pairing.ID = id++;
 
                 if (pairing.Pairing.Progression.Value != null)
-                {
-                    var progression = pairingsContainer.Single(p => p.Pairing == pairing.Pairing.Progression.Value);
-
-                    const float line_width = 2;
-
-                    var path = new Path
-                    {
-                        BypassAutoSizeAxes = Axes.Both,
-                        PathWidth = line_width,
-                    };
-
-                    paths.Add(path);
-
-                    Vector2 getCenteredVector(Vector2 top, Vector2 bottom) => new Vector2(top.X, top.Y + (bottom.Y - top.Y) / 2);
-
-                    const float padding = 10;
-
-                    var q1 = pairing.ScreenSpaceDrawQuad;
-                    var q2 = progression.ScreenSpaceDrawQuad;
-
-                    bool progressionToRight = q2.TopLeft.X > q1.TopLeft.X;
-
-                    if (!progressionToRight)
-                    {
-                        var temp = q2;
-                        q2 = q1;
-                        q1 = temp;
-                    }
-
-                    var c1 = getCenteredVector(q1.TopRight, q1.BottomRight) + new Vector2(padding, 0);
-                    var c2 = getCenteredVector(q2.TopLeft, q2.BottomLeft) - new Vector2(padding, 0);
-
-                    var p1 = c1;
-                    var p2 = p1 + new Vector2(padding, 0);
-
-                    if (p2.X > c2.X)
-                    {
-                        c2 = getCenteredVector(q2.TopRight, q2.BottomRight) + new Vector2(padding, 0);
-                        p2.X = c2.X + padding;
-                    }
-
-                    var p3 = new Vector2(p2.X, c2.Y);
-                    var p4 = new Vector2(c2.X, p3.Y);
-
-                    path.Positions = new[] { p1, p2, p3, p4 }.Select(p => path.ToLocalSpace(p)).ToList();
-                }
+                    paths.Add(new ProgressionPath(pairing, pairingsContainer.Single(p => p.Pairing == pairing.Pairing.Progression.Value)));
             }
         }
 
-        public void JoinRequest(MatchPairing pairing)
-        {
-            AddInternal(new JoinRequestHandler(pairingsContainer, pairing));
-        }
+        public void JoinRequest(MatchPairing pairing) => AddInternal(new JoinRequestHandler(pairingsContainer, pairing));
 
         private class JoinRequestHandler : CompositeDrawable
         {
             private readonly Container<DrawableMatchPairing> pairingsContainer;
             public readonly MatchPairing Source;
 
+            private ProgressionPath path;
+
             public JoinRequestHandler(Container<DrawableMatchPairing> pairingsContainer, MatchPairing source)
             {
                 this.pairingsContainer = pairingsContainer;
-                Source = source;
                 RelativeSizeAxes = Axes.Both;
+
+                Source = source;
+                Source.Progression.Value = null;
+            }
+
+            private DrawableMatchPairing findTarget(InputState state) => pairingsContainer.FirstOrDefault(d => d.ReceiveMouseInputAt(state.Mouse.NativeState.Position));
+
+            protected override bool OnMouseMove(InputState state)
+            {
+                var found = findTarget(state);
+
+                if (found == path?.Destination)
+                    return false;
+
+                path?.Expire();
+                path = null;
+
+                if (found == null)
+                    return false;
+
+                AddInternal(path = new ProgressionPath(pairingsContainer.First(c => c.Pairing == Source), found) { Alpha = 0.4f });
+
+                return base.OnMouseMove(state);
             }
 
             protected override bool OnClick(InputState state)
             {
-                var found = pairingsContainer.FirstOrDefault(d => d.ReceiveMouseInputAt(state.Mouse.NativeState.Position));
+                var found = findTarget(state);
 
                 if (found != null)
                 {
