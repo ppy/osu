@@ -33,31 +33,23 @@ namespace osu.Game.Rulesets.Catch.UI
 
             Size = new Vector2(0.86f); // matches stable's vertical offset for catcher plate
 
-            InternalChild = new Container
+            InternalChild = new PlayfieldLayer
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fit,
-                FillAspectRatio = 4f / 3,
-                Child = new PlayfieldLayer
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    explodingFruitContainer = new Container
                     {
-                        explodingFruitContainer = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        catcherArea = new CatcherArea(difficulty)
-                        {
-                            GetVisualRepresentation = getVisualRepresentation,
-                            ExplodingFruitTarget = explodingFruitContainer,
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.TopLeft,
-                        },
-                        HitObjectContainer
-                    }
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    catcherArea = new CatcherArea(difficulty)
+                    {
+                        GetVisualRepresentation = getVisualRepresentation,
+                        ExplodingFruitTarget = explodingFruitContainer,
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.TopLeft,
+                    },
+                    HitObjectContainer
                 }
             };
         }
