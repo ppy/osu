@@ -119,5 +119,14 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             Pairing.Position = new Point((int)pos.X, (int)pos.Y);
             return true;
         }
+
+        public void Remove()
+        {
+            if (Pairing.ProgressionSource.Value != null)
+                Pairing.ProgressionSource.Value.Progression.Value = null;
+
+            Pairing.Progression.Value = null;
+            Expire();
+        }
     }
 }

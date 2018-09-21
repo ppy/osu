@@ -2,16 +2,18 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Lines;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.States;
-using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using SixLabors.Primitives;
 
 namespace osu.Game.Tournament.Screens.Ladder
 {
-    public class LadderManager : CompositeDrawable
+    public class LadderManager : CompositeDrawable, IHasContextMenu
     {
         public readonly List<TournamentTeam> Teams;
         private readonly Container<DrawableMatchPairing> pairingsContainer;
@@ -23,7 +25,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = new OsuContextMenuContainer
+            InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
@@ -56,15 +58,14 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         private void addPairing(MatchPairing pairing) => pairingsContainer.Add(new DrawableMatchPairing(pairing));
 
-        protected override bool OnClick(InputState state)
+        public MenuItem[] ContextMenuItems => new MenuItem[]
         {
-            addPairing(new MatchPairing
+            new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
             {
-                Position = new Point((int)state.Mouse.Position.X, (int)state.Mouse.Position.Y)
-            });
-
-            return true;
-        }
+                var pos = ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
+                addPairing(new MatchPairing { Position = new Point((int)pos.X, (int)pos.Y) });
+            }),
+        };
 
         protected override void Update()
         {
@@ -82,7 +83,7 @@ namespace osu.Game.Tournament.Screens.Ladder
             }
         }
 
-        public void JoinRequest(MatchPairing pairing) => AddInternal(new JoinRequestHandler(pairingsContainer, pairing));
+        public void RequestJoin(MatchPairing pairing) => AddInternal(new JoinRequestHandler(pairingsContainer, pairing));
 
         private class JoinRequestHandler : CompositeDrawable
         {
@@ -126,7 +127,8 @@ namespace osu.Game.Tournament.Screens.Ladder
 
                 if (found != null)
                 {
-                    Source.Progression.Value = found.Pairing;
+                    if (found.Pairing != Source)
+                        Source.Progression.Value = found.Pairing;
                     Expire();
                     return true;
                 }
@@ -134,5 +136,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                 return false;
             }
         }
+
+        public void Remove(MatchPairing pairing) => pairingsContainer.FirstOrDefault(p => p.Pairing == pairing)?.Remove();
     }
 }
