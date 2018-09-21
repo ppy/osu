@@ -286,9 +286,10 @@ namespace osu.Game.Database
             using (ContextFactory.GetForWrite())
             {
                 // re-fetch the model on the import context.
-                var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == item.ID);
+                var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).FirstOrDefault(s => s.ID == item.ID);
 
-                if (foundModel.DeletePending) return;
+                // Test for null since FirstOrDefault will return null if nothing is found
+                if (foundModel == null || foundModel.DeletePending) return;
 
                 if (ModelStore.Delete(foundModel))
                     Files.Dereference(foundModel.Files.Select(f => f.FileInfo).ToArray());
