@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -29,6 +30,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
+
+            Size = new Vector2(0.86f); // matches stable's vertical offset for catcher plate
 
             InternalChild = new Container
             {
