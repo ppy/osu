@@ -109,7 +109,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             paths.Clear();
 
-            int id = 0;
+            int id = 1;
             foreach (var pairing in pairingsContainer.OrderBy(d => d.Y).ThenBy(d => d.X))
             {
                 pairing.Pairing.ID = id++;
