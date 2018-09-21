@@ -96,7 +96,8 @@ namespace osu.Game.Database
         private void handleEvent(Action a)
         {
             if (delayingEvents)
-                lock (queuedEvents) queuedEvents.Add(a);
+                lock (queuedEvents)
+                    queuedEvents.Add(a);
             else
                 a.Invoke();
         }
@@ -441,7 +442,7 @@ namespace osu.Game.Database
             if (!stable.ExistsDirectory(ImportFromStablePath))
             {
                 // This handles situations like when the user does not have a Skins folder
-                Logger.Log("No " + ImportFromStablePath + " folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
+                Logger.Log($"No {ImportFromStablePath} folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
                 return Task.CompletedTask;
             }
 
