@@ -30,8 +30,8 @@ namespace osu.Game.Tournament.Screens.Ladder
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    pairingsContainer = new Container<DrawableMatchPairing> { RelativeSizeAxes = Axes.Both },
                     paths = new Container<Path> { RelativeSizeAxes = Axes.Both },
+                    pairingsContainer = new Container<DrawableMatchPairing> { RelativeSizeAxes = Axes.Both },
                 }
             };
 
