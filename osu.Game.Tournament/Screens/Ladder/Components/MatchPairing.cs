@@ -41,12 +41,21 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             Progression.ValueChanged += progression =>
             {
                 if (lastProgression != null)
+                    // clear the source from the previous progression.
                     lastProgression.ProgressionSource.Value = null;
 
                 if (progression != null)
+                    // set the source on the new progression.
                     progression.ProgressionSource.Value = this;
 
                 lastProgression = progression;
+            };
+
+            ProgressionSource.ValueChanged += source =>
+            {
+                if (source != null)
+                    // ennsure no two-way progressions.
+                    Progression.Value = null;
             };
         }
 
