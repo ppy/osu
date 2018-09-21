@@ -12,6 +12,7 @@ namespace osu.Game.Screens.Backgrounds
     public class BackgroundScreenBeatmap : BlurrableBackgroundScreen
     {
         private WorkingBeatmap beatmap;
+
         public WorkingBeatmap Beatmap
         {
             get { return beatmap; }
@@ -24,7 +25,7 @@ namespace osu.Game.Screens.Backgrounds
 
                 Schedule(() =>
                 {
-                    LoadComponentAsync(new BeatmapBackground(beatmap), b =>
+                    LoadComponentAsync(new BeatmapBackground(beatmap), b => Schedule(() =>
                     {
                         float newDepth = 0;
                         if (Background != null)
@@ -38,7 +39,7 @@ namespace osu.Game.Screens.Backgrounds
                         b.Depth = newDepth;
                         Add(Background = b);
                         Background.BlurSigma = BlurTarget;
-                    });
+                    }));
                 });
             }
         }
