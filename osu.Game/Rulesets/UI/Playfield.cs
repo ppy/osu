@@ -16,12 +16,14 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class Playfield : Container
+    public abstract class Playfield : CompositeDrawable
     {
         /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
-        public HitObjectContainer HitObjectContainer { get; private set; }
+        public HitObjectContainer HitObjectContainer => hitObjectContainerLazy.Value;
+
+        private readonly Lazy<HitObjectContainer> hitObjectContainerLazy;
 
         /// <summary>
         /// A function that converts gamefield coordinates to screen space.
@@ -51,6 +53,8 @@ namespace osu.Game.Rulesets.UI
         protected Playfield()
         {
             RelativeSizeAxes = Axes.Both;
+
+            hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
         }
 
         private WorkingBeatmap beatmap;
@@ -59,11 +63,6 @@ namespace osu.Game.Rulesets.UI
         private void load(IBindableBeatmap beatmap)
         {
             this.beatmap = beatmap.Value;
-
-            HitObjectContainer = CreateHitObjectContainer();
-            HitObjectContainer.RelativeSizeAxes = Axes.Both;
-
-            Add(HitObjectContainer);
         }
 
         /// <summary>
@@ -94,11 +93,6 @@ namespace osu.Game.Rulesets.UI
             nestedPlayfields.Value.Add(otherPlayfield);
         }
 
-        /// <summary>
-        /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
-        /// </summary>
-        protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
-
         protected override void Update()
         {
             base.Update();
@@ -108,5 +102,10 @@ namespace osu.Game.Rulesets.UI
                     if (mod is IUpdatableByPlayfield updatable)
                         updatable.Update(this);
         }
+
+        /// <summary>
+        /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
     }
 }

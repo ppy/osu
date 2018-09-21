@@ -30,8 +30,6 @@ namespace osu.Game.Rulesets.Mania.UI
         internal readonly Container TopLevelContainer;
         private readonly Container explosionContainer;
 
-        protected override Container<Drawable> Content => hitObjectArea;
-
         public Column()
         {
             RelativeSizeAxes = Axes.Y;
@@ -54,7 +52,10 @@ namespace osu.Game.Rulesets.Mania.UI
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        hitObjectArea = new ColumnHitObjectArea { RelativeSizeAxes = Axes.Both },
+                        hitObjectArea = new ColumnHitObjectArea(HitObjectContainer)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
                         explosionContainer = new Container
                         {
                             Name = "Hit explosions",

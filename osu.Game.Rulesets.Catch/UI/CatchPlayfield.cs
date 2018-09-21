@@ -17,9 +17,6 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         public const float BASE_WIDTH = 512;
 
-        protected override Container<Drawable> Content => content;
-        private readonly Container<Drawable> content;
-
         private readonly CatcherArea catcherArea;
 
         protected override bool UserScrollSpeedAdjustment => false;
@@ -56,10 +53,7 @@ namespace osu.Game.Rulesets.Catch.UI
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.TopLeft,
                         },
-                        content = new Container<Drawable>
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                        },
+                        HitObjectContainer
                     }
                 }
             };
