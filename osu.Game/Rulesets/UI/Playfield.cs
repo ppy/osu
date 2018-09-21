@@ -9,17 +9,24 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
+using OpenTK;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class Playfield : ScalableContainer
+    public abstract class Playfield : Container
     {
         /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
         public HitObjectContainer HitObjectContainer { get; private set; }
+
+        /// <summary>
+        /// A function that converts gamefield coordinates to screen space.
+        /// </summary>
+        public Func<Vector2, Vector2> GamefieldToScreenSpace => HitObjectContainer.ToScreenSpace;
 
         /// <summary>
         /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
@@ -39,16 +46,9 @@ namespace osu.Game.Rulesets.UI
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
         /// <summary>
-        /// A container for keeping track of DrawableHitObjects.
+        /// Creates a new <see cref="Playfield"/>.
         /// </summary>
-        /// <param name="customWidth">The width to scale the internal coordinate space to.
-        /// May be null if scaling based on <paramref name="customHeight"/> is desired. If <paramref name="customHeight"/> is also null, no scaling will occur.
-        /// </param>
-        /// <param name="customHeight">The height to scale the internal coordinate space to.
-        /// May be null if scaling based on <paramref name="customWidth"/> is desired. If <paramref name="customWidth"/> is also null, no scaling will occur.
-        /// </param>
-        protected Playfield(float? customWidth = null, float? customHeight = null)
-            : base(customWidth, customHeight)
+        protected Playfield()
         {
             RelativeSizeAxes = Axes.Both;
         }

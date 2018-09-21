@@ -25,7 +25,6 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override bool UserScrollSpeedAdjustment => false;
 
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation)
-            : base(BASE_WIDTH)
         {
             Direction.Value = ScrollingDirection.Down;
 
@@ -34,27 +33,36 @@ namespace osu.Game.Rulesets.Catch.UI
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
 
-            base.Content.Anchor = Anchor.BottomLeft;
-            base.Content.Origin = Anchor.BottomLeft;
-
-            base.Content.AddRange(new Drawable[]
+            InternalChild = new Container
             {
-                explodingFruitContainer = new Container
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                FillMode = FillMode.Fit,
+                FillAspectRatio = 4f / 3,
+                Child = new ScalingContainer(BASE_WIDTH)
                 {
                     RelativeSizeAxes = Axes.Both,
-                },
-                catcherArea = new CatcherArea(difficulty)
-                {
-                    GetVisualRepresentation = getVisualRepresentation,
-                    ExplodingFruitTarget = explodingFruitContainer,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopLeft,
-                },
-                content = new Container<Drawable>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-            });
+                    Children = new Drawable[]
+                    {
+                        explodingFruitContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        catcherArea = new CatcherArea(difficulty)
+                        {
+                            GetVisualRepresentation = getVisualRepresentation,
+                            ExplodingFruitTarget = explodingFruitContainer,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.TopLeft,
+                        },
+                        content = new Container<Drawable>
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                    }
+                }
+            };
         }
 
         public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.AttemptCatch(obj);
