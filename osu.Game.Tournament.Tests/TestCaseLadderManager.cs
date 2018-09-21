@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.Screens.Ladder;
 using osu.Game.Tournament.Screens.Ladder.Components;
 
 namespace osu.Game.Tournament.Tests
