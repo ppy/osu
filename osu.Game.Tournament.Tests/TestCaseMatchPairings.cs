@@ -47,14 +47,16 @@ namespace osu.Game.Tournament.Tests
                 }
             );
 
-            Child = new Container
+            Child = new FillFlowContainer
             {
-                AutoSizeAxes = Axes.Both,
+                RelativeSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
                 Children = new Drawable[]
                 {
-                    level1 = new Container<DrawableMatchPairing>
+                    level1 = new FillFlowContainer<DrawableMatchPairing>
                     {
-                        AutoSizeAxes = Axes.Both,
+                        AutoSizeAxes = Axes.X,
+                        Direction = FillDirection.Vertical,
                         Children = new[]
                         {
                             new DrawableMatchPairing(pairing1),
@@ -62,9 +64,10 @@ namespace osu.Game.Tournament.Tests
                             new DrawableMatchPairing(new MatchPairing()),
                         }
                     },
-                    level2 = new Container<DrawableMatchPairing>
+                    level2 = new FillFlowContainer<DrawableMatchPairing>
                     {
-                        AutoSizeAxes = Axes.Both,
+                        AutoSizeAxes = Axes.X,
+                        Direction = FillDirection.Vertical,
                         Margin = new MarginPadding(20),
                         Children = new[]
                         {
