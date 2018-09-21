@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override string ShortenedName => "SI";
         public override FontAwesome Icon => FontAwesome.fa_rotate_right;
         public override ModType Type => ModType.Fun;
-        public override string Description => "Circle spin in. No approach circles.";
+        public override string Description => "Circles spin in. No approach circles.";
         public override double ScoreMultiplier => 1;
         public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden) };
 
@@ -33,6 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             foreach (var drawable in drawables)
             {
+                // Need to add custom update in order to disable fade
                 drawable.ApplyCustomUpdateState += ApplyZoomState;
             }
         }
@@ -43,8 +44,9 @@ namespace osu.Game.Rulesets.Osu.Mods
             if (state != ArmedState.Idle) return;
 
             var h = (OsuHitObject)drawable.HitObject;
-            var appearTime = h.StartTime - h.TimePreempt;
-            var moveDuration = h.TimePreempt;
+
+            var appearTime = h.StartTime - h.TimePreempt + 1;
+            var moveDuration = h.TimePreempt - 1;
 
             switch (drawable)
             {
@@ -63,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                             .RotateTo(origRotate+rotate_offset)
                             .RotateTo(origRotate, moveDuration)
                             .ScaleTo(origScale * new Vector2(rotate_starting_width, 0))
-                            .ScaleTo(origScale, moveDuration)
+                            .ScaleTo(origScale, moveDuration, Easing.InQuad)
                             .FadeTo(1);
                     }
 
