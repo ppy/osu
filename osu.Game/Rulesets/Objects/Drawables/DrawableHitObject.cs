@@ -28,6 +28,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         /// </summary>
         public virtual Color4 AccentColour { get; set; } = Color4.Gray;
 
+        public virtual string Font { get; set; } = @"Venera";
+
         // Todo: Rulesets should be overriding the resources instead, but we need to figure out where/when to apply overrides first
         protected virtual string SampleNamespace => null;
 

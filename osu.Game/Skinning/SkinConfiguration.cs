@@ -7,12 +7,14 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Skinning
 {
-    public class SkinConfiguration : IHasComboColours, IHasCustomColours
+    public class SkinConfiguration : IHasComboColours, IHasCustomColours, IHasHitCircleNumberFont
     {
         public readonly SkinInfo SkinInfo = new SkinInfo();
 
         public List<Color4> ComboColours { get; set; } = new List<Color4>();
 
         public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
+
+        public string HitCircleNumberFont { get; set; }
     }
 }

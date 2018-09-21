@@ -64,6 +64,9 @@ namespace osu.Game.Beatmaps.Formats
                 case Section.Colours:
                     handleColours(output, line);
                     return;
+                case Section.Fonts:
+                    handleFonts(output, line);
+                    return;
             }
         }
 
@@ -110,6 +113,18 @@ namespace osu.Game.Beatmaps.Formats
             {
                 if (!(output is IHasCustomColours tHasCustomColours)) return;
                 tHasCustomColours.CustomColours[pair.Key] = colour;
+            }
+        }
+
+        private void handleFonts(T output, string line)
+        {
+            var pair = SplitKeyVal(line);
+
+            string font = pair.Value;
+            if (pair.Key.Equals(@"HitCircleNumberFont"))
+            {
+                if (!(output is IHasHitCircleNumberFont tHasHitCircleNumberFont)) return;
+                tHasHitCircleNumberFont.HitCircleNumberFont = font;
             }
         }
 

@@ -76,6 +76,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        public override string Font
+        {
+            get { return base.Font; }
+            set
+            {
+                base.Font = value;
+                number.Font = Font;
+            }
+        }
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)

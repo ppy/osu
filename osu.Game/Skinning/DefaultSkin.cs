@@ -21,7 +21,8 @@ namespace osu.Game.Skinning
                     new Color4(102, 136, 0, 255),
                     new Color4(204, 102, 0, 255),
                     new Color4(121, 9, 13, 255)
-                }
+                },
+                HitCircleNumberFont = @"Venera"
             };
         }
 

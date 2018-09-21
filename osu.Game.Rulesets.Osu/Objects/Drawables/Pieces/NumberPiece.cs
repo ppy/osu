@@ -22,6 +22,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             set { number.Text = value; }
         }
 
+        public string Font
+        {
+            get { return number.Font; }
+            set { number.Font = value; }
+        }
+
         public NumberPiece()
         {
             Anchor = Anchor.Centre;
