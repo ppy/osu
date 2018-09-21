@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fit,
                 FillAspectRatio = 4f / 3,
-                Child = content = new ScalingContainer(OsuPlayfield.BASE_SIZE.X) { RelativeSizeAxes = Axes.Both }
+                Child = content = new ScalingContainer { RelativeSizeAxes = Axes.Both }
             };
         }
 
@@ -30,18 +30,11 @@ namespace osu.Game.Rulesets.Osu.UI
         /// </summary>
         private class ScalingContainer : Container
         {
-            private readonly float targetWidth;
-
-            public ScalingContainer(float targetWidth)
-            {
-                this.targetWidth = targetWidth;
-            }
-
             protected override void Update()
             {
                 base.Update();
 
-                Scale = new Vector2(Parent.ChildSize.X / targetWidth);
+                Scale = new Vector2(Parent.ChildSize.X / OsuPlayfield.BASE_SIZE.X);
                 Size = Vector2.Divide(Vector2.One, Scale);
             }
         }

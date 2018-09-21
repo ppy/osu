@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.UI
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fit,
                 FillAspectRatio = 4f / 3,
-                Child = new ScalingContainer(BASE_WIDTH)
+                Child = new PlayfieldLayer
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
