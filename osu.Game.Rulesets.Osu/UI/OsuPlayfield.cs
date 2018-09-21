@@ -27,35 +27,27 @@ namespace osu.Game.Rulesets.Osu.UI
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            InternalChild = new Container
+            InternalChild = new PlayfieldLayer
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
-                FillMode = FillMode.Fit,
-                FillAspectRatio = 4f / 3,
-                Child = new ScalingContainer(BASE_SIZE.X)
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
+                    connectionLayer = new FollowPointRenderer
                     {
-                        connectionLayer = new FollowPointRenderer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Depth = 2,
-                        },
-                        judgementLayer = new JudgementContainer<DrawableOsuJudgement>
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Depth = 1,
-                        },
-                        HitObjectContainer,
-                        approachCircles = new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Depth = -1,
-                        },
-                    }
+                        RelativeSizeAxes = Axes.Both,
+                        Depth = 2,
+                    },
+                    judgementLayer = new JudgementContainer<DrawableOsuJudgement>
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Depth = 1,
+                    },
+                    HitObjectContainer,
+                    approachCircles = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Depth = -1,
+                    },
                 }
             };
         }

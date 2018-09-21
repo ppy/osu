@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             new HitObjectCompositionTool<Spinner>()
         };
 
-        protected override Container CreateLayerContainer() => new LayerContainer();
+        protected override Container CreateLayerContainer() => new PlayfieldLayer { RelativeSizeAxes = Axes.Both };
 
         public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)
         {
@@ -45,21 +45,6 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
 
             return base.CreateMaskFor(hitObject);
-        }
-
-        private class LayerContainer : Container
-        {
-            protected override Container<Drawable> Content => content;
-            private readonly Container content;
-
-            public LayerContainer()
-            {
-                RelativeSizeAxes = Axes.Both;
-                FillMode = FillMode.Fit;
-                FillAspectRatio = 4f / 3;
-
-                Child = content = new ScalingContainer(OsuPlayfield.BASE_SIZE.X) { RelativeSizeAxes = Axes.Both };
-            }
         }
     }
 }
