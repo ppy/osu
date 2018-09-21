@@ -25,7 +25,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 {
     public class DrawableMatchTeam : DrawableTournamentTeam, IHasContextMenu
     {
-        private readonly Bindable<TournamentTeam> team;
         private readonly MatchPairing pairing;
         private OsuSpriteText scoreText;
         private Box background;
@@ -39,10 +38,12 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private readonly Func<bool> isWinner;
         private LadderManager manager;
 
+        [Resolved(CanBeNull = true)]
+        private LadderEditorInfo editorInfo { get; set; } = null;
+
         public DrawableMatchTeam(Bindable<TournamentTeam> team, MatchPairing pairing)
             : base(team)
         {
-            this.team = team.GetBoundCopy();
             this.pairing = pairing;
             Size = new Vector2(150, 40);
 
@@ -127,7 +128,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {
-            if (Team == null) return false;
+            if (Team == null || editorInfo.EditingEnabled) return false;
 
             if (args.Button == MouseButton.Left)
             {
@@ -158,12 +159,20 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             scoreText.Font = AcronymText.Font = winner ? "Exo2.0-Bold" : "Exo2.0-Regular";
         }
 
-        public MenuItem[] ContextMenuItems => new MenuItem[]
+        public MenuItem[] ContextMenuItems
         {
-            new OsuMenuItem("Populate team", MenuItemType.Standard, () => team.Value = manager.Teams.Random()),
-            new OsuMenuItem("Join with", MenuItemType.Standard, () => manager.RequestJoin(pairing)),
-            new OsuMenuItem("Remove", MenuItemType.Destructive, () => manager.Remove(pairing)),
-        };
+            get
+            {
+                if (!editorInfo.EditingEnabled)
+                    return new MenuItem[0];
+
+                return new MenuItem[]
+                {
+                    new OsuMenuItem("Join with", MenuItemType.Standard, () => manager.RequestJoin(pairing)),
+                    new OsuMenuItem("Remove", MenuItemType.Destructive, () => manager.Remove(pairing)),
+                };
+            }
+        }
     }
 
     internal static class Extensions

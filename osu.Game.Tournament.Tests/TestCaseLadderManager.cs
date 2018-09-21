@@ -21,7 +21,7 @@ namespace osu.Game.Tournament.Tests
         private readonly LadderManager manager;
 
         [Cached]
-        private Bindable<TournamentConditions> conditions = new Bindable<TournamentConditions>(new TournamentConditions { BestOf = 9 });
+        private Bindable<TournamentConditions> conditions = new Bindable<TournamentConditions>(new TournamentConditions());
 
         public TestCaseLadderManager()
         {
