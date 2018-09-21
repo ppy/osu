@@ -20,9 +20,6 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
-        private readonly Container content;
-        protected override Container<Drawable> Content => content;
-
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
         public OsuPlayfield()
@@ -37,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.UI
                 RelativeSizeAxes = Axes.Both,
                 FillMode = FillMode.Fit,
                 FillAspectRatio = 4f / 3,
-                Child = content = new ScalingContainer(BASE_SIZE.X)
+                Child = new ScalingContainer(BASE_SIZE.X)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -52,6 +49,7 @@ namespace osu.Game.Rulesets.Osu.UI
                             RelativeSizeAxes = Axes.Both,
                             Depth = 1,
                         },
+                        HitObjectContainer,
                         approachCircles = new Container
                         {
                             RelativeSizeAxes = Axes.Both,

@@ -44,9 +44,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
         private readonly JudgementContainer<DrawableTaikoJudgement> judgementContainer;
 
-        protected override Container<Drawable> Content => content;
-        private readonly Container content;
-
         private readonly Container topLevelHitContainer;
 
         private readonly Container barlineContainer;
@@ -118,12 +115,13 @@ namespace osu.Game.Rulesets.Taiko.UI
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = HIT_TARGET_OFFSET }
                         },
-                        content = new Container
+                        new Container
                         {
                             Name = "Hit objects",
                             RelativeSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = HIT_TARGET_OFFSET },
-                            Masking = true
+                            Masking = true,
+                            Child = HitObjectContainer
                         },
                         kiaiExplosionContainer = new Container<KiaiHitExplosion>
                         {
