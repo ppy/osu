@@ -10,6 +10,7 @@ using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
@@ -63,6 +64,20 @@ namespace osu.Game.Screens.Menu
                     }
                 },
                 sideFlashes = new MenuSideFlashes(),
+            };
+
+            buttons.StateChanged += state =>
+            {
+                switch (state)
+                {
+                    case ButtonSystemState.Initial:
+                    case ButtonSystemState.Exit:
+                        background.FadeColour(Color4.White, 500, Easing.OutSine);
+                        break;
+                    default:
+                        background.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine);
+                        break;
+                }
             };
         }
 
