@@ -69,7 +69,10 @@ namespace osu.Game.Rulesets.Osu.Mods
                             .FadeTo(1);
                     }
 
-                    circle.ApproachCircle.Hide();
+                    using (circle.ApproachCircle.BeginAbsoluteSequence(appearTime, true))
+                    {
+                        circle.ApproachCircle.Hide();
+                    }
 
                     break;
 
