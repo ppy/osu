@@ -20,32 +20,46 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
+        private readonly Container content;
+        protected override Container<Drawable> Content => content;
+
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
         public OsuPlayfield()
-            : base(BASE_SIZE.X)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            AddRange(new Drawable[]
+            InternalChild = new Container
             {
-                connectionLayer = new FollowPointRenderer
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                FillMode = FillMode.Fit,
+                FillAspectRatio = 4f / 3,
+                Child = content = new ScalingContainer(BASE_SIZE.X)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Depth = 2,
-                },
-                judgementLayer = new JudgementContainer<DrawableOsuJudgement>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 1,
-                },
-                approachCircles = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = -1,
-                },
-            });
+                    Children = new Drawable[]
+                    {
+                        connectionLayer = new FollowPointRenderer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Depth = 2,
+                        },
+                        judgementLayer = new JudgementContainer<DrawableOsuJudgement>
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Depth = 1,
+                        },
+                        approachCircles = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Depth = -1,
+                        },
+                    }
+                }
+            };
         }
 
         public override void Add(DrawableHitObject h)

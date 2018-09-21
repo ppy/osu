@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -31,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             new HitObjectCompositionTool<Spinner>()
         };
 
-        protected override ScalableContainer CreateLayerContainer() => new ScalableContainer(OsuPlayfield.BASE_SIZE.X) { RelativeSizeAxes = Axes.Both };
+        protected override Container CreateLayerContainer() => new LayerContainer();
 
         public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)
         {
@@ -44,6 +45,21 @@ namespace osu.Game.Rulesets.Osu.Edit
             }
 
             return base.CreateMaskFor(hitObject);
+        }
+
+        private class LayerContainer : Container
+        {
+            protected override Container<Drawable> Content => content;
+            private readonly Container content;
+
+            public LayerContainer()
+            {
+                RelativeSizeAxes = Axes.Both;
+                FillMode = FillMode.Fit;
+                FillAspectRatio = 4f / 3;
+
+                Child = content = new ScalingContainer(OsuPlayfield.BASE_SIZE.X) { RelativeSizeAxes = Axes.Both };
+            }
         }
     }
 }
