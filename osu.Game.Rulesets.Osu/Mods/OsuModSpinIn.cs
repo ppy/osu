@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => new[] { typeof(OsuModHidden) };
 
         private const int rotate_offset = 360;
-        private const float rotate_starting_width = 2.5f;
+        private const float rotate_starting_width = 2.0f;
 
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
@@ -63,9 +63,9 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         circle
                             .RotateTo(origRotate+rotate_offset)
-                            .RotateTo(origRotate, moveDuration)
+                            .RotateTo(origRotate, moveDuration, Easing.InOutSine)
                             .ScaleTo(origScale * new Vector2(rotate_starting_width, 0))
-                            .ScaleTo(origScale, moveDuration, Easing.InQuad)
+                            .ScaleTo(origScale, moveDuration, Easing.InOutSine)
                             .FadeTo(1);
                     }
 
@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                         slider
                             .ScaleTo(0)
-                            .ScaleTo(origScale, moveDuration)
+                            .ScaleTo(origScale, moveDuration, Easing.InOutSine)
                             .FadeTo(1);
                     }
 
