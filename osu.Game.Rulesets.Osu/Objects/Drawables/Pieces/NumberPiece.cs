@@ -9,6 +9,9 @@ using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Skinning;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -27,6 +30,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
+            RelativeSizeAxes = Axes.Both;
+
+            number = new OsuSpriteText
+            {
+                Text = @"1",
+                Font = @"Venera",
+                UseFullGlyphHeight = false,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                TextSize = 40,
+                Alpha = 1
+            };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(FontStore fontStore)
+        {
+            Texture numberTexture = fontStore.GetCharacter(number.Font, Text.ToString()[0]);
             Children = new Drawable[]
             {
                 new SkinnableDrawable("Play/osu/number-glow", name => new CircularContainer
@@ -41,16 +62,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     },
                     Child = new Box()
                 }, s => s.GetTexture("Play/osu/hitcircle") == null),
-                number = new OsuSpriteText
-                {
-                    Text = @"1",
-                    Font = @"Venera",
-                    UseFullGlyphHeight = false,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    TextSize = 40,
-                    Alpha = 1
-                }
+                new SkinnableDrawable($"Play/osu/default-{Text}", _ => new Sprite {
+                    Texture = numberTexture,
+                    Size =numberTexture.Size*number.TextSize/100,
+
+                })
             };
         }
     }
