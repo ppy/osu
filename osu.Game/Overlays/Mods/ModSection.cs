@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.EventArgs;
 using osu.Framework.Input.States;
 
@@ -24,6 +25,7 @@ namespace osu.Game.Overlays.Mods
         public Action<Mod> Action;
         protected abstract Key[] ToggleKeys { get; }
         public abstract ModType ModType { get; }
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => false;
 
         public string Header
         {
