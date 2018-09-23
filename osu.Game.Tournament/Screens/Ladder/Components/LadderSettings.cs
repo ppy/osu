@@ -3,7 +3,6 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -17,8 +16,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private const int padding = 10;
 
         protected override string Title => @"ladder";
-
-        private PlayerSliderBar<double> sliderBestOf;
 
         private OsuTextBox textboxTeam1;
         private OsuTextBox textboxTeam2;
@@ -70,39 +67,38 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     },
                 },
                 textboxTeam2 = new OsuTextBox { RelativeSizeAxes = Axes.X, Height = 20 },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Padding = new MarginPadding { Horizontal = padding },
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            Text = "Best of",
-                        },
-                    },
-                },
-                sliderBestOf = new PlayerSliderBar<double>
-                {
-                    Bindable = new BindableDouble
-                    {
-                        Default = 11,
-                        Value = 11,
-                        MinValue = 1,
-                        MaxValue = 21,
-                        Precision = 1,
-                    },
-                }
+                // new Container
+                // {
+                //     RelativeSizeAxes = Axes.X,
+                //     AutoSizeAxes = Axes.Y,
+                //     Padding = new MarginPadding { Horizontal = padding },
+                //     Children = new Drawable[]
+                //     {
+                //         new OsuSpriteText
+                //         {
+                //             Anchor = Anchor.CentreLeft,
+                //             Origin = Anchor.CentreLeft,
+                //             Text = "Best of",
+                //         },
+                //     },
+                // },
+                // sliderBestOf = new PlayerSliderBar<double>
+                // {
+                //     Bindable = new BindableDouble
+                //     {
+                //         Default = 11,
+                //         Value = 11,
+                //         MinValue = 1,
+                //         MaxValue = 21,
+                //         Precision = 1,
+                //     },
+                // }
             };
 
             editorInfo.Selected.ValueChanged += selection =>
             {
                 textboxTeam1.Text = selection?.Team1.Value?.Acronym;
                 textboxTeam2.Text = selection?.Team2.Value?.Acronym;
-                sliderBestOf.Bindable.Value = selection?.BestOf ?? sliderBestOf.Bindable.Default;
             };
 
             textboxTeam1.OnCommit = (val, newText) =>
@@ -117,10 +113,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     editorInfo.Selected.Value.Team2.Value = teamEntries.FirstOrDefault(t => t.Acronym == val.Text);
             };
 
-            sliderBestOf.Bindable.ValueChanged += val =>
-            {
-                if (editorInfo.Selected.Value != null) editorInfo.Selected.Value.BestOf.Value = (int)val;
-            };
+            // sliderBestOf.Bindable.ValueChanged += val =>
+            // {
+            //     if (editorInfo.Selected.Value != null) editorInfo.Selected.Value.BestOf.Value = (int)val;
+            // };
 
             editorInfo.EditingEnabled.ValueChanged += enabled =>
             {

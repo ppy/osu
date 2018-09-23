@@ -61,7 +61,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             pairing.Team2.BindValueChanged(_ => updateTeams());
             pairing.Team1Score.BindValueChanged(_ => updateWinConditions());
             pairing.Team2Score.BindValueChanged(_ => updateWinConditions());
-            pairing.BestOf.BindValueChanged(_ => updateWinConditions());
+            pairing.Grouping.BindValueChanged(_ => updateWinConditions());
             pairing.Completed.BindValueChanged(_ => updateProgression());
             pairing.Progression.BindValueChanged(_ => updateProgression());
 
@@ -112,11 +112,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private void updateWinConditions()
         {
-            if (conditions.Value == null) return;
+            if (conditions.Value == null || Pairing.Grouping.Value == null) return;
 
-            var instaWinAmount = Pairing.BestOf.Value / 2;
+            var instaWinAmount = Pairing.Grouping.Value.BestOf / 2;
 
-            Pairing.Completed.Value = Pairing.Team1Score + Pairing.Team2Score >= Pairing.BestOf || Pairing.Team1Score > instaWinAmount || Pairing.Team2Score > instaWinAmount;
+            Pairing.Completed.Value = Pairing.Grouping.Value.BestOf > 0 && (Pairing.Team1Score + Pairing.Team2Score >= Pairing.Grouping.Value.BestOf || Pairing.Team1Score > instaWinAmount || Pairing.Team2Score > instaWinAmount);
         }
 
         protected override void LoadComplete()
