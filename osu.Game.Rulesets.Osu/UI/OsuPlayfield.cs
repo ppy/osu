@@ -19,12 +19,15 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly Container approachCircles;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
+        private readonly OsuRulesetContainer rulesetContainer;
 
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
-        public OsuPlayfield()
+        public OsuPlayfield(OsuRulesetContainer rulesetContainer)
             : base(BASE_SIZE.X)
         {
+            this.rulesetContainer = rulesetContainer;
+
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
@@ -69,10 +72,13 @@ namespace osu.Game.Rulesets.Osu.UI
             if (!judgedObject.DisplayResult || !DisplayJudgements)
                 return;
 
+            var explosionBaseSize = rulesetContainer.Beatmap.BeatmapInfo.BaseDifficulty.CircleSize;
+
             DrawableOsuJudgement explosion = new DrawableOsuJudgement(result, judgedObject)
             {
                 Origin = Anchor.Centre,
-                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition
+                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition,
+                Scale = new Vector2((1.0f - 0.7f * (explosionBaseSize - 5) / 5) / 2 * 1.65f)
             };
 
             judgementLayer.Add(explosion);
