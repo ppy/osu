@@ -1,16 +1,14 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Overlays.Settings;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play.PlayerSettings;
-using osu.Game.Tournament.Components;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
@@ -22,8 +20,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private PlayerSliderBar<double> sliderBestOf;
 
-        private SettingsDropdown<TournamentTeam> dropdownTeam1;
-        private SettingsDropdown<TournamentTeam> dropdownTeam2;
+        private OsuTextBox textboxTeam1;
+        private OsuTextBox textboxTeam2;
 
         [Resolved]
         private LadderEditorInfo editorInfo { get; set; } = null;
@@ -31,7 +29,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            var teamEntries = editorInfo.Teams.Select(t => new KeyValuePair<string, TournamentTeam>(t.ToString(), t)).Prepend(new KeyValuePair<string, TournamentTeam>("Empty", new TournamentTeam()));
+            var teamEntries = editorInfo.Teams;
 
             Children = new Drawable[]
             {
@@ -55,15 +53,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                         },
                     },
                 },
-                dropdownTeam1 = new SettingsDropdown<TournamentTeam>
-                {
-                    Items = teamEntries,
-                    Bindable = new Bindable<TournamentTeam>
-                    {
-                        Value = teamEntries.First().Value,
-                        Default = teamEntries.First().Value
-                    }
-                },
+                textboxTeam1 = new OsuTextBox { RelativeSizeAxes = Axes.X, Height = 20 },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -79,15 +69,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                         },
                     },
                 },
-                dropdownTeam2 = new SettingsDropdown<TournamentTeam>
-                {
-                    Items = teamEntries,
-                    Bindable = new Bindable<TournamentTeam>
-                    {
-                        Value = teamEntries.First().Value,
-                        Default = teamEntries.First().Value
-                    }
-                },
+                textboxTeam2 = new OsuTextBox { RelativeSizeAxes = Axes.X, Height = 20 },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -107,10 +89,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 {
                     Bindable = new BindableDouble
                     {
-                        Default = 5,
-                        Value = 5,
+                        Default = 11,
+                        Value = 11,
                         MinValue = 1,
-                        MaxValue = 20,
+                        MaxValue = 21,
                         Precision = 1,
                     },
                 }
@@ -118,19 +100,21 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             editorInfo.Selected.ValueChanged += selection =>
             {
-                dropdownTeam1.Bindable.Value = dropdownTeam1.Items.FirstOrDefault(i => i.Value.Acronym == selection?.Team1.Value?.Acronym).Value;
-                dropdownTeam2.Bindable.Value = dropdownTeam1.Items.FirstOrDefault(i => i.Value.Acronym == selection?.Team2.Value?.Acronym).Value;
+                textboxTeam1.Text = selection?.Team1.Value?.Acronym;
+                textboxTeam2.Text = selection?.Team2.Value?.Acronym;
                 sliderBestOf.Bindable.Value = selection?.BestOf ?? sliderBestOf.Bindable.Default;
             };
 
-            dropdownTeam1.Bindable.ValueChanged += val =>
+            textboxTeam1.OnCommit = (val, newText) =>
             {
-                if (editorInfo.Selected.Value != null) editorInfo.Selected.Value.Team1.Value = val.Acronym == null ? null : val;
+                if (newText && editorInfo.Selected.Value != null)
+                    editorInfo.Selected.Value.Team1.Value = teamEntries.FirstOrDefault(t => t.Acronym == val.Text);
             };
 
-            dropdownTeam2.Bindable.ValueChanged += val =>
+            textboxTeam2.OnCommit = (val, newText) =>
             {
-                if (editorInfo.Selected.Value != null) editorInfo.Selected.Value.Team2.Value = val.Acronym == null ? null : val;
+                if (newText && editorInfo.Selected.Value != null)
+                    editorInfo.Selected.Value.Team2.Value = teamEntries.FirstOrDefault(t => t.Acronym == val.Text);
             };
 
             sliderBestOf.Bindable.ValueChanged += val =>
