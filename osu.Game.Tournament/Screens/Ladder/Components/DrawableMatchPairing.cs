@@ -114,7 +114,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             if (conditions.Value == null) return;
 
-            Pairing.Completed.Value = Pairing.Team1Score.Value + Pairing.Team2Score.Value >= Pairing.BestOf.Value;
+            var instaWinAmount = Pairing.BestOf.Value / 2;
+
+            Pairing.Completed.Value = Pairing.Team1Score + Pairing.Team2Score >= Pairing.BestOf || Pairing.Team1Score > instaWinAmount || Pairing.Team2Score > instaWinAmount;
         }
 
         protected override void LoadComplete()

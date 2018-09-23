@@ -25,7 +25,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public readonly Bindable<bool> Completed = new Bindable<bool>();
 
-        public readonly BindableInt BestOf = new BindableInt(5);
+        public readonly BindableInt BestOf = new BindableInt(11);
 
         [JsonIgnore]
         public readonly Bindable<MatchPairing> Progression = new Bindable<MatchPairing>();
