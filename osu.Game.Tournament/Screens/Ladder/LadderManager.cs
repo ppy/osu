@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -13,24 +12,20 @@ using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
+using OpenTK;
+using OpenTK.Graphics;
 using SixLabors.Primitives;
 
 namespace osu.Game.Tournament.Screens.Ladder
 {
-    public class LadderEditorInfo
-    {
-        public readonly BindableBool EditingEnabled = new BindableBool();
-        public List<TournamentTeam> Teams = new List<TournamentTeam>();
-        public List<TournamentGrouping> Groupings = new List<TournamentGrouping>();
-        public readonly Bindable<MatchPairing> Selected = new Bindable<MatchPairing>();
-    }
-
     public class LadderManager : CompositeDrawable, IHasContextMenu
     {
         public readonly List<TournamentTeam> Teams;
         private readonly Container<DrawableMatchPairing> pairingsContainer;
         private readonly Container<Path> paths;
         private readonly Container headings;
+
+        private readonly ScrollableContainer scrollContent;
 
         [Cached]
         private readonly LadderEditorInfo editorInfo = new LadderEditorInfo();
@@ -47,7 +42,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new ScrollableContainer
+                    scrollContent = new ScrollableContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -202,7 +197,7 @@ namespace osu.Game.Tournament.Screens.Ladder
             layout.Validate();
         }
 
-        public void RequestJoin(MatchPairing pairing, bool losers) => AddInternal(new JoinRequestHandler(pairingsContainer, pairing, losers));
+        public void RequestJoin(MatchPairing pairing, bool losers) => scrollContent.Add(new JoinRequestHandler(pairingsContainer, pairing, losers));
 
         private class JoinRequestHandler : CompositeDrawable
         {
@@ -227,6 +222,8 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             private DrawableMatchPairing findTarget(InputState state) => pairingsContainer.FirstOrDefault(d => d.ReceiveMouseInputAt(state.Mouse.NativeState.Position));
 
+            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+
             protected override bool OnMouseMove(InputState state)
             {
                 var found = findTarget(state);
@@ -240,7 +237,10 @@ namespace osu.Game.Tournament.Screens.Ladder
                 if (found == null)
                     return false;
 
-                AddInternal(path = new ProgressionPath(pairingsContainer.First(c => c.Pairing == Source), found) { Alpha = 0.4f });
+                AddInternal(path = new ProgressionPath(pairingsContainer.First(c => c.Pairing == Source), found)
+                {
+                    Colour = Color4.Yellow,
+                });
 
                 return base.OnMouseMove(state);
             }
