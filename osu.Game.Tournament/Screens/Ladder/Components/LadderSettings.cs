@@ -23,6 +23,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private OsuTextBox textboxTeam1;
         private OsuTextBox textboxTeam2;
         private SettingsDropdown<TournamentGrouping> groupingDropdown;
+        private PlayerCheckbox losersCheckbox;
 
         [Resolved]
         private LadderEditorInfo editorInfo { get; set; } = null;
@@ -32,7 +33,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             var teamEntries = editorInfo.Teams;
 
-            var groupingOptions = editorInfo.Groupings.Select(g => new KeyValuePair<string, TournamentGrouping>(g.Name, g)).Prepend(new KeyValuePair<string, TournamentGrouping>("None", new TournamentGrouping()));
+            var groupingOptions = editorInfo.Groupings.Select(g => new KeyValuePair<string, TournamentGrouping>(g.Name, g))
+                                            .Prepend(new KeyValuePair<string, TournamentGrouping>("None", new TournamentGrouping()));
 
             Children = new Drawable[]
             {
@@ -78,6 +80,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Bindable = new Bindable<TournamentGrouping>(),
                     Items = groupingOptions
                 },
+                losersCheckbox = new PlayerCheckbox
+                {
+                    LabelText = "Losers Bracket",
+                    Bindable = new Bindable<bool>()
+                }
                 // new Container
                 // {
                 //     RelativeSizeAxes = Axes.X,
@@ -111,6 +118,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 textboxTeam1.Text = selection?.Team1.Value?.Acronym;
                 textboxTeam2.Text = selection?.Team2.Value?.Acronym;
                 groupingDropdown.Bindable.Value = selection?.Grouping.Value ?? groupingOptions.First().Value;
+                losersCheckbox.Current.Value = selection?.Losers.Value ?? false;
             };
 
             textboxTeam1.OnCommit = (val, newText) =>
@@ -129,6 +137,12 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 if (editorInfo.Selected.Value != null)
                     editorInfo.Selected.Value.Grouping.Value = grouping;
+            };
+
+            losersCheckbox.Current.ValueChanged += losers =>
+            {
+                if (editorInfo.Selected.Value != null)
+                    editorInfo.Selected.Value.Losers.Value = losers;
             };
 
             // sliderBestOf.Bindable.ValueChanged += val =>

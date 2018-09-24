@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Configuration;
@@ -54,7 +53,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                         Children = new Drawable[]
                         {
                             paths = new Container<Path> { RelativeSizeAxes = Axes.Both },
-                            headings = new Container() { RelativeSizeAxes = Axes.Both },
+                            headings = new Container { RelativeSizeAxes = Axes.Both },
                             pairingsContainer = new Container<DrawableMatchPairing> { RelativeSizeAxes = Axes.Both },
                         }
                     },
@@ -75,7 +74,12 @@ namespace osu.Game.Tournament.Screens.Ladder
                 if (src == null) throw new InvalidOperationException();
 
                 if (dest != null)
-                    src.Progression.Value = dest;
+                {
+                    if (pair.Losers)
+                        src.LosersProgression.Value = dest;
+                    else
+                        src.Progression.Value = dest;
+                }
             }
 
             foreach (var pairing in info.Pairings)
@@ -99,10 +103,9 @@ namespace osu.Game.Tournament.Screens.Ladder
             return new LadderInfo
             {
                 Pairings = pairings,
-                Progressions = pairings
-                               .Where(p => p.Progression.Value != null)
-                               .Select(p => (p.ID, p.Progression.Value.ID))
-                               .ToList(),
+                Progressions = pairings.Where(p => p.Progression.Value != null).Select(p => new TournamentProgression(p.ID, p.Progression.Value.ID)).Concat(
+                                           pairings.Where(p => p.LosersProgression.Value != null).Select(p => new TournamentProgression(p.ID, p.LosersProgression.Value.ID, true)))
+                                       .ToList(),
                 Groupings = editorInfo.Groupings
             };
         }
@@ -120,7 +123,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                 {
                     new OsuMenuItem("Create new match", MenuItemType.Highlighted, () =>
                     {
-                        var pos = ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
+                        var pos = pairingsContainer.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
                         addPairing(new MatchPairing { Position = new Point((int)pos.X, (int)pos.Y) });
                     }),
                 };
@@ -161,7 +164,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             foreach (var group in editorInfo.Groupings)
             {
-                var topPairing = pairingsContainer.Where(p => p.Pairing.Grouping.Value == group).OrderBy(p => p.Y).FirstOrDefault();
+                var topPairing = pairingsContainer.Where(p => !p.Pairing.Losers && p.Pairing.Grouping.Value == group).OrderBy(p => p.Y).FirstOrDefault();
 
                 if (topPairing == null) continue;
 
@@ -173,25 +176,44 @@ namespace osu.Game.Tournament.Screens.Ladder
                 });
             }
 
+            foreach (var group in editorInfo.Groupings)
+            {
+                var topPairing = pairingsContainer.Where(p => p.Pairing.Losers && p.Pairing.Grouping.Value == group).OrderBy(p => p.Y).FirstOrDefault();
+
+                if (topPairing == null) continue;
+
+                headings.Add(new DrawableTournamentGrouping(group, true)
+                {
+                    Position = headings.ToLocalSpace((topPairing.ScreenSpaceDrawQuad.TopLeft + topPairing.ScreenSpaceDrawQuad.TopRight) / 2),
+                    Margin = new MarginPadding { Bottom = 10 },
+                    Origin = Anchor.BottomCentre,
+                });
+            }
+
             layout.Validate();
         }
 
-        public void RequestJoin(MatchPairing pairing) => AddInternal(new JoinRequestHandler(pairingsContainer, pairing));
+        public void RequestJoin(MatchPairing pairing, bool losers) => AddInternal(new JoinRequestHandler(pairingsContainer, pairing, losers));
 
         private class JoinRequestHandler : CompositeDrawable
         {
             private readonly Container<DrawableMatchPairing> pairingsContainer;
             public readonly MatchPairing Source;
+            private readonly bool losers;
 
             private ProgressionPath path;
 
-            public JoinRequestHandler(Container<DrawableMatchPairing> pairingsContainer, MatchPairing source)
+            public JoinRequestHandler(Container<DrawableMatchPairing> pairingsContainer, MatchPairing source, bool losers)
             {
                 this.pairingsContainer = pairingsContainer;
                 RelativeSizeAxes = Axes.Both;
 
                 Source = source;
-                Source.Progression.Value = null;
+                this.losers = losers;
+                if (losers)
+                    Source.LosersProgression.Value = null;
+                else
+                    Source.Progression.Value = null;
             }
 
             private DrawableMatchPairing findTarget(InputState state) => pairingsContainer.FirstOrDefault(d => d.ReceiveMouseInputAt(state.Mouse.NativeState.Position));
@@ -221,7 +243,13 @@ namespace osu.Game.Tournament.Screens.Ladder
                 if (found != null)
                 {
                     if (found.Pairing != Source)
-                        Source.Progression.Value = found.Pairing;
+                    {
+                        if (losers)
+                            Source.LosersProgression.Value = found.Pairing;
+                        else
+                            Source.Progression.Value = found.Pairing;
+                    }
+
                     Expire();
                     return true;
                 }

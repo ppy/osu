@@ -25,11 +25,16 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public readonly Bindable<bool> Completed = new Bindable<bool>();
 
+        public readonly Bindable<bool> Losers = new Bindable<bool>();
+
         [JsonIgnore]
         public readonly Bindable<TournamentGrouping> Grouping = new Bindable<TournamentGrouping>();
 
         [JsonIgnore]
         public readonly Bindable<MatchPairing> Progression = new Bindable<MatchPairing>();
+
+        [JsonIgnore]
+        public readonly Bindable<MatchPairing> LosersProgression = new Bindable<MatchPairing>();
 
         [JsonProperty]
         public Point Position;
@@ -46,6 +51,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         [JsonIgnore]
         public TournamentTeam Winner => !Completed.Value ? null : Team1Score.Value > Team2Score.Value ? Team1.Value : Team2.Value;
+
+        [JsonIgnore]
+        public TournamentTeam Loser => !Completed.Value ? null : Team1Score.Value > Team2Score.Value ? Team2.Value : Team1.Value;
 
         /// <summary>
         /// Remove scores from the match, in case of a false click or false start.

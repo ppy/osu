@@ -141,6 +141,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             }
             else
             {
+                if (pairing.Progression.Value.Completed)
+                    // don't allow changing scores if the match has a progression. can cause large data loss
+                    return false;
+
                 if (score.Value > 0)
                     score.Value--;
                 else
@@ -168,7 +172,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem("Join with", MenuItemType.Standard, () => manager.RequestJoin(pairing)),
+                    new OsuMenuItem("Join with", MenuItemType.Standard, () => manager.RequestJoin(pairing, false)),
+                    new OsuMenuItem("Join with (loser)", MenuItemType.Standard, () => manager.RequestJoin(pairing, true)),
                     new OsuMenuItem("Remove", MenuItemType.Destructive, () => manager.Remove(pairing)),
                 };
             }

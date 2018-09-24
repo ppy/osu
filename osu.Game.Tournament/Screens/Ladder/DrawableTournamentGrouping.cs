@@ -10,7 +10,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 {
     public class DrawableTournamentGrouping : CompositeDrawable
     {
-        public DrawableTournamentGrouping(TournamentGrouping grouping)
+        public DrawableTournamentGrouping(TournamentGrouping grouping, bool losers = false)
         {
             AutoSizeAxes = Axes.Both;
             InternalChild = new FillFlowContainer
@@ -27,7 +27,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                     },
                     new OsuSpriteText
                     {
-                        Text = grouping.Name.ToUpper(),
+                        Text = ((losers ? "Losers " : "") + grouping.Name).ToUpper(),
                         Font = "Exo2.0-Bold",
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre

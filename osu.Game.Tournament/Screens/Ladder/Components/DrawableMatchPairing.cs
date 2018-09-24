@@ -64,6 +64,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             pairing.Grouping.BindValueChanged(_ => updateWinConditions());
             pairing.Completed.BindValueChanged(_ => updateProgression());
             pairing.Progression.BindValueChanged(_ => updateProgression());
+            pairing.LosersProgression.BindValueChanged(_ => updateProgression());
 
             updateTeams();
         }
@@ -102,12 +103,21 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             var progression = Pairing.Progression?.Value;
 
-            if (progression == null) return;
+            if (progression != null)
+            {
+                bool progressionAbove = progression.ID < Pairing.ID;
 
-            bool progressionAbove = progression.ID < Pairing.ID;
+                var destinationForWinner = progressionAbove || progression.Team1.Value != null && progression.Team1.Value != Pairing.Winner ? progression.Team2 : progression.Team1;
+                destinationForWinner.Value = Pairing.Winner;
+            }
 
-            var destinationForWinner = progressionAbove ? progression.Team2 : progression.Team1;
-            destinationForWinner.Value = Pairing.Winner;
+            if ((progression = Pairing.LosersProgression?.Value) != null)
+            {
+                bool progressionAbove = progression.ID < Pairing.ID;
+
+                var destinationForLoser = progressionAbove || progression.Team1.Value != null && progression.Team1.Value != Pairing.Winner ? progression.Team2 : progression.Team1;
+                destinationForLoser.Value = Pairing.Loser;
+            }
         }
 
         private void updateWinConditions()
@@ -197,6 +207,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             Selected = false;
             Pairing.Progression.Value = null;
+            Pairing.LosersProgression.Value = null;
 
             Expire();
         }
