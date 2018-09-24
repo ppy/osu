@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using osu.Framework.Allocation;
+using osu.Framework.Caching;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,7 +14,6 @@ using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
-using OpenTK;
 using SixLabors.Primitives;
 
 namespace osu.Game.Tournament.Screens.Ladder
@@ -30,6 +31,7 @@ namespace osu.Game.Tournament.Screens.Ladder
         public readonly List<TournamentTeam> Teams;
         private readonly Container<DrawableMatchPairing> pairingsContainer;
         private readonly Container<Path> paths;
+        private readonly Container headings;
 
         [Cached]
         private readonly LadderEditorInfo editorInfo = new LadderEditorInfo();
@@ -52,6 +54,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                         Children = new Drawable[]
                         {
                             paths = new Container<Path> { RelativeSizeAxes = Axes.Both },
+                            headings = new Container() { RelativeSizeAxes = Axes.Both },
                             pairingsContainer = new Container<DrawableMatchPairing> { RelativeSizeAxes = Axes.Both },
                         }
                     },
@@ -81,6 +84,9 @@ namespace osu.Game.Tournament.Screens.Ladder
             foreach (var group in info.Groupings)
             foreach (var id in group.Pairings)
                 info.Pairings.Single(p => p.ID == id).Grouping.Value = group;
+
+            // todo: fix this
+            Scheduler.AddDelayed(() => layout.Invalidate(), 100, true);
         }
 
         public LadderInfo CreateInfo()
@@ -121,11 +127,20 @@ namespace osu.Game.Tournament.Screens.Ladder
             }
         }
 
+        private Cached layout = new Cached();
+
         protected override void Update()
         {
             base.Update();
 
+            if (!layout.IsValid)
+                updateLayout();
+        }
+
+        private void updateLayout()
+        {
             paths.Clear();
+            headings.Clear();
 
             int id = 1;
             foreach (var pairing in pairingsContainer.OrderBy(d => d.Y).ThenBy(d => d.X))
@@ -143,6 +158,22 @@ namespace osu.Game.Tournament.Screens.Ladder
                         paths.Add(new ProgressionPath(pairing, dest));
                 }
             }
+
+            foreach (var group in editorInfo.Groupings)
+            {
+                var topPairing = pairingsContainer.Where(p => p.Pairing.Grouping.Value == group).OrderBy(p => p.Y).FirstOrDefault();
+
+                if (topPairing == null) continue;
+
+                headings.Add(new DrawableTournamentGrouping(group)
+                {
+                    Position = headings.ToLocalSpace((topPairing.ScreenSpaceDrawQuad.TopLeft + topPairing.ScreenSpaceDrawQuad.TopRight) / 2),
+                    Margin = new MarginPadding { Bottom = 10 },
+                    Origin = Anchor.BottomCentre,
+                });
+            }
+
+            layout.Validate();
         }
 
         public void RequestJoin(MatchPairing pairing) => AddInternal(new JoinRequestHandler(pairingsContainer, pairing));
@@ -200,18 +231,5 @@ namespace osu.Game.Tournament.Screens.Ladder
         }
 
         public void Remove(MatchPairing pairing) => pairingsContainer.FirstOrDefault(p => p.Pairing == pairing)?.Remove();
-    }
-
-    public class ScrollableContainer : Container
-    {
-        protected override bool OnDragStart(InputState state) => true;
-
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
-
-        protected override bool OnDrag(InputState state)
-        {
-            Position += state.Mouse.Delta;
-            return base.OnDrag(state);
-        }
     }
 }
