@@ -1,12 +1,15 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
@@ -19,6 +22,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private OsuTextBox textboxTeam1;
         private OsuTextBox textboxTeam2;
+        private SettingsDropdown<TournamentGrouping> groupingDropdown;
 
         [Resolved]
         private LadderEditorInfo editorInfo { get; set; } = null;
@@ -27,6 +31,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private void load()
         {
             var teamEntries = editorInfo.Teams;
+
+            var groupingOptions = editorInfo.Groupings.Select(g => new KeyValuePair<string, TournamentGrouping>(g.Name, g)).Prepend(new KeyValuePair<string, TournamentGrouping>("None", new TournamentGrouping()));
 
             Children = new Drawable[]
             {
@@ -67,6 +73,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     },
                 },
                 textboxTeam2 = new OsuTextBox { RelativeSizeAxes = Axes.X, Height = 20 },
+                groupingDropdown = new SettingsDropdown<TournamentGrouping>
+                {
+                    Bindable = new Bindable<TournamentGrouping>(),
+                    Items = groupingOptions
+                },
                 // new Container
                 // {
                 //     RelativeSizeAxes = Axes.X,
@@ -99,6 +110,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 textboxTeam1.Text = selection?.Team1.Value?.Acronym;
                 textboxTeam2.Text = selection?.Team2.Value?.Acronym;
+                groupingDropdown.Bindable.Value = selection?.Grouping.Value ?? groupingOptions.First().Value;
             };
 
             textboxTeam1.OnCommit = (val, newText) =>
@@ -111,6 +123,12 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 if (newText && editorInfo.Selected.Value != null)
                     editorInfo.Selected.Value.Team2.Value = teamEntries.FirstOrDefault(t => t.Acronym == val.Text);
+            };
+
+            groupingDropdown.Bindable.ValueChanged += grouping =>
+            {
+                if (editorInfo.Selected.Value != null)
+                    editorInfo.Selected.Value.Grouping.Value = grouping;
             };
 
             // sliderBestOf.Bindable.ValueChanged += val =>

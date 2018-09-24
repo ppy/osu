@@ -25,6 +25,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public readonly Bindable<bool> Completed = new Bindable<bool>();
 
+        [JsonIgnore]
         public readonly Bindable<TournamentGrouping> Grouping = new Bindable<TournamentGrouping>();
 
         [JsonIgnore]
