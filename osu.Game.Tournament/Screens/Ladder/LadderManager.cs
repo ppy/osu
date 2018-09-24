@@ -12,6 +12,7 @@ using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
+using OpenTK;
 using SixLabors.Primitives;
 
 namespace osu.Game.Tournament.Screens.Ladder
@@ -43,8 +44,15 @@ namespace osu.Game.Tournament.Screens.Ladder
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    paths = new Container<Path> { RelativeSizeAxes = Axes.Both },
-                    pairingsContainer = new Container<DrawableMatchPairing> { RelativeSizeAxes = Axes.Both },
+                    new ScrollableContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Children = new Drawable[]
+                        {
+                            paths = new Container<Path> { RelativeSizeAxes = Axes.Both },
+                            pairingsContainer = new Container<DrawableMatchPairing> { RelativeSizeAxes = Axes.Both },
+                        }
+                    },
                     new LadderEditorSettings
                     {
                         Anchor = Anchor.TopRight,
@@ -182,5 +190,18 @@ namespace osu.Game.Tournament.Screens.Ladder
         }
 
         public void Remove(MatchPairing pairing) => pairingsContainer.FirstOrDefault(p => p.Pairing == pairing)?.Remove();
+    }
+
+    public class ScrollableContainer : Container
+    {
+        protected override bool OnDragStart(InputState state) => true;
+
+        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+
+        protected override bool OnDrag(InputState state)
+        {
+            Position += state.Mouse.Delta;
+            return base.OnDrag(state);
+        }
     }
 }
