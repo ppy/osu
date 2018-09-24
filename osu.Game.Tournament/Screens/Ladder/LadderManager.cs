@@ -21,6 +21,7 @@ namespace osu.Game.Tournament.Screens.Ladder
     {
         public readonly BindableBool EditingEnabled = new BindableBool();
         public List<TournamentTeam> Teams = new List<TournamentTeam>();
+        public List<TournamentGrouping> Groupings = new List<TournamentGrouping>();
         public readonly Bindable<MatchPairing> Selected = new Bindable<MatchPairing>();
     }
 
@@ -36,6 +37,7 @@ namespace osu.Game.Tournament.Screens.Ladder
         public LadderManager(LadderInfo info, List<TournamentTeam> teams)
         {
             editorInfo.Teams = Teams = teams;
+            editorInfo.Groupings = info.Groupings;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -75,11 +77,18 @@ namespace osu.Game.Tournament.Screens.Ladder
 
             foreach (var pairing in info.Pairings)
                 addPairing(pairing);
+
+            foreach (var group in info.Groupings)
+            foreach (var id in group.Pairings)
+                info.Pairings.Single(p => p.ID == id).Grouping.Value = group;
         }
 
         public LadderInfo CreateInfo()
         {
             var pairings = pairingsContainer.Select(p => p.Pairing).ToList();
+
+            foreach (var g in editorInfo.Groupings)
+                g.Pairings = pairings.Where(p => p.Grouping.Value == g).Select(p => p.ID).ToList();
 
             return new LadderInfo
             {
@@ -87,7 +96,8 @@ namespace osu.Game.Tournament.Screens.Ladder
                 Progressions = pairings
                                .Where(p => p.Progression.Value != null)
                                .Select(p => (p.ID, p.Progression.Value.ID))
-                               .ToList()
+                               .ToList(),
+                Groupings = editorInfo.Groupings
             };
         }
 
