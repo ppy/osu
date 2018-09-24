@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.States;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
@@ -144,6 +146,16 @@ namespace osu.Game.Tournament.Screens.Ladder
                 updateLayout();
         }
 
+        private Color4 normalPathColour;
+        private Color4 losersPathColour;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            normalPathColour = colours.BlueDarker.Darken(2);
+            losersPathColour = colours.YellowDarker.Darken(2);
+        }
+
         private void updateLayout()
         {
             paths.Clear();
@@ -162,7 +174,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                         // clean up outdated progressions.
                         pairing.Pairing.Progression.Value = null;
                     else
-                        paths.Add(new ProgressionPath(pairing, dest));
+                        paths.Add(new ProgressionPath(pairing, dest) { Colour = pairing.Pairing.Losers ? losersPathColour : normalPathColour });
                 }
             }
 
