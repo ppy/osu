@@ -15,7 +15,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             Source = source;
             Destination = destination;
 
-            PathWidth = 2;
+            PathWidth = 3;
             BypassAutoSizeAxes = Axes.Both;
         }
 
