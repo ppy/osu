@@ -77,7 +77,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 textboxTeam2 = new OsuTextBox { RelativeSizeAxes = Axes.X, Height = 20 },
                 groupingDropdown = new SettingsDropdown<TournamentGrouping>
                 {
-                    Bindable = new Bindable<TournamentGrouping>(),
+                    Bindable = new Bindable<TournamentGrouping> { Default = groupingOptions.First().Value },
                     Items = groupingOptions
                 },
                 losersCheckbox = new PlayerCheckbox
