@@ -24,10 +24,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             base.LoadComplete();
             Vector2 getCenteredVector(Vector2 top, Vector2 bottom) => new Vector2(top.X, top.Y + (bottom.Y - top.Y) / 2);
 
-            const float padding = 10;
-
             var q1 = Source.ScreenSpaceDrawQuad;
             var q2 = Destination.ScreenSpaceDrawQuad;
+
+            float padding = q1.Width / 20;
 
             bool progressionToRight = q2.TopLeft.X > q1.TopLeft.X;
 
