@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -49,8 +50,24 @@ namespace osu.Game.Rulesets.Scoring
 
         public Score ReadReplayFile(string replayFilename)
         {
-            using (Stream s = storage.GetStream(Path.Combine(replay_folder, replayFilename)))
-                return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(s);
+            Stream stream;
+            if (File.Exists(replayFilename))
+            {
+                // Handle replay with File since it is outside of storage
+                stream = File.OpenRead(replayFilename);
+            }
+            else if (storage.Exists(Path.Combine(replay_folder, replayFilename)))
+            {
+                stream = storage.GetStream(Path.Combine(replay_folder, replayFilename));
+            }
+            else
+            {
+                Logger.Log($"Replay file {replayFilename} cannot be found", LoggingTarget.Information, LogLevel.Error);
+                return null;
+            }
+
+            using (stream)
+                return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream);
         }
     }
 }
