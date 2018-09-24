@@ -35,9 +35,9 @@ namespace osu.Game.Tournament.Screens.Ladder
         [Cached]
         private readonly LadderEditorInfo editorInfo = new LadderEditorInfo();
 
-        public LadderManager(LadderInfo info, List<TournamentTeam> teams)
+        public LadderManager(LadderInfo info)
         {
-            editorInfo.Teams = Teams = teams;
+            editorInfo.Teams = Teams = info.Teams;
             editorInfo.Groupings = info.Groupings;
 
             RelativeSizeAxes = Axes.Both;
@@ -66,6 +66,14 @@ namespace osu.Game.Tournament.Screens.Ladder
                 }
             };
 
+            // assign teams
+            foreach (var pairing in info.Pairings)
+            {
+                pairing.Team1.Value = info.Teams.FirstOrDefault(t => t.Acronym == pairing.Team1Acronym);
+                pairing.Team2.Value = info.Teams.FirstOrDefault(t => t.Acronym == pairing.Team2Acronym);
+            }
+
+            // assign progressions
             foreach (var pair in info.Progressions)
             {
                 var src = info.Pairings.FirstOrDefault(p => p.ID == pair.Item1);
@@ -106,6 +114,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                 Progressions = pairings.Where(p => p.Progression.Value != null).Select(p => new TournamentProgression(p.ID, p.Progression.Value.ID)).Concat(
                                            pairings.Where(p => p.LosersProgression.Value != null).Select(p => new TournamentProgression(p.ID, p.LosersProgression.Value.ID, true)))
                                        .ToList(),
+                Teams = editorInfo.Teams,
                 Groupings = editorInfo.Groupings
             };
         }

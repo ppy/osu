@@ -15,11 +15,17 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     {
         public int ID;
 
+        [JsonIgnore]
         public readonly Bindable<TournamentTeam> Team1 = new Bindable<TournamentTeam>();
+
+        public string Team1Acronym;
 
         public readonly Bindable<int?> Team1Score = new Bindable<int?>();
 
+        [JsonIgnore]
         public readonly Bindable<TournamentTeam> Team2 = new Bindable<TournamentTeam>();
+
+        public string Team2Acronym;
 
         public readonly Bindable<int?> Team2Score = new Bindable<int?>();
 
@@ -36,14 +42,15 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [JsonIgnore]
         public readonly Bindable<MatchPairing> LosersProgression = new Bindable<MatchPairing>();
 
-        [JsonProperty]
         public Point Position;
 
         public MatchPairing()
         {
+            Team1.BindValueChanged(t => Team1Acronym = t?.Acronym, true);
+            Team2.BindValueChanged(t => Team2Acronym = t?.Acronym, true);
         }
 
-        public MatchPairing(TournamentTeam team1 = null, TournamentTeam team2 = null)
+        public MatchPairing(TournamentTeam team1 = null, TournamentTeam team2 = null) : this()
         {
             Team1.Value = team1;
             Team2.Value = team2;
