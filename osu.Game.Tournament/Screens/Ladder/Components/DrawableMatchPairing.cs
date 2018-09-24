@@ -65,6 +65,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             pairing.Completed.BindValueChanged(_ => updateProgression());
             pairing.Progression.BindValueChanged(_ => updateProgression());
             pairing.LosersProgression.BindValueChanged(_ => updateProgression());
+            pairing.Losers.BindValueChanged(_ => updateTeams());
 
             updateTeams();
         }
@@ -156,8 +157,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             flow.Children = new[]
             {
-                new DrawableMatchTeam(Pairing.Team1, Pairing),
-                new DrawableMatchTeam(Pairing.Team2, Pairing)
+                new DrawableMatchTeam(Pairing.Team1, Pairing, Pairing.Losers),
+                new DrawableMatchTeam(Pairing.Team2, Pairing, Pairing.Losers)
             };
 
             SchedulerAfterChildren.Add(() => Scheduler.Add(updateProgression));

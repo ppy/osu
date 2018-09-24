@@ -2,8 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -26,6 +24,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     public class DrawableMatchTeam : DrawableTournamentTeam, IHasContextMenu
     {
         private readonly MatchPairing pairing;
+        private readonly bool losers;
         private OsuSpriteText scoreText;
         private Box background;
 
@@ -41,10 +40,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [Resolved(CanBeNull = true)]
         private LadderEditorInfo editorInfo { get; set; } = null;
 
-        public DrawableMatchTeam(Bindable<TournamentTeam> team, MatchPairing pairing)
+        public DrawableMatchTeam(Bindable<TournamentTeam> team, MatchPairing pairing, bool losers)
             : base(team)
         {
             this.pairing = pairing;
+            this.losers = losers;
             Size = new Vector2(150, 40);
 
             Masking = true;
@@ -72,7 +72,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             this.manager = manager;
 
-            colourWinner = colours.BlueDarker;
+            colourWinner = losers ? colours.YellowDarker : colours.BlueDarker;
             colourNormal = OsuColour.Gray(0.2f);
 
             InternalChildren = new Drawable[]
