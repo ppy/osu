@@ -4,9 +4,8 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Tournament.Screens.Ladder.Components;
 
-namespace osu.Game.Tournament.Screens.Ladder
+namespace osu.Game.Tournament.Screens.Ladder.Components
 {
     public class DrawableTournamentGrouping : CompositeDrawable
     {
