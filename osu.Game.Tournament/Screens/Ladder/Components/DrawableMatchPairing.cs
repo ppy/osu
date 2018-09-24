@@ -107,7 +107,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 bool progressionAbove = progression.ID < Pairing.ID;
 
-                var destinationForWinner = progressionAbove || progression.Team1.Value != null && progression.Team1.Value != Pairing.Winner ? progression.Team2 : progression.Team1;
+                var destinationForWinner = progressionAbove || progression.Team1.Value != null && progression.Team1.Value != Pairing.Team1.Value && progression.Team1.Value != Pairing.Team2.Value ? progression.Team2 : progression.Team1;
                 destinationForWinner.Value = Pairing.Winner;
             }
 
@@ -115,7 +115,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 bool progressionAbove = progression.ID < Pairing.ID;
 
-                var destinationForLoser = progressionAbove || progression.Team1.Value != null && progression.Team1.Value != Pairing.Winner ? progression.Team2 : progression.Team1;
+                var destinationForLoser = progressionAbove || progression.Team1.Value != null && progression.Team1.Value != Pairing.Team1.Value && progression.Team1.Value != Pairing.Team2.Value ? progression.Team2 : progression.Team1;
                 destinationForLoser.Value = Pairing.Loser;
             }
         }
