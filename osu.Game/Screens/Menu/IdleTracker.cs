@@ -4,8 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Menu
 {
@@ -24,14 +23,19 @@ namespace osu.Game.Screens.Menu
 
         public bool OnReleased(PlatformAction action) => updateLastInteractionTime();
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args) => updateLastInteractionTime();
-
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args) => updateLastInteractionTime();
-
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => updateLastInteractionTime();
-
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => updateLastInteractionTime();
-
-        protected override bool OnMouseMove(InputState state) => updateLastInteractionTime();
+        protected override bool Handle(UIEvent e)
+        {
+            switch (e)
+            {
+                case KeyDownEvent _:
+                case KeyUpEvent _:
+                case MouseDownEvent _:
+                case MouseUpEvent _:
+                case MouseMoveEvent _:
+                    return updateLastInteractionTime();
+                default:
+                    return base.Handle(e);
+            }
+        }
     }
 }
