@@ -85,7 +85,6 @@ namespace osu.Game
         public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
 
         private IdleTracker idleTracker;
-        public double IdleTime => idleTracker?.IdleTime ?? 0;
 
         public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
@@ -378,6 +377,7 @@ namespace osu.Game
                 Depth = -6,
             }, overlayContent.Add);
 
+            dependencies.Cache(idleTracker);
             dependencies.Cache(settings);
             dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
