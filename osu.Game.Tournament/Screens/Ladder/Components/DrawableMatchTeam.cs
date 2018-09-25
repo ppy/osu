@@ -126,7 +126,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             }, true);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        //TODO: use OnClick instead once we have per-button clicks.
+        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
         {
             if (Team == null || editorInfo.EditingEnabled) return false;
 
