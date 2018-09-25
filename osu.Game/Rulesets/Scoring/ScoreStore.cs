@@ -47,14 +47,14 @@ namespace osu.Game.Rulesets.Scoring
 
         public Score ReadReplayFile(string replayFilename)
         {
-            if (!File.Exists(replayFilename))
+            if (File.Exists(replayFilename))
             {
-                Logger.Log($"Replay file {replayFilename} cannot be found", LoggingTarget.Information, LogLevel.Error);
-                return null;
+                using (var stream = File.OpenRead(replayFilename))
+                    return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream);
             }
 
-            using (var stream = File.OpenRead(replayFilename))
-                return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream);
+            Logger.Log($"Replay file {replayFilename} cannot be found", LoggingTarget.Information, LogLevel.Error);
+            return null;
         }
     }
 }
