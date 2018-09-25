@@ -155,7 +155,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             updateWinConditions();
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => editorInfo.EditingEnabled;
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => args.Button == MouseButton.Left && editorInfo.EditingEnabled;
 
         protected override bool OnDragStart(InputState state) => editorInfo.EditingEnabled;
 
