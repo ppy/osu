@@ -20,9 +20,12 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"id")]
         public int? OnlineBeatmapSetID
         {
-            get { return onlineBeatmapSetID; }
-            set { onlineBeatmapSetID = value > 0 ? value : null; }
+            get => onlineBeatmapSetID;
+            set => onlineBeatmapSetID = value > 0 ? value : null;
         }
+
+        [JsonProperty(@"status")]
+        public BeatmapSetOnlineStatus Status { get; set; }
 
         [JsonProperty(@"preview_url")]
         private string preview { get; set; }
@@ -42,9 +45,6 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"storyboard")]
         private bool hasStoryboard { get; set; }
 
-        [JsonProperty(@"status")]
-        private BeatmapSetOnlineStatus status { get; set; }
-
         [JsonProperty(@"submitted_date")]
         private DateTimeOffset submitted { get; set; }
 
@@ -57,7 +57,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"user_id")]
         private long creatorId
         {
-            set { Author.Id = value; }
+            set => Author.Id = value;
         }
 
         [JsonProperty(@"beatmaps")]
@@ -69,6 +69,7 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 OnlineBeatmapSetID = OnlineBeatmapSetID,
                 Metadata = this,
+                Status = Status,
                 OnlineInfo = new BeatmapSetOnlineInfo
                 {
                     Covers = covers,
@@ -76,7 +77,7 @@ namespace osu.Game.Online.API.Requests.Responses
                     PlayCount = playCount,
                     FavouriteCount = favouriteCount,
                     BPM = bpm,
-                    Status = status,
+                    Status = Status,
                     HasVideo = hasVideo,
                     HasStoryboard = hasStoryboard,
                     Submitted = submitted,
