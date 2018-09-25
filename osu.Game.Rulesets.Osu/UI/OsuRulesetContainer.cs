@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new OsuScoreProcessor(this);
 
-        protected override Playfield CreatePlayfield() => new OsuPlayfield(this);
+        protected override Playfield CreatePlayfield() => new OsuPlayfield();
 
         public override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
 
