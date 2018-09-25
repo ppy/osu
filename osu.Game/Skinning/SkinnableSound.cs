@@ -31,7 +31,7 @@ namespace osu.Game.Skinning
 
         public void Play() => channels?.ForEach(c => c.Play());
 
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin, SkinManager skinManager, bool allowFallback)
         {
             channels = samples.Select(s =>
             {
