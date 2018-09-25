@@ -20,16 +20,24 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         protected override bool OnDrag(InputState state)
         {
-            this.MoveTo(target += state.Mouse.Delta, 1000, Easing.OutQuint);
-
+            this.TransformTo(nameof(OriginPosition), target -= state.Mouse.Delta / scale, 1000, Easing.OutQuint);
             return base.OnDrag(state);
         }
 
+
         protected override bool OnScroll(InputState state)
         {
-            this.ScaleTo(scale += state.Mouse.ScrollDelta.Y / 15, 1000, Easing.OutQuint);
+            this.ScaleTo(scale += state.Mouse.ScrollDelta.Y / 15 * scale, 1000, Easing.OutQuint);
+            target = ToLocalSpace(state.Mouse.NativeState.Position) / 2;
+            this.TransformTo(nameof(OriginPosition), target, 1000, Easing.OutQuint);
 
             return base.OnScroll(state);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+            Invalidate();
         }
     }
 }
