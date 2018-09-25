@@ -14,8 +14,6 @@ namespace osu.Game.Rulesets.Scoring
 {
     public class ScoreStore : DatabaseBackedStore, ICanAcceptFiles
     {
-        private readonly Storage storage;
-
         private readonly BeatmapManager beatmaps;
         private readonly RulesetStore rulesets;
 
@@ -26,9 +24,8 @@ namespace osu.Game.Rulesets.Scoring
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ScoreIPCChannel ipc;
 
-        public ScoreStore(Storage storage, DatabaseContextFactory factory, IIpcHost importHost = null, BeatmapManager beatmaps = null, RulesetStore rulesets = null) : base(factory)
+        public ScoreStore(DatabaseContextFactory factory, IIpcHost importHost = null, BeatmapManager beatmaps = null, RulesetStore rulesets = null) : base(factory)
         {
-            this.storage = storage;
             this.beatmaps = beatmaps;
             this.rulesets = rulesets;
 
