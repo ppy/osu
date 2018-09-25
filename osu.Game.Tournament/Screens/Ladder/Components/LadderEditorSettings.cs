@@ -85,32 +85,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     LabelText = "Losers Bracket",
                     Bindable = new Bindable<bool>()
                 }
-                // new Container
-                // {
-                //     RelativeSizeAxes = Axes.X,
-                //     AutoSizeAxes = Axes.Y,
-                //     Padding = new MarginPadding { Horizontal = padding },
-                //     Children = new Drawable[]
-                //     {
-                //         new OsuSpriteText
-                //         {
-                //             Anchor = Anchor.CentreLeft,
-                //             Origin = Anchor.CentreLeft,
-                //             Text = "Best of",
-                //         },
-                //     },
-                // },
-                // sliderBestOf = new PlayerSliderBar<double>
-                // {
-                //     Bindable = new BindableDouble
-                //     {
-                //         Default = 11,
-                //         Value = 11,
-                //         MinValue = 1,
-                //         MaxValue = 21,
-                //         Precision = 1,
-                //     },
-                // }
             };
 
             editorInfo.Selected.ValueChanged += selection =>
