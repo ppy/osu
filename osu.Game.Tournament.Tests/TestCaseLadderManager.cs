@@ -4,7 +4,6 @@
 using System.IO;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Tests.Visual;
@@ -17,9 +16,6 @@ namespace osu.Game.Tournament.Tests
     {
         [Cached]
         private readonly LadderManager manager;
-
-        [Cached]
-        private Bindable<TournamentConditions> conditions = new Bindable<TournamentConditions>(new TournamentConditions());
 
         public TestCaseLadderManager()
         {

@@ -3,8 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Tests.Visual;
@@ -22,9 +20,6 @@ namespace osu.Game.Tournament.Tests
             typeof(DrawableMatchTeam),
             typeof(DrawableTournamentTeam),
         };
-
-        [Cached]
-        private Bindable<TournamentConditions> conditions = new Bindable<TournamentConditions>(new TournamentConditions());
 
         public TestCaseMatchPairings()
         {

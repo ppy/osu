@@ -19,7 +19,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     {
         public readonly MatchPairing Pairing;
         private readonly FillFlowContainer<DrawableMatchTeam> flow;
-        private readonly Bindable<TournamentConditions> conditions = new Bindable<TournamentConditions>();
         private readonly Drawable selectionBox;
         private Bindable<MatchPairing> globalSelection;
 
@@ -70,15 +69,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             updateTeams();
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(Bindable<TournamentConditions> conditions)
-        {
-            this.conditions.BindValueChanged(_ => updateWinConditions());
-
-            if (conditions != null)
-                this.conditions.BindTo(conditions);
-        }
-
         private bool selected;
 
         public bool Selected
@@ -123,7 +113,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private void updateWinConditions()
         {
-            if (conditions.Value == null || Pairing.Grouping.Value == null) return;
+            if (Pairing.Grouping.Value == null) return;
 
             var instaWinAmount = Pairing.Grouping.Value.BestOf / 2;
 
