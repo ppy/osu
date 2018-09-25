@@ -50,23 +50,13 @@ namespace osu.Game.Rulesets.Scoring
 
         public Score ReadReplayFile(string replayFilename)
         {
-            Stream stream;
-            if (File.Exists(replayFilename))
-            {
-                // Handle replay with File since it is outside of storage
-                stream = File.OpenRead(replayFilename);
-            }
-            else if (storage.Exists(Path.Combine(replay_folder, replayFilename)))
-            {
-                stream = storage.GetStream(Path.Combine(replay_folder, replayFilename));
-            }
-            else
+            if (!File.Exists(replayFilename))
             {
                 Logger.Log($"Replay file {replayFilename} cannot be found", LoggingTarget.Information, LogLevel.Error);
                 return null;
             }
 
-            using (stream)
+            using (var stream = File.OpenRead(replayFilename))
                 return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream);
         }
     }
