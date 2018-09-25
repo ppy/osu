@@ -155,9 +155,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             updateWinConditions();
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => args.Button == MouseButton.Left;
+        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => editorInfo.EditingEnabled;
 
-        protected override bool OnDragStart(InputState state) => true;
+        protected override bool OnDragStart(InputState state) => editorInfo.EditingEnabled;
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {
@@ -182,9 +182,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         protected override bool OnDrag(InputState state)
         {
             if (base.OnDrag(state)) return true;
-
-            if (!editorInfo.EditingEnabled)
-                return false;
 
             Selected = true;
             this.MoveToOffset(state.Mouse.Delta);
