@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
 
         public const float TAB_AREA_HEIGHT = 50;
 
-        private GetMessagesRequest fetchReq;
+        private GetUpdatesRequest fetchReq;
 
         private readonly ChatTabControl channelTabs;
 
@@ -285,7 +285,7 @@ namespace osu.Game.Overlays
             chatBackground.Colour = colours.ChatBlue;
         }
 
-        private long? lastMessageId;
+        private long lastMessageId;
 
         private readonly List<Channel> careChannels = new List<Channel>();
 
@@ -304,9 +304,9 @@ namespace osu.Game.Overlays
 
                 Scheduler.Add(delegate
                 {
-                    addChannel(channels.Find(c => c.Name == @"#lazer"));
-                    addChannel(channels.Find(c => c.Name == @"#osu"));
-                    addChannel(channels.Find(c => c.Name == @"#lobby"));
+                    //addChannel(channels.Find(c => c.Name == @"#lazer"));
+                    //addChannel(channels.Find(c => c.Name == @"#osu"));
+                    //addChannel(channels.Find(c => c.Name == @"#lobby"));
 
                     channelSelection.OnRequestJoin = addChannel;
                     channelSelection.OnRequestLeave = removeChannel;
@@ -320,7 +320,7 @@ namespace osu.Game.Overlays
                     };
                 });
 
-                messageRequest = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
+                messageRequest = Scheduler.AddDelayed(fetchUpdates, 1000, true);
             };
 
             api.Queue(req);
@@ -394,6 +394,15 @@ namespace osu.Game.Overlays
             {
                 careChannels.Add(channel);
                 channelTabs.AddItem(channel);
+
+                if (channel.Type == ChannelType.Public && !channel.Joined)
+                {
+                    var req = new JoinChannelRequest(channel, api.LocalUser);
+                    req.Success += addChannel;
+                    req.Failure += ex => removeChannel(channel);
+                    api.Queue(req);
+                    return;
+                }
             }
 
             // let's fetch a small number of messages to bring us up-to-date with the backlog.
@@ -415,39 +424,48 @@ namespace osu.Game.Overlays
             loadedChannels.Remove(loadedChannels.Find(c => c.Channel == channel));
             channelTabs.RemoveItem(channel);
 
+            api.Queue(new LeaveChannelRequest(channel, api.LocalUser));
             channel.Joined.Value = false;
         }
 
         private void fetchInitialMessages(Channel channel)
         {
-            var req = new GetMessagesRequest(new List<Channel> { channel }, null);
+            var req = new GetMessagesRequest(channel);
 
-            req.Success += delegate (List<Message> messages)
+            req.Success += messages =>
             {
                 loading.Hide();
                 channel.AddNewMessages(messages.ToArray());
                 Debug.Write("success!");
             };
-            req.Failure += delegate
-            {
-                Debug.Write("failure!");
-            };
+
+            req.Failure += exception => Debug.Write("failure!");
 
             api.Queue(req);
         }
 
-        private void fetchNewMessages()
+        private void fetchUpdates()
         {
             if (fetchReq != null) return;
 
-            fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
+            fetchReq = new GetUpdatesRequest(lastMessageId);
 
-            fetchReq.Success += delegate (List<Message> messages)
+            fetchReq.Success += updates =>
             {
-                foreach (var group in messages.Where(m => m.TargetType == TargetType.Channel).GroupBy(m => m.TargetId))
-                    careChannels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
+                // fuck the what.
+                if (updates?.Presence != null)
+                {
+                    foreach (var channel in updates.Presence)
+                    {
+                        channel.Joined.Value = true;
+                        addChannel(channel);
+                    }
 
-                lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
+                    foreach (var group in updates.Messages.Where(m => m.TargetType == TargetType.Channel).GroupBy(m => m.TargetId))
+                        careChannels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
+
+                    lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
+                }
 
                 Debug.Write("success!");
                 fetchReq = null;

@@ -19,7 +19,7 @@ namespace osu.Game.Online.Chat
         public string Topic;
 
         [JsonProperty(@"type")]
-        public string Type;
+        public ChannelType Type;
 
         [JsonProperty(@"channel_id")]
         public int Id;
