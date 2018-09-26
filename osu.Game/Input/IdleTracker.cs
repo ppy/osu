@@ -6,7 +6,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 
-namespace osu.Game.Screens.Menu
+namespace osu.Game.Input
 {
     public class IdleTracker : Component, IKeyBindingHandler<PlatformAction>
     {

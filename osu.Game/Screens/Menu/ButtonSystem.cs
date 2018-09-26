@@ -14,6 +14,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using OpenTK;
@@ -269,7 +270,7 @@ namespace osu.Game.Screens.Menu
 
         protected override void Update()
         {
-            if (idleTracker.IdleTime > 6000 && State != ButtonSystemState.Exit)
+            if (idleTracker?.IdleTime > 6000 && State != ButtonSystemState.Exit)
                 State = ButtonSystemState.Initial;
 
             base.Update();
