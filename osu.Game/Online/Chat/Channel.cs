@@ -24,6 +24,9 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"channel_id")]
         public int Id;
 
+        [JsonProperty(@"last_message_id")]
+        public long? LastMessageId;
+
         public readonly SortedList<Message> Messages = new SortedList<Message>(Comparer<Message>.Default);
 
         private readonly List<LocalEchoMessage> pendingMessages = new List<LocalEchoMessage>();
@@ -51,11 +54,18 @@ namespace osu.Game.Online.Chat
             NewMessagesArrived?.Invoke(new[] { message });
         }
 
+        public bool MessagesLoaded { get; private set; }
+
         public void AddNewMessages(params Message[] messages)
         {
             messages = messages.Except(Messages).ToArray();
 
             Messages.AddRange(messages);
+            MessagesLoaded = true;
+
+            var maxMessageId = messages.Max(m => m.Id);
+            if (maxMessageId > LastMessageId)
+                LastMessageId = maxMessageId;
 
             purgeOldMessages();
 
