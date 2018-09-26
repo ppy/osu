@@ -282,17 +282,19 @@ namespace osu.Game.Database
         /// Is a no-op for already deleted items.
         /// </summary>
         /// <param name="item">The item to delete.</param>
-        public void Delete(TModel item)
+        /// <returns>false if no operation was performed</returns>
+        public bool Delete(TModel item)
         {
             using (ContextFactory.GetForWrite())
             {
                 // re-fetch the model on the import context.
-                var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == item.ID);
+                var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).FirstOrDefault(s => s.ID == item.ID);
 
-                if (foundModel.DeletePending) return;
+                if (foundModel == null || foundModel.DeletePending) return false;
 
                 if (ModelStore.Delete(foundModel))
                     Files.Dereference(foundModel.Files.Select(f => f.FileInfo).ToArray());
+                return true;
             }
         }
 
