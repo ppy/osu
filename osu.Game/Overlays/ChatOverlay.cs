@@ -362,7 +362,7 @@ namespace osu.Game.Overlays
                     loadedChannels.Add(loaded);
                     LoadComponentAsync(loaded, l =>
                     {
-                        if (currentChannel.Messages.Any())
+                        if (currentChannel.MessagesLoaded)
                             loading.Hide();
 
                         currentChannelContainer.Clear(false);
@@ -398,7 +398,7 @@ namespace osu.Game.Overlays
                 if (channel.Type == ChannelType.Public && !channel.Joined)
                 {
                     var req = new JoinChannelRequest(channel, api.LocalUser);
-                    req.Success += addChannel;
+                    req.Success += () => addChannel(channel);
                     req.Failure += ex => removeChannel(channel);
                     api.Queue(req);
                     return;
@@ -431,15 +431,12 @@ namespace osu.Game.Overlays
         private void fetchInitialMessages(Channel channel)
         {
             var req = new GetMessagesRequest(channel);
-
             req.Success += messages =>
             {
-                loading.Hide();
                 channel.AddNewMessages(messages.ToArray());
-                Debug.Write("success!");
+                if (channel == currentChannel)
+                    loading.Hide();
             };
-
-            req.Failure += exception => Debug.Write("failure!");
 
             api.Queue(req);
         }
