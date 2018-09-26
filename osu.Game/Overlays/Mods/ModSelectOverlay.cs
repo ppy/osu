@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Mods
         protected readonly OsuSpriteText MultiplierLabel, UnrankedLabel;
         private readonly FillFlowContainer footerContainer;
 
-        protected override bool BlockPassThroughKeyboard => false;
+        protected override bool BlockNonPositionalInput => false;
 
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
