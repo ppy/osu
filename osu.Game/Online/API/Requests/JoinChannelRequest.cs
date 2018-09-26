@@ -8,7 +8,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class JoinChannelRequest : APIRequest<Channel>
+    public class JoinChannelRequest : APIRequest
     {
         private readonly Channel channel;
         private readonly User user;
