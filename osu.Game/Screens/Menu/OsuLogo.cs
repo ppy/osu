@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Menu
 
         public bool BeatMatching = true;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => logoContainer.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => logoContainer.ReceivePositionalInputAt(screenSpacePos);
 
         public bool Ripple
         {
@@ -342,7 +342,7 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override bool HandleMouseInput => base.HandleMouseInput && Action != null && Alpha > 0.2f;
+        public override bool HandlePositionalInput => base.HandlePositionalInput && Action != null && Alpha > 0.2f;
 
         protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
         {

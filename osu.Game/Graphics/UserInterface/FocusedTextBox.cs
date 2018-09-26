@@ -34,7 +34,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         // We may not be focused yet, but we need to handle keyboard input to be able to request focus
-        public override bool HandleKeyboardInput => HoldFocus || base.HandleKeyboardInput;
+        public override bool HandleNonPositionalInput => HoldFocus || base.HandleNonPositionalInput;
 
         protected override void OnFocus(InputState state)
         {
