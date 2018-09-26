@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Select
             ruleset.ValueChanged += _ => updateDisplay();
         }
 
-        protected override bool BlockPassThroughMouse => false;
+        protected override bool BlockPositionalInput => false;
 
         protected override void PopIn()
         {
@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Select
                 RelativeSizeAxes = Axes.Both;
 
                 titleBinding = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
-                artistBinding  = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
+                artistBinding = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
 
                 Children = new Drawable[]
                 {

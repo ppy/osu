@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.HUD
 {
     public class QuitButton : FillFlowContainer
     {
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         private readonly Button button;
 

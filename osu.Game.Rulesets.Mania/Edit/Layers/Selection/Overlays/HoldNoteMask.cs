@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
             }
 
             // Todo: This is temporary, since the note masks don't do anything special yet. In the future they will handle input.
-            public override bool HandleMouseInput => false;
+            public override bool HandlePositionalInput => false;
         }
     }
 }

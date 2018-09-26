@@ -153,10 +153,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             if (Time.Current < slider.EndTime)
             {
-                // Make sure to use the base version of ReceiveMouseInputAt so that we correctly check the position.
+                // Make sure to use the base version of ReceivePositionalInputAt so that we correctly check the position.
                 Tracking = canCurrentlyTrack
                            && lastState != null
-                           && ReceiveMouseInputAt(lastState.Mouse.NativeState.Position)
+                           && ReceivePositionalInputAt(lastState.Mouse.NativeState.Position)
                            && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
             }
         }
