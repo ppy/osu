@@ -290,7 +290,6 @@ namespace osu.Game.Database
                 // re-fetch the model on the import context.
                 var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).FirstOrDefault(s => s.ID == item.ID);
 
-                // Test for null since FirstOrDefault will return null if nothing is found
                 if (foundModel == null || foundModel.DeletePending) return false;
 
                 if (ModelStore.Delete(foundModel))
