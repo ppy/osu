@@ -170,6 +170,7 @@ namespace osu.Game.Skinning
             {
                 string textureName = $"{font}-{c}";
 
+                // Approximate value that brings character sizing roughly in-line with stable
                 float ratio = 36;
 
                 var texture = textures.Get($"{textureName}@2x");
