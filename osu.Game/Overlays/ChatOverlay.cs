@@ -449,13 +449,15 @@ namespace osu.Game.Overlays
 
             fetchReq.Success += updates =>
             {
-                // fuck the what.
                 if (updates?.Presence != null)
                 {
                     foreach (var channel in updates.Presence)
                     {
-                        channel.Joined.Value = true;
-                        addChannel(channel);
+                        if (careChannels.Find(c => c.Id == channel.Id) == null)
+                        {
+                            channel.Joined.Value = true;
+                            addChannel(channel);
+                        }
                     }
 
                     foreach (var group in updates.Messages.Where(m => m.TargetType == TargetType.Channel).GroupBy(m => m.TargetId))
@@ -464,13 +466,11 @@ namespace osu.Game.Overlays
                     lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
                 }
 
-                Debug.Write("success!");
                 fetchReq = null;
             };
 
             fetchReq.Failure += delegate
             {
-                Debug.Write("failure!");
                 fetchReq = null;
             };
 
