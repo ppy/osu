@@ -22,8 +22,8 @@ namespace osu.Game.Skinning
     {
         private readonly AudioManager audio;
 
-        private int comboIndexPrev = 0;
-        private int comboIndexSkin = 0;
+        private int comboIndexPrev;
+        private int comboIndexSkin;
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin());
         public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
