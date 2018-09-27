@@ -57,8 +57,7 @@ namespace osu.Game.Skinning
                     componentName = "hit300";
                     break;
                 case "Play/osu/number-text":
-                    // Todo: Not necessarily default font
-                    return hasFont("default") ? new LegacySpriteText(Textures, "default") : null;
+                    return hasFont(Configuration.HitCircleFont) ? new LegacySpriteText(Textures, Configuration.HitCircleFont) : null;
             }
 
             var texture = GetTexture(componentName);
