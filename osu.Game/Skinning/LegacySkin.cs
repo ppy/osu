@@ -58,25 +58,29 @@ namespace osu.Game.Skinning
                     break;
             }
 
-            float ratio = 0.72f; // brings sizing roughly in-line with stable
-
-            var texture = GetTexture($"{componentName}@2x");
-            if (texture == null)
-            {
-                ratio *= 2;
-                texture = GetTexture(componentName);
-            }
+            var texture = GetTexture(componentName);
 
             if (texture == null) return null;
 
-            return new Sprite
-            {
-                Texture = texture,
-                Scale = new Vector2(ratio),
-            };
+            return new Sprite { Texture = texture };
         }
 
-        public override Texture GetTexture(string componentName) => Textures.Get(componentName);
+        public override Texture GetTexture(string componentName)
+        {
+            float ratio = 2;
+
+            var texture = Textures.Get($"{componentName}@2x");
+            if (texture == null)
+            {
+                ratio = 1;
+                texture = Textures.Get(componentName);
+            }
+
+            if (texture != null)
+                texture.ScaleAdjust = ratio / 0.72f; // brings sizing roughly in-line with stable
+
+            return texture;
+        }
 
         public override SampleChannel GetSample(string sampleName) => Samples.Get(sampleName);
 
