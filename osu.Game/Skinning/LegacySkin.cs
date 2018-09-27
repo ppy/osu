@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Database;
-using OpenTK;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Skinning
 {
@@ -56,11 +56,15 @@ namespace osu.Game.Skinning
                 case "Play/Great":
                     componentName = "hit300";
                     break;
+                case "Play/osu/number-text":
+                    // Todo: Not necessarily default font
+                    return hasFont("default") ? new LegacySpriteText(Textures, "default") : null;
             }
 
             var texture = GetTexture(componentName);
 
-            if (texture == null) return null;
+            if (texture == null)
+                return null;
 
             return new Sprite { Texture = texture };
         }
@@ -83,6 +87,8 @@ namespace osu.Game.Skinning
         }
 
         public override SampleChannel GetSample(string sampleName) => Samples.Get(sampleName);
+
+        private bool hasFont(string fontName) => GetTexture($"{fontName}-0") != null;
 
         protected class LegacySkinResourceStore<T> : IResourceStore<byte[]>
             where T : INamedFileInfo
@@ -145,6 +151,40 @@ namespace osu.Game.Skinning
             }
 
             #endregion
+        }
+
+        private class LegacySpriteText : OsuSpriteText
+        {
+            private readonly TextureStore textures;
+            private readonly string font;
+
+            public LegacySpriteText(TextureStore textures, string font)
+            {
+                this.textures = textures;
+                this.font = font;
+
+                Shadow = false;
+                UseFullGlyphHeight = false;
+            }
+
+            protected override Texture GetTextureForCharacter(char c)
+            {
+                string textureName = $"{font}-{c}";
+
+                float ratio = 36;
+
+                var texture = textures.Get($"{textureName}@2x");
+                if (texture == null)
+                {
+                    ratio = 18;
+                    texture = textures.Get(textureName);
+                }
+
+                if (texture != null)
+                    texture.ScaleAdjust = ratio;
+
+                return texture;
+            }
         }
     }
 }
