@@ -18,6 +18,9 @@ namespace osu.Game.Skinning
     public class SkinnableDrawable<T> : SkinReloadableDrawable
         where T : Drawable
     {
+        /// <summary>
+        /// The displayed component. May or may not be a type-<typeparamref name="T"/> member.
+        /// </summary>
         protected Drawable Drawable { get; private set; }
 
         private readonly Func<string, T> createDefault;
@@ -45,7 +48,6 @@ namespace osu.Game.Skinning
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
-            Drawable = null;
             Drawable = skin.GetDrawableComponent(componentName);
 
             if (Drawable != null)
