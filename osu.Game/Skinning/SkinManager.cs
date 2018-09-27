@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using OpenTK.Graphics;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
@@ -20,6 +21,9 @@ namespace osu.Game.Skinning
     public class SkinManager : ArchiveModelManager<SkinInfo, SkinFileInfo>, ISkinSource
     {
         private readonly AudioManager audio;
+
+        private int comboIndexPrev = 0;
+        private int comboIndexSkin = 0;
 
         public readonly Bindable<Skin> CurrentSkin = new Bindable<Skin>(new DefaultSkin());
         public readonly Bindable<SkinInfo> CurrentSkinInfo = new Bindable<SkinInfo>(SkinInfo.Default) { Default = SkinInfo.Default };
@@ -124,6 +128,21 @@ namespace osu.Game.Skinning
         public Texture GetTexture(string componentName) => CurrentSkin.Value.GetTexture(componentName);
 
         public SampleChannel GetSample(string sampleName) => CurrentSkin.Value.GetSample(sampleName);
+
+        public Color4? GetComboColours(int comboIndex)
+        {
+            if (comboIndex == 1)
+            {
+                comboIndexPrev = comboIndex;
+                comboIndexSkin = 1;
+            }
+            else if (comboIndex != comboIndexPrev)
+            {
+                comboIndexPrev = comboIndex;
+                comboIndexSkin++;
+            }
+            return CurrentSkin.Value.GetComboColours(comboIndexSkin);
+        }
 
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class => CurrentSkin.Value.GetValue(query);
 

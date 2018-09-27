@@ -14,7 +14,6 @@ namespace osu.Game.Skinning
     {
         private readonly Func<ISkinSource, bool> allowFallback;
         private ISkinSource skin;
-        private SkinManager skinManager;
 
         /// <summary>
         /// Whether fallback to default skin should be allowed if the custom skin is missing this resource.
@@ -31,14 +30,13 @@ namespace osu.Game.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load(ISkinSource source, SkinManager skinManager)
+        private void load(ISkinSource source)
         {
             skin = source;
-            this.skinManager = skinManager;
             skin.SourceChanged += onChange;
         }
 
-        private void onChange() => SkinChanged(skin, skinManager, allowDefaultFallback);
+        private void onChange() => SkinChanged(skin, allowDefaultFallback);
 
         protected override void LoadAsyncComplete()
         {
@@ -51,7 +49,7 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <param name="skin">The new skin.</param>
         /// <param name="allowFallback">Whether fallback to default skin should be allowed if the custom skin is missing this resource.</param>
-        protected virtual void SkinChanged(ISkinSource skin, SkinManager skinManager, bool allowFallback)
+        protected virtual void SkinChanged(ISkinSource skin, bool allowFallback)
         {
         }
 

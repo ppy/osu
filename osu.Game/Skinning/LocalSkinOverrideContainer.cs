@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
@@ -41,6 +42,14 @@ namespace osu.Game.Skinning
             if (beatmapHitsounds && (sourceChannel = source.GetSample(sampleName)) != null)
                 return sourceChannel;
             return fallbackSource?.GetSample(sampleName);
+        }
+
+        public Color4? GetComboColours(int comboIndex)
+        {
+            Color4? sourceComboColours;
+            if (beatmapSkins && (sourceComboColours = source.GetComboColours(comboIndex)) != null)
+                return sourceComboColours;
+            return fallbackSource?.GetComboColours(comboIndex);
         }
 
         public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct

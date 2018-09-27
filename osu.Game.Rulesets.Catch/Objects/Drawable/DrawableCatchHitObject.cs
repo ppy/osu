@@ -60,17 +60,12 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss);
         }
 
-        protected override void SkinChanged(ISkinSource skin, SkinManager skinManager, bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
-            base.SkinChanged(skin, skinManager, allowFallback);
+            base.SkinChanged(skin, allowFallback);
 
-            if (HitObject is IHasComboInformation combo) {
-                SkinConfiguration skinConfiguration = skinManager.CurrentSkin.Value.Configuration;
-                if (skinConfiguration != null && skinConfiguration.ComboColours.Count > 0)
-                    AccentColour = skinConfiguration.ComboColours[combo.ComboIndex % skinConfiguration.ComboColours.Count];
-                else
-                    AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
-            }
+            if (HitObject is IHasComboInformation combo)
+                AccentColour = (Color4)(skin.GetComboColours(combo.ComboIndex) ?? Color4.White);
         }
 
         private const float preempt = 1000;

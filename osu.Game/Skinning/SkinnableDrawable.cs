@@ -40,7 +40,7 @@ namespace osu.Game.Skinning
             RelativeSizeAxes = Axes.Both;
         }
 
-        protected override void SkinChanged(ISkinSource skin, SkinManager skinManager,  bool allowFallback)
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
             var drawable = skin.GetDrawableComponent(componentName);
             if (drawable != null)
