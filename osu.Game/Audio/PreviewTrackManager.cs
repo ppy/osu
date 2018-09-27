@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
@@ -8,6 +10,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
+using osu.Game.Overlays.Direct;
 
 namespace osu.Game.Audio
 {
@@ -23,6 +26,8 @@ namespace osu.Game.Audio
 
         private TrackManagerPreviewTrack current;
 
+        private readonly List<PlayButtonState> playButtonStates = new List<PlayButtonState>();
+
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, FrameworkConfigManager config)
         {
@@ -32,6 +37,15 @@ namespace osu.Game.Audio
             audio.AddItem(trackManager);
 
             config.BindWith(FrameworkSetting.VolumeMusic, trackManager.Volume);
+        }
+
+        public PlayButtonState GetPlayButtonState(BeatmapSetInfo beatmapSet)
+        {
+            var findByBeatmapSet = playButtonStates.FirstOrDefault(state => state.BeatmapSet == beatmapSet);
+            if (findByBeatmapSet == null)
+                playButtonStates.Add(findByBeatmapSet = new PlayButtonState(beatmapSet));
+
+            return findByBeatmapSet;
         }
 
         /// <summary>
