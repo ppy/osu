@@ -60,6 +60,8 @@ namespace osu.Game.Online.Chat
         {
             messages = messages.Except(Messages).ToArray();
 
+            if (messages.Length == 0) return;
+
             Messages.AddRange(messages);
             MessagesLoaded = true;
 
