@@ -47,7 +47,7 @@ namespace osu.Game.Overlays
 
         public const float TAB_AREA_HEIGHT = 50;
 
-        private GetMessagesRequest fetchReq;
+        private GetUpdatesRequest fetchReq;
 
         private readonly ChatTabControl channelTabs;
 
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
 
-        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceiveMouseInputAt(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.ReceiveMouseInputAt(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceivePositionalInputAt(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.ReceivePositionalInputAt(screenSpacePos);
 
         public ChatOverlay()
         {
@@ -285,7 +285,7 @@ namespace osu.Game.Overlays
             chatBackground.Colour = colours.ChatBlue;
         }
 
-        private long? lastMessageId;
+        private long lastMessageId;
 
         private readonly List<Channel> careChannels = new List<Channel>();
 
@@ -304,9 +304,9 @@ namespace osu.Game.Overlays
 
                 Scheduler.Add(delegate
                 {
+                    //todo: decide how to handle default channels for a user now that they are saved server-side.
                     addChannel(channels.Find(c => c.Name == @"#lazer"));
                     addChannel(channels.Find(c => c.Name == @"#osu"));
-                    addChannel(channels.Find(c => c.Name == @"#lobby"));
 
                     channelSelection.OnRequestJoin = addChannel;
                     channelSelection.OnRequestLeave = removeChannel;
@@ -320,7 +320,7 @@ namespace osu.Game.Overlays
                     };
                 });
 
-                messageRequest = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
+                messageRequest = Scheduler.AddDelayed(fetchUpdates, 1000, true);
             };
 
             api.Queue(req);
@@ -362,7 +362,7 @@ namespace osu.Game.Overlays
                     loadedChannels.Add(loaded);
                     LoadComponentAsync(loaded, l =>
                     {
-                        if (currentChannel.Messages.Any())
+                        if (currentChannel.MessagesLoaded)
                             loading.Hide();
 
                         currentChannelContainer.Clear(false);
@@ -394,6 +394,15 @@ namespace osu.Game.Overlays
             {
                 careChannels.Add(channel);
                 channelTabs.AddItem(channel);
+
+                if (channel.Type == ChannelType.Public && !channel.Joined)
+                {
+                    var req = new JoinChannelRequest(channel, api.LocalUser);
+                    req.Success += () => addChannel(channel);
+                    req.Failure += ex => removeChannel(channel);
+                    api.Queue(req);
+                    return;
+                }
             }
 
             // let's fetch a small number of messages to bring us up-to-date with the backlog.
@@ -415,47 +424,53 @@ namespace osu.Game.Overlays
             loadedChannels.Remove(loadedChannels.Find(c => c.Channel == channel));
             channelTabs.RemoveItem(channel);
 
+            api.Queue(new LeaveChannelRequest(channel, api.LocalUser));
             channel.Joined.Value = false;
         }
 
         private void fetchInitialMessages(Channel channel)
         {
-            var req = new GetMessagesRequest(new List<Channel> { channel }, null);
-
-            req.Success += delegate (List<Message> messages)
+            var req = new GetMessagesRequest(channel);
+            req.Success += messages =>
             {
-                loading.Hide();
                 channel.AddNewMessages(messages.ToArray());
-                Debug.Write("success!");
-            };
-            req.Failure += delegate
-            {
-                Debug.Write("failure!");
+                if (channel == currentChannel)
+                    loading.Hide();
             };
 
             api.Queue(req);
         }
 
-        private void fetchNewMessages()
+        private void fetchUpdates()
         {
             if (fetchReq != null) return;
 
-            fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
+            fetchReq = new GetUpdatesRequest(lastMessageId);
 
-            fetchReq.Success += delegate (List<Message> messages)
+            fetchReq.Success += updates =>
             {
-                foreach (var group in messages.Where(m => m.TargetType == TargetType.Channel).GroupBy(m => m.TargetId))
-                    careChannels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
+                if (updates?.Presence != null)
+                {
+                    foreach (var channel in updates.Presence)
+                    {
+                        if (careChannels.Find(c => c.Id == channel.Id) == null)
+                        {
+                            channel.Joined.Value = true;
+                            addChannel(channel);
+                        }
+                    }
 
-                lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
+                    foreach (var group in updates.Messages.GroupBy(m => m.ChannelId))
+                        careChannels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
 
-                Debug.Write("success!");
+                    lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
+                }
+
                 fetchReq = null;
             };
 
             fetchReq.Failure += delegate
             {
-                Debug.Write("failure!");
                 fetchReq = null;
             };
 
@@ -517,8 +532,7 @@ namespace osu.Game.Overlays
             {
                 Sender = api.LocalUser.Value,
                 Timestamp = DateTimeOffset.Now,
-                TargetType = TargetType.Channel, //TODO: read this from channel
-                TargetId = target.Id,
+                ChannelId = target.Id,
                 IsAction = isAction,
                 Content = postText
             };
