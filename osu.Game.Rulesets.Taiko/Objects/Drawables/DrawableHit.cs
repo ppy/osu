@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private bool validActionPressed;
 
-        private bool handleExtraPress;
+        private bool pressHandledThisFrame;
 
         protected DrawableHit(Hit hit)
             : base(hit)
@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool OnPressed(TaikoAction action)
         {
-            if (handleExtraPress)
+            if (pressHandledThisFrame)
                 return true;
 
             if (Judged)
@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             // Regardless of whether we've hit or not, any secondary key presses in the same frame should be discarded
             // E.g. hitting a non-strong centre as a strong should not fall through and perform a hit on the next note
-            handleExtraPress = true;
+            pressHandledThisFrame = true;
 
             return result;
         }
@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             // The input manager processes all input prior to us updating, so this is the perfect time
             // for us to remove the extra press blocking, before input is handled in the next frame
-            handleExtraPress = false;
+            pressHandledThisFrame = false;
 
             Size = BaseSize * Parent.RelativeChildSize;
         }
