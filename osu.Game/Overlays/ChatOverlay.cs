@@ -305,10 +305,8 @@ namespace osu.Game.Overlays
                 Scheduler.Add(delegate
                 {
                     //todo: decide how to handle default channels for a user now that they are saved server-side.
-                    // we likely don't want to re-join every startup like this.
-                    //addChannel(channels.Find(c => c.Name == @"#lazer"));
-                    //addChannel(channels.Find(c => c.Name == @"#osu"));
-                    //addChannel(channels.Find(c => c.Name == @"#lobby"));
+                    addChannel(channels.Find(c => c.Name == @"#lazer"));
+                    addChannel(channels.Find(c => c.Name == @"#osu"));
 
                     channelSelection.OnRequestJoin = addChannel;
                     channelSelection.OnRequestLeave = removeChannel;
