@@ -13,6 +13,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Game.Database;
 using osu.Game.Graphics.Sprites;
+using OpenTK;
 
 namespace osu.Game.Skinning
 {
@@ -57,7 +58,7 @@ namespace osu.Game.Skinning
                     componentName = "hit300";
                     break;
                 case "Play/osu/number-text":
-                    return hasFont(Configuration.HitCircleFont) ? new LegacySpriteText(Textures, Configuration.HitCircleFont) : null;
+                    return !hasFont(Configuration.HitCircleFont) ? null : new LegacySpriteText(Textures, Configuration.HitCircleFont) { Scale = new Vector2(0.96f) };
             }
 
             var texture = GetTexture(componentName);
