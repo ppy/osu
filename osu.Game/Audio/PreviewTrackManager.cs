@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.Direct;
@@ -17,7 +17,7 @@ namespace osu.Game.Audio
     /// <summary>
     /// A central store for the retrieval of <see cref="PreviewTrack"/>s.
     /// </summary>
-    public class PreviewTrackManager : Component
+    public class PreviewTrackManager : CompositeDrawable
     {
         private readonly BindableDouble muteBindable = new BindableDouble();
 
@@ -43,7 +43,10 @@ namespace osu.Game.Audio
         {
             var findByBeatmapSet = playButtonStates.FirstOrDefault(state => state.BeatmapSet == beatmapSet);
             if (findByBeatmapSet == null)
+            {
                 playButtonStates.Add(findByBeatmapSet = new PlayButtonState(beatmapSet));
+                AddInternal(findByBeatmapSet);
+            }
 
             return findByBeatmapSet;
         }

@@ -3,12 +3,13 @@
 
 using System;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class PlayButtonState
+    public class PlayButtonState : CompositeDrawable
     {
         public BeatmapSetInfo BeatmapSet { get; }
         public PreviewTrack Preview { get; set; }
