@@ -54,7 +54,7 @@ namespace osu.Game.Graphics
             Scheduler.AddDelayed(updateTimeWithReschedule, timeUntilNextUpdate);
         }
 
-        public override bool HandleMouseInput => true;
+        public override bool HandlePositionalInput => true;
 
         protected virtual string Format() => Date.Humanize();
 

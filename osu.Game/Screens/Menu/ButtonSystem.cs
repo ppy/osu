@@ -160,8 +160,8 @@ namespace osu.Game.Screens.Menu
 
         private ButtonSystemState state = ButtonSystemState.Initial;
 
-        public override bool HandleKeyboardInput => state != ButtonSystemState.Exit;
-        public override bool HandleMouseInput => state != ButtonSystemState.Exit;
+        public override bool HandleNonPositionalInput => state != ButtonSystemState.Exit;
+        public override bool HandlePositionalInput => state != ButtonSystemState.Exit;
 
         public ButtonSystemState State
         {
