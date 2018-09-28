@@ -462,7 +462,7 @@ namespace osu.Game.Overlays
                         }
                     }
 
-                    foreach (var group in updates.Messages.Where(m => m.TargetType == TargetType.Channel).GroupBy(m => m.TargetId))
+                    foreach (var group in updates.Messages.GroupBy(m => m.ChannelId))
                         careChannels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
 
                     lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
@@ -534,8 +534,7 @@ namespace osu.Game.Overlays
             {
                 Sender = api.LocalUser.Value,
                 Timestamp = DateTimeOffset.Now,
-                TargetType = TargetType.Channel, //TODO: read this from channel
-                TargetId = target.Id,
+                ChannelId = target.Id,
                 IsAction = isAction,
                 Content = postText
             };

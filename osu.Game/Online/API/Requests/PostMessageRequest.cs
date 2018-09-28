@@ -27,6 +27,6 @@ namespace osu.Game.Online.API.Requests
             return req;
         }
 
-        protected override string Target => $@"chat/channels/{message.TargetId}/messages";
+        protected override string Target => $@"chat/channels/{message.ChannelId}/messages";
     }
 }
