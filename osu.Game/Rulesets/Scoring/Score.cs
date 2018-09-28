@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
@@ -32,6 +33,7 @@ namespace osu.Game.Rulesets.Scoring
 
         public User User;
 
+        [JsonIgnore]
         public Replay Replay;
 
         public BeatmapInfo Beatmap;
