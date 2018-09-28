@@ -89,6 +89,8 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        public override bool IsPresent => base.IsPresent || Info == null; // Visibility is updated in the LoadComponentAsync callback
+
         private BufferedWedgeInfo loadingInfo;
 
         private void updateDisplay()
