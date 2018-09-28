@@ -536,7 +536,7 @@ namespace osu.Game.Screens.Select
 
         private void delete(BeatmapSetInfo beatmap)
         {
-            if (beatmap == null) return;
+            if (beatmap == null || beatmap.ID <= 0) return;
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
