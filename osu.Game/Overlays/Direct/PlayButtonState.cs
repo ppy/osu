@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
@@ -16,6 +16,8 @@ namespace osu.Game.Overlays.Direct
         public BindableBool Playing { get; }
         public BindableBool Loading { get; }
 
+        private PreviewTrackManager previewTrackManager;
+
         public PlayButtonState(BeatmapSetInfo beatmapSet)
         {
             BeatmapSet = beatmapSet;
@@ -24,9 +26,40 @@ namespace osu.Game.Overlays.Direct
             Loading = new BindableBool();
         }
 
+        [BackgroundDependencyLoader]
+        private void load(PreviewTrackManager previewTrackManager)
+        {
+            this.previewTrackManager = previewTrackManager;
+        }
+
         private void playingStateChanged(bool playing)
         {
-            throw new NotImplementedException();
+            if (playing)
+            {
+                if (Preview != null)
+                {
+                    Preview.Start();
+                    return;
+                }
+
+                Loading.Value = true;
+
+                LoadComponentAsync(Preview = previewTrackManager.Get(BeatmapSet), preview =>
+                {
+                    AddInternal(preview);
+                    Loading.Value = false;
+                    preview.Stopped += () => Playing.Value = false;
+
+                    // user may have changed their mind.
+                    if (Playing)
+                        preview.Start();
+                });
+            }
+            else
+            {
+                Preview?.Stop();
+                Loading.Value = false;
+            }
         }
     }
 }

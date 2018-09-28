@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.States;
@@ -17,9 +16,6 @@ namespace osu.Game.Overlays.Direct
 {
     public class PlayButton : Container
     {
-        public readonly BindableBool Playing = new BindableBool();
-        public PreviewTrack Preview { get; private set; }
-
         private BeatmapSetInfo beatmapSet;
 
         public BeatmapSetInfo BeatmapSet
@@ -29,12 +25,8 @@ namespace osu.Game.Overlays.Direct
             {
                 if (value == beatmapSet) return;
                 beatmapSet = value;
-
-                Preview?.Stop();
-                Preview?.Expire();
-                Preview = null;
-
-                Playing.Value = false;
+                if (previewTrackManager != null)
+                    getPlayButtonState();
             }
         }
 
@@ -43,23 +35,6 @@ namespace osu.Game.Overlays.Direct
         private readonly LoadingAnimation loadingAnimation;
 
         private const float transition_duration = 500;
-
-        private bool loading
-        {
-            set
-            {
-                if (value)
-                {
-                    icon.FadeTo(0.5f, transition_duration, Easing.OutQuint);
-                    loadingAnimation.Show();
-                }
-                else
-                {
-                    icon.FadeTo(1, transition_duration, Easing.OutQuint);
-                    loadingAnimation.Hide();
-                }
-            }
-        }
 
         public PlayButton(BeatmapSetInfo setInfo = null)
         {
@@ -79,23 +54,43 @@ namespace osu.Game.Overlays.Direct
                     Size = new Vector2(15),
                 },
             });
-
-            Playing.ValueChanged += playingStateChanged;
         }
 
         private PreviewTrackManager previewTrackManager;
+        private PlayButtonState playButtonState;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colour, PreviewTrackManager previewTrackManager)
         {
             this.previewTrackManager = previewTrackManager;
-
+            if (beatmapSet != null)
+                getPlayButtonState();
             hoverColour = colour.Yellow;
+        }
+
+        private void getPlayButtonState()
+        {
+            if (playButtonState != null)
+                unsubscribeFromEvents();
+            playButtonState = previewTrackManager.GetPlayButtonState(beatmapSet);
+            subscribeToEvents();
+        }
+
+        private void subscribeToEvents()
+        {
+            playButtonState.Loading.ValueChanged += loadingStateChanged;
+            playButtonState.Playing.ValueChanged += playingStateChanged;
+        }
+
+        private void unsubscribeFromEvents()
+        {
+            playButtonState.Loading.ValueChanged -= loadingStateChanged;
+            playButtonState.Playing.ValueChanged -= playingStateChanged;
         }
 
         protected override bool OnClick(InputState state)
         {
-            Playing.Toggle();
+            playButtonState.Playing.Toggle();
             return true;
         }
 
@@ -107,58 +102,36 @@ namespace osu.Game.Overlays.Direct
 
         protected override void OnHoverLost(InputState state)
         {
-            if (!Playing.Value)
+            if (!playButtonState.Playing.Value)
                 icon.FadeColour(Color4.White, 120, Easing.InOutQuint);
             base.OnHoverLost(state);
+        }
+
+        private void loadingStateChanged(bool loading)
+        {
+            if (loading)
+            {
+                icon.FadeTo(0.5f, transition_duration, Easing.OutQuint);
+                loadingAnimation.Show();
+            }
+            else
+            {
+                icon.FadeTo(1, transition_duration, Easing.OutQuint);
+                loadingAnimation.Hide();
+            }
         }
 
         private void playingStateChanged(bool playing)
         {
             icon.Icon = playing ? FontAwesome.fa_stop : FontAwesome.fa_play;
             icon.FadeColour(playing || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
-
-            if (playing)
-            {
-                if (BeatmapSet == null)
-                {
-                    Playing.Value = false;
-                    return;
-                }
-
-                if (Preview != null)
-                {
-                    Preview.Start();
-                    return;
-                }
-
-                loading = true;
-
-                LoadComponentAsync(Preview = previewTrackManager.Get(beatmapSet), preview =>
-                {
-                    // beatmapset may have changed.
-                    if (Preview != preview)
-                        return;
-
-                    AddInternal(preview);
-                    loading = false;
-                    preview.Stopped += () => Playing.Value = false;
-
-                    // user may have changed their mind.
-                    if (Playing)
-                        preview.Start();
-                });
-            }
-            else
-            {
-                Preview?.Stop();
-                loading = false;
-            }
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            Playing.Value = false;
+            unsubscribeFromEvents();
+            playButtonState = null;
         }
     }
 }

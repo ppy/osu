@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -24,14 +23,18 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
         private readonly Box bg, progress;
         private readonly PlayButton playButton;
-
-        private PreviewTrack preview => playButton.Preview;
-        public Bindable<bool> Playing => playButton.Playing;
+        private PreviewTrackManager previewTrackManager;
+        private PlayButtonState playButtonState;
 
         public BeatmapSetInfo BeatmapSet
         {
             get { return playButton.BeatmapSet; }
-            set { playButton.BeatmapSet = value; }
+            set
+            {
+                playButton.BeatmapSet = value;
+                playButtonState = previewTrackManager.GetPlayButtonState(BeatmapSet);
+                playButtonState.Playing.ValueChanged += newValue => progress.FadeTo(newValue ? 1 : 0, 100);
+            }
         }
 
         public PreviewButton()
@@ -67,23 +70,29 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             };
 
             Action = () => playButton.Click();
-            Playing.ValueChanged += newValue => progress.FadeTo(newValue ? 1 : 0, 100);
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, PreviewTrackManager previewTrackManager)
         {
             progress.Colour = colours.Yellow;
+
+            this.previewTrackManager = previewTrackManager;
+            if (BeatmapSet != null)
+            {
+                playButtonState = previewTrackManager.GetPlayButtonState(BeatmapSet);
+                playButtonState.Playing.ValueChanged += newValue => progress.FadeTo(newValue ? 1 : 0, 100);
+            }
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (Playing.Value && preview != null)
+            if (playButtonState.Playing.Value && playButtonState.Preview != null)
             {
                 // prevent negative (potential infinite) width if a track without length was loaded
-                progress.Width = preview.Length > 0 ? (float)(preview.CurrentTime / preview.Length) : 0f;
+                progress.Width = playButtonState.Preview.Length > 0 ? (float)(playButtonState.Preview.CurrentTime / playButtonState.Preview.Length) : 0f;
             }
             else
                 progress.Width = 0;

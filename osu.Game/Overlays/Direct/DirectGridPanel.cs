@@ -224,7 +224,7 @@ namespace osu.Game.Overlays.Direct
                 Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
             });
 
-            PreviewPlaying.ValueChanged += _ => updateStatusContainer();
+            PlayButtonState.Playing.ValueChanged += _ => updateStatusContainer();
         }
 
         protected override bool OnHover(InputState state)
@@ -239,6 +239,6 @@ namespace osu.Game.Overlays.Direct
             updateStatusContainer();
         }
 
-        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying ? 0 : 1, 120, Easing.InOutQuint);
+        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PlayButtonState.Playing ? 0 : 1, 120, Easing.InOutQuint);
     }
 }
