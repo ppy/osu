@@ -32,10 +32,16 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             set
             {
                 playButton.BeatmapSet = value;
-                playButtonState = previewTrackManager.GetPlayButtonState(BeatmapSet);
-                playButtonState.Playing.ValueChanged += newValue => progress.FadeTo(newValue ? 1 : 0, 100);
+
+                if (playButtonState != null)
+                    playButtonState.Playing.ValueChanged -= playingStateChanged;
+                playButtonState = previewTrackManager.GetPlayButtonState(playButton.BeatmapSet);
+                playButtonState.Playing.ValueChanged += playingStateChanged;
+                playButtonState.Playing.TriggerChange();
             }
         }
+
+        private void playingStateChanged(bool newValue) => progress.FadeTo(newValue ? 1 : 0, 100);
 
         public PreviewButton()
         {
