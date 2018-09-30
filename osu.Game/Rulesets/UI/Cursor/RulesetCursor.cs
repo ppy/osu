@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.UI.Cursor
         ///<summary/>
         public double IdleDelay = 2000;
 
-        public RulesetCursor() : base()
+        public RulesetCursor()
         {
             Hide();
         }
