@@ -3,32 +3,32 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.MathUtils;
 using osu.Framework.Threading;
 using osu.Game.Graphics.Backgrounds;
 
 namespace osu.Game.Screens.Backgrounds
 {
-    public class BackgroundScreenDefault : BackgroundScreen
+    public class BackgroundScreenDefault : BlurrableBackgroundScreen
     {
         private int currentDisplay;
         private const int background_count = 5;
 
         private string backgroundName => $@"Menu/menu-background-{currentDisplay % background_count + 1}";
 
-        private Background current;
-
         [BackgroundDependencyLoader]
         private void load()
         {
+            currentDisplay = RNG.Next(0, background_count);
             display(new Background(backgroundName));
         }
 
         private void display(Background newBackground)
         {
-            current?.FadeOut(800, Easing.InOutSine);
-            current?.Expire();
+            Background?.FadeOut(800, Easing.InOutSine);
+            Background?.Expire();
 
-            Add(current = newBackground);
+            Add(Background = newBackground);
             currentDisplay++;
         }
 

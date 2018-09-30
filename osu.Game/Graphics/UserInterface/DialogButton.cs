@@ -211,7 +211,7 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceivePositionalInputAt(screenSpacePos);
 
         protected override bool OnClick(InputState state)
         {
