@@ -80,6 +80,9 @@ namespace osu.Game.Overlays.Direct
         {
             playButtonState.Loading.ValueChanged += loadingStateChanged;
             playButtonState.Playing.ValueChanged += playingStateChanged;
+
+            playButtonState.Loading.TriggerChange();
+            playButtonState.Playing.TriggerChange();
         }
 
         private void unsubscribeFromEvents()
@@ -130,8 +133,12 @@ namespace osu.Game.Overlays.Direct
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            unsubscribeFromEvents();
-            playButtonState = null;
+
+            if (playButtonState != null)
+            {
+                unsubscribeFromEvents();
+                playButtonState = null;
+            }
         }
     }
 }

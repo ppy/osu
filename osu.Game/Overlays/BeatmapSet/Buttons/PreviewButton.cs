@@ -86,8 +86,9 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             this.previewTrackManager = previewTrackManager;
             if (BeatmapSet != null)
             {
-                playButtonState = previewTrackManager.GetPlayButtonState(BeatmapSet);
-                playButtonState.Playing.ValueChanged += newValue => progress.FadeTo(newValue ? 1 : 0, 100);
+                playButtonState = previewTrackManager.GetPlayButtonState(playButton.BeatmapSet);
+                playButtonState.Playing.ValueChanged += playingStateChanged;
+                playButtonState.Playing.TriggerChange();
             }
         }
 
