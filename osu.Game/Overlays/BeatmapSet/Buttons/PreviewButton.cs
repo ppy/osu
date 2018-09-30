@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         {
             base.Update();
 
-            if (playButtonState.Playing.Value && playButtonState.Preview != null)
+            if (playButtonState != null && playButtonState.Playing.Value && playButtonState.Preview != null)
             {
                 // prevent negative (potential infinite) width if a track without length was loaded
                 progress.Width = playButtonState.Preview.Length > 0 ? (float)(playButtonState.Preview.CurrentTime / playButtonState.Preview.Length) : 0f;
