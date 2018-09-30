@@ -486,6 +486,15 @@ namespace osu.Game.Screens.Select
                 updateItem(p, halfHeight);
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // aggressively dispose "off-screen" items to reduce GC pressure.
+            foreach (var i in Items)
+                i.Dispose();
+        }
+
         private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
         {
             if (beatmapSet.Beatmaps.All(b => b.Hidden))
