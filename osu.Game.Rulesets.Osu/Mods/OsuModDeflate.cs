@@ -38,6 +38,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                     .Then()
                     .ScaleTo(origScale, h.TimePreempt)
                     .Then()
+                    .FadeOut(800)
                     .ScaleTo(d.Scale * 1.5f, 400, Easing.OutQuad);  // reapply overwritten ScaleTo
             }
         }
