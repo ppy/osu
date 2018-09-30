@@ -10,13 +10,18 @@ namespace osu.Game.Rulesets.UI.Cursor
 {
     public class RulesetCursor : MenuCursor
     {
-        private double lastActiveTime = 0;
-        private StopwatchClock clock = new StopwatchClock(true);
+        private double lastActiveTime;
+        private readonly StopwatchClock clock = new StopwatchClock(true);
         private double idleTime => clock.CurrentTime - lastActiveTime;
         ///<summary> 
         ///Time of idling after which the cursor is hidden.
         ///<summary/>
         public double IdleDelay = 2000;
+
+        public RulesetCursor() : base()
+        {
+            Hide();
+        }
 
         protected override bool OnMouseMove(InputState state)
         {
