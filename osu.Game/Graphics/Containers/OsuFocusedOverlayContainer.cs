@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.Containers
 
         protected virtual bool PlaySamplesOnStateChange => true;
 
-        protected override bool BlockPassThroughKeyboard => true;
+        protected override bool BlockNonPositionalInput => true;
 
         private PreviewTrackManager previewTrackManager;
 
@@ -54,14 +54,14 @@ namespace osu.Game.Graphics.Containers
         /// Whether mouse input should be blocked screen-wide while this overlay is visible.
         /// Performing mouse actions outside of the valid extents will hide the overlay.
         /// </summary>
-        public virtual bool BlockScreenWideMouse => BlockPassThroughMouse;
+        public virtual bool BlockScreenWideMouse => BlockPositionalInput;
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => BlockScreenWideMouse || base.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => BlockScreenWideMouse || base.ReceivePositionalInputAt(screenSpacePos);
 
         protected override bool OnClick(InputState state)
         {
-            if (!base.ReceiveMouseInputAt(state.Mouse.NativeState.Position))
+            if (!base.ReceivePositionalInputAt(state.Mouse.NativeState.Position))
             {
                 State = Visibility.Hidden;
                 return true;

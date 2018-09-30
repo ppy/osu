@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Dialog
         public static readonly float ENTER_DURATION = 500;
         public static readonly float EXIT_DURATION = 200;
 
-        protected override bool BlockPassThroughMouse => false;
+        protected override bool BlockPositionalInput => false;
 
         private readonly Vector2 ringSize = new Vector2(100f);
         private readonly Vector2 ringMinifiedSize = new Vector2(20f);

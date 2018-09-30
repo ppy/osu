@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Play.HUD
         protected override void PopOut() => this.FadeOut(fade_duration);
 
         //We want to handle keyboard inputs all the time in order to trigger ToggleVisibility() when not visible
-        public override bool HandleKeyboardInput => true;
+        public override bool HandleNonPositionalInput => true;
 
         protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
         {

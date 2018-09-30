@@ -28,7 +28,7 @@ namespace osu.Game.Overlays
         private VolumeMeter volumeMeterMusic;
         private MuteButton muteButton;
 
-        protected override bool BlockPassThroughMouse => false;
+        protected override bool BlockPositionalInput => false;
 
         private readonly BindableDouble muteAdjustment = new BindableDouble();
 
