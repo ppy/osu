@@ -85,7 +85,7 @@ namespace osu.Game.Screens.Select.Options
             return false;
         }
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => box.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
         public BeatmapOptionsButton()
         {

@@ -11,7 +11,7 @@ namespace osu.Game.Overlays
     {
         protected readonly WaveContainer Waves;
 
-        protected override bool BlockPassThroughKeyboard => true;
+        protected override bool BlockNonPositionalInput => true;
         protected override Container<Drawable> Content => Waves;
 
         protected WaveOverlayContainer()
