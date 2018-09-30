@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public int IndexInBeatmap { get; set; }
 
-        public virtual FruitVisualRepresentation VisualRepresentation => (FruitVisualRepresentation)(IndexInBeatmap % 4);
+        public virtual FruitVisualRepresentation VisualRepresentation => (FruitVisualRepresentation)(ComboIndex % 4);
 
         public virtual bool NewCombo { get; set; }
 

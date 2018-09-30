@@ -155,7 +155,7 @@ namespace osu.Game.Overlays
                 switch (action)
                 {
                     case GlobalAction.Back:
-                        TriggerOnClick();
+                        Click();
                         return true;
                 }
 

@@ -28,8 +28,8 @@ namespace osu.Game.Overlays.Music
         private SpriteIcon handle;
         private TextFlowContainer text;
         private IEnumerable<SpriteText> titleSprites;
-        private UnicodeBindableString titleBind;
-        private UnicodeBindableString artistBind;
+        private ILocalisedBindableString titleBind;
+        private ILocalisedBindableString artistBind;
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Music
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuColour colours, LocalisationManager localisation)
         {
             hoverColour = colours.Yellow;
             artistColour = colours.Gray9;
@@ -97,11 +97,10 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            titleBind = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
-            artistBind = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
+            titleBind = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
+            artistBind = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
 
-            artistBind.ValueChanged += newText => recreateText();
-            artistBind.TriggerChange();
+            artistBind.BindValueChanged(newText => recreateText(), true);
         }
 
         private void recreateText()

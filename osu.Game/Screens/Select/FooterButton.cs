@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Select
         private readonly Box box;
         private readonly Box light;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => box.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
         public FooterButton()
         {

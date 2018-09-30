@@ -65,13 +65,15 @@ namespace osu.Game.Rulesets.Judgements
 
             this.FadeInFromZero(100, Easing.OutQuint);
 
+            var origScale = Scale;
+
             switch (Result.Type)
             {
                 case HitResult.None:
                     break;
                 case HitResult.Miss:
-                    this.ScaleTo(1.6f);
-                    this.ScaleTo(1, 100, Easing.In);
+                    this.ScaleTo(origScale * 1.6f);
+                    this.ScaleTo(origScale, 100, Easing.In);
 
                     this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
                     this.RotateTo(40, 800, Easing.InQuint);
@@ -79,8 +81,8 @@ namespace osu.Game.Rulesets.Judgements
                     this.Delay(600).FadeOut(200);
                     break;
                 default:
-                    this.ScaleTo(0.9f);
-                    this.ScaleTo(1, 500, Easing.OutElastic);
+                    this.ScaleTo(origScale * 0.9f);
+                    this.ScaleTo(origScale, 500, Easing.OutElastic);
 
                     this.Delay(100).FadeOut(400);
                     break;

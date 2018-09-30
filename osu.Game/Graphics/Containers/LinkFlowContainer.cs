@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.Containers
         {
         }
 
-        public override bool HandleMouseInput => true;
+        public override bool HandlePositionalInput => true;
 
         private OsuGame game;
 

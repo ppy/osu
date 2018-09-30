@@ -47,7 +47,6 @@ namespace osu.Game.Overlays
         private PlaylistOverlay playlist;
 
         private BeatmapManager beatmaps;
-        private LocalisationEngine localisation;
 
         private List<BeatmapSetInfo> beatmapSets;
         private BeatmapSetInfo currentSet;
@@ -67,11 +66,10 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(BindableBeatmap beatmap, BeatmapManager beatmaps, OsuColour colours, LocalisationEngine localisation)
+        private void load(BindableBeatmap beatmap, BeatmapManager beatmaps, OsuColour colours)
         {
             this.beatmap.BindTo(beatmap);
             this.beatmaps = beatmaps;
-            this.localisation = localisation;
 
             Children = new Drawable[]
             {
@@ -351,17 +349,14 @@ namespace osu.Game.Overlays
                 {
                     if (beatmap?.Beatmap == null) //this is not needed if a placeholder exists
                     {
-                        title.Current = null;
                         title.Text = @"Nothing to play";
-
-                        artist.Current = null;
                         artist.Text = @"Nothing to play";
                     }
                     else
                     {
                         BeatmapMetadata metadata = beatmap.Metadata;
-                        title.Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
-                        artist.Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
+                        title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));
+                        artist.Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist));
                     }
                 });
 

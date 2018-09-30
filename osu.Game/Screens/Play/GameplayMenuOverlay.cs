@@ -28,9 +28,9 @@ namespace osu.Game.Screens.Play
         private const int button_height = 70;
         private const float background_alpha = 0.75f;
 
-        protected override bool BlockPassThroughKeyboard => true;
+        protected override bool BlockNonPositionalInput => true;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public Action OnRetry;
         public Action OnQuit;
@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play
         /// <summary>
         /// Action that is invoked when <see cref="GlobalAction.Back"/> is triggered.
         /// </summary>
-        protected virtual Action BackAction => () => InternalButtons.Children.Last().TriggerOnClick();
+        protected virtual Action BackAction => () => InternalButtons.Children.Last().Click();
 
         public abstract string Header { get; }
         public abstract string Description { get; }
