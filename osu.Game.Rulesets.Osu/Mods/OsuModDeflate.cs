@@ -36,7 +36,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 var origScale = d.Scale;
                 d.ScaleTo(1.1f, 1)      // if duration = 0 then components (i.e. flash) scale with it -> we don't want that
                     .Then()
-                    .ScaleTo(origScale, h.TimePreempt);
+                    .ScaleTo(origScale, h.TimePreempt)
+                    .Then()
+                    .ScaleTo(d.Scale * 1.5f, 400, Easing.OutQuad);  // reapply overwritten ScaleTo
             }
         }
     }
