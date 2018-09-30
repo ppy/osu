@@ -29,15 +29,14 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             if (!(drawable is DrawableHitCircle d))
                 return;
-            
             d.ApproachCircle.Hide();
             var h = d.HitObject;
-
             using (d.BeginAbsoluteSequence(h.StartTime - h.TimePreempt))
             {
                 var origScale = d.Scale;
-                d.ScaleTo(1.1f);
-                d.ScaleTo(origScale, h.TimePreempt);
+                d.ScaleTo(1.1f, 1)      // if duration = 0 then components (i.e. flash) scale with it -> we don't want that
+                    .Then()
+                    .ScaleTo(origScale, h.TimePreempt);
             }
         }
     }
