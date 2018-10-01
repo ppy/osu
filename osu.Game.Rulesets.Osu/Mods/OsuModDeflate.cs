@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 drawable.ApplyCustomUpdateState += drawableOnApplyCustomUpdateState;
         }
 
-        protected void drawableOnApplyCustomUpdateState(DrawableHitObject drawable, ArmedState state)
+        private void drawableOnApplyCustomUpdateState(DrawableHitObject drawable, ArmedState state)
         {
             if (!(drawable is DrawableHitCircle d))
                 return;
