@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Catch
                 case ModType.Automation:
                     return new Mod[]
                     {
-                        new MultiMod(new CatchModAutoplay(), new ModCinema()),
+                        new MultiMod(new CatchModAutoplay(), new CatchModAutoplay2(), new ModCinema()),
                         new CatchModRelax(),
                     };
                 default:

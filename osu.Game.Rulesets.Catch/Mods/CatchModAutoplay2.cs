@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -13,15 +13,17 @@ using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
-    public class CatchModAutoplay : ModAutoplay<CatchHitObject>
+    public class CatchModAutoplay2 : ModAutoplay<CatchHitObject>
     {
-        public override Type[] IncompatibleMods => new[] { typeof(CatchModRelax), typeof(CatchModSuddenDeath), typeof(CatchModNoFail), typeof(CatchModAutoplay2) };
+        public override string Name => "Autoplay2";
+        public override string ShortenedName => "A2";
+        public override Type[] IncompatibleMods => new[] { typeof(CatchModRelax), typeof(CatchModSuddenDeath), typeof(CatchModNoFail), typeof(CatchModAutoplay) };
         protected override Score CreateReplayScore(Beatmap<CatchHitObject> beatmap)
         {
             return new Score
             {
                 User = new User { Username = "osu!salad!" },
-                Replay = new CatchAutoGenerator(beatmap).Generate(),
+                Replay = new CatchAutoGenerator2(beatmap).Generate(),
             };
         }
 
