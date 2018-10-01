@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Dialog
         public static readonly float ENTER_DURATION = 500;
         public static readonly float EXIT_DURATION = 200;
 
-        protected override bool BlockPassThroughMouse => false;
+        protected override bool BlockPositionalInput => false;
 
         private readonly Vector2 ringSize = new Vector2(100f);
         private readonly Vector2 ringMinifiedSize = new Vector2(20f);
@@ -199,7 +199,7 @@ namespace osu.Game.Overlays.Dialog
             switch (action)
             {
                 case GlobalAction.Select:
-                    Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerOnClick();
+                    Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.Click();
                     return true;
             }
 
@@ -252,7 +252,7 @@ namespace osu.Game.Overlays.Dialog
             if (!actionInvoked)
                 // In the case a user did not choose an action before a hide was triggered, press the last button.
                 // This is presumed to always be a sane default "cancel" action.
-                buttonsContainer.Last().TriggerOnClick();
+                buttonsContainer.Last().Click();
 
             base.PopOut();
             content.FadeOut(EXIT_DURATION, Easing.InSine);
@@ -261,7 +261,7 @@ namespace osu.Game.Overlays.Dialog
         private void pressButtonAtIndex(int index)
         {
             if (index < Buttons.Count())
-                Buttons.Skip(index).First().TriggerOnClick();
+                Buttons.Skip(index).First().Click();
         }
     }
 }

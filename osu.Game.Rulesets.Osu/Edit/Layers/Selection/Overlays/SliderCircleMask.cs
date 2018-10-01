@@ -56,6 +56,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
         }
 
         // Todo: This is temporary, since the slider circle masks don't do anything special yet. In the future they will handle input.
-        public override bool HandleMouseInput => false;
+        public override bool HandlePositionalInput => false;
     }
 }

@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             {
             }
 
-            public override bool HandleKeyboardInput => IsHovered && !CurrentNumber.Disabled;
+            public override bool HandleNonPositionalInput => IsHovered && !CurrentNumber.Disabled;
 
             protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
             {

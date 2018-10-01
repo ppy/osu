@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Menu
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => box.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
         public Button(string text, string sampleName, FontAwesome symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
         {
@@ -229,8 +229,8 @@ namespace osu.Game.Screens.Menu
             boxHoverLayer.FadeOut(800, Easing.OutExpo);
         }
 
-        public override bool HandleKeyboardInput => state == ButtonState.Expanded;
-        public override bool HandleMouseInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
+        public override bool HandleNonPositionalInput => state == ButtonState.Expanded;
+        public override bool HandlePositionalInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
 
         protected override void Update()
         {

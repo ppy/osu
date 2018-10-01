@@ -10,8 +10,8 @@ before_build:
   - cmd: nuget restore -verbosity quiet
 build_script:
   - ps: iex ((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/secure-file/master/install.ps1'))
-  - appveyor DownloadFile https://puu.sh/A6g5K/4d08705438.enc # signing certificate
-  - cmd: appveyor-tools\secure-file -decrypt 4d08705438.enc -secret %decode_secret% -out %HOMEPATH%\deanherbert.pfx
+  - appveyor DownloadFile https://puu.sh/BCrS8/7faccf7876.enc # signing certificate
+  - cmd: appveyor-tools\secure-file -decrypt 7faccf7876.enc -secret %decode_secret% -out %HOMEPATH%\deanherbert.pfx
   - appveyor DownloadFile https://puu.sh/A6g75/fdc6f19b04.enc # deploy configuration
   - cd osu-deploy
   - nuget restore -verbosity quiet

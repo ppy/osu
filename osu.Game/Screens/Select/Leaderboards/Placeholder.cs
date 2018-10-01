@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Select.Leaderboards
     {
         protected const float TEXT_SIZE = 22;
 
-        public override bool HandleMouseInput => true;
+        public override bool HandlePositionalInput => true;
 
         protected Placeholder()
             : base(cp => cp.TextSize = TEXT_SIZE)
