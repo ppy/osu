@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             void adjustFadeIn(OsuHitObject h) => h.TimeFadeIn = h.TimePreempt * fade_in_duration_multiplier;
 
-            foreach (var d in drawables.OfType<DrawableOsuHitObject>())
+            foreach (var d in drawables.Where((x, i) => i % 2 == 1).OfType<DrawableOsuHitObject>())
             {
                 adjustFadeIn(d.HitObject);
                 foreach (var h in d.HitObject.NestedHitObjects.OfType<OsuHitObject>())
