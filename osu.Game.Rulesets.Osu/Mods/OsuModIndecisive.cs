@@ -14,7 +14,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModIndecisive : Mod, IApplicableToDrawableHitObjects
+    public class OsuModIndecisive : ModHidden, IApplicableToDrawableHitObjects
     {
         public override string Name => "Indecisive";
         public override string ShortenedName => "ID";
@@ -26,22 +26,21 @@ namespace osu.Game.Rulesets.Osu.Mods
         private const double fade_in_duration_multiplier = 0.4;
         private const double fade_out_duration_multiplier = 0.3;
 
-        public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
+        public override void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             void adjustFadeIn(OsuHitObject h) => h.TimeFadeIn = h.TimePreempt * fade_in_duration_multiplier;
 
-            foreach (var d in drawables.Where((x, i) => i % 2 == 1).OfType<DrawableOsuHitObject>())
+            foreach (var d in drawables.OfType<DrawableOsuHitObject>())
             {
                 adjustFadeIn(d.HitObject);
                 foreach (var h in d.HitObject.NestedHitObjects.OfType<OsuHitObject>())
                     adjustFadeIn(h);
             }
 
-            foreach (var drawable in drawables.Where((x, i) => i % 2 == 1))
-                drawable.ApplyCustomUpdateState += ApplyHiddenState;
+            base.ApplyToDrawableHitObjects(drawables.Where((x, i) => i % 2 == 1));  // the only line different from OsuModHidden :^)
         }
 
-        protected void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
+        protected override void ApplyHiddenState(DrawableHitObject drawable, ArmedState state)
         {
             if (!(drawable is DrawableOsuHitObject d))
                 return;
