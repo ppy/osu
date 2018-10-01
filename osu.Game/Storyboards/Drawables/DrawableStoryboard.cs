@@ -18,8 +18,8 @@ namespace osu.Game.Storyboards.Drawables
         protected override Container<DrawableStoryboardLayer> Content => content;
 
         protected override Vector2 DrawScale => new Vector2(Parent.DrawHeight / 480);
-        public override bool HandleKeyboardInput => false;
-        public override bool HandleMouseInput => false;
+        public override bool HandleNonPositionalInput => false;
+        public override bool HandlePositionalInput => false;
 
         private bool passing = true;
         public bool Passing
@@ -57,7 +57,7 @@ namespace osu.Game.Storyboards.Drawables
         [BackgroundDependencyLoader]
         private void load(FileStore fileStore)
         {
-            dependencies.Cache(new TextureStore(new RawTextureLoaderStore(fileStore.Store), false) { ScaleAdjust = 1, });
+            dependencies.Cache(new TextureStore(new TextureLoaderStore(fileStore.Store), false, scaleAdjust: 1));
 
             foreach (var layer in Storyboard.Layers)
                 Add(layer.CreateDrawable());

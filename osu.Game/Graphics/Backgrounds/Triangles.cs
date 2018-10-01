@@ -30,8 +30,8 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         private const float edge_smoothness = 1;
 
-        public override bool HandleKeyboardInput => false;
-        public override bool HandleMouseInput => false;
+        public override bool HandleNonPositionalInput => false;
+        public override bool HandlePositionalInput => false;
 
 
         public Color4 ColourLight = Color4.White;
@@ -116,7 +116,7 @@ namespace osu.Game.Graphics.Backgrounds
 
             float adjustedAlpha = HideAlphaDiscrepancies ?
                 // Cubically scale alpha to make it drop off more sharply.
-                (float)Math.Pow(DrawInfo.Colour.AverageColour.Linear.A, 3) :
+                (float)Math.Pow(DrawColourInfo.Colour.AverageColour.Linear.A, 3) :
                 1;
 
             float elapsedSeconds = (float)Time.Elapsed / 1000;
@@ -235,7 +235,7 @@ namespace osu.Game.Graphics.Backgrounds
                         Vector2Extensions.Transform(particle.Position * Size + new Vector2(-offset.X, offset.Y), DrawInfo.Matrix)
                     );
 
-                    ColourInfo colourInfo = DrawInfo.Colour;
+                    ColourInfo colourInfo = DrawColourInfo.Colour;
                     colourInfo.ApplyChild(particle.Colour);
 
                     Texture.DrawTriangle(

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.IO.File;
@@ -58,7 +59,7 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
-        private readonly List<Action> cachedEvents = new List<Action>();
+        private readonly List<Action> queuedEvents = new List<Action>();
 
         /// <summary>
         /// Allows delaying of outwards events until an operation is confirmed (at a database level).
@@ -76,20 +77,27 @@ namespace osu.Game.Database
         /// <param name="perform">Whether the flushed events should be performed.</param>
         private void flushEvents(bool perform)
         {
+            Action[] events;
+            lock (queuedEvents)
+            {
+                events = queuedEvents.ToArray();
+                queuedEvents.Clear();
+            }
+
             if (perform)
             {
-                foreach (var a in cachedEvents)
+                foreach (var a in events)
                     a.Invoke();
             }
 
-            cachedEvents.Clear();
             delayingEvents = false;
         }
 
         private void handleEvent(Action a)
         {
             if (delayingEvents)
-                cachedEvents.Add(a);
+                lock (queuedEvents)
+                    queuedEvents.Add(a);
             else
                 a.Invoke();
         }
@@ -129,7 +137,6 @@ namespace osu.Game.Database
             List<TModel> imported = new List<TModel>();
 
             int current = 0;
-            int errors = 0;
             foreach (string path in paths)
             {
                 if (notification.State == ProgressNotificationState.Cancelled)
@@ -162,12 +169,29 @@ namespace osu.Game.Database
                 {
                     e = e.InnerException ?? e;
                     Logger.Error(e, $@"Could not import ({Path.GetFileName(path)})");
-                    errors++;
                 }
             }
 
-            notification.Text = errors > 0 ? $"Import complete with {errors} errors" : "Import successful!";
-            notification.State = ProgressNotificationState.Completed;
+            if (imported.Count == 0)
+            {
+                notification.Text = "Import failed!";
+                notification.State = ProgressNotificationState.Cancelled;
+            }
+            else
+            {
+                notification.CompletionText = $"Imported {current} {typeof(TModel).Name.Replace("Info", "").ToLower()}s!";
+                notification.CompletionClickAction += () =>
+                {
+                    if (imported.Count > 0)
+                        PresentCompletedImport(imported);
+                    return true;
+                };
+                notification.State = ProgressNotificationState.Completed;
+            }
+        }
+
+        protected virtual void PresentCompletedImport(IEnumerable<TModel> imported)
+        {
         }
 
         /// <summary>
@@ -258,17 +282,19 @@ namespace osu.Game.Database
         /// Is a no-op for already deleted items.
         /// </summary>
         /// <param name="item">The item to delete.</param>
-        public void Delete(TModel item)
+        /// <returns>false if no operation was performed</returns>
+        public bool Delete(TModel item)
         {
             using (ContextFactory.GetForWrite())
             {
                 // re-fetch the model on the import context.
-                var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == item.ID);
+                var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).FirstOrDefault(s => s.ID == item.ID);
 
-                if (foundModel.DeletePending) return;
+                if (foundModel == null || foundModel.DeletePending) return false;
 
                 if (ModelStore.Delete(foundModel))
                     Files.Dereference(foundModel.Files.Select(f => f.FileInfo).ToArray());
+                return true;
             }
         }
 
@@ -283,7 +309,7 @@ namespace osu.Game.Database
             var notification = new ProgressNotification
             {
                 Progress = 0,
-                CompletionText = "Deleted all beatmaps!",
+                CompletionText = $"Deleted all {typeof(TModel).Name.Replace("Info", "").ToLower()}s!",
                 State = ProgressNotificationState.Active,
             };
 
@@ -384,6 +410,48 @@ namespace osu.Game.Database
 
             return fileInfos;
         }
+
+        #region osu-stable import
+
+        /// <summary>
+        /// Set a storage with access to an osu-stable install for import purposes.
+        /// </summary>
+        public Func<Storage> GetStableStorage { private get; set; }
+
+        /// <summary>
+        /// Denotes whether an osu-stable installation is present to perform automated imports from.
+        /// </summary>
+        public bool StableInstallationAvailable => GetStableStorage?.Invoke() != null;
+
+        /// <summary>
+        /// The relative path from osu-stable's data directory to import items from.
+        /// </summary>
+        protected virtual string ImportFromStablePath => null;
+
+        /// <summary>
+        /// This is a temporary method and will likely be replaced by a full-fledged (and more correctly placed) migration process in the future.
+        /// </summary>
+        public Task ImportFromStableAsync()
+        {
+            var stable = GetStableStorage?.Invoke();
+
+            if (stable == null)
+            {
+                Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
+                return Task.CompletedTask;
+            }
+
+            if (!stable.ExistsDirectory(ImportFromStablePath))
+            {
+                // This handles situations like when the user does not have a Skins folder
+                Logger.Log($"No {ImportFromStablePath} folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
+                return Task.CompletedTask;
+            }
+
+            return Task.Factory.StartNew(() => Import(stable.GetDirectories(ImportFromStablePath).Select(f => stable.GetFullPath(f)).ToArray()), TaskCreationOptions.LongRunning);
+        }
+
+        #endregion
 
         /// <summary>
         /// Create a barebones model from the provided archive.

@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
         }
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)
@@ -216,7 +216,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                         Texture.DrawQuad(
                             new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
-                            DrawInfo.Colour,
+                            DrawColourInfo.Colour,
                             null,
                             v => Shared.VertexBuffer.Vertices[end++] = new TexturedTrailVertex
                             {

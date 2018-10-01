@@ -13,6 +13,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using OpenTK;
+using OpenTK.Input;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using System;
@@ -141,6 +142,17 @@ namespace osu.Game.Overlays.Chat
 
                 text.FadeIn(transition_length, Easing.OutQuint);
                 textBold.FadeOut(transition_length, Easing.OutQuint);
+            }
+
+            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            {
+                if (args.Button == MouseButton.Middle)
+                {
+                    closeButton.Action();
+                    return true;
+                }
+
+                return false;
             }
 
             protected override bool OnHover(InputState state)

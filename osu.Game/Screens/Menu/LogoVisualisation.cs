@@ -64,8 +64,8 @@ namespace osu.Game.Screens.Menu
 
         private readonly float[] frequencyAmplitudes = new float[256];
 
-        public override bool HandleKeyboardInput => false;
-        public override bool HandleMouseInput => false;
+        public override bool HandleNonPositionalInput => false;
+        public override bool HandlePositionalInput => false;
 
         private Shader shader;
         private readonly Texture texture;
@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Menu
 
                 Vector2 inflation = DrawInfo.MatrixInverse.ExtractScale().Xy;
 
-                ColourInfo colourInfo = DrawInfo.Colour;
+                ColourInfo colourInfo = DrawColourInfo.Colour;
                 colourInfo.ApplyChild(Colour);
 
                 if (AudioData != null)

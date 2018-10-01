@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.Toolbar
 
         private readonly ToolbarUserArea userArea;
 
-        protected override bool BlockPassThroughMouse => false;
+        protected override bool BlockPositionalInput => false;
 
         private const double transition_time = 500;
 
@@ -83,14 +83,14 @@ namespace osu.Game.Overlays.Toolbar
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame osuGame)
         {
-            if (osuGame != null)
-                overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
-
             StateChanged += visibility =>
             {
                 if (overlayActivationMode == OverlayActivation.Disabled)
                     State = Visibility.Hidden;
             };
+
+            if (osuGame != null)
+                overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
         }
 
         public class ToolbarBackground : Container

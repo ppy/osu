@@ -52,8 +52,8 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public Action<BeatmapInfo> SelectionChanged;
 
-        public override bool HandleKeyboardInput => AllowSelection;
-        public override bool HandleMouseInput => AllowSelection;
+        public override bool HandleNonPositionalInput => AllowSelection;
+        public override bool HandlePositionalInput => AllowSelection;
 
         /// <summary>
         /// Used to avoid firing null selections before the initial beatmaps have been loaded via <see cref="BeatmapSets"/>.
@@ -484,6 +484,15 @@ namespace osu.Game.Screens.Select
             float halfHeight = drawHeight / 2;
             foreach (DrawableCarouselItem p in scrollableContent.Children)
                 updateItem(p, halfHeight);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            // aggressively dispose "off-screen" items to reduce GC pressure.
+            foreach (var i in Items)
+                i.Dispose();
         }
 
         private CarouselBeatmapSet createCarouselSet(BeatmapSetInfo beatmapSet)
