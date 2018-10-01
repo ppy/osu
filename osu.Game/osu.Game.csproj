@@ -16,9 +16,9 @@
   <ItemGroup Label="Package References">
     <PackageReference Include="Humanizer" Version="2.4.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.1.3" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <PackageReference Include="ppy.osu.Framework" Version="2018.913.0" />
+    <PackageReference Include="ppy.osu.Framework" Version="2018.928.0" />
     <PackageReference Include="SharpCompress" Version="0.22.0" />
     <PackageReference Include="NUnit" Version="3.10.1" />
     <PackageReference Include="SharpRaven" Version="2.4.0" />
