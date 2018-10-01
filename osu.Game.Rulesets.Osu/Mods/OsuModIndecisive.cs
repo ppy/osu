@@ -14,7 +14,7 @@ using osu.Framework.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModIndecisive : ModHidden, IApplicableToDrawableHitObjects
+    public class OsuModIndecisive : ModHidden
     {
         public override string Name => "Indecisive";
         public override string ShortenedName => "ID";
