@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Mods
         {
             foreach (var button in buttons)
             {
-                int i = Array.FindIndex(button.Mods, m => modTypes.Any(t => t.IsInstanceOfType(m)));
+                int i = Array.FindIndex(button.Mods, m => modTypes.Any(t => t.IsInstanceOfType(m) && !m.GetType().IsSubclassOf(t)));
 
                 if (i >= 0)
                     button.SelectAt(i);
