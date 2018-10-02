@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.Mods
             {
                 var index = Array.IndexOf(ToggleKeys, e.Key);
                 if (index > -1 && index < buttons.Length)
-                    buttons[index].SelectNext(e.CurrentState.Keyboard.ShiftPressed ? -1 : 1);
+                    buttons[index].SelectNext(e.ShiftPressed ? -1 : 1);
             }
 
             return base.OnKeyDown(e);

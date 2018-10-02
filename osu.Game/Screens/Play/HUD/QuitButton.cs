@@ -190,7 +190,7 @@ namespace osu.Game.Screens.Play.HUD
 
             protected override bool OnMouseUp(MouseUpEvent e)
             {
-                if (!e.CurrentState.Mouse.Buttons.Any())
+                if (!e.HasAnyButtonPressed)
                     AbortConfirm();
                 return true;
             }

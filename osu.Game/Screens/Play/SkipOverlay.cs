@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Play
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (!e.CurrentState.Mouse.HasAnyButtonPressed)
+            if (!e.HasAnyButtonPressed)
                 fadeContainer.State = Visibility.Visible;
             return base.OnMouseMove(e);
         }

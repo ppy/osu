@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Play
         {
             if (e.Repeat) return false;
 
-            if (e.CurrentState.Keyboard.ShiftPressed)
+            if (e.ShiftPressed)
             {
                 switch (e.Key)
                 {

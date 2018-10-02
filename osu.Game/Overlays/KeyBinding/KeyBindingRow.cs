@@ -171,7 +171,7 @@ namespace osu.Game.Overlays.KeyBinding
         protected override bool OnMouseUp(MouseUpEvent e)
         {
             // don't do anything until the last button is released.
-            if (!HasFocus || e.CurrentState.Mouse.HasAnyButtonPressed)
+            if (!HasFocus || e.HasAnyButtonPressed)
                 return base.OnMouseUp(e);
 
             if (bindTarget.IsHovered)
@@ -205,7 +205,7 @@ namespace osu.Game.Overlays.KeyBinding
             {
                 case Key.Delete:
                 {
-                    if (e.CurrentState.Keyboard.ShiftPressed)
+                    if (e.ShiftPressed)
                     {
                         bindTarget.UpdateKeyCombination(InputKey.None);
                         finalise();

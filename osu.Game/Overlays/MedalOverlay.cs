@@ -183,7 +183,7 @@ namespace osu.Game.Overlays
 
         protected override void OnFocusLost(FocusLostEvent e)
         {
-            if (e.CurrentState.Keyboard.IsPressed(Key.Escape)) dismiss();
+            if (e.CurrentState.Keyboard.Keys.IsPressed(Key.Escape)) dismiss();
         }
 
         private const double initial_duration = 400;

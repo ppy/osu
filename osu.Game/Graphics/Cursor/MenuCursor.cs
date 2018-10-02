@@ -90,7 +90,7 @@ namespace osu.Game.Graphics.Cursor
 
         protected override bool OnMouseUp(MouseUpEvent e)
         {
-            if (!e.CurrentState.Mouse.HasMainButtonPressed)
+            if (!e.IsPressed(MouseButton.Left) && !e.IsPressed(MouseButton.Right))
             {
                 activeCursor.AdditiveLayer.FadeOutFromOne(500, Easing.OutQuint);
                 activeCursor.ScaleTo(1, 500, Easing.OutElastic);

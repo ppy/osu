@@ -560,7 +560,7 @@ namespace osu.Game.Screens.Select
             switch (e.Key)
             {
                 case Key.Delete:
-                    if (e.CurrentState.Keyboard.ShiftPressed)
+                    if (e.ShiftPressed)
                     {
                         if (!Beatmap.IsDefault)
                             delete(Beatmap.Value.BeatmapSetInfo);

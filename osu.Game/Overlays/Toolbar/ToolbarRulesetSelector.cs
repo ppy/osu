@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             base.OnKeyDown(e);
 
-            if (e.CurrentState.Keyboard.ControlPressed && !e.Repeat && e.Key >= Key.Number1 && e.Key <= Key.Number9)
+            if (e.ControlPressed && !e.Repeat && e.Key >= Key.Number1 && e.Key <= Key.Number9)
             {
                 int requested = e.Key - Key.Number1;
 
