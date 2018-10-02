@@ -10,7 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -251,16 +251,16 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             background.FadeTo(0.5f, 300, Easing.OutQuint);
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             background.FadeTo(background_alpha, 200, Easing.OutQuint);
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
         private class GlowingSpriteText : Container
