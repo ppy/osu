@@ -205,8 +205,7 @@ namespace osu.Game.Screens.Menu
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            var keyboard = e.CurrentState.Keyboard;
-            if (e.Repeat || keyboard.ControlPressed || keyboard.ShiftPressed || keyboard.AltPressed)
+            if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed)
                 return false;
 
             if (triggerKey == e.Key && triggerKey != Key.Unknown)
