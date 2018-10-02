@@ -51,7 +51,7 @@ namespace osu.Game.Overlays
         private readonly ChatTabControl channelTabs;
 
         private readonly Container chatContainer;
-        private readonly Container tabsArea;
+        private readonly TabsArea tabsArea;
         private readonly Box chatBackground;
         private readonly Box tabBackground;
 
@@ -145,11 +145,8 @@ namespace osu.Game.Overlays
                                 loading = new LoadingAnimation(),
                             }
                         },
-                        tabsArea = new Container
+                        tabsArea = new TabsArea
                         {
-                            Name = @"tabs area",
-                            RelativeSizeAxes = Axes.X,
-                            Height = TAB_AREA_HEIGHT,
                             Children = new Drawable[]
                             {
                                 tabBackground = new Box
@@ -540,6 +537,19 @@ namespace osu.Game.Overlays
             req.Success += m => target.ReplaceMessage(message, m);
 
             api.Queue(req);
+        }
+
+        private class TabsArea : Container
+        {
+            // IsHovered is used
+            public override bool HandlePositionalInput => true;
+
+            public TabsArea()
+            {
+                Name = @"tabs area";
+                RelativeSizeAxes = Axes.X;
+                Height = TAB_AREA_HEIGHT;
+            }
         }
     }
 }
