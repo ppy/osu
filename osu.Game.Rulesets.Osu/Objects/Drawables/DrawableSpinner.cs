@@ -55,28 +55,28 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             {
                 circleContainer = new Container
                 {
-                     AutoSizeAxes = Axes.Both,
-                     Anchor = Anchor.Centre,
-                     Origin = Anchor.Centre,
-                     Children = new Drawable[]
-                     {
-                         glow = new GlowPiece(),
-                         circle = new CirclePiece
-                         {
-                             Position = Vector2.Zero,
-                             Anchor = Anchor.Centre,
-                         },
-                         new RingPiece(),
-                         symbol = new SpriteIcon
-                         {
-                             Anchor = Anchor.Centre,
-                             Origin = Anchor.Centre,
-                             Size = new Vector2(48),
-                             Icon = FontAwesome.fa_asterisk,
-                             Shadow = false,
-                         },
-                     }
-                 },
+                    AutoSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new Drawable[]
+                    {
+                        glow = new GlowPiece(),
+                        circle = new CirclePiece
+                        {
+                            Position = Vector2.Zero,
+                            Anchor = Anchor.Centre,
+                        },
+                        new RingPiece(),
+                        symbol = new SpriteIcon
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Size = new Vector2(48),
+                            Icon = FontAwesome.fa_asterisk,
+                            Shadow = false,
+                        },
+                    }
+                },
                 mainContainer = new AspectContainer
                 {
                     Anchor = Anchor.Centre,
@@ -109,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Y = 120,
-                    Alpha = 0,
+                    Alpha = 0
                 }
             };
         }
