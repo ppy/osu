@@ -17,8 +17,7 @@ using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Audio.Track;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Menu
@@ -151,7 +150,7 @@ namespace osu.Game.Screens.Menu
             rightward = !rightward;
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             if (State != ButtonState.Expanded) return true;
 
@@ -167,7 +166,7 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             icon.ClearTransforms();
             icon.RotateTo(0, 500, Easing.Out);
@@ -186,30 +185,30 @@ namespace osu.Game.Screens.Menu
                 sampleClick = audio.Sample.Get($@"Menu/{sampleName}");
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             boxHoverLayer.FadeTo(0.1f, 1000, Easing.OutQuint);
-            return base.OnMouseDown(state, args);
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
             boxHoverLayer.FadeTo(0, 1000, Easing.OutQuint);
-            return base.OnMouseUp(state, args);
+            return base.OnMouseUp(e);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             trigger();
             return true;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (args.Repeat || state.Keyboard.ControlPressed || state.Keyboard.ShiftPressed || state.Keyboard.AltPressed)
+            if (e.Repeat || state.Keyboard.ControlPressed || state.Keyboard.ShiftPressed || state.Keyboard.AltPressed)
                 return false;
 
-            if (triggerKey == args.Key && triggerKey != Key.Unknown)
+            if (triggerKey == e.Key && triggerKey != Key.Unknown)
             {
                 trigger();
                 return true;

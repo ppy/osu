@@ -227,15 +227,15 @@ namespace osu.Game.Overlays.Direct
             PreviewPlaying.ValueChanged += _ => updateStatusContainer();
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             updateStatusContainer();
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
             updateStatusContainer();
         }
 
