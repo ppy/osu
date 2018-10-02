@@ -5,7 +5,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK.Graphics;
@@ -104,22 +104,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private InputState lastState;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             lastState = state;
-            return base.OnMouseDown(state, args);
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
             lastState = state;
-            return base.OnMouseUp(state, args);
+            return base.OnMouseUp(e);
         }
 
-        protected override bool OnMouseMove(InputState state)
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            lastState = state;
-            return base.OnMouseMove(state);
+            lastState = e;
+            return base.OnMouseMove(e);
         }
 
         public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)

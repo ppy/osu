@@ -5,7 +5,7 @@ using System;
 using osu.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Edit
 
         private bool selectionRequested;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             selectionRequested = false;
 
@@ -109,23 +109,23 @@ namespace osu.Game.Rulesets.Edit
             return IsSelected;
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             if (State == SelectionState.Selected && !selectionRequested)
             {
                 selectionRequested = true;
-                SelectionRequested?.Invoke(this, state);
+                SelectionRequested?.Invoke(this, e);
                 return true;
             }
 
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
-        protected override bool OnDragStart(InputState state) => true;
+        protected override bool OnDragStart(DragStartEvent e) => true;
 
-        protected override bool OnDrag(InputState state)
+        protected override bool OnDrag(DragEvent e)
         {
-            DragRequested?.Invoke(this, state);
+            DragRequested?.Invoke(this, e);
             return true;
         }
 

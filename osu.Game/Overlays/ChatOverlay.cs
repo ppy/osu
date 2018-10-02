@@ -13,7 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -191,25 +191,25 @@ namespace osu.Game.Overlays
 
         public void OpenChannel(Channel channel) => addChannel(channel);
 
-        protected override bool OnDragStart(InputState state)
+        protected override bool OnDragStart(DragStartEvent e)
         {
             isDragging = tabsArea.IsHovered;
 
             if (!isDragging)
-                return base.OnDragStart(state);
+                return base.OnDragStart(e);
 
             startDragChatHeight = ChatHeight.Value;
             return true;
         }
 
-        protected override bool OnDrag(InputState state)
+        protected override bool OnDrag(DragEvent e)
         {
             if (isDragging)
             {
-                Trace.Assert(state.Mouse.PositionMouseDown != null);
+                Trace.Assert(e.Mouse.PositionMouseDown != null);
 
                 // ReSharper disable once PossibleInvalidOperationException
-                double targetChatHeight = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
+                double targetChatHeight = startDragChatHeight - (e.Mouse.Position.Y - e.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
 
                 // If the channel selection screen is shown, mind its minimum height
                 if (channelSelection.State == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
@@ -221,10 +221,10 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDragEnd(InputState state)
+        protected override bool OnDragEnd(DragEndEvent e)
         {
             isDragging = false;
-            return base.OnDragEnd(state);
+            return base.OnDragEnd(e);
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
@@ -242,11 +242,11 @@ namespace osu.Game.Overlays
 
         public override bool AcceptsFocus => true;
 
-        protected override void OnFocus(InputState state)
+        protected override void OnFocus(FocusEvent e)
         {
             //this is necessary as textbox is masked away and therefore can't get focus :(
             GetContainingInputManager().ChangeFocus(textbox);
-            base.OnFocus(state);
+            base.OnFocus(e);
         }
 
         protected override void PopIn()

@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using OpenTK.Input;
 
@@ -29,7 +29,7 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool IsDragging => base.IsDragging || mouseScrollBarDragging;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             if (shouldPerformRightMouseScroll(state))
             {
@@ -37,32 +37,32 @@ namespace osu.Game.Graphics.Containers
                 return true;
             }
 
-            return base.OnMouseDown(state, args);
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnDrag(InputState state)
+        protected override bool OnDrag(DragEvent e)
         {
             if (mouseScrollBarDragging)
             {
-                scrollToRelative(state.Mouse.Position[ScrollDim]);
+                scrollToRelative(e.Mouse.Position[ScrollDim]);
                 return true;
             }
 
-            return base.OnDrag(state);
+            return base.OnDrag(e);
         }
 
-        protected override bool OnDragStart(InputState state)
+        protected override bool OnDragStart(DragStartEvent e)
         {
-            if (shouldPerformRightMouseScroll(state))
+            if (shouldPerformRightMouseScroll(e))
             {
                 mouseScrollBarDragging = true;
                 return true;
             }
 
-            return base.OnDragStart(state);
+            return base.OnDragStart(e);
         }
 
-        protected override bool OnDragEnd(InputState state)
+        protected override bool OnDragEnd(DragEndEvent e)
         {
             if (mouseScrollBarDragging)
             {
@@ -70,7 +70,7 @@ namespace osu.Game.Graphics.Containers
                 return true;
             }
 
-            return base.OnDragEnd(state);
+            return base.OnDragEnd(e);
         }
     }
 }
