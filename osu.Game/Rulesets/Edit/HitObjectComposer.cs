@@ -26,12 +26,12 @@ namespace osu.Game.Rulesets.Edit
 
         public IEnumerable<DrawableHitObject> HitObjects => rulesetContainer.Playfield.AllHitObjects;
 
-        protected ICompositionTool CurrentTool { get; private set; }
         protected IRulesetConfigManager Config { get; private set; }
 
         private readonly List<Container> layerContainers = new List<Container>();
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
+        private Container placementContainer;
         private EditRulesetContainer rulesetContainer;
 
         protected HitObjectComposer(Ruleset ruleset)
@@ -64,7 +64,11 @@ namespace osu.Game.Rulesets.Edit
             };
 
             var layerAboveRuleset = CreateLayerContainer();
-            layerAboveRuleset.Child = new HitObjectMaskLayer();
+            layerAboveRuleset.Children = new Drawable[]
+            {
+                new HitObjectMaskLayer(),
+                placementContainer = new Container { RelativeSizeAxes = Axes.Both }
+            };
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -144,11 +148,28 @@ namespace osu.Game.Rulesets.Edit
             });
         }
 
-        private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
+        private void setCompositionTool(HitObjectCompositionTool tool)
+        {
+            placementContainer.Clear(true);
+
+            if (tool != null)
+            {
+                var mask = tool.CreatePlacementMask();
+                mask.PlacementFinished += h =>
+                {
+                    rulesetContainer.AddHitObject(h);
+
+                    // Re-construct the mask
+                    setCompositionTool(tool);
+                };
+
+                placementContainer.Child = mask;
+            }
+        }
 
         protected abstract EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap);
 
-        protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
+        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
         /// <summary>
         /// Creates a <see cref="SelectionMask"/> for a specific <see cref="DrawableHitObject"/>.
