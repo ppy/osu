@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
+namespace osu.Game.Rulesets.Osu.Edit.Masks
 {
     public class SliderSelectionMask : SelectionMask
     {
