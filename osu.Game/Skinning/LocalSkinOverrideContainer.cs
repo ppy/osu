@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
@@ -44,30 +43,22 @@ namespace osu.Game.Skinning
             return fallbackSource?.GetSample(sampleName);
         }
 
-        public Color4? GetComboColours(int comboIndex)
-        {
-            Color4? sourceComboColours;
-            if (beatmapSkins && (sourceComboColours = source.GetComboColours(comboIndex)) != null)
-                return sourceComboColours;
-            return fallbackSource?.GetComboColours(comboIndex);
-        }
-
         public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
         {
-            TValue? val = null;
+            TValue? val;
             if ((source as Skin)?.Configuration is TConfiguration conf)
-                val = query?.Invoke(conf);
-
-            return val ?? fallbackSource?.GetValue(query);
+                if (beatmapSkins && (val = query?.Invoke(conf)) != null)
+                    return val;
+            return fallbackSource?.GetValue(query);
         }
 
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
         {
-            TValue val = null;
+            TValue val;
             if ((source as Skin)?.Configuration is TConfiguration conf)
-                val = query?.Invoke(conf);
-
-            return val ?? fallbackSource?.GetValue(query);
+                if (beatmapSkins && (val = query?.Invoke(conf)) != null)
+                    return val;
+            return fallbackSource?.GetValue(query);
         }
 
         private readonly ISkinSource source;

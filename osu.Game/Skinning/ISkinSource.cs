@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK.Graphics;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
@@ -21,8 +20,6 @@ namespace osu.Game.Skinning
         Texture GetTexture(string componentName);
 
         SampleChannel GetSample(string sampleName);
-
-        Color4? GetComboColours(int comboIndex);
 
         TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class;
 
