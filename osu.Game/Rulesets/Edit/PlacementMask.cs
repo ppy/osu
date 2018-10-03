@@ -40,6 +40,14 @@ namespace osu.Game.Rulesets.Edit
             HitObject.ApplyDefaults(workingBeatmap.Value.Beatmap.ControlPointInfo, workingBeatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Fixes a 1-frame position discrpancy due to the first mouse move event happening in the next frame
+            Position = GetContainingInputManager().CurrentState.Mouse.Position;
+        }
+
         /// <summary>
         /// Finishes the placement of <see cref="HitObject"/>.
         /// </summary>
