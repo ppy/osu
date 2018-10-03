@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     }
                     else
                         resolutionDropdown.Hide();
-                });
+                }, true);
             }
 
             letterboxing.BindValueChanged(isVisible =>

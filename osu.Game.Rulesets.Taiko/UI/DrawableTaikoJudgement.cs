@@ -31,10 +31,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             switch (Result.Type)
             {
                 case HitResult.Good:
-                    Colour = colours.GreenLight;
+                    JudgementBody.Colour = colours.GreenLight;
                     break;
                 case HitResult.Great:
-                    Colour = colours.BlueLight;
+                    JudgementBody.Colour = colours.BlueLight;
                     break;
             }
         }
