@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             Origin = Anchor.CentreLeft
         };
 
-        protected override DrawableHitObject<TaikoHitObject> GetVisualRepresentation(TaikoHitObject h)
+        public override DrawableHitObject<TaikoHitObject> GetVisualRepresentation(TaikoHitObject h)
         {
             switch (h)
             {

@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override Vector2 PlayfieldArea => new Vector2(0.86f); // matches stable's vertical offset for catcher plate
 
-        protected override DrawableHitObject<CatchHitObject> GetVisualRepresentation(CatchHitObject h)
+        public override DrawableHitObject<CatchHitObject> GetVisualRepresentation(CatchHitObject h)
         {
             switch (h)
             {
