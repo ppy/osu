@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using System.Collections.Generic;
@@ -33,11 +33,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new ManiaEditRulesetContainer(ruleset, beatmap);
 
-        protected override IReadOnlyList<ICompositionTool> CompositionTools => new ICompositionTool[]
-        {
-            new HitObjectCompositionTool<Note>("Note"),
-            new HitObjectCompositionTool<HoldNote>("Hold"),
-        };
+        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => Array.Empty<HitObjectCompositionTool>();
 
         public override SelectionMask CreateMaskFor(DrawableHitObject hitObject)
         {
