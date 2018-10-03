@@ -16,6 +16,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public const double OBJECT_RADIUS = 64;
 
         public event Action<Vector2> PositionChanged;
+        public event Action<int> StackHeightChanged;
 
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;
@@ -44,7 +45,20 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedEndPosition => EndPosition + StackOffset;
 
-        public virtual int StackHeight { get; set; }
+        private int stackHeight;
+
+        public int StackHeight
+        {
+            get => stackHeight;
+            set
+            {
+                if (stackHeight == value)
+                    return;
+                stackHeight = value;
+
+                StackHeightChanged?.Invoke(value);
+            }
+        }
 
         public Vector2 StackOffset => new Vector2(StackHeight * Scale * -6.4f);
 
