@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Edit
@@ -20,7 +21,7 @@ namespace osu.Game.Rulesets.Edit
             RelativeSizeAxes = Axes.Both;
         }
 
-        public abstract void AddHitObject(HitObject hitObject);
+        public abstract DrawableHitObject AddHitObject(HitObject hitObject);
     }
 
     public abstract class EditRulesetContainer<TObject> : EditRulesetContainer
@@ -40,7 +41,7 @@ namespace osu.Game.Rulesets.Edit
             InternalChild = rulesetContainer = CreateRulesetContainer(ruleset, workingBeatmap);
         }
 
-        public override void AddHitObject(HitObject hitObject)
+        public override DrawableHitObject AddHitObject(HitObject hitObject)
         {
             var tObject = (TObject)hitObject;
 
@@ -54,8 +55,12 @@ namespace osu.Game.Rulesets.Edit
             tObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
             processor.PostProcess();
 
-            rulesetContainer.Playfield.Add(rulesetContainer.GetVisualRepresentation(tObject));
+            var drawableObject = rulesetContainer.GetVisualRepresentation(tObject);
+
+            rulesetContainer.Playfield.Add(drawableObject);
             rulesetContainer.Playfield.PostProcess();
+
+            return drawableObject;
         }
 
         /// <summary>

@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Edit
         private readonly List<Container> layerContainers = new List<Container>();
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
+        private HitObjectMaskLayer maskLayer;
         private Container placementContainer;
         private EditRulesetContainer rulesetContainer;
 
@@ -66,7 +67,7 @@ namespace osu.Game.Rulesets.Edit
             var layerAboveRuleset = CreateLayerContainer();
             layerAboveRuleset.Children = new Drawable[]
             {
-                new HitObjectMaskLayer(),
+                maskLayer = new HitObjectMaskLayer(),
                 placementContainer = new Container { RelativeSizeAxes = Axes.Both }
             };
 
@@ -157,7 +158,9 @@ namespace osu.Game.Rulesets.Edit
                 var mask = tool.CreatePlacementMask();
                 mask.PlacementFinished += h =>
                 {
-                    rulesetContainer.AddHitObject(h);
+                    var drawableObject = rulesetContainer.AddHitObject(h);
+
+                    maskLayer.AddMask(drawableObject);
 
                     // Re-construct the mask
                     setCompositionTool(tool);
