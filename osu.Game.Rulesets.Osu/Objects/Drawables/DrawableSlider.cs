@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using OpenTK.Graphics;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -101,24 +102,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        public Color4 AccentColourBody
-        {
-            get { return Body.AccentColour; }
-            set { Body.AccentColour = value; }
-        }
-
-        public Color4 AccentColourBall
-        {
-            get { return Ball.AccentColour; }
-            set { Ball.AccentColour = value; }
-        }
-
-        public Color4 AccentColourBorder
-        {
-            get { return Body.BorderColour; }
-            set { Body.BorderColour = value; }
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
@@ -150,6 +133,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     obj.RelativeAnchorPosition = childAnchorPosition;
                 Ball.RelativeAnchorPosition = childAnchorPosition;
             }
+        }
+
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            base.SkinChanged(skin, allowFallback);
+
+            Body.AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null) ?? Body.AccentColour;
+            Body.BorderColour = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : (Color4?)null) ?? Body.BorderColour;
+            Ball.AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? Ball.AccentColour;
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
