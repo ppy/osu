@@ -49,7 +49,7 @@ namespace osu.Game.Tests.Visual
                             Vector2.Zero,
                             new Vector2(216, 0),
                         },
-                        Distance = 400,
+                        Distance = 216,
                         Velocity = 1,
                         TickDistance = 100,
                         Scale = 0.5f,
