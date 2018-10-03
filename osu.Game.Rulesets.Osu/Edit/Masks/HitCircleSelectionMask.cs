@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
-namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
+namespace osu.Game.Rulesets.Osu.Edit.Masks
 {
     public class HitCircleSelectionMask : SelectionMask
     {
