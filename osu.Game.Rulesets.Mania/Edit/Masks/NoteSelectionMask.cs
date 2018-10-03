@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 
-namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
+namespace osu.Game.Rulesets.Mania.Edit.Masks
 {
     public class NoteSelectionMask : SelectionMask
     {
