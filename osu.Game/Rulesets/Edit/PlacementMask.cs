@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using OpenTK;
@@ -24,14 +25,18 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         protected readonly HitObject HitObject;
 
+        private IAdjustableClock clock;
+
         public PlacementMask(HitObject hitObject)
         {
             HitObject = hitObject;
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap workingBeatmap)
+        private void load(IBindableBeatmap workingBeatmap, IAdjustableClock clock)
         {
+            this.clock = clock;
+
             HitObject.ApplyDefaults(workingBeatmap.Value.Beatmap.ControlPointInfo, workingBeatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty);
         }
 
@@ -39,6 +44,13 @@ namespace osu.Game.Rulesets.Edit
         /// Finishes the placement of <see cref="HitObject"/>.
         /// </summary>
         public void Finish() => PlacementFinished?.Invoke(HitObject);
+
+        protected override void Update()
+        {
+            base.Update();
+
+            HitObject.StartTime = clock.CurrentTime;
+        }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.ReceivePositionalInputAt(screenSpacePos) ?? false;
 
