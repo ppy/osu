@@ -61,6 +61,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = circle.DrawSize;
 
             HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
+            HitObject.StackHeightChanged += _ => Position = HitObject.StackedPosition;
         }
 
         public override Color4 AccentColour
