@@ -97,6 +97,9 @@ namespace osu.Game.Graphics.UserInterface
             #region DrawableOsuDropdownMenuItem
             public class DrawableOsuDropdownMenuItem : DrawableDropdownMenuItem, IHasAccentColour
             {
+                // IsHovered is used
+                public override bool HandlePositionalInput => true;
+
                 private Color4? accentColour;
                 public Color4 AccentColour
                 {
