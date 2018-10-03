@@ -57,6 +57,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             if (HitObject is IHasComboInformation combo)
                 AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : (Color4?)null) ?? Color4.White;
+            if (this is DrawableSlider slider)
+            {
+                slider.AccentColourBody = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : (Color4?)null) ?? slider.AccentColourBody;
+                slider.AccentColourBall = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : (Color4?)null) ?? slider.AccentColourBall;
+                slider.AccentColourBorder = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : (Color4?)null) ?? slider.AccentColourBorder;
+            }
         }
 
         protected virtual void UpdatePreemptState() => this.FadeIn(HitObject.TimeFadeIn);

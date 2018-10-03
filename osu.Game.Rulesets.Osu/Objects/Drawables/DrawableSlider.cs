@@ -101,6 +101,24 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        public Color4 AccentColourBody
+        {
+            get { return Body.AccentColour; }
+            set { Body.AccentColour = value; }
+        }
+
+        public Color4 AccentColourBall
+        {
+            get { return Ball.AccentColour; }
+            set { Ball.AccentColour = value; }
+        }
+
+        public Color4 AccentColourBorder
+        {
+            get { return Body.BorderColour; }
+            set { Body.BorderColour = value; }
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
