@@ -1,12 +1,10 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks
 {
@@ -16,22 +14,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
             : base(hitCircle)
         {
             Origin = Anchor.Centre;
-
+            AutoSizeAxes = Axes.Both;
             Position = hitCircle.Position;
-            Size = hitCircle.Size;
-            Scale = hitCircle.Scale;
 
-            CornerRadius = Size.X / 2;
-
-            AddInternal(new RingPiece());
+            InternalChild = new HitCircleMask((HitCircle)hitCircle.HitObject);
 
             hitCircle.HitObject.PositionChanged += _ => Position = hitCircle.Position;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            Colour = colours.Yellow;
         }
     }
 }
