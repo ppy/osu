@@ -14,12 +14,12 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
 {
-    public class SliderMask : HitObjectMask
+    public class SliderSelectionMask : SelectionMask
     {
         private readonly SliderBody body;
         private readonly DrawableSlider slider;
 
-        public SliderMask(DrawableSlider slider)
+        public SliderSelectionMask(DrawableSlider slider)
             : base(slider)
         {
             this.slider = slider;
@@ -35,8 +35,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
                     AccentColour = Color4.Transparent,
                     PathWidth = sliderObject.Scale * 64
                 },
-                new SliderCircleMask(slider.HeadCircle, slider),
-                new SliderCircleMask(slider.TailCircle, slider),
+                new SliderCircleSelectionMask(slider.HeadCircle, slider),
+                new SliderCircleSelectionMask(slider.TailCircle, slider),
             };
 
             sliderObject.PositionChanged += _ => Position = slider.Position;

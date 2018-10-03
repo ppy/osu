@@ -9,9 +9,9 @@ using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
 {
-    public class NoteMask : HitObjectMask
+    public class NoteSelectionMask : SelectionMask
     {
-        public NoteMask(DrawableNote note)
+        public NoteSelectionMask(DrawableNote note)
             : base(note)
         {
             Scale = note.Scale;

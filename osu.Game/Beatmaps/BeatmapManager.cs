@@ -350,7 +350,7 @@ namespace osu.Game.Beatmaps
                 OnlineBeatmapSetID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
                 Hash = computeBeatmapSetHash(reader),
-                Metadata = beatmap.Metadata
+                Metadata = beatmap.Metadata,
             };
         }
 

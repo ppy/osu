@@ -10,9 +10,9 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
 {
-    public class HitCircleMask : HitObjectMask
+    public class HitCircleSelectionMask : SelectionMask
     {
-        public HitCircleMask(DrawableHitCircle hitCircle)
+        public HitCircleSelectionMask(DrawableHitCircle hitCircle)
             : base(hitCircle)
         {
             Origin = Anchor.Centre;

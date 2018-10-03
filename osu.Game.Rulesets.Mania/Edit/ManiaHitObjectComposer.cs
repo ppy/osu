@@ -40,14 +40,14 @@ namespace osu.Game.Rulesets.Mania.Edit
             new HitObjectCompositionTool<HoldNote>("Hold"),
         };
 
-        public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)
+        public override SelectionMask CreateMaskFor(DrawableHitObject hitObject)
         {
             switch (hitObject)
             {
                 case DrawableNote note:
-                    return new NoteMask(note);
+                    return new NoteSelectionMask(note);
                 case DrawableHoldNote holdNote:
-                    return new HoldNoteMask(holdNote);
+                    return new HoldNoteSelectionMask(holdNote);
             }
 
             return base.CreateMaskFor(hitObject);
