@@ -151,10 +151,10 @@ namespace osu.Game.Rulesets.Edit
         protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
 
         /// <summary>
-        /// Creates a <see cref="HitObjectMask"/> for a specific <see cref="DrawableHitObject"/>.
+        /// Creates a <see cref="SelectionMask"/> for a specific <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
-        public virtual HitObjectMask CreateMaskFor(DrawableHitObject hitObject) => null;
+        public virtual SelectionMask CreateMaskFor(DrawableHitObject hitObject) => null;
 
         /// <summary>
         /// Creates a <see cref="MaskSelection"/> which outlines <see cref="DrawableHitObject"/>s

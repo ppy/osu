@@ -12,21 +12,21 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
 {
-    public class SliderCircleMask : HitObjectMask
+    public class SliderCircleSelectionMask : SelectionMask
     {
-        public SliderCircleMask(DrawableHitCircle sliderHead, DrawableSlider slider)
+        public SliderCircleSelectionMask(DrawableHitCircle sliderHead, DrawableSlider slider)
             : this(sliderHead, Vector2.Zero, slider)
         {
         }
 
-        public SliderCircleMask(DrawableSliderTail sliderTail, DrawableSlider slider)
+        public SliderCircleSelectionMask(DrawableSliderTail sliderTail, DrawableSlider slider)
             : this(sliderTail, ((Slider)slider.HitObject).Curve.PositionAt(1), slider)
         {
         }
 
         private readonly DrawableOsuHitObject hitObject;
 
-        private SliderCircleMask(DrawableOsuHitObject hitObject, Vector2 position, DrawableSlider slider)
+        private SliderCircleSelectionMask(DrawableOsuHitObject hitObject, Vector2 position, DrawableSlider slider)
             : base(hitObject)
         {
             this.hitObject = hitObject;

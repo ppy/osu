@@ -13,36 +13,36 @@ using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
-    public class MaskContainer : Container<HitObjectMask>
+    public class MaskContainer : Container<SelectionMask>
     {
         /// <summary>
-        /// Invoked when any <see cref="HitObjectMask"/> is selected.
+        /// Invoked when any <see cref="SelectionMask"/> is selected.
         /// </summary>
-        public event Action<HitObjectMask> MaskSelected;
+        public event Action<SelectionMask> MaskSelected;
 
         /// <summary>
-        /// Invoked when any <see cref="HitObjectMask"/> is deselected.
+        /// Invoked when any <see cref="SelectionMask"/> is deselected.
         /// </summary>
-        public event Action<HitObjectMask> MaskDeselected;
+        public event Action<SelectionMask> MaskDeselected;
 
         /// <summary>
-        /// Invoked when any <see cref="HitObjectMask"/> requests selection.
+        /// Invoked when any <see cref="SelectionMask"/> requests selection.
         /// </summary>
-        public event Action<HitObjectMask, InputState> MaskSelectionRequested;
+        public event Action<SelectionMask, InputState> MaskSelectionRequested;
 
         /// <summary>
-        /// Invoked when any <see cref="HitObjectMask"/> requests drag.
+        /// Invoked when any <see cref="SelectionMask"/> requests drag.
         /// </summary>
-        public event Action<HitObjectMask, Vector2, InputState> MaskDragRequested;
+        public event Action<SelectionMask, Vector2, InputState> MaskDragRequested;
 
-        private IEnumerable<HitObjectMask> aliveMasks => AliveInternalChildren.Cast<HitObjectMask>();
+        private IEnumerable<SelectionMask> aliveMasks => AliveInternalChildren.Cast<SelectionMask>();
 
         public MaskContainer()
         {
             RelativeSizeAxes = Axes.Both;
         }
 
-        public override void Add(HitObjectMask drawable)
+        public override void Add(SelectionMask drawable)
         {
             if (drawable == null) throw new ArgumentNullException(nameof(drawable));
 
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             drawable.DragRequested += onDragRequested;
         }
 
-        public override bool Remove(HitObjectMask drawable)
+        public override bool Remove(SelectionMask drawable)
         {
             if (drawable == null) throw new ArgumentNullException(nameof(drawable));
 
@@ -87,33 +87,33 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         }
 
         /// <summary>
-        /// Deselects all selected <see cref="HitObjectMask"/>s.
+        /// Deselects all selected <see cref="SelectionMask"/>s.
         /// </summary>
         public void DeselectAll() => aliveMasks.ToList().ForEach(m => m.Deselect());
 
-        private void onMaskSelected(HitObjectMask mask)
+        private void onMaskSelected(SelectionMask mask)
         {
             MaskSelected?.Invoke(mask);
             ChangeChildDepth(mask, 1);
         }
 
-        private void onMaskDeselected(HitObjectMask mask)
+        private void onMaskDeselected(SelectionMask mask)
         {
             MaskDeselected?.Invoke(mask);
             ChangeChildDepth(mask, 0);
         }
 
-        private void onSelectionRequested(HitObjectMask mask, InputState state) => MaskSelectionRequested?.Invoke(mask, state);
-        private void onDragRequested(HitObjectMask mask, Vector2 delta, InputState state) => MaskDragRequested?.Invoke(mask, delta, state);
+        private void onSelectionRequested(SelectionMask mask, InputState state) => MaskSelectionRequested?.Invoke(mask, state);
+        private void onDragRequested(SelectionMask mask, Vector2 delta, InputState state) => MaskDragRequested?.Invoke(mask, delta, state);
 
         protected override int Compare(Drawable x, Drawable y)
         {
-            if (!(x is HitObjectMask xMask) || !(y is HitObjectMask yMask))
+            if (!(x is SelectionMask xMask) || !(y is SelectionMask yMask))
                 return base.Compare(x, y);
             return Compare(xMask, yMask);
         }
 
-        public int Compare(HitObjectMask x, HitObjectMask y)
+        public int Compare(SelectionMask x, SelectionMask y)
         {
             // dpeth is used to denote selected status (we always want selected masks to handle input first).
             int d = x.Depth.CompareTo(y.Depth);
