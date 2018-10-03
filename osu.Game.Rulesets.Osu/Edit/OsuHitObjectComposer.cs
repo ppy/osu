@@ -34,14 +34,14 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override Container CreateLayerContainer() => new PlayfieldAdjustmentContainer { RelativeSizeAxes = Axes.Both };
 
-        public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)
+        public override SelectionMask CreateMaskFor(DrawableHitObject hitObject)
         {
             switch (hitObject)
             {
                 case DrawableHitCircle circle:
-                    return new HitCircleMask(circle);
+                    return new HitCircleSelectionMask(circle);
                 case DrawableSlider slider:
-                    return new SliderMask(slider);
+                    return new SliderSelectionMask(slider);
             }
 
             return base.CreateMaskFor(hitObject);
