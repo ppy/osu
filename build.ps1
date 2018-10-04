@@ -1,7 +1,5 @@
 ##########################################################################
-# This is the Cake bootstrapper script for PowerShell.
-# This file was downloaded from https://github.com/cake-build/resources
-# Feel free to change this file to fit your needs.
+# This is a customized Cake bootstrapper script for PowerShell.
 ##########################################################################
 
 <#
@@ -10,7 +8,7 @@
 This is a Powershell script to bootstrap a Cake build.
 
 .DESCRIPTION
-This Powershell script will download NuGet if missing, restore NuGet tools (including Cake)
+This Powershell script restores NuGet tools (including Cake)
 and execute your Cake build script with the parameters you provide.
 
 .PARAMETER Script
@@ -49,17 +47,21 @@ Param(
 
 Write-Host "Preparing to run build script..."
 
+# Determine the script root for resolving other paths.
 if(!$PSScriptRoot){
     $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent
 }
 
+# Resolve the paths for resources used for debugging.
 $TOOLS_DIR = Join-Path $PSScriptRoot "tools"
-$CAKE_CSPROJ = Join-Path $TOOLS_DIR "cake.csproj"
+$CAKE_CSPROJ = Join-Path $TOOLS_DIR "cakebootstrap.csproj"
 
-Invoke-Expression "dotnet restore `"$CAKE_CSPROJ`" --packages `"$TOOLS_DIR`""
+# Install the required tools locally.
+Write-Host "Restoring cake tools..."
+Invoke-Expression "dotnet restore `"$CAKE_CSPROJ`" --packages `"$TOOLS_DIR`"" | Out-Null
 
 # Find the Cake executable
-$CAKE_EXECUTABLE = (Get-ChildItem -Path ./tools/cake.coreclr/ -Filter Cake.dll -Recurse).FullName
+$CAKE_EXECUTABLE = (Get-ChildItem -Path ./tools/cake.tool/ -Filter Cake.dll -Recurse).FullName
 
 # Build Cake arguments
 $cakeArguments = @("$Script");
@@ -69,7 +71,6 @@ if ($Verbosity) { $cakeArguments += "-verbosity=$Verbosity" }
 if ($ShowDescription) { $cakeArguments += "-showdescription" }
 if ($DryRun) { $cakeArguments += "-dryrun" }
 if ($Experimental) { $cakeArguments += "-experimental" }
-if ($Mono) { $cakeArguments += "-mono" }
 $cakeArguments += $ScriptArgs
 
 # Start Cake
