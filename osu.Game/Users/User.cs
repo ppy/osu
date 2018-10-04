@@ -83,7 +83,7 @@ namespace osu.Game.Users
         [JsonProperty(@"location")]
         public string Location;
 
-        [JsonProperty(@"lastvisit")]
+        [JsonProperty(@"last_visit")]
         public DateTimeOffset LastVisit;
 
         [JsonProperty(@"twitter")]
