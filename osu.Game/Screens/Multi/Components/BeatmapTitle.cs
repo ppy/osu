@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
@@ -13,8 +12,6 @@ namespace osu.Game.Screens.Multi.Components
     public class BeatmapTitle : FillFlowContainer<OsuSpriteText>
     {
         private readonly OsuSpriteText beatmapTitle, beatmapDash, beatmapArtist;
-
-        private LocalisationEngine localisation;
 
         public float TextSize
         {
@@ -48,12 +45,6 @@ namespace osu.Game.Screens.Multi.Components
             };
         }
 
-        [BackgroundDependencyLoader]
-        private void load(LocalisationEngine localisation)
-        {
-            this.localisation = localisation;
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -64,15 +55,14 @@ namespace osu.Game.Screens.Multi.Components
         {
             if (beatmap == null)
             {
-                beatmapTitle.Current = beatmapArtist.Current = null;
                 beatmapTitle.Text = "Changing map";
                 beatmapDash.Text = beatmapArtist.Text = string.Empty;
             }
             else
             {
-                beatmapTitle.Current = localisation.GetUnicodePreference(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title);
+                beatmapTitle.Text = new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title));
                 beatmapDash.Text = @" - ";
-                beatmapArtist.Current = localisation.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist);
+                beatmapArtist.Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist));
             }
         }
     }

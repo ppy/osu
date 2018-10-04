@@ -47,10 +47,10 @@ namespace osu.Game.Graphics.UserInterface
             public readonly SpriteIcon Chevron;
 
             //don't allow clicking between transitions and don't make the chevron clickable
-            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Alpha == 1f && Text.ReceiveMouseInputAt(screenSpacePos);
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Alpha == 1f && Text.ReceivePositionalInputAt(screenSpacePos);
 
-            public override bool HandleKeyboardInput => State == Visibility.Visible;
-            public override bool HandleMouseInput => State == Visibility.Visible;
+            public override bool HandleNonPositionalInput => State == Visibility.Visible;
+            public override bool HandlePositionalInput => State == Visibility.Visible;
             public override bool IsRemovable => true;
 
             private Visibility state;
