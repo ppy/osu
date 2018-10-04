@@ -37,6 +37,7 @@ namespace osu.Game.Tests.Visual
             typeof(HitCirclePiece),
             typeof(HitCircleSelectionMask),
             typeof(HitCirclePlacementMask),
+            typeof(SliderSelectionMask),
         };
 
         private HitObjectComposer composer;
