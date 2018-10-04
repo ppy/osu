@@ -27,9 +27,10 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override RulesetContainer<OsuHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             => new OsuEditRulesetContainer(ruleset, beatmap);
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new[]
+        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
             new HitCircleCompositionTool(),
+            new SliderCompositionTool(),
         };
 
         protected override Container CreateLayerContainer() => new PlayfieldAdjustmentContainer { RelativeSizeAxes = Axes.Both };
