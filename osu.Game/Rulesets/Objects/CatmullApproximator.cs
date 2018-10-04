@@ -1,40 +1,32 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public readonly ref struct CatmullApproximator
+    public class CatmullApproximator : IApproximator
     {
         /// <summary>
         /// The amount of pieces to calculate for each controlpoint quadruplet.
         /// </summary>
         private const int detail = 50;
 
-        private readonly ReadOnlySpan<Vector2> controlPoints;
-
-        public CatmullApproximator(ReadOnlySpan<Vector2> controlPoints)
-        {
-            this.controlPoints = controlPoints;
-        }
-
         /// <summary>
         /// Creates a piecewise-linear approximation of a Catmull-Rom spline.
         /// </summary>
         /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-        public List<Vector2> CreateCatmull()
+        public List<Vector2> Approximate(List<Vector2> controlPoints)
         {
-            var result = new List<Vector2>((controlPoints.Length - 1) * detail * 2);
+            var result = new List<Vector2>();
 
-            for (int i = 0; i < controlPoints.Length - 1; i++)
+            for (int i = 0; i < controlPoints.Count - 1; i++)
             {
                 var v1 = i > 0 ? controlPoints[i - 1] : controlPoints[i];
                 var v2 = controlPoints[i];
-                var v3 = i < controlPoints.Length - 1 ? controlPoints[i + 1] : v2 + v2 - v1;
-                var v4 = i < controlPoints.Length - 2 ? controlPoints[i + 2] : v3 + v3 - v2;
+                var v3 = i < controlPoints.Count - 1 ? controlPoints[i + 1] : v2 + v2 - v1;
+                var v4 = i < controlPoints.Count - 2 ? controlPoints[i + 2] : v3 + v3 - v2;
 
                 for (int c = 0; c < detail; c++)
                 {
