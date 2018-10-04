@@ -8,8 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -26,7 +25,7 @@ namespace osu.Game.Overlays.Dialog
         public static readonly float ENTER_DURATION = 500;
         public static readonly float EXIT_DURATION = 200;
 
-        protected override bool BlockPassThroughMouse => false;
+        protected override bool BlockPositionalInput => false;
 
         private readonly Vector2 ringSize = new Vector2(100f);
         private readonly Vector2 ringMinifiedSize = new Vector2(20f);
@@ -199,19 +198,19 @@ namespace osu.Game.Overlays.Dialog
             switch (action)
             {
                 case GlobalAction.Select:
-                    Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.TriggerOnClick();
+                    Buttons.OfType<PopupDialogOkButton>().FirstOrDefault()?.Click();
                     return true;
             }
 
             return base.OnPressed(action);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (args.Repeat) return false;
+            if (e.Repeat) return false;
 
             // press button at number if 1-9 on number row or keypad are pressed
-            var k = args.Key;
+            var k = e.Key;
             if (k >= Key.Number1 && k <= Key.Number9)
             {
                 pressButtonAtIndex(k - Key.Number1);
@@ -224,7 +223,7 @@ namespace osu.Game.Overlays.Dialog
                 return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
         protected override void PopIn()
@@ -252,7 +251,7 @@ namespace osu.Game.Overlays.Dialog
             if (!actionInvoked)
                 // In the case a user did not choose an action before a hide was triggered, press the last button.
                 // This is presumed to always be a sane default "cancel" action.
-                buttonsContainer.Last().TriggerOnClick();
+                buttonsContainer.Last().Click();
 
             base.PopOut();
             content.FadeOut(EXIT_DURATION, Easing.InSine);
@@ -261,7 +260,7 @@ namespace osu.Game.Overlays.Dialog
         private void pressButtonAtIndex(int index)
         {
             if (index < Buttons.Count())
-                Buttons.Skip(index).First().TriggerOnClick();
+                Buttons.Skip(index).First().Click();
         }
     }
 }

@@ -3,8 +3,7 @@
 
 using OpenTK.Graphics;
 using System;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 using OpenTK.Input;
 
@@ -34,22 +33,22 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         // We may not be focused yet, but we need to handle keyboard input to be able to request focus
-        public override bool HandleKeyboardInput => HoldFocus || base.HandleKeyboardInput;
+        public override bool HandleNonPositionalInput => HoldFocus || base.HandleNonPositionalInput;
 
-        protected override void OnFocus(InputState state)
+        protected override void OnFocus(FocusEvent e)
         {
-            base.OnFocus(state);
+            base.OnFocus(e);
             BorderThickness = 0;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (!HasFocus) return false;
 
-            if (args.Key == Key.Escape)
+            if (e.Key == Key.Escape)
                 return false; // disable the framework-level handling of escape key for confority (we use GlobalAction.Back).
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
         public override bool OnPressed(GlobalAction action)
