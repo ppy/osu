@@ -2,14 +2,19 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Lines;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using OpenTK;
+using OpenTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks
 {
@@ -19,10 +24,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
 
         private readonly CirclePlacementMask headMask;
         private readonly CirclePlacementMask tailMask;
+        private readonly Path path;
 
-        private readonly List<Vector2> controlPoints = new List<Vector2>();
+        private readonly List<Segment> segments = new List<Segment>();
+        private Vector2 cursor;
 
-        private PlacementState state = PlacementState.Head;
+        private PlacementState state;
 
         public SliderPlacementMask()
             : base(new Slider())
@@ -31,22 +38,32 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
 
             InternalChildren = new Drawable[]
             {
+                path = new Path { PathWidth = 5 },
                 headMask = new CirclePlacementMask(),
                 tailMask = new CirclePlacementMask(),
             };
 
-            setState(PlacementState.Head);
+            segments.Add(new Segment(Vector2.Zero));
+
+            setState(PlacementState.Initial);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            path.Colour = colours.Yellow;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             switch (state)
             {
-                case PlacementState.Head:
+                case PlacementState.Initial:
                     headMask.Position = e.MousePosition;
                     return true;
-                case PlacementState.Tail:
-                    tailMask.Position = ToLocalSpace(e.ScreenSpaceMousePosition);
+                case PlacementState.Body:
+                    tailMask.Position = e.MousePosition;
+                    cursor = tailMask.Position - headMask.Position;
                     return true;
             }
 
@@ -57,31 +74,84 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
         {
             switch (state)
             {
-                case PlacementState.Head:
-                    setState(PlacementState.Tail);
-                    controlPoints.Add(Vector2.Zero);
+                case PlacementState.Initial:
+                    beginCurve();
                     break;
-                case PlacementState.Tail:
-                    controlPoints.Add(tailMask.Position - headMask.Position);
-                    HitObject.Position = headMask.Position;
-                    HitObject.ControlPoints = controlPoints.ToList();
-                    HitObject.CurveType = CurveType.Linear;
-                    HitObject.Distance = Vector2.Distance(controlPoints.First(), controlPoints.Last());
-                    Finish();
+                case PlacementState.Body:
+                    switch (e.Button)
+                    {
+                        case MouseButton.Left:
+                            segments.Last().ControlPoints.Add(cursor);
+                            break;
+                    }
+
                     break;
             }
 
-            return base.OnClick(e);
+            return true;
+        }
+
+        protected override bool OnMouseUp(MouseUpEvent e)
+        {
+            if (state == PlacementState.Body && e.Button == MouseButton.Right)
+                endCurve();
+            return base.OnMouseUp(e);
+        }
+
+        protected override bool OnDoubleClick(DoubleClickEvent e)
+        {
+            segments.Add(new Segment(segments[segments.Count - 1].ControlPoints.Last()));
+            return true;
+        }
+
+        private void beginCurve()
+        {
+            setState(PlacementState.Body);
+        }
+
+        private void endCurve()
+        {
+            HitObject.Position = headMask.Position;
+            HitObject.ControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToList();
+            HitObject.CurveType = HitObject.ControlPoints.Count > 2 ? CurveType.Bezier : CurveType.Linear;
+            HitObject.Distance = segments.Sum(s => s.Distance);
+
+            Finish();
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            segments.ForEach(s => s.Calculate());
+
+            switch (state)
+            {
+                case PlacementState.Body:
+                    path.Position = headMask.Position;
+                    path.PathWidth = 10;
+
+                    path.ClearVertices();
+
+                    for (int i = 0; i < segments.Count; i++)
+                    {
+                        var segmentPath = segments[i].Calculate(i == segments.Count - 1 ? (Vector2?)cursor : null);
+                        segmentPath.ForEach(v => path.AddVertex(v));
+                    }
+
+                    path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
+                    break;
+            }
         }
 
         private void setState(PlacementState newState)
         {
             switch (newState)
             {
-                case PlacementState.Head:
+                case PlacementState.Initial:
                     tailMask.Alpha = 0;
                     break;
-                case PlacementState.Tail:
+                case PlacementState.Body:
                     tailMask.Alpha = 1;
                     break;
             }
@@ -91,9 +161,52 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
 
         private enum PlacementState
         {
-            Head,
+            Initial,
             Body,
-            Tail
+        }
+
+        private class Segment
+        {
+            public float Distance { get; private set; }
+
+            public readonly List<Vector2> ControlPoints = new List<Vector2>();
+            public IApproximator Approximator = new LinearApproximator();
+
+            public Segment(Vector2 offset)
+            {
+                ControlPoints.Add(offset);
+            }
+
+            public List<Vector2> Calculate(Vector2? cursor = null)
+            {
+                var allControlPoints = ControlPoints.ToList();
+                if (cursor.HasValue)
+                    allControlPoints.Add(cursor.Value);
+
+                IApproximator approximator;
+
+                switch (Approximator)
+                {
+                    case null:
+                        approximator = new LinearApproximator();
+                        break;
+                    case LinearApproximator _ when allControlPoints.Count > 2:
+                    case CircularArcApproximator _ when allControlPoints.Count > 3:
+                        approximator = new BezierApproximator();
+                        break;
+                    default:
+                        approximator = Approximator;
+                        break;
+                }
+
+                Distance = 0;
+
+                var points = approximator.Approximate(allControlPoints);
+                for (int i = 0; i < points.Count - 1; i++)
+                    Distance += Vector2.Distance(points[i], points[i + 1]);
+
+                return points;
+            }
         }
     }
 }
