@@ -54,7 +54,7 @@ if(!$PSScriptRoot){
 
 # Resolve the paths for resources used for debugging.
 $TOOLS_DIR = Join-Path $PSScriptRoot "tools"
-$CAKE_CSPROJ = Join-Path $TOOLS_DIR "cakebootstrap.csproj"
+$CAKE_CSPROJ = Join-Path $TOOLS_DIR "cakebuild.csproj"
 
 # Install the required tools locally.
 Write-Host "Restoring cake tools..."
