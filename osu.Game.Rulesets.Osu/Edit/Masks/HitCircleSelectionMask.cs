@@ -19,7 +19,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
 
             InternalChild = new HitCircleMask((HitCircle)hitCircle.HitObject);
 
-            hitCircle.HitObject.PositionChanged += _ => Position = hitCircle.Position;
+            hitCircle.HitObject.PositionChanged += _ => Position = hitCircle.HitObject.StackedPosition;
+            hitCircle.HitObject.StackHeightChanged += _ => Position = hitCircle.HitObject.StackedPosition;
         }
     }
 }
