@@ -206,22 +206,19 @@ namespace osu.Game.Rulesets.UI
             mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            if (mouseDisabled.Value && (e.Button == MouseButton.Left || e.Button == MouseButton.Right)) return false;
-            return base.OnMouseDown(e);
-        }
-
-        protected override bool OnMouseUp(MouseUpEvent e)
-        {
-            if (!CurrentState.Mouse.IsPressed(e.Button)) return false;
-            return base.OnMouseUp(e);
-        }
-
         protected override bool Handle(UIEvent e)
         {
-            if (mouseDisabled.Value && e is MouseDownEvent me && (me.Button == MouseButton.Left || me.Button == MouseButton.Right)) return false;
-
+            switch (e)
+            {
+                case MouseDownEvent mouseDown when mouseDown.Button == MouseButton.Left || mouseDown.Button == MouseButton.Right:
+                    if (mouseDisabled.Value)
+                        return false;
+                    break;
+                case MouseUpEvent mouseUp:
+                    if (!CurrentState.Mouse.IsPressed(mouseUp.Button))
+                        return false;
+                    break;
+            }
             return base.Handle(e);
         }
 
