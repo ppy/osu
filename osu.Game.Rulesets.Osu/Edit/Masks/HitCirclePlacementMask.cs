@@ -21,16 +21,25 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
             InternalChild = new HitCircleMask(HitObject);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Fixes a 1-frame position discrpancy due to the first mouse move event happening in the next frame
+            Position = GetContainingInputManager().CurrentState.Mouse.Position;
+        }
+
         protected override bool OnClick(ClickEvent e)
         {
+            HitObject.Position = e.MousePosition;
             Finish();
             return true;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            HitObject.Position = e.MousePosition;
-            return base.OnMouseMove(e);
+            Position = e.MousePosition;
+            return true;
         }
     }
 }
