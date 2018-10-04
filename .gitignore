@@ -12,8 +12,7 @@
 
 ### Cake ###
 tools/*
-!tools/packages.config
-!tools/cake.csproj
+!tools/cakebuild.csproj
 
 # Build results
 bin/[Dd]ebug/
