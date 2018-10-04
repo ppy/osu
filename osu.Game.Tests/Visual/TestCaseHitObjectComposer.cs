@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Edit;
+using osu.Game.Rulesets.Osu.Edit.Masks;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Tests.Beatmaps;
@@ -29,7 +30,10 @@ namespace osu.Game.Tests.Visual
             typeof(HitObjectComposer),
             typeof(OsuHitObjectComposer),
             typeof(HitObjectMaskLayer),
-            typeof(NotNullAttribute)
+            typeof(NotNullAttribute),
+            typeof(HitCircleMask),
+            typeof(HitCircleSelectionMask),
+            typeof(HitCirclePlacementMask),
         };
 
         [BackgroundDependencyLoader]
