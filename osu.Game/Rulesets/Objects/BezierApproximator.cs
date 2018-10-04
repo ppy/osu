@@ -1,29 +1,77 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public readonly ref struct BezierApproximator
+    public class BezierApproximator : IApproximator
     {
-        private readonly int count;
-        private readonly ReadOnlySpan<Vector2> controlPoints;
-        private readonly Vector2[] subdivisionBuffer1;
-        private readonly Vector2[] subdivisionBuffer2;
-
         private const float tolerance = 0.25f;
         private const float tolerance_sq = tolerance * tolerance;
 
-        public BezierApproximator(ReadOnlySpan<Vector2> controlPoints)
-        {
-            this.controlPoints = controlPoints;
-            count = controlPoints.Length;
+        private int count;
+        private Vector2[] subdivisionBuffer1;
+        private Vector2[] subdivisionBuffer2;
 
+        /// <summary>
+        /// Creates a piecewise-linear approximation of a bezier curve, by adaptively repeatedly subdividing
+        /// the control points until their approximation error vanishes below a given threshold.
+        /// </summary>
+        /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
+        public List<Vector2> Approximate(List<Vector2> controlPoints)
+        {
+            count = controlPoints.Count;
             subdivisionBuffer1 = new Vector2[count];
             subdivisionBuffer2 = new Vector2[count * 2 - 1];
+
+             List<Vector2> output = new List<Vector2>();
+
+            if (count == 0)
+                return output;
+
+            Stack<Vector2[]> toFlatten = new Stack<Vector2[]>();
+            Stack<Vector2[]> freeBuffers = new Stack<Vector2[]>();
+
+            // "toFlatten" contains all the curves which are not yet approximated well enough.
+            // We use a stack to emulate recursion without the risk of running into a stack overflow.
+            // (More specifically, we iteratively and adaptively refine our curve with a
+            // <a href="https://en.wikipedia.org/wiki/Depth-first_search">Depth-first search</a>
+            // over the tree resulting from the subdivisions we make.)
+            toFlatten.Push(controlPoints.ToArray());
+
+            Vector2[] leftChild = subdivisionBuffer2;
+
+            while (toFlatten.Count > 0)
+            {
+                Vector2[] parent = toFlatten.Pop();
+                if (isFlatEnough(parent))
+                {
+                    // If the control points we currently operate on are sufficiently "flat", we use
+                    // an extension to De Casteljau's algorithm to obtain a piecewise-linear approximation
+                    // of the bezier curve represented by our control points, consisting of the same amount
+                    // of points as there are control points.
+                    approximate(parent, output);
+                    freeBuffers.Push(parent);
+                    continue;
+                }
+
+                // If we do not yet have a sufficiently "flat" (in other words, detailed) approximation we keep
+                // subdividing the curve we are currently operating on.
+                Vector2[] rightChild = freeBuffers.Count > 0 ? freeBuffers.Pop() : new Vector2[count];
+                subdivide(parent, leftChild, rightChild);
+
+                // We re-use the buffer of the parent for one of the children, so that we save one allocation per iteration.
+                for (int i = 0; i < count; ++i)
+                    parent[i] = leftChild[i];
+
+                toFlatten.Push(rightChild);
+                toFlatten.Push(parent);
+            }
+
+            output.Add(controlPoints[count - 1]);
+            return output;
         }
 
         /// <summary>
@@ -91,61 +139,6 @@ namespace osu.Game.Rulesets.Objects
                 Vector2 p = 0.25f * (l[index - 1] + 2 * l[index] + l[index + 1]);
                 output.Add(p);
             }
-        }
-
-        /// <summary>
-        /// Creates a piecewise-linear approximation of a bezier curve, by adaptively repeatedly subdividing
-        /// the control points until their approximation error vanishes below a given threshold.
-        /// </summary>
-        /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-        public List<Vector2> CreateBezier()
-        {
-            List<Vector2> output = new List<Vector2>();
-
-            if (count == 0)
-                return output;
-
-            Stack<Vector2[]> toFlatten = new Stack<Vector2[]>();
-            Stack<Vector2[]> freeBuffers = new Stack<Vector2[]>();
-
-            // "toFlatten" contains all the curves which are not yet approximated well enough.
-            // We use a stack to emulate recursion without the risk of running into a stack overflow.
-            // (More specifically, we iteratively and adaptively refine our curve with a
-            // <a href="https://en.wikipedia.org/wiki/Depth-first_search">Depth-first search</a>
-            // over the tree resulting from the subdivisions we make.)
-            toFlatten.Push(controlPoints.ToArray());
-
-            Vector2[] leftChild = subdivisionBuffer2;
-
-            while (toFlatten.Count > 0)
-            {
-                Vector2[] parent = toFlatten.Pop();
-                if (isFlatEnough(parent))
-                {
-                    // If the control points we currently operate on are sufficiently "flat", we use
-                    // an extension to De Casteljau's algorithm to obtain a piecewise-linear approximation
-                    // of the bezier curve represented by our control points, consisting of the same amount
-                    // of points as there are control points.
-                    approximate(parent, output);
-                    freeBuffers.Push(parent);
-                    continue;
-                }
-
-                // If we do not yet have a sufficiently "flat" (in other words, detailed) approximation we keep
-                // subdividing the curve we are currently operating on.
-                Vector2[] rightChild = freeBuffers.Count > 0 ? freeBuffers.Pop() : new Vector2[count];
-                subdivide(parent, leftChild, rightChild);
-
-                // We re-use the buffer of the parent for one of the children, so that we save one allocation per iteration.
-                for (int i = 0; i < count; ++i)
-                    parent[i] = leftChild[i];
-
-                toFlatten.Push(rightChild);
-                toFlatten.Push(parent);
-            }
-
-            output.Add(controlPoints[count - 1]);
-            return output;
         }
     }
 }
