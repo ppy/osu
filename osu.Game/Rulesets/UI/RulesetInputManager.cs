@@ -73,12 +73,10 @@ namespace osu.Game.Rulesets.UI
         #region IHasReplayHandler
 
         private ReplayInputHandler replayInputHandler;
+
         public ReplayInputHandler ReplayInputHandler
         {
-            get
-            {
-                return replayInputHandler;
-            }
+            get => replayInputHandler;
             set
             {
                 if (replayInputHandler != null) RemoveHandler(replayInputHandler);
@@ -220,6 +218,13 @@ namespace osu.Game.Rulesets.UI
             return base.OnMouseUp(e);
         }
 
+        protected override bool Handle(UIEvent e)
+        {
+            if (mouseDisabled.Value && e is MouseDownEvent me && (me.Button == MouseButton.Left || me.Button == MouseButton.Right)) return false;
+
+            return base.Handle(e);
+        }
+
         #endregion
 
         #region Key Counter Attachment
@@ -269,7 +274,7 @@ namespace osu.Game.Rulesets.UI
     }
 
     public class RulesetInputManagerInputState<T> : InputState
-    where T : struct
+        where T : struct
     {
         public ReplayState<T> LastReplayState;
 
