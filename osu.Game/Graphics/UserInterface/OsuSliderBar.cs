@@ -13,8 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -125,16 +124,16 @@ namespace osu.Game.Graphics.UserInterface
             AccentColour = colours.Pink;
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             Nub.Glowing = true;
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             Nub.Glowing = false;
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
         protected override void OnUserChange()
@@ -164,16 +163,16 @@ namespace osu.Game.Graphics.UserInterface
             sample.Play();
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             Nub.Current.Value = true;
-            return base.OnMouseDown(state, args);
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
             Nub.Current.Value = false;
-            return base.OnMouseUp(state, args);
+            return base.OnMouseUp(e);
         }
 
         protected override void UpdateAfterChildren()

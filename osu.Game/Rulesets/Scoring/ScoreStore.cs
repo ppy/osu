@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -13,8 +14,6 @@ namespace osu.Game.Rulesets.Scoring
 {
     public class ScoreStore : DatabaseBackedStore, ICanAcceptFiles
     {
-        private readonly Storage storage;
-
         private readonly BeatmapManager beatmaps;
         private readonly RulesetStore rulesets;
 
@@ -25,9 +24,8 @@ namespace osu.Game.Rulesets.Scoring
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ScoreIPCChannel ipc;
 
-        public ScoreStore(Storage storage, DatabaseContextFactory factory, IIpcHost importHost = null, BeatmapManager beatmaps = null, RulesetStore rulesets = null) : base(factory)
+        public ScoreStore(DatabaseContextFactory factory, IIpcHost importHost = null, BeatmapManager beatmaps = null, RulesetStore rulesets = null) : base(factory)
         {
-            this.storage = storage;
             this.beatmaps = beatmaps;
             this.rulesets = rulesets;
 
@@ -49,8 +47,14 @@ namespace osu.Game.Rulesets.Scoring
 
         public Score ReadReplayFile(string replayFilename)
         {
-            using (Stream s = storage.GetStream(Path.Combine(replay_folder, replayFilename)))
-                return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(s);
+            if (File.Exists(replayFilename))
+            {
+                using (var stream = File.OpenRead(replayFilename))
+                    return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream);
+            }
+
+            Logger.Log($"Replay file {replayFilename} cannot be found", LoggingTarget.Information, LogLevel.Error);
+            return null;
         }
     }
 }

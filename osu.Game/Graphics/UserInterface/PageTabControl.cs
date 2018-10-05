@@ -10,7 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Graphics.UserInterface
@@ -67,14 +67,14 @@ namespace osu.Game.Graphics.UserInterface
                 box.Colour = colours.Yellow;
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 if (!Active)
                     slideActive();
                 return true;
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 if (!Active)
                     slideInactive();

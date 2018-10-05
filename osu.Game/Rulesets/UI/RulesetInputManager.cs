@@ -8,7 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Timing;
@@ -18,6 +18,9 @@ using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
 using OpenTK.Input;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
+using JoystickState = osu.Framework.Input.States.JoystickState;
+using KeyboardState = osu.Framework.Input.States.KeyboardState;
+using MouseState = osu.Framework.Input.States.MouseState;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -35,13 +38,7 @@ namespace osu.Game.Rulesets.UI
         protected override InputState CreateInitialState()
         {
             var state = base.CreateInitialState();
-            return new RulesetInputManagerInputState<T>
-            {
-                Mouse = state.Mouse,
-                Keyboard = state.Keyboard,
-                Joystick = state.Joystick,
-                LastReplayState = null
-            };
+            return new RulesetInputManagerInputState<T>(state.Mouse, state.Keyboard, state.Joystick);
         }
 
         protected readonly KeyBindingContainer<T> KeyBindingContainer;
@@ -76,12 +73,10 @@ namespace osu.Game.Rulesets.UI
         #region IHasReplayHandler
 
         private ReplayInputHandler replayInputHandler;
+
         public ReplayInputHandler ReplayInputHandler
         {
-            get
-            {
-                return replayInputHandler;
-            }
+            get => replayInputHandler;
             set
             {
                 if (replayInputHandler != null) RemoveHandler(replayInputHandler);
@@ -211,16 +206,23 @@ namespace osu.Game.Rulesets.UI
             mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (mouseDisabled.Value && (args.Button == MouseButton.Left || args.Button == MouseButton.Right)) return false;
-            return base.OnMouseDown(state, args);
+            if (mouseDisabled.Value && (e.Button == MouseButton.Left || e.Button == MouseButton.Right)) return false;
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
-            if (!CurrentState.Mouse.IsPressed(args.Button)) return false;
-            return base.OnMouseUp(state, args);
+            if (!CurrentState.Mouse.IsPressed(e.Button)) return false;
+            return base.OnMouseUp(e);
+        }
+
+        protected override bool Handle(UIEvent e)
+        {
+            if (mouseDisabled.Value && e is MouseDownEvent me && (me.Button == MouseButton.Left || me.Button == MouseButton.Right)) return false;
+
+            return base.Handle(e);
         }
 
         #endregion
@@ -272,8 +274,13 @@ namespace osu.Game.Rulesets.UI
     }
 
     public class RulesetInputManagerInputState<T> : InputState
-    where T : struct
+        where T : struct
     {
         public ReplayState<T> LastReplayState;
+
+        public RulesetInputManagerInputState(MouseState mouse = null, KeyboardState keyboard = null, JoystickState joystick = null)
+            : base(mouse, keyboard, joystick)
+        {
+        }
     }
 }

@@ -8,7 +8,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using OpenTK;
@@ -72,18 +72,18 @@ namespace osu.Game.Screens.Select.Carousel
             hoverLayer.Colour = colours.Blue.Opacity(0.1f);
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             sampleHover?.Play();
 
             hoverLayer.FadeIn(100, Easing.OutQuint);
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             hoverLayer.FadeOut(1000, Easing.OutQuint);
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
         public void SetMultiplicativeAlpha(float alpha) => borderContainer.Alpha = alpha;
@@ -145,7 +145,7 @@ namespace osu.Game.Screens.Select.Carousel
             };
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             Item.State.Value = CarouselItemState.Selected;
             return true;

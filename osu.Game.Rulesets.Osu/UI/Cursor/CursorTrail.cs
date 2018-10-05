@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using OpenTK;
 using OpenTK.Graphics;
@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
         }
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)
@@ -117,15 +117,15 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             timeOffset = Time.Current;
         }
 
-        protected override bool OnMouseMove(InputState state)
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            Vector2 pos = state.Mouse.NativeState.Position;
+            Vector2 pos = e.ScreenSpaceMousePosition;
 
             if (lastPosition == null)
             {
                 lastPosition = pos;
                 resampler.AddPosition(lastPosition.Value);
-                return base.OnMouseMove(state);
+                return base.OnMouseMove(e);
             }
 
             foreach (Vector2 pos2 in resampler.AddPosition(pos))
@@ -147,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 }
             }
 
-            return base.OnMouseMove(state);
+            return base.OnMouseMove(e);
         }
 
         private void addPosition(Vector2 pos)
