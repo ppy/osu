@@ -88,15 +88,16 @@ namespace osu.Game.Beatmaps.Formats
             if (split.Length != 3 && split.Length != 4)
                 throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {pair.Value}");
 
-            byte a = 255;
+            Color4 colour;
 
-            if (!byte.TryParse(split[0], out var r) || !byte.TryParse(split[1], out var g) || !byte.TryParse(split[2], out var b)
-                || split.Length == 4 && !byte.TryParse(split[3], out a))
+            try
+            {
+                colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), split.Length == 4 ? byte.Parse(split[3]) : 255);
+            }
+            catch (Exception e)
             {
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
             }
-
-            Color4 colour = new Color4(r, g, b, a);
 
             if (isCombo)
             {
