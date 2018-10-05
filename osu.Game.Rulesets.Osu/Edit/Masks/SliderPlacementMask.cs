@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
 
             InternalChildren = new Drawable[]
             {
-                path = new Path { PathWidth = 5 },
+                path = new SmoothPath { PathWidth = 3 },
                 headMask = new CirclePlacementMask(),
                 tailMask = new CirclePlacementMask(),
             };
@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            path.Colour = colours.Yellow;
+            path.Colour = colours.YellowDark;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -129,8 +129,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
             {
                 case PlacementState.Body:
                     path.Position = headMask.Position;
-                    path.PathWidth = 10;
-
                     path.ClearVertices();
 
                     for (int i = 0; i < segments.Count; i++)
