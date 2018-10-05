@@ -76,10 +76,7 @@ namespace osu.Game.Overlays.Toolbar
                 modeButtons.Add(new ToolbarRulesetButton
                 {
                     Ruleset = r,
-                    Action = delegate
-                    {
-                        if (!ruleset.Disabled) ruleset.Value = r;
-                    }
+                    Action = delegate { ruleset.Value = r; }
                 });
             }
 
@@ -107,6 +104,8 @@ namespace osu.Game.Overlays.Toolbar
 
         public override bool HandleNonPositionalInput => !ruleset.Disabled && base.HandleNonPositionalInput;
         public override bool HandlePositionalInput => !ruleset.Disabled && base.HandlePositionalInput;
+
+        public override bool PropagatePositionalInputSubTree => false;
 
         private void disabledChanged(bool isDisabled) => this.FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
 
