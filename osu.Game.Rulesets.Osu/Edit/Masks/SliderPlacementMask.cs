@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
@@ -27,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
         private readonly Path path;
 
         private readonly List<Segment> segments = new List<Segment>();
+        private readonly Container<SliderControlPoint> controlPointContainer;
         private Vector2 cursor;
 
         private PlacementState state;
@@ -41,6 +43,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
                 path = new SmoothPath { PathWidth = 3 },
                 headMask = new CirclePlacementMask(),
                 tailMask = new CirclePlacementMask(),
+                controlPointContainer = new Container<SliderControlPoint> { RelativeSizeAxes = Axes.Both }
             };
 
             segments.Add(new Segment(Vector2.Zero));
@@ -64,6 +67,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
                 case PlacementState.Body:
                     tailMask.Position = e.MousePosition;
                     cursor = tailMask.Position - headMask.Position;
+                    controlPointContainer.Last().NextPoint = e.MousePosition;
                     return true;
             }
 
@@ -88,6 +92,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
                     break;
             }
 
+            controlPointContainer.Add(new SliderControlPoint { Position = e.MousePosition });
+
             return true;
         }
 
@@ -101,6 +107,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
         protected override bool OnDoubleClick(DoubleClickEvent e)
         {
             segments.Add(new Segment(segments[segments.Count - 1].ControlPoints.Last()));
+            controlPointContainer.Last().SegmentSeparator = true;
             return true;
         }
 
@@ -168,7 +175,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
             public float Distance { get; private set; }
 
             public readonly List<Vector2> ControlPoints = new List<Vector2>();
-            public IApproximator Approximator = new LinearApproximator();
 
             public Segment(Vector2 offset)
             {
@@ -183,17 +189,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
 
                 IApproximator approximator;
 
-                switch (Approximator)
+                switch (allControlPoints.Count)
                 {
-                    case null:
+                    case 1:
+                    case 2:
                         approximator = new LinearApproximator();
                         break;
-                    case LinearApproximator _ when allControlPoints.Count > 2:
-                    case CircularArcApproximator _ when allControlPoints.Count > 3:
-                        approximator = new BezierApproximator();
-                        break;
                     default:
-                        approximator = Approximator;
+                        approximator = new BezierApproximator();
                         break;
                 }
 
