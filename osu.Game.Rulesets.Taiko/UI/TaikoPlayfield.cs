@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             Direction.Value = ScrollingDirection.Left;
 
-            InternalChild = new PlayfieldLayer
+            InternalChild = new PlayfieldAdjustmentContainer
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,

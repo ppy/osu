@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             Size = new Vector2(0.75f);
 
-            InternalChild = new PlayfieldLayer
+            InternalChild = new PlayfieldAdjustmentContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
