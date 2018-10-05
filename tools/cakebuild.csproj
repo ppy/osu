@@ -6,6 +6,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Cake" Version="0.30.0" />
-    <DotnetCliToolReference Include="Cake.Tool" Version="0.30.0" />
+    <PackageReference Include="Cake.CoreCLR" Version="0.30.0" />
   </ItemGroup>
 </Project>
