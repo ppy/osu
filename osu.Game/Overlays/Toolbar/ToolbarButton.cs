@@ -11,8 +11,7 @@ using osu.Game.Graphics.Sprites;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 
@@ -145,22 +144,22 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             HoverBackground.FlashColour(Color4.White.Opacity(100), 500, Easing.OutQuint);
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             HoverBackground.FadeOut(200);
             tooltipContainer.FadeOut(100);
