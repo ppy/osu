@@ -61,7 +61,7 @@ Write-Host "Restoring cake tools..."
 Invoke-Expression "dotnet restore `"$CAKE_CSPROJ`" --packages `"$TOOLS_DIR`"" | Out-Null
 
 # Find the Cake executable
-$CAKE_EXECUTABLE = (Get-ChildItem -Path ./tools/cake.tool/ -Filter Cake.dll -Recurse).FullName
+$CAKE_EXECUTABLE = (Get-ChildItem -Path ./tools/cake.coreclr/ -Filter Cake.dll -Recurse).FullName
 
 # Build Cake arguments
 $cakeArguments = @("$Script");
