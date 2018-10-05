@@ -375,6 +375,7 @@ namespace osu.Game.Overlays.Profile
             }
 
             infoTextLeft.NewParagraph();
+            infoTextLeft.NewLine();
 
             if (user.JoinDate.ToUniversalTime().Year < 2008)
             {
@@ -386,13 +387,16 @@ namespace osu.Game.Overlays.Profile
                 infoTextLeft.AddText(new DrawableJoinDate(user.JoinDate), boldItalic);
             }
 
+            infoTextLeft.NewLine();
+
             if (user.LastVisit.HasValue)
             {
-                infoTextLeft.NewLine();
                 infoTextLeft.AddText("Last seen ", lightText);
                 infoTextLeft.AddText(new DrawableDate(user.LastVisit.Value), boldItalic);
-                infoTextLeft.NewParagraph();
             }
+
+            infoTextLeft.NewParagraph();
+            infoTextLeft.NewLine();
 
             if (user.PlayStyle?.Length > 0)
             {
@@ -416,6 +420,7 @@ namespace osu.Game.Overlays.Profile
             tryAddInfoRightLine(FontAwesome.fa_heart_o, user.Interests);
             tryAddInfoRightLine(FontAwesome.fa_suitcase, user.Occupation);
             infoTextRight.NewParagraph();
+            infoTextRight.NewLine();
             if (!string.IsNullOrEmpty(user.Twitter))
                 tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
             tryAddInfoRightLine(FontAwesome.fa_gamepad, user.Discord);

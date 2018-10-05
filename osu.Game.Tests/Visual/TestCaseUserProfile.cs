@@ -53,6 +53,11 @@ namespace osu.Game.Tests.Visual
                 CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
                 JoinDate = DateTimeOffset.Now.AddDays(-1),
                 LastVisit = DateTimeOffset.Now,
+                PlayStyle = new[] { "Code" },
+                Location = @"Somewhere",
+                Interests = @"C#",
+                Occupation = @"Coding",
+                Website = @"https://github.com/ppy/osu",
                 ProfileOrder = new[] { "me" },
                 Statistics = new UserStatistics
                 {
