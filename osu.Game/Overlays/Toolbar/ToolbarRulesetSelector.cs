@@ -76,7 +76,10 @@ namespace osu.Game.Overlays.Toolbar
                 modeButtons.Add(new ToolbarRulesetButton
                 {
                     Ruleset = r,
-                    Action = delegate { ruleset.Value = r; }
+                    Action = delegate
+                    {
+                        if (!ruleset.Disabled) ruleset.Value = r;
+                    }
                 });
             }
 
