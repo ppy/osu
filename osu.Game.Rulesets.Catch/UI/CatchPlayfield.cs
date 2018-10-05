@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             Size = new Vector2(0.86f); // matches stable's vertical offset for catcher plate
 
-            InternalChild = new PlayfieldLayer
+            InternalChild = new PlayfieldAdjustmentContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
