@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.Toolbar
         public override bool HandleNonPositionalInput => !ruleset.Disabled && base.HandleNonPositionalInput;
         public override bool HandlePositionalInput => !ruleset.Disabled && base.HandlePositionalInput;
 
-        public override bool PropagatePositionalInputSubTree => false;
+        public override bool PropagatePositionalInputSubTree => !ruleset.Disabled;
 
         private void disabledChanged(bool isDisabled) => this.FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
 
