@@ -11,8 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
@@ -68,7 +67,7 @@ namespace osu.Game.Screens.Menu
 
         public bool BeatMatching = true;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => logoContainer.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => logoContainer.ReceivePositionalInputAt(screenSpacePos);
 
         public bool Ripple
         {
@@ -342,25 +341,25 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override bool HandleMouseInput => base.HandleMouseInput && Action != null && Alpha > 0.2f;
+        public override bool HandlePositionalInput => base.HandlePositionalInput && Action != null && Alpha > 0.2f;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (args.Button != MouseButton.Left) return false;
+            if (e.Button != MouseButton.Left) return false;
 
             logoBounceContainer.ScaleTo(0.9f, 1000, Easing.Out);
             return true;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
-            if (args.Button != MouseButton.Left) return false;
+            if (e.Button != MouseButton.Left) return false;
 
             logoBounceContainer.ScaleTo(1f, 500, Easing.OutElastic);
             return true;
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             if (Action?.Invoke() ?? true)
                 sampleClick.Play();
@@ -371,13 +370,13 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             logoHoverContainer.ScaleTo(1.1f, 500, Easing.OutElastic);
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             logoHoverContainer.ScaleTo(1, 500, Easing.OutElastic);
         }

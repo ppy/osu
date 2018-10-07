@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
@@ -13,7 +12,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -47,12 +46,12 @@ namespace osu.Game.Overlays
 
         public const float TAB_AREA_HEIGHT = 50;
 
-        private GetMessagesRequest fetchReq;
+        private GetUpdatesRequest fetchReq;
 
         private readonly ChatTabControl channelTabs;
 
         private readonly Container chatContainer;
-        private readonly Container tabsArea;
+        private readonly TabsArea tabsArea;
         private readonly Box chatBackground;
         private readonly Box tabBackground;
 
@@ -62,7 +61,7 @@ namespace osu.Game.Overlays
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
 
-        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceiveMouseInputAt(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.ReceiveMouseInputAt(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceivePositionalInputAt(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.ReceivePositionalInputAt(screenSpacePos);
 
         public ChatOverlay()
         {
@@ -146,11 +145,8 @@ namespace osu.Game.Overlays
                                 loading = new LoadingAnimation(),
                             }
                         },
-                        tabsArea = new Container
+                        tabsArea = new TabsArea
                         {
-                            Name = @"tabs area",
-                            RelativeSizeAxes = Axes.X,
-                            Height = TAB_AREA_HEIGHT,
                             Children = new Drawable[]
                             {
                                 tabBackground = new Box
@@ -191,25 +187,22 @@ namespace osu.Game.Overlays
 
         public void OpenChannel(Channel channel) => addChannel(channel);
 
-        protected override bool OnDragStart(InputState state)
+        protected override bool OnDragStart(DragStartEvent e)
         {
             isDragging = tabsArea.IsHovered;
 
             if (!isDragging)
-                return base.OnDragStart(state);
+                return base.OnDragStart(e);
 
             startDragChatHeight = ChatHeight.Value;
             return true;
         }
 
-        protected override bool OnDrag(InputState state)
+        protected override bool OnDrag(DragEvent e)
         {
             if (isDragging)
             {
-                Trace.Assert(state.Mouse.PositionMouseDown != null);
-
-                // ReSharper disable once PossibleInvalidOperationException
-                double targetChatHeight = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
+                double targetChatHeight = startDragChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
 
                 // If the channel selection screen is shown, mind its minimum height
                 if (channelSelection.State == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
@@ -221,10 +214,10 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDragEnd(InputState state)
+        protected override bool OnDragEnd(DragEndEvent e)
         {
             isDragging = false;
-            return base.OnDragEnd(state);
+            return base.OnDragEnd(e);
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
@@ -242,11 +235,11 @@ namespace osu.Game.Overlays
 
         public override bool AcceptsFocus => true;
 
-        protected override void OnFocus(InputState state)
+        protected override void OnFocus(FocusEvent e)
         {
             //this is necessary as textbox is masked away and therefore can't get focus :(
             GetContainingInputManager().ChangeFocus(textbox);
-            base.OnFocus(state);
+            base.OnFocus(e);
         }
 
         protected override void PopIn()
@@ -285,7 +278,7 @@ namespace osu.Game.Overlays
             chatBackground.Colour = colours.ChatBlue;
         }
 
-        private long? lastMessageId;
+        private long lastMessageId;
 
         private readonly List<Channel> careChannels = new List<Channel>();
 
@@ -304,9 +297,9 @@ namespace osu.Game.Overlays
 
                 Scheduler.Add(delegate
                 {
+                    //todo: decide how to handle default channels for a user now that they are saved server-side.
                     addChannel(channels.Find(c => c.Name == @"#lazer"));
                     addChannel(channels.Find(c => c.Name == @"#osu"));
-                    addChannel(channels.Find(c => c.Name == @"#lobby"));
 
                     channelSelection.OnRequestJoin = addChannel;
                     channelSelection.OnRequestLeave = removeChannel;
@@ -320,7 +313,7 @@ namespace osu.Game.Overlays
                     };
                 });
 
-                messageRequest = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
+                messageRequest = Scheduler.AddDelayed(fetchUpdates, 1000, true);
             };
 
             api.Queue(req);
@@ -362,7 +355,7 @@ namespace osu.Game.Overlays
                     loadedChannels.Add(loaded);
                     LoadComponentAsync(loaded, l =>
                     {
-                        if (currentChannel.Messages.Any())
+                        if (currentChannel.MessagesLoaded)
                             loading.Hide();
 
                         currentChannelContainer.Clear(false);
@@ -394,6 +387,15 @@ namespace osu.Game.Overlays
             {
                 careChannels.Add(channel);
                 channelTabs.AddItem(channel);
+
+                if (channel.Type == ChannelType.Public && !channel.Joined)
+                {
+                    var req = new JoinChannelRequest(channel, api.LocalUser);
+                    req.Success += () => addChannel(channel);
+                    req.Failure += ex => removeChannel(channel);
+                    api.Queue(req);
+                    return;
+                }
             }
 
             // let's fetch a small number of messages to bring us up-to-date with the backlog.
@@ -415,47 +417,53 @@ namespace osu.Game.Overlays
             loadedChannels.Remove(loadedChannels.Find(c => c.Channel == channel));
             channelTabs.RemoveItem(channel);
 
+            api.Queue(new LeaveChannelRequest(channel, api.LocalUser));
             channel.Joined.Value = false;
         }
 
         private void fetchInitialMessages(Channel channel)
         {
-            var req = new GetMessagesRequest(new List<Channel> { channel }, null);
-
-            req.Success += delegate (List<Message> messages)
+            var req = new GetMessagesRequest(channel);
+            req.Success += messages =>
             {
-                loading.Hide();
                 channel.AddNewMessages(messages.ToArray());
-                Debug.Write("success!");
-            };
-            req.Failure += delegate
-            {
-                Debug.Write("failure!");
+                if (channel == currentChannel)
+                    loading.Hide();
             };
 
             api.Queue(req);
         }
 
-        private void fetchNewMessages()
+        private void fetchUpdates()
         {
             if (fetchReq != null) return;
 
-            fetchReq = new GetMessagesRequest(careChannels, lastMessageId);
+            fetchReq = new GetUpdatesRequest(lastMessageId);
 
-            fetchReq.Success += delegate (List<Message> messages)
+            fetchReq.Success += updates =>
             {
-                foreach (var group in messages.Where(m => m.TargetType == TargetType.Channel).GroupBy(m => m.TargetId))
-                    careChannels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
+                if (updates?.Presence != null)
+                {
+                    foreach (var channel in updates.Presence)
+                    {
+                        if (careChannels.Find(c => c.Id == channel.Id) == null)
+                        {
+                            channel.Joined.Value = true;
+                            addChannel(channel);
+                        }
+                    }
 
-                lastMessageId = messages.LastOrDefault()?.Id ?? lastMessageId;
+                    foreach (var group in updates.Messages.GroupBy(m => m.ChannelId))
+                        careChannels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
 
-                Debug.Write("success!");
+                    lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
+                }
+
                 fetchReq = null;
             };
 
             fetchReq.Failure += delegate
             {
-                Debug.Write("failure!");
                 fetchReq = null;
             };
 
@@ -517,8 +525,7 @@ namespace osu.Game.Overlays
             {
                 Sender = api.LocalUser.Value,
                 Timestamp = DateTimeOffset.Now,
-                TargetType = TargetType.Channel, //TODO: read this from channel
-                TargetId = target.Id,
+                ChannelId = target.Id,
                 IsAction = isAction,
                 Content = postText
             };
@@ -530,6 +537,19 @@ namespace osu.Game.Overlays
             req.Success += m => target.ReplaceMessage(message, m);
 
             api.Queue(req);
+        }
+
+        private class TabsArea : Container
+        {
+            // IsHovered is used
+            public override bool HandlePositionalInput => true;
+
+            public TabsArea()
+            {
+                Name = @"tabs area";
+                RelativeSizeAxes = Axes.X;
+                Height = TAB_AREA_HEIGHT;
+            }
         }
     }
 }
