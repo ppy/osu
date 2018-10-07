@@ -27,6 +27,9 @@ namespace osu.Game.Overlays.Direct
     {
         public readonly BeatmapSetInfo SetInfo;
 
+        public BindableBool Playing { get; }
+        public BindableBool Loading { get; }
+
         private const double hover_transition_time = 400;
 
         private Container content;
@@ -45,6 +48,9 @@ namespace osu.Game.Overlays.Direct
         protected DirectPanel(BeatmapSetInfo setInfo)
         {
             SetInfo = setInfo;
+
+            Playing = new BindableBool();
+            Loading = new BindableBool();
         }
 
         private readonly EdgeEffectParameters edgeEffectNormal = new EdgeEffectParameters
@@ -72,7 +78,10 @@ namespace osu.Game.Overlays.Direct
             this.beatmaps = beatmaps;
             this.beatmapSetOverlay = beatmapSetOverlay;
             this.colours = colours;
-            this.PlayButtonState = previewTrackManager.GetPlayButtonState(SetInfo);
+
+            PlayButtonState = previewTrackManager.GetPlayButtonState(SetInfo);
+            Playing.BindTo(PlayButtonState.Playing);
+            Loading.BindTo(PlayButtonState.Loading);
 
             AddInternal(content = new Container
             {
@@ -115,7 +124,7 @@ namespace osu.Game.Overlays.Direct
         {
             base.Update();
 
-            if (PlayButtonState.Playing && PlayButtonState.Preview != null && PlayButtonState.Preview.TrackLoaded)
+            if (Playing !=null &&Playing && PlayButtonState.Preview != null && PlayButtonState.Preview.TrackLoaded)
             {
                 PreviewBar.Width = (float)(PlayButtonState.Preview.CurrentTime / PlayButtonState.Preview.Length);
             }
@@ -135,7 +144,7 @@ namespace osu.Game.Overlays.Direct
         {
             content.TweenEdgeEffectTo(edgeEffectNormal, hover_transition_time, Easing.OutQuint);
             content.MoveToY(0, hover_transition_time, Easing.OutQuint);
-            if (FadePlayButton && !PlayButtonState.Playing)
+            if (FadePlayButton && !Playing)
                 PlayButton.FadeOut(120, Easing.InOutQuint);
 
             base.OnHoverLost(e);
@@ -185,8 +194,8 @@ namespace osu.Game.Overlays.Direct
             base.LoadComplete();
             this.FadeInFromZero(200, Easing.Out);
 
-            PlayButtonState.Playing.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered || !FadePlayButton ? 1 : 0, 120, Easing.InOutQuint);
-            PlayButtonState.Playing.ValueChanged += newValue => PreviewBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
+            Playing.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered || !FadePlayButton ? 1 : 0, 120, Easing.InOutQuint);
+            Playing.ValueChanged += newValue => PreviewBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
         }
 
         protected List<DifficultyIcon> GetDifficultyIcons()

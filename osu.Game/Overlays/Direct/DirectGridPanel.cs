@@ -1,19 +1,19 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics;
+using osu.Game.Graphics.Sprites;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -224,7 +224,7 @@ namespace osu.Game.Overlays.Direct
                 Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
             });
 
-            PlayButtonState.Playing.ValueChanged += _ => updateStatusContainer();
+            Playing.ValueChanged += _ => updateStatusContainer();
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -239,6 +239,6 @@ namespace osu.Game.Overlays.Direct
             updateStatusContainer();
         }
 
-        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PlayButtonState.Playing ? 0 : 1, 120, Easing.InOutQuint);
+        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || Playing ? 0 : 1, 120, Easing.InOutQuint);
     }
 }

@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,25 +20,35 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class PreviewButton : OsuClickableContainer
     {
+        public BindableBool Playing { get; }
+
         private const float transition_duration = 500;
 
         private readonly Box bg, progress;
         private readonly PlayButton playButton;
         private PreviewTrackManager previewTrackManager;
-        private PlayButtonState playButtonState;
+
+        private PlayButtonState _playButtonState;
+        private PlayButtonState playButtonState
+        {
+            get { return _playButtonState; }
+            set
+            {
+                Playing.UnbindAll();
+                _playButtonState = value;
+                Playing.BindTo(value.Playing);
+                Playing.BindValueChanged(playingStateChanged, true);
+            }
+        }
 
         public BeatmapSetInfo BeatmapSet
         {
             get { return playButton.BeatmapSet; }
             set
             {
+                if (playButton.BeatmapSet == value) return;
                 playButton.BeatmapSet = value;
-
-                if (playButtonState != null)
-                    playButtonState.Playing.ValueChanged -= playingStateChanged;
                 playButtonState = previewTrackManager.GetPlayButtonState(playButton.BeatmapSet);
-                playButtonState.Playing.ValueChanged += playingStateChanged;
-                playButtonState.Playing.TriggerChange();
             }
         }
 
@@ -76,6 +87,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             };
 
             Action = () => playButton.Click();
+
+            Playing = new BindableBool();
         }
 
         [BackgroundDependencyLoader]
@@ -87,8 +100,6 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             if (BeatmapSet != null)
             {
                 playButtonState = previewTrackManager.GetPlayButtonState(playButton.BeatmapSet);
-                playButtonState.Playing.ValueChanged += playingStateChanged;
-                playButtonState.Playing.TriggerChange();
             }
         }
 
@@ -96,7 +107,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         {
             base.Update();
 
-            if (playButtonState != null && playButtonState.Playing.Value && playButtonState.Preview != null)
+            if (playButtonState != null && Playing.Value && playButtonState.Preview != null)
             {
                 // prevent negative (potential infinite) width if a track without length was loaded
                 progress.Width = playButtonState.Preview.Length > 0 ? (float)(playButtonState.Preview.CurrentTime / playButtonState.Preview.Length) : 0f;

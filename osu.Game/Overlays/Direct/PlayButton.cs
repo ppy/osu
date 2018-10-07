@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -16,6 +17,9 @@ namespace osu.Game.Overlays.Direct
 {
     public class PlayButton : Container
     {
+        public BindableBool Playing { get; }
+        public BindableBool Loading { get; }
+
         private BeatmapSetInfo beatmapSet;
 
         public BeatmapSetInfo BeatmapSet
@@ -54,6 +58,9 @@ namespace osu.Game.Overlays.Direct
                     Size = new Vector2(15),
                 },
             });
+
+            Playing = new BindableBool();
+            Loading = new BindableBool();
         }
 
         private PreviewTrackManager previewTrackManager;
@@ -70,25 +77,15 @@ namespace osu.Game.Overlays.Direct
 
         private void getPlayButtonState()
         {
-            if (playButtonState != null)
-                unsubscribeFromEvents();
             playButtonState = previewTrackManager.GetPlayButtonState(beatmapSet);
-            subscribeToEvents();
-        }
 
-        private void subscribeToEvents()
-        {
-            playButtonState.Loading.ValueChanged += loadingStateChanged;
-            playButtonState.Playing.ValueChanged += playingStateChanged;
+            Playing.UnbindAll();
+            Playing.BindTo(playButtonState.Playing);
+            Playing.BindValueChanged(playingStateChanged, true);
 
-            playButtonState.Loading.TriggerChange();
-            playButtonState.Playing.TriggerChange();
-        }
-
-        private void unsubscribeFromEvents()
-        {
-            playButtonState.Loading.ValueChanged -= loadingStateChanged;
-            playButtonState.Playing.ValueChanged -= playingStateChanged;
+            Loading.UnbindAll();
+            Loading.BindTo(playButtonState.Loading);
+            Loading.BindValueChanged(loadingStateChanged, true);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -133,12 +130,7 @@ namespace osu.Game.Overlays.Direct
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-
-            if (playButtonState != null)
-            {
-                unsubscribeFromEvents();
-                playButtonState = null;
-            }
+            playButtonState = null;
         }
     }
 }
