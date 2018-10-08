@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;
 
-        protected override double StrainValueOf(OsuDifficultyHitObject current) => Math.Pow(current.Distance, 0.99) / current.DeltaTime;
+        protected override double StrainValueOf(OsuDifficultyHitObject current) => (Math.Pow(current.TravelDistance, 0.99) + Math.Pow(current.JumpDistance, 0.99)) / current.DeltaTime;
     }
 }
