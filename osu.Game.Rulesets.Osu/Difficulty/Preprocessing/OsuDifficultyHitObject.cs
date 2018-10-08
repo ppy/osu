@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
-            Vector2 lastCursorPosition = lastObject.StackedPosition;
+            Vector2 lastCursorPosition = lastObject.Position;
             float lastTravelDistance = 0;
 
             var lastSlider = lastObject as Slider;
@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 lastTravelDistance = lastSlider.LazyTravelDistance;
             }
 
-            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+            JumpDistance = (BaseObject.Position * scalingFactor - lastCursorPosition * scalingFactor).Length;
             TravelDistance = lastTravelDistance * scalingFactor;
         }
 
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             if (slider.LazyEndPosition != null)
                 return;
-            slider.LazyEndPosition = slider.StackedPosition;
+            slider.LazyEndPosition = slider.Position;
 
             float approxFollowCircleRadius = (float)(slider.Radius * 3);
             var computeVertex = new Action<double>(t =>
@@ -101,7 +101,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     progress = progress % 1;
 
                 // ReSharper disable once PossibleInvalidOperationException (bugged in current r# version)
-                var diff = slider.StackedPosition + slider.Curve.PositionAt(progress) - slider.LazyEndPosition.Value;
+                var diff = slider.Position + slider.Curve.PositionAt(progress) - slider.LazyEndPosition.Value;
                 float dist = diff.Length;
 
                 if (dist > approxFollowCircleRadius)
