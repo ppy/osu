@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Framework.Input.EventArgs;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Screens.Play;
@@ -15,7 +14,7 @@ using OpenTK.Input;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseKeyCounter : OsuTestCase
+    public class TestCaseKeyCounter : ManualInputManagerTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -53,16 +52,16 @@ namespace osu.Game.Tests.Visual
 
             AddStep($"Press {testKey} key", () =>
             {
-                rewindTestKeyCounterKeyboard.TriggerOnKeyDown(null, new KeyDownEventArgs { Key = testKey, Repeat = false });
-                rewindTestKeyCounterKeyboard.TriggerOnKeyUp(null, new KeyUpEventArgs { Key = testKey });
+                InputManager.PressKey(testKey);
+                InputManager.ReleaseKey(testKey);
             });
 
             AddAssert($"Check {testKey} counter after keypress", () => rewindTestKeyCounterKeyboard.CountPresses == 1);
 
             AddStep($"Press {testKey} key", () =>
             {
-                rewindTestKeyCounterKeyboard.TriggerOnKeyDown(null, new KeyDownEventArgs { Key = testKey, Repeat = false });
-                rewindTestKeyCounterKeyboard.TriggerOnKeyUp(null, new KeyUpEventArgs { Key = testKey });
+                InputManager.PressKey(testKey);
+                InputManager.ReleaseKey(testKey);
                 time1 = Clock.CurrentTime;
             });
 

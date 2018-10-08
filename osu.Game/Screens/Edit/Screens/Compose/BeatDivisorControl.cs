@@ -12,8 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
@@ -231,11 +230,11 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             {
             }
 
-            public override bool HandleKeyboardInput => IsHovered && !CurrentNumber.Disabled;
+            public override bool HandleNonPositionalInput => IsHovered && !CurrentNumber.Disabled;
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+            protected override bool OnKeyDown(KeyDownEvent e)
             {
-                switch (args.Key)
+                switch (e.Key)
                 {
                     case Key.Right:
                         beatDivisor.Next();
@@ -250,34 +249,34 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 }
             }
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            protected override bool OnMouseDown(MouseDownEvent e)
             {
                 marker.Active = true;
-                return base.OnMouseDown(state, args);
+                return base.OnMouseDown(e);
             }
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            protected override bool OnMouseUp(MouseUpEvent e)
             {
                 marker.Active = false;
-                return base.OnMouseUp(state, args);
+                return base.OnMouseUp(e);
             }
 
-            protected override bool OnClick(InputState state)
+            protected override bool OnClick(ClickEvent e)
             {
-                handleMouseInput(state);
+                handleMouseInput(e.ScreenSpaceMousePosition);
                 return true;
             }
 
-            protected override bool OnDrag(InputState state)
+            protected override bool OnDrag(DragEvent e)
             {
-                handleMouseInput(state);
+                handleMouseInput(e.ScreenSpaceMousePosition);
                 return true;
             }
 
-            private void handleMouseInput(InputState state)
+            private void handleMouseInput(Vector2 screenSpaceMousePosition)
             {
                 // copied from SliderBar so we can do custom spacing logic.
-                var xPosition = (ToLocalSpace(state?.Mouse.NativeState.Position ?? Vector2.Zero).X - RangePadding) / UsableWidth;
+                var xPosition = (ToLocalSpace(screenSpaceMousePosition).X - RangePadding) / UsableWidth;
 
                 CurrentNumber.Value = availableDivisors.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
                 OnUserChange();
