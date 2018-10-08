@@ -21,9 +21,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public OsuHitObject BaseObject { get; }
 
         /// <summary>
-        /// Normalized distance from the <see cref="OsuHitObject.StackedPosition"/> of the previous <see cref="OsuDifficultyHitObject"/>.
+        /// Normalized distance from the end position of the previous <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        public double Distance { get; private set; }
+        public double JumpDistance { get; private set; }
+
+        /// <summary>
+        /// Normalized distance from the start position to the end position of the previous <see cref="OsuDifficultyHitObject"/>.
+        /// </summary>
+        public double TravelDistance { get; private set; }
 
         /// <summary>
         /// Milliseconds elapsed since the StartTime of the previous <see cref="OsuDifficultyHitObject"/>.
@@ -51,10 +56,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private void setDistances()
         {
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
-            double scalingFactor = normalized_radius / BaseObject.Radius;
+            float scalingFactor = normalized_radius / (float)BaseObject.Radius;
             if (BaseObject.Radius < 30)
             {
-                double smallCircleBonus = Math.Min(30 - BaseObject.Radius, 5) / 50;
+                float smallCircleBonus = Math.Min(30 - (float)BaseObject.Radius, 5) / 50;
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
@@ -69,7 +74,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 lastTravelDistance = lastSlider.LazyTravelDistance;
             }
 
-            Distance = (lastTravelDistance + (BaseObject.StackedPosition - lastCursorPosition).Length) * scalingFactor;
+            JumpDistance = (BaseObject.StackedPosition - lastCursorPosition).Length * scalingFactor;
+            TravelDistance = lastTravelDistance * scalingFactor;
         }
 
         private void setTimingValues()
