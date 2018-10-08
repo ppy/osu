@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             var computeVertex = new Action<double>(t =>
             {
                 // ReSharper disable once PossibleInvalidOperationException (bugged in current r# version)
-                var diff = slider.StackedPositionAt(t) - slider.LazyEndPosition.Value;
+                var diff = slider.StackedPositionAt(((int)t - (int)slider.StartTime) / (float)(int)slider.Duration) - slider.LazyEndPosition.Value;
                 float dist = diff.Length;
 
                 if (dist > approxFollowCircleRadius)
