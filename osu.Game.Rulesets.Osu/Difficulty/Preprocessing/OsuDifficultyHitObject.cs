@@ -74,7 +74,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 lastTravelDistance = lastSlider.LazyTravelDistance;
             }
 
-            JumpDistance = (BaseObject.StackedPosition - lastCursorPosition).Length * scalingFactor;
+            JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
             TravelDistance = lastTravelDistance * scalingFactor;
         }
 
