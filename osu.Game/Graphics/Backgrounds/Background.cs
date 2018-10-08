@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using OpenTK.Graphics;
 
 namespace osu.Game.Graphics.Backgrounds
 {
@@ -28,7 +27,6 @@ namespace osu.Game.Graphics.Backgrounds
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Colour = Color4.DarkGray,
                 FillMode = FillMode.Fill,
             });
         }
