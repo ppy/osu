@@ -5,7 +5,7 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Transforms;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using OpenTK;
 
@@ -97,13 +97,13 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
             zoomedContent.Width = DrawWidth * currentZoom;
         }
 
-        protected override bool OnScroll(InputState state)
+        protected override bool OnScroll(ScrollEvent e)
         {
-            if (state.Mouse.HasPreciseScroll)
+            if (e.IsPrecise)
                 // for now, we don't support zoom when using a precision scroll device. this needs gesture support.
-                return base.OnScroll(state);
+                return base.OnScroll(e);
 
-            setZoomTarget(zoomTarget + state.Mouse.ScrollDelta.Y, zoomedContent.ToLocalSpace(state.Mouse.NativeState.Position).X);
+            setZoomTarget(zoomTarget + e.ScrollDelta.Y, zoomedContent.ToLocalSpace(e.ScreenSpaceMousePosition).X);
             return true;
         }
 

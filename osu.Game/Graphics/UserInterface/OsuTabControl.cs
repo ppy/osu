@@ -14,7 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics.Sprites;
 
@@ -126,14 +126,14 @@ namespace osu.Game.Graphics.UserInterface
                 Text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 if (!Active)
                     fadeActive();
                 return true;
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 if (!Active)
                     fadeInactive();
@@ -265,16 +265,16 @@ namespace osu.Game.Graphics.UserInterface
                     Padding = new MarginPadding { Left = 5, Right = 5 };
                 }
 
-                protected override bool OnHover(InputState state)
+                protected override bool OnHover(HoverEvent e)
                 {
                     Foreground.Colour = BackgroundColour;
-                    return base.OnHover(state);
+                    return base.OnHover(e);
                 }
 
-                protected override void OnHoverLost(InputState state)
+                protected override void OnHoverLost(HoverLostEvent e)
                 {
                     Foreground.Colour = BackgroundColourHover;
-                    base.OnHoverLost(state);
+                    base.OnHoverLost(e);
                 }
             }
         }

@@ -10,7 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -99,7 +99,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
             bubble.Colour = button.Selected ? selectedBubbleColour : defaultBubbleColour;
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             if (button.Selected)
                 return true;
@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
 
             button.Selected.Value = true;
 
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
         protected override SpriteText CreateText() => new OsuSpriteText

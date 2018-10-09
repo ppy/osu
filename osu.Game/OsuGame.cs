@@ -65,7 +65,8 @@ namespace osu.Game
 
         private BeatmapSetOverlay beatmapSetOverlay;
 
-        private ScreenshotManager screenshotManager;
+        [Cached]
+        private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
         protected RavenLogger RavenLogger;
 
@@ -289,9 +290,6 @@ namespace osu.Game
 
         protected override void LoadComplete()
         {
-            // this needs to be cached before base.LoadComplete as it is used by MenuCursorContainer.
-            dependencies.Cache(screenshotManager = new ScreenshotManager());
-
             base.LoadComplete();
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
@@ -299,11 +297,13 @@ namespace osu.Game
             // This prevents the cursor from showing until we have a screen with CursorVisible = true
             MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
 
-            // hook up notifications to components.
+            // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => notifications?.Post(n);
-            BeatmapManager.PostNotification = n => notifications?.Post(n);
+            SkinManager.GetStableStorage = GetStorageForStableInstall;
 
+            BeatmapManager.PostNotification = n => notifications?.Post(n);
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
+
             BeatmapManager.PresentBeatmap = PresentBeatmap;
 
             AddRange(new Drawable[]
@@ -353,7 +353,7 @@ namespace osu.Game
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -3 }, mainContent.Add);
             loadComponentSingleFile(musicController = new MusicController
             {
-                Depth = -4,
+                Depth = -5,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
