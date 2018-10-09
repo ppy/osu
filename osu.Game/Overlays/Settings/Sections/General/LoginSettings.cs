@@ -16,7 +16,7 @@ using System.ComponentModel;
 using osu.Game.Graphics;
 using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 using Container = osu.Framework.Graphics.Containers.Container;
 
@@ -175,12 +175,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         public override bool AcceptsFocus => true;
 
-        protected override bool OnClick(InputState state) => true;
+        protected override bool OnClick(ClickEvent e) => true;
 
-        protected override void OnFocus(InputState state)
+        protected override void OnFocus(FocusEvent e)
         {
             if (form != null) GetContainingInputManager().ChangeFocus(form);
-            base.OnFocus(state);
+            base.OnFocus(e);
         }
 
         private class LoginForm : FillFlowContainer
@@ -244,9 +244,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             public override bool AcceptsFocus => true;
 
-            protected override bool OnClick(InputState state) => true;
+            protected override bool OnClick(ClickEvent e) => true;
 
-            protected override void OnFocus(InputState state)
+            protected override void OnFocus(FocusEvent e)
             {
                 Schedule(() => { GetContainingInputManager().ChangeFocus(string.IsNullOrEmpty(username.Text) ? username : password); });
             }

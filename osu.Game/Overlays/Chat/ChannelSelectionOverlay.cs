@@ -10,7 +10,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
@@ -150,10 +150,10 @@ namespace osu.Game.Overlays.Chat
             headerBg.Colour = colours.Gray2.Opacity(0.75f);
         }
 
-        protected override void OnFocus(InputState state)
+        protected override void OnFocus(FocusEvent e)
         {
             GetContainingInputManager().ChangeFocus(search);
-            base.OnFocus(state);
+            base.OnFocus(e);
         }
 
         protected override void PopIn()
