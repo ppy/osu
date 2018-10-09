@@ -165,7 +165,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
-        public void TestDecodeBeatmapColors()
+        public void TestDecodeBeatmapColours()
         {
             var decoder = new LegacySkinDecoder();
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
@@ -181,6 +181,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     new Color4(128, 255, 128, 255),
                     new Color4(255, 187, 255, 255),
                     new Color4(255, 177, 140, 255),
+                    new Color4(100, 100, 100, 100),
                 };
                 Assert.AreEqual(expectedColors.Length, comboColors.Count);
                 for (int i = 0; i < expectedColors.Length; i++)
