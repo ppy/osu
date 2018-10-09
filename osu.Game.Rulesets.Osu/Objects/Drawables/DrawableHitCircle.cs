@@ -76,6 +76,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
+        public void HideButApproachCircle()
+        {
+            circle.Hide();
+            circle.AlwaysPresent = true;
+            ring.Hide();
+            number.Hide();
+            glow.Hide();
+        }
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
