@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 new CollectionsDropdown<PlaylistCollection>
                 {
                     RelativeSizeAxes = Axes.X,
-                    Items = new[] { new KeyValuePair<string, PlaylistCollection>(@"All", PlaylistCollection.All) },
+                    Items = new[] { PlaylistCollection.All },
                 },
             };
         }

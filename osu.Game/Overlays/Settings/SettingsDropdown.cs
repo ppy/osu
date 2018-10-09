@@ -12,18 +12,15 @@ namespace osu.Game.Overlays.Settings
     {
         private Dropdown<T> dropdown;
 
-        private IEnumerable<KeyValuePair<string, T>> items = new KeyValuePair<string, T>[] { };
-        public IEnumerable<KeyValuePair<string, T>> Items
+        private IEnumerable<KeyValuePair<string, T>> entries = new KeyValuePair<string, T>[] { };
+        public IEnumerable<KeyValuePair<string, T>> Entries
         {
-            get
-            {
-                return items;
-            }
+            get => entries;
             set
             {
-                items = value;
+                entries = value;
                 if (dropdown != null)
-                    dropdown.Items = value;
+                    dropdown.Entries = value;
             }
         }
 
@@ -31,7 +28,7 @@ namespace osu.Game.Overlays.Settings
         {
             Margin = new MarginPadding { Top = 5 },
             RelativeSizeAxes = Axes.X,
-            Items = Items,
+            Entries = Entries,
         };
     }
 }

@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = "Resolution",
                     ShowsDefaultIndicator = false,
-                    Items = resolutions,
+                    Entries = resolutions,
                     Bindable = sizeFullscreen
                 };
 

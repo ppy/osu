@@ -54,19 +54,19 @@ namespace osu.Game.Overlays.Settings.Sections
             skins.ItemAdded += itemAdded;
             skins.ItemRemoved += itemRemoved;
 
-            skinDropdown.Items = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, int>(s.ToString(), s.ID));
+            skinDropdown.Entries = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, int>(s.ToString(), s.ID));
 
             var skinBindable = config.GetBindable<int>(OsuSetting.Skin);
 
             // Todo: This should not be necessary when OsuConfigManager is databased
-            if (skinDropdown.Items.All(s => s.Value != skinBindable.Value))
+            if (skinDropdown.Entries.All(s => s.Value != skinBindable.Value))
                 skinBindable.Value = 0;
 
             skinDropdown.Bindable = skinBindable;
         }
 
-        private void itemRemoved(SkinInfo s) => skinDropdown.Items = skinDropdown.Items.Where(i => i.Value != s.ID);
-        private void itemAdded(SkinInfo s) => skinDropdown.Items = skinDropdown.Items.Append(new KeyValuePair<string, int>(s.ToString(), s.ID));
+        private void itemRemoved(SkinInfo s) => skinDropdown.Entries = skinDropdown.Entries.Where(i => i.Value != s.ID);
+        private void itemAdded(SkinInfo s) => skinDropdown.Entries = skinDropdown.Entries.Append(new KeyValuePair<string, int>(s.ToString(), s.ID));
 
         protected override void Dispose(bool isDisposing)
         {
