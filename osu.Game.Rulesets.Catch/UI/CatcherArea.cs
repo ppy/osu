@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatcherArea : Container
     {
-        public const float CATCHER_SIZE = 84;
+        public const float CATCHER_SIZE = 109;
 
         protected readonly Catcher MovableCatcher;
 
