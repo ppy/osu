@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Music
                         new CollectionsDropdown<PlaylistCollection>
                         {
                             RelativeSizeAxes = Axes.X,
-                            Items = new[] { new KeyValuePair<string, PlaylistCollection>(@"All", PlaylistCollection.All) },
+                            Items = new[] { PlaylistCollection.All },
                         }
                     },
                 },
