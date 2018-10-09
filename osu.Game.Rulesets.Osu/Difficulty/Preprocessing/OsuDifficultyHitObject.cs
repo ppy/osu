@@ -3,7 +3,6 @@
 
 using System;
 using System.Linq;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using OpenTK;
 
