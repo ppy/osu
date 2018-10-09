@@ -81,6 +81,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             circle.Hide();
             circle.AlwaysPresent = true;
             ring.Hide();
+            flash.Hide();
+            explode.Hide();
             number.Hide();
             glow.Hide();
         }
