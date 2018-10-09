@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         }
 
         /* Similar to ApplyHiddenState, only different if drawable is DrawableHitCircle.
-         * If we'd use ApplyHiddenState instead but only on non-DrawableHitCircle's, then 
+         * If we'd use ApplyHiddenState instead but only on non-DrawableHitCircle's, then
          * the nested object HeadCircle of DrawableSlider would still use ApplyHiddenState,
          * thus treating the DrawableHitCircle with the hidden mod instead of the traceable mod.
          */
