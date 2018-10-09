@@ -6,8 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -30,17 +29,17 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             Add(marker = new MarkerVisualisation());
         }
 
-        protected override bool OnDragStart(InputState state) => true;
-        protected override bool OnDragEnd(InputState state) => true;
-        protected override bool OnDrag(InputState state)
+        protected override bool OnDragStart(DragStartEvent e) => true;
+        protected override bool OnDragEnd(DragEndEvent e) => true;
+        protected override bool OnDrag(DragEvent e)
         {
-            seekToPosition(state.Mouse.NativeState.Position);
+            seekToPosition(e.ScreenSpaceMousePosition);
             return true;
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            seekToPosition(state.Mouse.NativeState.Position);
+            seekToPosition(e.ScreenSpaceMousePosition);
             return true;
         }
 

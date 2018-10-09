@@ -218,6 +218,7 @@
   <s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=GMT/@EntryIndexedValue">GMT</s:String>
   <s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=QAT/@EntryIndexedValue">QAT</s:String>
   <s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=BNG/@EntryIndexedValue">BNG</s:String>
+	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/Abbreviations/=UI/@EntryIndexedValue">UI</s:String>
 	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/PredefinedNamingRules/=EnumMember/@EntryIndexedValue">HINT</s:String>
 	<s:String x:Key="/Default/CodeStyle/CSharpFileLayoutPatterns/Pattern/@EntryValue">&lt;?xml version="1.0" encoding="utf-16"?&gt;&#xD;
 &lt;Patterns xmlns="urn:schemas-jetbrains-com:member-reordering-patterns"&gt;&#xD;

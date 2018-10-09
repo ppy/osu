@@ -17,8 +17,7 @@ using osu.Framework.Caching;
 using osu.Framework.Threading;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
@@ -52,8 +51,8 @@ namespace osu.Game.Screens.Select
         /// </summary>
         public Action<BeatmapInfo> SelectionChanged;
 
-        public override bool HandleKeyboardInput => AllowSelection;
-        public override bool HandleMouseInput => AllowSelection;
+        public override bool HandleNonPositionalInput => AllowSelection;
+        public override bool HandlePositionalInput => AllowSelection;
 
         /// <summary>
         /// Used to avoid firing null selections before the initial beatmaps have been loaded via <see cref="BeatmapSets"/>.
@@ -381,12 +380,12 @@ namespace osu.Game.Screens.Select
 
         public void ScrollToSelected() => scrollPositionCache.Invalidate();
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
             int direction = 0;
             bool skipDifficulties = false;
 
-            switch (args.Key)
+            switch (e.Key)
             {
                 case Key.Up:
                     direction = -1;
@@ -405,7 +404,7 @@ namespace osu.Game.Screens.Select
             }
 
             if (direction == 0)
-                return base.OnKeyDown(state, args);
+                return base.OnKeyDown(e);
 
             SelectNext(direction, skipDifficulties);
             return true;
