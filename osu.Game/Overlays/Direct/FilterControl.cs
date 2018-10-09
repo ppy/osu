@@ -73,8 +73,8 @@ namespace osu.Game.Overlays.Direct
                 iconContainer.FadeTo(Ruleset.ID == obj?.ID ? 1f : 0.5f, 100);
             }
 
-            public override bool HandleKeyboardInput => !bindable.Disabled && base.HandleKeyboardInput;
-            public override bool HandleMouseInput => !bindable.Disabled && base.HandleMouseInput;
+            public override bool HandleNonPositionalInput => !bindable.Disabled && base.HandleNonPositionalInput;
+            public override bool HandlePositionalInput => !bindable.Disabled && base.HandlePositionalInput;
 
             public RulesetToggleButton(Bindable<RulesetInfo> bindable, RulesetInfo ruleset)
             {

@@ -17,8 +17,7 @@ using OpenTK.Input;
 using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using System;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat
@@ -144,9 +143,9 @@ namespace osu.Game.Overlays.Chat
                 textBold.FadeOut(transition_length, Easing.OutQuint);
             }
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            protected override bool OnMouseUp(MouseUpEvent e)
             {
-                if (args.Button == MouseButton.Middle)
+                if (e.Button == MouseButton.Middle)
                 {
                     closeButton.Action();
                     return true;
@@ -155,7 +154,7 @@ namespace osu.Game.Overlays.Chat
                 return false;
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 if (IsRemovable)
                     closeButton.FadeIn(200, Easing.OutQuint);
@@ -165,7 +164,7 @@ namespace osu.Game.Overlays.Chat
                 return true;
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 closeButton.FadeOut(200, Easing.OutQuint);
                 updateState();
@@ -291,28 +290,28 @@ namespace osu.Game.Overlays.Chat
                     };
                 }
 
-                protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+                protected override bool OnMouseDown(MouseDownEvent e)
                 {
                     icon.ScaleTo(0.5f, 1000, Easing.OutQuint);
-                    return base.OnMouseDown(state, args);
+                    return base.OnMouseDown(e);
                 }
 
-                protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+                protected override bool OnMouseUp(MouseUpEvent e)
                 {
                     icon.ScaleTo(0.75f, 1000, Easing.OutElastic);
-                    return base.OnMouseUp(state, args);
+                    return base.OnMouseUp(e);
                 }
 
-                protected override bool OnHover(InputState state)
+                protected override bool OnHover(HoverEvent e)
                 {
                     icon.FadeColour(Color4.Red, 200, Easing.OutQuint);
-                    return base.OnHover(state);
+                    return base.OnHover(e);
                 }
 
-                protected override void OnHoverLost(InputState state)
+                protected override void OnHoverLost(HoverLostEvent e)
                 {
                     icon.FadeColour(Color4.White, 200, Easing.OutQuint);
-                    base.OnHoverLost(state);
+                    base.OnHoverLost(e);
                 }
             }
 

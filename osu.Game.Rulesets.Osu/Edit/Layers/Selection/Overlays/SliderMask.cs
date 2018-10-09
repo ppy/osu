@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
             body.UpdateProgress(0);
         }
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => body.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => body.ReceivePositionalInputAt(screenSpacePos);
 
         public override Vector2 SelectionPoint => ToScreenSpace(OriginPosition);
         public override Quad SelectionQuad => body.PathDrawQuad;
