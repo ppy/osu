@@ -4,7 +4,7 @@
 using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
@@ -68,10 +68,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        protected override bool OnMouseMove(InputState state)
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            mousePosition = Parent.ToLocalSpace(state.Mouse.NativeState.Position);
-            return base.OnMouseMove(state);
+            mousePosition = Parent.ToLocalSpace(e.ScreenSpaceMousePosition);
+            return base.OnMouseMove(e);
         }
 
         private Vector2 mousePosition;
