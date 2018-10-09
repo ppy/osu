@@ -10,8 +10,7 @@ using osu.Game.Rulesets.Mods;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -55,16 +54,16 @@ namespace osu.Game.Overlays.Mods
 
         private ModButton[] buttons = { };
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (ToggleKeys != null)
             {
-                var index = Array.IndexOf(ToggleKeys, args.Key);
+                var index = Array.IndexOf(ToggleKeys, e.Key);
                 if (index > -1 && index < buttons.Length)
-                    buttons[index].SelectNext(state.Keyboard.ShiftPressed ? -1 : 1);
+                    buttons[index].SelectNext(e.ShiftPressed ? -1 : 1);
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
         public void DeselectAll() => DeselectTypes(buttons.Select(b => b.SelectedMod?.GetType()).Where(t => t != null));
