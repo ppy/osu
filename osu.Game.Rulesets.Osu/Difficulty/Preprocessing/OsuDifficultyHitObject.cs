@@ -21,12 +21,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public OsuHitObject BaseObject { get; }
 
         /// <summary>
-        /// Normalized distance from the end position of the previous <see cref="OsuDifficultyHitObject"/>.
+        /// Normalized distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
         public double JumpDistance { get; private set; }
 
         /// <summary>
-        /// Normalized distance from the start position to the end position of the previous <see cref="OsuDifficultyHitObject"/>.
+        /// Normalized distance between the start and end position of the previous <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
         public double TravelDistance { get; private set; }
 
