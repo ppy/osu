@@ -10,7 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
 
@@ -97,25 +97,25 @@ namespace osu.Game.Graphics.UserInterface
                 }
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 sampleHover.Play();
                 text.BoldText.FadeIn(transition_length, Easing.OutQuint);
                 text.NormalText.FadeOut(transition_length, Easing.OutQuint);
-                return base.OnHover(state);
+                return base.OnHover(e);
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 text.BoldText.FadeOut(transition_length, Easing.OutQuint);
                 text.NormalText.FadeIn(transition_length, Easing.OutQuint);
-                base.OnHoverLost(state);
+                base.OnHoverLost(e);
             }
 
-            protected override bool OnClick(InputState state)
+            protected override bool OnClick(ClickEvent e)
             {
                 sampleClick.Play();
-                return base.OnClick(state);
+                return base.OnClick(e);
             }
 
             protected sealed override Drawable CreateContent() => text = CreateTextContainer();

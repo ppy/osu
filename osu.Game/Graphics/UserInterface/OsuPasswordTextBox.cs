@@ -9,8 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 
 namespace osu.Game.Graphics.UserInterface
@@ -43,23 +42,23 @@ namespace osu.Game.Graphics.UserInterface
             this.host = host;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (args.Key == Key.CapsLock)
+            if (e.Key == Key.CapsLock)
                 updateCapsWarning(host.CapsLockEnabled);
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
-        protected override void OnFocus(InputState state)
+        protected override void OnFocus(FocusEvent e)
         {
             updateCapsWarning(host.CapsLockEnabled);
-            base.OnFocus(state);
+            base.OnFocus(e);
         }
 
-        protected override void OnFocusLost(InputState state)
+        protected override void OnFocusLost(FocusLostEvent e)
         {
             updateCapsWarning(false);
-            base.OnFocusLost(state);
+            base.OnFocusLost(e);
         }
 
         private void updateCapsWarning(bool visible) => warning.FadeTo(visible ? 1 : 0, 250, Easing.OutQuint);
