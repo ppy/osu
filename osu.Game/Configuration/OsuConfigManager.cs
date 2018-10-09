@@ -83,8 +83,6 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
 
-            Set(OsuSetting.SpeedChangeVisualisation, SpeedChangeVisualisationMethod.Sequential);
-
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
 
             // Update
@@ -143,7 +141,6 @@ namespace osu.Game.Configuration
         ChatDisplayHeight,
         Version,
         ShowConvertedBeatmaps,
-        SpeedChangeVisualisation,
         Skin,
         ScreenshotFormat,
         ScreenshotCaptureMenuCursor,

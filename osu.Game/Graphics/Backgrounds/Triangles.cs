@@ -30,10 +30,6 @@ namespace osu.Game.Graphics.Backgrounds
         /// </summary>
         private const float edge_smoothness = 1;
 
-        public override bool HandleNonPositionalInput => false;
-        public override bool HandlePositionalInput => false;
-
-
         public Color4 ColourLight = Color4.White;
         public Color4 ColourDark = Color4.Black;
 
