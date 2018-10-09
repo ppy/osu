@@ -291,7 +291,7 @@ namespace osu.Game.Overlays
             messageRequest?.Cancel();
 
             ListChannelsRequest req = new ListChannelsRequest();
-            req.Success += delegate (List<Channel> channels)
+            req.Success += delegate(List<Channel> channels)
             {
                 AvailableChannels = channels;
 
@@ -323,10 +323,7 @@ namespace osu.Game.Overlays
 
         protected Channel CurrentChannel
         {
-            get
-            {
-                return currentChannel;
-            }
+            get { return currentChannel; }
 
             set
             {
@@ -445,13 +442,7 @@ namespace osu.Game.Overlays
                 if (updates?.Presence != null)
                 {
                     foreach (var channel in updates.Presence)
-                    {
-                        if (careChannels.Find(c => c.Id == channel.Id) == null)
-                        {
-                            channel.Joined.Value = true;
-                            addChannel(channel);
-                        }
-                    }
+                        addChannel(AvailableChannels.Find(c => c.Id == channel.Id));
 
                     foreach (var group in updates.Messages.GroupBy(m => m.ChannelId))
                         careChannels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
@@ -462,10 +453,7 @@ namespace osu.Game.Overlays
                 fetchReq = null;
             };
 
-            fetchReq.Failure += delegate
-            {
-                fetchReq = null;
-            };
+            fetchReq.Failure += delegate { fetchReq = null; };
 
             api.Queue(fetchReq);
         }
