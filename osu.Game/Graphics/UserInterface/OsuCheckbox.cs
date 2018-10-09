@@ -8,7 +8,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
 
@@ -95,18 +95,18 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             Nub.Glowing = true;
             Nub.Expanded = true;
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             Nub.Glowing = false;
             Nub.Expanded = false;
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
         [BackgroundDependencyLoader]
