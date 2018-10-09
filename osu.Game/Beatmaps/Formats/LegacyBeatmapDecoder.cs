@@ -5,6 +5,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using osu.Framework.IO.File;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Objects.Legacy;
 using osu.Game.Beatmaps.ControlPoints;
@@ -100,7 +101,7 @@ namespace osu.Game.Beatmaps.Formats
             switch (pair.Key)
             {
                 case @"AudioFilename":
-                    metadata.AudioFile = pair.Value;
+                    metadata.AudioFile = FileSafety.PathStandardise(pair.Value);
                     break;
                 case @"AudioLeadIn":
                     beatmap.BeatmapInfo.AudioLeadIn = int.Parse(pair.Value);
@@ -256,7 +257,7 @@ namespace osu.Game.Beatmaps.Formats
             {
                 case EventType.Background:
                     string filename = split[2].Trim('"');
-                    beatmap.BeatmapInfo.Metadata.BackgroundFile = filename;
+                    beatmap.BeatmapInfo.Metadata.BackgroundFile = FileSafety.PathStandardise(filename);
                     break;
                 case EventType.Break:
                     var breakEvent = new BreakPeriod
