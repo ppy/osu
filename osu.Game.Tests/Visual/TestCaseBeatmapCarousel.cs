@@ -77,6 +77,7 @@ namespace osu.Game.Tests.Visual
             testEmptyTraversal();
             testHiding();
             testSelectingFilteredRuleset();
+            testFilterByStarRange();
             testCarouselRootIsRandom();
         }
 
@@ -243,6 +244,54 @@ namespace osu.Game.Tests.Visual
             AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
 
             AddAssert("Selection is non-null", () => currentSelection != null);
+        }
+
+        /// <summary>
+        /// Test filtering by restricting the desired star range
+        /// </summary>
+        private void testFilterByStarRange()
+        {
+            var manyStarDiffs = createTestBeatmapSet(set_count + 1);
+            manyStarDiffs.Beatmaps.Clear();
+
+            for (int i = 0; i < 12; i++)
+            {
+                manyStarDiffs.Beatmaps.Add(new BeatmapInfo
+                {
+                    OnlineBeatmapID = manyStarDiffs.ID * 10 + i,
+                    Path = $"randomDiff{i}.osu",
+                    Version = $"Totally Normal {i}",
+                    StarDifficulty = i,
+                    BaseDifficulty = new BeatmapDifficulty
+                    {
+                        OverallDifficulty = 5,
+                    }
+                });
+            }
+
+            AddStep("add set with many stars", () => carousel.UpdateBeatmapSet(manyStarDiffs));
+
+            AddStep("select added set", () => carousel.SelectBeatmap(manyStarDiffs.Beatmaps[0], false));
+
+            AddStep("Filter to 1-3 stars", () => carousel.Filter(new FilterCriteria { DisplayStarsMinimum = 1, DisplayStarsMaximum = 3 }, false));
+            checkVisibleItemCount(diff: false, count: 1);
+            checkVisibleItemCount(diff: true, count: 3);
+
+            AddStep("Filter to 3-3 stars", () => carousel.Filter(new FilterCriteria { DisplayStarsMinimum = 3, DisplayStarsMaximum = 3 }, false));
+            checkVisibleItemCount(diff: false, count: 1);
+            checkVisibleItemCount(diff: true, count: 1);
+
+            AddStep("Filter to 4-2 stars", () => carousel.Filter(new FilterCriteria { DisplayStarsMinimum = 4, DisplayStarsMaximum = 2 }, false));
+            checkVisibleItemCount(diff: false, count: 0);
+            checkVisibleItemCount(diff: true, count: 0);
+
+            AddStep("remove added set", () =>
+            {
+                carousel.RemoveBeatmapSet(manyStarDiffs);
+                manyStarDiffs = null;
+            });
+
+            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
         }
 
         /// <summary>

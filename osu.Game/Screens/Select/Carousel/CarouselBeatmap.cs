@@ -26,6 +26,12 @@ namespace osu.Game.Screens.Select.Carousel
 
             bool match = criteria.Ruleset == null || Beatmap.RulesetID == criteria.Ruleset.ID || Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps;
 
+            if(criteria.DisplayStarsMinimum.HasValue)
+                match &= Beatmap.StarDifficulty >= criteria.DisplayStarsMinimum;
+
+            if (criteria.DisplayStarsMaximum.HasValue)
+                match &= Beatmap.StarDifficulty <= criteria.DisplayStarsMaximum;
+
             if (!string.IsNullOrEmpty(criteria.SearchText))
                 match &=
                     Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteria.SearchText, StringComparison.InvariantCultureIgnoreCase) >= 0) ||
