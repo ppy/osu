@@ -27,12 +27,14 @@ namespace osu.Game.Beatmaps
         [JsonProperty("id")]
         public int? OnlineBeatmapID
         {
-            get { return onlineBeatmapID; }
-            set { onlineBeatmapID = value > 0 ? value : null; }
+            get => onlineBeatmapID;
+            set => onlineBeatmapID = value > 0 ? value : null;
         }
 
         [JsonIgnore]
         public int BeatmapSetInfoID { get; set; }
+
+        public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
 
         [Required]
         public BeatmapSetInfo BeatmapSet { get; set; }
@@ -82,7 +84,7 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public string StoredBookmarks
         {
-            get { return string.Join(",", Bookmarks); }
+            get => string.Join(",", Bookmarks);
             set
             {
                 if (string.IsNullOrEmpty(value))
@@ -93,8 +95,7 @@ namespace osu.Game.Beatmaps
 
                 Bookmarks = value.Split(',').Select(v =>
                 {
-                    int val;
-                    bool result = int.TryParse(v, out val);
+                    bool result = int.TryParse(v, out int val);
                     return new { result, val };
                 }).Where(p => p.result).Select(p => p.val).ToArray();
             }

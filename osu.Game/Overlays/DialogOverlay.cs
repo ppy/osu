@@ -43,7 +43,7 @@ namespace osu.Game.Overlays
 
         protected override bool PlaySamplesOnStateChange => false;
 
-        protected override bool BlockPassThroughKeyboard => true;
+        protected override bool BlockNonPositionalInput => true;
 
         private void onDialogOnStateChanged(VisibilityContainer dialog, Visibility v)
         {
