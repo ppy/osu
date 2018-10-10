@@ -113,6 +113,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
 
         private void beginCurve()
         {
+            HitObject.StartTime = EditorClock.CurrentTime;
             setState(PlacementState.Body);
         }
 
