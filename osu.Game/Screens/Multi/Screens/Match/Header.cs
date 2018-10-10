@@ -8,8 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -151,28 +150,28 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 border.BorderColour = colours.Yellow;
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 border.FadeIn(transition_duration);
-                return base.OnHover(state);
+                return base.OnHover(e);
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
-                base.OnHoverLost(state);
+                base.OnHoverLost(e);
                 border.FadeOut(transition_duration);
             }
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            protected override bool OnMouseDown(MouseDownEvent e)
             {
                 bg.FadeTo(0.75f, 1000, Easing.Out);
-                return base.OnMouseDown(state, args);
+                return base.OnMouseDown(e);
             }
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            protected override bool OnMouseUp(MouseUpEvent e)
             {
                 bg.FadeTo(bg_opacity, transition_duration);
-                return base.OnMouseUp(state, args);
+                return base.OnMouseUp(e);
             }
         }
     }

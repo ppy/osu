@@ -386,10 +386,13 @@ namespace osu.Game.Overlays.Profile
                 infoTextLeft.AddText(new DrawableJoinDate(user.JoinDate), boldItalic);
             }
 
-            infoTextLeft.NewLine();
-            infoTextLeft.AddText("Last seen ", lightText);
-            infoTextLeft.AddText(new DrawableDate(user.LastVisit), boldItalic);
-            infoTextLeft.NewParagraph();
+            if (user.LastVisit.HasValue)
+            {
+                infoTextLeft.NewLine();
+                infoTextLeft.AddText("Last seen ", lightText);
+                infoTextLeft.AddText(new DrawableDate(user.LastVisit.Value), boldItalic);
+                infoTextLeft.NewParagraph();
+            }
 
             if (user.PlayStyle?.Length > 0)
             {
