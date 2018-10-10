@@ -74,8 +74,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 lastTravelDistance = lastSlider.LazyTravelDistance;
             }
 
-            JumpDistance = (BaseObject.Position * scalingFactor - lastCursorPosition * scalingFactor).Length;
-            TravelDistance = lastTravelDistance * scalingFactor;
+            // Don't need to jump to reach spinners
+            if (!(BaseObject is Spinner))
+                JumpDistance = (BaseObject.Position * scalingFactor - lastCursorPosition * scalingFactor).Length;
+
+            // Todo: BUG!!! Last slider's travel distance is considered ONLY IF we ourselves are also sliders!
+            if (BaseObject is Slider)
+                TravelDistance = lastTravelDistance * scalingFactor;
         }
 
         private void setTimingValues()
