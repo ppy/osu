@@ -46,8 +46,15 @@ namespace osu.Game.Rulesets.Catch.Replays
                 (h1.StartTime.CompareTo(h2.StartTime) == 0 ? h1.HyperDash.CompareTo(h2.HyperDash) : 0); //we need hyper dashes to be last in case of equality.
             });
 
-            //Building the score while skipping droplets/banana that are during an hyperdash from the list
+            // Removing droplets/banana that are during an hyperdash from the list
             bool skipping = false;
+            for (int i = 0; i < objects.Count; ++i)
+                if (skipping && (objects[i] is Banana || objects[i] is TinyDroplet))
+                    objects.RemoveAt(i--);
+                else
+                    skipping = objects[i].HyperDash;
+
+            //Building the score
             List<CatchStepFunction> scores = new List<CatchStepFunction>();
             List<double> times = new List<double>();
             scores.Insert(0, new CatchStepFunction()); // After the last object, there is no more score to be made
@@ -55,19 +62,8 @@ namespace osu.Game.Rulesets.Catch.Replays
             for (int i = objects.Count - 1; i >= 0; --i)
             {
                 int value;
-                CatchHitObject obj = objects[i]; ;
-                if (obj is Fruit || obj is Droplet)
-                {
-                    skipping = obj.HyperDash;
-                    value = obj is Fruit ? 300 : 20;
-                }
-                else if (skipping)
-                {
-                    objects.RemoveAt(i);
-                    continue;
-                }
-                else
-                    value = 1;
+                CatchHitObject obj = objects[i];
+                value = obj is Banana || obj is TinyDroplet ? 1 : obj is Fruit ? 300 : 20;
                 if (obj.StartTime != times[0])
                 {
                     scores.Insert(0, new CatchStepFunction(scores[0], (float)(dash_speed * (times[0] - obj.StartTime))));
@@ -77,27 +73,24 @@ namespace osu.Game.Rulesets.Catch.Replays
                 {
                     float distance = Math.Abs(obj.HyperDashTarget.X - obj.X);
                     scores[0].Set(Math.Max(0, obj.X - halfCatcherWidth), Math.Min(1, obj.X + halfCatcherWidth),
-                    scores[0].Max(obj.X - distance, obj.X + distance));
+                    scores[1].Max(obj.X - distance, obj.X + distance));
                 }
                 scores[0].Add(Math.Max(0, obj.X - halfCatcherWidth), Math.Min(1, obj.X + halfCatcherWidth), value);
             }
-            Replay.Frames.Add(new CatchReplayFrame(0, 0.5f));
             float lastPosition = 0.5f;
-            double lastTime = 0;
-            float nexthyperDashDistance = 0;
+            double lastTime = -1000;
+            Replay.Frames.Add(new CatchReplayFrame(lastTime, lastPosition));
             float hyperDashDistance = 0;
             for (int i = 0, j = 0; i < objects.Count; ++i)
             {
-                if (objects[i].StartTime != times[j])
+                if (objects[i].StartTime != lastTime)
                 {
                     float movementRange = hyperDashDistance == 0 ? (float)(dash_speed * (times[j] - lastTime)) : hyperDashDistance;
                     lastPosition = scores[j].OptimalPath(lastPosition - movementRange, lastPosition + movementRange);
-                    lastTime = times[j];
+                    lastTime = times[j++];
                     Replay.Frames.Add(new CatchReplayFrame(lastTime, lastPosition));
-                    ++j;
-                    hyperDashDistance = nexthyperDashDistance;
                 }
-                nexthyperDashDistance = objects[i].HyperDash && lastPosition >= objects[i].X - halfCatcherWidth && lastPosition <= objects[i].X + halfCatcherWidth
+                hyperDashDistance = objects[i].HyperDash && lastPosition >= objects[i].X - halfCatcherWidth && lastPosition <= objects[i].X + halfCatcherWidth
                 ? Math.Abs(objects[i].HyperDashTarget.X - lastPosition) : 0;
             }
             return Replay;
