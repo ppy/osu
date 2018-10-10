@@ -71,17 +71,17 @@ namespace osu.Game.Input.Bindings
         ToggleSettings,
         [Description("Toggle osu!direct")]
         ToggleDirect,
-        [Description("Increase Volume")]
+        [Description("Increase volume")]
         IncreaseVolume,
-        [Description("Decrease Volume")]
+        [Description("Decrease volume")]
         DecreaseVolume,
         [Description("Toggle mute")]
         ToggleMute,
 
         // In-Game Keybindings
-        [Description("Skip Cutscene")]
+        [Description("Skip cutscene")]
         SkipCutscene,
-        [Description("Quick Retry (Hold)")]
+        [Description("Quick retry (hold)")]
         QuickRetry,
 
         [Description("Take screenshot")]
