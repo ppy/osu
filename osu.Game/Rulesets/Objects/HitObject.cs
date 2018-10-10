@@ -75,11 +75,11 @@ namespace osu.Game.Rulesets.Objects
 
             nestedHitObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
-            nestedHitObjects.ForEach(h =>
+            foreach (var h in nestedHitObjects)
             {
                 h.HitWindows = HitWindows;
                 h.ApplyDefaults(controlPointInfo, difficulty);
-            });
+            }
         }
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
