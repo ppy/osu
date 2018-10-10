@@ -64,23 +64,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             Vector2 lastCursorPosition = lastObject.StackedPosition;
-            float lastTravelDistance = 0;
 
             var lastSlider = lastObject as Slider;
             if (lastSlider != null)
             {
                 computeSliderCursorPosition(lastSlider);
                 lastCursorPosition = lastSlider.LazyEndPosition ?? lastCursorPosition;
-                lastTravelDistance = lastSlider.LazyTravelDistance;
             }
 
             // Don't need to jump to reach spinners
             if (!(BaseObject is Spinner))
                 JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
 
-            // Todo: BUG!!! Last slider's travel distance is considered ONLY IF we ourselves are also sliders!
+            // Todo: BUG!!! Last slider's travel distance is considered ONLY IF we ourselves are also a slider!
             if (BaseObject is Slider)
-                TravelDistance = lastTravelDistance * scalingFactor;
+                TravelDistance = (lastSlider?.LazyTravelDistance ?? 0) * scalingFactor;
         }
 
         private void setTimingValues()
