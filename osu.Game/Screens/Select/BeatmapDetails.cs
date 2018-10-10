@@ -327,11 +327,6 @@ namespace osu.Game.Screens.Select
                                 TextSize = 14,
                             },
                         },
-                        textFlow = new OsuTextFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        },
                     },
                 };
             }
@@ -349,6 +344,8 @@ namespace osu.Game.Screens.Select
                     setTextAsync(value);
                 }
             }
+
+            public override bool IsPresent => base.IsPresent || textFlow == null; // Visibility is updated in the LoadComponentAsync callback
 
             private void setTextAsync(string text)
             {

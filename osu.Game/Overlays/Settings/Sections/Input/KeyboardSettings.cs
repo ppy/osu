@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 new SettingsButton
                 {
-                    Text = "Key Configuration",
+                    Text = "Key configuration",
                     Action = keyConfig.ToggleVisibility
                 },
             };
