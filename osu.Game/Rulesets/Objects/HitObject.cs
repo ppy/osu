@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public HitWindows HitWindows { get; set; }
 
-        private readonly Lazy<SortedList<HitObject>> nestedHitObjects = new Lazy<SortedList<HitObject>>(() => new SortedList<HitObject>((h1, h2) => h1.StartTime.CompareTo(h2.StartTime)));
+        private readonly Lazy<List<HitObject>> nestedHitObjects = new Lazy<List<HitObject>>(() => new List<HitObject>());
 
         [JsonIgnore]
         public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects.Value;
@@ -79,6 +79,8 @@ namespace osu.Game.Rulesets.Objects
 
             if (nestedHitObjects.IsValueCreated)
             {
+                nestedHitObjects.Value.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
+
                 nestedHitObjects.Value.ForEach(h =>
                 {
                     h.HitWindows = HitWindows;
