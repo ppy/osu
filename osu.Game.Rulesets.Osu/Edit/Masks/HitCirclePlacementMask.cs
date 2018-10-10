@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
 
         protected override bool OnClick(ClickEvent e)
         {
+            HitObject.StartTime = EditorClock.CurrentTime;
             HitObject.Position = e.MousePosition;
             Finish();
             return true;
