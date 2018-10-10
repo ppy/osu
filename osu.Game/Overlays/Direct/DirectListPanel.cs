@@ -10,8 +10,8 @@ using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
-using osu.Framework.Localisation;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Direct
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load(LocalisationEngine localisation, OsuColour colours)
+        private void load(OsuColour colours)
         {
             Content.CornerRadius = 5;
 
@@ -94,13 +94,13 @@ namespace osu.Game.Overlays.Direct
                                                     {
                                                         new OsuSpriteText
                                                         {
-                                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
+                                                            Text = new LocalisedString((SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title)),
                                                             TextSize = 18,
                                                             Font = @"Exo2.0-BoldItalic",
                                                         },
                                                         new OsuSpriteText
                                                         {
-                                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
+                                                            Text = new LocalisedString((SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist)),
                                                             Font = @"Exo2.0-BoldItalic",
                                                         },
                                                     }

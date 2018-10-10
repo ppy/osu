@@ -12,8 +12,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
@@ -168,25 +167,25 @@ namespace osu.Game.Overlays.Settings
 
             public string TooltipText => "Revert to default";
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;
+            protected override bool OnMouseUp(MouseUpEvent e) => true;
 
-            protected override bool OnClick(InputState state)
+            protected override bool OnClick(ClickEvent e)
             {
                 if (bindable != null && !bindable.Disabled)
                     bindable.SetDefault();
                 return true;
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 hovering = true;
                 UpdateState();
                 return false;
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 hovering = false;
                 UpdateState();

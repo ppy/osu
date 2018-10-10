@@ -8,7 +8,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -138,13 +138,13 @@ namespace osu.Game.Screens.Edit.Components
                     textBold.Colour = hoveredColour = colours.Yellow;
                 }
 
-                protected override bool OnHover(InputState state)
+                protected override bool OnHover(HoverEvent e)
                 {
                     updateState();
                     return true;
                 }
 
-                protected override void OnHoverLost(InputState state) => updateState();
+                protected override void OnHoverLost(HoverLostEvent e) => updateState();
                 protected override void OnActivated() => updateState();
                 protected override void OnDeactivated() => updateState();
 
