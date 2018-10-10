@@ -20,8 +20,6 @@ namespace osu.Game.Graphics.Containers
         {
         }
 
-        public override bool HandleMouseInput => true;
-
         private OsuGame game;
 
         private Action showNotImplementedError;

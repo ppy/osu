@@ -78,8 +78,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private bool judgementOccurred;
 
         public bool Interactive = true;
-        public override bool HandleKeyboardInput => Interactive;
-        public override bool HandleMouseInput => Interactive;
+        public override bool HandleNonPositionalInput => Interactive;
+        public override bool HandlePositionalInput => Interactive;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
         /// <summary>
-        /// Plays all the hitsounds for this <see cref="DrawableHitObject"/>.
+        /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
         /// </summary>
         public void PlaySamples() => Samples?.Play();
 

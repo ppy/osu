@@ -29,7 +29,7 @@ namespace osu.Game.Overlays.Profile.Sections
         public string TooltipText { get; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(LocalisationEngine locale, BeatmapSetOverlay beatmapSetOverlay)
+        private void load(BeatmapSetOverlay beatmapSetOverlay)
         {
             Action = () =>
             {
@@ -46,16 +46,14 @@ namespace osu.Game.Overlays.Profile.Sections
                 {
                     new OsuSpriteText
                     {
-                        Current = locale.GetUnicodePreference(
-                            $"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
-                            $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] "
-                        ),
+                        Text = new LocalisedString(($"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
+                                                    $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
                         TextSize = 15,
                         Font = "Exo2.0-SemiBoldItalic",
                     },
                     new OsuSpriteText
                     {
-                        Current = locale.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist),
+                        Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
                         TextSize = 12,
                         Padding = new MarginPadding { Top = 3 },
                         Font = "Exo2.0-RegularItalic",

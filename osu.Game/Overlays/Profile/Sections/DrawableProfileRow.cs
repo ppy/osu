@@ -6,7 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using OpenTK;
 using OpenTK.Graphics;
@@ -105,20 +105,20 @@ namespace osu.Game.Overlays.Profile.Sections
             coloredBackground.Colour = underscoreLine.Colour = colour.Gray4;
         }
 
-        protected override bool OnClick(InputState state) => true;
+        protected override bool OnClick(ClickEvent e) => true;
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             background.FadeIn(fade_duration, Easing.OutQuint);
             underscoreLine.FadeOut(fade_duration, Easing.OutQuint);
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             background.FadeOut(fade_duration, Easing.OutQuint);
             underscoreLine.FadeIn(fade_duration, Easing.OutQuint);
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
     }
 }
