@@ -35,6 +35,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double DeltaTime { get; private set; }
 
+        /// <summary>
+        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 50ms.
+        /// </summary>
+        public double StrainTime { get; private set; }
+
         private readonly OsuHitObject lastObject;
         private readonly double timeRate;
 
@@ -83,8 +88,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 
         private void setTimingValues()
         {
-            // Every timing inverval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure.
-            DeltaTime = Math.Max(50, (BaseObject.StartTime - lastObject.StartTime) / timeRate);
+            DeltaTime = (BaseObject.StartTime - lastObject.StartTime) / timeRate;
+
+            // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
+            StrainTime = Math.Max(50, DeltaTime);
         }
 
         private void computeSliderCursorPosition(Slider slider)
