@@ -32,14 +32,13 @@ namespace osu.Game.Screens.Select
 
         public SortMode Sort
         {
-            get { return sort; }
+            get => sort;
             set
             {
-                if (sort != value)
-                {
-                    sort = value;
-                    FilterChanged?.Invoke(CreateCriteria());
-                }
+                if (sort == value) return;
+
+                sort = value;
+                FilterChanged?.Invoke(CreateCriteria());
             }
         }
 
@@ -47,14 +46,13 @@ namespace osu.Game.Screens.Select
 
         public GroupMode Group
         {
-            get { return group; }
+            get => group;
             set
             {
-                if (group != value)
-                {
-                    group = value;
-                    FilterChanged?.Invoke(CreateCriteria());
-                }
+                if (group == value) return;
+
+                group = value;
+                FilterChanged?.Invoke(CreateCriteria());
             }
         }
 
@@ -64,7 +62,9 @@ namespace osu.Game.Screens.Select
             Sort = sort,
             SearchText = searchTextBox.Text,
             AllowConvertedBeatmaps = showConverted,
-            Ruleset = ruleset.Value
+            Ruleset = ruleset.Value,
+            DisplayStarsMinimum = minimumStars,
+            DisplayStarsMaximum = maximumStars,
         };
 
         public Action Exit;
@@ -168,7 +168,9 @@ namespace osu.Game.Screens.Select
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
-        private Bindable<bool> showConverted;
+        private readonly Bindable<bool> showConverted = new Bindable<bool>();
+        private readonly Bindable<double> minimumStars = new Bindable<double>();
+        private readonly Bindable<double> maximumStars = new Bindable<double>();
 
         public readonly Box Background;
 
@@ -177,8 +179,14 @@ namespace osu.Game.Screens.Select
         {
             sortTabs.AccentColour = colours.GreenLight;
 
-            showConverted = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
-            showConverted.ValueChanged += val => updateCriteria();
+            config.BindWith(OsuSetting.ShowConvertedBeatmaps, showConverted);
+            showConverted.ValueChanged += _ => updateCriteria();
+
+            config.BindWith(OsuSetting.DisplayStarsMinimum, minimumStars);
+            minimumStars.ValueChanged += _ => updateCriteria();
+
+            config.BindWith(OsuSetting.DisplayStarsMaximum, maximumStars);
+            maximumStars.ValueChanged += _ => updateCriteria();
 
             ruleset.BindTo(parentRuleset);
             ruleset.BindValueChanged(_ => updateCriteria(), true);
