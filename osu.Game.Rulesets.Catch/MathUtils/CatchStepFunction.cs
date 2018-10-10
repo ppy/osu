@@ -17,12 +17,12 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         ///<summary>
         /// Partition of the step function, on [0;1]
         ///</summary>
-        private List<float> partition = new List<float>();
+        private readonly List<float> partition = new List<float>();
         ///<summary>
         /// Values that the step function takes. 
         /// value[i] is the value on [partition[i], partition[i+1]]
         ///</summary>
-        private List<int> values = new List<int>();
+        private readonly List<int> values = new List<int>();
 
         ///<summary>
         /// Constructs a null function.
@@ -43,18 +43,17 @@ namespace osu.Game.Rulesets.Catch.MathUtils
 
             // windowsLeft is the index of the first input partition that is strictly greater than the left of the window
             // windowsRight is the index of the first input partition that is strictly greater than the right of the window
-            int windowLeft, windowRight, windowMax;
+            int windowLeft = 0, windowRight, windowMax;
             Queue<int> window = new Queue<int>();
 
             // Extend the input function left and right, to simplify things
             input.partition.Add(1 + halfWindowWidth);
             input.values.Add(0);
-            input.partition.Insert(0,-halfWindowWidth);
-            input.values.Insert(0,0);
+            input.partition.Insert(0, -halfWindowWidth);
+            input.values.Insert(0, 0);
 
             // Initialising the window.
-            windowLeft = 0;
-            for(windowRight = windowLeft; input.partition[windowRight] <= halfWindowWidth; ++windowRight)
+            for (windowRight = windowLeft; input.partition[windowRight] <= halfWindowWidth; ++windowRight)
                 window.Enqueue(input.values[windowRight]);
             windowMax = window.Max();
             ++windowLeft;
@@ -62,7 +61,7 @@ namespace osu.Game.Rulesets.Catch.MathUtils
             // At each iteration we slide the windows one step to the right,
             // adding a new value and partition each time, until the end.
             partition.Add(0);
-            while(true)
+            while (true)
             {
                 values.Add(windowMax);
                 // This distance is used to know if it is the left side or the right side of the windows
@@ -71,22 +70,22 @@ namespace osu.Game.Rulesets.Catch.MathUtils
                 if (distance <= 0)
                 {
                     //if we reach the end, stop. The last partition (1) is added after the loop.
-                    if(windowRight == input.partition.Count - 1)
+                    if (windowRight == input.partition.Count - 1)
                         break;
                     windowMax = Math.Max(windowMax, input.values[windowRight]);
                     window.Enqueue(input.values[windowRight]);
                     partition.Add(input.partition[windowRight] - halfWindowWidth);
                     ++windowRight;
                 }
-                if(distance >= 0)
+                if (distance >= 0)
                 {
-                    if(window.Dequeue() == windowMax)
+                    if (window.Dequeue() == windowMax)
                         windowMax = window.Max();
                     partition.Add(input.partition[windowLeft] + halfWindowWidth);
                     ++windowLeft;
                 }
                 //if we added the same partition twice (moving two steps in a iteration)
-                if(distance == 0)
+                if (distance == 0)
                     partition.RemoveAt(partition.Count - 1);
             }
             partition.Add(1);
@@ -114,14 +113,14 @@ namespace osu.Game.Rulesets.Catch.MathUtils
             for (int i = partition.Count - 1; i > 1; --i)
                 if (partition[i] == partition[i - 1])
                 {
-                    values.RemoveAt(i-1);
+                    values.RemoveAt(i - 1);
                     partition.RemoveAt(i);
                 }
         }
 
         ///<summary>
-        /// Adds <param name="value"> time the indicator function of
-        /// [<param name="from">, <param name="to">] to the step function.
+        /// Adds <param name="value"></param> time the indicator function of
+        /// [<param name="from"></param>, <param name="to"></param>] to the step function.
         ///</summary>
         public void Add(float from, float to, int value)
         {
@@ -130,10 +129,10 @@ namespace osu.Game.Rulesets.Catch.MathUtils
             Assert.GreaterOrEqual(1, to);
 
             int indexStart, indexEnd;
-            for (indexStart = 0; partition[indexStart] <= from; ++indexStart) ;
+            for (indexStart = 0; partition[indexStart] <= from; ++indexStart) { continue; }
             partition.Insert(indexStart, from);
             values.Insert(indexStart, values[indexStart - 1]);
-            for (indexEnd = indexStart; partition[indexEnd] < to; ++indexEnd) ;
+            for (indexEnd = indexStart; partition[indexEnd] < to; ++indexEnd) { continue; }
             partition.Insert(indexEnd, to);
             values.Insert(indexEnd - 1, values[indexEnd - 1]);
             for (int i = indexStart; i < indexEnd; ++i)
@@ -148,10 +147,10 @@ namespace osu.Game.Rulesets.Catch.MathUtils
             Assert.GreaterOrEqual(1, to);
 
             int indexStart, indexEnd;
-            for (indexStart = 0; partition[indexStart] <= from; ++indexStart) ;
+            for (indexStart = 0; partition[indexStart] <= from; ++indexStart) { continue; }
             partition.Insert(indexStart, from);
             values.Insert(indexStart, values[indexStart - 1]);
-            for (indexEnd = indexStart; partition[indexEnd] < to; ++indexEnd) ;
+            for (indexEnd = indexStart; partition[indexEnd] < to; ++indexEnd) { continue; }
             partition.Insert(indexEnd, to);
             values.Insert(indexEnd - 1, values[indexEnd - 1]);
             for (int i = indexStart; i < indexEnd; ++i)
@@ -160,37 +159,41 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         }
 
         ///<summary>
-        /// Maximal value on [<param name="from">, <param name="to">]
+        /// Maximal value on [<param name="from"></param>, <param name="to"></param>]
         ///</summary>
         public int Max(float from, float to)
         {
             int max = 0;
-            for(int i = 0; i < values.Count; ++i)
-                if(values[i] > max && partition[i] < to && partition[i+1] > from)
+            for (int i = 0; i < values.Count; ++i)
+                if (values[i] > max && partition[i] < to && partition[i + 1] > from)
                     max = values[i];
             return max;
         }
 
         ///<summary>
-        /// Returns a point of [<param name="from">, <param name="to">] that reach the
-        /// maximal value on [<param name="from">, <param name="to">].
-        /// We return the point furthest away from a suboptimal point,
+        /// Returns a point of [<param name="from"></param>, <param name="to"></param>] that reach the
+        /// maximal value on [<param name="from"></param>, <param name="to"></param>].
+        /// Returns <param name="target"></param> if it works,
+        /// we return the point furthest away from a suboptimal point otherwise,
         /// as it will often be the easiest optimal path, from a gameplay perspective.
         ///</summary>
-        public float OptimalPath(float from, float to)
+        public float OptimalPath(float from, float to, float target)
         {
-            Assert.GreaterOrEqual(to, from);
+            Assert.GreaterOrEqual(to, target);
+            Assert.GreaterOrEqual(target, from);
 
             int max = Max(from, to);
             float ret = -1, value = -1;
             for (int i = 0; i < values.Count; ++i)
                 if (values[i] == max && partition[i] <= to && partition[i + 1] >= from)
                 {
-                    float newValue = partition[i+1] - partition[i];
-                    if(newValue > value)
+                    if (target >= partition[i] && target <= partition[i + 1])
+                        return target;
+                    float newValue = partition[i + 1] - partition[i];
+                    if (newValue > value)
                     {
                         value = newValue;
-                        ret = MathHelper.Clamp((partition[i+1] + partition[i]) / 2, from, to);
+                        ret = MathHelper.Clamp((partition[i + 1] + partition[i]) / 2, from, to);
                     }
                 }
             return ret;

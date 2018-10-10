@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.MathUtils;
@@ -11,7 +10,6 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Users;
-using osu.Framework.Logging;
 namespace osu.Game.Rulesets.Catch.Replays
 {
     internal class CatchAutoGenerator2 : AutoGenerator<CatchHitObject>
@@ -27,7 +25,7 @@ namespace osu.Game.Rulesets.Catch.Replays
         public override Replay Generate()
         {
             float halfCatcherWidth = CatcherArea.GetCatcherSize(Beatmap.BeatmapInfo.BaseDifficulty) / 2;
-            double dash_speed = CatcherArea.Catcher.BASE_SPEED;
+            const double dash_speed = CatcherArea.Catcher.BASE_SPEED;
             // Todo: Realistically this shouldn't be needed, but the first frame is skipped with the way replays are currently handled
             Replay.Frames.Add(new CatchReplayFrame(-100000, 0.5f));
             List<CatchHitObject> objects = new List<CatchHitObject>();
@@ -61,9 +59,8 @@ namespace osu.Game.Rulesets.Catch.Replays
             times.Insert(0, 1 + objects[objects.Count - 1].StartTime); //some time after the last object
             for (int i = objects.Count - 1; i >= 0; --i)
             {
-                int value;
                 CatchHitObject obj = objects[i];
-                value = obj is Banana || obj is TinyDroplet ? 1 : obj is Fruit ? 300 : 20;
+                int value = obj is Banana || obj is TinyDroplet ? 1 : obj is Fruit ? 300 : 20;
                 if (obj.StartTime != times[0])
                 {
                     scores.Insert(0, new CatchStepFunction(scores[0], (float)(dash_speed * (times[0] - obj.StartTime))));
@@ -78,17 +75,48 @@ namespace osu.Game.Rulesets.Catch.Replays
                 scores[0].Add(Math.Max(0, obj.X - halfCatcherWidth), Math.Min(1, obj.X + halfCatcherWidth), value);
             }
             float lastPosition = 0.5f;
-            double lastTime = -1000;
-            Replay.Frames.Add(new CatchReplayFrame(lastTime, lastPosition));
+            double lastTime = -10000;
+            void moveToNext(float target, double time)
+            {
+                const double movementSpeed = dash_speed / 2;
+                float positionChange = Math.Abs(lastPosition - target);
+                double timeAvailable = time - lastTime;
+                //So we can either make it there without a dash or not.
+                double speedRequired = positionChange / timeAvailable;
+                bool dashRequired = speedRequired > movementSpeed && time != 0;
+                if (dashRequired)
+                {
+                    //we do a movement in two parts - the dash part then the normal part...
+                    double timeAtDashSpeed = (positionChange - movementSpeed * timeAvailable) / (dash_speed - movementSpeed);
+                    if (timeAtDashSpeed <= timeAvailable)
+                    {
+                        float midPosition = lastPosition + Math.Sign(target - lastPosition) * (float)(timeAtDashSpeed * dash_speed);
+                        //dash movement
+                        Replay.Frames.Add(new CatchReplayFrame(lastTime + timeAtDashSpeed, midPosition, true));
+                        Replay.Frames.Add(new CatchReplayFrame(time, target));
+                    }
+                    else
+                        Replay.Frames.Add(new CatchReplayFrame(time, target, true));
+                }
+                else
+                {
+                    double timeBefore = positionChange / movementSpeed;
+
+                    Replay.Frames.Add(new CatchReplayFrame(lastTime + timeBefore, target));
+                    Replay.Frames.Add(new CatchReplayFrame(time, target));
+                }
+                lastTime = time;
+                lastPosition = target;
+            }
+            moveToNext(0.5f, 0);
             float hyperDashDistance = 0;
             for (int i = 0, j = 0; i < objects.Count; ++i)
             {
                 if (objects[i].StartTime != lastTime)
                 {
                     float movementRange = hyperDashDistance == 0 ? (float)(dash_speed * (times[j] - lastTime)) : hyperDashDistance;
-                    lastPosition = scores[j].OptimalPath(lastPosition - movementRange, lastPosition + movementRange);
-                    lastTime = times[j++];
-                    Replay.Frames.Add(new CatchReplayFrame(lastTime, lastPosition));
+                    float target = scores[j].OptimalPath(lastPosition - movementRange, lastPosition + movementRange, lastPosition);
+                    moveToNext(target, times[j++]);
                 }
                 hyperDashDistance = objects[i].HyperDash && lastPosition >= objects[i].X - halfCatcherWidth && lastPosition <= objects[i].X + halfCatcherWidth
                 ? Math.Abs(objects[i].HyperDashTarget.X - lastPosition) : 0;
