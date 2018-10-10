@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         protected readonly HitObject HitObject;
 
-        private IAdjustableClock clock;
+        protected IClock EditorClock { get; private set; }
 
         public PlacementMask(HitObject hitObject)
         {
@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(IBindableBeatmap workingBeatmap, IAdjustableClock clock)
         {
-            this.clock = clock;
+            EditorClock = clock;
 
             HitObject.ApplyDefaults(workingBeatmap.Value.Beatmap.ControlPointInfo, workingBeatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty);
         }
@@ -44,13 +44,6 @@ namespace osu.Game.Rulesets.Edit
         /// Finishes the placement of <see cref="HitObject"/>.
         /// </summary>
         public void Finish() => PlacementFinished?.Invoke(HitObject);
-
-        protected override void Update()
-        {
-            base.Update();
-
-            HitObject.StartTime = clock.CurrentTime;
-        }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.ReceivePositionalInputAt(screenSpacePos) ?? false;
 
