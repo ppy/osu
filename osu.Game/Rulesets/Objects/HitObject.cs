@@ -1,11 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -58,10 +55,10 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public HitWindows HitWindows { get; set; }
 
-        private readonly Lazy<List<HitObject>> nestedHitObjects = new Lazy<List<HitObject>>(() => new List<HitObject>());
+        private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
 
         [JsonIgnore]
-        public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects.Value;
+        public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects;
 
         /// <summary>
         /// Applies default values to this HitObject.
@@ -72,21 +69,17 @@ namespace osu.Game.Rulesets.Objects
         {
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            if (nestedHitObjects.IsValueCreated)
-                nestedHitObjects.Value.Clear();
+            nestedHitObjects.Clear();
 
             CreateNestedHitObjects();
 
-            if (nestedHitObjects.IsValueCreated)
-            {
-                nestedHitObjects.Value.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
+            nestedHitObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
-                nestedHitObjects.Value.ForEach(h =>
-                {
-                    h.HitWindows = HitWindows;
-                    h.ApplyDefaults(controlPointInfo, difficulty);
-                });
-            }
+            nestedHitObjects.ForEach(h =>
+            {
+                h.HitWindows = HitWindows;
+                h.ApplyDefaults(controlPointInfo, difficulty);
+            });
         }
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
@@ -106,7 +99,7 @@ namespace osu.Game.Rulesets.Objects
         {
         }
 
-        protected void AddNested(HitObject hitObject) => nestedHitObjects.Value.Add(hitObject);
+        protected void AddNested(HitObject hitObject) => nestedHitObjects.Add(hitObject);
 
         /// <summary>
         /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
