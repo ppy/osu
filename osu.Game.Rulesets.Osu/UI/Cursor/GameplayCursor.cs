@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -94,6 +95,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             private Bindable<bool> autoCursorScale;
             private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
+            protected virtual Color4 CursorColor => Color4.White;
+
             public OsuCursor()
             {
                 Origin = Anchor.Centre;
@@ -108,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
                     BorderThickness = Size.X / 6,
-                    BorderColour = Color4.White,
+                    BorderColour = CursorColor,
                     EdgeEffect = new EdgeEffectParameters
                     {
                         Type = EdgeEffectType.Shadow,
@@ -130,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                             RelativeSizeAxes = Axes.Both,
                             Masking = true,
                             BorderThickness = Size.X / 3,
-                            BorderColour = Color4.White.Opacity(0.5f),
+                            BorderColour = CursorColor.Opacity(0.5f),
                             Children = new Drawable[]
                             {
                                 new Box
@@ -153,7 +156,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.White,
+                                    Colour = CursorColor,
                                 },
                             },
                         },
@@ -189,6 +192,32 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 cursorContainer.Scale = new Vector2(scale);
             }
+        }
+
+        public class OsuClickToResumeCursor : OsuCursor, IKeyBindingHandler<OsuAction>
+        {
+            protected override Color4 CursorColor => Color4.Orange;
+            private readonly Action resumeAction;
+            public OsuClickToResumeCursor(Action resumeAction) => this.resumeAction = resumeAction;
+
+            public bool OnPressed(OsuAction action)
+            {
+                switch (action)
+                {
+                    case OsuAction.LeftButton:
+                    case OsuAction.RightButton:
+                        if (IsHovered)
+                        {
+                            resumeAction();
+                            return true;
+                        }
+                        else return false;
+                }
+
+                return false;
+            }
+
+            public bool OnReleased(OsuAction action) => false;
         }
     }
 }
