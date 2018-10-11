@@ -12,6 +12,11 @@ namespace osu.Game.Beatmaps.ControlPoints
     [Serializable]
     public class ControlPointInfo
     {
+        private readonly TimingControlPoint timingPointSearch = new TimingControlPoint();
+        private readonly DifficultyControlPoint difficultyPointSearch = new DifficultyControlPoint();
+        private readonly SampleControlPoint samplePointSearch = new SampleControlPoint();
+        private readonly EffectControlPoint effectPointSearch = new EffectControlPoint();
+
         /// <summary>
         /// All timing points.
         /// </summary>
@@ -41,28 +46,28 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the difficulty control point at.</param>
         /// <returns>The difficulty control point.</returns>
-        public DifficultyControlPoint DifficultyPointAt(double time) => binarySearch(DifficultyPoints, time);
+        public DifficultyControlPoint DifficultyPointAt(double time) => binarySearch(DifficultyPoints, time, difficultyPointSearch);
 
         /// <summary>
         /// Finds the effect control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the effect control point at.</param>
         /// <returns>The effect control point.</returns>
-        public EffectControlPoint EffectPointAt(double time) => binarySearch(EffectPoints, time);
+        public EffectControlPoint EffectPointAt(double time) => binarySearch(EffectPoints, time, effectPointSearch);
 
         /// <summary>
         /// Finds the sound control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the sound control point at.</param>
         /// <returns>The sound control point.</returns>
-        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time, SamplePoints.FirstOrDefault());
+        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time, samplePointSearch, SamplePoints.FirstOrDefault());
 
         /// <summary>
         /// Finds the timing control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the timing control point at.</param>
         /// <returns>The timing control point.</returns>
-        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, TimingPoints.FirstOrDefault());
+        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, timingPointSearch, TimingPoints.FirstOrDefault());
 
         /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
@@ -92,7 +97,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="time">The time to find the control point at.</param>
         /// <param name="prePoint">The control point to use when <paramref name="time"/> is before any control points. If null, a new control point will be constructed.</param>
         /// <returns>The active control point at <paramref name="time"/>.</returns>
-        private T binarySearch<T>(SortedList<T> list, double time, T prePoint = null)
+        private T binarySearch<T>(SortedList<T> list, double time, T searchPoint, T prePoint = null)
             where T : ControlPoint, new()
         {
             if (list == null)
@@ -104,7 +109,8 @@ namespace osu.Game.Beatmaps.ControlPoints
             if (time < list[0].Time)
                 return prePoint ?? new T();
 
-            int index = list.BinarySearch(new T { Time = time });
+            searchPoint.Time = time;
+            int index = list.BinarySearch(searchPoint);
 
             // Check if we've found an exact match (t == time)
             if (index >= 0)
