@@ -60,14 +60,14 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the sound control point at.</param>
         /// <returns>The sound control point.</returns>
-        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time, samplePointSearch, SamplePoints.FirstOrDefault());
+        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time, samplePointSearch, SamplePoints.Count > 0 ? SamplePoints[0] : null);
 
         /// <summary>
         /// Finds the timing control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the timing control point at.</param>
         /// <returns>The timing control point.</returns>
-        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, timingPointSearch, TimingPoints.FirstOrDefault());
+        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, timingPointSearch, TimingPoints.Count > 0 ? TimingPoints[0] : null);
 
         /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
