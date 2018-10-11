@@ -18,6 +18,7 @@ namespace osu.Game.Rulesets.Catch.Mods
         public override string Name => "Autoplay2";
         public override string ShortenedName => "A2";
         public override Type[] IncompatibleMods => new[] { typeof(CatchModRelax), typeof(CatchModSuddenDeath), typeof(CatchModNoFail), typeof(CatchModAutoplay) };
+
         protected override Score CreateReplayScore(Beatmap<CatchHitObject> beatmap)
         {
             return new Score

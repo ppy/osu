@@ -1,11 +1,11 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using NUnit.Framework;
-using OpenTK;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.MathUtils
 {
@@ -18,8 +18,9 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         /// Partition of the step function, on [0;1]
         ///</summary>
         private readonly List<float> partition = new List<float>();
+
         ///<summary>
-        /// Values that the step function takes. 
+        /// Values that the step function takes.
         /// value[i] is the value on [partition[i], partition[i+1]]
         ///</summary>
         private readonly List<int> values = new List<int>();
@@ -43,7 +44,7 @@ namespace osu.Game.Rulesets.Catch.MathUtils
 
             // windowsLeft is the index of the first input partition that is strictly greater than the left of the window
             // windowsRight is the index of the first input partition that is strictly greater than the right of the window
-            int windowLeft = 0, windowRight, windowMax;
+            int windowLeft = 0, windowRight;
             Queue<int> window = new Queue<int>();
 
             // Extend the input function left and right, to simplify things
@@ -55,7 +56,7 @@ namespace osu.Game.Rulesets.Catch.MathUtils
             // Initialising the window.
             for (windowRight = windowLeft; input.partition[windowRight] <= halfWindowWidth; ++windowRight)
                 window.Enqueue(input.values[windowRight]);
-            windowMax = window.Max();
+            var windowMax = window.Max();
             ++windowLeft;
 
             // At each iteration we slide the windows one step to the right,
@@ -77,6 +78,7 @@ namespace osu.Game.Rulesets.Catch.MathUtils
                     partition.Add(input.partition[windowRight] - halfWindowWidth);
                     ++windowRight;
                 }
+
                 if (distance >= 0)
                 {
                     if (window.Dequeue() == windowMax)
@@ -84,10 +86,12 @@ namespace osu.Game.Rulesets.Catch.MathUtils
                     partition.Add(input.partition[windowLeft] + halfWindowWidth);
                     ++windowLeft;
                 }
+
                 //if we added the same partition twice (moving two steps in a iteration)
                 if (distance == 0)
                     partition.RemoveAt(partition.Count - 1);
             }
+
             partition.Add(1);
 
             // Revert the extension
@@ -110,6 +114,7 @@ namespace osu.Game.Rulesets.Catch.MathUtils
                     values.RemoveAt(i);
                     partition.RemoveAt(i);
                 }
+
             for (int i = partition.Count - 1; i > 1; --i)
                 if (partition[i] == partition[i - 1])
                 {
@@ -129,10 +134,16 @@ namespace osu.Game.Rulesets.Catch.MathUtils
             Assert.GreaterOrEqual(1, to);
 
             int indexStart, indexEnd;
-            for (indexStart = 0; partition[indexStart] <= from; ++indexStart) { continue; }
+            for (indexStart = 0; partition[indexStart] <= from; ++indexStart)
+            {
+            }
+
             partition.Insert(indexStart, from);
             values.Insert(indexStart, values[indexStart - 1]);
-            for (indexEnd = indexStart; partition[indexEnd] < to; ++indexEnd) { continue; }
+            for (indexEnd = indexStart; partition[indexEnd] < to; ++indexEnd)
+            {
+            }
+
             partition.Insert(indexEnd, to);
             values.Insert(indexEnd - 1, values[indexEnd - 1]);
             for (int i = indexStart; i < indexEnd; ++i)
@@ -147,10 +158,16 @@ namespace osu.Game.Rulesets.Catch.MathUtils
             Assert.GreaterOrEqual(1, to);
 
             int indexStart, indexEnd;
-            for (indexStart = 0; partition[indexStart] <= from; ++indexStart) { continue; }
+            for (indexStart = 0; partition[indexStart] <= from; ++indexStart)
+            {
+            }
+
             partition.Insert(indexStart, from);
             values.Insert(indexStart, values[indexStart - 1]);
-            for (indexEnd = indexStart; partition[indexEnd] < to; ++indexEnd) { continue; }
+            for (indexEnd = indexStart; partition[indexEnd] < to; ++indexEnd)
+            {
+            }
+
             partition.Insert(indexEnd, to);
             values.Insert(indexEnd - 1, values[indexEnd - 1]);
             for (int i = indexStart; i < indexEnd; ++i)
@@ -196,6 +213,7 @@ namespace osu.Game.Rulesets.Catch.MathUtils
                         ret = MathHelper.Clamp((partition[i + 1] + partition[i]) / 2, from, to);
                     }
                 }
+
             return ret;
         }
     }

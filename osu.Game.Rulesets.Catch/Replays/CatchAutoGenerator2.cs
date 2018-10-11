@@ -3,13 +3,13 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.MathUtils;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Users;
+
 namespace osu.Game.Rulesets.Catch.Replays
 {
     internal class CatchAutoGenerator2 : AutoGenerator<CatchHitObject>
@@ -38,11 +38,9 @@ namespace osu.Game.Rulesets.Catch.Replays
                     foreach (var nested in obj.NestedHitObjects)
                         objects.Add((CatchHitObject)nested);
             }
-            objects.Sort((CatchHitObject h1, CatchHitObject h2) =>
-            {
-                return h1.StartTime.CompareTo(h2.StartTime) +
-                (h1.StartTime.CompareTo(h2.StartTime) == 0 ? h1.HyperDash.CompareTo(h2.HyperDash) : 0); //we need hyper dashes to be last in case of equality.
-            });
+
+            objects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime) +
+                                     (h1.StartTime.CompareTo(h2.StartTime) == 0 ? h1.HyperDash.CompareTo(h2.HyperDash) : 0));
 
             // Removing droplets/banana that are during an hyperdash from the list
             bool skipping = false;
@@ -66,28 +64,32 @@ namespace osu.Game.Rulesets.Catch.Replays
                     scores.Insert(0, new CatchStepFunction(scores[0], (float)(dash_speed * (times[0] - obj.StartTime))));
                     times.Insert(0, obj.StartTime);
                 }
+
                 if (obj.HyperDash)
                 {
                     float distance = Math.Abs(obj.HyperDashTarget.X - obj.X);
                     scores[0].Set(Math.Max(0, obj.X - halfCatcherWidth), Math.Min(1, obj.X + halfCatcherWidth),
-                    scores[1].Max(obj.X - distance, obj.X + distance));
+                        scores[1].Max(obj.X - distance, obj.X + distance));
                 }
+
                 scores[0].Add(Math.Max(0, obj.X - halfCatcherWidth), Math.Min(1, obj.X + halfCatcherWidth), value);
             }
+
             float lastPosition = 0.5f;
             double lastTime = -10000;
+
             void moveToNext(float target, double time)
             {
-                const double movementSpeed = dash_speed / 2;
+                const double movement_speed = dash_speed / 2;
                 float positionChange = Math.Abs(lastPosition - target);
                 double timeAvailable = time - lastTime;
                 //So we can either make it there without a dash or not.
                 double speedRequired = positionChange / timeAvailable;
-                bool dashRequired = speedRequired > movementSpeed && time != 0;
+                bool dashRequired = speedRequired > movement_speed && time != 0;
                 if (dashRequired)
                 {
                     //we do a movement in two parts - the dash part then the normal part...
-                    double timeAtDashSpeed = (positionChange - movementSpeed * timeAvailable) / (dash_speed - movementSpeed);
+                    double timeAtDashSpeed = (positionChange - movement_speed * timeAvailable) / (dash_speed - movement_speed);
                     if (timeAtDashSpeed <= timeAvailable)
                     {
                         float midPosition = lastPosition + Math.Sign(target - lastPosition) * (float)(timeAtDashSpeed * dash_speed);
@@ -100,14 +102,16 @@ namespace osu.Game.Rulesets.Catch.Replays
                 }
                 else
                 {
-                    double timeBefore = positionChange / movementSpeed;
+                    double timeBefore = positionChange / movement_speed;
 
                     Replay.Frames.Add(new CatchReplayFrame(lastTime + timeBefore, target));
                     Replay.Frames.Add(new CatchReplayFrame(time, target));
                 }
+
                 lastTime = time;
                 lastPosition = target;
             }
+
             moveToNext(0.5f, 0);
             float hyperDashDistance = 0;
             for (int i = 0, j = 0; i < objects.Count; ++i)
@@ -118,9 +122,12 @@ namespace osu.Game.Rulesets.Catch.Replays
                     float target = scores[j].OptimalPath(lastPosition - movementRange, lastPosition + movementRange, lastPosition);
                     moveToNext(target, times[j++]);
                 }
+
                 hyperDashDistance = objects[i].HyperDash && lastPosition >= objects[i].X - halfCatcherWidth && lastPosition <= objects[i].X + halfCatcherWidth
-                ? Math.Abs(objects[i].HyperDashTarget.X - lastPosition) : 0;
+                    ? Math.Abs(objects[i].HyperDashTarget.X - lastPosition)
+                    : 0;
             }
+
             return Replay;
         }
     }
