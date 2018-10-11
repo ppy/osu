@@ -18,6 +18,7 @@ namespace osu.Game.Beatmaps.Formats
         public LegacyDifficultyCalculatorBeatmapDecoder(int version = LATEST_VERSION)
             : base(version)
         {
+            ApplyOffsets = false;
         }
 
         public new static void Register()
