@@ -112,19 +112,20 @@ namespace osu.Game.Rulesets.Catch.Replays
                 lastPosition = target;
             }
 
-            moveToNext(0.5f, 0);
+            moveToNext(0.5f, -1000);
             float hyperDashDistance = 0;
-            for (int i = 0, j = 0; i < objects.Count; ++i)
+            int j = 0;
+            foreach (var obj in objects)
             {
-                if (objects[i].StartTime != lastTime)
+                if (obj.StartTime != lastTime)
                 {
                     float movementRange = hyperDashDistance == 0 ? (float)(dash_speed * (times[j] - lastTime)) : hyperDashDistance;
                     float target = scores[j].OptimalPath(lastPosition - movementRange, lastPosition + movementRange, lastPosition);
                     moveToNext(target, times[j++]);
                 }
 
-                hyperDashDistance = objects[i].HyperDash && lastPosition >= objects[i].X - halfCatcherWidth && lastPosition <= objects[i].X + halfCatcherWidth
-                    ? Math.Abs(objects[i].HyperDashTarget.X - lastPosition)
+                hyperDashDistance = obj.HyperDash && lastPosition >= obj.X - halfCatcherWidth && lastPosition <= obj.X + halfCatcherWidth
+                    ? Math.Abs(obj.HyperDashTarget.X - lastPosition)
                     : 0;
             }
 
