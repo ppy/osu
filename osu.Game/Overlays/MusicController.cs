@@ -196,10 +196,16 @@ namespace osu.Game.Overlays
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
+        private ScheduledDelegate seekDelegate;
+
         private void attemptSeek(double progress)
         {
-            if (!beatmap.Disabled)
-                current?.Track.Seek(progress);
+            seekDelegate?.Cancel();
+            seekDelegate = Schedule(() =>
+            {
+                if (!beatmap.Disabled)
+                    current?.Track.Seek(progress);
+            });
         }
 
         private void playlistOrderChanged(BeatmapSetInfo beatmapSetInfo, int index)

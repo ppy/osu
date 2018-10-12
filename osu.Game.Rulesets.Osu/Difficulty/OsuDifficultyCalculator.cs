@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double sectionLength = section_length * timeRate;
 
             // The first object doesn't generate a strain, so we begin with an incremented section end
-            double currentSectionEnd = 2 * sectionLength;
+            double currentSectionEnd = Math.Ceiling(beatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
 
             foreach (OsuDifficultyHitObject h in difficultyBeatmap)
             {
