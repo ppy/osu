@@ -8,26 +8,23 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
-using osu.Framework.Graphics.Textures;
 using OpenTK.Graphics.ES30;
 using OpenTK.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class SliderBody : Container, ISliderProgress
     {
-        private readonly Path path;
+        private readonly SliderPath path;
         private readonly BufferedContainer container;
 
         public float PathWidth
         {
-            get { return path.PathWidth; }
-            set { path.PathWidth = value; }
+            get => path.PathWidth;
+            set => path.PathWidth = value;
         }
 
         /// <summary>
@@ -43,47 +40,39 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public double? SnakedStart { get; private set; }
         public double? SnakedEnd { get; private set; }
 
-        private Color4 accentColour = Color4.White;
-
         /// <summary>
         /// Used to colour the path.
         /// </summary>
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => path.AccentColour;
             set
             {
-                if (accentColour == value)
+                if (path.AccentColour == value)
                     return;
-                accentColour = value;
+                path.AccentColour = value;
 
-                if (LoadState >= LoadState.Ready)
-                    reloadTexture();
+                container.ForceRedraw();
             }
         }
-
-        private Color4 borderColour = Color4.White;
 
         /// <summary>
         /// Used to colour the path border.
         /// </summary>
         public new Color4 BorderColour
         {
-            get { return borderColour; }
+            get => path.BorderColour;
             set
             {
-                if (borderColour == value)
+                if (path.BorderColour == value)
                     return;
-                borderColour = value;
+                path.BorderColour = value;
 
-                if (LoadState >= LoadState.Ready)
-                    reloadTexture();
+                container.ForceRedraw();
             }
         }
 
         public Quad PathDrawQuad => container.ScreenSpaceDrawQuad;
-
-        private int textureWidth => (int)PathWidth * 2;
 
         private Vector2 topLeftOffset;
 
@@ -101,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     CacheDrawnFrameBuffer = true,
                     Children = new Drawable[]
                     {
-                        path = new Path
+                        path = new SliderPath
                         {
                             Blending = BlendingMode.None,
                         },
@@ -134,44 +123,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load()
         {
-            reloadTexture();
             computeSize();
-        }
-
-        private void reloadTexture()
-        {
-            var texture = new Texture(textureWidth, 1);
-
-            //initialise background
-            var raw = new Image<Rgba32>(textureWidth, 1);
-
-            const float aa_portion = 0.02f;
-            const float border_portion = 0.128f;
-            const float gradient_portion = 1 - border_portion;
-
-            const float opacity_at_centre = 0.3f;
-            const float opacity_at_edge = 0.8f;
-
-            for (int i = 0; i < textureWidth; i++)
-            {
-                float progress = (float)i / (textureWidth - 1);
-
-                if (progress <= border_portion)
-                {
-                    raw[i, 0] = new Rgba32(BorderColour.R, BorderColour.G, BorderColour.B, Math.Min(progress / aa_portion, 1) * BorderColour.A);
-                }
-                else
-                {
-                    progress -= border_portion;
-                    raw[i, 0] = new Rgba32(AccentColour.R, AccentColour.G, AccentColour.B,
-                        (opacity_at_edge - (opacity_at_edge - opacity_at_centre) * progress / gradient_portion) * AccentColour.A);
-                }
-            }
-
-            texture.SetData(new TextureUpload(raw));
-            path.Texture = texture;
-
-            container.ForceRedraw();
         }
 
         private void computeSize()
@@ -225,6 +177,54 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
 
             SetRange(start, end);
+        }
+
+        private class SliderPath : SmoothPath
+        {
+            private const float border_portion = 0.128f;
+            private const float gradient_portion = 1 - border_portion;
+
+            private const float opacity_at_centre = 0.3f;
+            private const float opacity_at_edge = 0.8f;
+
+            private Color4 borderColour = Color4.White;
+
+            public Color4 BorderColour
+            {
+                get => borderColour;
+                set
+                {
+                    if (borderColour == value)
+                        return;
+                    borderColour = value;
+
+                    InvalidateTexture();
+                }
+            }
+
+            private Color4 accentColour = Color4.White;
+
+            public Color4 AccentColour
+            {
+                get => accentColour;
+                set
+                {
+                    if (accentColour == value)
+                        return;
+                    accentColour = value;
+
+                    InvalidateTexture();
+                }
+            }
+
+            protected override Color4 ColourAt(float position)
+            {
+                if (position <= border_portion)
+                    return BorderColour;
+
+                position -= border_portion;
+                return new Color4(AccentColour.R, AccentColour.G, AccentColour.B, (opacity_at_edge - (opacity_at_edge - opacity_at_centre) * position / gradient_portion) * AccentColour.A);
+            }
         }
     }
 }
