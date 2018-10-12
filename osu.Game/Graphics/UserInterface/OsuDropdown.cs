@@ -51,6 +51,8 @@ namespace osu.Game.Graphics.UserInterface
         #region OsuDropdownMenu
         protected class OsuDropdownMenu : DropdownMenu, IHasAccentColour
         {
+            public override bool HandleNonPositionalInput => State == MenuState.Open;
+
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
             public OsuDropdownMenu()
             {

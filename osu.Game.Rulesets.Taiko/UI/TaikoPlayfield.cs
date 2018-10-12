@@ -201,7 +201,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 }
             };
 
-            VisibleTimeRange.Value = 6000;
+            VisibleTimeRange.Value = 7000;
         }
 
         [BackgroundDependencyLoader]
