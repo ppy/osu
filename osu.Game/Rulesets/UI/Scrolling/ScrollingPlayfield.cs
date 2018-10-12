@@ -65,20 +65,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         protected virtual SpeedChangeVisualisationMethod VisualisationMethod => SpeedChangeVisualisationMethod.Sequential;
 
-        /// <summary>
-        /// Creates a new <see cref="ScrollingPlayfield"/>.
-        /// </summary>
-        /// <param name="customWidth">The width to scale the internal coordinate space to.
-        /// May be null if scaling based on <paramref name="customHeight"/> is desired. If <paramref name="customHeight"/> is also null, no scaling will occur.
-        /// </param>
-        /// <param name="customHeight">The height to scale the internal coordinate space to.
-        /// May be null if scaling based on <paramref name="customWidth"/> is desired. If <paramref name="customWidth"/> is also null, no scaling will occur.
-        /// </param>
-        protected ScrollingPlayfield(float? customWidth = null, float? customHeight = null)
-            : base(customWidth, customHeight)
-        {
-        }
-
         [BackgroundDependencyLoader]
         private void load()
         {

@@ -30,8 +30,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
 
-        protected override Container<Drawable> Content => barLineContainer;
-        private readonly Container<Drawable> barLineContainer;
+        private readonly Container barLineContainer;
 
         public Container<DrawableManiaJudgement> Judgements => judgements;
         private readonly JudgementContainer<DrawableManiaJudgement> judgements;
@@ -105,6 +104,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
+                                Child = HitObjectContainer
                             }
                         },
                         judgements = new JudgementContainer<DrawableManiaJudgement>
