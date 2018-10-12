@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
         {
             base.InitialiseDefaults();
 
-            Set(ManiaSetting.ScrollTime, 1500.0, 50.0, 10000.0, 50.0);
+            Set(ManiaSetting.ScrollTime, 2250.0, 50.0, 10000.0, 50.0);
             Set(ManiaSetting.ScrollDirection, ManiaScrollingDirection.Down);
         }
 
