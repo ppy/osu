@@ -12,7 +12,7 @@ install:
   - cmd: dotnet tool install CodeFileSanity --version 0.0.16 --global
 before_build:
   - cmd: CodeFileSanity
-  - cmd: nuget sources Add -Source https://ci.appveyor.com/nuget/osu-framework
+  - cmd: nuget sources Add -Name "appveyor osu-framework" -Source https://ci.appveyor.com/nuget/osu-framework
   - cmd: nuget restore -verbosity quiet
 build:
   project: osu.sln
