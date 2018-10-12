@@ -143,6 +143,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             public readonly Size Size;
             // TODO for now, these values are completely ignored
+            // ReSharper disable NotAccessedField.Local
             public readonly float RefreshRate;
             public readonly int BitsPerPixel;
 
