@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using OpenTK;
 using osu.Framework.Configuration;
 using osu.Framework.Input.Bindings;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
@@ -59,15 +59,15 @@ namespace osu.Game.Graphics.Containers
         // receive input outside our bounds so we can trigger a close event on ourselves.
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => BlockScreenWideMouse || base.ReceivePositionalInputAt(screenSpacePos);
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
-            if (!base.ReceivePositionalInputAt(state.Mouse.NativeState.Position))
+            if (!base.ReceivePositionalInputAt(e.ScreenSpaceMousePosition))
             {
                 State = Visibility.Hidden;
                 return true;
             }
 
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
         public virtual bool OnPressed(GlobalAction action)

@@ -21,14 +21,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         public OsuHitObject BaseObject { get; }
 
         /// <summary>
-        /// Normalized distance from the <see cref="OsuHitObject.StackedPosition"/> of the previous <see cref="OsuDifficultyHitObject"/>.
+        /// Normalized distance from the end position of the previous <see cref="OsuDifficultyHitObject"/> to the start position of this <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
-        public double Distance { get; private set; }
+        public double JumpDistance { get; private set; }
+
+        /// <summary>
+        /// Normalized distance between the start and end position of the previous <see cref="OsuDifficultyHitObject"/>.
+        /// </summary>
+        public double TravelDistance { get; private set; }
 
         /// <summary>
         /// Milliseconds elapsed since the StartTime of the previous <see cref="OsuDifficultyHitObject"/>.
         /// </summary>
         public double DeltaTime { get; private set; }
+
+        /// <summary>
+        /// Milliseconds elapsed since the start time of the previous <see cref="OsuDifficultyHitObject"/>, with a minimum of 50ms.
+        /// </summary>
+        public double StrainTime { get; private set; }
 
         private readonly OsuHitObject lastObject;
         private readonly double timeRate;
@@ -51,31 +61,37 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         private void setDistances()
         {
             // We will scale distances by this factor, so we can assume a uniform CircleSize among beatmaps.
-            double scalingFactor = normalized_radius / BaseObject.Radius;
+            float scalingFactor = normalized_radius / (float)BaseObject.Radius;
             if (BaseObject.Radius < 30)
             {
-                double smallCircleBonus = Math.Min(30 - BaseObject.Radius, 5) / 50;
+                float smallCircleBonus = Math.Min(30 - (float)BaseObject.Radius, 5) / 50;
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
             Vector2 lastCursorPosition = lastObject.StackedPosition;
-            float lastTravelDistance = 0;
 
             var lastSlider = lastObject as Slider;
             if (lastSlider != null)
             {
                 computeSliderCursorPosition(lastSlider);
                 lastCursorPosition = lastSlider.LazyEndPosition ?? lastCursorPosition;
-                lastTravelDistance = lastSlider.LazyTravelDistance;
             }
 
-            Distance = (lastTravelDistance + (BaseObject.StackedPosition - lastCursorPosition).Length) * scalingFactor;
+            // Don't need to jump to reach spinners
+            if (!(BaseObject is Spinner))
+                JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+
+            // Todo: BUG!!! Last slider's travel distance is considered ONLY IF we ourselves are also a slider!
+            if (BaseObject is Slider)
+                TravelDistance = (lastSlider?.LazyTravelDistance ?? 0) * scalingFactor;
         }
 
         private void setTimingValues()
         {
-            // Every timing inverval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure.
-            DeltaTime = Math.Max(50, (BaseObject.StartTime - lastObject.StartTime) / timeRate);
+            DeltaTime = (BaseObject.StartTime - lastObject.StartTime) / timeRate;
+
+            // Every strain interval is hard capped at the equivalent of 375 BPM streaming speed as a safety measure
+            StrainTime = Math.Max(50, DeltaTime);
         }
 
         private void computeSliderCursorPosition(Slider slider)
@@ -87,8 +103,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             float approxFollowCircleRadius = (float)(slider.Radius * 3);
             var computeVertex = new Action<double>(t =>
             {
+                double progress = ((int)t - (int)slider.StartTime) / (float)(int)slider.SpanDuration;
+                if (progress % 2 > 1)
+                    progress = 1 - progress % 1;
+                else
+                    progress = progress % 1;
+
                 // ReSharper disable once PossibleInvalidOperationException (bugged in current r# version)
-                var diff = slider.StackedPositionAt(t) - slider.LazyEndPosition.Value;
+                var diff = slider.StackedPosition + slider.Curve.PositionAt(progress) - slider.LazyEndPosition.Value;
                 float dist = diff.Length;
 
                 if (dist > approxFollowCircleRadius)
