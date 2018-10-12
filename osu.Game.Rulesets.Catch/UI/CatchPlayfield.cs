@@ -11,15 +11,13 @@ using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchPlayfield : ScrollingPlayfield
     {
         public const float BASE_WIDTH = 512;
-
-        protected override Container<Drawable> Content => content;
-        private readonly Container<Drawable> content;
 
         private readonly CatcherArea catcherArea;
 
@@ -28,7 +26,6 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override SpeedChangeVisualisationMethod VisualisationMethod => SpeedChangeVisualisationMethod.Constant;
 
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation)
-            : base(BASE_WIDTH)
         {
             Direction.Value = ScrollingDirection.Down;
 
@@ -37,27 +34,27 @@ namespace osu.Game.Rulesets.Catch.UI
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
 
-            base.Content.Anchor = Anchor.BottomLeft;
-            base.Content.Origin = Anchor.BottomLeft;
+            Size = new Vector2(0.86f); // matches stable's vertical offset for catcher plate
 
-            base.Content.AddRange(new Drawable[]
+            InternalChild = new PlayfieldAdjustmentContainer
             {
-                explodingFruitContainer = new Container
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                catcherArea = new CatcherArea(difficulty)
-                {
-                    GetVisualRepresentation = getVisualRepresentation,
-                    ExplodingFruitTarget = explodingFruitContainer,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopLeft,
-                },
-                content = new Container<Drawable>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-            });
+                    explodingFruitContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    catcherArea = new CatcherArea(difficulty)
+                    {
+                        GetVisualRepresentation = getVisualRepresentation,
+                        ExplodingFruitTarget = explodingFruitContainer,
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.TopLeft,
+                    },
+                    HitObjectContainer
+                }
+            };
 
             VisibleTimeRange.Value = BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
         }
