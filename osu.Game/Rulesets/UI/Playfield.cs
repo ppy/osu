@@ -93,6 +93,15 @@ namespace osu.Game.Rulesets.UI
             nestedPlayfields.Value.Add(otherPlayfield);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // in the case a consumer forgets to add the HitObjectContainer, we will add it here.
+            if (HitObjectContainer.Parent == null)
+                AddInternal(HitObjectContainer);
+        }
+
         protected override void Update()
         {
             base.Update();
