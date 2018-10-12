@@ -6,8 +6,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -155,22 +154,22 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             updateWinConditions();
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => args.Button == MouseButton.Left && editorInfo.EditingEnabled;
+        protected override bool OnMouseDown(MouseDownEvent e) => e.Button == MouseButton.Left && editorInfo.EditingEnabled;
 
-        protected override bool OnDragStart(InputState state) => editorInfo.EditingEnabled;
+        protected override bool OnDragStart(DragStartEvent e) => editorInfo.EditingEnabled;
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (Selected && editorInfo.EditingEnabled && args.Key == Key.Delete)
+            if (Selected && editorInfo.EditingEnabled && e.Key == Key.Delete)
             {
                 Remove();
                 return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             if (!editorInfo.EditingEnabled)
                 return false;
@@ -179,12 +178,12 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             return true;
         }
 
-        protected override bool OnDrag(InputState state)
+        protected override bool OnDrag(DragEvent e)
         {
-            if (base.OnDrag(state)) return true;
+            if (base.OnDrag(e)) return true;
 
             Selected = true;
-            this.MoveToOffset(state.Mouse.Delta);
+            this.MoveToOffset(e.Delta);
 
             var pos = Position;
             Pairing.Position = new Point((int)pos.X, (int)pos.Y);

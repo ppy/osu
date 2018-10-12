@@ -9,8 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -127,11 +126,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         }
 
         //TODO: use OnClick instead once we have per-button clicks.
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
             if (Team == null || editorInfo.EditingEnabled) return false;
 
-            if (args.Button == MouseButton.Left)
+            if (e.Button == MouseButton.Left)
             {
                 if (score.Value == null)
                 {

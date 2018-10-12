@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -196,10 +196,16 @@ namespace osu.Game.Overlays
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
+        private ScheduledDelegate seekDelegate;
+
         private void attemptSeek(double progress)
         {
-            if (!beatmap.Disabled)
-                current?.Track.Seek(progress);
+            seekDelegate?.Cancel();
+            seekDelegate = Schedule(() =>
+            {
+                if (!beatmap.Disabled)
+                    current?.Track.Seek(progress);
+            });
         }
 
         private void playlistOrderChanged(BeatmapSetInfo beatmapSetInfo, int index)
@@ -457,20 +463,14 @@ namespace osu.Game.Overlays
 
         private class DragContainer : Container
         {
-            private Vector2 dragStart;
-
-            protected override bool OnDragStart(InputState state)
+            protected override bool OnDragStart(DragStartEvent e)
             {
-                base.OnDragStart(state);
-                dragStart = state.Mouse.Position;
                 return true;
             }
 
-            protected override bool OnDrag(InputState state)
+            protected override bool OnDrag(DragEvent e)
             {
-                if (base.OnDrag(state)) return true;
-
-                Vector2 change = state.Mouse.Position - dragStart;
+                Vector2 change = e.MousePosition - e.MouseDownPosition;
 
                 // Diminish the drag distance as we go further to simulate "rubber band" feeling.
                 change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
@@ -479,10 +479,10 @@ namespace osu.Game.Overlays
                 return true;
             }
 
-            protected override bool OnDragEnd(InputState state)
+            protected override bool OnDragEnd(DragEndEvent e)
             {
                 this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
-                return base.OnDragEnd(state);
+                return base.OnDragEnd(e);
             }
         }
     }

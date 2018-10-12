@@ -27,9 +27,6 @@ namespace osu.Desktop.Overlays
         private NotificationOverlay notificationOverlay;
         private GameHost host;
 
-        public override bool HandleKeyboardInput => false;
-        public override bool HandleMouseInput => false;
-
         [BackgroundDependencyLoader]
         private void load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game, OsuConfigManager config, GameHost host)
         {
