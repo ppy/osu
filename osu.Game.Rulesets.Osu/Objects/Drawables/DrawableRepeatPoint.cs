@@ -41,6 +41,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
         }
 
+        public bool IsFirstRepeat => repeatPoint.RepeatIndex == 0;
+
         protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (repeatPoint.StartTime <= Time.Current)

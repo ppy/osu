@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var h = d.HitObject;
 
+            float rescale = 2;
+
             switch (drawable)
             {
                 case DrawableHitCircle c:
@@ -55,6 +57,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                             break;
                     }
                     break;
+
                 case DrawableSlider s:
                     using (d.BeginAbsoluteSequence(h.StartTime - h.TimePreempt + 1, true))
                     {
@@ -62,18 +65,20 @@ namespace osu.Game.Rulesets.Osu.Mods
                         var origBodySize = s.Body.Size;
                         var origBodyDrawPos = s.Body.DrawPosition;
 
-                        s.Body.MoveTo(origBodyDrawPos - new Vector2(origPathWidth), 1)
-                            .Then()
-                            .MoveTo(origBodyDrawPos, h.TimePreempt);
-
-                        s.Body.ResizeTo(origBodySize * 2, 1)
-                            .Then()
-                            .ResizeTo(origBodySize, h.TimePreempt);
-
-                        s.Body.TransformTo("PathWidth", origPathWidth * 2, 1)
-                            .Then()
-                            .TransformTo("PathWidth", origPathWidth, h.TimePreempt);
+                        // Fits nicely for CS=4, too big on lower CS, too small on higher CS
+                        s.Body.Animate(
+                            b => b.MoveTo(origBodyDrawPos - new Vector2(origPathWidth)).MoveTo(origBodyDrawPos, h.TimePreempt),
+                            b => b.ResizeTo(origBodySize * rescale).ResizeTo(origBodySize, h.TimePreempt),
+                            b => b.TransformTo("PathWidth", origPathWidth * rescale).TransformTo("PathWidth", origPathWidth, h.TimePreempt)
+                        );
                     }
+                    break;
+                case DrawableRepeatPoint rp:
+                    if (!rp.IsFirstRepeat)
+                        break;
+                    var origSizeRP = rp.Size;
+                    using (d.BeginAbsoluteSequence(h.StartTime - h.TimePreempt + 1, true))
+                        rp.ResizeTo(origSizeRP * rescale).ResizeTo(origSizeRP, h.TimePreempt);
                     break;
             }
         }
