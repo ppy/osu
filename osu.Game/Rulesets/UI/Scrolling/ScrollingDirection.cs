@@ -6,19 +6,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
     public enum ScrollingDirection
     {
         /// <summary>
-        /// Hitobjects will scroll vertically from the bottom of the hitobject container.
+        /// Hit objects will scroll vertically from the bottom of the hitobject container.
         /// </summary>
         Up,
         /// <summary>
-        /// Hitobjects will scroll vertically from the top of the hitobject container.
+        /// Hit objects will scroll vertically from the top of the hitobject container.
         /// </summary>
         Down,
         /// <summary>
-        /// Hitobjects will scroll horizontally from the right of the hitobject container.
+        /// Hit objects will scroll horizontally from the right of the hitobject container.
         /// </summary>
         Left,
         /// <summary>
-        /// Hitobjects will scroll horizontally from the left of the hitobject container.
+        /// Hit objects will scroll horizontally from the left of the hitobject container.
         /// </summary>
         Right
     }
