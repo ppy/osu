@@ -20,8 +20,7 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
+            Size = Vector2.One
         };
-
-        protected override Vector2 PlayfieldArea => Vector2.One;
     }
 }
