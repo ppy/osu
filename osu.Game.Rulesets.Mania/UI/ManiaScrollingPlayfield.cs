@@ -7,7 +7,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaScrollingPlayfield : ScrollingPlayfield
+    public abstract class ManiaScrollingPlayfield : ScrollingPlayfield
     {
         private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
