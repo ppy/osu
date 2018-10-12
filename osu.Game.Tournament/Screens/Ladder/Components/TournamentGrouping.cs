@@ -2,13 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
     public class TournamentGrouping
     {
-        public string Name;
-        public string Description;
+        public readonly Bindable<string> Name = new Bindable<string>();
+        public readonly Bindable<string> Description = new Bindable<string>();
 
         public int BestOf;
 

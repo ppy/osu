@@ -20,7 +20,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 {
                     new OsuSpriteText
                     {
-                        Text = grouping.Description.ToUpper(),
+                        Text = grouping.Description.Value.ToUpper(),
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre
                     },

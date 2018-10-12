@@ -8,6 +8,6 @@ namespace osu.Game.Overlays.Settings
 {
     public class SettingsTextBox : SettingsItem<string>
     {
-        protected override Drawable CreateControl() => new OsuTextBox();
+        protected override Drawable CreateControl() => new OsuTextBox { RelativeSizeAxes = Axes.X };
     }
 }
