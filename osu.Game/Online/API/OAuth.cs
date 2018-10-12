@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Diagnostics;
+using System.Net.Http;
 using osu.Framework.Configuration;
 using osu.Framework.IO.Network;
 
@@ -40,7 +41,7 @@ namespace osu.Game.Online.API
             using (var req = new AccessTokenRequestPassword(username, password)
             {
                 Url = $@"{endpoint}/oauth/token",
-                Method = HttpMethod.POST,
+                Method = HttpMethod.Post,
                 ClientId = clientId,
                 ClientSecret = clientSecret
             })
@@ -66,7 +67,7 @@ namespace osu.Game.Online.API
                 using (var req = new AccessTokenRequestRefresh(refresh)
                 {
                     Url = $@"{endpoint}/oauth/token",
-                    Method = HttpMethod.POST,
+                    Method = HttpMethod.Post,
                     ClientId = clientId,
                     ClientSecret = clientSecret
                 })

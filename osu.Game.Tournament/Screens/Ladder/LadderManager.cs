@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -235,13 +236,13 @@ namespace osu.Game.Tournament.Screens.Ladder
                     Source.Progression.Value = null;
             }
 
-            private DrawableMatchPairing findTarget(InputState state) => pairingsContainer.FirstOrDefault(d => d.ReceiveMouseInputAt(state.Mouse.NativeState.Position));
+            private DrawableMatchPairing findTarget(InputState state) => pairingsContainer.FirstOrDefault(d => d.ReceivePositionalInputAt(state.Mouse.Position));
 
-            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-            protected override bool OnMouseMove(InputState state)
+            protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                var found = findTarget(state);
+                var found = findTarget(e.CurrentState);
 
                 if (found == path?.Destination)
                     return false;
@@ -257,12 +258,12 @@ namespace osu.Game.Tournament.Screens.Ladder
                     Colour = Color4.Yellow,
                 });
 
-                return base.OnMouseMove(state);
+                return base.OnMouseMove(e);
             }
 
-            protected override bool OnClick(InputState state)
+            protected override bool OnClick(ClickEvent e)
             {
-                var found = findTarget(state);
+                var found = findTarget(e.CurrentState);
 
                 if (found != null)
                 {

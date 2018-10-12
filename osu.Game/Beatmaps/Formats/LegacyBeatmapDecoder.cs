@@ -318,12 +318,12 @@ namespace osu.Game.Beatmaps.Formats
 
                 if (timingChange)
                 {
-                    handleTimingControlPoint(new TimingControlPoint
-                    {
-                        Time = time,
-                        BeatLength = beatLength,
-                        TimeSignature = timeSignature
-                    });
+                    var controlPoint = CreateTimingControlPoint();
+                    controlPoint.Time = time;
+                    controlPoint.BeatLength = beatLength;
+                    controlPoint.TimeSignature = timeSignature;
+
+                    handleTimingControlPoint(controlPoint);
                 }
 
                 handleDifficultyControlPoint(new DifficultyControlPoint
@@ -417,6 +417,8 @@ namespace osu.Game.Beatmaps.Formats
         private double getOffsetTime() => ApplyOffsets ? offset : 0;
 
         private double getOffsetTime(double time) => time + (ApplyOffsets ? offset : 0);
+
+        protected virtual TimingControlPoint CreateTimingControlPoint() => new TimingControlPoint();
 
         [Flags]
         internal enum EffectFlags
