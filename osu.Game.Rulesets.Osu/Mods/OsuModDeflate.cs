@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var h = d.HitObject;
 
-            float rescale = 2;
+            const float rescale = 2;
 
             switch (drawable)
             {
@@ -76,9 +76,9 @@ namespace osu.Game.Rulesets.Osu.Mods
                 case DrawableRepeatPoint rp:
                     if (!rp.IsFirstRepeat)
                         break;
-                    var origSizeRP = rp.Size;
+                    var origSizeRp = rp.Size;
                     using (d.BeginAbsoluteSequence(h.StartTime - h.TimePreempt + 1, true))
-                        rp.ResizeTo(origSizeRP * rescale).ResizeTo(origSizeRP, h.TimePreempt);
+                        rp.ResizeTo(origSizeRp * rescale).ResizeTo(origSizeRp, h.TimePreempt);
                     break;
             }
         }
