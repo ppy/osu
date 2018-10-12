@@ -1,9 +1,9 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
@@ -15,7 +15,7 @@ namespace osu.Game.Overlays.Settings.Sections
 {
     public class SkinSection : SettingsSection
     {
-        private SettingsDropdown<int> skinDropdown;
+        private SettingsDropdown<SkinInfo> skinDropdown;
 
         public override string Header => "Skin";
 
@@ -31,7 +31,7 @@ namespace osu.Game.Overlays.Settings.Sections
             FlowContent.Spacing = new Vector2(0, 5);
             Children = new Drawable[]
             {
-                skinDropdown = new SettingsDropdown<int>(),
+                skinDropdown = new SettingsDropdown<SkinInfo>(),
                 new SettingsSlider<double, SizeSlider>
                 {
                     LabelText = "Menu cursor size",
@@ -54,19 +54,22 @@ namespace osu.Game.Overlays.Settings.Sections
             skins.ItemAdded += itemAdded;
             skins.ItemRemoved += itemRemoved;
 
-            skinDropdown.Entries = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, int>(s.ToString(), s.ID));
+            skinDropdown.Items = skins.GetAllUsableSkins();
 
             var skinBindable = config.GetBindable<int>(OsuSetting.Skin);
 
             // Todo: This should not be necessary when OsuConfigManager is databased
-            if (skinDropdown.Entries.All(s => s.Value != skinBindable.Value))
+            if (skinDropdown.Items.All(s => s.ID != skinBindable.Value))
                 skinBindable.Value = 0;
 
-            skinDropdown.Bindable = skinBindable;
+            // Todo: Create helpers to link two bindables with converters?
+            skinDropdown.Bindable = new Bindable<SkinInfo>();
+            skinDropdown.Bindable.BindValueChanged(v => skinBindable.Value = v.ID);
+            skinBindable.BindValueChanged(v => skinDropdown.Bindable.Value = skinDropdown.Items.FirstOrDefault(si => si.ID == v));
         }
 
-        private void itemRemoved(SkinInfo s) => skinDropdown.Entries = skinDropdown.Entries.Where(i => i.Value != s.ID);
-        private void itemAdded(SkinInfo s) => skinDropdown.Entries = skinDropdown.Entries.Append(new KeyValuePair<string, int>(s.ToString(), s.ID));
+        private void itemRemoved(SkinInfo s) => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != s.ID);
+        private void itemAdded(SkinInfo s) => skinDropdown.Items = skinDropdown.Items.Append(s);
 
         protected override void Dispose(bool isDisposing)
         {

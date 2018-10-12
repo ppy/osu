@@ -6,6 +6,7 @@ using osu.Framework.Audio;
 using osu.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Audio
 {
@@ -13,8 +14,10 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
     {
         protected override string Header => "Devices";
 
+        private const string default_audio_device = "Default";
+
         private AudioManager audio;
-        private SettingsDropdown<string> dropdown;
+        private SettingsDropdown<AudioDeviceItem> dropdown;
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio)
@@ -35,12 +38,12 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
         private void updateItems()
         {
-            var deviceItems = new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("Default", string.Empty) };
-            deviceItems.AddRange(audio.AudioDeviceNames.Select(d => new KeyValuePair<string, string>(d, d)));
+            var deviceItems = new List<AudioDeviceItem> { AudioDeviceItem.DEFAULT };
+            deviceItems.AddRange(audio.AudioDeviceNames.Select(name => new AudioDeviceItem(name)));
 
             var preferredDeviceName = audio.AudioDevice.Value;
-            if (deviceItems.All(kv => kv.Value != preferredDeviceName))
-                deviceItems.Add(new KeyValuePair<string, string>(preferredDeviceName, preferredDeviceName));
+            if (deviceItems.All(item => item.Name != preferredDeviceName))
+                deviceItems.Add(new AudioDeviceItem(preferredDeviceName));
 
             // The option dropdown for audio device selection lists all audio
             // device names. Dropdowns, however, may not have multiple identical
@@ -48,7 +51,7 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
             // the dropdown. BASS does not give us a simple mechanism to select
             // specific audio devices in such a case anyways. Such
             // functionality would require involved OS-specific code.
-            dropdown.Entries = deviceItems.Distinct().ToList();
+            dropdown.Items = deviceItems.Distinct().ToList();
         }
 
         private void onDeviceChanged(string name) => updateItems();
@@ -59,15 +62,45 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
 
             Children = new Drawable[]
             {
-                dropdown = new SettingsDropdown<string>()
+                dropdown = new SettingsDropdown<AudioDeviceItem>()
             };
 
             updateItems();
 
-            dropdown.Bindable = audio.AudioDevice;
+            // Todo: Create helpers to link two bindables with converters?
+            dropdown.Bindable = new Bindable<AudioDeviceItem>();
+            // if "Default" is selected, the AudioManager must recieve string.Empty
+            dropdown.Bindable.BindValueChanged(device => audio.AudioDevice.Value = device == AudioDeviceItem.DEFAULT ? string.Empty : device.Name);
+            // if the AudioManager reports null or string.Empty, select "Default" in the dropdown
+            audio.AudioDevice.BindValueChanged(name => dropdown.Bindable.Value = string.IsNullOrEmpty(name)
+                                                        ? AudioDeviceItem.DEFAULT
+                                                        : dropdown.Items.FirstOrDefault(device => device.Name == name));
 
             audio.OnNewDevice += onDeviceChanged;
             audio.OnLostDevice += onDeviceChanged;
+        }
+
+        private class AudioDeviceItem
+        {
+            public static readonly AudioDeviceItem DEFAULT = new DefaultItem();
+
+            public readonly string Name;
+
+            public AudioDeviceItem(string name)
+            {
+                Name = name;
+            }
+
+            public override string ToString() => Name;
+
+            private class DefaultItem : AudioDeviceItem
+            {
+                public DefaultItem()
+                    // TODO make this localisable
+                    : base("Default")
+                {
+                }
+            }
         }
     }
 }

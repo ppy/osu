@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private Bindable<Size> sizeFullscreen;
 
         private OsuGameBase game;
-        private SettingsDropdown<Size> resolutionDropdown;
+        private SettingsDropdown<DisplayResolutionItem> resolutionDropdown;
         private SettingsEnumDropdown<WindowMode> windowModeDropdown;
 
         private const int transition_duration = 400;
@@ -85,13 +85,18 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             if (resolutions.Count > 1)
             {
-                resolutionSettingsContainer.Child = resolutionDropdown = new SettingsDropdown<Size>
+                resolutionSettingsContainer.Child = resolutionDropdown = new SettingsDropdown<DisplayResolutionItem>
                 {
-                    LabelText = "Resolution",
+                    LabelText = "Fullscreen Resolution",
                     ShowsDefaultIndicator = false,
-                    Entries = resolutions,
-                    Bindable = sizeFullscreen
+                    Items = resolutions
                 };
+
+                // TODO do something with the selected refresh rate and bpp settings
+                // Todo: Create helpers to link two bindables with converters?
+                resolutionDropdown.Bindable = new Bindable<DisplayResolutionItem>();
+                resolutionDropdown.Bindable.BindValueChanged(item => sizeFullscreen.Value = item.Size);
+                sizeFullscreen.BindValueChanged(size => resolutionDropdown.Bindable.Value = resolutionDropdown.Items.FirstOrDefault(item => item.Size == size));
 
                 windowModeDropdown.Bindable.BindValueChanged(windowMode =>
                 {
@@ -115,18 +120,51 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }, true);
         }
 
-        private IReadOnlyList<KeyValuePair<string, Size>> getResolutions()
+        private IReadOnlyList<DisplayResolutionItem> getResolutions()
         {
-            var resolutions = new KeyValuePair<string, Size>("Default", new Size(9999, 9999)).Yield();
+            var resolutions = DisplayResolutionItem.DEFAULT.Yield();
 
             if (game.Window != null)
                 resolutions = resolutions.Concat(game.Window.AvailableResolutions
                                                      .Where(r => r.Width >= 800 && r.Height >= 600)
                                                      .OrderByDescending(r => r.Width)
                                                      .ThenByDescending(r => r.Height)
-                                                     .Select(res => new KeyValuePair<string, Size>($"{res.Width}x{res.Height}", new Size(res.Width, res.Height)))
-                                                     .Distinct());
+                                                     .Select(res => new Size(res.Width, res.Height))
+                                                     .Distinct()
+                                                     // TODO: keep multiple identical sizes with different refresh rates
+                                                     // https://github.com/ppy/osu-framework/pull/1946#issuecomment-429009249
+                                                     .Select(size => new DisplayResolutionItem(size, 0, 0)));
             return resolutions.ToList();
+        }
+
+        private class DisplayResolutionItem
+        {
+            public static readonly DisplayResolutionItem DEFAULT = new DefaultItem();
+
+            public readonly Size Size;
+            // TODO for now, these values are completely ignored
+            public readonly float RefreshRate;
+            public readonly int BitsPerPixel;
+
+            public DisplayResolutionItem(Size size, float refreshRate, int bitsPerPixel)
+            {
+                Size = size;
+                RefreshRate = refreshRate;
+                BitsPerPixel = bitsPerPixel;
+            }
+
+            public override string ToString() => $"{Size.Width}x{Size.Height}"; //$"{Size.Width}x{Size.Height} @{RefreshRate} Hz ({BitsPerPixel} bpp)";
+
+            private class DefaultItem : DisplayResolutionItem
+            {
+                public DefaultItem()
+                    : base(new Size(9999, 9999), 60, 32)
+                {
+                }
+
+                // TODO make this localisable
+                public override string ToString() => "Default";
+            }
         }
     }
 }
