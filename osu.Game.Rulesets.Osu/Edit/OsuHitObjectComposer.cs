@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             new HitObjectCompositionTool<Spinner>()
         };
 
-        protected override Container CreateLayerContainer() => new PlayfieldLayer { RelativeSizeAxes = Axes.Both };
+        protected override Container CreateLayerContainer() => new PlayfieldAdjustmentContainer { RelativeSizeAxes = Axes.Both };
 
         public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)
         {

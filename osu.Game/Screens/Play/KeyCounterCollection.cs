@@ -118,8 +118,8 @@ namespace osu.Game.Screens.Play
 
         private void updateVisibility() => this.FadeTo(Visible.Value || configVisibility.Value ? 1 : 0, duration);
 
-        public override bool HandleKeyboardInput => receptor == null;
-        public override bool HandleMouseInput => receptor == null;
+        public override bool HandleNonPositionalInput => receptor == null;
+        public override bool HandlePositionalInput => receptor == null;
 
         public IFrameBasedClock AudioClock { get; set; }
 
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Play
                 Target = target;
             }
 
-            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
             protected override bool Handle(UIEvent e)
             {

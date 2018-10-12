@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         #region User Input Handling
 
-        public void HandleDrag(HitObjectMask m, InputState state)
+        public void HandleDrag(HitObjectMask m, Vector2 delta, InputState state)
         {
             // Todo: Various forms of snapping
 
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 switch (mask.HitObject.HitObject)
                 {
                     case IHasEditablePosition editablePosition:
-                        editablePosition.OffsetPosition(state.Mouse.Delta);
+                        editablePosition.OffsetPosition(delta);
                         break;
                 }
             }

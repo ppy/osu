@@ -1,23 +1,24 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Allocation;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Rulesets.Taiko.Objects;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Game.Rulesets.Taiko.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Extensions.Color4Extensions;
 using System.Linq;
-using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
+using osu.Game.Graphics;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.Objects.Drawables;
+using osu.Game.Rulesets.Taiko.Judgements;
+using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -40,6 +41,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override bool UserScrollSpeedAdjustment => false;
 
+        protected override SpeedChangeVisualisationMethod VisualisationMethod => SpeedChangeVisualisationMethod.Overlapping;
+
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
         private readonly JudgementContainer<DrawableTaikoJudgement> judgementContainer;
@@ -58,7 +61,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         {
             Direction.Value = ScrollingDirection.Left;
 
-            InternalChild = new PlayfieldLayer
+            InternalChild = new PlayfieldAdjustmentContainer
             {
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
@@ -198,7 +201,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                 }
             };
 
-            VisibleTimeRange.Value = 6000;
+            VisibleTimeRange.Value = 7000;
         }
 
         [BackgroundDependencyLoader]

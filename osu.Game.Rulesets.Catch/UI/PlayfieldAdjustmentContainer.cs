@@ -7,12 +7,12 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
-    public class PlayfieldLayer : Container
+    public class PlayfieldAdjustmentContainer : Container
     {
         protected override Container<Drawable> Content => content;
         private readonly Container content;
 
-        public PlayfieldLayer()
+        public PlayfieldAdjustmentContainer()
         {
             InternalChild = new Container
             {
