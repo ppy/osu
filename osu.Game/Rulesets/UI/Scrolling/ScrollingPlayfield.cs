@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
 
@@ -62,6 +63,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         protected readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
+        protected virtual SpeedChangeVisualisationMethod VisualisationMethod => SpeedChangeVisualisationMethod.Sequential;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -90,7 +93,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         protected sealed override HitObjectContainer CreateHitObjectContainer()
         {
-            var container = new ScrollingHitObjectContainer();
+            var container = new ScrollingHitObjectContainer(VisualisationMethod);
             container.Direction.BindTo(Direction);
             return container;
         }

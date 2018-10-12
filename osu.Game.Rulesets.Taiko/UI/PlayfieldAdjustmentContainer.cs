@@ -6,7 +6,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
-    public class PlayfieldLayer : Container
+    public class PlayfieldAdjustmentContainer : Container
     {
         private const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
         private const float default_aspect = 16f / 9f;

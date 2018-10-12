@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             Size = new Vector2(0.75f);
 
-            InternalChild = new PlayfieldLayer
+            InternalChild = new PlayfieldAdjustmentContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
@@ -78,7 +78,8 @@ namespace osu.Game.Rulesets.Osu.UI
             DrawableOsuJudgement explosion = new DrawableOsuJudgement(result, judgedObject)
             {
                 Origin = Anchor.Centre,
-                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition
+                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition,
+                Scale = new Vector2(((OsuHitObject)judgedObject.HitObject).Scale * 1.65f)
             };
 
             judgementLayer.Add(explosion);
