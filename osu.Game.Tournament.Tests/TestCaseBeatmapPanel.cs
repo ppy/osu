@@ -1,6 +1,8 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -20,6 +22,11 @@ namespace osu.Game.Tournament.Tests
 
         [Resolved]
         private RulesetStore rulesets { get; set; } = null;
+
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(TournamentBeatmapPanel),
+        };
 
         [BackgroundDependencyLoader]
         private void load()
