@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Game.Tournament.Components;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -91,23 +92,50 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         private void updateProgression()
         {
-            var progression = Pairing.Progression?.Value;
-
-            if (progression != null)
+            if (!Pairing.Completed)
             {
-                bool progressionAbove = progression.ID < Pairing.ID;
+                // ensure we clear any of our teams from our progression.
+                // this is not pretty logic but should suffice for now.
+                if (Pairing.Progression.Value != null && Pairing.Progression.Value.Team1.Value == Pairing.Team1.Value)
+                    Pairing.Progression.Value.Team1.Value = null;
 
-                var destinationForWinner = progressionAbove || progression.Team1.Value != null && progression.Team1.Value != Pairing.Team1.Value && progression.Team1.Value != Pairing.Team2.Value ? progression.Team2 : progression.Team1;
-                destinationForWinner.Value = Pairing.Winner;
+                if (Pairing.Progression.Value != null && Pairing.Progression.Value.Team2.Value == Pairing.Team2.Value)
+                    Pairing.Progression.Value.Team2.Value = null;
+
+                if (Pairing.LosersProgression.Value != null && Pairing.LosersProgression.Value.Team1.Value == Pairing.Team1.Value)
+                    Pairing.LosersProgression.Value.Team1.Value = null;
+
+                if (Pairing.LosersProgression.Value != null && Pairing.LosersProgression.Value.Team2.Value == Pairing.Team2.Value)
+                    Pairing.LosersProgression.Value.Team2.Value = null;
+            }
+            else
+            {
+                transferProgression(Pairing.Progression?.Value, Pairing.Winner);
+                transferProgression(Pairing.LosersProgression?.Value, Pairing.Loser);
+            }
+        }
+
+        private void transferProgression(MatchPairing destination, TournamentTeam team)
+        {
+            if (destination == null) return;
+
+            bool progressionAbove = destination.ID < Pairing.ID;
+
+            Bindable<TournamentTeam> destinationTeam;
+
+            // check for the case where we have already transferred out value
+            if (destination.Team1.Value == team)
+                destinationTeam = destination.Team1;
+            else if (destination.Team2.Value == team)
+                destinationTeam = destination.Team2;
+            else
+            {
+                destinationTeam = progressionAbove ? destination.Team2 : destination.Team1;
+                if (destinationTeam.Value != null)
+                    destinationTeam = progressionAbove ? destination.Team1 : destination.Team2;
             }
 
-            if ((progression = Pairing.LosersProgression?.Value) != null)
-            {
-                bool progressionAbove = progression.ID < Pairing.ID;
-
-                var destinationForLoser = progressionAbove || progression.Team1.Value != null && progression.Team1.Value != Pairing.Team1.Value && progression.Team1.Value != Pairing.Team2.Value ? progression.Team2 : progression.Team1;
-                destinationForLoser.Value = Pairing.Loser;
-            }
+            destinationTeam.Value = team;
         }
 
         private void updateWinConditions()
