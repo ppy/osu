@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using Newtonsoft.Json;
 using osu.Framework.Configuration;
 using osu.Game.Tournament.Components;
@@ -41,6 +42,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         [JsonIgnore]
         public readonly Bindable<MatchPairing> LosersProgression = new Bindable<MatchPairing>();
+
+        public readonly Bindable<DateTimeOffset> Date = new Bindable<DateTimeOffset>();
 
         public Point Position;
 
