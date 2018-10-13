@@ -16,22 +16,22 @@ namespace osu.Game.Tournament.Tests
     public class TestCaseBeatmapPanel : OsuTestCase
     {
         [Resolved]
-        protected APIAccess API { get; set; }
+        private APIAccess api { get; set; }
 
         [Resolved]
-        protected RulesetStore Rulesets { get; set; }
+        private RulesetStore rulesets { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
             var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = 1091460 });
             req.Success += success;
-            API.Queue(req);
+            api.Queue(req);
         }
 
         private void success(APIBeatmap apiBeatmap)
         {
-            var beatmap = apiBeatmap.ToBeatmap(Rulesets);
+            var beatmap = apiBeatmap.ToBeatmap(rulesets);
             Add(new TournamentBeatmapPanel(beatmap)
             {
                 Anchor = Anchor.Centre,
