@@ -141,7 +141,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             }
             else
             {
-                if (pairing.Progression.Value?.Completed.Value != false)
+                if (pairing.Progression.Value?.Completed.Value == true)
                     // don't allow changing scores if the match has a progression. can cause large data loss
                     return false;
 
