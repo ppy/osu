@@ -16,10 +16,10 @@ namespace osu.Game.Tournament.Tests
     public class TestCaseBeatmapPanel : OsuTestCase
     {
         [Resolved]
-        private APIAccess api { get; set; }
+        private APIAccess api { get; set; } = null;
 
         [Resolved]
-        private RulesetStore rulesets { get; set; }
+        private RulesetStore rulesets { get; set; } = null;
 
         [BackgroundDependencyLoader]
         private void load()
