@@ -61,17 +61,13 @@ namespace osu.Game.Online.API.Requests.Responses
         {
             return new BeatmapInfo
             {
-                Metadata = this,
+                Metadata = !string.IsNullOrEmpty(Artist) ? this : (BeatmapMetadata)BeatmapSet,
                 Ruleset = rulesets.GetRuleset(ruleset),
                 StarDifficulty = starDifficulty,
                 OnlineBeatmapID = OnlineBeatmapID,
                 Version = version,
                 Status = Status,
-                BeatmapSet = new BeatmapSetInfo
-                {
-                    OnlineBeatmapSetID = OnlineBeatmapSetID,
-                    Status = BeatmapSet?.Status ?? BeatmapSetOnlineStatus.None
-                },
+                BeatmapSet = BeatmapSet.ToBeatmapSet(rulesets),
                 BaseDifficulty = new BeatmapDifficulty
                 {
                     DrainRate = drainRate,
