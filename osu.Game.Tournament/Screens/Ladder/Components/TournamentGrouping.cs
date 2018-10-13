@@ -11,7 +11,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         public readonly Bindable<string> Name = new Bindable<string>();
         public readonly Bindable<string> Description = new Bindable<string>();
 
-        public int BestOf;
+        public readonly BindableInt BestOf = new BindableInt(9) { Default = 9, MinValue = 3, MaxValue = 23 };
 
         public List<int> Pairings = new List<int>();
     }
