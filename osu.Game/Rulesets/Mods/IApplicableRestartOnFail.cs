@@ -4,7 +4,7 @@
 namespace osu.Game.Rulesets.Mods
 {
     /// <summary>
-    /// Represents a mod which can override (and block) a fail.
+    /// Represents a mod which can request to restart on fail.
     /// </summary>
     public interface IApplicableRestartOnFail : IApplicableMod
     {
