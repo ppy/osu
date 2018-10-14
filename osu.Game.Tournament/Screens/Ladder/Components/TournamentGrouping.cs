@@ -14,6 +14,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public readonly BindableInt BestOf = new BindableInt(9) { Default = 9, MinValue = 3, MaxValue = 23 };
 
+        public readonly List<GroupingBeatmap> Beatmaps = new List<GroupingBeatmap>();
+
         public readonly Bindable<DateTimeOffset> StartDate = new Bindable<DateTimeOffset>();
 
         public List<int> Pairings = new List<int>();
