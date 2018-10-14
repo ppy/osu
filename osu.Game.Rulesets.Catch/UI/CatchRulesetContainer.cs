@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -31,8 +30,6 @@ namespace osu.Game.Rulesets.Catch.UI
         protected override Playfield CreatePlayfield() => new CatchPlayfield(Beatmap.BeatmapInfo.BaseDifficulty, GetVisualRepresentation);
 
         public override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
-
-        protected override Vector2 PlayfieldArea => new Vector2(0.86f); // matches stable's vertical offset for catcher plate
 
         protected override DrawableHitObject<CatchHitObject> GetVisualRepresentation(CatchHitObject h)
         {

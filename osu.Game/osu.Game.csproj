@@ -15,7 +15,7 @@
   </ItemGroup>
   <ItemGroup Label="Package References">
     <PackageReference Include="Humanizer" Version="2.5.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="2.1.4" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="ppy.osu.Framework" Version="2018.1012.0" />
