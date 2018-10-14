@@ -16,6 +16,7 @@ using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -31,6 +32,8 @@ namespace osu.Game.Rulesets.Osu.UI
         protected override Playfield CreatePlayfield() => new OsuPlayfield();
 
         public override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
+
+        public override ResumeOverlay CreateResumeOverlay() => new OsuResumeOverlay();
 
         protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
         {

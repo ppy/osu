@@ -22,8 +22,13 @@ namespace osu.Game.Rulesets.Osu.UI
             {
                 inputManager = value;
                 inputManager.Add(clickToResumeCursor = new GameplayCursor.OsuClickToResumeCursor(ResumeAction));
-                Add(inputManager);
             }
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            Add(InputManager);
         }
 
         public override void Show()

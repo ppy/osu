@@ -160,7 +160,7 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                pauseContainer = new PauseContainer(offsetClock, adjustableClock)
+                pauseContainer = new PauseContainer(offsetClock, adjustableClock, RulesetContainer)
                 {
                     Retries = RestartCount,
                     OnRetry = Restart,

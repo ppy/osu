@@ -196,6 +196,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         public class OsuClickToResumeCursor : OsuCursor, IKeyBindingHandler<OsuAction>
         {
+            public override bool HandlePositionalInput => true;
             protected override Color4 CursorColor => Color4.Orange;
             private readonly Action resumeAction;
             public OsuClickToResumeCursor(Action resumeAction) => this.resumeAction = resumeAction;

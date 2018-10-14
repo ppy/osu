@@ -12,6 +12,8 @@ namespace osu.Game.Screens.Play
         public Action ResumeAction { get; set; }
         public Action PauseAction { get; set; }
 
+        protected override Action BackAction => PauseAction;
+
         public CursorContainer Cursor { get; set; }
         public virtual PassThroughInputManager InputManager { get; set; }
     }

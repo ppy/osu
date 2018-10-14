@@ -22,6 +22,7 @@ using osu.Game.Overlays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Screens.Play;
 using OpenTK;
 
 namespace osu.Game.Rulesets.UI
@@ -123,6 +124,8 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         /// <returns>The input manager.</returns>
         public abstract PassThroughInputManager CreateInputManager();
+
+        public virtual ResumeOverlay CreateResumeOverlay() => null;
 
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
