@@ -50,7 +50,7 @@ namespace osu.Game.Screens.Play
         /// </summary>
         /// <param name="framedClock">The gameplay clock. This is the clock that will process frames.</param>
         /// <param name="decoupledClock">The seekable clock. This is the clock that will be paused and resumed.</param>
-        /// <param name="rulesetContainer"></param>
+        /// <param name="rulesetContainer">Required for creating <see cref="ResumeOverlay"/></param>
         public PauseContainer(FramedClock framedClock, DecoupleableInterpolatingFramedClock decoupledClock, RulesetContainer rulesetContainer)
         {
             this.framedClock = framedClock;
@@ -70,10 +70,7 @@ namespace osu.Game.Screens.Play
                 OnResume = () =>
                 {
                     if (resumeOverlay == null)
-                    {
-                        IsResuming = true;
-                        this.Delay(400).Schedule(Resume);
-                    }
+                        scheduleResuming();
 
                     pauseOverlay.Hide();
                     resumeOverlay?.Show();
@@ -82,13 +79,11 @@ namespace osu.Game.Screens.Play
                 OnQuit = () => OnQuit(),
             });
 
-            resumeOverlay = rulesetContainer.CreateResumeOverlay();
-            if (resumeOverlay != null)
+            if ((resumeOverlay = rulesetContainer.CreateResumeOverlay()) != null)
             {
                 resumeOverlay.ResumeAction = () =>
                 {
-                    IsResuming = true;
-                    this.Delay(400).Schedule(Resume);
+                    scheduleResuming();
                     resumeOverlay.Hide();
                 };
                 resumeOverlay.PauseAction = () =>
@@ -96,10 +91,14 @@ namespace osu.Game.Screens.Play
                     resumeOverlay.Hide();
                     pauseOverlay.Show();
                 };
-                resumeOverlay.Cursor = rulesetContainer.Cursor;
-                resumeOverlay.InputManager = rulesetContainer.CreateInputManager();
                 AddInternal(resumeOverlay);
             }
+        }
+
+        private void scheduleResuming()
+        {
+            IsResuming = true;
+            this.Delay(400).Schedule(Resume);
         }
 
         public void Pause(bool force = false) => Schedule(() => // Scheduled to ensure a stable position in execution order, no matter how it was called.

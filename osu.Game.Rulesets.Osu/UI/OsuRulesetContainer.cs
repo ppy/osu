@@ -4,7 +4,6 @@
 using System.Linq;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
-using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -13,10 +12,11 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.UI.Cursor;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Replays;
 using osu.Game.Screens.Play;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -33,7 +33,11 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
 
-        public override ResumeOverlay CreateResumeOverlay() => new OsuResumeOverlay();
+        public override ResumeOverlay CreateResumeOverlay() => new OsuResumeOverlay
+        {
+            Cursor = Cursor,
+            InputManager = CreateInputManager()
+        };
 
         protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
         {
