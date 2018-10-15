@@ -43,7 +43,8 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     Position = positionData?.Position ?? Vector2.Zero,
                     NewCombo = comboData?.NewCombo ?? false,
                     ComboOffset = comboData?.ComboOffset ?? 0,
-                    LegacyLastTickOffset = legacyOffset?.LegacyLastTickOffset
+                    LegacyLastTickOffset = legacyOffset?.LegacyLastTickOffset,
+                    TickDistanceMultiplier = beatmap.BeatmapInfo.BeatmapVersion < 8 ? 1f / beatmap.ControlPointInfo.DifficultyPointAt(original.StartTime).SpeedMultiplier : 1
                 };
             }
             else if (endTimeData != null)
