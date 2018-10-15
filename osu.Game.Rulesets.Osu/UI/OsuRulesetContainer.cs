@@ -16,7 +16,6 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
