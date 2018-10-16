@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Framework.Configuration;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
+    [Serializable]
     public class TournamentGrouping
     {
         public readonly Bindable<string> Name = new Bindable<string>();
@@ -14,6 +16,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public readonly BindableInt BestOf = new BindableInt(9) { Default = 9, MinValue = 3, MaxValue = 23 };
 
+        [JsonProperty]
         public readonly List<GroupingBeatmap> Beatmaps = new List<GroupingBeatmap>();
 
         public readonly Bindable<DateTimeOffset> StartDate = new Bindable<DateTimeOffset>();

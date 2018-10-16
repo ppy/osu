@@ -1,11 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Game.Users;
 
 namespace osu.Game.Tournament.Components
 {
+    [Serializable]
     public class TournamentTeam
     {
         /// <summary>
@@ -35,6 +38,7 @@ namespace osu.Game.Tournament.Components
             set { acronym = value; }
         }
 
+        [JsonProperty]
         public List<User> Players { get; set; }
 
         public override string ToString() => FullName ?? Acronym;
