@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -26,7 +27,7 @@ namespace osu.Game.Audio
 
         private TrackManagerPreviewTrack current;
 
-        private readonly List<PlayButtonState> playButtonStates = new List<PlayButtonState>();
+        private readonly List<WeakReference<PlayButtonState>> playButtonStates = new List<WeakReference<PlayButtonState>>();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, FrameworkConfigManager config)
@@ -41,25 +42,35 @@ namespace osu.Game.Audio
 
         public PlayButtonState GetPlayButtonState(BeatmapSetInfo beatmapSet)
         {
-            var findByBeatmapSet = playButtonStates.FirstOrDefault(state => state.BeatmapSet == beatmapSet);
-            if (findByBeatmapSet == null)
+            PlayButtonState result = null;
+
+            var exists = playButtonStates.FirstOrDefault(weakReference => weakReference.TryGetTarget(out result) && result.BeatmapSet == beatmapSet) != null;
+
+            if (!exists)
             {
-                playButtonStates.Add(findByBeatmapSet = new PlayButtonState(beatmapSet));
-                findByBeatmapSet.StateChanged += (state) =>
+                result = new PlayButtonState(beatmapSet);
+
+                var freeWeakReference = playButtonStates.FirstOrDefault(reference => !reference.TryGetTarget(out _));
+                if (freeWeakReference != null)
+                    freeWeakReference.SetTarget(result);
+                else
+                    playButtonStates.Add(new WeakReference<PlayButtonState>(result));
+
+                result.StateChanged += (state) =>
                 {
                     switch (state)
                     {
                         case PlayButtonState.PlaybackState.Playing:
-                            AddInternal(findByBeatmapSet);
+                            AddInternal(result);
                             break;
                         case PlayButtonState.PlaybackState.Stopped:
-                            RemoveInternal(findByBeatmapSet);
+                            RemoveInternal(result);
                             break;
                     }
                 };
             }
 
-            return findByBeatmapSet;
+            return result;
         }
 
         /// <summary>
