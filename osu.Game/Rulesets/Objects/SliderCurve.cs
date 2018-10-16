@@ -27,6 +27,12 @@ namespace osu.Game.Rulesets.Objects
         {
             switch (CurveType)
             {
+                case CurveType.Linear:
+                    var result = new List<Vector2>(subControlPoints.Length);
+                    foreach (var c in subControlPoints)
+                        result.Add(c);
+
+                    return result;
                 case CurveType.PerfectCurve:
                     //we can only use CircularArc iff we have exactly three control points and no dissection.
                     if (ControlPoints.Length != 3 || subControlPoints.Length != 3)
@@ -66,18 +72,9 @@ namespace osu.Game.Rulesets.Objects
                 {
                     ReadOnlySpan<Vector2> cpSpan = ControlPoints.AsSpan().Slice(start, end - start);
 
-                    if (CurveType == CurveType.Linear)
-                    {
-                        foreach (var t in cpSpan)
-                            if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
-                                calculatedPath.Add(t);
-                    }
-                    else
-                    {
-                        foreach (Vector2 t in calculateSubpath(cpSpan))
-                            if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
-                                calculatedPath.Add(t);
-                    }
+                    foreach (Vector2 t in calculateSubpath(cpSpan))
+                        if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
+                            calculatedPath.Add(t);
 
                     start = end;
                 }
