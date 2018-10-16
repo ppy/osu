@@ -18,12 +18,23 @@ namespace osu.Game.Overlays.Direct
 
         public BeatmapSetInfo BeatmapSet { get; }
 
-        private WeakReference previewWeakReference;
+        private WeakReference<PreviewTrack> previewWeakReference;
 
         public PreviewTrack Preview
         {
-            get => (PreviewTrack)(previewWeakReference != null && previewWeakReference.IsAlive ? previewWeakReference.Target : null);
-            set => previewWeakReference = new WeakReference(value);
+            get
+            {
+                PreviewTrack result = null;
+                previewWeakReference?.TryGetTarget(out result);
+                return result;
+            }
+            set
+            {
+                if (previewWeakReference != null)
+                    previewWeakReference.SetTarget(value);
+                else
+                    previewWeakReference = new WeakReference<PreviewTrack>(value);
+            }
         }
 
         public BindableBool Playing { get; }
