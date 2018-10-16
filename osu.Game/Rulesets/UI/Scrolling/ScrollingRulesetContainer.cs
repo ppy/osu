@@ -60,6 +60,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
                 return new MultiplierControlPoint(c.Time)
                 {
+                    Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier,
                     TimingPoint = lastTimingPoint,
                     DifficultyPoint = lastDifficultyPoint
                 };
@@ -78,7 +79,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             // If we have no control points, add a default one
             if (DefaultControlPoints.Count == 0)
-                DefaultControlPoints.Add(new MultiplierControlPoint());
+                DefaultControlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier });
 
             DefaultControlPoints.ForEach(c => applySpeedAdjustment(c, Playfield));
         }
@@ -87,23 +88,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             playfield.HitObjects.AddControlPoint(controlPoint);
             playfield.NestedPlayfields?.OfType<ScrollingPlayfield>().ForEach(p => applySpeedAdjustment(controlPoint, p));
-        }
-
-        /// <summary>
-        /// Generates a <see cref="MultiplierControlPoint"/> with the default timing change/difficulty change from the beatmap at a time.
-        /// </summary>
-        /// <param name="time">The time to create the control point at.</param>
-        /// <returns>The default <see cref="MultiplierControlPoint"/> at <paramref name="time"/>.</returns>
-        public MultiplierControlPoint CreateControlPointAt(double time)
-        {
-            if (DefaultControlPoints.Count == 0)
-                return new MultiplierControlPoint(time);
-
-            int index = DefaultControlPoints.BinarySearch(new MultiplierControlPoint(time));
-            if (index < 0)
-                return new MultiplierControlPoint(time);
-
-            return new MultiplierControlPoint(time, DefaultControlPoints[index]);
         }
     }
 }
