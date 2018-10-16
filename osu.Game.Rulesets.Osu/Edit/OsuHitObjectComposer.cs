@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Edit.Masks;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
-using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
