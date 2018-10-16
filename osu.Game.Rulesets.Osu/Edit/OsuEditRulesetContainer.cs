@@ -28,9 +28,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             {
             }
 
-            protected override Vector2 PlayfieldArea => Vector2.One;
-
             protected override CursorContainer CreateCursor() => null;
         }
+        protected override Playfield CreatePlayfield() => new OsuPlayfield { Size = Vector2.One　};
     }
 }

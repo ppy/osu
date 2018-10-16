@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -24,6 +25,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
             if (stageDefinitions.Count <= 0)
                 throw new ArgumentException("Can't have zero or fewer stages.");
+
+            Size = new Vector2(1, 0.8f);
 
             GridContainer playfieldGrid;
             AddInternal(playfieldGrid = new GridContainer

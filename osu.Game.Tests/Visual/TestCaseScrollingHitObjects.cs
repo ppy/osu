@@ -121,14 +121,21 @@ namespace osu.Game.Tests.Visual
                 Direction = direction;
 
                 Padding = new MarginPadding(2);
-                Content.Masking = true;
 
-                AddInternal(new Box
+                InternalChildren = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.5f,
-                    Depth = float.MaxValue
-                });
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.5f,
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        Child = HitObjectContainer
+                    }
+                };
             }
         }
 
