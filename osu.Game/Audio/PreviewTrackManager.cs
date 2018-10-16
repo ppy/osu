@@ -45,7 +45,18 @@ namespace osu.Game.Audio
             if (findByBeatmapSet == null)
             {
                 playButtonStates.Add(findByBeatmapSet = new PlayButtonState(beatmapSet));
-                AddInternal(findByBeatmapSet);
+                findByBeatmapSet.StateChanged += (state) =>
+                {
+                    switch (state)
+                    {
+                        case PlayButtonState.PlaybackState.Playing:
+                            AddInternal(findByBeatmapSet);
+                            break;
+                        case PlayButtonState.PlaybackState.Stopped:
+                            RemoveInternal(findByBeatmapSet);
+                            break;
+                    }
+                };
             }
 
             return findByBeatmapSet;

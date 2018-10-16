@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
@@ -10,11 +11,15 @@ using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Direct
 {
-    public class PlayButtonState : CompositeDrawable
+    public class PlayButtonState : CompositeDrawable, IStateful<PlayButtonState.PlaybackState>
     {
+        public PlaybackState State { get; set; }
+        public event Action<PlaybackState> StateChanged;
+
         public BeatmapSetInfo BeatmapSet { get; }
 
         private WeakReference previewWeakReference;
+
         public PreviewTrack Preview
         {
             get => (PreviewTrack)(previewWeakReference != null && previewWeakReference.IsAlive ? previewWeakReference.Target : null);
@@ -42,6 +47,7 @@ namespace osu.Game.Overlays.Direct
 
         private void playingStateChanged(bool playing)
         {
+            StateChanged?.Invoke(State = playing ? PlaybackState.Playing : PlaybackState.Stopped);
             if (playing)
             {
                 if (Preview != null)
@@ -74,6 +80,12 @@ namespace osu.Game.Overlays.Direct
 
                 Loading.Value = false;
             }
+        }
+
+        public enum PlaybackState
+        {
+            Playing,
+            Stopped
         }
     }
 }
