@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -10,6 +8,7 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
+using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.Direct;
 
@@ -27,7 +26,7 @@ namespace osu.Game.Audio
 
         private TrackManagerPreviewTrack current;
 
-        private readonly List<WeakReference<PlayButtonState>> playButtonStates = new List<WeakReference<PlayButtonState>>();
+        private readonly WeakList<PlayButtonState> playButtonStates = new WeakList<PlayButtonState>();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, FrameworkConfigManager config)
@@ -54,9 +53,9 @@ namespace osu.Game.Audio
                 if (freeWeakReference != null)
                     freeWeakReference.SetTarget(result);
                 else
-                    playButtonStates.Add(new WeakReference<PlayButtonState>(result));
+                    playButtonStates.Add(result);
 
-                result.StateChanged += (state) =>
+                result.StateChanged += state =>
                 {
                     switch (state)
                     {
