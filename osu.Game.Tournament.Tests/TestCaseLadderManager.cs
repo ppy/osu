@@ -11,9 +11,10 @@ namespace osu.Game.Tournament.Tests
     public class TestCaseLadderManager : LadderTestCase
     {
         [Cached]
-        private readonly LadderManager manager;
+        private LadderManager manager;
 
-        public TestCaseLadderManager()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Add(new OsuContextMenuContainer
             {

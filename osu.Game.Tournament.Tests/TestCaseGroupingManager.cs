@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -37,6 +38,11 @@ namespace osu.Game.Tournament.Tests
                 }
             });
 
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             foreach (var g in Ladder.Groupings)
                 items.Add(new GroupingRow(g));
         }
