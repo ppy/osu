@@ -84,7 +84,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         internal float LazyTravelDistance;
 
-        public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
+        public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
+
         public int RepeatCount { get; set; }
 
         /// <summary>
@@ -129,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             {
                 StartTime = StartTime,
                 Position = Position,
-                Samples = Samples,
+                Samples = NodeSamples[0],
                 SampleControlPoint = SampleControlPoint,
                 IndexInCurrentCombo = IndexInCurrentCombo,
                 ComboIndex = ComboIndex,
@@ -209,7 +210,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                     Position = Position + Curve.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
-                    Samples = new List<SampleInfo>(RepeatSamples[repeatIndex])
+                    Samples = new List<SampleInfo>(NodeSamples[1 + repeatIndex])
                 });
             }
         }

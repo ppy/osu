@@ -116,7 +116,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
                 Distance = 700,
                 RepeatCount = repeats,
-                RepeatSamples = createEmptySamples(repeats),
+                NodeSamples = createEmptySamples(repeats),
                 StackHeight = 10
             };
 
@@ -148,7 +148,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
                 Distance = distance,
                 RepeatCount = repeats,
-                RepeatSamples = createEmptySamples(repeats),
+                NodeSamples = createEmptySamples(repeats),
                 StackHeight = stackHeight
             };
 
@@ -169,7 +169,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
                 Distance = 600,
                 RepeatCount = repeats,
-                RepeatSamples = createEmptySamples(repeats)
+                NodeSamples = createEmptySamples(repeats)
             };
 
             addSlider(slider, 2, 3);
@@ -195,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
                 Distance = 793.4417,
                 RepeatCount = repeats,
-                RepeatSamples = createEmptySamples(repeats)
+                NodeSamples = createEmptySamples(repeats)
             };
 
             addSlider(slider, 2, 3);
@@ -220,7 +220,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
                 Distance = 480,
                 RepeatCount = repeats,
-                RepeatSamples = createEmptySamples(repeats)
+                NodeSamples = createEmptySamples(repeats)
             };
 
             addSlider(slider, 2, 3);
@@ -246,7 +246,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
                 Distance = 1000,
                 RepeatCount = repeats,
-                RepeatSamples = createEmptySamples(repeats)
+                NodeSamples = createEmptySamples(repeats)
             };
 
             addSlider(slider, 2, 3);
@@ -274,7 +274,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
                 Distance = 300,
                 RepeatCount = repeats,
-                RepeatSamples = repeatSamples
+                NodeSamples = repeatSamples
             };
 
             addSlider(slider, 3, 1);
