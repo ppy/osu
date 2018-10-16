@@ -152,7 +152,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             set { Curve.ControlPoints = value; }
         }
 
-        public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
+        public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
 
         public CurveType CurveType
         {

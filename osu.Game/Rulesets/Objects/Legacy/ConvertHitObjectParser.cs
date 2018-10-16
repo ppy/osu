@@ -169,6 +169,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
                     result = CreateSlider(pos, combo, comboOffset, points, length, curveType, repeatCount, nodeSamples);
+
+                    // The samples are played when the slider ends, which is the last node
+                    result.Samples = nodeSamples[nodeSamples.Count - 1];
                 }
                 else if (type.HasFlag(ConvertHitObjectType.Spinner))
                 {
@@ -200,7 +203,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 }
 
                 result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture) + Offset;
-                result.Samples = convertSoundType(soundType, bankInfo);
+
+                if (result.Samples.Count == 0)
+                    result.Samples = convertSoundType(soundType, bankInfo);
 
                 FirstObject = false;
 
@@ -260,9 +265,9 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="length">The slider length.</param>
         /// <param name="curveType">The slider curve type.</param>
         /// <param name="repeatCount">The slider repeat count.</param>
-        /// <param name="repeatSamples">The samples to be played when the repeat nodes are hit. This includes the head and tail of the slider.</param>
+        /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> nodeSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.

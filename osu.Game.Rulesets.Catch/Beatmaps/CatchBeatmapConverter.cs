@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     ControlPoints = curveData.ControlPoints,
                     CurveType = curveData.CurveType,
                     Distance = curveData.Distance,
-                    RepeatSamples = curveData.RepeatSamples,
+                    NodeSamples = curveData.NodeSamples,
                     RepeatCount = curveData.RepeatCount,
                     X = (positionData?.X ?? 0) / CatchPlayfield.BASE_WIDTH,
                     NewCombo = comboData?.NewCombo ?? false,
