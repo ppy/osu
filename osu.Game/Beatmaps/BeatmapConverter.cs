@@ -76,8 +76,11 @@ namespace osu.Game.Beatmaps
 
                 var converted = ConvertHitObject(obj, beatmap);
 
-                // Note: This will not perform .ToList() if ObjectConverted is null
-                ObjectConverted?.Invoke(obj, converted.ToList());
+                if (ObjectConverted != null)
+                {
+                    converted = converted.ToList();
+                    ObjectConverted.Invoke(obj, converted);
+                }
 
                 foreach (var c in converted)
                 {
