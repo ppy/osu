@@ -69,7 +69,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 Masking = true,
                 RelativeSizeAxes = Axes.Both,
-                Child = path = new Path { RelativeSizeAxes = Axes.Both, PathWidth = 1 }
+                Child = path = new SmoothPath { RelativeSizeAxes = Axes.Both, PathWidth = 1 }
             });
         }
 
