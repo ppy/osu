@@ -20,6 +20,7 @@ using osu.Game.Screens.Edit.Screens;
 using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Design;
 using osu.Game.Screens.Edit.Components;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Edit
 {
@@ -189,6 +190,21 @@ namespace osu.Game.Screens.Edit
             else
                 clock.SeekForward(!clock.IsRunning);
             return true;
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Left:
+                    clock.SeekBackward(true);
+                    return true;
+                case Key.Right:
+                    clock.SeekForward(true);
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
         }
 
         protected override void OnResuming(Screen last)

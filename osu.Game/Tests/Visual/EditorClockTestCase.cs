@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Edit.Screens.Compose;
+using OpenTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
@@ -64,6 +65,21 @@ namespace osu.Game.Tests.Visual
                 Clock.SeekForward(true);
 
             return true;
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Left:
+                    Clock.SeekBackward(true);
+                    return true;
+                case Key.Right:
+                    Clock.SeekForward(true);
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
         }
     }
 }

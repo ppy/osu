@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual
 {
     [TestFixture]
     [Cached(Type = typeof(IPlacementHandler))]
-    public class TestCaseHitObjectComposer : OsuTestCase, IPlacementHandler
+    public class TestCaseHitObjectComposer : EditorClockTestCase, IPlacementHandler
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -37,6 +37,11 @@ namespace osu.Game.Tests.Visual
             typeof(HitCircleSelectionMask),
             typeof(HitCirclePlacementMask),
         };
+
+        public TestCaseHitObjectComposer()
+        {
+            BeatDivisor.Value = 4;
+        }
 
         private HitObjectComposer composer;
 
