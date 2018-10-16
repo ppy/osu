@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             {
                 StartTime = StartTime,
                 Position = Position,
-                Samples = NodeSamples[0],
+                Samples = getNodeSamples(0),
                 SampleControlPoint = SampleControlPoint,
                 IndexInCurrentCombo = IndexInCurrentCombo,
                 ComboIndex = ComboIndex,
@@ -210,9 +210,16 @@ namespace osu.Game.Rulesets.Osu.Objects
                     Position = Position + Curve.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
-                    Samples = new List<SampleInfo>(NodeSamples[1 + repeatIndex])
+                    Samples = getNodeSamples(1 + repeatIndex)
                 });
             }
+        }
+
+        private List<SampleInfo> getNodeSamples(int nodeIndex)
+        {
+            if (nodeIndex < NodeSamples.Count)
+                return NodeSamples[nodeIndex];
+            return Samples;
         }
 
         public override Judgement CreateJudgement() => new OsuJudgement();
