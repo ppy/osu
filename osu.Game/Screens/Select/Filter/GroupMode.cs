@@ -21,8 +21,8 @@ namespace osu.Game.Screens.Select.Filter
         DateAdded,
         [Description("Difficulty")]
         Difficulty,
-        [Description("Favorites")]
-        Favorites,
+        [Description("Favourites")]
+        Favourites,
         [Description("Length")]
         Length,
         [Description("My Maps")]

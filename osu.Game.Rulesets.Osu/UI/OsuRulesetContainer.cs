@@ -4,7 +4,6 @@
 using System.Linq;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
-using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -56,12 +55,6 @@ namespace osu.Game.Rulesets.Osu.UI
                 var first = (OsuHitObject)Objects.First();
                 return first.StartTime - first.TimePreempt;
             }
-        }
-
-        protected override Vector2 GetAspectAdjustedSize()
-        {
-            var aspectSize = DrawSize.X * 0.75f < DrawSize.Y ? new Vector2(DrawSize.X, DrawSize.X * 0.75f) : new Vector2(DrawSize.Y * 4f / 3f, DrawSize.Y);
-            return new Vector2(aspectSize.X / DrawSize.X, aspectSize.Y / DrawSize.Y);
         }
 
         protected override CursorContainer CreateCursor() => new GameplayCursor();

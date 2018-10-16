@@ -73,12 +73,10 @@ namespace osu.Game.Rulesets.UI
         #region IHasReplayHandler
 
         private ReplayInputHandler replayInputHandler;
+
         public ReplayInputHandler ReplayInputHandler
         {
-            get
-            {
-                return replayInputHandler;
-            }
+            get => replayInputHandler;
             set
             {
                 if (replayInputHandler != null) RemoveHandler(replayInputHandler);
@@ -208,16 +206,20 @@ namespace osu.Game.Rulesets.UI
             mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
+        protected override bool Handle(UIEvent e)
         {
-            if (mouseDisabled.Value && (e.Button == MouseButton.Left || e.Button == MouseButton.Right)) return false;
-            return base.OnMouseDown(e);
-        }
-
-        protected override bool OnMouseUp(MouseUpEvent e)
-        {
-            if (!CurrentState.Mouse.IsPressed(e.Button)) return false;
-            return base.OnMouseUp(e);
+            switch (e)
+            {
+                case MouseDownEvent mouseDown when mouseDown.Button == MouseButton.Left || mouseDown.Button == MouseButton.Right:
+                    if (mouseDisabled.Value)
+                        return false;
+                    break;
+                case MouseUpEvent mouseUp:
+                    if (!CurrentState.Mouse.IsPressed(mouseUp.Button))
+                        return false;
+                    break;
+            }
+            return base.Handle(e);
         }
 
         #endregion
@@ -269,7 +271,7 @@ namespace osu.Game.Rulesets.UI
     }
 
     public class RulesetInputManagerInputState<T> : InputState
-    where T : struct
+        where T : struct
     {
         public ReplayState<T> LastReplayState;
 

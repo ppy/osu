@@ -189,6 +189,6 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
         /// </summary>
-        protected virtual ScalableContainer CreateLayerContainer() => new ScalableContainer { RelativeSizeAxes = Axes.Both };
+        protected virtual Container CreateLayerContainer() => new Container { RelativeSizeAxes = Axes.Both };
     }
 }
