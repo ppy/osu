@@ -12,10 +12,10 @@ namespace osu.Game.Beatmaps.ControlPoints
     [Serializable]
     public class ControlPointInfo
     {
-        private readonly TimingControlPoint timingPointSearch = new TimingControlPoint();
-        private readonly DifficultyControlPoint difficultyPointSearch = new DifficultyControlPoint();
-        private readonly SampleControlPoint samplePointSearch = new SampleControlPoint();
-        private readonly EffectControlPoint effectPointSearch = new EffectControlPoint();
+        private readonly TimingControlPoint timingSearchPoint = new TimingControlPoint();
+        private readonly DifficultyControlPoint difficultySearchPoint = new DifficultyControlPoint();
+        private readonly SampleControlPoint sampleSearchPoint = new SampleControlPoint();
+        private readonly EffectControlPoint effectSearchPoint = new EffectControlPoint();
 
         /// <summary>
         /// All timing points.
@@ -46,28 +46,28 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the difficulty control point at.</param>
         /// <returns>The difficulty control point.</returns>
-        public DifficultyControlPoint DifficultyPointAt(double time) => binarySearch(DifficultyPoints, time, difficultyPointSearch);
+        public DifficultyControlPoint DifficultyPointAt(double time) => binarySearch(DifficultyPoints, time, difficultySearchPoint);
 
         /// <summary>
         /// Finds the effect control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the effect control point at.</param>
         /// <returns>The effect control point.</returns>
-        public EffectControlPoint EffectPointAt(double time) => binarySearch(EffectPoints, time, effectPointSearch);
+        public EffectControlPoint EffectPointAt(double time) => binarySearch(EffectPoints, time, effectSearchPoint);
 
         /// <summary>
         /// Finds the sound control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the sound control point at.</param>
         /// <returns>The sound control point.</returns>
-        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time, samplePointSearch, SamplePoints.Count > 0 ? SamplePoints[0] : null);
+        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time, sampleSearchPoint, SamplePoints.Count > 0 ? SamplePoints[0] : null);
 
         /// <summary>
         /// Finds the timing control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the timing control point at.</param>
         /// <returns>The timing control point.</returns>
-        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, timingPointSearch, TimingPoints.Count > 0 ? TimingPoints[0] : null);
+        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, timingSearchPoint, TimingPoints.Count > 0 ? TimingPoints[0] : null);
 
         /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
