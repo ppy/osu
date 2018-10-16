@@ -3,8 +3,13 @@
 
 using System.IO;
 using Newtonsoft.Json;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Rulesets;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Screens.Ladder.Components;
 
@@ -14,9 +19,34 @@ namespace osu.Game.Tournament.Tests
     {
         protected LadderInfo Ladder;
 
-        protected LadderTestCase()
+        [Resolved]
+        private APIAccess api { get; set; } = null;
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; } = null;
+
+        [BackgroundDependencyLoader]
+        private void load()
         {
             Ladder = File.Exists(@"bracket.json") ? JsonConvert.DeserializeObject<LadderInfo>(File.ReadAllText(@"bracket.json")) : new LadderInfo();
+
+            bool addedInfo = false;
+
+            foreach (var g in Ladder.Groupings)
+            foreach (var b in g.Beatmaps)
+            {
+                if (b.BeatmapInfo == null)
+                {
+                    var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
+                    req.Success += i => b.BeatmapInfo = i.ToBeatmap(rulesets);
+                    req.Perform(api);
+
+                    addedInfo = true;
+                }
+            }
+
+            if (addedInfo)
+                SaveChanges();
 
             Add(new OsuButton
             {

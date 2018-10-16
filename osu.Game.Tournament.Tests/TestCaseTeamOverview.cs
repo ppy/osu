@@ -2,13 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
+using osu.Framework.Allocation;
 using osu.Game.Tournament.Screens.TeamIntro;
 
 namespace osu.Game.Tournament.Tests
 {
     public class TestCaseTeamIntro : LadderTestCase
     {
-        public TestCaseTeamIntro()
+        [BackgroundDependencyLoader]
+        private void load()
         {
             var team1 = Ladder.Teams.First(t => t.Acronym == "USA");
             var team2 = Ladder.Teams.First(t => t.Acronym == "JPN");
