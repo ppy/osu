@@ -10,7 +10,6 @@ namespace osu.Game.Tournament.Tests
 {
     public class TestCaseLadderManager : LadderTestCase
     {
-        [Cached]
         private LadderManager manager;
 
         [BackgroundDependencyLoader]
