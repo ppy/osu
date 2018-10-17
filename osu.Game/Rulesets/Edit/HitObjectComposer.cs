@@ -149,7 +149,11 @@ namespace osu.Game.Rulesets.Edit
         /// Adds a <see cref="HitObject"/> to the <see cref="Beatmaps.Beatmap"/> and visualises it.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
-        public void Add(HitObject hitObject) => maskLayer.AddMaskFor(rulesetContainer.Add(hitObject));
+        public void Add(HitObject hitObject)
+        {
+            maskLayer.AddMaskFor(rulesetContainer.Add(hitObject));
+            placementContainer.Refresh();
+        }
 
         internal abstract EditRulesetContainer CreateRulesetContainer();
 
