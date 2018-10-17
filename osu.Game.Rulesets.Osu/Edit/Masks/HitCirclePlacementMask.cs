@@ -33,7 +33,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
         {
             HitObject.StartTime = EditorClock.CurrentTime;
             HitObject.Position = e.MousePosition;
-            Finish();
+
+            EndPlacement();
             return true;
         }
 
