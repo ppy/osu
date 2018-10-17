@@ -36,10 +36,9 @@ namespace osu.Game.Rulesets.Edit
         private IPlacementHandler placementHandler { get; set; }
 
         private HitObjectMaskLayer maskLayer;
-        private Container placementContainer;
         private EditRulesetContainer rulesetContainer;
 
-        private HitObjectCompositionTool compositionTool;
+        private readonly Bindable<HitObjectCompositionTool> compositionTool = new Bindable<HitObjectCompositionTool>();
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -74,7 +73,7 @@ namespace osu.Game.Rulesets.Edit
             layerAboveRuleset.Children = new Drawable[]
             {
                 maskLayer = new HitObjectMaskLayer(),
-                placementContainer = new Container { RelativeSizeAxes = Axes.Both }
+                new PlacementContainer(compositionTool),
             };
 
             layerContainers.Add(layerBelowRuleset);
@@ -118,21 +117,14 @@ namespace osu.Game.Rulesets.Edit
             };
 
             toolboxCollection.Items =
-                CompositionTools.Select(t => new RadioButton(t.Name, () => setCompositionTool(t)))
-                .Prepend(new RadioButton("Select", () => setCompositionTool(null)))
+                CompositionTools.Select(t => new RadioButton(t.Name, () => compositionTool.Value = t))
+                .Prepend(new RadioButton("Select", () => compositionTool.Value = null))
                 .ToList();
 
             toolboxCollection.Items[0].Select();
 
-            placementHandler.PlacementFinished += h =>
-            {
-                var drawableObject = rulesetContainer.AddHitObject(h);
-
-                maskLayer.AddMask(drawableObject);
-
-                // Re-construct the mask
-                setCompositionTool(compositionTool);
-            };
+            // Todo: no
+            placementHandler.PlacementFinished += h => maskLayer.AddMask(rulesetContainer.AddHitObject(h));
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -163,16 +155,6 @@ namespace osu.Game.Rulesets.Edit
                 l.Position = rulesetContainer.Playfield.Position;
                 l.Size = rulesetContainer.Playfield.Size;
             });
-        }
-
-        private void setCompositionTool(HitObjectCompositionTool tool)
-        {
-            compositionTool = tool;
-
-            placementContainer.Clear(true);
-
-            if (tool != null)
-                placementContainer.Child = tool.CreatePlacementMask();
         }
 
         protected abstract EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap);
