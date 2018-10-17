@@ -113,6 +113,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
 
         private void beginCurve()
         {
+            BeginPlacement();
+
             HitObject.StartTime = EditorClock.CurrentTime;
             setState(PlacementState.Body);
         }
@@ -124,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
             HitObject.CurveType = HitObject.ControlPoints.Count > 2 ? CurveType.Bezier : CurveType.Linear;
             HitObject.Distance = segments.Sum(s => s.Distance);
 
-            Finish();
+            EndPlacement();
         }
 
         protected override void Update()
