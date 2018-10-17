@@ -16,6 +16,11 @@ namespace osu.Game.Rulesets.Edit
     public class PlacementMask : CompositeDrawable, IRequireHighFrequencyMousePosition
     {
         /// <summary>
+        /// Invoked when the placement of <see cref="HitObject"/> has started.
+        /// </summary>
+        public event Action<HitObject> PlacementStarted;
+
+        /// <summary>
         /// Invoked when the placement of <see cref="HitObject"/> has finished.
         /// </summary>
         public event Action<HitObject> PlacementFinished;
@@ -40,10 +45,27 @@ namespace osu.Game.Rulesets.Edit
             HitObject.ApplyDefaults(workingBeatmap.Value.Beatmap.ControlPointInfo, workingBeatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty);
         }
 
+        private bool placementBegun;
+
         /// <summary>
-        /// Finishes the placement of <see cref="HitObject"/>.
+        /// Signals that the placement of <see cref="HitObject"/> has started.
         /// </summary>
-        public void Finish() => PlacementFinished?.Invoke(HitObject);
+        protected void BeginPlacement()
+        {
+            PlacementStarted?.Invoke(HitObject);
+            placementBegun = true;
+        }
+
+        /// <summary>
+        /// Signals that the placement of <see cref="HitObject"/> has finished.
+        /// This will destroy this <see cref="PlacementMask"/>, and add the <see cref="HitObject"/> to the <see cref="Beatmap"/>.
+        /// </summary>
+        protected void EndPlacement()
+        {
+            if (!placementBegun)
+                BeginPlacement();
+            PlacementFinished?.Invoke(HitObject);
+        }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.ReceivePositionalInputAt(screenSpacePos) ?? false;
 
@@ -64,6 +86,7 @@ namespace osu.Game.Rulesets.Edit
         {
             base.Dispose(isDisposing);
 
+            PlacementStarted = null;
             PlacementFinished = null;
         }
     }
