@@ -104,8 +104,11 @@ namespace osu.Game.Beatmaps.ControlPoints
             if (time < list[0].Time)
                 return prePoint ?? new T();
 
+            if (time >= list[list.Count - 1].Time)
+                return list[list.Count - 1];
+
             int l = 0;
-            int r = list.Count - 1;
+            int r = list.Count - 2;
 
             while (l <= r)
             {
