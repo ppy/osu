@@ -4,36 +4,23 @@
 using osu.Framework.Graphics;
 using OpenTK;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class ManiaEditRulesetContainer : EditRulesetContainer<ManiaHitObject>
+    public class ManiaEditRulesetContainer : ManiaRulesetContainer
     {
-        public ManiaEditRulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap)
-            : base(ruleset, workingBeatmap)
+        public ManiaEditRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
         }
 
-        protected override RulesetContainer<ManiaHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap)
-            => new RulesetContainer(ruleset, workingBeatmap);
-
-        private new class RulesetContainer : ManiaRulesetContainer
+        protected override Playfield CreatePlayfield() => new ManiaEditPlayfield(Beatmap.Stages)
         {
-            public RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
-                : base(ruleset, beatmap)
-            {
-            }
-
-            protected override Playfield CreatePlayfield() => new ManiaEditPlayfield(Beatmap.Stages)
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Size = Vector2.One
-            };
-        }
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Size = Vector2.One
+        };
     }
 }

@@ -23,23 +23,24 @@ namespace osu.Game.Rulesets.Edit
 {
     public abstract class HitObjectComposer : CompositeDrawable
     {
-        private readonly Ruleset ruleset;
-
         public IEnumerable<DrawableHitObject> HitObjects => rulesetContainer.Playfield.AllHitObjects;
+
+        protected readonly Ruleset Ruleset;
+
+        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         protected IRulesetConfigManager Config { get; private set; }
 
         private readonly List<Container> layerContainers = new List<Container>();
-        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         private EditRulesetContainer rulesetContainer;
 
         private HitObjectMaskLayer maskLayer;
         private PlacementContainer placementContainer;
 
-        protected HitObjectComposer(Ruleset ruleset)
+        internal HitObjectComposer(Ruleset ruleset)
         {
-            this.ruleset = ruleset;
+            Ruleset = ruleset;
 
             RelativeSizeAxes = Axes.Both;
         }
@@ -47,11 +48,11 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(IBindableBeatmap beatmap, IFrameBasedClock framedClock)
         {
-            this.beatmap.BindTo(beatmap);
+            Beatmap.BindTo(beatmap);
 
             try
             {
-                rulesetContainer = CreateRulesetContainer(ruleset, beatmap.Value);
+                rulesetContainer = CreateRulesetContainer();
                 rulesetContainer.Clock = framedClock;
             }
             catch (Exception e)
@@ -126,16 +127,9 @@ namespace osu.Game.Rulesets.Edit
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             dependencies.CacheAs(this);
-            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(ruleset);
+            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
 
             return dependencies;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            rulesetContainer.Playfield.DisplayJudgements.Value = false;
         }
 
         protected override void UpdateAfterChildren()
@@ -152,12 +146,12 @@ namespace osu.Game.Rulesets.Edit
         }
 
         /// <summary>
-        /// Adds a <see cref="HitObject"/> to the <see cref="Beatmap"/> and visualises it.
+        /// Adds a <see cref="HitObject"/> to the <see cref="Beatmaps.Beatmap"/> and visualises it.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
         public void Add(HitObject hitObject) => maskLayer.AddMaskFor(rulesetContainer.Add(hitObject));
 
-        protected abstract EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap);
+        internal abstract EditRulesetContainer CreateRulesetContainer();
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
@@ -177,5 +171,19 @@ namespace osu.Game.Rulesets.Edit
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
         /// </summary>
         protected virtual Container CreateLayerContainer() => new Container { RelativeSizeAxes = Axes.Both };
+    }
+
+    public abstract class HitObjectComposer<TObject> : HitObjectComposer
+        where TObject : HitObject
+    {
+        protected HitObjectComposer(Ruleset ruleset)
+            : base(ruleset)
+        {
+        }
+
+        internal override EditRulesetContainer CreateRulesetContainer()
+            => new EditRulesetContainer<TObject>(CreateRulesetContainer(Ruleset, Beatmap.Value));
+
+        protected abstract RulesetContainer<TObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap);
     }
 }

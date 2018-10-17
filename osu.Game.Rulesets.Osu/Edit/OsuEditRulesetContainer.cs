@@ -3,34 +3,21 @@
 
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuEditRulesetContainer : EditRulesetContainer<OsuHitObject>
+    public class OsuEditRulesetContainer : OsuRulesetContainer
     {
-        public OsuEditRulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap)
-            : base(ruleset, workingBeatmap)
+        public OsuEditRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
         }
 
-        protected override RulesetContainer<OsuHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap)
-            => new RulesetContainer(ruleset, workingBeatmap);
+        protected override CursorContainer CreateCursor() => null;
 
-        private new class RulesetContainer : OsuRulesetContainer
-        {
-            public RulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
-                : base(ruleset, beatmap)
-            {
-            }
-
-            protected override CursorContainer CreateCursor() => null;
-
-            protected override Playfield CreatePlayfield() => new OsuPlayfield { Size = Vector2.One　};
-        }
+        protected override Playfield CreatePlayfield() => new OsuPlayfield { Size = Vector2.One　};
     }
 }
