@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Video;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens;
@@ -22,15 +22,14 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
             InternalChildren = new Drawable[]
             {
-                new Box
+                new VideoSprite(@"C:\Users\Dean\BG Team - Both OWC.m4v")
                 {
-                    Colour = Color4.White,
-                    RelativeSizeAxes = Axes.Both
+                    RelativeSizeAxes = Axes.Both,
+                    Loop = true,
                 },
                 new TeamWithPlayers(team1, true)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Margin = new MarginPadding(40),
                     Width = 0.5f,
                     Height = 0.6f,
                     Anchor = Anchor.Centre,
@@ -39,7 +38,6 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 new TeamWithPlayers(team2)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Margin = new MarginPadding(40),
                     Width = 0.5f,
                     Height = 0.6f,
                     Anchor = Anchor.Centre,
@@ -48,7 +46,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 new RoundDisplay(round)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Height = 0.3f,
+                    Height = 0.25f,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                 }
@@ -119,7 +117,9 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     new TeamDisplay(team, left ? "Team Red" : "Team Blue", colour)
                     {
                         Anchor = left ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = left ? Anchor.CentreRight : Anchor.CentreLeft,
+                        Origin = Anchor.Centre,
+                        RelativePositionAxes = Axes.Both,
+                        X = (left ? -1 : 1) * 0.36f,
                     },
                     players = new FillFlowContainer
                     {
