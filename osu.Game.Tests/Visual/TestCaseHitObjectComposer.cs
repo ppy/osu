@@ -15,13 +15,15 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Masks;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseHitObjectComposer : OsuTestCase
+    [Cached(Type = typeof(IPlacementHandler))]
+    public class TestCaseHitObjectComposer : OsuTestCase, IPlacementHandler
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -35,6 +37,9 @@ namespace osu.Game.Tests.Visual
             typeof(HitCircleSelectionMask),
             typeof(HitCirclePlacementMask),
         };
+
+        public event Action<HitObject> PlacementStarted;
+        public event Action<HitObject> PlacementFinished;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -67,5 +72,9 @@ namespace osu.Game.Tests.Visual
 
             Child = new OsuHitObjectComposer(new OsuRuleset());
         }
+
+        public void BeginPlacement(HitObject hitObject) => PlacementStarted?.Invoke(hitObject);
+
+        public void EndPlacement(HitObject hitObject) => PlacementFinished?.Invoke(hitObject);
     }
 }

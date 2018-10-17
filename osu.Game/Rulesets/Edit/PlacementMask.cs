@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
@@ -9,6 +8,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Screens.Edit.Screens.Compose;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Edit
@@ -16,21 +16,14 @@ namespace osu.Game.Rulesets.Edit
     public class PlacementMask : CompositeDrawable, IRequireHighFrequencyMousePosition
     {
         /// <summary>
-        /// Invoked when the placement of <see cref="HitObject"/> has started.
-        /// </summary>
-        public event Action<HitObject> PlacementStarted;
-
-        /// <summary>
-        /// Invoked when the placement of <see cref="HitObject"/> has finished.
-        /// </summary>
-        public event Action<HitObject> PlacementFinished;
-
-        /// <summary>
         /// The <see cref="HitObject"/> that is being placed.
         /// </summary>
         protected readonly HitObject HitObject;
 
         protected IClock EditorClock { get; private set; }
+
+        [Resolved]
+        private IPlacementHandler placementHandler { get; set; }
 
         public PlacementMask(HitObject hitObject)
         {
@@ -52,7 +45,7 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         protected void BeginPlacement()
         {
-            PlacementStarted?.Invoke(HitObject);
+            placementHandler.BeginPlacement(HitObject);
             placementBegun = true;
         }
 
@@ -64,7 +57,7 @@ namespace osu.Game.Rulesets.Edit
         {
             if (!placementBegun)
                 BeginPlacement();
-            PlacementFinished?.Invoke(HitObject);
+            placementHandler.EndPlacement(HitObject);
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.ReceivePositionalInputAt(screenSpacePos) ?? false;
@@ -80,14 +73,6 @@ namespace osu.Game.Rulesets.Edit
                 default:
                     return false;
             }
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            PlacementStarted = null;
-            PlacementFinished = null;
         }
     }
 }
