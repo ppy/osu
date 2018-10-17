@@ -19,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
             AutoSizeAxes = Axes.Both;
 
             InternalChild = new HitCircleMask(HitObject);
+
+            HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
         }
 
         protected override void LoadComplete()
@@ -26,21 +28,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
             base.LoadComplete();
 
             // Fixes a 1-frame position discrpancy due to the first mouse move event happening in the next frame
-            Position = GetContainingInputManager().CurrentState.Mouse.Position;
+            HitObject.Position = GetContainingInputManager().CurrentState.Mouse.Position;
         }
 
         protected override bool OnClick(ClickEvent e)
         {
             HitObject.StartTime = EditorClock.CurrentTime;
-            HitObject.Position = e.MousePosition;
-
             EndPlacement();
             return true;
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            Position = e.MousePosition;
+            HitObject.Position = e.MousePosition;
             return true;
         }
     }
