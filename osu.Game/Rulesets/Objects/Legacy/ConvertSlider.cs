@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <see cref="ConvertSlider"/>s don't need a curve since they're converted to ruleset-specific hitobjects.
         /// </summary>
         public SliderCurve Curve { get; } = null;
-        public List<Vector2> ControlPoints { get; set; }
+        public Vector2[] ControlPoints { get; set; }
         public CurveType CurveType { get; set; }
 
         public double Distance { get; set; }
