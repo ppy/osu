@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
@@ -22,6 +23,8 @@ namespace osu.Game.Rulesets.Edit
 
         protected IClock EditorClock { get; private set; }
 
+        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
         [Resolved]
         private IPlacementHandler placementHandler { get; set; }
 
@@ -31,11 +34,13 @@ namespace osu.Game.Rulesets.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap workingBeatmap, IAdjustableClock clock)
+        private void load(IBindableBeatmap beatmap, IAdjustableClock clock)
         {
+            this.beatmap.BindTo(beatmap);
+
             EditorClock = clock;
 
-            HitObject.ApplyDefaults(workingBeatmap.Value.Beatmap.ControlPointInfo, workingBeatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty);
+            ApplyDefaultsToHitObject();
         }
 
         private bool placementBegun;
@@ -59,6 +64,11 @@ namespace osu.Game.Rulesets.Edit
                 BeginPlacement();
             placementHandler.EndPlacement(HitObject);
         }
+
+        /// <summary>
+        /// Invokes <see cref="HitObject.ApplyDefaults"/>, refreshing <see cref="HitObject.NestedHitObjects"/> and parameters for the <see cref="HitObject"/>.
+        /// </summary>
+        protected void ApplyDefaultsToHitObject() => HitObject.ApplyDefaults(beatmap.Value.Beatmap.ControlPointInfo, beatmap.Value.Beatmap.BeatmapInfo.BaseDifficulty);
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parent?.ReceivePositionalInputAt(screenSpacePos) ?? false;
 
