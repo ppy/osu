@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Tournament.Screens.TeamIntro;
 
 namespace osu.Game.Tournament.Tests
@@ -17,7 +18,11 @@ namespace osu.Game.Tournament.Tests
 
             var round = Ladder.Groupings.First(g => g.Name == "Finals");
 
-            Add(new TeamIntroScreen(team1, team2, round));
+            Add(new TeamIntroScreen(team1, team2, round)
+            {
+                FillMode = FillMode.Fit,
+                FillAspectRatio = 16 / 9f
+            });
         }
     }
 }

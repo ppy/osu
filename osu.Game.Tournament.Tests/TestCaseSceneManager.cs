@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Video;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Screens.Ladder;
 using osu.Game.Tournament.Screens.TeamIntro;
@@ -53,16 +54,18 @@ namespace osu.Game.Tournament.Tests
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    FillMode = FillMode.Fit,
+                    FillAspectRatio = 16/9f,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Size = new Vector2(0.8f),
+                    Size = new Vector2(0.8f, 1),
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        new Box
+                        new VideoSprite(@"C:\Users\Dean\BG Side Logo - OWC.m4v")
                         {
-                            Colour = Color4.White,
                             RelativeSizeAxes = Axes.Both,
+                            FillMode = FillMode.Fit,
                         },
                         screens = new Container
                         {
@@ -71,12 +74,15 @@ namespace osu.Game.Tournament.Tests
                             {
                                 bracket = new LadderManager(Ladder),
                                 mapPool = new MapPoolScreen(Ladder.Groupings.First(g => g.Name == "Finals")),
-                                teamIntro = new TeamIntroScreen(Ladder.Teams.First(t => t.Acronym == "USA"), Ladder.Teams.First(t => t.Acronym == "JPN"), Ladder.Groupings.First(g => g.Name == "Finals"))
+                                teamIntro = new TeamIntroScreen(Ladder.Teams.First(t => t.Acronym == "USA"), Ladder.Teams.First(t => t.Acronym == "JPN"),
+                                    Ladder.Groupings.First(g => g.Name == "Finals"))
                             }
                         },
                     }
                 },
             };
+
+            setScreen(teamIntro);
         }
 
         private void setScreen(Drawable screen)
