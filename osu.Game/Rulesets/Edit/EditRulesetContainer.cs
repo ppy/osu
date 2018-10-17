@@ -12,9 +12,10 @@ namespace osu.Game.Rulesets.Edit
 {
     public abstract class EditRulesetContainer : CompositeDrawable
     {
-        public Playfield Playfield => RulesetContainer.Playfield;
-
-        protected abstract RulesetContainer RulesetContainer { get; }
+        /// <summary>
+        /// The <see cref="Playfield"/> contained by this <see cref="EditRulesetContainer"/>.
+        /// </summary>
+        public abstract Playfield Playfield { get; }
 
         internal EditRulesetContainer()
         {
@@ -29,21 +30,23 @@ namespace osu.Game.Rulesets.Edit
         internal abstract DrawableHitObject Add(HitObject hitObject);
     }
 
-    public abstract class EditRulesetContainer<TObject> : EditRulesetContainer
+    public class EditRulesetContainer<TObject> : EditRulesetContainer
         where TObject : HitObject
     {
-        private readonly Ruleset ruleset;
+        public override Playfield Playfield => rulesetContainer.Playfield;
 
-        private readonly RulesetContainer<TObject> rulesetContainer;
-        protected override RulesetContainer RulesetContainer => rulesetContainer;
-
+        private Ruleset ruleset => rulesetContainer.Ruleset;
         private Beatmap<TObject> beatmap => rulesetContainer.Beatmap;
 
-        protected EditRulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap)
-        {
-            this.ruleset = ruleset;
+        private readonly RulesetContainer<TObject> rulesetContainer;
 
-            InternalChild = rulesetContainer = CreateRulesetContainer(ruleset, workingBeatmap);
+        public EditRulesetContainer(RulesetContainer<TObject> rulesetContainer)
+        {
+            this.rulesetContainer = rulesetContainer;
+
+            InternalChild = rulesetContainer;
+
+            Playfield.DisplayJudgements.Value = false;
         }
 
         internal override DrawableHitObject Add(HitObject hitObject)
@@ -69,11 +72,5 @@ namespace osu.Game.Rulesets.Edit
 
             return drawableObject;
         }
-
-        /// <summary>
-        /// Creates the underlying <see cref="RulesetContainer"/>.
-        /// </summary>
-        /// <returns></returns>
-        protected abstract RulesetContainer<TObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap workingBeatmap);
     }
 }

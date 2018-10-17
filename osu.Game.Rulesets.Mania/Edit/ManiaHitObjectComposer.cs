@@ -11,11 +11,13 @@ using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Edit.Masks;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class ManiaHitObjectComposer : HitObjectComposer
+    public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>
     {
         protected new ManiaConfigManager Config => (ManiaConfigManager)base.Config;
 
@@ -31,7 +33,8 @@ namespace osu.Game.Rulesets.Mania.Edit
             return dependencies;
         }
 
-        protected override EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new ManiaEditRulesetContainer(ruleset, beatmap);
+        protected override RulesetContainer<ManiaHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            => new ManiaEditRulesetContainer(ruleset, beatmap);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => Array.Empty<HitObjectCompositionTool>();
 

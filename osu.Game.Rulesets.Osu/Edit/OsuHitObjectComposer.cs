@@ -9,19 +9,22 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Edit.Masks;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuHitObjectComposer : HitObjectComposer
+    public class OsuHitObjectComposer : HitObjectComposer<OsuHitObject>
     {
         public OsuHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
         }
 
-        protected override EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new OsuEditRulesetContainer(ruleset, beatmap);
+        protected override RulesetContainer<OsuHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            => new OsuEditRulesetContainer(ruleset, beatmap);
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new[]
         {
