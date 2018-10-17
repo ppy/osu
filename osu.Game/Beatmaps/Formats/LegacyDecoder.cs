@@ -69,9 +69,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected string StripComments(string line)
         {
-            const string comment_prefix = "//";
-
-            var index = line.AsSpan().IndexOf(comment_prefix.AsSpan());
+            var index = line.AsSpan().IndexOf("//".AsSpan());
             if (index > 0)
                 return line.Substring(0, index);
             return line;

@@ -65,7 +65,6 @@ namespace osu.Game.Beatmaps
         {
             var result = new List<T>(hitObjects.Count);
 
-            // ReSharper disable once ForCanBeConvertedToForeach
             foreach (var obj in hitObjects)
             {
                 if (obj is T tObj)
