@@ -12,11 +12,6 @@ namespace osu.Game.Beatmaps.ControlPoints
     [Serializable]
     public class ControlPointInfo
     {
-        private readonly TimingControlPoint timingSearchPoint = new TimingControlPoint();
-        private readonly DifficultyControlPoint difficultySearchPoint = new DifficultyControlPoint();
-        private readonly SampleControlPoint sampleSearchPoint = new SampleControlPoint();
-        private readonly EffectControlPoint effectSearchPoint = new EffectControlPoint();
-
         /// <summary>
         /// All timing points.
         /// </summary>
@@ -46,28 +41,28 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// </summary>
         /// <param name="time">The time to find the difficulty control point at.</param>
         /// <returns>The difficulty control point.</returns>
-        public DifficultyControlPoint DifficultyPointAt(double time) => binarySearch(DifficultyPoints, time, difficultySearchPoint);
+        public DifficultyControlPoint DifficultyPointAt(double time) => binarySearch(DifficultyPoints, time);
 
         /// <summary>
         /// Finds the effect control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the effect control point at.</param>
         /// <returns>The effect control point.</returns>
-        public EffectControlPoint EffectPointAt(double time) => binarySearch(EffectPoints, time, effectSearchPoint);
+        public EffectControlPoint EffectPointAt(double time) => binarySearch(EffectPoints, time);
 
         /// <summary>
         /// Finds the sound control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the sound control point at.</param>
         /// <returns>The sound control point.</returns>
-        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time, sampleSearchPoint, SamplePoints.Count > 0 ? SamplePoints[0] : null);
+        public SampleControlPoint SamplePointAt(double time) => binarySearch(SamplePoints, time, SamplePoints.Count > 0 ? SamplePoints[0] : null);
 
         /// <summary>
         /// Finds the timing control point that is active at <paramref name="time"/>.
         /// </summary>
         /// <param name="time">The time to find the timing control point at.</param>
         /// <returns>The timing control point.</returns>
-        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, timingSearchPoint, TimingPoints.Count > 0 ? TimingPoints[0] : null);
+        public TimingControlPoint TimingPointAt(double time) => binarySearch(TimingPoints, time, TimingPoints.Count > 0 ? TimingPoints[0] : null);
 
         /// <summary>
         /// Finds the maximum BPM represented by any timing control point.
@@ -97,7 +92,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <param name="time">The time to find the control point at.</param>
         /// <param name="prePoint">The control point to use when <paramref name="time"/> is before any control points. If null, a new control point will be constructed.</param>
         /// <returns>The active control point at <paramref name="time"/>.</returns>
-        private T binarySearch<T>(SortedList<T> list, double time, T searchPoint, T prePoint = null)
+        private T binarySearch<T>(SortedList<T> list, double time, T prePoint = null)
             where T : ControlPoint, new()
         {
             if (list == null)
@@ -109,18 +104,23 @@ namespace osu.Game.Beatmaps.ControlPoints
             if (time < list[0].Time)
                 return prePoint ?? new T();
 
-            searchPoint.Time = time;
-            int index = list.BinarySearch(searchPoint);
+            int l = 0;
+            int r = list.Count - 1;
 
-            // Check if we've found an exact match (t == time)
-            if (index >= 0)
-                return list[index];
+            while (l <= r)
+            {
+                int pivot = l + ((r - l) >> 1);
 
-            index = ~index;
+                if (list[pivot].Time < time)
+                    l = pivot + 1;
+                else if (list[pivot].Time > time)
+                    r = pivot - 1;
+                else
+                    return list[pivot];
+            }
 
-            // BinarySearch will return the index of the first element _greater_ than the search
-            // This is the inactive point - the active point is the one before it (index - 1)
-            return list[index - 1];
+            // l will be the first control point with Time > time, but we want the one before it
+            return list[l - 1];
         }
     }
 }
