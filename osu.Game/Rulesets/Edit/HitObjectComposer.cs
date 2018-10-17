@@ -13,9 +13,9 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
 
@@ -32,13 +32,10 @@ namespace osu.Game.Rulesets.Edit
         private readonly List<Container> layerContainers = new List<Container>();
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
-        [Resolved]
-        private IPlacementHandler placementHandler { get; set; }
-
-        private HitObjectMaskLayer maskLayer;
         private EditRulesetContainer rulesetContainer;
 
-        private readonly Bindable<HitObjectCompositionTool> compositionTool = new Bindable<HitObjectCompositionTool>();
+        private HitObjectMaskLayer maskLayer;
+        private PlacementContainer placementContainer;
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -73,7 +70,7 @@ namespace osu.Game.Rulesets.Edit
             layerAboveRuleset.Children = new Drawable[]
             {
                 maskLayer = new HitObjectMaskLayer(),
-                new PlacementContainer(compositionTool),
+                placementContainer = new PlacementContainer(),
             };
 
             layerContainers.Add(layerBelowRuleset);
@@ -117,14 +114,11 @@ namespace osu.Game.Rulesets.Edit
             };
 
             toolboxCollection.Items =
-                CompositionTools.Select(t => new RadioButton(t.Name, () => compositionTool.Value = t))
-                .Prepend(new RadioButton("Select", () => compositionTool.Value = null))
+                CompositionTools.Select(t => new RadioButton(t.Name, () => placementContainer.CurrentTool = t))
+                .Prepend(new RadioButton("Select", () => placementContainer.CurrentTool = null))
                 .ToList();
 
             toolboxCollection.Items[0].Select();
-
-            // Todo: no
-            placementHandler.PlacementFinished += h => maskLayer.AddMask(rulesetContainer.AddHitObject(h));
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -156,6 +150,12 @@ namespace osu.Game.Rulesets.Edit
                 l.Size = rulesetContainer.Playfield.Size;
             });
         }
+
+        /// <summary>
+        /// Adds a <see cref="HitObject"/> to the <see cref="Beatmap"/> and visualises it.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
+        public void Add(HitObject hitObject) => maskLayer.AddMaskFor(rulesetContainer.Add(hitObject));
 
         protected abstract EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap);
 

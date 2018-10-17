@@ -13,10 +13,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     public class HitObjectMaskLayer : CompositeDrawable
     {
         private MaskContainer maskContainer;
-        private HitObjectComposer composer;
 
         [Resolved]
-        private IPlacementHandler placementHandler { get; set; }
+        private HitObjectComposer composer { get; set; }
 
         public HitObjectMaskLayer()
         {
@@ -24,10 +23,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         }
 
         [BackgroundDependencyLoader]
-        private void load(HitObjectComposer composer)
+        private void load()
         {
-            this.composer = composer;
-
             maskContainer = new MaskContainer();
 
             var maskSelection = composer.CreateMaskSelection();
@@ -51,7 +48,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             };
 
             foreach (var obj in composer.HitObjects)
-                AddMask(obj);
+                AddMaskFor(obj);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -64,7 +61,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// Adds a mask for a <see cref="DrawableHitObject"/> which adds movement support.
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create a mask for.</param>
-        public void AddMask(DrawableHitObject hitObject)
+        public void AddMaskFor(DrawableHitObject hitObject)
         {
             var mask = composer.CreateMaskFor(hitObject);
             if (mask == null)

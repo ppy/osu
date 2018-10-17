@@ -38,8 +38,7 @@ namespace osu.Game.Tests.Visual
             typeof(HitCirclePlacementMask),
         };
 
-        public event Action<HitObject> PlacementStarted;
-        public event Action<HitObject> PlacementFinished;
+        private HitObjectComposer composer;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -70,11 +69,13 @@ namespace osu.Game.Tests.Visual
             Dependencies.CacheAs<IAdjustableClock>(clock);
             Dependencies.CacheAs<IFrameBasedClock>(clock);
 
-            Child = new OsuHitObjectComposer(new OsuRuleset());
+            Child = composer = new OsuHitObjectComposer(new OsuRuleset());
         }
 
-        public void BeginPlacement(HitObject hitObject) => PlacementStarted?.Invoke(hitObject);
+        public void BeginPlacement(HitObject hitObject)
+        {
+        }
 
-        public void EndPlacement(HitObject hitObject) => PlacementFinished?.Invoke(hitObject);
+        public void EndPlacement(HitObject hitObject) => composer.Add(hitObject);
     }
 }
