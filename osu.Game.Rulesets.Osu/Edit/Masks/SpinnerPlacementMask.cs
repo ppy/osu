@@ -82,10 +82,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
             switch (state)
             {
                 case PlacementState.Start:
+                    BeginPlacement();
                     state = PlacementState.End;
                     return true;
                 case PlacementState.End:
-                    Finish();
+                    EndPlacement();
                     return true;
             }
 
