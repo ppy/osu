@@ -61,11 +61,8 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            var layerBelowRuleset = new BorderLayer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = CreateLayerContainer()
-            };
+            var layerBelowRuleset = CreateLayerContainer();
+            layerBelowRuleset.Child = new BorderLayer { RelativeSizeAxes = Axes.Both };
 
             var layerAboveRuleset = CreateLayerContainer();
             layerAboveRuleset.Children = new Drawable[]
