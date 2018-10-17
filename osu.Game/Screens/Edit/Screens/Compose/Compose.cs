@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using OpenTK.Graphics;
@@ -10,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
@@ -21,25 +21,17 @@ namespace osu.Game.Screens.Edit.Screens.Compose
         private const float vertical_margins = 10;
         private const float horizontal_margins = 20;
 
-        /// <summary>
-        /// Invoked when the placement of a <see cref="HitObject"/> has started.
-        /// </summary>
-        public event Action<HitObject> PlacementStarted;
-
-        /// <summary>
-        /// Invoked when the placement of a <see cref="HitObject"/> has finished.
-        /// </summary>
-        public event Action<HitObject> PlacementFinished;
-
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
-        private Container composerContainer;
+        private HitObjectComposer composer;
 
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] BindableBeatDivisor beatDivisor)
         {
             if (beatDivisor != null)
                 this.beatDivisor.BindTo(beatDivisor);
+
+            Container composerContainer;
 
             Children = new Drawable[]
             {
@@ -114,7 +106,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 return;
             }
 
-            var composer = ruleset.CreateHitObjectComposer();
+            composer = ruleset.CreateHitObjectComposer();
             if (composer == null)
             {
                 Logger.Log($"Ruleset {ruleset.Description} doesn't support hitobject composition.");
@@ -125,8 +117,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose
             composerContainer.Child = composer;
         }
 
-        public void BeginPlacement(HitObject hitObject) => PlacementStarted?.Invoke(hitObject);
+        public void BeginPlacement(HitObject hitObject)
+        {
+        }
 
-        public void EndPlacement(HitObject hitObject) => PlacementFinished?.Invoke(hitObject);
+        public void EndPlacement(HitObject hitObject) => composer.Add(hitObject);
     }
 }

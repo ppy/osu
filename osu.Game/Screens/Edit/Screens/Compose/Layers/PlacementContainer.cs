@@ -1,8 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Edit.Tools;
@@ -14,32 +12,37 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     {
         private readonly Container maskContainer;
 
-        private readonly IBindable<HitObjectCompositionTool> compositionTool = new Bindable<HitObjectCompositionTool>();
-
-        [Resolved]
-        private IPlacementHandler placementHandler { get; set; }
-
-        public PlacementContainer(IBindable<HitObjectCompositionTool> compositionTool)
+        public PlacementContainer()
         {
-            this.compositionTool.BindTo(compositionTool);
-
             RelativeSizeAxes = Axes.Both;
-
-            this.compositionTool.BindValueChanged(onToolChanged);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        private HitObjectCompositionTool currentTool;
+
+        /// <summary>
+        /// The current placement tool.
+        /// </summary>
+        public HitObjectCompositionTool CurrentTool
         {
-            // Refresh the mask after each placement
-            placementHandler.PlacementFinished += _ => onToolChanged(compositionTool.Value);
+            get => currentTool;
+            set
+            {
+                if (currentTool == value)
+                    return;
+                currentTool = value;
+
+                Refresh();
+            }
         }
 
-        private void onToolChanged(HitObjectCompositionTool tool)
+        /// <summary>
+        /// Refreshes the current placement tool.
+        /// </summary>
+        public void Refresh()
         {
             ClearInternal();
 
-            var mask = tool?.CreatePlacementMask();
+            var mask = CurrentTool?.CreatePlacementMask();
             if (mask != null)
                 InternalChild = mask;
         }

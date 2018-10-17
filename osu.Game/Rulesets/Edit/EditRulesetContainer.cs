@@ -21,7 +21,12 @@ namespace osu.Game.Rulesets.Edit
             RelativeSizeAxes = Axes.Both;
         }
 
-        public abstract DrawableHitObject AddHitObject(HitObject hitObject);
+        /// <summary>
+        /// Adds a <see cref="HitObject"/> to the <see cref="Beatmap"/> and displays a visual representation of it.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
+        /// <returns>The visual representation of <paramref name="hitObject"/>.</returns>
+        internal abstract DrawableHitObject Add(HitObject hitObject);
     }
 
     public abstract class EditRulesetContainer<TObject> : EditRulesetContainer
@@ -41,20 +46,22 @@ namespace osu.Game.Rulesets.Edit
             InternalChild = rulesetContainer = CreateRulesetContainer(ruleset, workingBeatmap);
         }
 
-        public override DrawableHitObject AddHitObject(HitObject hitObject)
+        internal override DrawableHitObject Add(HitObject hitObject)
         {
             var tObject = (TObject)hitObject;
 
-            // Insert into beatmap while maintaining sorting order
+            // Add to beatmap, preserving sorting order
             var insertionIndex = beatmap.HitObjects.FindLastIndex(h => h.StartTime <= hitObject.StartTime);
             beatmap.HitObjects.Insert(insertionIndex + 1, tObject);
 
+            // Process object
             var processor = ruleset.CreateBeatmapProcessor(beatmap);
 
             processor.PreProcess();
             tObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
             processor.PostProcess();
 
+            // Add visual representation
             var drawableObject = rulesetContainer.GetVisualRepresentation(tObject);
 
             rulesetContainer.Playfield.Add(drawableObject);
