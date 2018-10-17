@@ -1,25 +1,26 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public class BezierApproximator
+    public readonly ref struct BezierApproximator
     {
         private readonly int count;
-        private readonly List<Vector2> controlPoints;
+        private readonly ReadOnlySpan<Vector2> controlPoints;
         private readonly Vector2[] subdivisionBuffer1;
         private readonly Vector2[] subdivisionBuffer2;
 
         private const float tolerance = 0.25f;
         private const float tolerance_sq = tolerance * tolerance;
 
-        public BezierApproximator(List<Vector2> controlPoints)
+        public BezierApproximator(ReadOnlySpan<Vector2> controlPoints)
         {
             this.controlPoints = controlPoints;
-            count = controlPoints.Count;
+            count = controlPoints.Length;
 
             subdivisionBuffer1 = new Vector2[count];
             subdivisionBuffer2 = new Vector2[count * 2 - 1];

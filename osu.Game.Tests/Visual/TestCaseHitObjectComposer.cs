@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual
                     new Slider
                     {
                         Position = new Vector2(128, 256),
-                        ControlPoints = new List<Vector2>
+                        ControlPoints = new[]
                         {
                             Vector2.Zero,
                             new Vector2(216, 0),
