@@ -146,7 +146,7 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public SliderCurve Curve { get; } = new SliderCurve();
 
-        public List<Vector2> ControlPoints
+        public Vector2[] ControlPoints
         {
             get { return Curve.ControlPoints; }
             set { Curve.ControlPoints = value; }
