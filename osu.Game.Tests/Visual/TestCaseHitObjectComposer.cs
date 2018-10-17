@@ -36,6 +36,7 @@ namespace osu.Game.Tests.Visual
             typeof(HitCircleMask),
             typeof(HitCircleSelectionMask),
             typeof(HitCirclePlacementMask),
+            typeof(SpinnerPlacementMask)
         };
 
         public TestCaseHitObjectComposer()
