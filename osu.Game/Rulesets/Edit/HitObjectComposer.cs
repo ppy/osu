@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
 using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
 
@@ -31,9 +32,14 @@ namespace osu.Game.Rulesets.Edit
         private readonly List<Container> layerContainers = new List<Container>();
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
+        [Resolved]
+        private IPlacementHandler placementHandler { get; set; }
+
         private HitObjectMaskLayer maskLayer;
         private Container placementContainer;
         private EditRulesetContainer rulesetContainer;
+
+        private HitObjectCompositionTool compositionTool;
 
         protected HitObjectComposer(Ruleset ruleset)
         {
@@ -117,6 +123,16 @@ namespace osu.Game.Rulesets.Edit
                 .ToList();
 
             toolboxCollection.Items[0].Select();
+
+            placementHandler.PlacementFinished += h =>
+            {
+                var drawableObject = rulesetContainer.AddHitObject(h);
+
+                maskLayer.AddMask(drawableObject);
+
+                // Re-construct the mask
+                setCompositionTool(compositionTool);
+            };
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -151,23 +167,12 @@ namespace osu.Game.Rulesets.Edit
 
         private void setCompositionTool(HitObjectCompositionTool tool)
         {
+            compositionTool = tool;
+
             placementContainer.Clear(true);
 
             if (tool != null)
-            {
-                var mask = tool.CreatePlacementMask();
-                mask.PlacementFinished += h =>
-                {
-                    var drawableObject = rulesetContainer.AddHitObject(h);
-
-                    maskLayer.AddMask(drawableObject);
-
-                    // Re-construct the mask
-                    setCompositionTool(tool);
-                };
-
-                placementContainer.Child = mask;
-            }
+                placementContainer.Child = tool.CreatePlacementMask();
         }
 
         protected abstract EditRulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap);

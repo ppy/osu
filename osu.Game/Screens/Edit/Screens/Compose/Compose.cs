@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using OpenTK.Graphics;
@@ -9,14 +10,26 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Screens.Edit.Screens.Compose
 {
-    public class Compose : EditorScreen
+    [Cached(Type = typeof(IPlacementHandler))]
+    public class Compose : EditorScreen, IPlacementHandler
     {
         private const float vertical_margins = 10;
         private const float horizontal_margins = 20;
+
+        /// <summary>
+        /// Invoked when the placement of a <see cref="HitObject"/> has started.
+        /// </summary>
+        public event Action<HitObject> PlacementStarted;
+
+        /// <summary>
+        /// Invoked when the placement of a <see cref="HitObject"/> has finished.
+        /// </summary>
+        public event Action<HitObject> PlacementFinished;
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
@@ -111,5 +124,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 
             composerContainer.Child = composer;
         }
+
+        public void BeginPlacement(HitObject hitObject) => PlacementStarted?.Invoke(hitObject);
+
+        public void EndPlacement(HitObject hitObject) => PlacementFinished?.Invoke(hitObject);
     }
 }
