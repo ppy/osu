@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using OpenTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
@@ -21,6 +22,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     new OsuSpriteText
                     {
                         Text = grouping.Description.Value.ToUpper(),
+                        Colour = Color4.Black,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre
                     },
@@ -28,6 +30,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     {
                         Text = ((losers ? "Losers " : "") + grouping.Name).ToUpper(),
                         Font = "Exo2.0-Bold",
+                        Colour = Color4.Black,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre
                     },
