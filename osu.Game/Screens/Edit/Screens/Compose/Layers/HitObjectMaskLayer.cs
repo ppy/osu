@@ -15,6 +15,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         private MaskContainer maskContainer;
         private HitObjectComposer composer;
 
+        [Resolved]
+        private IPlacementHandler placementHandler { get; set; }
+
         public HitObjectMaskLayer()
         {
             RelativeSizeAxes = Axes.Both;
