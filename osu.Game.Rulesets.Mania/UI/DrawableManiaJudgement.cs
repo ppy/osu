@@ -30,10 +30,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
             if (Result.IsHit)
             {
-                this.ScaleTo(0.8f);
-                this.ScaleTo(1, 250, Easing.OutElastic);
+                JudgementBody.ScaleTo(0.8f);
+                JudgementBody.ScaleTo(1, 250, Easing.OutElastic);
 
-                this.Delay(50).FadeOut(200).ScaleTo(0.75f, 250);
+                JudgementBody.Delay(50).ScaleTo(0.75f, 250);
+                this.Delay(50).FadeOut(200);
             }
 
             Expire();

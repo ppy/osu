@@ -10,18 +10,28 @@ using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
-        public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Time.Current >= HitObject.StartTime - HitObject.TimePreempt;
+        public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Clock?.CurrentTime >= HitObject.StartTime - HitObject.TimePreempt;
+
+        private readonly ShakeContainer shakeContainer;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
+            base.AddInternal(shakeContainer = new ShakeContainer { RelativeSizeAxes = Axes.Both });
             Alpha = 0;
         }
+
+        // Forward all internal management to shakeContainer.
+        // This is a bit ugly but we don't have the concept of InternalContent so it'll have to do for now. (https://github.com/ppy/osu-framework/issues/1690)
+        protected override void AddInternal(Drawable drawable) => shakeContainer.Add(drawable);
+        protected override void ClearInternal(bool disposeChildren = true) => shakeContainer.Clear(disposeChildren);
+        protected override bool RemoveInternal(Drawable drawable) => shakeContainer.Remove(drawable);
 
         protected sealed override void UpdateState(ArmedState state)
         {
@@ -67,6 +77,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private OsuInputManager osuActionInputManager;
         internal OsuInputManager OsuActionInputManager => osuActionInputManager ?? (osuActionInputManager = GetContainingInputManager() as OsuInputManager);
+
+        protected virtual void Shake(double maximumLength) => shakeContainer.Shake(maximumLength);
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(judgement);
     }

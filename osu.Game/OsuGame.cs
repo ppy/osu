@@ -65,7 +65,8 @@ namespace osu.Game
 
         private BeatmapSetOverlay beatmapSetOverlay;
 
-        private ScreenshotManager screenshotManager;
+        [Cached]
+        private readonly ScreenshotManager screenshotManager = new ScreenshotManager();
 
         protected RavenLogger RavenLogger;
 
@@ -75,10 +76,10 @@ namespace osu.Game
         {
             get
             {
-                Screen s = screenStack;
-                while (s != null && !(s is Intro))
-                    s = s.ChildScreen;
-                return s as Intro;
+                Screen screen = screenStack;
+                while (screen != null && !(screen is Intro))
+                    screen = screen.ChildScreen;
+                return screen as Intro;
             }
         }
 
@@ -126,8 +127,8 @@ namespace osu.Game
         /// <param name="toolbar">Whether the toolbar should also be hidden.</param>
         public void CloseAllOverlays(bool toolbar = true)
         {
-            foreach (var o in overlays)
-                o.State = Visibility.Hidden;
+            foreach (var overlay in overlays)
+                overlay.State = Visibility.Hidden;
             if (toolbar) Toolbar.State = Visibility.Hidden;
         }
 
@@ -244,7 +245,7 @@ namespace osu.Game
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId);
 
-        protected void LoadScore(Score s)
+        protected void LoadScore(Score score)
         {
             scoreLoad?.Cancel();
 
@@ -252,18 +253,18 @@ namespace osu.Game
 
             if (menu == null)
             {
-                scoreLoad = Schedule(() => LoadScore(s));
+                scoreLoad = Schedule(() => LoadScore(score));
                 return;
             }
 
             if (!menu.IsCurrentScreen)
             {
                 menu.MakeCurrent();
-                this.Delay(500).Schedule(() => LoadScore(s), out scoreLoad);
+                this.Delay(500).Schedule(() => LoadScore(score), out scoreLoad);
                 return;
             }
 
-            if (s.Beatmap == null)
+            if (score.Beatmap == null)
             {
                 notifications.Post(new SimpleNotification
                 {
@@ -273,12 +274,12 @@ namespace osu.Game
                 return;
             }
 
-            ruleset.Value = s.Ruleset;
+            ruleset.Value = score.Ruleset;
 
-            Beatmap.Value = BeatmapManager.GetWorkingBeatmap(s.Beatmap);
-            Beatmap.Value.Mods.Value = s.Mods;
+            Beatmap.Value = BeatmapManager.GetWorkingBeatmap(score.Beatmap);
+            Beatmap.Value.Mods.Value = score.Mods;
 
-            menu.Push(new PlayerLoader(new ReplayPlayer(s.Replay)));
+            menu.Push(new PlayerLoader(new ReplayPlayer(score.Replay)));
         }
 
         protected override void Dispose(bool isDisposing)
@@ -289,9 +290,6 @@ namespace osu.Game
 
         protected override void LoadComplete()
         {
-            // this needs to be cached before base.LoadComplete as it is used by MenuCursorContainer.
-            dependencies.Cache(screenshotManager = new ScreenshotManager());
-
             base.LoadComplete();
 
             // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
@@ -299,11 +297,13 @@ namespace osu.Game
             // This prevents the cursor from showing until we have a screen with CursorVisible = true
             MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
 
-            // hook up notifications to components.
+            // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => notifications?.Post(n);
-            BeatmapManager.PostNotification = n => notifications?.Post(n);
+            SkinManager.GetStableStorage = GetStorageForStableInstall;
 
+            BeatmapManager.PostNotification = n => notifications?.Post(n);
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
+
             BeatmapManager.PresentBeatmap = PresentBeatmap;
 
             AddRange(new Drawable[]
@@ -353,7 +353,7 @@ namespace osu.Game
             loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -3 }, mainContent.Add);
             loadComponentSingleFile(musicController = new MusicController
             {
-                Depth = -4,
+                Depth = -5,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -506,22 +506,24 @@ namespace osu.Game
             // we could avoid the need for scheduling altogether.
             Schedule(() =>
             {
-                if (asyncLoadStream != null)
+                var previousLoadStream = asyncLoadStream;
+
+                //chain with existing load stream
+                asyncLoadStream = Task.Run(async () =>
                 {
-                    //chain with existing load stream
-                    asyncLoadStream = asyncLoadStream.ContinueWith(async t =>
+                    if (previousLoadStream != null)
+                        await previousLoadStream;
+
+                    try
                     {
-                        try
-                        {
-                            await LoadComponentAsync(d, add);
-                        }
-                        catch (OperationCanceledException)
-                        {
-                        }
-                    });
-                }
-                else
-                    asyncLoadStream = LoadComponentAsync(d, add);
+                        Logger.Log($"Loading {d}...", LoggingTarget.Debug);
+                        await LoadComponentAsync(d, add);
+                        Logger.Log($"Loaded {d}!", LoggingTarget.Debug);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                    }
+                });
             });
         }
 

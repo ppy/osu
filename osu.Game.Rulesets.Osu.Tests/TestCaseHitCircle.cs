@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private class TestDrawableHitCircle : DrawableHitCircle
+        protected class TestDrawableHitCircle : DrawableHitCircle
         {
             private readonly bool auto;
 
@@ -93,6 +93,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 this.auto = auto;
             }
+
+            public void TriggerJudgement() => UpdateResult(true);
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {

@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Menu
                 case GlobalAction.Back:
                     return goBack();
                 case GlobalAction.Select:
-                    logo?.TriggerOnClick();
+                    logo?.Click();
                     return true;
                 default:
                     return false;
@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Menu
                     sampleBack?.Play();
                     return true;
                 case ButtonSystemState.Play:
-                    backButton.TriggerOnClick();
+                    backButton.Click();
                     return true;
                 default:
                     return false;
@@ -150,18 +150,18 @@ namespace osu.Game.Screens.Menu
                     State = ButtonSystemState.TopLevel;
                     return true;
                 case ButtonSystemState.TopLevel:
-                    buttonsTopLevel.First().TriggerOnClick();
+                    buttonsTopLevel.First().Click();
                     return false;
                 case ButtonSystemState.Play:
-                    buttonsPlay.First().TriggerOnClick();
+                    buttonsPlay.First().Click();
                     return false;
             }
         }
 
         private ButtonSystemState state = ButtonSystemState.Initial;
 
-        public override bool HandleKeyboardInput => state != ButtonSystemState.Exit;
-        public override bool HandleMouseInput => state != ButtonSystemState.Exit;
+        public override bool HandleNonPositionalInput => state != ButtonSystemState.Exit;
+        public override bool HandlePositionalInput => state != ButtonSystemState.Exit;
 
         public ButtonSystemState State
         {
@@ -173,6 +173,9 @@ namespace osu.Game.Screens.Menu
 
                 ButtonSystemState lastState = state;
                 state = value;
+
+                if (game != null)
+                    game.OverlayActivationMode.Value = state == ButtonSystemState.Exit ? OverlayActivation.Disabled : OverlayActivation.All;
 
                 updateLogoState(lastState);
 
@@ -205,11 +208,7 @@ namespace osu.Game.Screens.Menu
                         {
                             logoTracking = false;
 
-                            if (game != null)
-                            {
-                                game.OverlayActivationMode.Value = state == ButtonSystemState.Exit ? OverlayActivation.Disabled : OverlayActivation.All;
-                                game.Toolbar.Hide();
-                            }
+                            game?.Toolbar.Hide();
 
                             logo.ClearTransforms(targetMember: nameof(Position));
                             logo.RelativePositionAxes = Axes.Both;
@@ -243,11 +242,7 @@ namespace osu.Game.Screens.Menu
                                 if (impact)
                                     logo.Impact();
 
-                                if (game != null)
-                                {
-                                    game.OverlayActivationMode.Value = OverlayActivation.All;
-                                    game.Toolbar.State = Visibility.Visible;
-                                }
+                                game?.Toolbar.Show();
                             }, 200);
                             break;
                         default:

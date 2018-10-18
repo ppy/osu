@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -136,21 +136,21 @@ namespace osu.Game.Screens.Play
 
         private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             // restore our screen defaults
             InitializeBackgroundElements();
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             if (GetContainingInputManager().HoveredDrawables.Contains(visualSettings))
             {
                 // show user setting preview
                 UpdateBackgroundElements();
             }
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
         protected override void InitializeBackgroundElements()
@@ -290,7 +290,7 @@ namespace osu.Game.Screens.Play
             }
 
             [BackgroundDependencyLoader]
-            private void load(LocalisationEngine localisation)
+            private void load()
             {
                 var metadata = beatmap?.BeatmapInfo?.Metadata ?? new BeatmapMetadata();
 
@@ -307,7 +307,7 @@ namespace osu.Game.Screens.Play
                         {
                             new OsuSpriteText
                             {
-                                Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title),
+                                Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
                                 TextSize = 36,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,
@@ -315,7 +315,7 @@ namespace osu.Game.Screens.Play
                             },
                             new OsuSpriteText
                             {
-                                Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist),
+                                Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
                                 TextSize = 26,
                                 Font = @"Exo2.0-MediumItalic",
                                 Origin = Anchor.TopCentre,

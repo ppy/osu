@@ -18,11 +18,8 @@ namespace osu.Game.Online.Chat
         [JsonProperty(@"sender_id")]
         public int UserId;
 
-        [JsonProperty(@"target_type")]
-        public TargetType TargetType;
-
-        [JsonProperty(@"target_id")]
-        public int TargetId;
+        [JsonProperty(@"channel_id")]
+        public int ChannelId;
 
         [JsonProperty(@"is_action")]
         public bool IsAction;
