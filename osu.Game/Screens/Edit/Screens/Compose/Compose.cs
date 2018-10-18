@@ -122,5 +122,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
         }
 
         public void EndPlacement(HitObject hitObject) => composer.Add(hitObject);
+
+        public void Delete(HitObject hitObject) => composer.Remove(hitObject);
     }
 }

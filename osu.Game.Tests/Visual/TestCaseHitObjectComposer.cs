@@ -77,5 +77,7 @@ namespace osu.Game.Tests.Visual
         }
 
         public void EndPlacement(HitObject hitObject) => composer.Add(hitObject);
+
+        public void Delete(HitObject hitObject) => composer.Remove(hitObject);
     }
 }

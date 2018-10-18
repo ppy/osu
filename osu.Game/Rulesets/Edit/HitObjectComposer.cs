@@ -152,6 +152,8 @@ namespace osu.Game.Rulesets.Edit
             placementContainer.Refresh();
         }
 
+        public void Remove(HitObject hitObject) => maskLayer.RemoveMaskFor(rulesetContainer.Remove(hitObject));
+
         internal abstract EditRulesetContainer CreateRulesetContainer();
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }

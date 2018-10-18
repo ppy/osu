@@ -9,5 +9,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
     {
         void BeginPlacement(HitObject hitObject);
         void EndPlacement(HitObject hitObject);
+
+        void Delete(HitObject hitObject);
     }
 }
