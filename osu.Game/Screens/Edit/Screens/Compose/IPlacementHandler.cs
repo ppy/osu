@@ -7,9 +7,22 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 {
     public interface IPlacementHandler
     {
+        /// <summary>
+        /// Notifies that a placement has begun.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> being placed.</param>
         void BeginPlacement(HitObject hitObject);
+
+        /// <summary>
+        /// Notifies that a placement has finished.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> that has been placed.</param>
         void EndPlacement(HitObject hitObject);
 
+        /// <summary>
+        /// Deletes a <see cref="HitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to delete.</param>
         void Delete(HitObject hitObject);
     }
 }
