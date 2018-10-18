@@ -36,13 +36,13 @@ namespace osu.Game.Overlays.Settings.Sections
                 {
                     LabelText = "Menu cursor size",
                     Bindable = config.GetBindable<double>(OsuSetting.MenuCursorSize),
-                    KeyboardStep = 0.1f
+                    KeyboardStep = 0.01f
                 },
                 new SettingsSlider<double, SizeSlider>
                 {
                     LabelText = "Gameplay cursor size",
                     Bindable = config.GetBindable<double>(OsuSetting.GameplayCursorSize),
-                    KeyboardStep = 0.1f
+                    KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
                 {
@@ -51,17 +51,22 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
             };
 
-            skins.ItemAdded += onItemsChanged;
-            skins.ItemRemoved += onItemsChanged;
+            skins.ItemAdded += itemAdded;
+            skins.ItemRemoved += itemRemoved;
 
-            reloadSkins();
+            skinDropdown.Items = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, int>(s.ToString(), s.ID));
 
-            skinDropdown.Bindable = config.GetBindable<int>(OsuSetting.Skin);
+            var skinBindable = config.GetBindable<int>(OsuSetting.Skin);
+
+            // Todo: This should not be necessary when OsuConfigManager is databased
+            if (skinDropdown.Items.All(s => s.Value != skinBindable.Value))
+                skinBindable.Value = 0;
+
+            skinDropdown.Bindable = skinBindable;
         }
 
-        private void reloadSkins() => skinDropdown.Items = skins.GetAllUsableSkins().Select(s => new KeyValuePair<string, int>(s.ToString(), s.ID));
-
-        private void onItemsChanged(SkinInfo _) => Schedule(reloadSkins);
+        private void itemRemoved(SkinInfo s) => skinDropdown.Items = skinDropdown.Items.Where(i => i.Value != s.ID);
+        private void itemAdded(SkinInfo s) => skinDropdown.Items = skinDropdown.Items.Append(new KeyValuePair<string, int>(s.ToString(), s.ID));
 
         protected override void Dispose(bool isDisposing)
         {
@@ -69,8 +74,8 @@ namespace osu.Game.Overlays.Settings.Sections
 
             if (skins != null)
             {
-                skins.ItemAdded -= onItemsChanged;
-                skins.ItemRemoved -= onItemsChanged;
+                skins.ItemAdded -= itemAdded;
+                skins.ItemRemoved -= itemRemoved;
             }
         }
 

@@ -6,6 +6,7 @@ using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -13,7 +14,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics.Sprites;
 
@@ -36,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             TabContainer.Spacing = new Vector2(10f, 0f);
 
-            Add(strip = new Box
+            AddInternal(strip = new Box
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
@@ -52,7 +53,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (accentColour == default(Color4))
+            if (accentColour == default)
                 AccentColour = colours.Blue;
         }
 
@@ -125,14 +126,14 @@ namespace osu.Game.Graphics.UserInterface
                 Text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 if (!Active)
                     fadeActive();
                 return true;
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 if (!Active)
                     fadeInactive();
@@ -141,7 +142,7 @@ namespace osu.Game.Graphics.UserInterface
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                if (accentColour == default(Color4))
+                if (accentColour == default)
                     AccentColour = colours.Blue;
             }
 
@@ -157,7 +158,7 @@ namespace osu.Game.Graphics.UserInterface
                         Margin = new MarginPadding { Top = 5, Bottom = 5 },
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
-                        Text = (value as Enum)?.GetDescription() ?? value.ToString(),
+                        Text = (value as IHasDescription)?.Description ?? (value as Enum)?.GetDescription() ?? value.ToString(),
                         TextSize = 14,
                         Font = @"Exo2.0-Bold", // Font should only turn bold when active?
                     },
@@ -264,16 +265,16 @@ namespace osu.Game.Graphics.UserInterface
                     Padding = new MarginPadding { Left = 5, Right = 5 };
                 }
 
-                protected override bool OnHover(InputState state)
+                protected override bool OnHover(HoverEvent e)
                 {
                     Foreground.Colour = BackgroundColour;
-                    return base.OnHover(state);
+                    return base.OnHover(e);
                 }
 
-                protected override void OnHoverLost(InputState state)
+                protected override void OnHoverLost(HoverLostEvent e)
                 {
                     Foreground.Colour = BackgroundColourHover;
-                    base.OnHoverLost(state);
+                    base.OnHoverLost(e);
                 }
             }
         }

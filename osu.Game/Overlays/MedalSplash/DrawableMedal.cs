@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.MedalSplash
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Text = "Medal Unlocked".ToUpper(),
+                    Text = "Medal Unlocked".ToUpperInvariant(),
                     TextSize = 24,
                     Font = @"Exo2.0-Light",
                     Alpha = 0f,
@@ -118,9 +118,9 @@ namespace osu.Game.Overlays.MedalSplash
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, TextureStore textures)
+        private void load(OsuColour colours, TextureStore textures, LargeTextureStore largeTextures)
         {
-            medalSprite.Texture = textures.Get(medal.ImageUrl);
+            medalSprite.Texture = largeTextures.Get(medal.ImageUrl);
             medalGlow.Texture = textures.Get(@"MedalSplash/medal-glow");
             description.Colour = colours.BlueLight;
         }

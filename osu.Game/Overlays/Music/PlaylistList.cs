@@ -8,7 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using OpenTK;
@@ -73,13 +73,13 @@ namespace osu.Game.Overlays.Music
             }
 
             [BackgroundDependencyLoader]
-            private void load(BeatmapManager beatmaps, OsuGameBase osuGame)
+            private void load(BeatmapManager beatmaps, IBindableBeatmap beatmap)
             {
                 beatmaps.GetAllUsableBeatmapSets().ForEach(addBeatmapSet);
                 beatmaps.ItemAdded += addBeatmapSet;
                 beatmaps.ItemRemoved += removeBeatmapSet;
 
-                beatmapBacking.BindTo(osuGame.Beatmap);
+                beatmapBacking.BindTo(beatmap);
                 beatmapBacking.ValueChanged += _ => updateSelectedSet();
             }
 
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Music
             private void updateSelectedSet()
             {
                 foreach (PlaylistItem s in items.Children)
-                    s.Selected = s.BeatmapSetInfo.ID == beatmapBacking.Value.BeatmapSetInfo.ID;
+                    s.Selected = s.BeatmapSetInfo.ID == beatmapBacking.Value.BeatmapSetInfo?.ID;
             }
 
             public string SearchTerm
@@ -115,25 +115,25 @@ namespace osu.Game.Overlays.Music
             private Vector2 nativeDragPosition;
             private PlaylistItem draggedItem;
 
-            protected override bool OnDragStart(InputState state)
+            protected override bool OnDragStart(DragStartEvent e)
             {
-                nativeDragPosition = state.Mouse.NativeState.Position;
+                nativeDragPosition = e.ScreenSpaceMousePosition;
                 draggedItem = items.FirstOrDefault(d => d.IsDraggable);
-                return draggedItem != null || base.OnDragStart(state);
+                return draggedItem != null || base.OnDragStart(e);
             }
 
-            protected override bool OnDrag(InputState state)
+            protected override bool OnDrag(DragEvent e)
             {
-                nativeDragPosition = state.Mouse.NativeState.Position;
+                nativeDragPosition = e.ScreenSpaceMousePosition;
                 if (draggedItem == null)
-                    return base.OnDrag(state);
+                    return base.OnDrag(e);
                 return true;
             }
 
-            protected override bool OnDragEnd(InputState state)
+            protected override bool OnDragEnd(DragEndEvent e)
             {
-                nativeDragPosition = state.Mouse.NativeState.Position;
-                var handled = draggedItem != null || base.OnDragEnd(state);
+                nativeDragPosition = e.ScreenSpaceMousePosition;
+                var handled = draggedItem != null || base.OnDragEnd(e);
                 draggedItem = null;
 
                 return handled;

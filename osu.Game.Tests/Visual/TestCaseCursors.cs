@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
@@ -19,12 +19,12 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseCursors : ManualInputManagerTestCase
     {
-        private readonly CursorOverrideContainer cursorOverrideContainer;
+        private readonly MenuCursorContainer menuCursorContainer;
         private readonly CustomCursorBox[] cursorBoxes = new CustomCursorBox[6];
 
         public TestCaseCursors()
         {
-            Child = cursorOverrideContainer = new CursorOverrideContainer
+            Child = menuCursorContainer = new MenuCursorContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Children = new[]
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("Check green cursor at mouse", () => checkAtMouse(cursorBoxes[0].Cursor));
             AddStep("Move out", moveOut);
             AddAssert("Check green cursor invisible", () => !checkVisible(cursorBoxes[0].Cursor));
-            AddAssert("Check global cursor visible", () => checkVisible(cursorOverrideContainer.Cursor));
+            AddAssert("Check global cursor visible", () => checkVisible(menuCursorContainer.Cursor));
         }
 
         /// <summary>
@@ -112,11 +112,11 @@ namespace osu.Game.Tests.Visual
             AddStep("Move to purple area", () => InputManager.MoveMouseTo(cursorBoxes[3]));
             AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].Cursor));
             AddAssert("Check purple cursor at mouse", () => checkAtMouse(cursorBoxes[3].Cursor));
-            AddAssert("Check global cursor visible", () => checkVisible(cursorOverrideContainer.Cursor));
-            AddAssert("Check global cursor at mouse", () => checkAtMouse(cursorOverrideContainer.Cursor));
+            AddAssert("Check global cursor visible", () => checkVisible(menuCursorContainer.Cursor));
+            AddAssert("Check global cursor at mouse", () => checkAtMouse(menuCursorContainer.Cursor));
             AddStep("Move out", moveOut);
             AddAssert("Check purple cursor visible", () => checkVisible(cursorBoxes[3].Cursor));
-            AddAssert("Check global cursor visible", () => checkVisible(cursorOverrideContainer.Cursor));
+            AddAssert("Check global cursor visible", () => checkVisible(menuCursorContainer.Cursor));
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         /// <param name="cursorContainer">The cursor to check.</param>
         private bool checkAtMouse(CursorContainer cursorContainer)
-            => Precision.AlmostEquals(InputManager.CurrentState.Mouse.NativeState.Position, cursorContainer.ToScreenSpace(cursorContainer.ActiveCursor.DrawPosition));
+            => Precision.AlmostEquals(InputManager.CurrentState.Mouse.Position, cursorContainer.ToScreenSpace(cursorContainer.ActiveCursor.DrawPosition));
 
         private class CustomCursorBox : Container, IProvideCursor
         {
@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual
             public CursorContainer Cursor { get; }
             public bool ProvidingUserCursor { get; }
 
-            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => base.ReceiveMouseInputAt(screenSpacePos) || SmoothTransition && !ProvidingUserCursor;
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) || SmoothTransition && !ProvidingUserCursor;
 
             private readonly Box background;
 
@@ -224,16 +224,16 @@ namespace osu.Game.Tests.Visual
                 };
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 background.FadeTo(0.4f, 250, Easing.OutQuint);
                 return false;
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 background.FadeTo(0.1f, 250);
-                base.OnHoverLost(state);
+                base.OnHoverLost(e);
             }
         }
 

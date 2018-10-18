@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Menu
 {
     public class LogoVisualisation : Drawable, IHasAccentColour
     {
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         /// <summary>
         /// The number of bars to jump each update iteration.
@@ -64,9 +64,6 @@ namespace osu.Game.Screens.Menu
 
         private readonly float[] frequencyAmplitudes = new float[256];
 
-        public override bool HandleKeyboardInput => false;
-        public override bool HandleMouseInput => false;
-
         private Shader shader;
         private readonly Texture texture;
 
@@ -78,9 +75,9 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, OsuGameBase game)
+        private void load(ShaderManager shaders, IBindableBeatmap beatmap)
         {
-            beatmap.BindTo(game.Beatmap);
+            this.beatmap.BindTo(beatmap);
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);
         }
 
@@ -176,7 +173,7 @@ namespace osu.Game.Screens.Menu
 
                 Vector2 inflation = DrawInfo.MatrixInverse.ExtractScale().Xy;
 
-                ColourInfo colourInfo = DrawInfo.Colour;
+                ColourInfo colourInfo = DrawColourInfo.Colour;
                 colourInfo.ApplyChild(Colour);
 
                 if (AudioData != null)

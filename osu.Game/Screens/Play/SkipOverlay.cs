@@ -4,9 +4,10 @@
 using System;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Audio;
+using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
@@ -17,6 +18,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
 
 namespace osu.Game.Screens.Play
@@ -34,8 +36,8 @@ namespace osu.Game.Screens.Play
         private FadeContainer fadeContainer;
         private double displayTime;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
-        protected override bool BlockPassThroughMouse => false;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+        protected override bool BlockPositionalInput => false;
 
         public SkipOverlay(double startTime)
         {
@@ -126,11 +128,11 @@ namespace osu.Game.Screens.Play
             remainingTimeBox.ResizeWidthTo((float)Math.Max(0, 1 - (Time.Current - displayTime) / (beginFadeTime - displayTime)), 120, Easing.OutQuint);
         }
 
-        protected override bool OnMouseMove(InputState state)
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            if (!state.Mouse.HasAnyButtonPressed)
+            if (!e.HasAnyButtonPressed)
                 fadeContainer.State = Visibility.Visible;
-            return base.OnMouseMove(state);
+            return base.OnMouseMove(e);
         }
 
         public bool OnPressed(GlobalAction action)
@@ -138,7 +140,7 @@ namespace osu.Game.Screens.Play
             switch (action)
             {
                 case GlobalAction.SkipCutscene:
-                    button.TriggerOnClick();
+                    button.Click();
                     return true;
             }
 
@@ -191,16 +193,16 @@ namespace osu.Game.Screens.Play
                 State = Visibility.Visible;
             }
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            protected override bool OnMouseDown(MouseDownEvent e)
             {
                 scheduledHide?.Cancel();
-                return base.OnMouseDown(state, args);
+                return base.OnMouseDown(e);
             }
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            protected override bool OnMouseUp(MouseUpEvent e)
             {
                 State = Visibility.Visible;
-                return base.OnMouseUp(state, args);
+                return base.OnMouseUp(e);
             }
         }
 
@@ -213,16 +215,20 @@ namespace osu.Game.Screens.Play
             private Box background;
             private AspectContainer aspect;
 
+            private SampleChannel sampleConfirm;
+
             public Button()
             {
                 RelativeSizeAxes = Axes.Both;
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
+            private void load(OsuColour colours, AudioManager audio)
             {
                 colourNormal = colours.Yellow;
                 colourHover = colours.YellowDark;
+
+                sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
 
                 Children = new Drawable[]
                 {
@@ -277,7 +283,7 @@ namespace osu.Game.Screens.Play
                 };
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 flow.TransformSpacingTo(new Vector2(5), 500, Easing.OutQuint);
                 box.FadeColour(colourHover, 500, Easing.OutQuint);
@@ -285,35 +291,37 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 flow.TransformSpacingTo(new Vector2(0), 500, Easing.OutQuint);
                 box.FadeColour(colourNormal, 500, Easing.OutQuint);
                 background.FadeTo(0.2f, 500, Easing.OutQuint);
-                base.OnHoverLost(state);
+                base.OnHoverLost(e);
             }
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            protected override bool OnMouseDown(MouseDownEvent e)
             {
                 aspect.ScaleTo(0.75f, 2000, Easing.OutQuint);
-                return base.OnMouseDown(state, args);
+                return base.OnMouseDown(e);
             }
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            protected override bool OnMouseUp(MouseUpEvent e)
             {
                 aspect.ScaleTo(1, 1000, Easing.OutElastic);
-                return base.OnMouseUp(state, args);
+                return base.OnMouseUp(e);
             }
 
-            protected override bool OnClick(InputState state)
+            protected override bool OnClick(ClickEvent e)
             {
                 if (!Enabled)
                     return false;
 
+                sampleConfirm.Play();
+
                 box.FlashColour(Color4.White, 500, Easing.OutQuint);
                 aspect.ScaleTo(1.2f, 2000, Easing.OutQuint);
 
-                bool result = base.OnClick(state);
+                bool result = base.OnClick(e);
 
                 // for now, let's disable the skip button after the first press.
                 // this will likely need to be contextual in the future (bound from external components).

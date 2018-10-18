@@ -3,14 +3,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Configuration;
-using osu.Framework.Development;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
@@ -22,15 +20,18 @@ using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Framework.Graphics.Performance;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input;
 using osu.Framework.Logging;
+using osu.Game.Audio;
 using osu.Game.Database;
-using osu.Game.Graphics.Textures;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
+using OpenTK.Input;
+using DebugUtils = osu.Game.Utils.DebugUtils;
 
 namespace osu.Game
 {
@@ -57,15 +58,16 @@ namespace osu.Game
 
         protected SettingsStore SettingsStore;
 
-        protected CursorOverrideContainer CursorOverrideContainer;
+        protected RulesetConfigCache RulesetConfigCache;
 
-        protected override string MainResourceFile => @"osu.Game.Resources.dll";
+        protected MenuCursorContainer MenuCursorContainer;
 
         private Container content;
 
         protected override Container<Drawable> Content => content;
 
-        public Bindable<WorkingBeatmap> Beatmap { get; private set; }
+        private OsuBindableBeatmap beatmap;
+        protected BindableBeatmap Beatmap => beatmap;
 
         private Bindable<bool> fpsDisplayVisible;
 
@@ -92,47 +94,30 @@ namespace osu.Game
 
         private DependencyContainer dependencies;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         private DatabaseContextFactory contextFactory;
+
+        protected override UserInputManager CreateUserInputManager() => new OsuUserInputManager();
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            dependencies.Cache(contextFactory = new DatabaseContextFactory(Host));
+            Resources.AddStore(new DllResourceStore(@"osu.Game.Resources.dll"));
 
-            dependencies.Cache(new LargeTextureStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures"))));
+            dependencies.Cache(contextFactory = new DatabaseContextFactory(Host.Storage));
+
+            var largeStore = new LargeTextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
+            largeStore.AddStore(new TextureLoaderStore(new OnlineStore()));
+            dependencies.Cache(largeStore);
 
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
 
-            runMigrations();
-
-            dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
-            dependencies.CacheAs<ISkinSource>(SkinManager);
-
-            var api = new APIAccess(LocalConfig);
-
-            dependencies.Cache(api);
-            dependencies.CacheAs<IAPIProvider>(api);
-
-            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
-            dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, api, Audio, Host));
-            dependencies.Cache(ScoreStore = new ScoreStore(Host.Storage, contextFactory, Host, BeatmapManager, RulesetStore));
-            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
-            dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
-            dependencies.Cache(new OsuColour());
-
-            fileImporters.Add(BeatmapManager);
-            fileImporters.Add(ScoreStore);
-            fileImporters.Add(SkinManager);
-
             //this completely overrides the framework default. will need to change once we make a proper FontStore.
-            dependencies.Cache(Fonts = new FontStore { ScaleAdjust = 100 });
+            dependencies.Cache(Fonts = new FontStore(new GlyphStore(Resources, @"Fonts/FontAwesome")));
 
-            Fonts.AddStore(new GlyphStore(Resources, @"Fonts/FontAwesome"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/osuFont"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-Medium"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Exo2.0-MediumItalic"));
@@ -156,34 +141,39 @@ namespace osu.Game
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera"));
             Fonts.AddStore(new GlyphStore(Resources, @"Fonts/Venera-Light"));
 
+            runMigrations();
+
+            dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
+            dependencies.CacheAs<ISkinSource>(SkinManager);
+
+            var api = new APIAccess(LocalConfig);
+
+            dependencies.Cache(api);
+            dependencies.CacheAs<IAPIProvider>(api);
+
+            dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
+            dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, api, Audio, Host));
+            dependencies.Cache(ScoreStore = new ScoreStore(contextFactory, Host, BeatmapManager, RulesetStore));
+            dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
+            dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
+            dependencies.Cache(RulesetConfigCache = new RulesetConfigCache(SettingsStore));
+            dependencies.Cache(new OsuColour());
+
+            fileImporters.Add(BeatmapManager);
+            fileImporters.Add(ScoreStore);
+            fileImporters.Add(SkinManager);
+
             var defaultBeatmap = new DummyWorkingBeatmap(this);
-            Beatmap = new NonNullableBindable<WorkingBeatmap>(defaultBeatmap);
+            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
             BeatmapManager.DefaultBeatmap = defaultBeatmap;
 
             // tracks play so loud our samples can't keep up.
             // this adds a global reduction of track volume for the time being.
             Audio.Track.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
-            Beatmap.ValueChanged += b =>
-            {
-                var trackLoaded = lastBeatmap?.TrackLoaded ?? false;
-
-                // compare to last beatmap as sometimes the two may share a track representation (optimisation, see WorkingBeatmap.TransferTo)
-                if (!trackLoaded || lastBeatmap?.Track != b.Track)
-                {
-                    if (trackLoaded)
-                    {
-                        Debug.Assert(lastBeatmap != null);
-                        Debug.Assert(lastBeatmap.Track != null);
-
-                        lastBeatmap.RecycleTrack();
-                    }
-
-                    Audio.Track.AddItem(b.Track);
-                }
-
-                lastBeatmap = b;
-            };
+            dependencies.CacheAs<BindableBeatmap>(beatmap);
+            dependencies.CacheAs<IBindableBeatmap>(beatmap);
 
             FileStore.Cleanup();
 
@@ -191,41 +181,22 @@ namespace osu.Game
 
             GlobalActionContainer globalBinding;
 
-            CursorOverrideContainer = new CursorOverrideContainer { RelativeSizeAxes = Axes.Both };
-            CursorOverrideContainer.Child = globalBinding = new GlobalActionContainer(this)
+            MenuCursorContainer = new MenuCursorContainer { RelativeSizeAxes = Axes.Both };
+            MenuCursorContainer.Child = globalBinding = new GlobalActionContainer(this)
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = content = new OsuTooltipContainer(CursorOverrideContainer.Cursor) { RelativeSizeAxes = Axes.Both }
+                Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
             };
 
-            base.Content.Add(new DrawSizePreservingFillContainer { Child = CursorOverrideContainer });
+            base.Content.Add(new DrawSizePreservingFillContainer { Child = MenuCursorContainer });
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);
+
+            PreviewTrackManager previewTrackManager;
+            dependencies.Cache(previewTrackManager = new PreviewTrackManager());
+            Add(previewTrackManager);
         }
-
-        private void runMigrations()
-        {
-            try
-            {
-                using (var db = contextFactory.GetForWrite())
-                    db.Context.Migrate();
-            }
-            catch (MigrationFailedException e)
-            {
-                Logger.Error(e.InnerException ?? e, "Migration failed! We'll be starting with a fresh database.", LoggingTarget.Database);
-
-                // if we failed, let's delete the database and start fresh.
-                // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
-                contextFactory.ResetDatabase();
-                Logger.Log("Database purged successfully.", LoggingTarget.Database, LogLevel.Important);
-
-                using (var db = contextFactory.GetForWrite())
-                    db.Context.Migrate();
-            }
-        }
-
-        private WorkingBeatmap lastBeatmap;
 
         protected override void LoadComplete()
         {
@@ -236,6 +207,29 @@ namespace osu.Game
             fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
             fpsDisplayVisible.ValueChanged += val => { FrameStatisticsMode = val ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
             fpsDisplayVisible.TriggerChange();
+        }
+
+        private void runMigrations()
+        {
+            try
+            {
+                using (var db = contextFactory.GetForWrite(false))
+                    db.Context.Migrate();
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.InnerException ?? e, "Migration failed! We'll be starting with a fresh database.", LoggingTarget.Database);
+
+                // if we failed, let's delete the database and start fresh.
+                // todo: we probably want a better (non-destructive) migrations/recovery process at a later point than this.
+                contextFactory.ResetDatabase();
+
+                Logger.Log("Database purged successfully.", LoggingTarget.Database);
+
+                // only run once more, then hard bail.
+                using (var db = contextFactory.GetForWrite(false))
+                    db.Context.Migrate();
+            }
         }
 
         public override void SetHost(GameHost host)
@@ -249,12 +243,59 @@ namespace osu.Game
 
         public void Import(params string[] paths)
         {
-            var extension = Path.GetExtension(paths.First());
+            var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
 
             foreach (var importer in fileImporters)
                 if (importer.HandledExtensions.Contains(extension)) importer.Import(paths);
         }
 
         public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
+
+        private class OsuBindableBeatmap : BindableBeatmap
+        {
+            public OsuBindableBeatmap(WorkingBeatmap defaultValue, AudioManager audioManager)
+                : this(defaultValue)
+            {
+                RegisterAudioManager(audioManager);
+            }
+
+            private OsuBindableBeatmap(WorkingBeatmap defaultValue)
+                : base(defaultValue)
+            {
+            }
+
+            public override BindableBeatmap GetBoundCopy()
+            {
+                var copy = new OsuBindableBeatmap(Default);
+                copy.BindTo(this);
+                return copy;
+            }
+        }
+
+        private class OsuUserInputManager : UserInputManager
+        {
+            protected override MouseButtonEventManager CreateButtonManagerFor(MouseButton button)
+            {
+                switch (button)
+                {
+                    case MouseButton.Right:
+                        return new RightMouseManager(button);
+                }
+
+                return base.CreateButtonManagerFor(button);
+            }
+
+            private class RightMouseManager : MouseButtonEventManager
+            {
+                public RightMouseManager(MouseButton button)
+                    : base(button)
+                {
+                }
+
+                public override bool EnableDrag => true; // allow right-mouse dragging for absolute scroll in scroll containers.
+                public override bool EnableClick => false;
+                public override bool ChangeFocusOnClick => false;
+            }
+        }
     }
 }

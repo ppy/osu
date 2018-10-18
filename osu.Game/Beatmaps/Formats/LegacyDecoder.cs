@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using osu.Framework.Logging;
+using osu.Game.Audio;
+using osu.Game.Beatmaps.ControlPoints;
 using OpenTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
@@ -29,7 +31,7 @@ namespace osu.Game.Beatmaps.Formats
                 if (ShouldSkipLine(line))
                     continue;
 
-                if (line.StartsWith(@"[") && line.EndsWith(@"]"))
+                if (line.StartsWith(@"[", StringComparison.Ordinal) && line.EndsWith(@"]", StringComparison.Ordinal))
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
                     {
@@ -51,16 +53,26 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//");
+        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//", StringComparison.Ordinal);
 
         protected virtual void ParseLine(T output, Section section, string line)
         {
+            line = StripComments(line);
+
             switch (section)
             {
                 case Section.Colours:
                     handleColours(output, line);
                     return;
             }
+        }
+
+        protected string StripComments(string line)
+        {
+            var index = line.AsSpan().IndexOf("//".AsSpan());
+            if (index > 0)
+                return line.Substring(0, index);
+            return line;
         }
 
         private bool hasComboColours;
@@ -73,13 +85,19 @@ namespace osu.Game.Beatmaps.Formats
 
             string[] split = pair.Value.Split(',');
 
-            if (split.Length != 3)
-                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {pair.Value}");
+            if (split.Length != 3 && split.Length != 4)
+                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {pair.Value}");
 
-            if (!byte.TryParse(split[0], out var r) || !byte.TryParse(split[1], out var g) || !byte.TryParse(split[2], out var b))
+            Color4 colour;
+
+            try
+            {
+                colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), split.Length == 4 ? byte.Parse(split[3]) : (byte)255);
+            }
+            catch (Exception e)
+            {
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
-
-            Color4 colour = new Color4(r, g, b, 255);
+            }
 
             if (isCombo)
             {
@@ -166,6 +184,26 @@ namespace osu.Game.Beatmaps.Formats
             Fail = 1,
             Pass = 2,
             Foreground = 3
+        }
+
+        internal class LegacySampleControlPoint : SampleControlPoint
+        {
+            public int CustomSampleBank;
+
+            public override SampleInfo ApplyTo(SampleInfo sampleInfo)
+            {
+                var baseInfo = base.ApplyTo(sampleInfo);
+
+                if (string.IsNullOrEmpty(baseInfo.Suffix) && CustomSampleBank > 1)
+                    baseInfo.Suffix = CustomSampleBank.ToString();
+
+                return baseInfo;
+            }
+
+            public override bool EquivalentTo(ControlPoint other)
+                => base.EquivalentTo(other)
+                   && other is LegacySampleControlPoint legacy
+                   && CustomSampleBank == legacy.CustomSampleBank;
         }
     }
 }

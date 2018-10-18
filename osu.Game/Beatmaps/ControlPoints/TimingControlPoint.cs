@@ -16,12 +16,18 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// The beat length at this control point.
         /// </summary>
-        public double BeatLength
+        public virtual double BeatLength
         {
             get => beatLength;
             set => beatLength = MathHelper.Clamp(value, 6, 60000);
         }
 
         private double beatLength = 1000;
+
+        public override bool EquivalentTo(ControlPoint other)
+            => base.EquivalentTo(other)
+               && other is TimingControlPoint timing
+               && TimeSignature.Equals(timing.TimeSignature)
+               && BeatLength.Equals(timing.BeatLength);
     }
 }

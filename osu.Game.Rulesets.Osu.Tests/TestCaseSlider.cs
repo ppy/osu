@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(239, 176),
-                ControlPoints = new List<Vector2>
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(154, 28),
@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-(distance / 2), 0),
-                ControlPoints = new List<Vector2>
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(distance, 0),
@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                ControlPoints = new List<Vector2>
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(200, 200),
@@ -184,7 +184,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 CurveType = CurveType.Linear,
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                ControlPoints = new List<Vector2>
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(150, 75),
@@ -210,7 +210,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 CurveType = CurveType.Bezier,
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                ControlPoints = new List<Vector2>
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(150, 75),
@@ -235,7 +235,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 CurveType = CurveType.Linear,
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(0, 0),
-                ControlPoints = new List<Vector2>
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(-200, 0),
@@ -265,7 +265,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-100, 0),
                 CurveType = CurveType.Catmull,
-                ControlPoints = new List<Vector2>
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(50, -50),
@@ -304,13 +304,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(new[] { drawable });
 
-            drawable.OnJudgement += onJudgement;
+            drawable.OnNewResult += onNewResult;
 
             Add(drawable);
         }
 
         private float judgementOffsetDirection = 1;
-        private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             var osuObject = judgedObject as DrawableOsuHitObject;
             if (osuObject == null)
@@ -321,8 +321,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Text = judgement.IsHit ? "Hit!" : "Miss!",
-                Colour = judgement.IsHit ? Color4.Green : Color4.Red,
+                Text = result.IsHit ? "Hit!" : "Miss!",
+                Colour = result.IsHit ? Color4.Green : Color4.Red,
                 TextSize = 30,
                 Position = osuObject.HitObject.StackedEndPosition + judgementOffsetDirection * new Vector2(0, 45)
             });

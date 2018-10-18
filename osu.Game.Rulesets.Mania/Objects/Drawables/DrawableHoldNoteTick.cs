@@ -7,8 +7,6 @@ using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Mania.Judgements;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Scoring;
 
@@ -73,39 +71,17 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             }
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (!userTriggered)
-                return;
-
             if (Time.Current < HitObject.StartTime)
                 return;
 
-            if (HoldStartTime?.Invoke() > HitObject.StartTime)
-                return;
+            var startTime = HoldStartTime?.Invoke();
 
-            AddJudgement(new HoldNoteTickJudgement { Result = HitResult.Perfect });
-        }
-
-        protected override void UpdateState(ArmedState state)
-        {
-            switch (State.Value)
-            {
-                case ArmedState.Hit:
-                    AccentColour = Color4.Green;
-                    break;
-            }
-        }
-
-        protected override void Update()
-        {
-            if (AllJudged)
-                return;
-
-            if (HoldStartTime?.Invoke() == null)
-                return;
-
-            UpdateJudgement(true);
+            if (startTime == null || startTime > HitObject.StartTime)
+                ApplyResult(r => r.Type = HitResult.Miss);
+            else
+                ApplyResult(r => r.Type = HitResult.Perfect);
         }
     }
 }

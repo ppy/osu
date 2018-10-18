@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using OpenTK.Graphics;
 
@@ -40,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         if (AllJudged)
                             return false;
 
-                        UpdateJudgement(true);
+                        UpdateResult(true);
                         return true;
                     },
                 },
@@ -77,31 +76,31 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
                 if (!HitObject.HitWindows.CanBeHit(timeOffset))
-                    AddJudgement(new OsuJudgement { Result = HitResult.Miss });
+                    ApplyResult(r => r.Type = HitResult.Miss);
+
                 return;
             }
 
             var result = HitObject.HitWindows.ResultFor(timeOffset);
             if (result == HitResult.None)
-                return;
-
-            AddJudgement(new OsuJudgement
             {
-                Result = result,
-                PositionOffset = Vector2.Zero //todo: set to correct value
-            });
+                Shake(Math.Abs(timeOffset) - HitObject.HitWindows.HalfWindowFor(HitResult.Miss));
+                return;
+            }
+
+            ApplyResult(r => r.Type = result);
         }
 
         protected override void UpdatePreemptState()
         {
             base.UpdatePreemptState();
 
-            ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadein * 2, HitObject.TimePreempt));
+            ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
             ApproachCircle.ScaleTo(1.1f, HitObject.TimePreempt);
         }
 

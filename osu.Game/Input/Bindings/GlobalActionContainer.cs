@@ -39,13 +39,18 @@ namespace osu.Game.Input.Bindings
             new KeyBinding(InputKey.F4, GlobalAction.ToggleMute),
 
             new KeyBinding(InputKey.Escape, GlobalAction.Back),
-            new KeyBinding(InputKey.MouseButton1, GlobalAction.Back)
+            new KeyBinding(InputKey.MouseButton1, GlobalAction.Back),
+
+            new KeyBinding(InputKey.Space, GlobalAction.Select),
+            new KeyBinding(InputKey.Enter, GlobalAction.Select),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]
         {
             new KeyBinding(InputKey.Space, GlobalAction.SkipCutscene),
-            new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry)
+            new KeyBinding(InputKey.Tilde, GlobalAction.QuickRetry),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Plus }, GlobalAction.IncreaseScrollSpeed),
+            new KeyBinding(new[] { InputKey.Control, InputKey.Minus }, GlobalAction.DecreaseScrollSpeed),
         };
 
         protected override IEnumerable<Drawable> KeyBindingInputQueue =>
@@ -66,17 +71,17 @@ namespace osu.Game.Input.Bindings
         ToggleSettings,
         [Description("Toggle osu!direct")]
         ToggleDirect,
-        [Description("Increase Volume")]
+        [Description("Increase volume")]
         IncreaseVolume,
-        [Description("Decrease Volume")]
+        [Description("Decrease volume")]
         DecreaseVolume,
         [Description("Toggle mute")]
         ToggleMute,
 
         // In-Game Keybindings
-        [Description("Skip Cutscene")]
+        [Description("Skip cutscene")]
         SkipCutscene,
-        [Description("Quick Retry (Hold)")]
+        [Description("Quick retry (hold)")]
         QuickRetry,
 
         [Description("Take screenshot")]
@@ -84,7 +89,16 @@ namespace osu.Game.Input.Bindings
         [Description("Toggle gameplay mouse buttons")]
         ToggleGameplayMouseButtons,
 
-        [Description("Go back")]
-        Back
+        [Description("Back")]
+        Back,
+
+        [Description("Increase scroll speed")]
+        IncreaseScrollSpeed,
+
+        [Description("Decrease scroll speed")]
+        DecreaseScrollSpeed,
+
+        [Description("Select")]
+        Select,
     }
 }

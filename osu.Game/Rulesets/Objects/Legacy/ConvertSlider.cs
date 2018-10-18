@@ -10,7 +10,7 @@ using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
-    internal abstract class ConvertSlider : HitObject, IHasCurve
+    internal abstract class ConvertSlider : HitObject, IHasCurve, IHasLegacyLastTickOffset
     {
         /// <summary>
         /// Scoring distance with a speed-adjusted beat length of 1 second.
@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <see cref="ConvertSlider"/>s don't need a curve since they're converted to ruleset-specific hitobjects.
         /// </summary>
         public SliderCurve Curve { get; } = null;
-        public List<Vector2> ControlPoints { get; set; }
+        public Vector2[] ControlPoints { get; set; }
         public CurveType CurveType { get; set; }
 
         public double Distance { get; set; }
@@ -45,5 +45,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             Velocity = scoringDistance / timingPoint.BeatLength;
         }
+
+        public double LegacyLastTickOffset => 36;
     }
 }

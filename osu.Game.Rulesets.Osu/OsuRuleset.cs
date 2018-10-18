@@ -31,8 +31,8 @@ namespace osu.Game.Rulesets.Osu
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
         {
-            new KeyBinding(InputKey.Z, OsuAction.LeftButton),
-            new KeyBinding(InputKey.X, OsuAction.RightButton),
+            new KeyBinding(InputKey.A, OsuAction.LeftButton),
+            new KeyBinding(InputKey.S, OsuAction.RightButton),
             new KeyBinding(InputKey.MouseLeft, OsuAction.LeftButton),
             new KeyBinding(InputKey.MouseRight, OsuAction.RightButton),
         };
@@ -93,57 +93,35 @@ namespace osu.Game.Rulesets.Osu
                     {
                         new OsuModEasy(),
                         new OsuModNoFail(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new OsuModHalfTime(),
-                                new OsuModDaycore(),
-                            },
-                        },
+                        new MultiMod(new OsuModHalfTime(), new OsuModDaycore()),
+                        new OsuModSpunOut(),
                     };
-
                 case ModType.DifficultyIncrease:
                     return new Mod[]
                     {
                         new OsuModHardRock(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new OsuModSuddenDeath(),
-                                new OsuModPerfect(),
-                            },
-                        },
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new OsuModDoubleTime(),
-                                new OsuModNightcore(),
-                            },
-                        },
+                        new MultiMod(new OsuModSuddenDeath(), new OsuModPerfect()),
+                        new MultiMod(new OsuModDoubleTime(), new OsuModNightcore()),
                         new OsuModHidden(),
                         new OsuModFlashlight(),
                     };
-
-                case ModType.Special:
+                case ModType.Conversion:
                     return new Mod[]
                     {
-                        new OsuModRelax(),
-                        new OsuModAutopilot(),
-                        new OsuModSpunOut(),
-                        new MultiMod
-                        {
-                            Mods = new Mod[]
-                            {
-                                new OsuModAutoplay(),
-                                new ModCinema(),
-                            },
-                        },
                         new OsuModTarget(),
                     };
-
+                case ModType.Automation:
+                    return new Mod[]
+                    {
+                        new MultiMod(new OsuModAutoplay(), new ModCinema()),
+                        new OsuModRelax(),
+                        new OsuModAutopilot(),
+                    };
+                case ModType.Fun:
+                    return new Mod[] {
+                        new OsuModTransform(),
+                        new OsuModWiggle(),
+                    };
                 default:
                     return new Mod[] { };
             }
@@ -151,9 +129,9 @@ namespace osu.Game.Rulesets.Osu
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_osu_o };
 
-        public override DifficultyCalculator CreateDifficultyCalculator(IBeatmap beatmap, Mod[] mods = null) => new OsuDifficultyCalculator(beatmap, mods);
+        public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuDifficultyCalculator(this, beatmap);
 
-        public override PerformanceCalculator CreatePerformanceCalculator(IBeatmap beatmap, Score score) => new OsuPerformanceCalculator(this, beatmap, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, Score score) => new OsuPerformanceCalculator(this, beatmap, score);
 
         public override HitObjectComposer CreateHitObjectComposer() => new OsuHitObjectComposer(this);
 
@@ -161,7 +139,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override string ShortName => "osu";
 
-        public override SettingsSubsection CreateSettings() => new OsuSettings();
+        public override RulesetSettingsSubsection CreateSettings() => new OsuSettings(this);
 
         public override int? LegacyID => 0;
 

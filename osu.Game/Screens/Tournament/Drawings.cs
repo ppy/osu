@@ -49,8 +49,8 @@ namespace osu.Game.Screens.Tournament
 
         private DependencyContainer dependencies;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, Storage storage)
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Tournament
 
             TextureStore flagStore = new TextureStore();
             // Local flag store
-            flagStore.AddStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), "Drawings")));
+            flagStore.AddStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), "Drawings")));
             // Default texture store
             flagStore.AddStore(textures);
 
@@ -323,7 +323,7 @@ namespace osu.Game.Screens.Tournament
                             if (string.IsNullOrEmpty(line))
                                 continue;
 
-                            if (line.ToUpper().StartsWith("GROUP"))
+                            if (line.ToUpperInvariant().StartsWith("GROUP"))
                                 continue;
 
                             // ReSharper disable once AccessToModifiedClosure

@@ -2,16 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK;
-using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -44,7 +43,6 @@ namespace osu.Game.Overlays.Mods
 
                     return new ModButton(m)
                     {
-                        SelectedColour = selectedColour,
                         SelectionChanged = Action,
                     };
                 }).ToArray();
@@ -56,27 +54,16 @@ namespace osu.Game.Overlays.Mods
 
         private ModButton[] buttons = { };
 
-        private Color4 selectedColour = Color4.White;
-        public Color4 SelectedColour
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            get => selectedColour;
-            set
+            if (ToggleKeys != null)
             {
-                if (value == selectedColour) return;
-                selectedColour = value;
-
-                foreach (ModButton button in buttons)
-                    button.SelectedColour = value;
+                var index = Array.IndexOf(ToggleKeys, e.Key);
+                if (index > -1 && index < buttons.Length)
+                    buttons[index].SelectNext(e.ShiftPressed ? -1 : 1);
             }
-        }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            var index = Array.IndexOf(ToggleKeys, args.Key);
-            if (index > -1 && index < buttons.Length)
-                buttons[index].SelectNext(state.Keyboard.ShiftPressed ? -1 : 1);
-
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
         public void DeselectAll() => DeselectTypes(buttons.Select(b => b.SelectedMod?.GetType()).Where(t => t != null));
@@ -124,6 +111,10 @@ namespace osu.Game.Overlays.Mods
         protected ModSection()
         {
             AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
+
+            Origin = Anchor.TopCentre;
+            Anchor = Anchor.TopCentre;
 
             Children = new Drawable[]
             {

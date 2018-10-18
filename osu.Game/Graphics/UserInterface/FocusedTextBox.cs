@@ -2,9 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using OpenTK.Graphics;
-using OpenTK.Input;
-using osu.Framework.Input;
 using System;
+using osu.Framework.Input.Events;
+using osu.Game.Input.Bindings;
+using OpenTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -19,6 +20,7 @@ namespace osu.Game.Graphics.UserInterface
         public Action Exit;
 
         private bool focus;
+
         public bool HoldFocus
         {
             get { return focus; }
@@ -26,31 +28,47 @@ namespace osu.Game.Graphics.UserInterface
             {
                 focus = value;
                 if (!focus && HasFocus)
-                    GetContainingInputManager().ChangeFocus(null);
+                    base.KillFocus();
             }
         }
 
         // We may not be focused yet, but we need to handle keyboard input to be able to request focus
-        public override bool HandleKeyboardInput => HoldFocus || base.HandleKeyboardInput;
+        public override bool HandleNonPositionalInput => HoldFocus || base.HandleNonPositionalInput;
 
-        protected override void OnFocus(InputState state)
+        protected override void OnFocus(FocusEvent e)
         {
-            base.OnFocus(state);
+            base.OnFocus(e);
             BorderThickness = 0;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (!args.Repeat && args.Key == Key.Escape)
+            if (!HasFocus) return false;
+
+            if (e.Key == Key.Escape)
+                return false; // disable the framework-level handling of escape key for confority (we use GlobalAction.Back).
+
+            return base.OnKeyDown(e);
+        }
+
+        public override bool OnPressed(GlobalAction action)
+        {
+            if (action == GlobalAction.Back)
             {
                 if (Text.Length > 0)
+                {
                     Text = string.Empty;
-                else
-                    Exit?.Invoke();
-                return true;
+                    return true;
+                }
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnPressed(action);
+        }
+
+        protected override void KillFocus()
+        {
+            base.KillFocus();
+            Exit?.Invoke();
         }
 
         public override bool RequestsFocus => HoldFocus;

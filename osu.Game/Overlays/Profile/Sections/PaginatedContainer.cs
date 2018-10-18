@@ -28,6 +28,7 @@ namespace osu.Game.Overlays.Profile.Sections
         protected readonly Bindable<User> User = new Bindable<User>();
 
         protected APIAccess Api;
+        protected APIRequest RetrievalRequest;
         protected RulesetStore Rulesets;
 
         public PaginatedContainer(Bindable<User> user, string header, string missing)
@@ -64,6 +65,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     {
                         TextSize = 14,
                         Text = "show more",
+                        Padding = new MarginPadding {Vertical = 10, Horizontal = 15 },
                     }
                 },
                 ShowMoreLoading = new LoadingAnimation

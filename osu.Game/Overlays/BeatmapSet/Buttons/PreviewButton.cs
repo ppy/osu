@@ -2,13 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private readonly Box bg, progress;
         private readonly PlayButton playButton;
 
-        private Track preview => playButton.Preview;
+        private PreviewTrack preview => playButton.Preview;
         public Bindable<bool> Playing => playButton.Playing;
 
         public BeatmapSetInfo BeatmapSet
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 },
             };
 
-            Action = () => Playing.Value = !Playing.Value;
+            Action = () => playButton.Click();
             Playing.ValueChanged += newValue => progress.FadeTo(newValue ? 1 : 0, 100);
         }
 
@@ -89,22 +89,16 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                 progress.Width = 0;
         }
 
-        protected override void Dispose(bool isDisposing)
-        {
-            Playing.Value = false;
-            base.Dispose(isDisposing);
-        }
-
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             bg.FadeColour(Color4.Black.Opacity(0.5f), 100);
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             bg.FadeColour(Color4.Black.Opacity(0.25f), 100);
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
     }
 }

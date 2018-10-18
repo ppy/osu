@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -10,6 +9,7 @@ using osu.Framework.Graphics.Shaders;
 using osu.Game.Screens.Menu;
 using OpenTK;
 using osu.Framework.Screens;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens
 {
@@ -18,6 +18,8 @@ namespace osu.Game.Screens
         private bool showDisclaimer;
 
         protected override bool HideOverlaysOnEnter => true;
+
+        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
         protected override bool AllowBackButton => false;
 
@@ -30,43 +32,48 @@ namespace osu.Game.Screens
         {
             base.LogoArriving(logo, resuming);
 
+            logo.BeatMatching = false;
             logo.Triangles = false;
             logo.Origin = Anchor.BottomRight;
             logo.Anchor = Anchor.BottomRight;
             logo.Position = new Vector2(-40);
             logo.Scale = new Vector2(0.2f);
 
-            logo.FadeInFromZero(5000, Easing.OutQuint);
-        }
-
-        private OsuScreen loadScreen;
-        private ShaderPrecompiler precompiler;
-
-        protected override void OnEntering(Screen last)
-        {
-            base.OnEntering(last);
-
-            LoadComponentAsync(precompiler = new ShaderPrecompiler(loadIfReady), Add);
-            LoadComponentAsync(loadScreen = showDisclaimer ? (OsuScreen)new Disclaimer() : new Intro(), s => loadIfReady());
-        }
-
-        private void loadIfReady()
-        {
-            if (ChildScreen == loadScreen) return;
-
-            if (loadScreen.LoadState != LoadState.Ready)
-                return;
-
-            if (!precompiler.FinishedCompiling)
-                return;
-
-            Push(loadScreen);
+            logo.Delay(500).FadeInFromZero(1000, Easing.OutQuint);
         }
 
         protected override void LogoSuspending(OsuLogo logo)
         {
             base.LogoSuspending(logo);
-            logo.FadeOut(100);
+            logo.FadeOut(logo.Alpha * 400);
+        }
+
+        private OsuScreen loadableScreen;
+        private ShaderPrecompiler precompiler;
+
+        protected virtual OsuScreen CreateLoadableScreen() => showDisclaimer ? (OsuScreen)new Disclaimer() : new Intro();
+
+        protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
+
+        protected override void OnEntering(Screen last)
+        {
+            base.OnEntering(last);
+
+            LoadComponentAsync(precompiler = CreateShaderPrecompiler(), Add);
+            LoadComponentAsync(loadableScreen = CreateLoadableScreen());
+
+            checkIfLoaded();
+        }
+
+        private void checkIfLoaded()
+        {
+            if (loadableScreen.LoadState != LoadState.Ready || !precompiler.FinishedCompiling)
+            {
+                Schedule(checkIfLoaded);
+                return;
+            }
+
+            Push(loadableScreen);
         }
 
         [BackgroundDependencyLoader]
@@ -80,15 +87,9 @@ namespace osu.Game.Screens
         /// </summary>
         public class ShaderPrecompiler : Drawable
         {
-            private readonly Action onLoaded;
             private readonly List<Shader> loadTargets = new List<Shader>();
 
             public bool FinishedCompiling { get; private set; }
-
-            public ShaderPrecompiler(Action onLoaded)
-            {
-                this.onLoaded = onLoaded;
-            }
 
             [BackgroundDependencyLoader]
             private void load(ShaderManager manager)
@@ -103,16 +104,17 @@ namespace osu.Game.Screens
                 loadTargets.Add(manager.Load(VertexShaderDescriptor.TEXTURE_3, FragmentShaderDescriptor.TEXTURE));
             }
 
+            protected virtual bool AllLoaded => loadTargets.All(s => s.Loaded);
+
             protected override void Update()
             {
                 base.Update();
 
                 // if our target is null we are done.
-                if (loadTargets.All(s => s.Loaded))
+                if (AllLoaded)
                 {
                     FinishedCompiling = true;
                     Expire();
-                    onLoaded?.Invoke();
                 }
             }
         }

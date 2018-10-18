@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.ComponentModel;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Mods;
@@ -13,10 +12,11 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using System.Linq;
 using System.Collections.Generic;
-using osu.Game.Rulesets.Osu;
+using NUnit.Framework;
+using osu.Framework.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Mania;
+using osu.Game.Overlays.Mods.Sections;
 using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.UI;
 using OpenTK.Graphics;
@@ -36,10 +36,10 @@ namespace osu.Game.Tests.Visual
             typeof(ModButtonEmpty),
             typeof(DifficultyReductionSection),
             typeof(DifficultyIncreaseSection),
-            typeof(SpecialSection),
+            typeof(AutomationSection),
+            typeof(ConversionSection),
+            typeof(FunSection),
         };
-
-        private const string unranked_suffix = " (Unranked)";
 
         private RulesetStore rulesets;
         private ModDisplay modDisplay;
@@ -49,11 +49,6 @@ namespace osu.Game.Tests.Visual
         private void load(RulesetStore rulesets)
         {
             this.rulesets = rulesets;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
 
             Add(modSelect = new TestModSelectOverlay
             {
@@ -70,34 +65,25 @@ namespace osu.Game.Tests.Visual
                 Position = new Vector2(0, 25),
             });
 
+            modDisplay.Current.UnbindBindings();
             modDisplay.Current.BindTo(modSelect.SelectedMods);
 
-            AddStep("Toggle", modSelect.ToggleVisibility);
-            AddStep("Hide", modSelect.Hide);
             AddStep("Show", modSelect.Show);
-
-            foreach (var rulesetInfo in rulesets.AvailableRulesets)
-            {
-                Ruleset ruleset = rulesetInfo.CreateInstance();
-                AddStep($"switch to {ruleset.Description}", () => modSelect.Ruleset.Value = rulesetInfo);
-
-                switch (ruleset)
-                {
-                    case OsuRuleset or:
-                        testOsuMods(or);
-                        break;
-                    case ManiaRuleset mr:
-                        testManiaMods(mr);
-                        break;
-                }
-            }
+            AddStep("Toggle", modSelect.ToggleVisibility);
+            AddStep("Toggle", modSelect.ToggleVisibility);
         }
 
-        private void testOsuMods(OsuRuleset ruleset)
+        [Test]
+        public void TestOsuMods()
         {
-            var easierMods = ruleset.GetModsFor(ModType.DifficultyReduction);
-            var harderMods = ruleset.GetModsFor(ModType.DifficultyIncrease);
-            var assistMods = ruleset.GetModsFor(ModType.Special);
+            var ruleset = rulesets.AvailableRulesets.First(r => r.ID == 0);
+            AddStep("change ruleset", () => { Ruleset.Value = ruleset; });
+
+            var instance = ruleset.CreateInstance();
+
+            var easierMods = instance.GetModsFor(ModType.DifficultyReduction);
+            var harderMods = instance.GetModsFor(ModType.DifficultyIncrease);
+            var assistMods = instance.GetModsFor(ModType.Automation);
 
             var noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
             var hiddenMod = harderMods.FirstOrDefault(m => m is OsuModHidden);
@@ -116,12 +102,43 @@ namespace osu.Game.Tests.Visual
             testMultiplierTextColour(noFailMod, modSelect.LowMultiplierColour);
             testMultiplierTextColour(hiddenMod, modSelect.HighMultiplierColour);
 
-            testUnimplmentedMod(autoPilotMod);
+            testUnimplementedMod(autoPilotMod);
         }
 
-        private void testManiaMods(ManiaRuleset ruleset)
+        [Test]
+        public void TestManiaMods()
         {
-            testMultiplierTextUnranked(ruleset.GetModsFor(ModType.Special).First(m => m is ManiaModRandom));
+            var ruleset = rulesets.AvailableRulesets.First(r => r.ID == 3);
+            AddStep("change ruleset", () => { Ruleset.Value = ruleset; });
+
+            testRankedText(ruleset.CreateInstance().GetModsFor(ModType.Conversion).First(m => m is ManiaModRandom));
+        }
+
+        [Test]
+        public void TestRulesetChanges()
+        {
+            var rulesetOsu = rulesets.AvailableRulesets.First(r => r.ID == 0);
+            var rulesetMania = rulesets.AvailableRulesets.First(r => r.ID == 3);
+
+            AddStep("change ruleset to null", () => { Ruleset.Value = null; });
+
+            var instance = rulesetOsu.CreateInstance();
+            var easierMods = instance.GetModsFor(ModType.DifficultyReduction);
+            var noFailMod = easierMods.FirstOrDefault(m => m is OsuModNoFail);
+
+            AddStep("set mods externally", () => { modDisplay.Current.Value = new[] { noFailMod }; });
+
+            AddStep("change ruleset to osu", () => { Ruleset.Value = rulesetOsu; });
+
+            AddAssert("ensure mods still selected", () => modDisplay.Current.Value.Single(m => m is OsuModNoFail) != null);
+
+            AddStep("change ruleset to mania", () => { Ruleset.Value = rulesetMania; });
+
+            AddAssert("ensure mods not selected", () => !modDisplay.Current.Value.Any(m => m is OsuModNoFail));
+
+            AddStep("change ruleset to osu", () => { Ruleset.Value = rulesetOsu; });
+
+            AddAssert("ensure mods not selected", () => !modDisplay.Current.Value.Any());
         }
 
         private void testSingleMod(Mod mod)
@@ -156,7 +173,7 @@ namespace osu.Game.Tests.Visual
                 checkNotSelected(mod);
         }
 
-        private void testUnimplmentedMod(Mod mod)
+        private void testUnimplementedMod(Mod mod)
         {
             selectNext(mod);
             checkNotSelected(mod);
@@ -198,13 +215,16 @@ namespace osu.Game.Tests.Visual
             checkLabelColor(Color4.White);
         }
 
-        private void testMultiplierTextUnranked(Mod mod)
+        private void testRankedText(Mod mod)
         {
-            AddAssert("check for ranked", () => !modSelect.MultiplierLabel.Text.EndsWith(unranked_suffix));
+            AddWaitStep(1, "wait for fade");
+            AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
             selectNext(mod);
-            AddAssert("check for unranked", () => modSelect.MultiplierLabel.Text.EndsWith(unranked_suffix));
+            AddWaitStep(1, "wait for fade");
+            AddAssert("check for unranked", () => modSelect.UnrankedLabel.Alpha != 0);
             selectPrevious(mod);
-            AddAssert("check for ranked", () => !modSelect.MultiplierLabel.Text.EndsWith(unranked_suffix));
+            AddWaitStep(1, "wait for fade");
+            AddAssert("check for ranked", () => modSelect.UnrankedLabel.Alpha == 0);
         }
 
         private void selectNext(Mod mod) => AddStep($"left click {mod.Name}", () => modSelect.GetModButton(mod)?.SelectNext(1));
@@ -233,6 +253,8 @@ namespace osu.Game.Tests.Visual
 
         private class TestModSelectOverlay : ModSelectOverlay
         {
+            public new Bindable<IEnumerable<Mod>> SelectedMods => base.SelectedMods;
+
             public ModButton GetModButton(Mod mod)
             {
                 var section = ModSectionsContainer.Children.Single(s => s.ModType == mod.Type);
@@ -240,6 +262,7 @@ namespace osu.Game.Tests.Visual
             }
 
             public new OsuSpriteText MultiplierLabel => base.MultiplierLabel;
+            public new OsuSpriteText UnrankedLabel => base.UnrankedLabel;
             public new TriangleButton DeselectAllButton => base.DeselectAllButton;
 
             public new Color4 LowMultiplierColour => base.LowMultiplierColour;

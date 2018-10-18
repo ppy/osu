@@ -1,9 +1,9 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
-using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -18,7 +18,7 @@ using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
-    public class OsuRulesetContainer : RulesetContainer<OsuHitObject>
+    public class OsuRulesetContainer : RulesetContainer<OsuPlayfield, OsuHitObject>
     {
         public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -33,23 +33,28 @@ namespace osu.Game.Rulesets.Osu.UI
 
         protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
         {
-            if (h is HitCircle circle)
-                return new DrawableHitCircle(circle);
+            switch (h)
+            {
+                case HitCircle circle:
+                    return new DrawableHitCircle(circle);
+                case Slider slider:
+                    return new DrawableSlider(slider);
+                case Spinner spinner:
+                    return new DrawableSpinner(spinner);
+            }
 
-            if (h is Slider slider)
-                return new DrawableSlider(slider);
-
-            if (h is Spinner spinner)
-                return new DrawableSpinner(spinner);
             return null;
         }
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new OsuReplayInputHandler(replay);
 
-        protected override Vector2 GetAspectAdjustedSize()
+        public override double GameplayStartTime
         {
-            var aspectSize = DrawSize.X * 0.75f < DrawSize.Y ? new Vector2(DrawSize.X, DrawSize.X * 0.75f) : new Vector2(DrawSize.Y * 4f / 3f, DrawSize.Y);
-            return new Vector2(aspectSize.X / DrawSize.X, aspectSize.Y / DrawSize.Y);
+            get
+            {
+                var first = (OsuHitObject)Objects.First();
+                return first.StartTime - first.TimePreempt;
+            }
         }
 
         protected override CursorContainer CreateCursor() => new GameplayCursor();

@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using osu.Framework.Input;
+using osu.Framework.Input.StateChanges;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Replays;
 
@@ -28,9 +28,9 @@ namespace osu.Game.Rulesets.Catch.Replays
             }
         }
 
-        public override List<InputState> GetPendingStates()
+        public override List<IInput> GetPendingInputs()
         {
-            if (!Position.HasValue) return new List<InputState>();
+            if (!Position.HasValue) return new List<IInput>();
 
             var actions = new List<CatchAction>();
 
@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Catch.Replays
             else if (Position.Value < CurrentFrame.Position)
                 actions.Add(CatchAction.MoveLeft);
 
-            return new List<InputState>
+            return new List<IInput>
             {
                 new CatchReplayState
                 {

@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
@@ -107,13 +107,20 @@ namespace osu.Game.Overlays.Profile.Header
             visibleBadge = 0;
 
             badgeFlowContainer.Clear();
-            foreach (var badge in badges)
+            for (var index = 0; index < badges.Length; index++)
             {
-                LoadComponentAsync(new DrawableBadge(badge)
+                int displayIndex = index;
+                LoadComponentAsync(new DrawableBadge(badges[index])
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                }, badgeFlowContainer.Add);
+                }, asyncBadge =>
+                {
+                    badgeFlowContainer.Add(asyncBadge);
+
+                    // load in stable order regardless of async load order.
+                    badgeFlowContainer.SetLayoutPosition(asyncBadge, displayIndex);
+                });
             }
         }
 
@@ -146,13 +153,13 @@ namespace osu.Game.Overlays.Profile.Header
                 this.hoverLostAction = hoverLostAction;
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 hoverAction();
                 return true;
             }
 
-            protected override void OnHoverLost(InputState state) => hoverLostAction();
+            protected override void OnHoverLost(HoverLostEvent e) => hoverLostAction();
         }
 
         private class DrawableBadge : Container, IHasTooltip
@@ -169,7 +176,7 @@ namespace osu.Game.Overlays.Profile.Header
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(LargeTextureStore textures)
             {
                 Child = new Sprite
                 {

@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
@@ -19,6 +19,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
@@ -64,7 +65,9 @@ namespace osu.Game.Screens.Menu
             set { colourAndTriangles.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint); }
         }
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => logoContainer.ReceiveMouseInputAt(screenSpacePos);
+        public bool BeatMatching = true;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => logoContainer.ReceivePositionalInputAt(screenSpacePos);
 
         public bool Ripple
         {
@@ -80,11 +83,10 @@ namespace osu.Game.Screens.Menu
 
         private const double early_activation = 60;
 
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
+
         public OsuLogo()
         {
-            // Required to make Schedule calls run in OsuScreen even when we are not visible.
-            AlwaysPresent = true;
-
             EarlyActivationMilliseconds = early_activation;
 
             Size = new Vector2(default_size);
@@ -264,6 +266,8 @@ namespace osu.Game.Screens.Menu
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
 
+            if (!BeatMatching) return;
+
             lastBeatIndex = beatIndex;
 
             var beatLength = timingPoint.BeatLength;
@@ -337,21 +341,25 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        public override bool HandleMouseInput => base.HandleMouseInput && Action != null && Alpha > 0.2f;
+        public override bool HandlePositionalInput => base.HandlePositionalInput && Action != null && Alpha > 0.2f;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
+            if (e.Button != MouseButton.Left) return false;
+
             logoBounceContainer.ScaleTo(0.9f, 1000, Easing.Out);
             return true;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
+            if (e.Button != MouseButton.Left) return false;
+
             logoBounceContainer.ScaleTo(1f, 500, Easing.OutElastic);
             return true;
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             if (Action?.Invoke() ?? true)
                 sampleClick.Play();
@@ -362,13 +370,13 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             logoHoverContainer.ScaleTo(1.1f, 500, Easing.OutElastic);
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             logoHoverContainer.ScaleTo(1, 500, Easing.OutElastic);
         }

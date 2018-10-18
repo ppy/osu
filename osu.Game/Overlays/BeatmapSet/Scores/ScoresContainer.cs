@@ -11,6 +11,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -28,10 +29,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             set => loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
         }
 
-        private IEnumerable<OnlineScore> scores;
+        private IEnumerable<APIScore> scores;
         private BeatmapInfo beatmap;
 
-        public IEnumerable<OnlineScore> Scores
+        public IEnumerable<APIScore> Scores
         {
             get { return scores; }
             set
@@ -61,7 +62,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 loading = true;
 
                 getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
-                getScoresRequest.Success += r => Scores = r.Scores;
+                getScoresRequest.Success += r => Schedule(() => Scores = r.Scores);
                 api.Queue(getScoresRequest);
             }
         }
@@ -132,6 +133,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             this.api = api;
             updateDisplay();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            getScoresRequest?.Cancel();
         }
     }
 }

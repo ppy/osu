@@ -35,15 +35,13 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, RulesetStore rulesets, OsuColour colours)
+        private void load(RulesetStore rulesets, OsuColour colours, Bindable<RulesetInfo> ruleset)
         {
             DisplayStyleControl.Dropdown.AccentColour = colours.BlueDark;
 
-            Ruleset.Value = game?.Ruleset.Value ?? rulesets.GetRuleset(0);
+            Ruleset.Value = ruleset ?? rulesets.GetRuleset(0);
             foreach (var r in rulesets.AvailableRulesets)
-            {
                 modeButtons.Add(new RulesetToggleButton(Ruleset, r));
-            }
         }
 
         private class RulesetToggleButton : OsuClickableContainer
@@ -75,8 +73,8 @@ namespace osu.Game.Overlays.Direct
                 iconContainer.FadeTo(Ruleset.ID == obj?.ID ? 1f : 0.5f, 100);
             }
 
-            public override bool HandleKeyboardInput => !bindable.Disabled && base.HandleKeyboardInput;
-            public override bool HandleMouseInput => !bindable.Disabled && base.HandleMouseInput;
+            public override bool HandleNonPositionalInput => !bindable.Disabled && base.HandleNonPositionalInput;
+            public override bool HandlePositionalInput => !bindable.Disabled && base.HandlePositionalInput;
 
             public RulesetToggleButton(Bindable<RulesetInfo> bindable, RulesetInfo ruleset)
             {

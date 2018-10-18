@@ -23,9 +23,6 @@ namespace osu.Game.Users
 
         public Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
-        [JsonProperty(@"age")]
-        public int? Age;
-
         //public Team Team;
 
         [JsonProperty(@"profile_colour")]
@@ -86,8 +83,8 @@ namespace osu.Game.Users
         [JsonProperty(@"location")]
         public string Location;
 
-        [JsonProperty(@"lastvisit")]
-        public DateTimeOffset LastVisit;
+        [JsonProperty(@"last_visit")]
+        public DateTimeOffset? LastVisit;
 
         [JsonProperty(@"twitter")]
         public string Twitter;
@@ -147,5 +144,14 @@ namespace osu.Game.Users
         public Badge[] Badges;
 
         public override string ToString() => Username;
+
+        /// <summary>
+        /// A user instance for displaying locally created system messages.
+        /// </summary>
+        public static readonly User SYSTEM_USER = new User
+        {
+            Username = "system",
+            Id = 0
+        };
     }
 }

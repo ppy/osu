@@ -12,6 +12,9 @@ using osu.Framework.Platform;
 using osu.Game;
 using OpenTK.Input;
 using Microsoft.Win32;
+using osu.Desktop.Updater;
+using osu.Framework;
+using osu.Framework.Platform.Windows;
 
 namespace osu.Desktop
 {
@@ -37,10 +40,55 @@ namespace osu.Desktop
             }
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            if (!noVersionOverlay)
+            {
+                LoadComponentAsync(new VersionManager { Depth = int.MinValue }, v =>
+                {
+                    Add(v);
+                    v.State = Visibility.Visible;
+                });
+
+                if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+                    Add(new SquirrelUpdateManager());
+                else
+                    Add(new SimpleUpdateManager());
+            }
+        }
+
+        public override void SetHost(GameHost host)
+        {
+            base.SetHost(host);
+            var desktopWindow = host.Window as DesktopGameWindow;
+            if (desktopWindow != null)
+            {
+                desktopWindow.CursorState |= CursorState.Hidden;
+
+                desktopWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
+                desktopWindow.Title = Name;
+
+                desktopWindow.FileDrop += fileDrop;
+            }
+        }
+
+        private void fileDrop(object sender, FileDropEventArgs e)
+        {
+            var filePaths = new[] { e.FileName };
+
+            var firstExtension = Path.GetExtension(filePaths.First());
+
+            if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
+
+            Task.Factory.StartNew(() => Import(filePaths), TaskCreationOptions.LongRunning);
+        }
+
         /// <summary>
         /// A method of accessing an osu-stable install in a controlled fashion.
         /// </summary>
-        private class StableStorage : DesktopStorage
+        private class StableStorage : WindowsStorage
         {
             protected override string LocateBasePath()
             {
@@ -72,49 +120,9 @@ namespace osu.Desktop
             }
 
             public StableStorage()
-                : base(string.Empty)
+                : base(string.Empty, null)
             {
             }
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            if (!noVersionOverlay)
-            {
-                LoadComponentAsync(new VersionManager { Depth = int.MinValue }, v =>
-                {
-                    Add(v);
-                    v.State = Visibility.Visible;
-                });
-            }
-        }
-
-        public override void SetHost(GameHost host)
-        {
-            base.SetHost(host);
-            var desktopWindow = host.Window as DesktopGameWindow;
-            if (desktopWindow != null)
-            {
-                desktopWindow.CursorState |= CursorState.Hidden;
-
-                desktopWindow.SetIconFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(GetType(), "lazer.ico"));
-                desktopWindow.Title = Name;
-
-                desktopWindow.FileDrop += fileDrop;
-            }
-        }
-
-        private void fileDrop(object sender, FileDropEventArgs e)
-        {
-            var filePaths = new[] { e.FileName };
-
-            var firstExtension = Path.GetExtension(filePaths.First());
-
-            if (filePaths.Any(f => Path.GetExtension(f) != firstExtension)) return;
-
-            Task.Factory.StartNew(() => Import(filePaths), TaskCreationOptions.LongRunning);
         }
     }
 }

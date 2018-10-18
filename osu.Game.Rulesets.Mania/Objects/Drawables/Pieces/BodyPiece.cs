@@ -32,6 +32,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                 background = new Box { RelativeSizeAxes = Axes.Both },
                 foreground = new BufferedContainer
                 {
+                    Blending = BlendingMode.Additive,
                     RelativeSizeAxes = Axes.Both,
                     CacheDrawnFrameBuffer = true,
                     Children = new Drawable[]
@@ -73,6 +74,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
             get { return accentColour; }
@@ -82,6 +84,16 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                     return;
                 accentColour = value;
 
+                updateAccentColour();
+            }
+        }
+
+        public bool Hitting
+        {
+            get { return hitting; }
+            set
+            {
+                hitting = value;
                 updateAccentColour();
             }
         }
@@ -118,13 +130,26 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             }
         }
 
+        private bool hitting;
+
         private void updateAccentColour()
         {
             if (!IsLoaded)
                 return;
 
-            foreground.Colour = AccentColour.Opacity(0.4f);
-            background.Colour = AccentColour.Opacity(0.2f);
+            foreground.Colour = AccentColour.Opacity(0.5f);
+            background.Colour = AccentColour.Opacity(0.7f);
+
+            const float animation_length = 50;
+
+            foreground.ClearTransforms(false, nameof(foreground.Colour));
+            if (hitting)
+            {
+                // wait for the next sync point
+                double synchronisedOffset = animation_length * 2 - Time.Current % (animation_length * 2);
+                using (foreground.BeginDelayedSequence(synchronisedOffset))
+                    foreground.FadeColour(AccentColour.Lighten(0.2f), animation_length).Then().FadeColour(foreground.Colour, animation_length).Loop();
+            }
 
             subtractionCache.Invalidate();
         }

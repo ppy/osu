@@ -3,14 +3,15 @@
 
 using System;
 using System.Linq;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using OpenTK.Graphics;
-using osu.Framework.Input;
-using osu.Framework.Configuration;
-using osu.Framework.Allocation;
+using osu.Framework.Input.Events;
+using osu.Framework.Timing;
 using osu.Game.Configuration;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -18,7 +19,8 @@ namespace osu.Game.Screens.Play
     {
         private const int duration = 100;
 
-        private Bindable<bool> showKeyCounter;
+        public readonly Bindable<bool> Visible = new Bindable<bool>(true);
+        private readonly Bindable<bool> configVisibility = new Bindable<bool>();
 
         public KeyCounterCollection()
         {
@@ -35,6 +37,9 @@ namespace osu.Game.Screens.Play
             key.FadeTime = FadeTime;
             key.KeyDownTextColor = KeyDownTextColor;
             key.KeyUpTextColor = KeyUpTextColor;
+            // Use the same clock object as SongProgress for saving KeyCounter state
+            if (AudioClock != null)
+                key.Clock = AudioClock;
         }
 
         public void ResetCount()
@@ -46,13 +51,13 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            showKeyCounter = config.GetBindable<bool>(OsuSetting.KeyOverlay);
-            showKeyCounter.ValueChanged += keyCounterVisibility => this.FadeTo(keyCounterVisibility ? 1 : 0, duration);
-            showKeyCounter.TriggerChange();
+            config.BindWith(OsuSetting.KeyOverlay, configVisibility);
+
+            Visible.BindValueChanged(_ => updateVisibility());
+            configVisibility.BindValueChanged(_ => updateVisibility(), true);
         }
 
-        //further: change default values here and in KeyCounter if needed, instead of passing them in every constructor
-        private bool isCounting;
+        private bool isCounting = true;
         public bool IsCounting
         {
             get { return isCounting; }
@@ -111,8 +116,12 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        public override bool HandleKeyboardInput => receptor == null;
-        public override bool HandleMouseInput => receptor == null;
+        private void updateVisibility() => this.FadeTo(Visible.Value || configVisibility.Value ? 1 : 0, duration);
+
+        public override bool HandleNonPositionalInput => receptor == null;
+        public override bool HandlePositionalInput => receptor == null;
+
+        public IFrameBasedClock AudioClock { get; set; }
 
         private Receptor receptor;
 
@@ -140,15 +149,20 @@ namespace osu.Game.Screens.Play
                 Target = target;
             }
 
-            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args) => Target.Children.Any(c => c.TriggerOnKeyDown(state, args));
-
-            protected override bool OnKeyUp(InputState state, KeyUpEventArgs args) => Target.Children.Any(c => c.TriggerOnKeyUp(state, args));
-
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseDown(state, args));
-
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => Target.Children.Any(c => c.TriggerOnMouseUp(state, args));
+            protected override bool Handle(UIEvent e)
+            {
+                switch (e)
+                {
+                    case KeyDownEvent _:
+                    case KeyUpEvent _:
+                    case MouseDownEvent _:
+                    case MouseUpEvent _:
+                        return Target.Children.Any(c => c.TriggerEvent(e));
+                }
+                return base.Handle(e);
+            }
         }
     }
 }

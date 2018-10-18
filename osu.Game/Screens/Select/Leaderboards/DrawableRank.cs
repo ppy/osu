@@ -41,12 +41,17 @@ namespace osu.Game.Screens.Select.Leaderboards
             updateTexture();
         }
 
-        private void updateTexture() => rankSprite.Texture = textures.Get($@"Grades/{Rank.GetDescription()}");
+        private void updateTexture()
+        {
+            rankSprite.Texture = textures.Get($@"Grades/{Rank.GetDescription()}");
+        }
 
         public void UpdateRank(ScoreRank newRank)
         {
             Rank = newRank;
-            updateTexture();
+
+            if (LoadState >= LoadState.Ready)
+                updateTexture();
         }
     }
 }

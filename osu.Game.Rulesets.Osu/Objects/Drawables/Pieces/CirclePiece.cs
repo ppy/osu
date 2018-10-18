@@ -12,6 +12,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class CirclePiece : Container, IKeyBindingHandler<OsuAction>
     {
+        // IsHovered is used
+        public override bool HandlePositionalInput => true;
+
         public Func<bool> Hit;
 
         public CirclePiece()

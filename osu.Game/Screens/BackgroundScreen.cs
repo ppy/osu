@@ -5,7 +5,7 @@ using System;
 using System.Threading;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using OpenTK;
 
 namespace osu.Game.Screens
@@ -20,7 +20,7 @@ namespace osu.Game.Screens
         private const float transition_length = 500;
         private const float x_movement_amount = 50;
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
             //we don't want to handle escape key.
             return false;
@@ -40,7 +40,14 @@ namespace osu.Game.Screens
             while (screen.LoadState < LoadState.Ready)
                 Thread.Sleep(1);
 
-            base.Push(screen);
+            try
+            {
+                base.Push(screen);
+            }
+            catch (ScreenAlreadyExitedException)
+            {
+                // screen may have exited before the push was successful.
+            }
         }
 
         protected override void Update()

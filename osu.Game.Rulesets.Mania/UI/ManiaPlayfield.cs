@@ -1,34 +1,24 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Mania.Objects;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Configuration;
-using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : ScrollingPlayfield
+    public class ManiaPlayfield : ManiaScrollingPlayfield
     {
-        /// <summary>
-        /// Whether this playfield should be inverted. This flips everything inside the playfield.
-        /// </summary>
-        public readonly Bindable<bool> Inverted = new Bindable<bool>(true);
-
-        public List<Column> Columns => stages.SelectMany(x => x.Columns).ToList();
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
 
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
-            : base(ScrollingDirection.Up)
         {
             if (stageDefinitions == null)
                 throw new ArgumentNullException(nameof(stageDefinitions));
@@ -36,14 +26,14 @@ namespace osu.Game.Rulesets.Mania.UI
             if (stageDefinitions.Count <= 0)
                 throw new ArgumentException("Can't have zero or fewer stages.");
 
-            Inverted.Value = true;
+            Size = new Vector2(1, 0.8f);
 
             GridContainer playfieldGrid;
-            InternalChild = playfieldGrid = new GridContainer
+            AddInternal(playfieldGrid = new GridContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Content = new[] { new Drawable[stageDefinitions.Count] }
-            };
+            });
 
             var normalColumnAction = ManiaAction.Key1;
             var specialColumnAction = ManiaAction.Special1;
@@ -52,7 +42,6 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
                 newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
-                newStage.Inverted.BindTo(Inverted);
 
                 playfieldGrid.Content[0][i] = newStage;
 
@@ -84,11 +73,6 @@ namespace osu.Game.Rulesets.Mania.UI
         private void load(ManiaConfigManager maniaConfig)
         {
             maniaConfig.BindWith(ManiaSetting.ScrollTime, VisibleTimeRange);
-        }
-
-        internal void OnJudgement(DrawableHitObject judgedObject, Judgement judgement)
-        {
-            getStageByColumn(((ManiaHitObject)judgedObject.HitObject).Column).OnJudgement(judgedObject, judgement);
         }
     }
 }

@@ -6,10 +6,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private readonly Box background;
 
-        public DrawableScore(int index, OnlineScore score)
+        public DrawableScore(int index, APIScore score)
         {
             ScoreModsContainer modsContainer;
 
@@ -125,18 +125,18 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             background.Colour = colours.Gray4;
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             background.FadeIn(fade_duration, Easing.OutQuint);
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             background.FadeOut(fade_duration, Easing.OutQuint);
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
-        protected override bool OnClick(InputState state) => true;
+        protected override bool OnClick(ClickEvent e) => true;
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
@@ -9,6 +10,8 @@ using System.Linq;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -25,9 +28,31 @@ namespace osu.Game.Rulesets.Osu.Objects
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
         public override Vector2 EndPosition => Position + this.CurvePositionAt(1);
 
+        public override int ComboIndex
+        {
+            get => base.ComboIndex;
+            set
+            {
+                base.ComboIndex = value;
+                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
+                    n.ComboIndex = value;
+            }
+        }
+
+        public override int IndexInCurrentCombo
+        {
+            get => base.IndexInCurrentCombo;
+            set
+            {
+                base.IndexInCurrentCombo = value;
+                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
+                    n.IndexInCurrentCombo = value;
+            }
+        }
+
         public SliderCurve Curve { get; } = new SliderCurve();
 
-        public List<Vector2> ControlPoints
+        public Vector2[] ControlPoints
         {
             get { return Curve.ControlPoints; }
             set { Curve.ControlPoints = value; }
@@ -44,6 +69,8 @@ namespace osu.Game.Rulesets.Osu.Objects
             get { return Curve.Distance; }
             set { Curve.Distance = value; }
         }
+
+        public double? LegacyLastTickOffset { get; set; }
 
         /// <summary>
         /// The position of the cursor at the point of completion of this <see cref="Slider"/> if it was hit
@@ -69,7 +96,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double TickDistance;
 
         public HitCircle HeadCircle;
-        public HitCircle TailCircle;
+        public SliderTailCircle TailCircle;
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
@@ -91,6 +118,9 @@ namespace osu.Game.Rulesets.Osu.Objects
             createSliderEnds();
             createTicks();
             createRepeatPoints();
+
+            if (LegacyLastTickOffset != null)
+                TailCircle.StartTime = Math.Max(StartTime + Duration / 2, TailCircle.StartTime - LegacyLastTickOffset.Value);
         }
 
         private void createSliderEnds()
@@ -105,7 +135,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 ComboIndex = ComboIndex,
             };
 
-            TailCircle = new SliderCircle(this)
+            TailCircle = new SliderTailCircle(this)
             {
                 StartTime = EndTime,
                 Position = EndPosition,
@@ -141,7 +171,8 @@ namespace osu.Game.Rulesets.Osu.Objects
                     var distanceProgress = d / length;
                     var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
 
-                    var firstSample = Samples.FirstOrDefault(s => s.Name == SampleInfo.HIT_NORMAL) ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
+                    var firstSample = Samples.FirstOrDefault(s => s.Name == SampleInfo.HIT_NORMAL)
+                                      ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
                     var sampleList = new List<SampleInfo>();
 
                     if (firstSample != null)
@@ -182,5 +213,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 });
             }
         }
+
+        public override Judgement CreateJudgement() => new OsuJudgement();
     }
 }

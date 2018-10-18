@@ -2,12 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
@@ -26,7 +24,7 @@ namespace osu.Game.Online.API
         private const string client_id = @"5";
         private const string client_secret = @"FGc9GAtyHzeQDshWP5Ah7dega8hJACAJpQtw6OXk";
 
-        private ConcurrentQueue<APIRequest> queue = new ConcurrentQueue<APIRequest>();
+        private readonly Queue<APIRequest> queue = new Queue<APIRequest>();
 
         /// <summary>
         /// The username/email provided by the user when initiating a login.
@@ -55,7 +53,13 @@ namespace osu.Game.Online.API
             authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
-            Task.Factory.StartNew(run, cancellationToken.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            var thread = new Thread(run)
+            {
+                Name = "APIAccess",
+                IsBackground = true
+            };
+
+            thread.Start();
         }
 
         private void onTokenChanged(OAuthToken token) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
@@ -75,10 +79,7 @@ namespace osu.Game.Online.API
 
         public void Unregister(IOnlineComponent component)
         {
-            Scheduler.Add(delegate
-            {
-                components.Remove(component);
-            });
+            Scheduler.Add(delegate { components.Remove(component); });
         }
 
         public string AccessToken => authentication.RequestAccessToken();
@@ -103,6 +104,7 @@ namespace osu.Game.Online.API
                             log.Add(@"Queueing a ping request");
                             Queue(new ListChannelsRequest { Timeout = 5000 });
                         }
+
                         break;
                     case APIState.Offline:
                     case APIState.Connecting:
@@ -148,7 +150,7 @@ namespace osu.Game.Online.API
                         // The Success callback event is fired on the main thread, so we should wait for that to run before proceeding.
                         // Without this, we will end up circulating this Connecting loop multiple times and queueing up many web requests
                         // before actually going online.
-                        while (State != APIState.Online)
+                        while (State > APIState.Offline && State < APIState.Online)
                             Thread.Sleep(500);
 
                         break;
@@ -158,22 +160,24 @@ namespace osu.Game.Online.API
                 if (authentication.RequestAccessToken() == null)
                 {
                     Logout(false);
-                    State = APIState.Offline;
                     continue;
                 }
 
-                //process the request queue.
-                APIRequest req;
-                while (queue.TryPeek(out req))
+                while (true)
                 {
-                    if (handleRequest(req))
+                    APIRequest req;
+
+                    lock (queue)
                     {
-                        //we have succeeded, so let's unqueue.
-                        queue.TryDequeue(out req);
+                        if (queue.Count == 0) break;
+                        req = queue.Dequeue();
                     }
+
+                    // TODO: handle failures better
+                    handleRequest(req);
                 }
 
-                Thread.Sleep(1);
+                Thread.Sleep(50);
             }
         }
 
@@ -206,7 +210,16 @@ namespace osu.Game.Online.API
             }
             catch (WebException we)
             {
-                HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
+                HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode
+                                            ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
+
+                // special cases for un-typed but useful message responses.
+                switch (we.Message)
+                {
+                    case "Unauthorized":
+                        statusCode = HttpStatusCode.Unauthorized;
+                        break;
+                }
 
                 switch (statusCode)
                 {
@@ -240,6 +253,7 @@ namespace osu.Game.Online.API
         }
 
         private APIState state;
+
         public APIState State
         {
             get { return state; }
@@ -264,7 +278,10 @@ namespace osu.Game.Online.API
 
         public bool IsLoggedIn => LocalUser.Value.Id > 1;
 
-        public void Queue(APIRequest request) => queue.Enqueue(request);
+        public void Queue(APIRequest request)
+        {
+            lock (queue) queue.Enqueue(request);
+        }
 
         public event StateChangeDelegate OnStateChange;
 
@@ -272,16 +289,17 @@ namespace osu.Game.Online.API
 
         private void flushQueue(bool failOldRequests = true)
         {
-            var oldQueue = queue;
-
-            //flush the queue.
-            queue = new ConcurrentQueue<APIRequest>();
-
-            if (failOldRequests)
+            lock (queue)
             {
-                APIRequest req;
-                while (oldQueue.TryDequeue(out req))
-                    req.Fail(new WebException(@"Disconnected from server"));
+                var oldQueueRequests = queue.ToArray();
+
+                queue.Clear();
+
+                if (failOldRequests)
+                {
+                    foreach (var req in oldQueueRequests)
+                        req.Fail(new WebException(@"Disconnected from server"));
+                }
             }
         }
 
@@ -292,6 +310,7 @@ namespace osu.Game.Online.API
             password = null;
             authentication.Clear();
             LocalUser.Value = createGuestUser();
+            State = APIState.Offline;
         }
 
         private static User createGuestUser() => new User

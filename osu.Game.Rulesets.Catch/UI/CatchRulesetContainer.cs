@@ -13,7 +13,6 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -36,14 +35,16 @@ namespace osu.Game.Rulesets.Catch.UI
         {
             switch (h)
             {
+                case Banana banana:
+                    return new DrawableBanana(banana);
                 case Fruit fruit:
                     return new DrawableFruit(fruit);
                 case JuiceStream stream:
                     return new DrawableJuiceStream(stream, GetVisualRepresentation);
-                case BananaShower banana:
-                    return new DrawableBananaShower(banana, GetVisualRepresentation);
+                case BananaShower shower:
+                    return new DrawableBananaShower(shower, GetVisualRepresentation);
                 case TinyDroplet tiny:
-                    return new DrawableDroplet(tiny) { Scale = new Vector2(0.5f) };
+                    return new DrawableTinyDroplet(tiny);
                 case Droplet droplet:
                     return new DrawableDroplet(droplet);
             }

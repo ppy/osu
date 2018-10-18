@@ -1,14 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Objects
@@ -57,10 +56,10 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public HitWindows HitWindows { get; set; }
 
-        private readonly Lazy<SortedList<HitObject>> nestedHitObjects = new Lazy<SortedList<HitObject>>(() => new SortedList<HitObject>((h1, h2) => h1.StartTime.CompareTo(h2.StartTime)));
+        private readonly SortedList<HitObject> nestedHitObjects = new SortedList<HitObject>(compareObjects);
 
         [JsonIgnore]
-        public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects.Value;
+        public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects;
 
         /// <summary>
         /// Applies default values to this HitObject.
@@ -71,18 +70,14 @@ namespace osu.Game.Rulesets.Objects
         {
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            if (nestedHitObjects.IsValueCreated)
-                nestedHitObjects.Value.Clear();
+            nestedHitObjects.Clear();
 
             CreateNestedHitObjects();
 
-            if (nestedHitObjects.IsValueCreated)
+            foreach (var h in nestedHitObjects)
             {
-                nestedHitObjects.Value.ForEach(h =>
-                {
-                    h.HitWindows = HitWindows;
-                    h.ApplyDefaults(controlPointInfo, difficulty);
-                });
+                h.HitWindows = HitWindows;
+                h.ApplyDefaults(controlPointInfo, difficulty);
             }
         }
 
@@ -103,7 +98,13 @@ namespace osu.Game.Rulesets.Objects
         {
         }
 
-        protected void AddNested(HitObject hitObject) => nestedHitObjects.Value.Add(hitObject);
+        protected void AddNested(HitObject hitObject) => nestedHitObjects.Add(hitObject);
+
+        /// <summary>
+        /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
+        /// May be null.
+        /// </summary>
+        public virtual Judgement CreateJudgement() => null;
 
         /// <summary>
         /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.
@@ -113,5 +114,7 @@ namespace osu.Game.Rulesets.Objects
         /// </para>
         /// </summary>
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
+
+        private static int compareObjects(HitObject first, HitObject second) => first.StartTime.CompareTo(second.StartTime);
     }
 }

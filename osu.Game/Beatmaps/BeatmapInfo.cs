@@ -23,28 +23,20 @@ namespace osu.Game.Beatmaps
         public int BeatmapVersion;
 
         private int? onlineBeatmapID;
-        private int? onlineBeatmapSetID;
 
         [JsonProperty("id")]
         public int? OnlineBeatmapID
         {
-            get { return onlineBeatmapID; }
-            set { onlineBeatmapID = value > 0 ? value : null; }
-        }
-
-        [JsonProperty("beatmapset_id")]
-        [NotMapped]
-        public int? OnlineBeatmapSetID
-        {
-            get { return onlineBeatmapSetID; }
-            set { onlineBeatmapSetID = value > 0 ? value : null; }
+            get => onlineBeatmapID;
+            set => onlineBeatmapID = value > 0 ? value : null;
         }
 
         [JsonIgnore]
         public int BeatmapSetInfoID { get; set; }
 
+        public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
+
         [Required]
-        [JsonIgnore]
         public BeatmapSetInfo BeatmapSet { get; set; }
 
         public BeatmapMetadata Metadata { get; set; }
@@ -76,8 +68,8 @@ namespace osu.Game.Beatmaps
 
         // General
         public int AudioLeadIn { get; set; }
-        public bool Countdown { get; set; }
-        public float StackLeniency { get; set; }
+        public bool Countdown { get; set; } = true;
+        public float StackLeniency { get; set; } = 0.7f;
         public bool SpecialStyle { get; set; }
 
         public int RulesetID { get; set; }
@@ -92,7 +84,7 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public string StoredBookmarks
         {
-            get { return string.Join(",", Bookmarks); }
+            get => string.Join(",", Bookmarks);
             set
             {
                 if (string.IsNullOrEmpty(value))
@@ -103,8 +95,7 @@ namespace osu.Game.Beatmaps
 
                 Bookmarks = value.Split(',').Select(v =>
                 {
-                    int val;
-                    bool result = int.TryParse(v, out val);
+                    bool result = int.TryParse(v, out int val);
                     return new { result, val };
                 }).Where(p => p.result).Select(p => p.val).ToArray();
             }
@@ -141,8 +132,8 @@ namespace osu.Game.Beatmaps
                                                       (Metadata ?? BeatmapSet.Metadata).AudioFile == (other.Metadata ?? other.BeatmapSet.Metadata).AudioFile;
 
         public bool BackgroundEquals(BeatmapInfo other) => other != null && BeatmapSet != null && other.BeatmapSet != null &&
-                                                      BeatmapSet.Hash == other.BeatmapSet.Hash &&
-                                                      (Metadata ?? BeatmapSet.Metadata).BackgroundFile == (other.Metadata ?? other.BeatmapSet.Metadata).BackgroundFile;
+                                                           BeatmapSet.Hash == other.BeatmapSet.Hash &&
+                                                           (Metadata ?? BeatmapSet.Metadata).BackgroundFile == (other.Metadata ?? other.BeatmapSet.Metadata).BackgroundFile;
 
         /// <summary>
         /// Returns a shallow-clone of this <see cref="BeatmapInfo"/>.

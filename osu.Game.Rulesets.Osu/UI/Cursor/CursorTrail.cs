@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using OpenTK;
 using OpenTK.Graphics;
@@ -75,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
         }
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         [BackgroundDependencyLoader]
         private void load(ShaderManager shaders, TextureStore textures)
@@ -116,15 +117,15 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             timeOffset = Time.Current;
         }
 
-        protected override bool OnMouseMove(InputState state)
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            Vector2 pos = state.Mouse.NativeState.Position;
+            Vector2 pos = e.ScreenSpaceMousePosition;
 
             if (lastPosition == null)
             {
                 lastPosition = pos;
                 resampler.AddPosition(lastPosition.Value);
-                return base.OnMouseMove(state);
+                return base.OnMouseMove(e);
             }
 
             foreach (Vector2 pos2 in resampler.AddPosition(pos))
@@ -146,7 +147,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 }
             }
 
-            return base.OnMouseMove(state);
+            return base.OnMouseMove(e);
         }
 
         private void addPosition(Vector2 pos)
@@ -196,7 +197,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 if (Shared.VertexBuffer == null)
                     Shared.VertexBuffer = new QuadVertexBuffer<TexturedTrailVertex>(max_sprites, BufferUsageHint.DynamicDraw);
 
-                Shader.GetUniform<float>("g_FadeClock").Value = Time;
+                Shader.GetUniform<float>("g_FadeClock").UpdateValue(ref Time);
 
                 int updateStart = -1, updateEnd = 0;
                 for (int i = 0; i < Parts.Length; ++i)
@@ -215,7 +216,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                         Texture.DrawQuad(
                             new Quad(pos.X - Size.X / 2, pos.Y - Size.Y / 2, Size.X, Size.Y),
-                            DrawInfo.Colour,
+                            DrawColourInfo.Colour,
                             null,
                             v => Shared.VertexBuffer.Vertices[end++] = new TexturedTrailVertex
                             {

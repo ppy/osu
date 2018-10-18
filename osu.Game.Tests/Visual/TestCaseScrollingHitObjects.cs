@@ -114,22 +114,28 @@ namespace osu.Game.Tests.Visual
 
         private class TestPlayfield : ScrollingPlayfield
         {
-            public readonly ScrollingDirection Direction;
+            public new readonly ScrollingDirection Direction;
 
             public TestPlayfield(ScrollingDirection direction)
-                : base(direction)
             {
                 Direction = direction;
 
                 Padding = new MarginPadding(2);
-                Content.Masking = true;
 
-                AddInternal(new Box
+                InternalChildren = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.5f,
-                    Depth = float.MaxValue
-                });
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.5f,
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        Child = HitObjectContainer
+                    }
+                };
             }
         }
 

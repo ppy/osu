@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
 using OpenTK.Graphics;
@@ -45,14 +44,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
-                Ball = new SliderBall(s)
+                Ball = new SliderBall(s, this)
                 {
                     BypassAutoSizeAxes = Axes.Both,
                     Scale = new Vector2(s.Scale),
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                HeadCircle = new DrawableSliderHead(s, s.HeadCircle),
+                HeadCircle = new DrawableSliderHead(s, s.HeadCircle)
+                {
+                    OnShake = Shake
+                },
                 TailCircle = new DrawableSliderTail(s, s.TailCircle)
             };
 
@@ -93,6 +95,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 base.AccentColour = value;
                 Body.AccentColour = AccentColour;
                 Ball.AccentColour = AccentColour;
+
+                foreach (var drawableHitObject in NestedHitObjects)
+                    drawableHitObject.AccentColour = AccentColour;
             }
         }
 
@@ -129,23 +134,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (!userTriggered && Time.Current >= slider.EndTime)
+            if (userTriggered || Time.Current < slider.EndTime)
+                return;
+
+            ApplyResult(r =>
             {
-                var judgementsCount = NestedHitObjects.Count;
+                var judgementsCount = NestedHitObjects.Count();
                 var judgementsHit = NestedHitObjects.Count(h => h.IsHit);
 
                 var hitFraction = (double)judgementsHit / judgementsCount;
-                if (hitFraction == 1 && HeadCircle.Judgements.Any(j => j.Result == HitResult.Great))
-                    AddJudgement(new OsuJudgement { Result = HitResult.Great });
-                else if (hitFraction >= 0.5 && HeadCircle.Judgements.Any(j => j.Result >= HitResult.Good))
-                    AddJudgement(new OsuJudgement { Result = HitResult.Good });
+
+                if (hitFraction == 1 && HeadCircle.Result.Type == HitResult.Great)
+                    r.Type = HitResult.Great;
+                else if (hitFraction >= 0.5 && HeadCircle.Result.Type >= HitResult.Good)
+                    r.Type = HitResult.Good;
                 else if (hitFraction > 0)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Meh });
+                    r.Type = HitResult.Meh;
                 else
-                    AddJudgement(new OsuJudgement { Result = HitResult.Miss });
-            }
+                    r.Type = HitResult.Miss;
+            });
         }
 
         protected override void UpdateCurrentState(ArmedState state)
@@ -175,6 +184,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public Drawable ProxiedLayer => HeadCircle.ApproachCircle;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Body.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Body.ReceivePositionalInputAt(screenSpacePos);
     }
 }

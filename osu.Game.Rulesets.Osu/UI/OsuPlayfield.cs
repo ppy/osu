@@ -11,7 +11,6 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Connections;
 using osu.Game.Rulesets.UI;
 using System.Linq;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -21,39 +20,43 @@ namespace osu.Game.Rulesets.Osu.UI
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
-        protected virtual bool DisplayJudgements => true;
-
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
         public OsuPlayfield()
-            : base(BASE_SIZE.X)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            AddRange(new Drawable[]
+            Size = new Vector2(0.75f);
+
+            InternalChild = new PlayfieldAdjustmentContainer
             {
-                connectionLayer = new FollowPointRenderer
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 2,
-                },
-                judgementLayer = new JudgementContainer<DrawableOsuJudgement>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 1,
-                },
-                approachCircles = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = -1,
-                },
-            });
+                    connectionLayer = new FollowPointRenderer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Depth = 2,
+                    },
+                    judgementLayer = new JudgementContainer<DrawableOsuJudgement>
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Depth = 1,
+                    },
+                    HitObjectContainer,
+                    approachCircles = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Depth = -1,
+                    },
+                }
+            };
         }
 
         public override void Add(DrawableHitObject h)
         {
-            h.OnJudgement += onJudgement;
+            h.OnNewResult += onNewResult;
 
             var c = h as IDrawableHitObjectWithProxiedApproach;
             if (c != null)
@@ -64,20 +67,19 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override void PostProcess()
         {
-            connectionLayer.HitObjects = HitObjects.Objects
-                .Select(d => d.HitObject)
-                .OrderBy(h => h.StartTime).OfType<OsuHitObject>();
+            connectionLayer.HitObjects = HitObjectContainer.Objects.Select(d => d.HitObject).OfType<OsuHitObject>();
         }
 
-        private void onJudgement(DrawableHitObject judgedObject, Judgement judgement)
+        private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!judgedObject.DisplayJudgement || !DisplayJudgements)
+            if (!judgedObject.DisplayResult || !DisplayJudgements)
                 return;
 
-            DrawableOsuJudgement explosion = new DrawableOsuJudgement(judgement, judgedObject)
+            DrawableOsuJudgement explosion = new DrawableOsuJudgement(result, judgedObject)
             {
                 Origin = Anchor.Centre,
-                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition + ((OsuJudgement)judgement).PositionOffset
+                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition,
+                Scale = new Vector2(((OsuHitObject)judgedObject.HitObject).Scale * 1.65f)
             };
 
             judgementLayer.Add(explosion);

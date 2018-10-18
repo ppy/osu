@@ -13,6 +13,8 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
     {
         private Pulp pulp;
 
+        public override bool StaysOnPlate => false;
+
         public DrawableDroplet(Droplet h)
             : base(h)
         {

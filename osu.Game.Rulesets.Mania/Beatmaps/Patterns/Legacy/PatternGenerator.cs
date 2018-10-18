@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using JetBrains.Annotations;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
@@ -90,6 +91,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
         }
 
         private double? conversionDifficulty;
+
         /// <summary>
         /// A difficulty factor used for various conversion methods from osu!stable.
         /// </summary>
@@ -103,20 +105,94 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 HitObject lastObject = OriginalBeatmap.HitObjects.LastOrDefault();
                 HitObject firstObject = OriginalBeatmap.HitObjects.FirstOrDefault();
 
-                double drainTime = (lastObject?.StartTime ?? 0) - (firstObject?.StartTime ?? 0);
-                drainTime -= OriginalBeatmap.TotalBreakTime;
+                // Drain time in seconds
+                int drainTime = (int)(((lastObject?.StartTime ?? 0) - (firstObject?.StartTime ?? 0) - OriginalBeatmap.TotalBreakTime) / 1000);
 
                 if (drainTime == 0)
-                    drainTime = 10000000;
-
-                // We need this in seconds
-                drainTime /= 1000;
+                    drainTime = 10000;
 
                 BeatmapDifficulty difficulty = OriginalBeatmap.BeatmapInfo.BaseDifficulty;
-                conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + OriginalBeatmap.HitObjects.Count() / drainTime * 9f) / 38f * 5f / 1.15;
+                conversionDifficulty = ((difficulty.DrainRate + MathHelper.Clamp(difficulty.ApproachRate, 4, 7)) / 1.5 + (double)OriginalBeatmap.HitObjects.Count / drainTime * 9f) / 38f * 5f / 1.15;
                 conversionDifficulty = Math.Min(conversionDifficulty.Value, 12);
 
                 return conversionDifficulty.Value;
+            }
+        }
+
+        /// <summary>
+        /// Finds a new column in which a <see cref="HitObject"/> can be placed.
+        /// This uses <see cref="GetRandomColumn"/> to pick the next candidate column.
+        /// </summary>
+        /// <param name="initialColumn">The initial column to test. This may be returned if it is already a valid column.</param>
+        /// <param name="patterns">A list of patterns for which the validity of a column should be checked against.
+        /// A column is not a valid candidate if a <see cref="HitObject"/> occupies the same column in any of the patterns.</param>
+        /// <returns>A column for which there are no <see cref="HitObject"/>s in any of <paramref name="patterns"/> occupying the same column.</returns>
+        /// <exception cref="NotEnoughColumnsException">If there are no valid candidate columns.</exception>
+        protected int FindAvailableColumn(int initialColumn, params Pattern[] patterns)
+            => FindAvailableColumn(initialColumn, null, patterns: patterns);
+
+        /// <summary>
+        /// Finds a new column in which a <see cref="HitObject"/> can be placed.
+        /// </summary>
+        /// <param name="initialColumn">The initial column to test. This may be returned if it is already a valid column.</param>
+        /// <param name="nextColumn">A function to retrieve the next column. If null, a randomisation scheme will be used.</param>
+        /// <param name="validation">A function to perform additional validation checks to determine if a column is a valid candidate for a <see cref="HitObject"/>.</param>
+        /// <param name="lowerBound">The minimum column index. If null, <see cref="RandomStart"/> is used.</param>
+        /// <param name="upperBound">The maximum column index. If null, <see cref="PatternGenerator.TotalColumns"/> is used.</param>
+        /// <param name="patterns">A list of patterns for which the validity of a column should be checked against.
+        /// A column is not a valid candidate if a <see cref="HitObject"/> occupies the same column in any of the patterns.</param>
+        /// <returns>A column which has passed the <paramref name="validation"/> check and for which there are no
+        /// <see cref="HitObject"/>s in any of <paramref name="patterns"/> occupying the same column.</returns>
+        /// <exception cref="NotEnoughColumnsException">If there are no valid candidate columns.</exception>
+        protected int FindAvailableColumn(int initialColumn, int? lowerBound = null, int? upperBound = null, Func<int, int> nextColumn = null, [InstantHandle] Func<int, bool> validation = null,
+                                          params Pattern[] patterns)
+        {
+            lowerBound = lowerBound ?? RandomStart;
+            upperBound = upperBound ?? TotalColumns;
+            nextColumn = nextColumn ?? (_ => GetRandomColumn(lowerBound, upperBound));
+
+            // Check for the initial column
+            if (isValid(initialColumn))
+                return initialColumn;
+
+            // Ensure that we have at least one free column, so that an endless loop is avoided
+            bool hasValidColumns = false;
+            for (int i = lowerBound.Value; i < upperBound.Value; i++)
+            {
+                hasValidColumns = isValid(i);
+                if (hasValidColumns)
+                    break;
+            }
+
+            if (!hasValidColumns)
+                throw new NotEnoughColumnsException();
+
+            // Iterate until a valid column is found. This is a random iteration in the default case.
+            do
+            {
+                initialColumn = nextColumn(initialColumn);
+            } while (!isValid(initialColumn));
+
+            return initialColumn;
+
+            bool isValid(int column) => validation?.Invoke(column) != false && !patterns.Any(p => p.ColumnHasObject(column));
+        }
+
+        /// <summary>
+        /// Returns a random column index in the range [<paramref name="lowerBound"/>, <paramref name="upperBound"/>).
+        /// </summary>
+        /// <param name="lowerBound">The minimum column index. If null, <see cref="RandomStart"/> is used.</param>
+        /// <param name="upperBound">The maximum column index. If null, <see cref="PatternGenerator.TotalColumns"/> is used.</param>
+        protected int GetRandomColumn(int? lowerBound = null, int? upperBound = null) => Random.Next(lowerBound ?? RandomStart, upperBound ?? TotalColumns);
+
+        /// <summary>
+        /// Occurs when mania conversion is stuck in an infinite loop unable to find columns to place new hitobjects in.
+        /// </summary>
+        public class NotEnoughColumnsException : Exception
+        {
+            public NotEnoughColumnsException()
+                : base("There were not enough columns to complete conversion.")
+            {
             }
         }
     }

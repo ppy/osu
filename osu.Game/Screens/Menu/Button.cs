@@ -9,7 +9,6 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
@@ -18,6 +17,7 @@ using OpenTK.Input;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Audio.Track;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Screens.Menu
@@ -35,12 +35,18 @@ namespace osu.Game.Screens.Menu
         private readonly Box boxHoverLayer;
         private readonly SpriteIcon icon;
         private readonly string sampleName;
+
+        /// <summary>
+        /// The menu state for which we are visible for.
+        /// </summary>
+        public ButtonSystemState VisibleState = ButtonSystemState.TopLevel;
+
         private readonly Action clickAction;
         private readonly Key triggerKey;
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => box.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
         public Button(string text, string sampleName, FontAwesome symbol, Color4 colour, Action clickAction = null, float extraWidth = 0, Key triggerKey = Key.Unknown)
         {
@@ -51,7 +57,7 @@ namespace osu.Game.Screens.Menu
             AutoSizeAxes = Axes.Both;
             Alpha = 0;
 
-            Vector2 boxSize = new Vector2(ButtonSystem.BUTTON_WIDTH + Math.Abs(extraWidth), ButtonSystem.BUTTON_AREA_HEIGHT);
+            Vector2 boxSize = new Vector2(ButtonSystem.BUTTON_WIDTH + Math.Abs(extraWidth), ButtonArea.BUTTON_AREA_HEIGHT);
 
             Children = new Drawable[]
             {
@@ -144,7 +150,7 @@ namespace osu.Game.Screens.Menu
             rightward = !rightward;
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             if (State != ButtonState.Expanded) return true;
 
@@ -160,7 +166,7 @@ namespace osu.Game.Screens.Menu
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             icon.ClearTransforms();
             icon.RotateTo(0, 500, Easing.Out);
@@ -179,30 +185,30 @@ namespace osu.Game.Screens.Menu
                 sampleClick = audio.Sample.Get($@"Menu/{sampleName}");
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             boxHoverLayer.FadeTo(0.1f, 1000, Easing.OutQuint);
-            return base.OnMouseDown(state, args);
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
             boxHoverLayer.FadeTo(0, 1000, Easing.OutQuint);
-            return base.OnMouseUp(state, args);
+            return base.OnMouseUp(e);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             trigger();
             return true;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (args.Repeat || state.Keyboard.ControlPressed || state.Keyboard.ShiftPressed || state.Keyboard.AltPressed)
+            if (e.Repeat || e.ControlPressed || e.ShiftPressed || e.AltPressed)
                 return false;
 
-            if (triggerKey == args.Key && triggerKey != Key.Unknown)
+            if (triggerKey == e.Key && triggerKey != Key.Unknown)
             {
                 trigger();
                 return true;
@@ -222,8 +228,8 @@ namespace osu.Game.Screens.Menu
             boxHoverLayer.FadeOut(800, Easing.OutExpo);
         }
 
-        public override bool HandleKeyboardInput => state == ButtonState.Expanded;
-        public override bool HandleMouseInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
+        public override bool HandleNonPositionalInput => state == ButtonState.Expanded;
+        public override bool HandlePositionalInput => state != ButtonState.Exploded && box.Scale.X >= 0.8f;
 
         protected override void Update()
         {
@@ -260,6 +266,7 @@ namespace osu.Game.Screens.Menu
                                 this.FadeOut(800);
                                 break;
                         }
+
                         break;
                     case ButtonState.Expanded:
                         const int expand_duration = 500;
@@ -274,6 +281,33 @@ namespace osu.Game.Screens.Menu
                 }
 
                 StateChanged?.Invoke(State);
+            }
+        }
+
+        public ButtonSystemState ButtonSystemState
+        {
+            set
+            {
+                ContractStyle = 0;
+
+                switch (value)
+                {
+                    case ButtonSystemState.Initial:
+                        State = ButtonState.Contracted;
+                        break;
+                    case ButtonSystemState.EnteringMode:
+                        ContractStyle = 1;
+                        State = ButtonState.Contracted;
+                        break;
+                    default:
+                        if (value == VisibleState)
+                            State = ButtonState.Expanded;
+                        else if (value < VisibleState)
+                            State = ButtonState.Contracted;
+                        else
+                            State = ButtonState.Exploded;
+                        break;
+                }
             }
         }
     }

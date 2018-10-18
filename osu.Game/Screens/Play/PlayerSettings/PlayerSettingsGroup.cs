@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -50,11 +50,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     content.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
                 }
 
-                button.FadeColour(expanded ? buttonActiveColour : Color4.White, 200, Easing.OutQuint);
+                updateExpanded();
             }
         }
 
-        private Color4 buttonActiveColour;
+        private Color4 expandedColour;
 
         protected PlayerSettingsGroup()
         {
@@ -93,7 +93,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    Text = Title.ToUpper(),
+                                    Text = Title.ToUpperInvariant(),
                                     TextSize = 17,
                                     Font = @"Exo2.0-Bold",
                                     Margin = new MarginPadding { Left = 10 },
@@ -127,15 +127,39 @@ namespace osu.Game.Screens.Play.PlayerSettings
             };
         }
 
+        private const float fade_duration = 800;
+        private const float inactive_alpha = 0.5f;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            this.FadeIn(fade_duration, Easing.OutQuint);
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            this.FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+            base.OnHoverLost(e);
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            button.Colour = buttonActiveColour = colours.Yellow;
+            expandedColour = colours.Yellow;
+
+            updateExpanded();
         }
+
+        private void updateExpanded() => button.FadeColour(expanded ? expandedColour : Color4.White, 200, Easing.InOutQuint);
 
         protected override Container<Drawable> Content => content;
 
-        protected override bool OnHover(InputState state) => true;
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
     }
 }

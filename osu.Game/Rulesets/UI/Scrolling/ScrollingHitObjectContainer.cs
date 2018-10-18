@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -29,31 +28,29 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         protected readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
 
-        private readonly ScrollingDirection direction;
+        public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
         private Cached initialStateCache = new Cached();
 
-        public ScrollingHitObjectContainer(ScrollingDirection direction)
-        {
-            this.direction = direction;
+        private readonly ISpeedChangeVisualiser speedChangeVisualiser;
 
+        public ScrollingHitObjectContainer(SpeedChangeVisualisationMethod visualisationMethod)
+        {
             RelativeSizeAxes = Axes.Both;
 
-            TimeRange.ValueChanged += v => initialStateCache.Invalidate();
-        }
+            TimeRange.ValueChanged += _ => initialStateCache.Invalidate();
+            Direction.ValueChanged += _ => initialStateCache.Invalidate();
 
-        private ISpeedChangeVisualiser speedChangeVisualiser;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            switch (config.Get<SpeedChangeVisualisationMethod>(OsuSetting.SpeedChangeVisualisation))
+            switch (visualisationMethod)
             {
                 case SpeedChangeVisualisationMethod.Sequential:
                     speedChangeVisualiser = new SequentialSpeedChangeVisualiser(ControlPoints);
                     break;
                 case SpeedChangeVisualisationMethod.Overlapping:
                     speedChangeVisualiser = new OverlappingSpeedChangeVisualiser(ControlPoints);
+                    break;
+                case SpeedChangeVisualisationMethod.Constant:
+                    speedChangeVisualiser = new ConstantSpeedChangeVisualiser();
                     break;
             }
         }
@@ -100,7 +97,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (!initialStateCache.IsValid)
             {
-                speedChangeVisualiser.ComputeInitialStates(Objects, direction, TimeRange, DrawSize);
+                speedChangeVisualiser.ComputeInitialStates(Objects, Direction, TimeRange, DrawSize);
                 initialStateCache.Validate();
             }
         }
@@ -110,7 +107,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             base.UpdateAfterChildrenLife();
 
             // We need to calculate this as soon as possible after lifetimes so that hitobjects get the final say in their positions
-            speedChangeVisualiser.UpdatePositions(AliveObjects, direction, Time.Current, TimeRange, DrawSize);
+            speedChangeVisualiser.UpdatePositions(AliveObjects, Direction, Time.Current, TimeRange, DrawSize);
         }
     }
 }

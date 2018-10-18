@@ -3,10 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Beatmaps
 {
+    /// <summary>
+    /// Provides functionality to convert a <see cref="IBeatmap"/> for a <see cref="Ruleset"/>.
+    /// </summary>
     public interface IBeatmapConverter
     {
         /// <summary>

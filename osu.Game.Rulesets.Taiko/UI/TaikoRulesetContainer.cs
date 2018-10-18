@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
@@ -13,7 +12,6 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Taiko.Replays;
-using OpenTK;
 using System.Linq;
 using osu.Framework.Input;
 using osu.Game.Input.Handlers;
@@ -37,7 +35,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private void loadBarLines()
         {
             TaikoHitObject lastObject = Beatmap.HitObjects[Beatmap.HitObjects.Count - 1];
-            double lastHitTime = 1 + (lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime;
+            double lastHitTime = 1 + ((lastObject as IHasEndTime)?.EndTime ?? lastObject.StartTime);
 
             var timingPoints = Beatmap.ControlPointInfo.TimingPoints.ToList();
 
@@ -69,64 +67,30 @@ namespace osu.Game.Rulesets.Taiko.UI
                 bool isMajor = currentBeat % (int)currentPoint.TimeSignature == 0;
                 Playfield.Add(isMajor ? new DrawableBarLineMajor(barLine) : new DrawableBarLine(barLine));
 
-                double bl = currentPoint.BeatLength;
-                if (bl < 800)
-                    bl *= (int)currentPoint.TimeSignature;
-
-                time += bl;
+                time += currentPoint.BeatLength * (int)currentPoint.TimeSignature;
                 currentBeat++;
             }
         }
-
-        protected override Vector2 GetAspectAdjustedSize()
-        {
-            const float default_relative_height = TaikoPlayfield.DEFAULT_HEIGHT / 768;
-            const float default_aspect = 16f / 9f;
-
-            float aspectAdjust = MathHelper.Clamp(DrawWidth / DrawHeight, 0.4f, 4) / default_aspect;
-
-            return new Vector2(1, default_relative_height * aspectAdjust);
-        }
-
-        protected override Vector2 PlayfieldArea => Vector2.One;
 
         public override ScoreProcessor CreateScoreProcessor() => new TaikoScoreProcessor(this);
 
         public override PassThroughInputManager CreateInputManager() => new TaikoInputManager(Ruleset.RulesetInfo);
 
-        protected override Playfield CreatePlayfield() => new TaikoPlayfield(Beatmap.ControlPointInfo)
-        {
-            Anchor = Anchor.CentreLeft,
-            Origin = Anchor.CentreLeft
-        };
+        protected override Playfield CreatePlayfield() => new TaikoPlayfield(Beatmap.ControlPointInfo);
 
         protected override DrawableHitObject<TaikoHitObject> GetVisualRepresentation(TaikoHitObject h)
         {
-            var centreHit = h as CentreHit;
-            if (centreHit != null)
+            switch (h)
             {
-                if (h.IsStrong)
-                    return new DrawableCentreHitStrong(centreHit);
-                return new DrawableCentreHit(centreHit);
+                case CentreHit centreHit:
+                    return new DrawableCentreHit(centreHit);
+                case RimHit rimHit:
+                    return new DrawableRimHit(rimHit);
+                case DrumRoll drumRoll:
+                    return new DrawableDrumRoll(drumRoll);
+                case Swell swell:
+                    return new DrawableSwell(swell);
             }
-
-            var rimHit = h as RimHit;
-            if (rimHit != null)
-            {
-                if (h.IsStrong)
-                    return new DrawableRimHitStrong(rimHit);
-                return new DrawableRimHit(rimHit);
-            }
-
-            var drumRoll = h as DrumRoll;
-            if (drumRoll != null)
-            {
-                return new DrawableDrumRoll(drumRoll);
-            }
-
-            var swell = h as Swell;
-            if (swell != null)
-                return new DrawableSwell(swell);
 
             return null;
         }
