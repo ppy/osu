@@ -152,7 +152,7 @@ namespace osu.Game.Overlays
             return false;
         }
 
-        private void onBuildSelected(APIChangelog build, EventArgs e) => FetchAndShowBuild(build);
+        private void onBuildSelected(APIChangelogBuild build, EventArgs e) => FetchAndShowBuild(build);
 
         private void fetchListing()
         {
@@ -183,12 +183,12 @@ namespace osu.Game.Overlays
         /// <summary>
         /// Fetches and shows a specific build from a specific update stream.
         /// </summary>
-        /// <param name="build">Must contain at least <see cref="APIChangelog.UpdateStream.Name"/> and
-        /// <see cref="APIChangelog.Version"/>. If <see cref="APIChangelog.UpdateStream.DisplayName"/> and
-        /// <see cref="APIChangelog.DisplayVersion"/> are specified, the header will instantly display them.</param>
+        /// <param name="build">Must contain at least <see cref="APIChangelogBuild.UpdateStream.Name"/> and
+        /// <see cref="APIChangelogBuild.Version"/>. If <see cref="APIChangelogBuild.UpdateStream.DisplayName"/> and
+        /// <see cref="APIChangelogBuild.DisplayVersion"/> are specified, the header will instantly display them.</param>
         /// <param name="updateBadges">Whether to update badges. Should be set to false in case
         /// the function is called by selecting a badge, to avoid an infinite loop.</param>
-        public void FetchAndShowBuild(APIChangelog build, bool updateBadges = true)
+        public void FetchAndShowBuild(APIChangelogBuild build, bool updateBadges = true)
         {
             var req = new GetChangelogBuildRequest(build.UpdateStream.Name, build.Version);
 

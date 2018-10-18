@@ -16,7 +16,7 @@ namespace osu.Game.Overlays.Changelog
         private APIAccess api;
         private ChangelogContentGroup changelogContentGroup;
 
-        public delegate void BuildSelectedEventHandler(APIChangelog build, EventArgs args);
+        public delegate void BuildSelectedEventHandler(APIChangelogBuild build, EventArgs args);
 
         public event BuildSelectedEventHandler BuildSelected;
 
@@ -28,12 +28,12 @@ namespace osu.Game.Overlays.Changelog
             Padding = new MarginPadding{ Bottom = 100 };
         }
 
-        public void ShowListing(APIChangelog[] changelog)
+        public void ShowListing(APIChangelogBuild[] changelog)
         {
             DateTime currentDate = new DateTime();
             Clear();
 
-            foreach (APIChangelog build in changelog)
+            foreach (APIChangelogBuild build in changelog)
             {
                 if (build.CreatedAt.Date != currentDate)
                 {
@@ -71,7 +71,7 @@ namespace osu.Game.Overlays.Changelog
             }
         }
 
-        public void ShowBuild(APIChangelog changelogBuild)
+        public void ShowBuild(APIChangelogBuild changelogBuild)
         {
             Child = changelogContentGroup = new ChangelogContentGroup(changelogBuild);
             changelogContentGroup.GenerateText(changelogBuild.ChangelogEntries);
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.Changelog
             changelogContentGroup.BuildSelected += OnBuildSelected;
         }
 
-        protected virtual void OnBuildSelected(APIChangelog build, EventArgs args)
+        protected virtual void OnBuildSelected(APIChangelogBuild build, EventArgs args)
         {
             BuildSelected?.Invoke(build, EventArgs.Empty);
         }
