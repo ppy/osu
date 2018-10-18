@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetChangelogLatestBuildsRequest : APIRequest<List<APIChangelog>>
+    public class GetChangelogLatestBuildsRequest : APIRequest<List<APIChangelogBuild>>
     {
         protected override string Target => @"changelog/latest-builds";
         protected override string Uri => $@"https://houtarouoreki.github.io/fake-api/{Target}"; // for testing

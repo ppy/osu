@@ -21,13 +21,13 @@ namespace osu.Game.Overlays.Changelog
         private readonly SortedDictionary<string, List<ChangelogEntry>> categories =
             new SortedDictionary<string, List<ChangelogEntry>>();
 
-        public delegate void BuildSelectedEventHandler(APIChangelog build, EventArgs args);
+        public delegate void BuildSelectedEventHandler(APIChangelogBuild build, EventArgs args);
 
         public event BuildSelectedEventHandler BuildSelected;
 
         public readonly FillFlowContainer ChangelogEntries;
 
-        public ChangelogContentGroup(APIChangelog build)
+        public ChangelogContentGroup(APIChangelogBuild build)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
-        public ChangelogContentGroup(APIChangelog build, bool newDate)
+        public ChangelogContentGroup(APIChangelogBuild build, bool newDate)
         {
             OsuHoverContainer clickableBuildText;
             RelativeSizeAxes = Axes.X;
@@ -202,7 +202,7 @@ namespace osu.Game.Overlays.Changelog
             }
         }
 
-        protected virtual void OnBuildSelected(APIChangelog build)
+        protected virtual void OnBuildSelected(APIChangelogBuild build)
         {
             BuildSelected?.Invoke(build, EventArgs.Empty);
         }

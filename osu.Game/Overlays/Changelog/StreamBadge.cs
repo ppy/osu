@@ -33,10 +33,10 @@ namespace osu.Game.Overlays.Changelog
         private SampleChannel sampleClick;
         private SampleChannel sampleHover;
 
-        public readonly APIChangelog LatestBuild;
+        public readonly APIChangelogBuild LatestBuild;
         private readonly FillFlowContainer<SpriteText> text;
 
-        public StreamBadge(APIChangelog latestBuild)
+        public StreamBadge(APIChangelogBuild latestBuild)
         {
             LatestBuild = latestBuild;
             Height = badge_height;

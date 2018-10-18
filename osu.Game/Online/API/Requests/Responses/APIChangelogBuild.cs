@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIChangelog
+    public class APIChangelogBuild
     {
         [JsonProperty("id")]
         public long Id { get; set; }
@@ -40,10 +40,10 @@ namespace osu.Game.Online.API.Requests.Responses
     public class Versions
     {
         [JsonProperty("next")]
-        public APIChangelog Next { get; set; }
+        public APIChangelogBuild Next { get; set; }
 
         [JsonProperty("previous")]
-        public APIChangelog Previous { get; set; }
+        public APIChangelogBuild Previous { get; set; }
     }
 
     public class ChangelogEntry

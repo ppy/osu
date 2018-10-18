@@ -22,7 +22,7 @@ namespace osu.Game.Tests.Visual
             AddWaitStep(3);
             AddStep(@"Show with Lazer 2018.712.0", () =>
             {
-                changelog.FetchAndShowBuild(new APIChangelog
+                changelog.FetchAndShowBuild(new APIChangelogBuild
                 {
                     Version = "2018.712.0",
                     UpdateStream = new UpdateStream { Name = "lazer" },

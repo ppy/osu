@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Changelog
         private const float vertical_padding = 20;
         private const float horizontal_padding = 85;
 
-        public delegate void SelectionHandler(APIChangelog releaseStream, EventArgs args);
+        public delegate void SelectionHandler(APIChangelogBuild releaseStream, EventArgs args);
 
         public event SelectionHandler Selected;
 
@@ -46,9 +46,9 @@ namespace osu.Game.Overlays.Changelog
             };
         }
 
-        public void Populate(List<APIChangelog> latestBuilds)
+        public void Populate(List<APIChangelogBuild> latestBuilds)
         {
-            foreach (APIChangelog updateStream in latestBuilds)
+            foreach (APIChangelogBuild updateStream in latestBuilds)
             {
                 var streamBadge = new StreamBadge(updateStream);
                 streamBadge.Selected += onBadgeSelected;

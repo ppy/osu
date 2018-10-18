@@ -5,7 +5,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetChangelogBuildRequest : APIRequest<APIChangelog>
+    public class GetChangelogBuildRequest : APIRequest<APIChangelogBuild>
     {
         private readonly string name;
         private readonly string version;
