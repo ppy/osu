@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
 
-            beatmapMaxCombo = Beatmap.HitObjects.Count();
+            beatmapMaxCombo = Beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
             beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
         }

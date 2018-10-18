@@ -72,10 +72,18 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 {
                     CurveType curveType = CurveType.Catmull;
                     double length = 0;
-                    var points = new List<Vector2> { Vector2.Zero };
 
-                    string[] pointsplit = split[5].Split('|');
-                    foreach (string t in pointsplit)
+                    string[] pointSplit = split[5].Split('|');
+
+                    int pointCount = 1;
+                    foreach (var t in pointSplit)
+                        if (t.Length > 1)
+                            pointCount++;
+
+                    var points = new Vector2[pointCount];
+
+                    int pointIndex = 1;
+                    foreach (string t in pointSplit)
                     {
                         if (t.Length == 1)
                         {
@@ -94,16 +102,18 @@ namespace osu.Game.Rulesets.Objects.Legacy
                                     curveType = CurveType.PerfectCurve;
                                     break;
                             }
+
                             continue;
                         }
 
                         string[] temp = t.Split(':');
-                        points.Add(new Vector2((int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture), (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)) - pos);
+                        points[pointIndex++] = new Vector2((int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture), (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)) - pos;
                     }
 
                     // osu-stable special-cased colinear perfect curves to a CurveType.Linear
-                    bool isLinear(List<Vector2> p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
-                    if (points.Count == 3 && curveType == CurveType.PerfectCurve && isLinear(points))
+                    bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
+
+                    if (points.Length == 3 && curveType == CurveType.PerfectCurve && isLinear(points))
                         curveType = CurveType.Linear;
 
                     int repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
@@ -262,7 +272,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// <param name="repeatCount">The slider repeat count.</param>
         /// <param name="repeatSamples">The samples to be played when the repeat nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
