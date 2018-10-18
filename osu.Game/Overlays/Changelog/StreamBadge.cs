@@ -8,6 +8,7 @@ using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -107,23 +108,23 @@ namespace osu.Game.Overlays.Changelog
             }
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             Activate(false);
             sampleClick?.Play();
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             sampleHover?.Play();
             DisableDim();
             this.FadeIn(transition_duration);
             lineBadge.Uncollapse();
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             if (!isActivated)
             {
@@ -132,7 +133,7 @@ namespace osu.Game.Overlays.Changelog
             }
             else
                 EnableDim();
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
         public void EnableDim() => text.FadeTo(0.5f, transition_duration);

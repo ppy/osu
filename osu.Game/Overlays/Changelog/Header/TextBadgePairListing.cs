@@ -4,6 +4,7 @@
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 
 namespace osu.Game.Overlays.Changelog.Header
@@ -48,23 +49,23 @@ namespace osu.Game.Overlays.Changelog.Header
             SetTextColour(badgeColour, 100);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             Activate();
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             LineBadge.Uncollapse();
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             if (!IsActivated)
                 LineBadge.Collapse();
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
         public void UpdateBadgeWidth() => LineBadge.ResizeWidthTo(Text.DrawWidth);

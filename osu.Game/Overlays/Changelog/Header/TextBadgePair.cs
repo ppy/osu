@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
 using System;
@@ -114,18 +115,18 @@ namespace osu.Game.Overlays.Changelog.Header
                 .FadeIn(duration, easing);
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             if (!IsActivated)
                 sampleHover?.Play();
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             OnActivated();
             sampleActivate?.Play();
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
         protected virtual void OnActivated()
