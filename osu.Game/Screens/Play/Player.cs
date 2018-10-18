@@ -292,6 +292,7 @@ namespace osu.Game.Screens.Play
             adjustableClock.Stop();
 
             HasFailed = true;
+            RulesetContainer.KeyBindingInputManager.UseParentInput = false;
             failOverlay.Retries = RestartCount;
             failOverlay.Show();
             return true;
