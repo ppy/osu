@@ -11,6 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks
 {
@@ -33,6 +34,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Both,
+                Size = new Vector2(1.3f),
                 FillMode = FillMode.Fit,
                 Masking = true,
                 Children = new[]
@@ -49,6 +51,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
                     }
                 }
             };
+
+            Alpha = 0.5f;
 
             // Temporary
             HitObject.Position = OsuPlayfield.BASE_SIZE / 2;
@@ -83,6 +87,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
             {
                 case PlacementState.Start:
                     BeginPlacement();
+                    Alpha = 1;
                     state = PlacementState.End;
                     return true;
                 case PlacementState.End:
