@@ -5,6 +5,7 @@ using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Online.API.Requests.Responses;
 using System;
@@ -95,7 +96,7 @@ namespace osu.Game.Overlays.Changelog
             Selected?.Invoke(source.LatestBuild, EventArgs.Empty);
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             foreach (StreamBadge streamBadge in badgesContainer.Children)
             {
@@ -109,10 +110,10 @@ namespace osu.Game.Overlays.Changelog
                 else
                     streamBadge.Deactivate();
             }
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             foreach (StreamBadge streamBadge in badgesContainer.Children)
             {
@@ -121,7 +122,7 @@ namespace osu.Game.Overlays.Changelog
                 else if (streamBadge.LatestBuild.UpdateStream.Id == selectedStreamId)
                     streamBadge.DisableDim();
             }
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
     }
 }

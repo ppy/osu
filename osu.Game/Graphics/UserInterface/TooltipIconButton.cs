@@ -9,6 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using System;
 
@@ -69,21 +70,21 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             if (isEnabled)
             {
                 sampleClick?.Play();
                 Action?.Invoke();
             }
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             if (isEnabled)
                 sampleHover?.Play();
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
         [BackgroundDependencyLoader]

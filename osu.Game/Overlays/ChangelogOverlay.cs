@@ -41,7 +41,7 @@ namespace osu.Game.Overlays
         private float savedScrollPosition;
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public ChangelogOverlay()
         {
