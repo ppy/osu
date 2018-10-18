@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -28,6 +29,13 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
         /// <returns>The visual representation of <paramref name="hitObject"/>.</returns>
         internal abstract DrawableHitObject Add(HitObject hitObject);
+
+        /// <summary>
+        /// Removes a <see cref="HitObject"/> from the <see cref="Beatmap"/> and the display.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to remove.</param>
+        /// <returns>The visual representation of the removed <paramref name="hitObject"/>.</returns>
+        internal abstract DrawableHitObject Remove(HitObject hitObject);
     }
 
     public class EditRulesetContainer<TObject> : EditRulesetContainer
@@ -68,6 +76,28 @@ namespace osu.Game.Rulesets.Edit
             var drawableObject = rulesetContainer.GetVisualRepresentation(tObject);
 
             rulesetContainer.Playfield.Add(drawableObject);
+            rulesetContainer.Playfield.PostProcess();
+
+            return drawableObject;
+        }
+
+        internal override DrawableHitObject Remove(HitObject hitObject)
+        {
+            var tObject = (TObject)hitObject;
+
+            // Remove from beatmap
+            beatmap.HitObjects.Remove(tObject);
+
+            // Process the beatmap
+            var processor = ruleset.CreateBeatmapProcessor(beatmap);
+
+            processor.PreProcess();
+            processor.PostProcess();
+
+            // Remove visual representation
+            var drawableObject = Playfield.AllHitObjects.Single(d => d.HitObject == hitObject);
+
+            rulesetContainer.Playfield.Remove(drawableObject);
             rulesetContainer.Playfield.PostProcess();
 
             return drawableObject;

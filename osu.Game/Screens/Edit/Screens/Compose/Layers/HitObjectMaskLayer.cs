@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -68,6 +69,20 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 return;
 
             maskContainer.Add(mask);
+        }
+
+        /// <summary>
+        /// Removes a mask for a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> for which to remove the mask.</param>
+        public void RemoveMaskFor(DrawableHitObject hitObject)
+        {
+            var maskToRemove = maskContainer.Single(m => m.HitObject == hitObject);
+            if (maskToRemove == null)
+                return;
+
+            maskToRemove.Deselect();
+            maskContainer.Remove(maskToRemove);
         }
     }
 }

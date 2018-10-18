@@ -3,15 +3,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Types;
 using OpenTK;
+using OpenTK.Input;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
@@ -25,6 +28,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         private readonly List<SelectionMask> selectedMasks;
 
         private Drawable outline;
+
+        [Resolved]
+        private IPlacementHandler placementHandler { get; set; }
 
         public MaskSelection()
         {
@@ -67,6 +73,21 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                         break;
                 }
             }
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.Repeat)
+                return base.OnKeyDown(e);
+
+            switch (e.Key)
+            {
+                case Key.Delete:
+                    foreach (var h in selectedMasks.ToList())
+                        placementHandler.Delete(h.HitObject.HitObject);
+                    return true;
+            }
+            return base.OnKeyDown(e);
         }
 
         #endregion
