@@ -44,6 +44,7 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
                     NewCombo = comboData?.NewCombo ?? false,
                     ComboOffset = comboData?.ComboOffset ?? 0,
                     LegacyLastTickOffset = legacyOffset?.LegacyLastTickOffset,
+                    // prior to v8, speed multipliers don't affect how many ticks are generated.
                     TickDistanceMultiplier = beatmap.BeatmapInfo.BeatmapVersion < 8 ? 1f / beatmap.ControlPointInfo.DifficultyPointAt(original.StartTime).SpeedMultiplier : 1
                 };
             }
