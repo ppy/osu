@@ -11,9 +11,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class SpinnerBackground : CircularContainer, IHasAccentColour
     {
-        public override bool HandleKeyboardInput => false;
-        public override bool HandleMouseInput => false;
-
         protected Box Disc;
 
         public Color4 AccentColour

@@ -75,6 +75,13 @@ namespace osu.Game.Database
             }
         }
 
+        ~OsuDbContext()
+        {
+            // DbContext does not contain a finalizer (https://github.com/aspnet/EntityFrameworkCore/issues/8872)
+            // This is used to clean up previous contexts when fresh contexts are exposed via DatabaseContextFactory
+            Dispose();
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             base.OnConfiguring(optionsBuilder);

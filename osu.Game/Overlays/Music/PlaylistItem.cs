@@ -8,8 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -28,8 +27,8 @@ namespace osu.Game.Overlays.Music
         private SpriteIcon handle;
         private TextFlowContainer text;
         private IEnumerable<SpriteText> titleSprites;
-        private UnicodeBindableString titleBind;
-        private UnicodeBindableString artistBind;
+        private ILocalisedBindableString titleBind;
+        private ILocalisedBindableString artistBind;
 
         public readonly BeatmapSetInfo BeatmapSetInfo;
 
@@ -37,16 +36,16 @@ namespace osu.Game.Overlays.Music
 
         public bool IsDraggable { get; private set; }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             IsDraggable = handle.IsHovered;
-            return base.OnMouseDown(state, args);
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
             IsDraggable = false;
-            return base.OnMouseUp(state, args);
+            return base.OnMouseUp(e);
         }
 
         private bool selected;
@@ -74,7 +73,7 @@ namespace osu.Game.Overlays.Music
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuColour colours, LocalisationManager localisation)
         {
             hoverColour = colours.Yellow;
             artistColour = colours.Gray9;
@@ -97,11 +96,10 @@ namespace osu.Game.Overlays.Music
                 },
             };
 
-            titleBind = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
-            artistBind = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
+            titleBind = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
+            artistBind = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
 
-            artistBind.ValueChanged += newText => recreateText();
-            artistBind.TriggerChange();
+            artistBind.BindValueChanged(newText => recreateText(), true);
         }
 
         private void recreateText()
@@ -124,19 +122,19 @@ namespace osu.Game.Overlays.Music
             });
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             handle.FadeIn(fade_duration);
 
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             handle.FadeOut(fade_duration);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             OnSelect?.Invoke(BeatmapSetInfo);
             return true;

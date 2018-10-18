@@ -6,10 +6,10 @@ using OpenTK.Graphics;
 using OpenTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Charts;
@@ -63,6 +63,20 @@ namespace osu.Game.Screens.Menu
                     }
                 },
                 sideFlashes = new MenuSideFlashes(),
+            };
+
+            buttons.StateChanged += state =>
+            {
+                switch (state)
+                {
+                    case ButtonSystemState.Initial:
+                    case ButtonSystemState.Exit:
+                        background.FadeColour(Color4.White, 500, Easing.OutSine);
+                        break;
+                    default:
+                        background.FadeColour(OsuColour.Gray(0.8f), 500, Easing.OutSine);
+                        break;
+                }
             };
         }
 
@@ -185,15 +199,15 @@ namespace osu.Game.Screens.Menu
             return base.OnExiting(next);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (!args.Repeat && state.Keyboard.ControlPressed && state.Keyboard.ShiftPressed && args.Key == Key.D)
+            if (!e.Repeat && e.ControlPressed && e.ShiftPressed && e.Key == Key.D)
             {
                 Push(new Drawings());
                 return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
     }
 }

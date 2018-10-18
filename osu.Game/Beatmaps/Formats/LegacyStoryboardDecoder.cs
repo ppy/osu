@@ -269,9 +269,9 @@ namespace osu.Game.Beatmaps.Formats
                     return Anchor.BottomCentre;
                 case LegacyOrigins.BottomRight:
                     return Anchor.BottomRight;
+                default:
+                    return Anchor.TopLeft;
             }
-
-            throw new InvalidDataException($@"Unknown origin: {value}");
         }
 
         private void handleVariables(string line)
@@ -298,6 +298,6 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private string cleanFilename(string path) => FileSafety.PathStandardise(FileSafety.PathSanitise(path.Trim('\"')));
+        private string cleanFilename(string path) => FileSafety.PathStandardise(path.Trim('"'));
     }
 }

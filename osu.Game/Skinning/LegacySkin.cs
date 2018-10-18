@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
@@ -36,7 +37,7 @@ namespace osu.Game.Skinning
                 Configuration = new SkinConfiguration();
 
             Samples = audioManager.GetSampleManager(storage);
-            Textures = new TextureStore(new RawTextureLoaderStore(storage));
+            Textures = new TextureStore(new TextureLoaderStore(storage));
         }
 
         public override Drawable GetDrawableComponent(string componentName)
@@ -108,10 +109,12 @@ namespace osu.Game.Skinning
                 return path == null ? null : underlyingStore.GetStream(path);
             }
 
-            byte[] IResourceStore<byte[]>.Get(string name)
+            byte[] IResourceStore<byte[]>.Get(string name) => GetAsync(name).Result;
+
+            public Task<byte[]> GetAsync(string name)
             {
                 string path = getPathForFile(name);
-                return path == null ? null : underlyingStore.Get(path);
+                return path == null ? Task.FromResult<byte[]>(null) : underlyingStore.GetAsync(path);
             }
 
             #region IDisposable Support

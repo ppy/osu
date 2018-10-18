@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -59,18 +59,18 @@ namespace osu.Game.Graphics.UserInterface
             text.FadeColour(AccentColour, transition_length, Easing.OutQuint);
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             fadeIn();
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             if (!Current)
                 fadeOut();
 
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
         [BackgroundDependencyLoader]

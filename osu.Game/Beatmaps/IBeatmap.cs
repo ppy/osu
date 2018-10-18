@@ -39,7 +39,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The hitobjects contained by this beatmap.
         /// </summary>
-        IEnumerable<HitObject> HitObjects { get; }
+        IReadOnlyList<HitObject> HitObjects { get; }
 
         /// <summary>
         /// Returns statistics for the <see cref="HitObjects"/> contained in this beatmap.

@@ -5,7 +5,7 @@ using System;
 using osu.Framework;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Invoked when this <see cref="HitObjectMask"/> has requested drag.
         /// </summary>
-        public event Action<HitObjectMask, InputState> DragRequested;
+        public event Action<HitObjectMask, Vector2, InputState> DragRequested;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="HitObjectMask"/> applies to.
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Edit
         public readonly DrawableHitObject HitObject;
 
         protected override bool ShouldBeAlive => HitObject.IsAlive && HitObject.IsPresent || State == SelectionState.Selected;
-        public override bool HandleMouseInput => ShouldBeAlive;
+        public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
 
         public HitObjectMask(DrawableHitObject hitObject)
@@ -96,36 +96,36 @@ namespace osu.Game.Rulesets.Edit
 
         private bool selectionRequested;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             selectionRequested = false;
 
             if (State == SelectionState.NotSelected)
             {
-                SelectionRequested?.Invoke(this, state);
+                SelectionRequested?.Invoke(this, e.CurrentState);
                 selectionRequested = true;
             }
 
             return IsSelected;
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             if (State == SelectionState.Selected && !selectionRequested)
             {
                 selectionRequested = true;
-                SelectionRequested?.Invoke(this, state);
+                SelectionRequested?.Invoke(this, e.CurrentState);
                 return true;
             }
 
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
-        protected override bool OnDragStart(InputState state) => true;
+        protected override bool OnDragStart(DragStartEvent e) => true;
 
-        protected override bool OnDrag(InputState state)
+        protected override bool OnDrag(DragEvent e)
         {
-            DragRequested?.Invoke(this, state);
+            DragRequested?.Invoke(this, e.Delta, e.CurrentState);
             return true;
         }
 

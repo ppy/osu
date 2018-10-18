@@ -44,14 +44,17 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
-                Ball = new SliderBall(s)
+                Ball = new SliderBall(s, this)
                 {
                     BypassAutoSizeAxes = Axes.Both,
                     Scale = new Vector2(s.Scale),
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                HeadCircle = new DrawableSliderHead(s, s.HeadCircle),
+                HeadCircle = new DrawableSliderHead(s, s.HeadCircle)
+                {
+                    OnShake = Shake
+                },
                 TailCircle = new DrawableSliderTail(s, s.TailCircle)
             };
 
@@ -181,6 +184,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public Drawable ProxiedLayer => HeadCircle.ApproachCircle;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Body.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Body.ReceivePositionalInputAt(screenSpacePos);
     }
 }
