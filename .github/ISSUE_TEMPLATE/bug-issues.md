@@ -3,14 +3,14 @@ name: Bug Report
 about: For issues regarding encountered game bugs
 ---
 
-<!---After you fill in all information, delete all comments in the issue-->
+<!-- After you fill in all information, delete all comments in the issue -->
 
-**What is your problem:** <!---Name the problem you have encountered-->
+**What is your problem:** <!-- Name the problem you have encountered -->
 
-**Describe your problem:** <!---Provide any information you believe could be useful-->
+**Describe your problem:** <!-- Provide any information you believe could be useful -->
 
 **Screenshots or videos showing encountered issue:** 
 
-**osu!lazer version:** <!---Provide the version of your osu!lazer, you can find it at the bottom of the screen -->
+**osu!lazer version:** <!-- Provide the version of your osu!lazer, you can find it at the bottom of the screen  -->
 
-**Logs:** <!---Attach your osu!lazer logs, you can find them under %appdata%\osu\logs-->
+**Logs:** <!-- Attach your osu!lazer logs, you can find them under %appdata%\osu\logs -->
