@@ -13,4 +13,4 @@ about: For issues regarding encountered game bugs
 
 **osu!lazer version:** <!-- Provide the version of your osu!lazer, you can find it at the bottom of the screen  -->
 
-**Logs:** <!-- Attach your osu!lazer logs, you can find them under %appdata%\osu\logs -->
+**Logs:** <!-- Attach your osu!lazer logs, you can find them under %appdata%\osu\logs in Windows, or under ~/.local/share/osu/ in Linux and macOS -->
