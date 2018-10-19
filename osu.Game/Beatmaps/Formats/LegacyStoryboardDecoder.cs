@@ -298,6 +298,6 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private string cleanFilename(string path) => FileSafety.PathStandardise(FileSafety.PathSanitise(path.Trim('\"')));
+        private string cleanFilename(string path) => FileSafety.PathStandardise(path.Trim('"'));
     }
 }
