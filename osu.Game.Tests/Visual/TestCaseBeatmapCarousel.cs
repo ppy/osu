@@ -65,6 +65,10 @@ namespace osu.Game.Tests.Visual
 
             carousel.SelectionChanged = s => currentSelection = s;
 
+            // not being hooked up to the config leads to the SR filter only showing 0 to 0 SR maps
+            // thus "filter" once to assume a 0 to 10 range
+            carousel.Filter(new TestCriteria());
+
             loadBeatmaps(beatmapSets);
 
             testTraversal();
@@ -150,9 +154,7 @@ namespace osu.Game.Tests.Visual
         private bool selectedBeatmapVisible()
         {
             var currentlySelected = carousel.Items.FirstOrDefault(s => s.Item is CarouselBeatmap && s.Item.State == CarouselItemState.Selected);
-            if (currentlySelected == null)
-                return true;
-            return currentlySelected.Item.Visible;
+            return currentlySelected?.Item.Visible ?? true;
         }
 
         private void checkInvisibleDifficultiesUnselectable()
@@ -165,8 +167,8 @@ namespace osu.Game.Tests.Visual
         {
             AddStep("Toggle non-matching filter", () =>
             {
-                carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false);
-                carousel.Filter(new FilterCriteria(), false);
+                carousel.Filter(new TestCriteria { SearchText = "Dingo" }, false);
+                carousel.Filter(new TestCriteria(), false);
                 eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
             }
             );
@@ -207,7 +209,7 @@ namespace osu.Game.Tests.Visual
 
             setSelected(1, 1);
 
-            AddStep("Filter", () => carousel.Filter(new FilterCriteria { SearchText = "set #3!" }, false));
+            AddStep("Filter", () => carousel.Filter(new TestCriteria { SearchText = "set #3!" }, false));
             checkVisibleItemCount(diff: false, count: 1);
             checkVisibleItemCount(diff: true, count: 3);
             checkSelected(3, 1);
@@ -215,7 +217,7 @@ namespace osu.Game.Tests.Visual
             advanceSelection(diff: true, count: 4);
             checkSelected(3, 2);
 
-            AddStep("Un-filter (debounce)", () => carousel.Filter(new FilterCriteria()));
+            AddStep("Un-filter (debounce)", () => carousel.Filter(new TestCriteria()));
             AddUntilStep(() => !carousel.PendingFilterTask, "Wait for debounce");
             checkVisibleItemCount(diff: false, count: set_count);
             checkVisibleItemCount(diff: true, count: 3);
@@ -223,13 +225,13 @@ namespace osu.Game.Tests.Visual
             // test filtering some difficulties (and keeping current beatmap set selected).
 
             setSelected(1, 2);
-            AddStep("Filter some difficulties", () => carousel.Filter(new FilterCriteria { SearchText = "Normal" }, false));
+            AddStep("Filter some difficulties", () => carousel.Filter(new TestCriteria { SearchText = "Normal" }, false));
             checkSelected(1, 1);
 
-            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+            AddStep("Un-filter", () => carousel.Filter(new TestCriteria(), false));
             checkSelected(1, 1);
 
-            AddStep("Filter all", () => carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false));
+            AddStep("Filter all", () => carousel.Filter(new TestCriteria { SearchText = "Dingo" }, false));
 
             checkVisibleItemCount(false, 0);
             checkVisibleItemCount(true, 0);
@@ -241,7 +243,7 @@ namespace osu.Game.Tests.Visual
             advanceSelection(false);
             AddAssert("Selection is null", () => currentSelection == null);
 
-            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+            AddStep("Un-filter", () => carousel.Filter(new TestCriteria(), false));
 
             AddAssert("Selection is non-null", () => currentSelection != null);
         }
@@ -273,15 +275,15 @@ namespace osu.Game.Tests.Visual
 
             AddStep("select added set", () => carousel.SelectBeatmap(manyStarDiffs.Beatmaps[0], false));
 
-            AddStep("Filter to 1-3 stars", () => carousel.Filter(new FilterCriteria { DisplayStarsMinimum = 1, DisplayStarsMaximum = 3 }, false));
+            AddStep("Filter to 1-3 stars", () => carousel.Filter(new TestCriteria { DisplayStarsMinimum = 1, DisplayStarsMaximum = 3 }, false));
             checkVisibleItemCount(diff: false, count: 1);
             checkVisibleItemCount(diff: true, count: 3);
 
-            AddStep("Filter to 3-3 stars", () => carousel.Filter(new FilterCriteria { DisplayStarsMinimum = 3, DisplayStarsMaximum = 3 }, false));
+            AddStep("Filter to 3-3 stars", () => carousel.Filter(new TestCriteria { DisplayStarsMinimum = 3, DisplayStarsMaximum = 3 }, false));
             checkVisibleItemCount(diff: false, count: 1);
             checkVisibleItemCount(diff: true, count: 1);
 
-            AddStep("Filter to 4-2 stars", () => carousel.Filter(new FilterCriteria { DisplayStarsMinimum = 4, DisplayStarsMaximum = 2 }, false));
+            AddStep("Filter to 4-2 stars", () => carousel.Filter(new TestCriteria { DisplayStarsMinimum = 4, DisplayStarsMaximum = 2 }, false));
             checkVisibleItemCount(diff: false, count: 0);
             checkVisibleItemCount(diff: true, count: 0);
 
@@ -291,7 +293,7 @@ namespace osu.Game.Tests.Visual
                 manyStarDiffs = null;
             });
 
-            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+            AddStep("Un-filter", () => carousel.Filter(new TestCriteria(), false));
         }
 
         /// <summary>
@@ -322,13 +324,13 @@ namespace osu.Game.Tests.Visual
             AddAssert("ensure repeat", () => selectedSets.Contains(carousel.SelectedBeatmapSet));
 
             AddStep("Add set with 100 difficulties", () => carousel.UpdateBeatmapSet(createTestBeatmapSetWithManyDifficulties(set_count + 1)));
-            AddStep("Filter Extra", () => carousel.Filter(new FilterCriteria { SearchText = "Extra 10" }, false));
+            AddStep("Filter Extra", () => carousel.Filter(new TestCriteria { SearchText = "Extra 10" }, false));
             checkInvisibleDifficultiesUnselectable();
             checkInvisibleDifficultiesUnselectable();
             checkInvisibleDifficultiesUnselectable();
             checkInvisibleDifficultiesUnselectable();
             checkInvisibleDifficultiesUnselectable();
-            AddStep("Un-filter", () => carousel.Filter(new FilterCriteria(), false));
+            AddStep("Un-filter", () => carousel.Filter(new TestCriteria(), false));
         }
 
         /// <summary>
@@ -359,9 +361,9 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         private void testSorting()
         {
-            AddStep("Sort by author", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Author }, false));
+            AddStep("Sort by author", () => carousel.Filter(new TestCriteria { Sort = SortMode.Author }, false));
             AddAssert("Check zzzzz is at bottom", () => carousel.BeatmapSets.Last().Metadata.AuthorString == "zzzzz");
-            AddStep("Sort by artist", () => carousel.Filter(new FilterCriteria { Sort = SortMode.Artist }, false));
+            AddStep("Sort by artist", () => carousel.Filter(new TestCriteria { Sort = SortMode.Artist }, false));
             AddAssert($"Check #{set_count} is at bottom", () => carousel.BeatmapSets.Last().Metadata.Title.EndsWith($"#{set_count}!"));
         }
 
@@ -451,7 +453,7 @@ namespace osu.Game.Tests.Visual
                 carousel.UpdateBeatmapSet(testMixed);
             });
             AddStep("filter to ruleset 0", () =>
-                carousel.Filter(new FilterCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
+                carousel.Filter(new TestCriteria { Ruleset = rulesets.AvailableRulesets.ElementAt(0) }, false));
             AddStep("select filtered map skipping filtered", () => carousel.SelectBeatmap(testMixed.Beatmaps[1], false));
             AddAssert("unfiltered beatmap selected", () => carousel.SelectedBeatmap.Equals(testMixed.Beatmaps[0]));
 
@@ -580,6 +582,15 @@ namespace osu.Game.Tests.Visual
             public new List<DrawableCarouselItem> Items => base.Items;
 
             public bool PendingFilterTask => PendingFilter != null;
+        }
+
+        private class TestCriteria : FilterCriteria
+        {
+            public TestCriteria()
+            {
+                DisplayStarsMinimum = 0;
+                DisplayStarsMaximum = 10;
+            }
         }
     }
 }
