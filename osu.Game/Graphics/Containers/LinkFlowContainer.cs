@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
 using osu.Framework.Platform;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Notifications;
 
 namespace osu.Game.Graphics.Containers
@@ -24,13 +25,15 @@ namespace osu.Game.Graphics.Containers
 
         private Action showNotImplementedError;
         private GameHost host;
+        private DialogOverlay dialogOverlay;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, NotificationOverlay notifications, GameHost host)
+        private void load(OsuGame game, NotificationOverlay notifications, GameHost host, DialogOverlay dialogOverlay)
         {
             // will be null in tests
             this.game = game;
             this.host = host;
+            this.dialogOverlay = dialogOverlay;
 
             showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
@@ -88,7 +91,7 @@ namespace osu.Game.Graphics.Containers
                             showNotImplementedError?.Invoke();
                             break;
                         case LinkAction.External:
-                            host.OpenUrlExternally(url);
+                            dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url)));
                             break;
                         case LinkAction.OpenUserProfile:
                             if (long.TryParse(linkArgument, out long userId))

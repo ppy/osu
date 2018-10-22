@@ -23,6 +23,7 @@ namespace osu.Game.Tests.Visual
     public class TestCaseChatLink : OsuTestCase
     {
         private readonly TestChatLineContainer textContainer;
+        private readonly DialogOverlay dialogOverlay;
         private Color4 linkColour;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
@@ -37,6 +38,7 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseChatLink()
         {
+            Add(dialogOverlay = new DialogOverlay { Depth = float.MinValue });
             Add(textContainer = new TestChatLineContainer
             {
                 Padding = new MarginPadding { Left = 20, Right = 20 },
@@ -50,6 +52,7 @@ namespace osu.Game.Tests.Visual
         private void load(OsuColour colours)
         {
             linkColour = colours.Blue;
+            Dependencies.Cache(dialogOverlay);
             Dependencies.Cache(new ChatOverlay
             {
                 AvailableChannels =
