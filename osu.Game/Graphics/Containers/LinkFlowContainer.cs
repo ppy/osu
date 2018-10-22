@@ -7,7 +7,9 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Framework.Configuration;
 using osu.Framework.Platform;
+using osu.Game.Configuration;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Notifications;
@@ -25,15 +27,19 @@ namespace osu.Game.Graphics.Containers
 
         private Action showNotImplementedError;
         private GameHost host;
+
         private DialogOverlay dialogOverlay;
+        private Bindable<bool> warnAboutOpeningExternal;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, NotificationOverlay notifications, GameHost host, DialogOverlay dialogOverlay)
+        private void load(OsuGame game, NotificationOverlay notifications, GameHost host, DialogOverlay dialogOverlay, OsuConfigManager config)
         {
             // will be null in tests
             this.game = game;
             this.host = host;
             this.dialogOverlay = dialogOverlay;
+
+            warnAboutOpeningExternal = config.GetBindable<bool>(OsuSetting.WarnAboutOpeningExternalLink);
 
             showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
@@ -91,7 +97,11 @@ namespace osu.Game.Graphics.Containers
                             showNotImplementedError?.Invoke();
                             break;
                         case LinkAction.External:
-                            dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url)));
+                            void externalAction() => host.OpenUrlExternally(url);
+                            if (warnAboutOpeningExternal)
+                                dialogOverlay.Push(new ExternalLinkDialog(url, externalAction));
+                            else
+                                externalAction();
                             break;
                         case LinkAction.OpenUserProfile:
                             if (long.TryParse(linkArgument, out long userId))
