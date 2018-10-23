@@ -31,6 +31,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.Chat;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
@@ -102,6 +103,9 @@ namespace osu.Game
         private SettingsOverlay settings;
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
+
+        private ExternalLinkOpener externalLinkOpener;
+        public void OpenUrlExternally(string url) => externalLinkOpener.OpenUrlExternally(url);
 
         // todo: move this to SongSelect once Screen has the ability to unsuspend.
         [Cached]
@@ -382,6 +386,8 @@ namespace osu.Game
             dependencies.Cache(beatmapSetOverlay);
             dependencies.Cache(notifications);
             dependencies.Cache(dialogOverlay);
+
+            Add(externalLinkOpener = new ExternalLinkOpener());
 
             var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications };
             overlays.AddRange(singleDisplaySideOverlays);
