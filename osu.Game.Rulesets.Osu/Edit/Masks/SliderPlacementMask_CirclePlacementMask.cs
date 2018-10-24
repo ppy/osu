@@ -12,15 +12,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
     {
         private class CirclePlacementMask : PlacementMask
         {
-            public new HitCircle HitObject => (HitCircle)base.HitObject;
-
-            public CirclePlacementMask()
-                : base(new HitCircle())
+            public CirclePlacementMask(HitCircle hitCircle)
+                : base(hitCircle)
             {
                 Origin = Anchor.Centre;
                 AutoSizeAxes = Axes.Both;
 
-                InternalChild = new HitCircleMask(HitObject);
+                InternalChild = new HitCircleMask(hitCircle);
+
+                hitCircle.PositionChanged += _ => Position = hitCircle.StackedPosition;
             }
 
             protected override bool Handle(UIEvent e) => false;
