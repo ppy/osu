@@ -341,6 +341,7 @@ namespace osu.Game.Screens.Select
                         return;
                     }
 
+                    this.FadeIn(transition_duration);
                     setTextAsync(value);
                 }
             }
