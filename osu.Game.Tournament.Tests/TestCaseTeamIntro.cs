@@ -13,10 +13,10 @@ namespace osu.Game.Tournament.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            var team1 = Ladder.Teams.First(t => t.Acronym == "USA");
-            var team2 = Ladder.Teams.First(t => t.Acronym == "JPN");
+            var team1 = Ladder.Teams.FirstOrDefault(t => t.Acronym == "USA");
+            var team2 = Ladder.Teams.FirstOrDefault(t => t.Acronym == "JPN");
 
-            var round = Ladder.Groupings.First(g => g.Name == "Finals");
+            var round = Ladder.Groupings.FirstOrDefault(g => g.Name == "Finals");
 
             Add(new TeamIntroScreen(team1, team2, round)
             {

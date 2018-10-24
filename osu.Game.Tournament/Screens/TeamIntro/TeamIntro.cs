@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Video;
@@ -84,7 +85,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
-                                Text = group.Name.Value,
+                                Text = group?.Name.Value ?? "Unknown Grouping",
                                 Font = "Exo2.0-Light",
                                 Spacing = new Vector2(10, 0),
                                 TextSize = 50,
@@ -94,7 +95,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
-                                Text = group.StartDate.Value.ToString("dd MMMM HH:mm UTC"),
+                                Text = (group?.StartDate.Value ?? DateTimeOffset.Now).ToString("dd MMMM HH:mm UTC"),
                                 TextSize = 20,
                             },
                         }
@@ -134,15 +135,18 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     },
                 };
 
-                foreach (var p in team.Players)
-                    players.Add(new OsuSpriteText
-                    {
-                        Text = p.Username,
-                        TextSize = 24,
-                        Colour = colour,
-                        Anchor = left ? Anchor.CentreRight : Anchor.CentreLeft,
-                        Origin = left ? Anchor.CentreRight : Anchor.CentreLeft,
-                    });
+                if (team != null)
+                {
+                    foreach (var p in team.Players)
+                        players.Add(new OsuSpriteText
+                        {
+                            Text = p.Username,
+                            TextSize = 24,
+                            Colour = colour,
+                            Anchor = left ? Anchor.CentreRight : Anchor.CentreLeft,
+                            Origin = left ? Anchor.CentreRight : Anchor.CentreLeft,
+                        });
+                }
             }
 
             private class TeamDisplay : DrawableTournamentTeam
@@ -168,7 +172,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             Flag,
                             new OsuSpriteText
                             {
-                                Text = team.FullName.ToUpper(),
+                                Text = team?.FullName.ToUpper() ?? "???",
                                 TextSize = 40,
                                 Colour = Color4.Black,
                                 Font = "Exo2.0-Light",
