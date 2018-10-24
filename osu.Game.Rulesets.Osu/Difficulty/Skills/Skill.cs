@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public abstract class Skill
     {
+        private const double difficulty_spike_factor = 1.12;
         /// <summary>
         /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
         /// </summary>
@@ -73,21 +74,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// <summary>
         /// Returns the calculated difficulty value representing all processed <see cref="OsuDifficultyHitObject"/>s.
         /// </summary>
-        public double DifficultyValue()
+        public (double total, double difficulty) DifficultyValue()
         {
             strainPeaks.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
 
+            double total = 0;
             double difficulty = 0;
             double weight = 1;
 
             // Difficulty is the weighted sum of the highest strains from every section.
             foreach (double strain in strainPeaks)
             {
+                total += Math.Pow(strain, difficulty_spike_factor);
                 difficulty += strain * weight;
                 weight *= 0.9;
             }
 
-            return difficulty;
+            return (total, difficulty);
         }
 
         /// <summary>

@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private const int section_length = 400;
         private const double difficulty_multiplier = 0.0675;
+        private const double length_bonus_base = -1.28;
+        private const double length_balancing_factor = 1.6;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -57,9 +59,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     s.Process(h);
             }
 
-            double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
-            double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
+            (double aimTotal, double aimDifficulty) = skills[0].DifficultyValue();
+            (double speedTotal, double speedDifficulty) = skills[1].DifficultyValue();
+
+            double aimRating = Math.Sqrt(aimDifficulty) * difficulty_multiplier;
+            double speedRating = Math.Sqrt(speedDifficulty) * difficulty_multiplier;
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
+
+            double lengthBonus = length_bonus_base + length_balancing_factor * ((2 + Math.Log10(aimTotal + speedTotal)) / (2 + Math.Log10(starRating)) - 1);
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
             double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
@@ -73,6 +80,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 AimStrain = aimRating,
                 SpeedStrain = speedRating,
+                LengthBonus = lengthBonus,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo
