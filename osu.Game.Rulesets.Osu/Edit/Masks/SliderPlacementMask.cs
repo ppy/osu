@@ -23,12 +23,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
     {
         public new Slider HitObject => (Slider)base.HitObject;
 
-        private readonly CirclePlacementMask headMask;
-        private readonly CirclePlacementMask tailMask;
-        private readonly Path path;
+        private Path path;
+        private Container<SliderControlPoint> controlPointContainer;
 
         private readonly List<Segment> segments = new List<Segment>();
-        private readonly Container<SliderControlPoint> controlPointContainer;
         private Vector2 cursor;
 
         private PlacementState state;
@@ -37,24 +35,23 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
             : base(new Slider())
         {
             RelativeSizeAxes = Axes.Both;
-
-            InternalChildren = new Drawable[]
-            {
-                path = new SmoothPath { PathWidth = 3 },
-                headMask = new CirclePlacementMask(),
-                tailMask = new CirclePlacementMask(),
-                controlPointContainer = new Container<SliderControlPoint> { RelativeSizeAxes = Axes.Both }
-            };
-
             segments.Add(new Segment(Vector2.Zero));
-
-            setState(PlacementState.Initial);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
+            InternalChildren = new Drawable[]
+            {
+                path = new SmoothPath { PathWidth = 3 },
+                new CirclePlacementMask(HitObject.HeadCircle),
+                new CirclePlacementMask(HitObject.TailCircle),
+                controlPointContainer = new Container<SliderControlPoint> { RelativeSizeAxes = Axes.Both }
+            };
+
             path.Colour = colours.YellowDark;
+
+            setState(PlacementState.Initial);
         }
 
         protected override bool OnMouseMove(MouseMoveEvent e)
@@ -62,11 +59,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
             switch (state)
             {
                 case PlacementState.Initial:
-                    headMask.Position = e.MousePosition;
+                    HitObject.Position = e.MousePosition;
                     return true;
                 case PlacementState.Body:
-                    tailMask.Position = e.MousePosition;
-                    cursor = tailMask.Position - headMask.Position;
+                    cursor = e.MousePosition - HitObject.Position;
                     controlPointContainer.Last().NextPoint = e.MousePosition;
                     return true;
             }
@@ -121,7 +117,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
 
         private void endCurve()
         {
-            HitObject.Position = headMask.Position;
             HitObject.ControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToList();
             HitObject.CurveType = HitObject.ControlPoints.Count > 2 ? CurveType.Bezier : CurveType.Linear;
             HitObject.Distance = segments.Sum(s => s.Distance);
@@ -138,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
             switch (state)
             {
                 case PlacementState.Body:
-                    path.Position = headMask.Position;
+                    path.Position = HitObject.Position;
                     path.ClearVertices();
 
                     for (int i = 0; i < segments.Count; i++)
@@ -154,16 +149,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
 
         private void setState(PlacementState newState)
         {
-            switch (newState)
-            {
-                case PlacementState.Initial:
-                    tailMask.Alpha = 0;
-                    break;
-                case PlacementState.Body:
-                    tailMask.Alpha = 1;
-                    break;
-            }
-
             state = newState;
         }
 
