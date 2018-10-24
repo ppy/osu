@@ -17,9 +17,10 @@ namespace osu.Game.Tournament.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            var round = Ladder.Groupings.First(g => g.Name == "Finals");
+            var round = Ladder.Groupings.FirstOrDefault(g => g.Name == "Finals");
 
-            Add(new MapPoolScreen(round));
+            if (round != null)
+                Add(new MapPoolScreen(round));
         }
     }
 
@@ -37,7 +38,7 @@ namespace osu.Game.Tournament.Tests
                     Padding = new MarginPadding(50),
                     Direction = FillDirection.Full,
                     RelativeSizeAxes = Axes.Both,
-                },
+                }
             };
 
             foreach (var b in round.Beatmaps)
