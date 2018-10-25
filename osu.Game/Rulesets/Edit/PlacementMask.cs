@@ -15,7 +15,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Edit
 {
-    public class PlacementMask : CompositeDrawable, IRequireHighFrequencyMousePosition
+    public abstract class PlacementMask : CompositeDrawable, IRequireHighFrequencyMousePosition
     {
         /// <summary>
         /// The <see cref="HitObject"/> that is being placed.
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private IPlacementHandler placementHandler { get; set; }
 
-        public PlacementMask(HitObject hitObject)
+        protected PlacementMask(HitObject hitObject)
         {
             HitObject = hitObject;
 
