@@ -3,8 +3,7 @@
 
 using osu.Core.Screens.Evast;
 using osu.Framework.Graphics;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using OpenTK;
 using OpenTK.Input;
 
@@ -37,26 +36,26 @@ namespace osu.Mods.Evast.Galaga
 
         private bool playerIsShooting;
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (!playerIsShooting && args.Key == Key.Q)
+            if (!playerIsShooting && e.Key == Key.Q)
             {
                 shoot();
                 playerIsShooting = true;
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        protected override bool OnKeyUp(KeyUpEvent e)
         {
-            if (playerIsShooting && args.Key == Key.Q)
+            if (playerIsShooting && e.Key == Key.Q)
             {
                 Scheduler.CancelDelayedTasks();
                 playerIsShooting = false;
             }
 
-            return base.OnKeyUp(state, args);
+            return base.OnKeyUp(e);
         }
 
         private void shoot()

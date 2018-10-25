@@ -7,6 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -109,16 +110,16 @@ namespace osu.Mods.Evast
                 text.Colour = colours.Yellow;
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 hover.FadeIn(100);
-                return base.OnHover(state);
+                return base.OnHover(e);
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 hover.FadeOut(100);
-                base.OnHoverLost(state);
+                base.OnHoverLost(e);
             }
         }
     }

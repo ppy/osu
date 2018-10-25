@@ -4,6 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.MathUtils;
 using OpenTK;
@@ -30,14 +31,14 @@ namespace osu.Mods.Evast.Particles
             }
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             foreach (var p in Children)
             {
                 p.MoveTo(RNG.NextBool() ? new Vector2(0, Size.X / 2) : new Vector2(Size.Y, Size.X / 2), RNG.NextDouble(100, 5000), Easing.OutQuad);
             }
 
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
         private class Particle : Container

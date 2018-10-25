@@ -66,12 +66,7 @@ namespace osu.Core.Wiki.Header
                     foreach (WikiClickableOsuSpriteText b in selectableWikis)
                     {
                         b.HoverContainer.IdleColour = osu.Pink;
-                        b.HoverContainer.TriggerEvent(new HoverLostEvent(new InputState
-                        {
-                            Keyboard = new KeyboardState(),
-                            Mouse = new MouseState(),
-                            Joystick = new JoystickState(),
-                        }));
+                        b.HoverContainer.TriggerEvent(new HoverLostEvent(new InputState(new MouseState(), new KeyboardState(), new JoystickState())));
                     }
             };
         }
@@ -109,12 +104,7 @@ namespace osu.Core.Wiki.Header
                     foreach (WikiClickableOsuSpriteText b in selectableWikis)
                     {
                         b.HoverContainer.IdleColour = osu.Pink;
-                        b.HoverContainer.TriggerEvent(new HoverLostEvent(new InputState
-                        {
-                            Keyboard = new KeyboardState(),
-                            Mouse = new MouseState(),
-                            Joystick = new JoystickState(),
-                        }));
+                        b.HoverContainer.TriggerEvent(new HoverLostEvent(new InputState(new MouseState(), new KeyboardState(), new JoystickState())));
                     }
 
                     button.HoverContainer.IdleColour = osu.Yellow;

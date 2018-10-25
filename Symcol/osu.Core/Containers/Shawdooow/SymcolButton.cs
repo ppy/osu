@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Backgrounds;
@@ -131,21 +131,21 @@ namespace osu.Core.Containers.Shawdooow
 
         private bool recieveInput;
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             hover.FadeTo(0.25f , 500, Easing.OutQuint);
             recieveInput = true;
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             hover.FadeOut(500, Easing.OutQuint);
             recieveInput = false;
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             content.ScaleTo(0.75f, 2000, Easing.OutQuint);
             if (Enabled.Value)
@@ -157,18 +157,18 @@ namespace osu.Core.Containers.Shawdooow
             return true;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
             content.ScaleTo(1, 1000, Easing.OutElastic);
-            return base.OnMouseUp(state, args);
+            return base.OnMouseUp(e);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (recieveInput && (args.Key == Key.X  || args.Key == Key.Z || args.Key == Key.C || args.Key == Key.V) || args.Key == Bind && Bind != Key.Unknown)
+            if (recieveInput && (e.Key == Key.X  || e.Key == Key.Z || e.Key == Key.C || e.Key == Key.V) || e.Key == Bind && Bind != Key.Unknown)
                 Action?.Invoke();
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
         public Action Action;

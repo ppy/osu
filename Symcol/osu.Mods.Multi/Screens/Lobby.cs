@@ -4,6 +4,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -171,7 +172,7 @@ namespace osu.Mods.Multi.Screens
             };
         }
 
-        protected override void OnFocus(InputState state)
+        protected override void OnFocus(FocusEvent e)
         {
             GetContainingInputManager().ChangeFocus(Filter.Search);
         }

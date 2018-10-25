@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Rulesets.Scoring;
 using osu.Mods.Multi.Networking;
@@ -74,9 +74,9 @@ namespace osu.Mods.Multi.Screens.Pieces
             }
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (args.Key == Key.Tab)
+            if (e.Key == Key.Tab)
             {
                 if (Alpha > 0)
                     this.FadeOut(100);
@@ -84,7 +84,7 @@ namespace osu.Mods.Multi.Screens.Pieces
                     this.FadeIn(100);
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
     }
 }

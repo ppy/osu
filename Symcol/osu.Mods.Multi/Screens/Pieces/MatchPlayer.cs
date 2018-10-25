@@ -4,6 +4,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
@@ -137,16 +138,16 @@ namespace osu.Mods.Multi.Screens.Pieces
 
         private void openLink(string link) => host.OpenUrlExternally(link);
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             dim.FadeTo(0.6f, 200);
 
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
 
             dim.FadeTo(0.8f, 200);
         }

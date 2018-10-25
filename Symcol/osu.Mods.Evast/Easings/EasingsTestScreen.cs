@@ -7,7 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using OpenTK;
@@ -101,7 +101,7 @@ namespace osu.Mods.Evast.Easings
                 title.Colour = colours.Yellow;
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 movingBox
                     .Delay(500)
@@ -113,15 +113,15 @@ namespace osu.Mods.Evast.Easings
                     .MoveToX(0.1f, 1000, (Easing)easingNumber)
                     .Loop();
 
-                return base.OnHover(state);
+                return base.OnHover(e);
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 movingBox.ClearTransforms();
                 movingBox.X = 0.1f;
 
-                base.OnHoverLost(state);
+                base.OnHoverLost(e);
             }
         }
     }

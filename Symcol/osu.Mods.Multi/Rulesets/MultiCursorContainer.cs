@@ -1,5 +1,5 @@
 ﻿using osu.Framework.Graphics.Cursor;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 
 namespace osu.Mods.Multi.Rulesets
 {
@@ -9,10 +9,10 @@ namespace osu.Mods.Multi.Rulesets
 
         public virtual MultiCursorContainer CreateMultiCursor() => null;
 
-        protected override bool OnMouseMove(InputState state)
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
             if (Slave) return false;
-            return base.OnMouseMove(state);
+            return base.OnMouseMove(e);
         }
     }
 }

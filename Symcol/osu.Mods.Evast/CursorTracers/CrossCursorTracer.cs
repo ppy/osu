@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 
 namespace osu.Mods.Evast.CursorTracers
@@ -49,12 +50,12 @@ namespace osu.Mods.Evast.CursorTracers
             };
         }
 
-        protected override bool OnMouseMove(InputState state)
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            horizontal.MoveToY(state.Mouse.Position.Y, delay, Easing.Out);
-            vertical.MoveToX(state.Mouse.Position.X, delay, Easing.Out);
+            horizontal.MoveToY(e.CurrentState.Mouse.Position.Y, delay, Easing.Out);
+            vertical.MoveToX(e.CurrentState.Mouse.Position.X, delay, Easing.Out);
 
-            return base.OnMouseMove(state);
+            return base.OnMouseMove(e);
         }
     }
 }

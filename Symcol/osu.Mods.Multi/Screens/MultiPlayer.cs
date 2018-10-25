@@ -11,7 +11,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
@@ -393,18 +393,18 @@ namespace osu.Mods.Multi.Screens
             Background?.FadeTo(1f, fade_out_duration);
         }
 
-        protected override bool OnScroll(InputState state) => mouseWheelDisabled.Value;
+        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value;
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (args.Key == Key.Escape && !args.Repeat)
+            if (e.Key == Key.Escape && !e.Repeat)
             {
                 OsuNetworkingHandler.SendToServer(new MatchExitPacket());
                 Exit();
                 return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
         private void initializeStoryboard(bool asyncLoad)

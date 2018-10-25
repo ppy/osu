@@ -3,8 +3,7 @@
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -161,11 +160,11 @@ namespace osu.Mods.Evast.Snake
             NewUpdate();
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (!args.Repeat)
+            if (!e.Repeat)
             {
-                switch (args.Key)
+                switch (e.Key)
                 {
                     case Key.Up:
                         if (direction == SnakeDirection.Down || direction == SnakeDirection.Up)
@@ -190,7 +189,7 @@ namespace osu.Mods.Evast.Snake
                 }
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
         private class SnakePixel : Pixel

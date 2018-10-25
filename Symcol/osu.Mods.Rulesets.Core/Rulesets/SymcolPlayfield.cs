@@ -5,7 +5,7 @@ namespace osu.Mods.Rulesets.Core.Rulesets
 {
     public class SymcolPlayfield : Playfield
     {
-        public SymcolPlayfield(Vector2 size) : base(size.X, size.Y)
+        public SymcolPlayfield(Vector2 size)// : base(size.X, size.Y)
         {
         }
     }

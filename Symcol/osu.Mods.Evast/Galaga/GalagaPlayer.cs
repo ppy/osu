@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using OpenTK;
 using OpenTK.Graphics;
@@ -32,9 +32,9 @@ namespace osu.Mods.Evast.Galaga
 
         private Vector2 currentDirection = Vector2.Zero;
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            switch (args.Key)
+            switch (e.Key)
             {
                 case Key.Up:
                     currentDirection.Y--;
@@ -50,12 +50,12 @@ namespace osu.Mods.Evast.Galaga
                     return true;
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        protected override bool OnKeyUp(KeyUpEvent e)
         {
-            switch (args.Key)
+            switch (e.Key)
             {
                 case Key.Up:
                     currentDirection.Y++;
@@ -71,7 +71,7 @@ namespace osu.Mods.Evast.Galaga
                     return true;
             }
 
-            return base.OnKeyUp(state, args);
+            return base.OnKeyUp(e);
         }
 
         public void Shoot() => BulletsContainer.AddNewBullet(new Vector2(X, Y), BulletTarget.Enemy);

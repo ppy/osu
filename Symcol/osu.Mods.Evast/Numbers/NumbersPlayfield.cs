@@ -6,7 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.EventArgs;
+using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
@@ -517,13 +517,13 @@ namespace osu.Mods.Evast.Numbers
             return null;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (!hasFailed)
             {
-                if (!args.Repeat)
+                if (!e.Repeat)
                 {
-                    switch (args.Key)
+                    switch (e.Key)
                     {
                         case Key.Right:
                             moveRight();
@@ -541,7 +541,7 @@ namespace osu.Mods.Evast.Numbers
                 }
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
         private class BackgroundPanel : Container
