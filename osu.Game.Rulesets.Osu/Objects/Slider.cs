@@ -70,6 +70,21 @@ namespace osu.Game.Rulesets.Osu.Objects
             set { Curve.Distance = value; }
         }
 
+        public override Vector2 Position
+        {
+            get => base.Position;
+            set
+            {
+                base.Position = value;
+
+                if (HeadCircle != null)
+                    HeadCircle.Position = value;
+
+                if (TailCircle != null)
+                    TailCircle.Position = EndPosition;
+            }
+        }
+
         public double? LegacyLastTickOffset { get; set; }
 
         /// <summary>

@@ -13,23 +13,30 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components
 {
     public class HitCircleMask : CompositeDrawable
     {
+        private readonly HitCircle hitCircle;
+
         public HitCircleMask(HitCircle hitCircle)
         {
-            Anchor = Anchor.Centre;
+            this.hitCircle = hitCircle;
             Origin = Anchor.Centre;
 
             Size = new Vector2((float)OsuHitObject.OBJECT_RADIUS * 2);
             Scale = new Vector2(hitCircle.Scale);
-
             CornerRadius = Size.X / 2;
 
-            AddInternal(new RingPiece());
+            InternalChild = new RingPiece();
+
+            hitCircle.PositionChanged += _ => UpdatePosition();
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
+
+            UpdatePosition();
         }
+
+        protected virtual void UpdatePosition() => Position = hitCircle.StackedPosition;
     }
 }
