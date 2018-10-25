@@ -2,14 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Edit.Masks.Slider.Components;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks
+namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider
 {
     public class SliderCircleSelectionMask : SelectionMask
     {
-        public SliderCircleSelectionMask(DrawableOsuHitObject hitObject, Slider slider, SliderPosition position)
+        public SliderCircleSelectionMask(DrawableOsuHitObject hitObject, Objects.Slider slider, SliderPosition position)
             : base(hitObject)
         {
             InternalChild = new SliderCircleMask(slider, position);
