@@ -13,15 +13,15 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Edit.Masks.Slider.Components;
 using OpenTK;
 using OpenTK.Input;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks
+namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider
 {
-    public partial class SliderPlacementMask : PlacementMask
+    public class SliderPlacementMask : PlacementMask
     {
-        public new Slider HitObject => (Slider)base.HitObject;
+        public new Objects.Slider HitObject => (Objects.Slider)base.HitObject;
 
         private Path path;
         private Container<SliderControlPoint> controlPointContainer;
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
         private PlacementState state;
 
         public SliderPlacementMask()
-            : base(new Slider())
+            : base(new Objects.Slider())
         {
             RelativeSizeAxes = Axes.Both;
             segments.Add(new Segment(Vector2.Zero));
@@ -44,8 +44,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
             InternalChildren = new Drawable[]
             {
                 path = new SmoothPath { PathWidth = 3 },
-                new CirclePlacementMask(HitObject.HeadCircle),
-                new CirclePlacementMask(HitObject.TailCircle),
+                new SliderCirclePiece(HitObject, SliderPosition.Start),
+                new SliderCirclePiece(HitObject, SliderPosition.End),
                 controlPointContainer = new Container<SliderControlPoint> { RelativeSizeAxes = Axes.Both }
             };
 
