@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircle
         public HitCirclePlacementMask()
             : base(new Objects.HitCircle())
         {
-            InternalChild = new HitCircleMask(HitObject);
+            InternalChild = new HitCirclePiece(HitObject);
         }
 
         protected override void LoadComplete()

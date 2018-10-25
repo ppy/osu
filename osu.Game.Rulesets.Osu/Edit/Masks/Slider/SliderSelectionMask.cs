@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider
 
             InternalChildren = new Drawable[]
             {
-                new SliderBodyMask(sliderObject),
+                new BodyPiece(sliderObject),
                 headMask = new SliderCircleSelectionMask(slider.HeadCircle, sliderObject, SliderPosition.Start),
                 new SliderCircleSelectionMask(slider.TailCircle, sliderObject, SliderPosition.End),
             };

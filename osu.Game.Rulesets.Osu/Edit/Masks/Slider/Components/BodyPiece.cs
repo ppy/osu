@@ -9,12 +9,12 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider.Components
 {
-    public class SliderBodyMask : CompositeDrawable
+    public class BodyPiece : CompositeDrawable
     {
         private readonly Objects.Slider slider;
         private readonly SliderBody body;
 
-        public SliderBodyMask(Objects.Slider slider)
+        public BodyPiece(Objects.Slider slider)
         {
             this.slider = slider;
             InternalChild = body = new SliderBody(slider)

@@ -34,7 +34,7 @@ namespace osu.Game.Tests.Visual
             typeof(OsuHitObjectComposer),
             typeof(HitObjectMaskLayer),
             typeof(NotNullAttribute),
-            typeof(HitCircleMask),
+            typeof(HitCirclePiece),
             typeof(HitCircleSelectionMask),
             typeof(HitCirclePlacementMask),
         };
