@@ -13,6 +13,9 @@
     <Version>0.0.0</Version>
     <FileVersion>0.0.0</FileVersion>
   </PropertyGroup>
+  <PropertyGroup Label="Defines">
+    <DefineConstants Condition="'$(TargetFrameworks)' == 'net471'">$(DefineConstants);NET_FRAMEWORK</DefineConstants>
+  </PropertyGroup>
   <PropertyGroup>
     <StartupObject>osu.Desktop.Program</StartupObject>
   </PropertyGroup>
