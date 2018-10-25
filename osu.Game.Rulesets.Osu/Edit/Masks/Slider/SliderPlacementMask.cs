@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Lines;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
@@ -23,7 +22,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider
     {
         public new Objects.Slider HitObject => (Objects.Slider)base.HitObject;
 
-        private Path path;
         private Container<SliderControlPoint> controlPointContainer;
 
         private readonly List<Segment> segments = new List<Segment>();
@@ -43,13 +41,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider
         {
             InternalChildren = new Drawable[]
             {
-                path = new SmoothPath { PathWidth = 3 },
+                new BodyPiece(HitObject),
                 new SliderCirclePiece(HitObject, SliderPosition.Start),
                 new SliderCirclePiece(HitObject, SliderPosition.End),
                 controlPointContainer = new Container<SliderControlPoint> { RelativeSizeAxes = Axes.Both }
             };
-
-            path.Colour = colours.YellowDark;
 
             setState(PlacementState.Initial);
         }
@@ -128,23 +124,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider
         {
             base.Update();
 
-            segments.ForEach(s => s.Calculate());
+            for (int i = 0; i < segments.Count; i++)
+                segments[i].Calculate(i == segments.Count - 1 ? (Vector2?)cursor : null);
 
-            switch (state)
-            {
-                case PlacementState.Body:
-                    path.Position = HitObject.Position;
-                    path.ClearVertices();
-
-                    for (int i = 0; i < segments.Count; i++)
-                    {
-                        var segmentPath = segments[i].Calculate(i == segments.Count - 1 ? (Vector2?)cursor : null);
-                        segmentPath.ForEach(v => path.AddVertex(v));
-                    }
-
-                    path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
-                    break;
-            }
+            HitObject.ControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToList();
+            HitObject.CurveType = HitObject.ControlPoints.Count > 2 ? CurveType.Bezier : CurveType.Linear;
+            HitObject.Distance = segments.Sum(s => s.Distance);
         }
 
         private void setState(PlacementState newState)
