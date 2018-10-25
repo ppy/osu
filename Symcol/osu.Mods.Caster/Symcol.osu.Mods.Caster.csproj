@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\osu.Game.props" />
+  <PropertyGroup Label="Project">
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>the caster bible</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Assets\Textures\Casters icon 1080.png" />
+    <None Remove="Assets\Textures\Casters.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\Casters icon 1080.png" />
+    <EmbeddedResource Include="Assets\Textures\Casters.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Symcol.osu.Core\Symcol.osu.Core.csproj" />
+  </ItemGroup>
+</Project>

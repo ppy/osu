@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\osu.Game.props" />
+  <PropertyGroup Label="Project">
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>symcol's osu mod loader</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="KoziLord\**" />
+    <EmbeddedResource Remove="KoziLord\**" />
+    <None Remove="KoziLord\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Assets\Textures\symcol spring 2018 1080.png" />
+    <None Remove="Assets\Textures\symcol summer 2018 1080.png" />
+    <None Remove="Assets\Textures\Symcol%402x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Textures\symcol spring 2018 1080.png" />
+    <EmbeddedResource Include="Assets\Textures\symcol summer 2018 1080.png" />
+    <EmbeddedResource Include="Assets\Textures\Symcol@2x.png" />
+  </ItemGroup>
+  <ItemGroup Label="Project References">
+    <ProjectReference Include="..\..\..\Symcol.Core\Symcol.Base\Symcol.Base.csproj" />
+    <ProjectReference Include="..\..\osu.Game\osu.Game.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Assets\Samples\" />
+    <Folder Include="Assets\Tracks\" />
+    <Folder Include="Containers\Evast\" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\osu.Game.props" />
+  <PropertyGroup Label="Project">
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>the map mixer!</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\osu.Mods.Evast\osu.Mods.Evast.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\osu.Game.props" />
+  <PropertyGroup Label="Project">
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>multi mod!</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Symcol.Core\Symcol.Networking\Symcol.Networking.csproj" />
+    <ProjectReference Include="..\osu.Mods.Evast\osu.Mods.Evast.csproj" />
+    <ProjectReference Include="..\osu.Mods.Rulesets.Core\osu.Mods.Rulesets.Core.csproj" />
+  </ItemGroup>
+</Project>
