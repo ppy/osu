@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -462,16 +462,23 @@ namespace osu.Game.Overlays.Profile
 
         private void tryAddInfoRightLine(FontAwesome icon, string str, string url = null)
         {
+            const int LocalCharLimit = 31; 
             if (string.IsNullOrEmpty(str)) return;
 
             infoTextRight.AddIcon(icon);
             if (url != null)
             {
-                infoTextRight.AddLink(" " + str, url);
+                if (str.Length > LocalCharLimit)
+                    infoTextRight.AddLink(" " + (str.Substring(0, LocalCharLimit) + "..."), url);
+                else
+                    infoTextRight.AddLink(" " + str, url);
             }
             else
             {
-                infoTextRight.AddText(" " + str);
+                if (str.Length > LocalCharLimit)
+                    infoTextRight.AddText(" " + (str.Substring(0, LocalCharLimit) + "..."));
+                else
+                    infoTextRight.AddText(" " + str);
             }
 
             infoTextRight.NewLine();
