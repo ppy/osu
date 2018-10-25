@@ -11,11 +11,11 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircle.Components
 {
-    public class HitCircleMask : CompositeDrawable
+    public class HitCirclePiece : CompositeDrawable
     {
         private readonly Objects.HitCircle hitCircle;
 
-        public HitCircleMask(Objects.HitCircle hitCircle)
+        public HitCirclePiece(Objects.HitCircle hitCircle)
         {
             this.hitCircle = hitCircle;
 

@@ -5,12 +5,12 @@ using osu.Game.Rulesets.Osu.Edit.Masks.HitCircle.Components;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider.Components
 {
-    public class SliderCircleMask : HitCircleMask
+    public class SliderCirclePiece : HitCirclePiece
     {
         private readonly Objects.Slider slider;
         private readonly SliderPosition position;
 
-        public SliderCircleMask(Objects.Slider slider, SliderPosition position)
+        public SliderCirclePiece(Objects.Slider slider, SliderPosition position)
             : base(slider.HeadCircle)
         {
             this.slider = slider;
