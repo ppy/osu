@@ -1,16 +1,16 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Edit.Masks.HitCircle.Components;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks
+namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider.Components
 {
     public class SliderCircleMask : HitCircleMask
     {
-        private readonly Slider slider;
+        private readonly Objects.Slider slider;
         private readonly SliderPosition position;
 
-        public SliderCircleMask(Slider slider, SliderPosition position)
+        public SliderCircleMask(Objects.Slider slider, SliderPosition position)
             : base(slider.HeadCircle)
         {
             this.slider = slider;
