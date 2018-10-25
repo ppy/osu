@@ -20,8 +20,6 @@ namespace osu.Game.Graphics.Containers
         {
         }
 
-        public override bool HandlePositionalInput => true;
-
         private OsuGame game;
 
         private Action showNotImplementedError;

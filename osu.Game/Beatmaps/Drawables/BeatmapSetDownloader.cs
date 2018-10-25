@@ -71,9 +71,11 @@ namespace osu.Game.Beatmaps.Drawables
             if (DownloadState.Value > DownloadStatus.NotDownloaded)
                 return;
 
-            beatmaps.Download(set, noVideo);
-
-            DownloadState.Value = DownloadStatus.Downloading;
+            if (beatmaps.Download(set, noVideo))
+            {
+                // Only change state if download can happen
+                DownloadState.Value = DownloadStatus.Downloading;
+            }
         }
 
         private void setAdded(BeatmapSetInfo s)

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -33,26 +32,25 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private Cached initialStateCache = new Cached();
 
-        public ScrollingHitObjectContainer()
+        private readonly ISpeedChangeVisualiser speedChangeVisualiser;
+
+        public ScrollingHitObjectContainer(SpeedChangeVisualisationMethod visualisationMethod)
         {
             RelativeSizeAxes = Axes.Both;
 
             TimeRange.ValueChanged += _ => initialStateCache.Invalidate();
             Direction.ValueChanged += _ => initialStateCache.Invalidate();
-        }
 
-        private ISpeedChangeVisualiser speedChangeVisualiser;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            switch (config.Get<SpeedChangeVisualisationMethod>(OsuSetting.SpeedChangeVisualisation))
+            switch (visualisationMethod)
             {
                 case SpeedChangeVisualisationMethod.Sequential:
                     speedChangeVisualiser = new SequentialSpeedChangeVisualiser(ControlPoints);
                     break;
                 case SpeedChangeVisualisationMethod.Overlapping:
                     speedChangeVisualiser = new OverlappingSpeedChangeVisualiser(ControlPoints);
+                    break;
+                case SpeedChangeVisualisationMethod.Constant:
+                    speedChangeVisualiser = new ConstantSpeedChangeVisualiser();
                     break;
             }
         }

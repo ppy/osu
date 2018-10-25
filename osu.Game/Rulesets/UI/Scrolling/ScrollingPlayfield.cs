@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
+using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects.Drawables;
 
@@ -62,19 +63,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         protected readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
-        /// <summary>
-        /// Creates a new <see cref="ScrollingPlayfield"/>.
-        /// </summary>
-        /// <param name="customWidth">The width to scale the internal coordinate space to.
-        /// May be null if scaling based on <paramref name="customHeight"/> is desired. If <paramref name="customHeight"/> is also null, no scaling will occur.
-        /// </param>
-        /// <param name="customHeight">The height to scale the internal coordinate space to.
-        /// May be null if scaling based on <paramref name="customWidth"/> is desired. If <paramref name="customWidth"/> is also null, no scaling will occur.
-        /// </param>
-        protected ScrollingPlayfield(float? customWidth = null, float? customHeight = null)
-            : base(customWidth, customHeight)
-        {
-        }
+        protected virtual SpeedChangeVisualisationMethod VisualisationMethod => SpeedChangeVisualisationMethod.Sequential;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -104,7 +93,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         protected sealed override HitObjectContainer CreateHitObjectContainer()
         {
-            var container = new ScrollingHitObjectContainer();
+            var container = new ScrollingHitObjectContainer(VisualisationMethod);
             container.Direction.BindTo(Direction);
             return container;
         }
