@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private Vector2 position;
 
-        public Vector2 Position
+        public virtual Vector2 Position
         {
             get => position;
             set
