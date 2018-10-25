@@ -462,21 +462,21 @@ namespace osu.Game.Overlays.Profile
 
         private void tryAddInfoRightLine(FontAwesome icon, string str, string url = null)
         {
-            const int LocalCharLimit = 31;
+            const int local_char_limit = 31;
             if (string.IsNullOrEmpty(str)) return;
 
             infoTextRight.AddIcon(icon);
             if (url != null)
             {
-                if (str.Length > LocalCharLimit)
-                    infoTextRight.AddLink(" " + (str.Substring(0, LocalCharLimit) + "..."), url);
+                if (str.Length > local_char_limit)
+                    infoTextRight.AddLink(" " + str.Substring(0, local_char_limit) + "...", url);
                 else
                     infoTextRight.AddLink(" " + str, url);
             }
             else
             {
-                if (str.Length > LocalCharLimit)
-                    infoTextRight.AddText(" " + (str.Substring(0, LocalCharLimit) + "..."));
+                if (str.Length > local_char_limit)
+                    infoTextRight.AddText(" " + str.Substring(0, local_char_limit) + "...");
                 else
                     infoTextRight.AddText(" " + str);
             }
