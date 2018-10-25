@@ -18,21 +18,27 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks
         public HitCircleMask(HitCircle hitCircle)
         {
             this.hitCircle = hitCircle;
-            Anchor = Anchor.Centre;
+
             Origin = Anchor.Centre;
 
             Size = new Vector2((float)OsuHitObject.OBJECT_RADIUS * 2);
-
             CornerRadius = Size.X / 2;
 
-            AddInternal(new RingPiece());
+            InternalChild = new RingPiece();
+
+            hitCircle.PositionChanged += _ => UpdatePosition();
+            hitCircle.StackHeightChanged += _ => UpdatePosition();
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
+
+            UpdatePosition();
         }
+
+        protected virtual void UpdatePosition() => Position = hitCircle.StackedPosition;
 
         protected override void Update()
         {
