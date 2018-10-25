@@ -31,6 +31,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
+using osu.Game.ModLoader;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
@@ -111,6 +112,7 @@ namespace osu.Game
         public OsuGame(string[] args = null)
         {
             this.args = args;
+            ModStore.LoadModSets();
 
             forwardLoggedErrorsToNotifications();
 
@@ -284,6 +286,7 @@ namespace osu.Game
 
         protected override void Dispose(bool isDisposing)
         {
+            ModStore.SymcolBaseSet?.Dispose();
             base.Dispose(isDisposing);
             RavenLogger.Dispose();
         }
@@ -325,7 +328,7 @@ namespace osu.Game
                 mainContent.Add(screenStack);
             });
 
-            loadComponentSingleFile(Toolbar = new Toolbar
+            Toolbar = new Toolbar
             {
                 Depth = -5,
                 OnHome = delegate
@@ -333,7 +336,21 @@ namespace osu.Game
                     CloseAllOverlays(false);
                     intro?.ChildScreen?.MakeCurrent();
                 },
-            }, overlayContent.Add);
+            };
+
+            if (ModStore.SymcolBaseSet != null)
+            {
+                Toolbar = ModStore.SymcolBaseSet.GetToolbar();
+                Toolbar.Depth = -5;
+                Toolbar.OnHome = delegate
+                {
+                    CloseAllOverlays(false);
+                    intro?.ChildScreen?.MakeCurrent();
+
+                };
+            }
+
+            loadComponentSingleFile(Toolbar, overlayContent.Add);
 
             loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
@@ -444,6 +461,8 @@ namespace osu.Game
 
             settings.StateChanged += _ => updateScreenOffset();
             notifications.StateChanged += _ => updateScreenOffset();
+
+            ModStore.SymcolBaseSet?.LoadComplete(this, Host);
         }
 
         private void forwardLoggedErrorsToNotifications()
