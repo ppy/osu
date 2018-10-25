@@ -18,8 +18,6 @@ namespace osu.Game.Rulesets.Objects
 
         public CurveType CurveType = CurveType.PerfectCurve;
 
-        public Vector2 Offset;
-
         private readonly List<Vector2> calculatedPath = new List<Vector2>();
         private readonly List<double> cumulativeLength = new List<double>();
 
@@ -187,12 +185,12 @@ namespace osu.Game.Rulesets.Objects
             int i = 0;
             for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i) { }
 
-            path.Add(interpolateVertices(i, d0) + Offset);
+            path.Add(interpolateVertices(i, d0));
 
             for (; i < calculatedPath.Count && cumulativeLength[i] <= d1; ++i)
-                path.Add(calculatedPath[i] + Offset);
+                path.Add(calculatedPath[i]);
 
-            path.Add(interpolateVertices(i, d1) + Offset);
+            path.Add(interpolateVertices(i, d1));
         }
 
         /// <summary>
@@ -207,7 +205,7 @@ namespace osu.Game.Rulesets.Objects
                 Calculate();
 
             double d = progressToDistance(progress);
-            return interpolateVertices(indexOfDistance(d), d) + Offset;
+            return interpolateVertices(indexOfDistance(d), d);
         }
     }
 }
