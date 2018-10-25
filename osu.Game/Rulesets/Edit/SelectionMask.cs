@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
@@ -52,6 +53,8 @@ namespace osu.Game.Rulesets.Edit
         {
             HitObject = hitObject;
 
+            RelativeSizeAxes = Axes.Both;
+
             AlwaysPresent = true;
             Alpha = 0;
         }
@@ -94,6 +97,8 @@ namespace osu.Game.Rulesets.Edit
 
         public bool IsSelected => State == SelectionState.Selected;
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObject.ReceivePositionalInputAt(screenSpacePos);
+
         private bool selectionRequested;
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -132,11 +137,11 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// The screen-space point that causes this <see cref="SelectionMask"/> to be selected.
         /// </summary>
-        public virtual Vector2 SelectionPoint => ScreenSpaceDrawQuad.Centre;
+        public virtual Vector2 SelectionPoint => HitObject.ScreenSpaceDrawQuad.Centre;
 
         /// <summary>
         /// The screen-space quad that outlines this <see cref="SelectionMask"/> for selections.
         /// </summary>
-        public virtual Quad SelectionQuad => ScreenSpaceDrawQuad;
+        public virtual Quad SelectionQuad => HitObject.ScreenSpaceDrawQuad;
     }
 }
