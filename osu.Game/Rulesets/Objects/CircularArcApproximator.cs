@@ -8,21 +8,15 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public class CircularArcApproximator
+    public readonly ref struct CircularArcApproximator
     {
-        private readonly Vector2 a;
-        private readonly Vector2 b;
-        private readonly Vector2 c;
-
-        private int amountPoints;
-
         private const float tolerance = 0.1f;
 
-        public CircularArcApproximator(Vector2 a, Vector2 b, Vector2 c)
+        private readonly ReadOnlySpan<Vector2> controlPoints;
+
+        public CircularArcApproximator(ReadOnlySpan<Vector2> controlPoints)
         {
-            this.a = a;
-            this.b = b;
-            this.c = c;
+            this.controlPoints = controlPoints;
         }
 
         /// <summary>
@@ -31,6 +25,10 @@ namespace osu.Game.Rulesets.Objects
         /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
         public List<Vector2> CreateArc()
         {
+            Vector2 a = controlPoints[0];
+            Vector2 b = controlPoints[1];
+            Vector2 c = controlPoints[2];
+
             float aSq = (b - c).LengthSquared;
             float bSq = (a - c).LengthSquared;
             float cSq = (a - b).LengthSquared;
@@ -81,7 +79,7 @@ namespace osu.Game.Rulesets.Objects
             // is: 2 * Math.Acos(1 - TOLERANCE / r)
             // The special case is required for extremely short sliders where the radius is smaller than
             // the tolerance. This is a pathological rather than a realistic case.
-            amountPoints = 2 * r <= tolerance ? 2 : Math.Max(2, (int)Math.Ceiling(thetaRange / (2 * Math.Acos(1 - tolerance / r))));
+            int amountPoints = 2 * r <= tolerance ? 2 : Math.Max(2, (int)Math.Ceiling(thetaRange / (2 * Math.Acos(1 - tolerance / r))));
 
             List<Vector2> output = new List<Vector2>(amountPoints);
 

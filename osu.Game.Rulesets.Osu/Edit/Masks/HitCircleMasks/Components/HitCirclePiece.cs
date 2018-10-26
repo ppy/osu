@@ -9,19 +9,19 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircle.Components
+namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components
 {
     public class HitCirclePiece : CompositeDrawable
     {
-        private readonly Objects.HitCircle hitCircle;
+        private readonly HitCircle hitCircle;
 
-        public HitCirclePiece(Objects.HitCircle hitCircle)
+        public HitCirclePiece(HitCircle hitCircle)
         {
             this.hitCircle = hitCircle;
-
             Origin = Anchor.Centre;
 
             Size = new Vector2((float)OsuHitObject.OBJECT_RADIUS * 2);
+            Scale = new Vector2(hitCircle.Scale);
             CornerRadius = Size.X / 2;
 
             InternalChild = new RingPiece();
@@ -39,12 +39,5 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircle.Components
         }
 
         protected virtual void UpdatePosition() => Position = hitCircle.StackedPosition;
-
-        protected override void Update()
-        {
-            base.Update();
-
-            Scale = new Vector2(hitCircle.Scale);
-        }
     }
 }

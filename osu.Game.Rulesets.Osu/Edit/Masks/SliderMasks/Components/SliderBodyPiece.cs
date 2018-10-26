@@ -4,17 +4,18 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK.Graphics;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider.Components
+namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
 {
-    public class BodyPiece : CompositeDrawable
+    public class SliderBodyPiece : CompositeDrawable
     {
-        private readonly Objects.Slider slider;
+        private readonly Slider slider;
         private readonly SliderBody body;
 
-        public BodyPiece(Objects.Slider slider)
+        public SliderBodyPiece(Slider slider)
         {
             this.slider = slider;
             InternalChild = body = new SliderBody(slider)

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.MathUtils;
@@ -13,7 +14,7 @@ namespace osu.Game.Rulesets.Objects
     {
         public double Distance;
 
-        public List<Vector2> ControlPoints;
+        public Vector2[] ControlPoints;
 
         public CurveType CurveType = CurveType.PerfectCurve;
 
@@ -22,19 +23,23 @@ namespace osu.Game.Rulesets.Objects
         private readonly List<Vector2> calculatedPath = new List<Vector2>();
         private readonly List<double> cumulativeLength = new List<double>();
 
-        private List<Vector2> calculateSubpath(List<Vector2> subControlPoints)
+        private List<Vector2> calculateSubpath(ReadOnlySpan<Vector2> subControlPoints)
         {
             switch (CurveType)
             {
                 case CurveType.Linear:
-                    return subControlPoints;
+                    var result = new List<Vector2>(subControlPoints.Length);
+                    foreach (var c in subControlPoints)
+                        result.Add(c);
+
+                    return result;
                 case CurveType.PerfectCurve:
                     //we can only use CircularArc iff we have exactly three control points and no dissection.
-                    if (ControlPoints.Count != 3 || subControlPoints.Count != 3)
+                    if (ControlPoints.Length != 3 || subControlPoints.Length != 3)
                         break;
 
                     // Here we have exactly 3 control points. Attempt to fit a circular arc.
-                    List<Vector2> subpath = new CircularArcApproximator(subControlPoints[0], subControlPoints[1], subControlPoints[2]).CreateArc();
+                    List<Vector2> subpath = new CircularArcApproximator(subControlPoints).CreateArc();
 
                     // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
                     if (subpath.Count == 0)
@@ -55,18 +60,23 @@ namespace osu.Game.Rulesets.Objects
             // Sliders may consist of various subpaths separated by two consecutive vertices
             // with the same position. The following loop parses these subpaths and computes
             // their shape independently, consecutively appending them to calculatedPath.
-            List<Vector2> subControlPoints = new List<Vector2>();
-            for (int i = 0; i < ControlPoints.Count; ++i)
+
+            int start = 0;
+            int end = 0;
+
+            for (int i = 0; i < ControlPoints.Length; ++i)
             {
-                subControlPoints.Add(ControlPoints[i]);
-                if (i == ControlPoints.Count - 1 || ControlPoints[i] == ControlPoints[i + 1])
+                end++;
+
+                if (i == ControlPoints.Length - 1 || ControlPoints[i] == ControlPoints[i + 1])
                 {
-                    List<Vector2> subpath = calculateSubpath(subControlPoints);
-                    foreach (Vector2 t in subpath)
+                    ReadOnlySpan<Vector2> cpSpan = ControlPoints.AsSpan().Slice(start, end - start);
+
+                    foreach (Vector2 t in calculateSubpath(cpSpan))
                         if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
                             calculatedPath.Add(t);
 
-                    subControlPoints.Clear();
+                    start = end;
                 }
             }
         }
@@ -166,7 +176,7 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="p1">End progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
         public void GetPathToProgress(List<Vector2> path, double p0, double p1)
         {
-            if (calculatedPath.Count == 0 && ControlPoints.Count > 0)
+            if (calculatedPath.Count == 0 && ControlPoints.Length > 0)
                 Calculate();
 
             double d0 = progressToDistance(p0);
@@ -193,7 +203,7 @@ namespace osu.Game.Rulesets.Objects
         /// <returns></returns>
         public Vector2 PositionAt(double progress)
         {
-            if (calculatedPath.Count == 0 && ControlPoints.Count > 0)
+            if (calculatedPath.Count == 0 && ControlPoints.Length > 0)
                 Calculate();
 
             double d = progressToDistance(progress);

@@ -3,9 +3,9 @@
 
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Edit.Masks.HitCircle.Components;
+using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircle
+namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks
 {
     public class HitCirclePlacementMask : PlacementMask
     {
