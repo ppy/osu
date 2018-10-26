@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
         public SliderCircleSelectionMask(DrawableOsuHitObject hitObject, Slider slider, SliderPosition position)
             : base(hitObject)
         {
-            InternalChild = new SliderCircleMask(slider, position);
+            InternalChild = new SliderCirclePiece(slider, position);
 
             Select();
         }
