@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components
 
             hitCircle.PositionChanged += _ => UpdatePosition();
             hitCircle.StackHeightChanged += _ => UpdatePosition();
+            hitCircle.ScaleChanged += _ => Scale = new Vector2(hitCircle.Scale);
         }
 
         [BackgroundDependencyLoader]
