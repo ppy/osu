@@ -3,7 +3,7 @@
 
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
-using osu.Game.Rulesets.Osu.Edit.Masks.HitCircle;
+using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit

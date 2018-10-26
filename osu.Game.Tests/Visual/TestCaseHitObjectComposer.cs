@@ -13,8 +13,8 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Edit;
-using osu.Game.Rulesets.Osu.Edit.Masks.HitCircle;
-using osu.Game.Rulesets.Osu.Edit.Masks.HitCircle.Components;
+using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks;
+using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Screens.Compose;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
@@ -53,14 +53,12 @@ namespace osu.Game.Tests.Visual
                     new Slider
                     {
                         Position = new Vector2(128, 256),
-                        ControlPoints = new List<Vector2>
+                        ControlPoints = new[]
                         {
                             Vector2.Zero,
                             new Vector2(216, 0),
                         },
                         Distance = 216,
-                        Velocity = 1,
-                        TickDistance = 100,
                         Scale = 0.5f,
                     }
                 },

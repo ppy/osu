@@ -148,11 +148,12 @@ namespace osu.Game.Beatmaps
         /// </summary>
         /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to be downloaded.</param>
         /// <param name="noVideo">Whether the beatmap should be downloaded without video. Defaults to false.</param>
-        public void Download(BeatmapSetInfo beatmapSetInfo, bool noVideo = false)
+        /// <returns>Downloading can happen</returns>
+        public bool Download(BeatmapSetInfo beatmapSetInfo, bool noVideo = false)
         {
             var existing = GetExistingDownload(beatmapSetInfo);
 
-            if (existing != null || api == null) return;
+            if (existing != null || api == null) return false;
 
             if (!api.LocalUser.Value.IsSupporter)
             {
@@ -161,7 +162,7 @@ namespace osu.Game.Beatmaps
                     Icon = FontAwesome.fa_superpowers,
                     Text = "You gotta be an osu!supporter to download for now 'yo"
                 });
-                return;
+                return false;
             }
 
             var downloadNotification = new DownloadNotification
@@ -227,6 +228,7 @@ namespace osu.Game.Beatmaps
             // don't run in the main api queue as this is a long-running task.
             Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
             BeatmapDownloadBegan?.Invoke(request);
+            return true;
         }
 
         protected override void PresentCompletedImport(IEnumerable<BeatmapSetInfo> imported)

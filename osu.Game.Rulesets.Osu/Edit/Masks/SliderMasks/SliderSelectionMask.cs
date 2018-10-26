@@ -3,11 +3,12 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Edit.Masks.Slider.Components;
+using osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using OpenTK;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider
+namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
 {
     public class SliderSelectionMask : SelectionMask
     {
@@ -16,11 +17,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider
         public SliderSelectionMask(DrawableSlider slider)
             : base(slider)
         {
-            var sliderObject = (Objects.Slider)slider.HitObject;
+            var sliderObject = (Slider)slider.HitObject;
 
             InternalChildren = new Drawable[]
             {
-                new BodyPiece(sliderObject),
+                new SliderBodyPiece(sliderObject),
                 headMask = new SliderCircleSelectionMask(slider.HeadCircle, sliderObject, SliderPosition.Start),
                 new SliderCircleSelectionMask(slider.TailCircle, sliderObject, SliderPosition.End),
             };

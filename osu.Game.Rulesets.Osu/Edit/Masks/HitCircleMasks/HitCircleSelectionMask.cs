@@ -2,17 +2,18 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Edit.Masks.HitCircle.Components;
+using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components;
+using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircle
+namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks
 {
     public class HitCircleSelectionMask : SelectionMask
     {
         public HitCircleSelectionMask(DrawableHitCircle hitCircle)
             : base(hitCircle)
         {
-            InternalChild = new HitCirclePiece((Objects.HitCircle)hitCircle.HitObject);
+            InternalChild = new HitCirclePiece((HitCircle)hitCircle.HitObject);
         }
     }
 }
