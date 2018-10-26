@@ -28,6 +28,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
             };
 
             slider.PositionChanged += _ => updatePosition();
+            slider.ScaleChanged += _ => body.PathWidth = slider.Scale * 64;
         }
 
         [BackgroundDependencyLoader]
