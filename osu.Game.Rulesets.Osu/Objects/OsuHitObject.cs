@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public event Action<Vector2> PositionChanged;
         public event Action<int> StackHeightChanged;
+        public event Action<float> ScaleChanged;
 
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;
@@ -64,7 +65,20 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public double Radius => OBJECT_RADIUS * Scale;
 
-        public float Scale { get; set; } = 1;
+        private float scale = 1;
+
+        public float Scale
+        {
+            get => scale;
+            set
+            {
+                if (scale == value)
+                    return;
+                scale = value;
+
+                ScaleChanged?.Invoke(value);
+            }
+        }
 
         public virtual bool NewCombo { get; set; }
 

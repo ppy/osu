@@ -62,6 +62,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
             HitObject.StackHeightChanged += _ => Position = HitObject.StackedPosition;
+            HitObject.ScaleChanged += s => Scale = new Vector2(s);
         }
 
         public override Color4 AccentColour
