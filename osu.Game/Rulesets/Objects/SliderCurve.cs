@@ -14,9 +14,11 @@ namespace osu.Game.Rulesets.Objects
     {
         public double Distance;
 
-        public Vector2[] ControlPoints;
+        public Vector2[] ControlPoints = Array.Empty<Vector2>();
 
         public CurveType CurveType = CurveType.PerfectCurve;
+
+        public Vector2 Offset;
 
         private readonly List<Vector2> calculatedPath = new List<Vector2>();
         private readonly List<double> cumulativeLength = new List<double>();
@@ -26,11 +28,7 @@ namespace osu.Game.Rulesets.Objects
             switch (CurveType)
             {
                 case CurveType.Linear:
-                    var result = new List<Vector2>(subControlPoints.Length);
-                    foreach (var c in subControlPoints)
-                        result.Add(c);
-
-                    return result;
+                    return new LinearApproximator(subControlPoints).CreateLinear();
                 case CurveType.PerfectCurve:
                     //we can only use CircularArc iff we have exactly three control points and no dissection.
                     if (ControlPoints.Length != 3 || subControlPoints.Length != 3)
@@ -185,12 +183,12 @@ namespace osu.Game.Rulesets.Objects
             int i = 0;
             for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i) { }
 
-            path.Add(interpolateVertices(i, d0));
+            path.Add(interpolateVertices(i, d0) + Offset);
 
             for (; i < calculatedPath.Count && cumulativeLength[i] <= d1; ++i)
-                path.Add(calculatedPath[i]);
+                path.Add(calculatedPath[i] + Offset);
 
-            path.Add(interpolateVertices(i, d1));
+            path.Add(interpolateVertices(i, d1) + Offset);
         }
 
         /// <summary>
@@ -205,7 +203,7 @@ namespace osu.Game.Rulesets.Objects
                 Calculate();
 
             double d = progressToDistance(progress);
-            return interpolateVertices(indexOfDistance(d), d);
+            return interpolateVertices(indexOfDistance(d), d) + Offset;
         }
     }
 }

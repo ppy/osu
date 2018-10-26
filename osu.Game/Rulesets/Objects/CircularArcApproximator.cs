@@ -8,19 +8,23 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public class CircularArcApproximator : IApproximator
+    public readonly ref struct CircularArcApproximator
     {
         private const float tolerance = 0.1f;
+
+        private readonly ReadOnlySpan<Vector2> controlPoints;
+
+        public CircularArcApproximator(ReadOnlySpan<Vector2> controlPoints)
+        {
+            this.controlPoints = controlPoints;
+        }
 
         /// <summary>
         /// Creates a piecewise-linear approximation of a circular arc curve.
         /// </summary>
         /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-        public List<Vector2> Approximate(List<Vector2> controlPoints)
+        public List<Vector2> CreateArc()
         {
-            if (controlPoints.Count != 3)
-                throw new ArgumentException("Must have 3 control points to perform circular arc approximation.", nameof(controlPoints));
-
             Vector2 a = controlPoints[0];
             Vector2 b = controlPoints[1];
             Vector2 c = controlPoints[2];

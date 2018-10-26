@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using OpenTK;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider.Components
+namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
 {
     /// <summary>
     /// Todo: Move this out of SliderPlacementMask...
