@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -12,11 +13,11 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Edit.Masks.Slider.Components;
+using osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components;
 using OpenTK;
 using OpenTK.Input;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider
+namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
 {
     public class SliderPlacementMask : PlacementMask
     {
@@ -41,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider
         {
             InternalChildren = new Drawable[]
             {
-                new BodyPiece(HitObject),
+                new SliderBodyPiece(HitObject),
                 new SliderCirclePiece(HitObject, SliderPosition.Start),
                 new SliderCirclePiece(HitObject, SliderPosition.End),
                 controlPointContainer = new Container<SliderControlPoint> { RelativeSizeAxes = Axes.Both }
@@ -113,8 +114,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider
 
         private void endCurve()
         {
-            HitObject.ControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToList();
-            HitObject.CurveType = HitObject.ControlPoints.Count > 2 ? CurveType.Bezier : CurveType.Linear;
+            HitObject.ControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
+            HitObject.CurveType = HitObject.ControlPoints.Length > 2 ? CurveType.Bezier : CurveType.Linear;
             HitObject.Distance = segments.Sum(s => s.Distance);
 
             EndPlacement();
@@ -127,8 +128,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider
             for (int i = 0; i < segments.Count; i++)
                 segments[i].Calculate(i == segments.Count - 1 ? (Vector2?)cursor : null);
 
-            HitObject.ControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToList();
-            HitObject.CurveType = HitObject.ControlPoints.Count > 2 ? CurveType.Bezier : CurveType.Linear;
+            HitObject.ControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
+            HitObject.CurveType = HitObject.ControlPoints.Length > 2 ? CurveType.Bezier : CurveType.Linear;
             HitObject.Distance = segments.Sum(s => s.Distance);
         }
 
@@ -154,32 +155,31 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.Slider
                 ControlPoints.Add(offset);
             }
 
-            public List<Vector2> Calculate(Vector2? cursor = null)
+            public void Calculate(Vector2? cursor = null)
             {
-                var allControlPoints = ControlPoints.ToList();
+                Span<Vector2> allControlPoints = stackalloc Vector2[ControlPoints.Count + (cursor.HasValue ? 1 : 0)];
+
+                for (int i = 0; i < ControlPoints.Count; i++)
+                    allControlPoints[i] = ControlPoints[i];
                 if (cursor.HasValue)
-                    allControlPoints.Add(cursor.Value);
+                    allControlPoints[allControlPoints.Length - 1] = cursor.Value;
 
-                IApproximator approximator;
+                List<Vector2> result;
 
-                switch (allControlPoints.Count)
+                switch (allControlPoints.Length)
                 {
                     case 1:
                     case 2:
-                        approximator = new LinearApproximator();
+                        result = new LinearApproximator(allControlPoints).CreateLinear();
                         break;
                     default:
-                        approximator = new BezierApproximator();
+                        result = new BezierApproximator(allControlPoints).CreateBezier();
                         break;
                 }
 
                 Distance = 0;
-
-                var points = approximator.Approximate(allControlPoints);
-                for (int i = 0; i < points.Count - 1; i++)
-                    Distance += Vector2.Distance(points[i], points[i + 1]);
-
-                return points;
+                for (int i = 0; i < result.Count - 1; i++)
+                    Distance += Vector2.Distance(result[i], result[i + 1]);
             }
         }
     }
