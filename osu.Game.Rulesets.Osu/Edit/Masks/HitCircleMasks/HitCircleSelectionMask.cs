@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks
         public HitCircleSelectionMask(DrawableHitCircle hitCircle)
             : base(hitCircle)
         {
-            InternalChild = new HitCircleMask((HitCircle)hitCircle.HitObject);
+            InternalChild = new HitCirclePiece((HitCircle)hitCircle.HitObject);
         }
     }
 }
