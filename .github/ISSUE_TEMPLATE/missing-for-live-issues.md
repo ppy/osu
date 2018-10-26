@@ -1,10 +1,10 @@
 ---
-name: Game Feature
-about: For issues regarding features to be found in the game
+name: Missing for Live
+about: For issues regarding game features required for live
 ---
 
 <!-- After you fill in all information, delete all comments in the issue -->
 
-**Describe the feature:** <!-- Describe the game feature -->
+**Describe the feature:** <!-- Describe the missing game feature -->
 
-**Designs:** <!-- Attach screenshots of how the feature should look like -->
+**Designs:** <!-- Attach screenshots of how the feature is supposed to look like -->
