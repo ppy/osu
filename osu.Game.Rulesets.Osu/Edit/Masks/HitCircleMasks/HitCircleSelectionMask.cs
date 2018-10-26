@@ -3,10 +3,11 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks
+namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks
 {
     public class HitCircleSelectionMask : SelectionMask
     {
