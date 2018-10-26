@@ -4,15 +4,16 @@
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks
 {
     public class HitCirclePlacementMask : PlacementMask
     {
-        public new Objects.HitCircle HitObject => (Objects.HitCircle)base.HitObject;
+        public new HitCircle HitObject => (HitCircle)base.HitObject;
 
         public HitCirclePlacementMask()
-            : base(new Objects.HitCircle())
+            : base(new HitCircle())
         {
             InternalChild = new HitCirclePiece(HitObject);
         }
