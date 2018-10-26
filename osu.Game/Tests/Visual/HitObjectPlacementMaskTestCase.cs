@@ -20,6 +20,8 @@ namespace osu.Game.Tests.Visual
 
         protected HitObjectPlacementMaskTestCase()
         {
+            Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize = 2;
+
             Add(hitObjectContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
