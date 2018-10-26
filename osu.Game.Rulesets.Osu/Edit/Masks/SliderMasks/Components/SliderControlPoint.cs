@@ -12,9 +12,6 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
 {
-    /// <summary>
-    /// Todo: Move this out of SliderPlacementMask...
-    /// </summary>
     public class SliderControlPoint : CompositeDrawable
     {
         private readonly Path path;
