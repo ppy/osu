@@ -5,8 +5,6 @@ about: For issues regarding encountered game bugs
 
 <!-- After you fill in all information, delete all comments in the issue -->
 
-**What is your problem:** <!-- Name the problem you have encountered -->
-
 **Describe your problem:** <!-- Provide any information you believe could be useful -->
 
 **Screenshots or videos showing encountered issue:** 
