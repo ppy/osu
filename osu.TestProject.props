@@ -10,10 +10,6 @@
     <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
     <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj" />
   </ItemGroup>
-  <ItemGroup Label="Package References">
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.3" />
-    <PackageReference Include="DeepEqual" Version="1.6.0" />
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="..\osu.Game\Tests\VisualTestRunner.cs">
       <Link>VisualTestRunner.cs</Link>

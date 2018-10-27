@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private const float fg_panel_depth = 4;
         private const float npc_depth = 6;
 
-        private readonly Container restrictTo;
+        private readonly CompositeDrawable restrictTo;
         private readonly bool modEasy, modHardrock;
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// </summary>
         private const float leniency = 0.1f;
 
-        public DrawableOsuBlinds(Container restrictTo, bool hasEasy, bool hasHardrock, Beatmap<OsuHitObject> beatmap)
+        public DrawableOsuBlinds(CompositeDrawable restrictTo, bool hasEasy, bool hasHardrock, Beatmap<OsuHitObject> beatmap)
         {
             this.restrictTo = restrictTo;
             this.beatmap = beatmap;
