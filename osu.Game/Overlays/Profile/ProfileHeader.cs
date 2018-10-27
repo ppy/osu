@@ -460,13 +460,13 @@ namespace osu.Game.Overlays.Profile
             badgeContainer.ShowBadges(user.Badges);
         }
 
-	private string Truncate(string str, int bound)
-	{
-		if(str.Length > bound)
-			return str.Substring(0, bound) + "...";
-		else
-			return str;
-	}
+        private string Truncate(string str, int bound)
+        {
+            if(str.Length > bound)
+                return str.Substring(0, bound) + "...";
+            else
+                return str;
+        }
 
         private void tryAddInfoRightLine(FontAwesome icon, string str, string url = null)
         {
@@ -477,7 +477,7 @@ namespace osu.Game.Overlays.Profile
 
 	    var line = " " + str;
 	    if(line.Length > local_char_limit)
-		    line = Truncate(line, local_char_limit);
+                line = Truncate(line, local_char_limit);
             if (url != null)
 		infoTextRight.AddLink(line, url);
             else
