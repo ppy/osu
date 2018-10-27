@@ -470,18 +470,18 @@ namespace osu.Game.Overlays.Profile
 
         private void tryAddInfoRightLine(FontAwesome icon, string str, string url = null)
         {
-	    const int local_char_limit = 31;
+            const int local_char_limit = 31;
             if (string.IsNullOrEmpty(str)) return;
 
             infoTextRight.AddIcon(icon);
 
-	    var line = " " + str;
-	    if(line.Length > local_char_limit)
+            var line = " " + str;
+            if(line.Length > local_char_limit)
                 line = Truncate(line, local_char_limit);
             if (url != null)
-		infoTextRight.AddLink(line, url);
+                infoTextRight.AddLink(line, url);
             else
-		infoTextRight.AddText(line);
+                infoTextRight.AddText(line);
 
             infoTextRight.NewLine();
         }
