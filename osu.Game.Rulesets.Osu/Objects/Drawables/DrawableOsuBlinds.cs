@@ -214,13 +214,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected override void LoadComplete()
         {
             const float break_open_early = 500;
+            const float break_close_late = 250;
 
             base.LoadComplete();
 
             var firstObj = beatmap.HitObjects[0];
-            var startDelay = firstObj.StartTime - firstObj.TimePreempt - firstObj.TimeFadeIn;
+            var startDelay = firstObj.StartTime - firstObj.TimePreempt;
 
-            using (BeginAbsoluteSequence(startDelay, true))
+            using (BeginAbsoluteSequence(startDelay + break_close_late, true))
                 LeaveBreak();
 
             foreach (var breakInfo in beatmap.Breaks)
@@ -230,7 +231,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     using (BeginAbsoluteSequence(breakInfo.StartTime - break_open_early, true))
                     {
                         EnterBreak();
-                        using (BeginDelayedSequence(breakInfo.Duration + break_open_early, true))
+                        using (BeginDelayedSequence(breakInfo.Duration + break_open_early + break_close_late, true))
                             LeaveBreak();
                     }
                 }
