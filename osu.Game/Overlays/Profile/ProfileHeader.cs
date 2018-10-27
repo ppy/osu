@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -460,26 +460,28 @@ namespace osu.Game.Overlays.Profile
             badgeContainer.ShowBadges(user.Badges);
         }
 
+	private string Truncate(string str, int bound)
+	{
+		if(str.Length > bound)
+			return str.Substring(0, bound) + "...";
+		else
+			return str;
+	}
+
         private void tryAddInfoRightLine(FontAwesome icon, string str, string url = null)
         {
-            const int local_char_limit = 31;
+	    const int local_char_limit = 31;
             if (string.IsNullOrEmpty(str)) return;
 
             infoTextRight.AddIcon(icon);
+
+	    var line = " " + str;
+	    if(line.Length > local_char_limit)
+		    line = Truncate(line, local_char_limit);
             if (url != null)
-            {
-                if (str.Length > local_char_limit)
-                    infoTextRight.AddLink(" " + str.Substring(0, local_char_limit) + "...", url);
-                else
-                    infoTextRight.AddLink(" " + str, url);
-            }
+		infoTextRight.AddLink(line, url);
             else
-            {
-                if (str.Length > local_char_limit)
-                    infoTextRight.AddText(" " + str.Substring(0, local_char_limit) + "...");
-                else
-                    infoTextRight.AddText(" " + str);
-            }
+		infoTextRight.AddText(line);
 
             infoTextRight.NewLine();
         }
