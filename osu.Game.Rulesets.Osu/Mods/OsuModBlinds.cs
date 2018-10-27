@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 if (mod is ModHardRock)
                     hasHardrock = true;
             }
-            rulesetContainer.Overlays.Add(flashlight = new DrawableOsuBlinds(rulesetContainer.Playfield, hasEasy, hasHardrock, rulesetContainer.Beatmap));
+            rulesetContainer.Overlays.Add(flashlight = new DrawableOsuBlinds(rulesetContainer.Playfield.HitObjectContainer, hasEasy, hasHardrock, rulesetContainer.Beatmap));
         }
 
         public override void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
