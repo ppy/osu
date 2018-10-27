@@ -460,7 +460,7 @@ namespace osu.Game.Overlays.Profile
             badgeContainer.ShowBadges(user.Badges);
         }
 
-        private string Truncate(string str, int bound)
+        private string truncate(string str, int bound)
         {
             if(str.Length > bound)
                 return str.Substring(0, bound) + "...";
@@ -477,7 +477,7 @@ namespace osu.Game.Overlays.Profile
 
             var line = " " + str;
             if(line.Length > local_char_limit)
-                line = Truncate(line, local_char_limit);
+                line = truncate(line, local_char_limit);
             if (url != null)
                 infoTextRight.AddLink(line, url);
             else
