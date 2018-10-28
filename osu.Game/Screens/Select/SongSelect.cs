@@ -225,7 +225,7 @@ namespace osu.Game.Screens.Select
 
         public void Edit(BeatmapInfo beatmap)
         {
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
             Push(new Editor());
         }
 
