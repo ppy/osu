@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Profile.Header
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.X,
-                    Height = 75,
+                    Height = 60,
                     Y = -secondary_textsize,
                     Alpha = 0,
                 }
