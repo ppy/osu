@@ -229,6 +229,8 @@ namespace osu.Game.Screens.Select
             Push(new Editor());
         }
 
+        protected void EditSelected() => Edit(beatmapNoDebounce);
+
         /// <summary>
         /// Call to make a selection and perform the default action for this SongSelect.
         /// </summary>
