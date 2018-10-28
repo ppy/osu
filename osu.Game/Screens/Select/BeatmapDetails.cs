@@ -307,10 +307,10 @@ namespace osu.Game.Screens.Select
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-                Alpha = 0;
 
                 InternalChild = textContainer = new FillFlowContainer
                 {
+                    Alpha = 0,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(spacing / 2),
@@ -327,11 +327,6 @@ namespace osu.Game.Screens.Select
                                 TextSize = 14,
                             },
                         },
-                        textFlow = new OsuTextFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        },
                     },
                 };
             }
@@ -342,7 +337,7 @@ namespace osu.Game.Screens.Select
                 {
                     if (string.IsNullOrEmpty(value))
                     {
-                        this.FadeOut(transition_duration);
+                        textContainer.FadeOut(transition_duration);
                         return;
                     }
 
@@ -364,7 +359,7 @@ namespace osu.Game.Screens.Select
                     textContainer.Add(textFlow = loaded);
 
                     // fade in if we haven't yet.
-                    this.FadeIn(transition_duration);
+                    textContainer.FadeIn(transition_duration);
                 });
             }
         }
