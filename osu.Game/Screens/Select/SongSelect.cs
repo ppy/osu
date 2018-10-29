@@ -223,13 +223,11 @@ namespace osu.Game.Screens.Select
             Carousel.LoadBeatmapSetsFromManager(this.beatmaps);
         }
 
-        public void Edit(BeatmapInfo beatmap)
+        public void Edit(BeatmapInfo beatmap = null)
         {
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap);
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
             Push(new Editor());
         }
-
-        protected void EditSelected() => Edit(beatmapNoDebounce);
 
         /// <summary>
         /// Call to make a selection and perform the default action for this SongSelect.

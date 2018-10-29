@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Select
             BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.fa_pencil, colours.Yellow, () =>
             {
                 ValidForResume = false;
-                EditSelected();
+                Edit();
             }, Key.Number3);
 
             if (dialogOverlay != null)
