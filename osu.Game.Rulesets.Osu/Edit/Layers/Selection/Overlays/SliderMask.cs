@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
 {
     public class SliderMask : HitObjectMask
     {
-        private readonly SliderBody body;
+        private readonly SnakingSliderBody body;
         private readonly DrawableSlider slider;
 
         public SliderMask(DrawableSlider slider)
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays
 
             InternalChildren = new Drawable[]
             {
-                body = new SliderBody(sliderObject)
+                body = new SnakingSliderBody(sliderObject)
                 {
                     AccentColour = Color4.Transparent,
                     PathWidth = sliderObject.Scale * 64
