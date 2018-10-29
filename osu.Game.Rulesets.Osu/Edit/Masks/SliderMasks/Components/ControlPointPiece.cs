@@ -31,19 +31,20 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
             this.index = index;
 
             Origin = Anchor.Centre;
-            Size = new Vector2(10);
+            AutoSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
                 path = new SmoothPath
                 {
-                    BypassAutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     PathWidth = 1
                 },
                 marker = new CircularContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(15),
                     Masking = true,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 }
@@ -68,6 +69,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
 
             path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
         }
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => marker.ReceivePositionalInputAt(screenSpacePos);
 
         protected override bool OnDragStart(DragStartEvent e) => true;
 
