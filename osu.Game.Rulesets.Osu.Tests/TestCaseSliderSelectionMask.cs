@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestCaseSliderSelectionMask : HitObjectSelectionMaskTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new Type[]
+        public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(SliderSelectionMask),
             typeof(SliderCircleSelectionMask),

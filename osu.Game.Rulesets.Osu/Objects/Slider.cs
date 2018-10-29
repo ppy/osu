@@ -64,6 +64,9 @@ namespace osu.Game.Rulesets.Osu.Objects
                 Curve.ControlPoints = value;
 
                 ControlPointsChanged?.Invoke(value);
+
+                if (TailCircle != null)
+                    TailCircle.Position = EndPosition;
             }
         }
 

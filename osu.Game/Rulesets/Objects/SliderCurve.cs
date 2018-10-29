@@ -124,10 +124,33 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
-        public void Calculate()
+        private void calculateCumulativeLength()
+        {
+            double l = 0;
+
+            cumulativeLength.Clear();
+            cumulativeLength.Add(l);
+
+            for (int i = 0; i < calculatedPath.Count - 1; ++i)
+            {
+                Vector2 diff = calculatedPath[i + 1] - calculatedPath[i];
+                double d = diff.Length;
+
+                l += d;
+                cumulativeLength.Add(l);
+            }
+
+            Distance = l;
+        }
+
+        public void Calculate(bool updateDistance = false)
         {
             calculatePath();
-            calculateCumulativeLengthAndTrimPath();
+
+            if (!updateDistance)
+                calculateCumulativeLengthAndTrimPath();
+            else
+                calculateCumulativeLength();
         }
 
         private int indexOfDistance(double d)

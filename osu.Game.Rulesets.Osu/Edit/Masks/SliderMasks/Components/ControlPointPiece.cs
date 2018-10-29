@@ -73,10 +73,27 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
 
         protected override bool OnDrag(DragEvent e)
         {
-            var newControlPoints = slider.ControlPoints.ToArray();
-            newControlPoints[index] += e.Delta;
+            if (index == 0)
+            {
+                // Special handling for the head - only the position of the slider changes
+                slider.Position += e.Delta;
 
-            slider.ControlPoints = newControlPoints;
+                // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
+                var newControlPoints = slider.ControlPoints.ToArray();
+                for (int i = 1; i < newControlPoints.Length; i++)
+                    newControlPoints[i] -= e.Delta;
+
+                slider.ControlPoints = newControlPoints;
+                slider.Curve.Calculate(true);
+            }
+            else
+            {
+                var newControlPoints = slider.ControlPoints.ToArray();
+                newControlPoints[index] += e.Delta;
+
+                slider.ControlPoints = newControlPoints;
+                slider.Curve.Calculate(true);
+            }
 
             return true;
         }

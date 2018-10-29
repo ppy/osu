@@ -85,6 +85,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
+
+            slider.ControlPointsChanged += _ => Body.Refresh();
         }
 
         public override Color4 AccentColour
