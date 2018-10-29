@@ -84,7 +84,6 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
 
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
-            Set(OsuSetting.RestartOnFail, false);
 
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
@@ -149,7 +148,6 @@ namespace osu.Game.Configuration
         BeatmapSkins,
         BeatmapHitsounds,
         IncreaseFirstObjectVisibility,
-        RestartOnFail,
         ScoreDisplayMode
     }
 }
