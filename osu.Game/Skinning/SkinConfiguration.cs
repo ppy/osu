@@ -14,5 +14,7 @@ namespace osu.Game.Skinning
         public List<Color4> ComboColours { get; set; } = new List<Color4>();
 
         public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
+
+        public string HitCircleFont { get; set; } = "default";
     }
 }
