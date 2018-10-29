@@ -7,7 +7,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 var target = Argument("target", "Build");
-var framework = Argument("framework", "netcoreapp2.1");
 var configuration = Argument("configuration", "Release");
 
 var osuSolution = new FilePath("./osu.sln");
