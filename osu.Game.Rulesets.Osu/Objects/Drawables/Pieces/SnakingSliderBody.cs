@@ -45,15 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         [BackgroundDependencyLoader]
         private void load()
         {
-            // Generate the entire curve
-            slider.Curve.GetPathToProgress(CurrentCurve, 0, 1);
-            SetVertices(CurrentCurve);
-
-            // The body is sized to the full path size to avoid excessive autosize computations
-            Size = Path.Size;
-
-            snakedPosition = Path.PositionInBoundingBox(Vector2.Zero);
-            snakedPathOffset = Path.PositionInBoundingBox(Path.Vertices[0]);
+            Refresh();
         }
 
         public void UpdateProgress(double completionProgress)
@@ -78,6 +70,27 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
 
             setRange(start, end);
+        }
+
+        public void Refresh()
+        {
+            // Generate the entire curve
+            slider.Curve.GetPathToProgress(CurrentCurve, 0, 1);
+            SetVertices(CurrentCurve);
+
+            // The body is sized to the full path size to avoid excessive autosize computations
+            Size = Path.Size;
+
+            snakedPosition = Path.PositionInBoundingBox(Vector2.Zero);
+            snakedPathOffset = Path.PositionInBoundingBox(Path.Vertices[0]);
+
+            var lastSnakedStart = SnakedStart ?? 0;
+            var lastSnakedEnd = SnakedEnd ?? 0;
+
+            SnakedStart = null;
+            SnakedEnd = null;
+
+            setRange(lastSnakedStart, lastSnakedEnd);
         }
 
         private void setRange(double p0, double p1)

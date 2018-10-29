@@ -90,6 +90,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Body.PathWidth = HitObject.Scale * 64;
                 Ball.Scale = new Vector2(HitObject.Scale);
             };
+
+            slider.ControlPointsChanged += _ => Body.Refresh();
         }
 
         public override Color4 AccentColour
