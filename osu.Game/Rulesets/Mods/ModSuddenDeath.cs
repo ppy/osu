@@ -3,9 +3,7 @@
 
 using System;
 using osu.Game.Graphics;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Scoring;
-using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.Mods
 {
