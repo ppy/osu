@@ -25,7 +25,7 @@ Build and run
 
 - Using Visual Studio 2017, Rider or Visual Studio Code (configurations are included)
 - From command line using `dotnet run --project osu.Desktop`. When building for non-development purposes, add `-c Release` to gain higher performance.
-- And from command line using `powershell ./build.ps1`. This will also run tests and code analysis. This command is used on CI. The code analysis is windows only.
+- And from command line using `powershell ./build.ps1` or if you use bash as your shell: `./build.sh`. This will also run tests and code analysis. This command is used on CI. The code analysis is windows only.
 
 Note: If you run from command line under linux, you will need to prefix the output folder to your `LD_LIBRARY_PATH`. See `.vscode/launch.json` for an example
 
