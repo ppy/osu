@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
@@ -22,8 +21,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
     public class SliderPlacementMask : PlacementMask
     {
         public new Objects.Slider HitObject => (Objects.Slider)base.HitObject;
-
-        private Container<SliderControlPoint> controlPointContainer;
 
         private readonly List<Segment> segments = new List<Segment>();
         private Vector2 cursor;
@@ -45,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
                 new SliderBodyPiece(HitObject),
                 new SliderCirclePiece(HitObject, SliderPosition.Start),
                 new SliderCirclePiece(HitObject, SliderPosition.End),
-                controlPointContainer = new Container<SliderControlPoint> { RelativeSizeAxes = Axes.Both }
+                new ControlPointVisualiser(HitObject),
             };
 
             setState(PlacementState.Initial);
@@ -60,7 +57,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
                     return true;
                 case PlacementState.Body:
                     cursor = e.MousePosition - HitObject.Position;
-                    controlPointContainer.Last().NextPoint = e.MousePosition;
                     return true;
             }
 
@@ -85,8 +81,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
                     break;
             }
 
-            controlPointContainer.Add(new SliderControlPoint { Position = e.MousePosition });
-
             return true;
         }
 
@@ -100,7 +94,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
         protected override bool OnDoubleClick(DoubleClickEvent e)
         {
             segments.Add(new Segment(segments[segments.Count - 1].ControlPoints.Last()));
-            controlPointContainer.Last().SegmentSeparator = true;
             return true;
         }
 
