@@ -16,57 +16,57 @@ var osuSolution = new FilePath("./osu.sln");
 ///////////////////////////////////////////////////////////////////////////////
 
 Task("Restore")
-.Does(() => {
-    DotNetCoreRestore(osuSolution.FullPath);
-});
+    .Does(() => {
+        DotNetCoreRestore(osuSolution.FullPath);
+    });
 
 Task("Compile")
-.IsDependentOn("Restore")
-.Does(() => {
-    DotNetCoreBuild(osuSolution.FullPath, new DotNetCoreBuildSettings {
-        Configuration = configuration,
-        NoRestore = true,
+    .IsDependentOn("Restore")
+    .Does(() => {
+        DotNetCoreBuild(osuSolution.FullPath, new DotNetCoreBuildSettings {
+            Configuration = configuration,
+            NoRestore = true,
+        });
     });
-});
 
 Task("Test")
-.IsDependentOn("Compile")
-.Does(() => {
-    var testAssemblies = GetFiles("**/*.Tests/bin/**/*.Tests.dll");
+    .IsDependentOn("Compile")
+    .Does(() => {
+        var testAssemblies = GetFiles("**/*.Tests/bin/**/*.Tests.dll");
 
-    DotNetCoreVSTest(testAssemblies, new DotNetCoreVSTestSettings {
-        Logger = AppVeyor.IsRunningOnAppVeyor ? "Appveyor" : $"trx",
-        Parallel = true,
-        ToolTimeout = TimeSpan.FromMinutes(10),
+        DotNetCoreVSTest(testAssemblies, new DotNetCoreVSTestSettings {
+            Logger = AppVeyor.IsRunningOnAppVeyor ? "Appveyor" : $"trx",
+            Parallel = true,
+            ToolTimeout = TimeSpan.FromMinutes(10),
+        });
     });
-});
 
 // windows only because both inspectcore and nvika depend on net45
 Task("InspectCode")
-.WithCriteria(IsRunningOnWindows())
-.IsDependentOn("Compile")
-.Does(() => {
-    var nVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
+    .WithCriteria(IsRunningOnWindows())
+    .IsDependentOn("Compile")
+    .Does(() => {
+        var nVikaToolPath = GetFiles("./tools/NVika.MSBuild.*/tools/NVika.exe").First();
 
-    InspectCode(osuSolution, new InspectCodeSettings {
-        CachesHome = "inspectcode",
-        OutputFile = "inspectcodereport.xml",
+        InspectCode(osuSolution, new InspectCodeSettings {
+            CachesHome = "inspectcode",
+            OutputFile = "inspectcodereport.xml",
+        });
+
+        StartProcess(nVikaToolPath, @"parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
     });
-
-    StartProcess(nVikaToolPath, @"parsereport ""inspectcodereport.xml"" --treatwarningsaserrors");
-});
 
 Task("CodeFileSanity")
-.Does(() => {
-    ValidateCodeSanity(new ValidateCodeSanitySettings {
-        RootDirectory = ".",
-        IsAppveyorBuild = AppVeyor.IsRunningOnAppVeyor
+    .Does(() => {
+        ValidateCodeSanity(new ValidateCodeSanitySettings {
+            RootDirectory = ".",
+            IsAppveyorBuild = AppVeyor.IsRunningOnAppVeyor
+        });
     });
-});
 
 Task("Build")
-.IsDependentOn("CodeFileSanity")
-.IsDependentOn("InspectCode")
-.IsDependentOn("Test");
+    .IsDependentOn("CodeFileSanity")
+    .IsDependentOn("InspectCode")
+    .IsDependentOn("Test");
 
 RunTarget(target);
