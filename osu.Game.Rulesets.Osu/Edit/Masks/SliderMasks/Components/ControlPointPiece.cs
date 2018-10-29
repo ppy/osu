@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
 
             Position = slider.StackedPosition + slider.ControlPoints[index];
 
-            marker.Colour = segmentSeparator ? colours.Red : colours.Yellow;
+            marker.Colour = isSegmentSeparator ? colours.Red : colours.Yellow;
 
             path.ClearVertices();
 
@@ -100,8 +100,19 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
 
         protected override bool OnDragEnd(DragEndEvent e) => true;
 
-        private bool segmentSeparator => index != 0 && index != slider.ControlPoints.Length - 1
-                                                    && slider.ControlPoints[index - 1] != slider.ControlPoints[index]
-                                                    && slider.ControlPoints[index + 1] != slider.ControlPoints[index];
+        private bool isSegmentSeparator
+        {
+            get
+            {
+                bool separator = false;
+
+                if (index < slider.ControlPoints.Length - 1)
+                    separator |= slider.ControlPoints[index + 1] == slider.ControlPoints[index];
+                if (index > 0)
+                    separator |= slider.ControlPoints[index - 1] == slider.ControlPoints[index];
+
+                return separator;
+            }
+        }
     }
 }
