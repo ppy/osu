@@ -20,11 +20,6 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                     LabelText = "Increase visibility of first object with \"Hidden\" mod",
                     Bindable = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility)
                 },
-                new SettingsCheckbox
-                {
-                    LabelText = "Restart on fail with \"Perfect\" and \"Sudden Death\" mod",
-                    Bindable = config.GetBindable<bool>(OsuSetting.RestartOnFail)
-                },
             };
         }
     }

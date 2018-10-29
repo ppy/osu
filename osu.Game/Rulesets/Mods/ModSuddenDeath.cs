@@ -9,7 +9,7 @@ using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModSuddenDeath : Mod, IReadFromConfig, IApplicableToScoreProcessor, IApplicableRestartOnFail
+    public abstract class ModSuddenDeath : Mod, IApplicableToScoreProcessor, IApplicableRestartOnFail
     {
         public override string Name => "Sudden Death";
         public override string ShortenedName => "SD";
@@ -20,17 +20,11 @@ namespace osu.Game.Rulesets.Mods
         public override bool Ranked => true;
         public override Type[] IncompatibleMods => new[] { typeof(ModNoFail), typeof(ModRelax), typeof(ModAutoplay) };
 
-        protected Bindable<bool> RestartOnFail = new Bindable<bool>();
-        public bool AllowRestart => RestartOnFail.Value;
+        public bool AllowRestart => true;
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             scoreProcessor.FailConditions += FailCondition;
-        }
-
-        public void ReadFromConfig(OsuConfigManager config)
-        {
-            RestartOnFail = config.GetBindable<bool>(OsuSetting.RestartOnFail);
         }
 
         protected virtual bool FailCondition(ScoreProcessor scoreProcessor) => scoreProcessor.Combo.Value == 0;
