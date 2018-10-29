@@ -48,6 +48,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks.Components
 
             spinner.PositionChanged += _ => updatePosition();
             spinner.StackHeightChanged += _ => updatePosition();
+            spinner.ScaleChanged += _ => ring.Scale = new Vector2(spinner.Scale);
 
             updatePosition();
         }
