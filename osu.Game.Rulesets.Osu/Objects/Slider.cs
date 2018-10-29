@@ -22,6 +22,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
+        public event Action<Vector2[]> ControlPointsChanged;
+
         public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
@@ -54,8 +56,18 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2[] ControlPoints
         {
-            get { return Curve.ControlPoints; }
-            set { Curve.ControlPoints = value; }
+            get => Curve.ControlPoints;
+            set
+            {
+                if (Curve.ControlPoints == value)
+                    return;
+                Curve.ControlPoints = value;
+
+                ControlPointsChanged?.Invoke(value);
+
+                if (TailCircle != null)
+                    TailCircle.Position = EndPosition;
+            }
         }
 
         public CurveType CurveType

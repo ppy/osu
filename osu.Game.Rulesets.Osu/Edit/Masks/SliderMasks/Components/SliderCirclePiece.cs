@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
         {
             this.slider = slider;
             this.position = position;
+
+            slider.ControlPointsChanged += _ => UpdatePosition();
         }
 
         protected override void UpdatePosition()
