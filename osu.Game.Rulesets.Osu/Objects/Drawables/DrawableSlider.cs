@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public readonly DrawableHitCircle HeadCircle;
         public readonly DrawableSliderTail TailCircle;
 
-        public readonly SliderBody Body;
+        public readonly SnakingSliderBody Body;
         public readonly SliderBall Ball;
 
         public DrawableSlider(Slider s)
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
-                Body = new SliderBody(s)
+                Body = new SnakingSliderBody(s)
                 {
                     PathWidth = s.Scale * 64,
                 },
