@@ -19,6 +19,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).ToArray();
 
         public bool AllowFail => false;
+        public bool RestartOnFail => false;
 
         public void Update(Playfield playfield)
         {
