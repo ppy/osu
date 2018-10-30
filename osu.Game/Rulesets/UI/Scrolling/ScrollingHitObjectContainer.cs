@@ -95,9 +95,22 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             base.Update();
 
+            speedChangeVisualiser.TimeRange = TimeRange.Value;
+
+            switch (Direction.Value)
+            {
+                case ScrollingDirection.Up:
+                case ScrollingDirection.Down:
+                    speedChangeVisualiser.ScrollLength = DrawSize.Y;
+                    break;
+                default:
+                    speedChangeVisualiser.ScrollLength = DrawSize.X;
+                    break;
+            }
+
             if (!initialStateCache.IsValid)
             {
-                speedChangeVisualiser.ComputeInitialStates(Objects, Direction, TimeRange, DrawSize);
+                speedChangeVisualiser.ComputeInitialStates(Objects, Direction);
                 initialStateCache.Validate();
             }
         }
@@ -107,7 +120,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             base.UpdateAfterChildrenLife();
 
             // We need to calculate this as soon as possible after lifetimes so that hitobjects get the final say in their positions
-            speedChangeVisualiser.UpdatePositions(AliveObjects, Direction, Time.Current, TimeRange, DrawSize);
+            speedChangeVisualiser.UpdatePositions(AliveObjects, Direction, Time.Current);
         }
     }
 }
