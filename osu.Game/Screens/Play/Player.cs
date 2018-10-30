@@ -289,7 +289,7 @@ namespace osu.Game.Screens.Play
             if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
-            if (Beatmap.Value.Mods.Value.OfType<IApplicableRestartOnFail>().Any(m => m.AllowRestart))
+            if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
             {
                 Restart();
                 return false;

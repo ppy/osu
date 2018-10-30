@@ -21,5 +21,6 @@ namespace osu.Game.Rulesets.Mods
         /// We never fail, 'yo.
         /// </summary>
         public bool AllowFail => false;
+        public bool RestartOnFail => false;
     }
 }
