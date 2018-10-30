@@ -4,11 +4,12 @@
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModDualStages : Mod, IPlayfieldTypeMod, IApplicableToBeatmapConverter, IApplicableToBeatmap
+    public class ManiaModDualStages : Mod, IPlayfieldTypeMod, IApplicableToBeatmapConverter, IApplicableToBeatmap<ManiaHitObject>
     {
         public override string Name => "Dual Stages";
         public override string ShortenedName => "DS";
@@ -31,12 +32,12 @@ namespace osu.Game.Rulesets.Mania.Mods
             mbc.TargetColumns *= 2;
         }
 
-        public void ApplyToBeatmap(IBeatmap beatmap)
+        public void ApplyToBeatmap(Beatmap<ManiaHitObject> beatmap)
         {
             if (isForCurrentRuleset)
                 return;
 
-            var maniaBeatmap = (ManiaBeatmap) beatmap;
+            var maniaBeatmap = (ManiaBeatmap)beatmap;
 
             var newDefinitions = new List<StageDefinition>();
             foreach (var existing in maniaBeatmap.Stages)
