@@ -135,6 +135,8 @@ namespace osu.Game.Screens.Play
         {
             bar.FadeTo(allowSeeking ? 1 : 0, transition_duration, Easing.In);
             this.MoveTo(new Vector2(0, allowSeeking ? 0 : bottom_bar_height), transition_duration, Easing.In);
+
+            info.Margin = new MarginPadding { Bottom = Height - (allowSeeking ? 0 : handle_size.Y) };
         }
 
         protected override void PopIn()
