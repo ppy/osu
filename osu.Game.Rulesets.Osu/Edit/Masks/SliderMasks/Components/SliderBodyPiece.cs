@@ -13,12 +13,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
     public class SliderBodyPiece : CompositeDrawable
     {
         private readonly Slider slider;
-        private readonly SliderBody body;
+        private readonly SnakingSliderBody body;
 
         public SliderBodyPiece(Slider slider)
         {
             this.slider = slider;
-            InternalChild = body = new SliderBody(slider)
+            InternalChild = body = new SnakingSliderBody(slider)
             {
                 AccentColour = Color4.Transparent,
                 PathWidth = slider.Scale * 64
