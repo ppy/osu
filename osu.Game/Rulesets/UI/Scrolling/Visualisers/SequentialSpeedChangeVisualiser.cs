@@ -7,44 +7,42 @@ using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
-    public readonly struct SequentialSpeedChangeVisualiser : ISpeedChangeVisualiser
+    public class SequentialSpeedChangeVisualiser : ISpeedChangeVisualiser
     {
         private readonly Dictionary<double, double> positionCache;
 
         private readonly IReadOnlyList<MultiplierControlPoint> controlPoints;
-        private readonly double timeRange;
-        private readonly float scrollLength;
 
-        public SequentialSpeedChangeVisualiser(IReadOnlyList<MultiplierControlPoint> controlPoints, double timeRange, float scrollLength)
+        public SequentialSpeedChangeVisualiser(IReadOnlyList<MultiplierControlPoint> controlPoints)
         {
             this.controlPoints = controlPoints;
-            this.timeRange = timeRange;
-            this.scrollLength = scrollLength;
 
             positionCache = new Dictionary<double, double>();
         }
 
-        public double GetDisplayStartTime(double time) => time - timeRange - 1000;
+        public double GetDisplayStartTime(double time, double timeRange) => time - timeRange - 1000;
 
-        public float GetLength(double startTime, double endTime)
+        public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
         {
-            var objectLength = relativePositionAtCached(endTime) - relativePositionAtCached(startTime);
+            var objectLength = relativePositionAtCached(endTime, timeRange) - relativePositionAtCached(startTime, timeRange);
             return (float)(objectLength * scrollLength);
         }
 
-        public float PositionAt(double time, double currentTime)
+        public float PositionAt(double time, double currentTime, double timeRange, float scrollLength)
         {
             // Caching is not used here as currentTime is unlikely to have been previously cached
-            double timelinePosition = relativePositionAt(currentTime);
-            return (float)((relativePositionAtCached(time) - timelinePosition) * scrollLength);
+            double timelinePosition = relativePositionAt(currentTime, timeRange);
+            return (float)((relativePositionAtCached(time, timeRange) - timelinePosition) * scrollLength);
         }
 
-        private double relativePositionAtCached(double time)
+        private double relativePositionAtCached(double time, double timeRange)
         {
             if (!positionCache.TryGetValue(time, out double existing))
-                positionCache[time] = existing = relativePositionAt(time);
+                positionCache[time] = existing = relativePositionAt(time, timeRange);
             return existing;
         }
+
+        public void Reset() => positionCache.Clear();
 
         /// <summary>
         /// Finds the position which corresponds to a point in time.
@@ -53,7 +51,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
         /// <param name="time">The time to find the position at.</param>
         /// <param name="timeRange">The amount of time visualised by the scrolling area.</param>
         /// <returns>A positive value indicating the position at <paramref name="time"/>.</returns>
-        private double relativePositionAt(double time)
+        private double relativePositionAt(double time, double timeRange)
         {
             if (controlPoints.Count == 0)
                 return time / timeRange;
