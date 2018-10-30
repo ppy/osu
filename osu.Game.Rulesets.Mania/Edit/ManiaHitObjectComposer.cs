@@ -4,7 +4,6 @@
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
-using osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -12,6 +11,7 @@ using osu.Game.Rulesets.UI;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.Configuration;
+using osu.Game.Rulesets.Mania.Edit.Masks;
 using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Edit
@@ -40,14 +40,14 @@ namespace osu.Game.Rulesets.Mania.Edit
             new HitObjectCompositionTool<HoldNote>("Hold"),
         };
 
-        public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)
+        public override SelectionMask CreateMaskFor(DrawableHitObject hitObject)
         {
             switch (hitObject)
             {
                 case DrawableNote note:
-                    return new NoteMask(note);
+                    return new NoteSelectionMask(note);
                 case DrawableHoldNote holdNote:
-                    return new HoldNoteMask(holdNote);
+                    return new HoldNoteSelectionMask(holdNote);
             }
 
             return base.CreateMaskFor(hitObject);
