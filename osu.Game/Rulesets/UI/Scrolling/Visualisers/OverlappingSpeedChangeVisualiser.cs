@@ -6,12 +6,15 @@ using osu.Framework.Lists;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
-using OpenTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
     public class OverlappingSpeedChangeVisualiser : ISpeedChangeVisualiser
     {
+        public double TimeRange { get; set; }
+
+        public float ScrollLength { get; set; }
+
         private readonly SortedList<MultiplierControlPoint> controlPoints;
 
         public OverlappingSpeedChangeVisualiser(SortedList<MultiplierControlPoint> controlPoints)
@@ -19,79 +22,72 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
             this.controlPoints = controlPoints;
         }
 
-        public void ComputeInitialStates(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction, double timeRange, Vector2 length)
+        public void ComputeInitialStates(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction)
         {
             foreach (var obj in hitObjects)
             {
-                // The total amount of time that the hitobject will remain visible within the timeRange, which decreases as the speed multiplier increases
-                double visibleDuration = timeRange / controlPointAt(obj.HitObject.StartTime).Multiplier;
-
-                obj.LifetimeStart = obj.HitObject.StartTime - visibleDuration;
+                obj.LifetimeStart = GetDisplayStartTime(obj.HitObject.StartTime);
 
                 if (obj.HitObject is IHasEndTime endTime)
                 {
-                    // At the hitobject's end time, the hitobject will be positioned such that its end rests at the origin.
-                    // This results in a negative-position value, and the absolute of it indicates the length of the hitobject.
-                    var hitObjectLength = -hitObjectPositionAt(obj, endTime.EndTime, timeRange);
-
                     switch (direction)
                     {
                         case ScrollingDirection.Up:
                         case ScrollingDirection.Down:
-                            obj.Height = (float)(hitObjectLength * length.Y);
+                            obj.Height = GetLength(obj.HitObject.StartTime, endTime.EndTime);
                             break;
                         case ScrollingDirection.Left:
                         case ScrollingDirection.Right:
-                            obj.Width = (float)(hitObjectLength * length.X);
+                            obj.Width = GetLength(obj.HitObject.StartTime, endTime.EndTime);
                             break;
                     }
                 }
 
-                ComputeInitialStates(obj.NestedHitObjects, direction, timeRange, length);
+                ComputeInitialStates(obj.NestedHitObjects, direction);
 
                 // Nested hitobjects don't need to scroll, but they do need accurate positions
-                UpdatePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime, timeRange, length);
+                UpdatePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime);
             }
         }
 
-        public void UpdatePositions(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction, double currentTime, double timeRange, Vector2 length)
+        public void UpdatePositions(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction, double currentTime)
         {
             foreach (var obj in hitObjects)
             {
-                var position = hitObjectPositionAt(obj, currentTime, timeRange);
-
                 switch (direction)
                 {
                     case ScrollingDirection.Up:
-                        obj.Y = (float)(position * length.Y);
+                        obj.Y = PositionAt(currentTime, obj.HitObject.StartTime);
                         break;
                     case ScrollingDirection.Down:
-                        obj.Y = (float)(-position * length.Y);
+                        obj.Y = -PositionAt(currentTime, obj.HitObject.StartTime);
                         break;
                     case ScrollingDirection.Left:
-                        obj.X = (float)(position * length.X);
+                        obj.X = PositionAt(currentTime, obj.HitObject.StartTime);
                         break;
                     case ScrollingDirection.Right:
-                        obj.X = (float)(-position * length.X);
+                        obj.X = -PositionAt(currentTime, obj.HitObject.StartTime);
                         break;
                 }
             }
         }
 
-        /// <summary>
-        /// Computes the position of a <see cref="DrawableHitObject"/> at a point in time.
-        /// <para>
-        /// At t &lt; startTime, position &gt; 0. <br />
-        /// At t = startTime, position = 0. <br />
-        /// At t &gt; startTime, position &lt; 0.
-        /// </para>
-        /// </summary>
-        /// <param name="obj">The <see cref="DrawableHitObject"/>.</param>
-        /// <param name="time">The time to find the position of <paramref name="obj"/> at.</param>
-        /// <param name="timeRange">The amount of time visualised by the scrolling area.</param>
-        /// <returns>The position of <paramref name="obj"/> in the scrolling area at time = <paramref name="time"/>.</returns>
-        private double hitObjectPositionAt(DrawableHitObject obj, double time, double timeRange)
-            => (obj.HitObject.StartTime - time) / timeRange * controlPointAt(obj.HitObject.StartTime).Multiplier;
+        public double GetDisplayStartTime(double startTime)
+        {
+            // The total amount of time that the hitobject will remain visible within the timeRange, which decreases as the speed multiplier increases
+            double visibleDuration = TimeRange / controlPointAt(startTime).Multiplier;
+            return startTime - visibleDuration;
+        }
+
+        public float GetLength(double startTime, double endTime)
+        {
+            // At the hitobject's end time, the hitobject will be positioned such that its end rests at the origin.
+            // This results in a negative-position value, and the absolute of it indicates the length of the hitobject.
+            return -PositionAt(endTime, startTime);
+        }
+
+        public float PositionAt(double currentTime, double startTime)
+            => (float)((startTime - currentTime) / TimeRange * controlPointAt(startTime).Multiplier * ScrollLength);
 
         private readonly MultiplierControlPoint searchPoint = new MultiplierControlPoint();
 
