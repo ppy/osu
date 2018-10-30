@@ -30,19 +30,30 @@ namespace osu.Game.Rulesets.UI.Scrolling
         protected readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
 
         public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
-        private readonly SpeedChangeVisualisationMethod visualisationMethod;
+
+        private readonly ISpeedChangeVisualiser visualiser;
 
         private Cached initialStateCache = new Cached();
-        private ISpeedChangeVisualiser visualiser;
 
         public ScrollingHitObjectContainer(SpeedChangeVisualisationMethod visualisationMethod)
         {
-            this.visualisationMethod = visualisationMethod;
-
             RelativeSizeAxes = Axes.Both;
 
             TimeRange.ValueChanged += _ => initialStateCache.Invalidate();
             Direction.ValueChanged += _ => initialStateCache.Invalidate();
+
+            switch (visualisationMethod)
+            {
+                case SpeedChangeVisualisationMethod.Sequential:
+                    visualiser = new SequentialSpeedChangeVisualiser(ControlPoints);
+                    break;
+                case SpeedChangeVisualisationMethod.Overlapping:
+                    visualiser = new OverlappingSpeedChangeVisualiser(ControlPoints);
+                    break;
+                case SpeedChangeVisualisationMethod.Constant:
+                    visualiser = new ConstantSpeedChangeVisualiser();
+                    break;
+            }
         }
 
         public override void Add(DrawableHitObject hitObject)
@@ -81,13 +92,26 @@ namespace osu.Game.Rulesets.UI.Scrolling
             return base.Invalidate(invalidation, source, shallPropagate);
         }
 
+        private float scrollLength;
+
         protected override void Update()
         {
             base.Update();
 
             if (!initialStateCache.IsValid)
             {
-                visualiser = createVisualiser();
+                switch (Direction.Value)
+                {
+                    case ScrollingDirection.Up:
+                    case ScrollingDirection.Down:
+                        scrollLength = DrawSize.Y;
+                        break;
+                    default:
+                        scrollLength = DrawSize.X;
+                        break;
+                }
+
+                visualiser.Reset();
 
                 foreach (var obj in Objects)
                     computeInitialStateRecursive(obj);
@@ -95,36 +119,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
             }
         }
 
-        private ISpeedChangeVisualiser createVisualiser()
-        {
-            float scrollLength;
-
-            switch (Direction.Value)
-            {
-                case ScrollingDirection.Up:
-                case ScrollingDirection.Down:
-                    scrollLength = DrawSize.Y;
-                    break;
-                default:
-                    scrollLength = DrawSize.X;
-                    break;
-            }
-
-            switch (visualisationMethod)
-            {
-                default:
-                case SpeedChangeVisualisationMethod.Constant:
-                    return new ConstantSpeedChangeVisualiser(TimeRange, scrollLength);
-                case SpeedChangeVisualisationMethod.Overlapping:
-                    return new OverlappingSpeedChangeVisualiser(ControlPoints, TimeRange, scrollLength);
-                case SpeedChangeVisualisationMethod.Sequential:
-                    return new SequentialSpeedChangeVisualiser(ControlPoints, TimeRange, scrollLength);
-            }
-        }
-
         private void computeInitialStateRecursive(DrawableHitObject hitObject)
         {
-            hitObject.LifetimeStart = visualiser.GetDisplayStartTime(hitObject.HitObject.StartTime);
+            hitObject.LifetimeStart = visualiser.GetDisplayStartTime(hitObject.HitObject.StartTime, TimeRange);
 
             if (hitObject.HitObject is IHasEndTime endTime)
             {
@@ -132,11 +129,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 {
                     case ScrollingDirection.Up:
                     case ScrollingDirection.Down:
-                        hitObject.Height = visualiser.GetLength(hitObject.HitObject.StartTime, endTime.EndTime);
+                        hitObject.Height = visualiser.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, TimeRange, scrollLength);
                         break;
                     case ScrollingDirection.Left:
                     case ScrollingDirection.Right:
-                        hitObject.Height = visualiser.GetLength(hitObject.HitObject.StartTime, endTime.EndTime);
+                        hitObject.Height = visualiser.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, TimeRange, scrollLength);
                         break;
                 }
             }
@@ -164,16 +161,16 @@ namespace osu.Game.Rulesets.UI.Scrolling
             switch (Direction.Value)
             {
                 case ScrollingDirection.Up:
-                    hitObject.Y = visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime);
+                    hitObject.Y = visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
                     break;
                 case ScrollingDirection.Down:
-                    hitObject.Y = -visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime);
+                    hitObject.Y = -visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
                     break;
                 case ScrollingDirection.Left:
-                    hitObject.X = visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime);
+                    hitObject.X = visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
                     break;
                 case ScrollingDirection.Right:
-                    hitObject.X = -visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime);
+                    hitObject.X = -visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
                     break;
             }
         }
