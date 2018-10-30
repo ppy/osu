@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
             positionCache = new Dictionary<double, double>();
         }
 
-        public double GetDisplayStartTime(double startTime) => startTime - timeRange - 1000;
+        public double GetDisplayStartTime(double time) => time - timeRange - 1000;
 
         public float GetLength(double startTime, double endTime)
         {
@@ -32,11 +32,11 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
             return (float)(objectLength * scrollLength);
         }
 
-        public float PositionAt(double currentTime, double startTime)
+        public float PositionAt(double time, double currentTime)
         {
             // Caching is not used here as currentTime is unlikely to have been previously cached
             double timelinePosition = relativePositionAt(currentTime);
-            return (float)((relativePositionAtCached(startTime) - timelinePosition) * scrollLength);
+            return (float)((relativePositionAtCached(time) - timelinePosition) * scrollLength);
         }
 
         private double relativePositionAtCached(double time)

@@ -5,10 +5,10 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
     public interface ISpeedChangeVisualiser
     {
-        double GetDisplayStartTime(double startTime);
+        double GetDisplayStartTime(double time);
 
         float GetLength(double startTime, double endTime);
 
-        float PositionAt(double currentTime, double startTime);
+        float PositionAt(double time, double currentTime);
     }
 }

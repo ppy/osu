@@ -14,15 +14,15 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
             this.scrollLength = scrollLength;
         }
 
-        public double GetDisplayStartTime(double startTime) => startTime - timeRange;
+        public double GetDisplayStartTime(double time) => time - timeRange;
 
         public float GetLength(double startTime, double endTime)
         {
             // At the hitobject's end time, the hitobject will be positioned such that its end rests at the origin.
             // This results in a negative-position value, and the absolute of it indicates the length of the hitobject.
-            return -PositionAt(endTime, startTime);
+            return -PositionAt(startTime, endTime);
         }
 
-        public float PositionAt(double currentTime, double startTime) => (float)((startTime - currentTime) / timeRange * scrollLength);
+        public float PositionAt(double time, double currentTime) => (float)((time - currentTime) / timeRange * scrollLength);
     }
 }

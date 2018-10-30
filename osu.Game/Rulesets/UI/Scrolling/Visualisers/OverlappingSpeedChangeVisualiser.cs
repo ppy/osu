@@ -23,22 +23,22 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
             searchPoint = new MultiplierControlPoint();
         }
 
-        public double GetDisplayStartTime(double startTime)
+        public double GetDisplayStartTime(double time)
         {
             // The total amount of time that the hitobject will remain visible within the timeRange, which decreases as the speed multiplier increases
-            double visibleDuration = timeRange / controlPointAt(startTime).Multiplier;
-            return startTime - visibleDuration;
+            double visibleDuration = timeRange / controlPointAt(time).Multiplier;
+            return time - visibleDuration;
         }
 
         public float GetLength(double startTime, double endTime)
         {
             // At the hitobject's end time, the hitobject will be positioned such that its end rests at the origin.
             // This results in a negative-position value, and the absolute of it indicates the length of the hitobject.
-            return -PositionAt(endTime, startTime);
+            return -PositionAt(startTime, endTime);
         }
 
-        public float PositionAt(double currentTime, double startTime)
-            => (float)((startTime - currentTime) / timeRange * controlPointAt(startTime).Multiplier * scrollLength);
+        public float PositionAt(double time, double currentTime)
+            => (float)((time - currentTime) / timeRange * controlPointAt(time).Multiplier * scrollLength);
 
         /// <summary>
         /// Finds the <see cref="MultiplierControlPoint"/> which affects the speed of hitobjects at a specific time.

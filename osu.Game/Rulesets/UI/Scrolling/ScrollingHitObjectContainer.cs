@@ -164,16 +164,16 @@ namespace osu.Game.Rulesets.UI.Scrolling
             switch (Direction.Value)
             {
                 case ScrollingDirection.Up:
-                    hitObject.Y = visualiser.PositionAt(currentTime, hitObject.HitObject.StartTime);
+                    hitObject.Y = visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime);
                     break;
                 case ScrollingDirection.Down:
-                    hitObject.Y = -visualiser.PositionAt(currentTime, hitObject.HitObject.StartTime);
+                    hitObject.Y = -visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime);
                     break;
                 case ScrollingDirection.Left:
-                    hitObject.X = visualiser.PositionAt(currentTime, hitObject.HitObject.StartTime);
+                    hitObject.X = visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime);
                     break;
                 case ScrollingDirection.Right:
-                    hitObject.X = -visualiser.PositionAt(currentTime, hitObject.HitObject.StartTime);
+                    hitObject.X = -visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime);
                     break;
             }
         }
