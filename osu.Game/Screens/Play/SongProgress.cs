@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play
     {
         private const int bottom_bar_height = 5;
 
-        private static readonly Vector2 handle_size = new Vector2(14, 18);
+        private static readonly Vector2 handle_size = new Vector2(10, 18);
 
         private const float transition_duration = 200;
 
