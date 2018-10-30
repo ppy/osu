@@ -8,7 +8,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Edit.Layers.Selection.Overlays;
+using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks;
+using osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
@@ -34,14 +35,14 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override Container CreateLayerContainer() => new PlayfieldAdjustmentContainer { RelativeSizeAxes = Axes.Both };
 
-        public override HitObjectMask CreateMaskFor(DrawableHitObject hitObject)
+        public override SelectionMask CreateMaskFor(DrawableHitObject hitObject)
         {
             switch (hitObject)
             {
                 case DrawableHitCircle circle:
-                    return new HitCircleMask(circle);
+                    return new HitCircleSelectionMask(circle);
                 case DrawableSlider slider:
-                    return new SliderMask(slider);
+                    return new SliderSelectionMask(slider);
             }
 
             return base.CreateMaskFor(hitObject);

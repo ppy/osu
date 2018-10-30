@@ -13,9 +13,9 @@ using osu.Game.Rulesets.UI.Scrolling;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
+namespace osu.Game.Rulesets.Mania.Edit.Masks
 {
-    public class HoldNoteMask : HitObjectMask
+    public class HoldNoteSelectionMask : SelectionMask
     {
         public new DrawableHoldNote HitObject => (DrawableHoldNote)base.HitObject;
 
@@ -23,13 +23,13 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
 
         private readonly BodyPiece body;
 
-        public HoldNoteMask(DrawableHoldNote hold)
+        public HoldNoteSelectionMask(DrawableHoldNote hold)
             : base(hold)
         {
             InternalChildren = new Drawable[]
             {
-                new HoldNoteNoteMask(hold.Head),
-                new HoldNoteNoteMask(hold.Tail),
+                new HoldNoteNoteSelectionMask(hold.Head),
+                new HoldNoteNoteSelectionMask(hold.Tail),
                 body = new BodyPiece
                 {
                     AccentColour = Color4.Transparent
@@ -59,9 +59,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
                 Y -= HitObject.Tail.DrawHeight;
         }
 
-        private class HoldNoteNoteMask : NoteMask
+        private class HoldNoteNoteSelectionMask : NoteSelectionMask
         {
-            public HoldNoteNoteMask(DrawableNote note)
+            public HoldNoteNoteSelectionMask(DrawableNote note)
                 : base(note)
             {
                 Select();

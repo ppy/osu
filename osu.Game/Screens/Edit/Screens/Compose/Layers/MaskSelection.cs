@@ -16,19 +16,19 @@ using OpenTK;
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
     /// <summary>
-    /// A box which surrounds <see cref="HitObjectMask"/>s and provides interactive handles, context menus etc.
+    /// A box which surrounds <see cref="SelectionMask"/>s and provides interactive handles, context menus etc.
     /// </summary>
     public class MaskSelection : CompositeDrawable
     {
         public const float BORDER_RADIUS = 2;
 
-        private readonly List<HitObjectMask> selectedMasks;
+        private readonly List<SelectionMask> selectedMasks;
 
         private Drawable outline;
 
         public MaskSelection()
         {
-            selectedMasks = new List<HitObjectMask>();
+            selectedMasks = new List<SelectionMask>();
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
@@ -54,7 +54,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         #region User Input Handling
 
-        public void HandleDrag(HitObjectMask m, Vector2 delta, InputState state)
+        public void HandleDrag(SelectionMask m, Vector2 delta, InputState state)
         {
             // Todo: Various forms of snapping
 
@@ -82,13 +82,13 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// Handle a mask becoming selected.
         /// </summary>
         /// <param name="mask">The mask.</param>
-        public void HandleSelected(HitObjectMask mask) => selectedMasks.Add(mask);
+        public void HandleSelected(SelectionMask mask) => selectedMasks.Add(mask);
 
         /// <summary>
         /// Handle a mask becoming deselected.
         /// </summary>
         /// <param name="mask">The mask.</param>
-        public void HandleDeselected(HitObjectMask mask)
+        public void HandleDeselected(SelectionMask mask)
         {
             selectedMasks.Remove(mask);
 
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// Handle a mask requesting selection.
         /// </summary>
         /// <param name="mask">The mask.</param>
-        public void HandleSelectionRequested(HitObjectMask mask, InputState state)
+        public void HandleSelectionRequested(SelectionMask mask, InputState state)
         {
             if (state.Keyboard.ControlPressed)
             {
