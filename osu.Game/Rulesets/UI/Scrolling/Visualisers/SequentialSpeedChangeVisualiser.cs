@@ -3,90 +3,40 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
-    public class SequentialSpeedChangeVisualiser : ISpeedChangeVisualiser
+    public readonly struct SequentialSpeedChangeVisualiser : ISpeedChangeVisualiser
     {
-        public double TimeRange { get; set; }
-
-        public float ScrollLength { get; set; }
-
-        private readonly Dictionary<double, double> positionCache = new Dictionary<double, double>();
+        private readonly Dictionary<double, double> positionCache;
 
         private readonly IReadOnlyList<MultiplierControlPoint> controlPoints;
+        private readonly double timeRange;
+        private readonly float scrollLength;
 
-        public SequentialSpeedChangeVisualiser(IReadOnlyList<MultiplierControlPoint> controlPoints)
+        public SequentialSpeedChangeVisualiser(IReadOnlyList<MultiplierControlPoint> controlPoints, double timeRange, float scrollLength)
         {
             this.controlPoints = controlPoints;
+            this.timeRange = timeRange;
+            this.scrollLength = scrollLength;
+
+            positionCache = new Dictionary<double, double>();
         }
 
-        public void ComputeInitialStates(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction)
-        {
-            foreach (var obj in hitObjects)
-            {
-                obj.LifetimeStart = GetDisplayStartTime(obj.HitObject.StartTime);
-
-                if (obj.HitObject is IHasEndTime endTime)
-                {
-                    switch (direction)
-                    {
-                        case ScrollingDirection.Up:
-                        case ScrollingDirection.Down:
-                            obj.Height = GetLength(obj.HitObject.StartTime, endTime.EndTime);
-                            break;
-                        case ScrollingDirection.Left:
-                        case ScrollingDirection.Right:
-                            obj.Width = GetLength(obj.HitObject.StartTime, endTime.EndTime);
-                            break;
-                    }
-                }
-
-                ComputeInitialStates(obj.NestedHitObjects, direction);
-
-                // Nested hitobjects don't need to scroll, but they do need accurate positions
-                UpdatePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime);
-            }
-        }
-
-        public void UpdatePositions(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction, double currentTime)
-        {
-            foreach (var obj in hitObjects)
-            {
-                switch (direction)
-                {
-                    case ScrollingDirection.Up:
-                        obj.Y = PositionAt(currentTime, obj.HitObject.StartTime);
-                        break;
-                    case ScrollingDirection.Down:
-                        obj.Y = -PositionAt(currentTime, obj.HitObject.StartTime);
-                        break;
-                    case ScrollingDirection.Left:
-                        obj.X = PositionAt(currentTime, obj.HitObject.StartTime);
-                        break;
-                    case ScrollingDirection.Right:
-                        obj.X = -PositionAt(currentTime, obj.HitObject.StartTime);
-                        break;
-                }
-            }
-        }
-
-        public double GetDisplayStartTime(double startTime) => startTime - TimeRange - 1000;
+        public double GetDisplayStartTime(double startTime) => startTime - timeRange - 1000;
 
         public float GetLength(double startTime, double endTime)
         {
             var objectLength = relativePositionAtCached(endTime) - relativePositionAtCached(startTime);
-            return (float)(objectLength * ScrollLength);
+            return (float)(objectLength * scrollLength);
         }
 
         public float PositionAt(double currentTime, double startTime)
         {
             // Caching is not used here as currentTime is unlikely to have been previously cached
             double timelinePosition = relativePositionAt(currentTime);
-            return (float)((relativePositionAtCached(startTime) - timelinePosition) * ScrollLength);
+            return (float)((relativePositionAtCached(startTime) - timelinePosition) * scrollLength);
         }
 
         private double relativePositionAtCached(double time)
@@ -106,7 +56,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
         private double relativePositionAt(double time)
         {
             if (controlPoints.Count == 0)
-                return time / TimeRange;
+                return time / timeRange;
 
             double length = 0;
 
@@ -130,7 +80,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
                 var durationInCurrent = Math.Min(currentDuration, time - current.StartTime);
 
                 // Figure out how much of the time range the duration represents, and adjust it by the speed multiplier
-                length += durationInCurrent / TimeRange * current.Multiplier;
+                length += durationInCurrent / timeRange * current.Multiplier;
             }
 
             return length;

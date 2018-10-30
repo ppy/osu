@@ -1,81 +1,32 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using osu.Framework.Lists;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
-    public class OverlappingSpeedChangeVisualiser : ISpeedChangeVisualiser
+    public readonly struct OverlappingSpeedChangeVisualiser : ISpeedChangeVisualiser
     {
-        public double TimeRange { get; set; }
-
-        public float ScrollLength { get; set; }
+        private readonly MultiplierControlPoint searchPoint;
 
         private readonly SortedList<MultiplierControlPoint> controlPoints;
+        private readonly double timeRange;
+        private readonly float scrollLength;
 
-        public OverlappingSpeedChangeVisualiser(SortedList<MultiplierControlPoint> controlPoints)
+        public OverlappingSpeedChangeVisualiser(SortedList<MultiplierControlPoint> controlPoints, double timeRange, float scrollLength)
         {
             this.controlPoints = controlPoints;
-        }
+            this.timeRange = timeRange;
+            this.scrollLength = scrollLength;
 
-        public void ComputeInitialStates(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction)
-        {
-            foreach (var obj in hitObjects)
-            {
-                obj.LifetimeStart = GetDisplayStartTime(obj.HitObject.StartTime);
-
-                if (obj.HitObject is IHasEndTime endTime)
-                {
-                    switch (direction)
-                    {
-                        case ScrollingDirection.Up:
-                        case ScrollingDirection.Down:
-                            obj.Height = GetLength(obj.HitObject.StartTime, endTime.EndTime);
-                            break;
-                        case ScrollingDirection.Left:
-                        case ScrollingDirection.Right:
-                            obj.Width = GetLength(obj.HitObject.StartTime, endTime.EndTime);
-                            break;
-                    }
-                }
-
-                ComputeInitialStates(obj.NestedHitObjects, direction);
-
-                // Nested hitobjects don't need to scroll, but they do need accurate positions
-                UpdatePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime);
-            }
-        }
-
-        public void UpdatePositions(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction, double currentTime)
-        {
-            foreach (var obj in hitObjects)
-            {
-                switch (direction)
-                {
-                    case ScrollingDirection.Up:
-                        obj.Y = PositionAt(currentTime, obj.HitObject.StartTime);
-                        break;
-                    case ScrollingDirection.Down:
-                        obj.Y = -PositionAt(currentTime, obj.HitObject.StartTime);
-                        break;
-                    case ScrollingDirection.Left:
-                        obj.X = PositionAt(currentTime, obj.HitObject.StartTime);
-                        break;
-                    case ScrollingDirection.Right:
-                        obj.X = -PositionAt(currentTime, obj.HitObject.StartTime);
-                        break;
-                }
-            }
+            searchPoint = new MultiplierControlPoint();
         }
 
         public double GetDisplayStartTime(double startTime)
         {
             // The total amount of time that the hitobject will remain visible within the timeRange, which decreases as the speed multiplier increases
-            double visibleDuration = TimeRange / controlPointAt(startTime).Multiplier;
+            double visibleDuration = timeRange / controlPointAt(startTime).Multiplier;
             return startTime - visibleDuration;
         }
 
@@ -87,9 +38,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
         }
 
         public float PositionAt(double currentTime, double startTime)
-            => (float)((startTime - currentTime) / TimeRange * controlPointAt(startTime).Multiplier * ScrollLength);
-
-        private readonly MultiplierControlPoint searchPoint = new MultiplierControlPoint();
+            => (float)((startTime - currentTime) / timeRange * controlPointAt(startTime).Multiplier * scrollLength);
 
         /// <summary>
         /// Finds the <see cref="MultiplierControlPoint"/> which affects the speed of hitobjects at a specific time.

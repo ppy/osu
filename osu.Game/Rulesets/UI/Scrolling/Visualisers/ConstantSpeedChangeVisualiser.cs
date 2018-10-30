@@ -1,69 +1,20 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Types;
-
 namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
-    public class ConstantSpeedChangeVisualiser : ISpeedChangeVisualiser
+    public readonly struct ConstantSpeedChangeVisualiser : ISpeedChangeVisualiser
     {
-        public double TimeRange { get; set; }
+        private readonly double timeRange;
+        private readonly float scrollLength;
 
-        public float ScrollLength { get; set; }
-
-        public void ComputeInitialStates(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction)
+        public ConstantSpeedChangeVisualiser(double timeRange, float scrollLength)
         {
-            foreach (var obj in hitObjects)
-            {
-                obj.LifetimeStart = GetDisplayStartTime(obj.HitObject.StartTime);
-
-                if (obj.HitObject is IHasEndTime endTime)
-                {
-                    switch (direction)
-                    {
-                        case ScrollingDirection.Up:
-                        case ScrollingDirection.Down:
-                            obj.Height = GetLength(obj.HitObject.StartTime, endTime.EndTime);
-                            break;
-                        case ScrollingDirection.Left:
-                        case ScrollingDirection.Right:
-                            obj.Height = GetLength(obj.HitObject.StartTime, endTime.EndTime);
-                            break;
-                    }
-                }
-
-                ComputeInitialStates(obj.NestedHitObjects, direction);
-
-                // Nested hitobjects don't need to scroll, but they do need accurate positions
-                UpdatePositions(obj.NestedHitObjects, direction, obj.HitObject.StartTime);
-            }
+            this.timeRange = timeRange;
+            this.scrollLength = scrollLength;
         }
 
-        public void UpdatePositions(IEnumerable<DrawableHitObject> hitObjects, ScrollingDirection direction, double currentTime)
-        {
-            foreach (var obj in hitObjects)
-            {
-                switch (direction)
-                {
-                    case ScrollingDirection.Up:
-                        obj.Y = PositionAt(currentTime, obj.HitObject.StartTime);
-                        break;
-                    case ScrollingDirection.Down:
-                        obj.Y = -PositionAt(currentTime, obj.HitObject.StartTime);
-                        break;
-                    case ScrollingDirection.Left:
-                        obj.X = PositionAt(currentTime, obj.HitObject.StartTime);
-                        break;
-                    case ScrollingDirection.Right:
-                        obj.X = -PositionAt(currentTime, obj.HitObject.StartTime);
-                        break;
-                }
-            }
-        }
-
-        public double GetDisplayStartTime(double startTime) => startTime - TimeRange;
+        public double GetDisplayStartTime(double startTime) => startTime - timeRange;
 
         public float GetLength(double startTime, double endTime)
         {
@@ -72,6 +23,6 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
             return -PositionAt(endTime, startTime);
         }
 
-        public float PositionAt(double currentTime, double startTime) => (float)((startTime - currentTime) / TimeRange * ScrollLength);
+        public float PositionAt(double currentTime, double startTime) => (float)((startTime - currentTime) / timeRange * scrollLength);
     }
 }
