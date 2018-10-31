@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override Playfield CreatePlayfield() => new TaikoPlayfield(Beatmap.ControlPointInfo);
 
-        protected override DrawableHitObject<TaikoHitObject> GetVisualRepresentation(TaikoHitObject h)
+        public override DrawableHitObject<TaikoHitObject> GetVisualRepresentation(TaikoHitObject h)
         {
             switch (h)
             {

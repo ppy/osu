@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly CursorContainer Cursor;
 
-        protected readonly Ruleset Ruleset;
+        public readonly Ruleset Ruleset;
 
         protected IRulesetConfigManager Config { get; private set; }
 
@@ -305,17 +305,7 @@ namespace osu.Game.Rulesets.UI
         private void loadObjects()
         {
             foreach (TObject h in Beatmap.HitObjects)
-            {
-                var drawableObject = GetVisualRepresentation(h);
-
-                if (drawableObject == null)
-                    continue;
-
-                drawableObject.OnNewResult += (_, r) => OnNewResult?.Invoke(r);
-                drawableObject.OnRevertResult += (_, r) => OnRevertResult?.Invoke(r);
-
-                Playfield.Add(drawableObject);
-            }
+                AddRepresentation(h);
 
             Playfield.PostProcess();
 
@@ -324,11 +314,29 @@ namespace osu.Game.Rulesets.UI
         }
 
         /// <summary>
+        /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="RulesetContainer{TObject}"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="TObject"/> to add the visual representation for.</param>
+        internal void AddRepresentation(TObject hitObject)
+        {
+            var drawableObject = GetVisualRepresentation(hitObject);
+
+            if (drawableObject == null)
+                return;
+
+            drawableObject.OnNewResult += (_, r) => OnNewResult?.Invoke(r);
+            drawableObject.OnRevertResult += (_, r) => OnRevertResult?.Invoke(r);
+
+            Playfield.Add(drawableObject);
+        }
+
+
+        /// <summary>
         /// Creates a DrawableHitObject from a HitObject.
         /// </summary>
         /// <param name="h">The HitObject to make drawable.</param>
         /// <returns>The DrawableHitObject.</returns>
-        protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
+        public abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
     }
 
     /// <summary>

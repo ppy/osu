@@ -17,20 +17,19 @@ using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuHitObjectComposer : HitObjectComposer
+    public class OsuHitObjectComposer : HitObjectComposer<OsuHitObject>
     {
         public OsuHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
         }
 
-        protected override RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => new OsuEditRulesetContainer(ruleset, beatmap);
+        protected override RulesetContainer<OsuHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            => new OsuEditRulesetContainer(ruleset, beatmap);
 
-        protected override IReadOnlyList<ICompositionTool> CompositionTools => new ICompositionTool[]
+        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new[]
         {
-            new HitObjectCompositionTool<HitCircle>(),
-            new HitObjectCompositionTool<Slider>(),
-            new HitObjectCompositionTool<Spinner>()
+            new HitCircleCompositionTool(),
         };
 
         protected override Container CreateLayerContainer() => new PlayfieldAdjustmentContainer { RelativeSizeAxes = Axes.Both };
