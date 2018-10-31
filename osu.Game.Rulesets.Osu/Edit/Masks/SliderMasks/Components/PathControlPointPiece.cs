@@ -14,7 +14,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
 {
-    public class ControlPointPiece : CompositeDrawable
+    public class PathControlPointPiece : CompositeDrawable
     {
         private readonly Slider slider;
         private readonly int index;
@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public ControlPointPiece(Slider slider, int index)
+        public PathControlPointPiece(Slider slider, int index)
         {
             this.slider = slider;
             this.index = index;
@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
                 newControlPoints[index - 1] = newControlPoints[index];
 
             slider.ControlPoints = newControlPoints;
-            slider.Curve.Calculate(true);
+            slider.Path.Calculate(true);
 
             return true;
         }

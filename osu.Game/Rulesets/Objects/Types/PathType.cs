@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.Objects.Types
 {
-    public enum CurveType
+    public enum PathType
     {
         Catmull,
         Bezier,

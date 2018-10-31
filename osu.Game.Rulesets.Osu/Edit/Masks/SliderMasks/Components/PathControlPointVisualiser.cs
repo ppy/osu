@@ -7,26 +7,26 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
 {
-    public class ControlPointVisualiser : CompositeDrawable
+    public class PathControlPointVisualiser : CompositeDrawable
     {
         private readonly Slider slider;
 
-        private readonly Container<ControlPointPiece> pieces;
+        private readonly Container<PathControlPointPiece> pieces;
 
-        public ControlPointVisualiser(Slider slider)
+        public PathControlPointVisualiser(Slider slider)
         {
             this.slider = slider;
 
-            InternalChild = pieces = new Container<ControlPointPiece> { RelativeSizeAxes = Axes.Both };
+            InternalChild = pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both };
 
-            slider.ControlPointsChanged += _ => updateControlPoints();
-            updateControlPoints();
+            slider.ControlPointsChanged += _ => updatePathControlPoints();
+            updatePathControlPoints();
         }
 
-        private void updateControlPoints()
+        private void updatePathControlPoints()
         {
             while (slider.ControlPoints.Length > pieces.Count)
-                pieces.Add(new ControlPointPiece(slider, pieces.Count));
+                pieces.Add(new PathControlPointPiece(slider, pieces.Count));
             while (slider.ControlPoints.Length < pieces.Count)
                 pieces.Remove(pieces[pieces.Count - 1]);
         }
