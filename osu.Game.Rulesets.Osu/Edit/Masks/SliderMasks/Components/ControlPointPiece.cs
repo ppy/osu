@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Size = new Vector2(15),
+                    Size = new Vector2(10),
                     Masking = true,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 }
