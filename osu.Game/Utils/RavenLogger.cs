@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using osu.Framework.Logging;
 using SharpRaven;
@@ -35,6 +36,9 @@ namespace osu.Game.Utils
 
                 if (exception != null)
                 {
+                    if (exception is IOException ioe && ioe.Message.StartsWith("There is not enough space on the disk"))
+                        return;
+
                     // since we let unhandled exceptions go ignored at times, we want to ensure they don't get submitted on subsequent reports.
                     if (lastException != null &&
                         lastException.Message == exception.Message && exception.StackTrace.StartsWith(lastException.StackTrace))
