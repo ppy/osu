@@ -289,15 +289,16 @@ namespace osu.Game.Screens.Play
             if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => !m.AllowFail))
                 return false;
 
-            if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
-            {
-                Restart();
-                return false;
-            }
-
             adjustableClock.Stop();
 
             HasFailed = true;
+
+            if (Beatmap.Value.Mods.Value.OfType<IApplicableFailOverride>().Any(m => m.RestartOnFail))
+            {
+                Restart();
+                return true;
+            }
+
             failOverlay.Retries = RestartCount;
             failOverlay.Show();
             return true;
