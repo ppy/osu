@@ -76,46 +76,38 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
 
         protected override bool OnDrag(DragEvent e)
         {
+            var newControlPoints = slider.ControlPoints.ToArray();
+
             if (index == 0)
             {
                 // Special handling for the head - only the position of the slider changes
                 slider.Position += e.Delta;
 
                 // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
-                var newControlPoints = slider.ControlPoints.ToArray();
                 for (int i = 1; i < newControlPoints.Length; i++)
                     newControlPoints[i] -= e.Delta;
-
-                slider.ControlPoints = newControlPoints;
-                slider.Curve.Calculate(true);
             }
             else
-            {
-                var newControlPoints = slider.ControlPoints.ToArray();
                 newControlPoints[index] += e.Delta;
 
-                slider.ControlPoints = newControlPoints;
-                slider.Curve.Calculate(true);
-            }
+            if (isSegmentSeparatorWithNext)
+                newControlPoints[index + 1] = newControlPoints[index];
+
+            if (isSegmentSeparatorWithPrevious)
+                newControlPoints[index - 1] = newControlPoints[index];
+
+            slider.ControlPoints = newControlPoints;
+            slider.Curve.Calculate(true);
 
             return true;
         }
 
         protected override bool OnDragEnd(DragEndEvent e) => true;
 
-        private bool isSegmentSeparator
-        {
-            get
-            {
-                bool separator = false;
+        private bool isSegmentSeparator => isSegmentSeparatorWithNext || isSegmentSeparatorWithPrevious;
 
-                if (index < slider.ControlPoints.Length - 1)
-                    separator |= slider.ControlPoints[index + 1] == slider.ControlPoints[index];
-                if (index > 0)
-                    separator |= slider.ControlPoints[index - 1] == slider.ControlPoints[index];
+        private bool isSegmentSeparatorWithNext => index < slider.ControlPoints.Length - 1 && slider.ControlPoints[index + 1] == slider.ControlPoints[index];
 
-                return separator;
-            }
-        }
+        private bool isSegmentSeparatorWithPrevious => index > 0 && slider.ControlPoints[index - 1] == slider.ControlPoints[index];
     }
 }
