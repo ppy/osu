@@ -87,6 +87,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                         placementHandler.Delete(h.HitObject.HitObject);
                     return true;
             }
+
             return base.OnKeyDown(e);
         }
 
