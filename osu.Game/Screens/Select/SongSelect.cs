@@ -350,7 +350,7 @@ namespace osu.Game.Screens.Select
                     }
                 }
 
-                ensurePlayingSelected(preview);
+                if (IsCurrentScreen) ensurePlayingSelected(preview);
                 UpdateBeatmap(Beatmap.Value);
             }
 
