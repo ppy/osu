@@ -6,6 +6,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks.Components;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks
 {
@@ -18,17 +19,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks
         private bool isPlacingEnd;
 
         public SpinnerPlacementMask()
-            : base(new Spinner())
+            : base(new Spinner { Position = OsuPlayfield.BASE_SIZE / 2 })
         {
             InternalChild = piece = new SpinnerPiece(HitObject) { Alpha = 0.5f };
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            // Fixes a 1-frame position discrpancy due to the first mouse move event happening in the next frame
-            HitObject.Position = GetContainingInputManager().CurrentState.Mouse.Position;
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -46,13 +39,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks
                 piece.FadeTo(1f, 150, Easing.OutQuint);
             }
 
-            return true;
-        }
-
-        protected override bool OnMouseMove(MouseMoveEvent e)
-        {
-            if (!isPlacingEnd)
-                HitObject.Position = e.MousePosition;
             return true;
         }
     }
