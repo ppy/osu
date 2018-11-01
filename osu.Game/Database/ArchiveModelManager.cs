@@ -404,7 +404,7 @@ namespace osu.Game.Database
                 using (Stream s = reader.GetStream(file))
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = FileSafety.PathSanitise(file),
+                        Filename = FileSafety.PathStandardise(file),
                         FileInfo = files.Add(s)
                     });
 

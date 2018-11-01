@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public readonly DrawableHitCircle HeadCircle;
         public readonly DrawableSliderTail TailCircle;
 
-        public readonly SliderBody Body;
+        public readonly SnakingSliderBody Body;
         public readonly SliderBall Ball;
 
         public DrawableSlider(Slider s)
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
-                Body = new SliderBody(s)
+                Body = new SnakingSliderBody(s)
                 {
                     PathWidth = s.Scale * 64,
                 },
@@ -85,6 +85,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
 
             HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
+
+            slider.ControlPointsChanged += _ => Body.Refresh();
         }
 
         public override Color4 AccentColour
@@ -119,7 +121,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
-            foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
+            foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Path.PositionAt(Body.SnakedStart ?? 0), slider.Path.PositionAt(Body.SnakedEnd ?? 0));
             foreach (var t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
 
             Size = Body.Size;
