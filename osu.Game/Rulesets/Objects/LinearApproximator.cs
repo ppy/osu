@@ -7,16 +7,9 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public readonly ref struct LinearApproximator
+    public readonly struct LinearApproximator : IApproximator
     {
-        private readonly ReadOnlySpan<Vector2> controlPoints;
-
-        public LinearApproximator(ReadOnlySpan<Vector2> controlPoints)
-        {
-            this.controlPoints = controlPoints;
-        }
-
-        public List<Vector2> CreateLinear()
+        public List<Vector2> Approximate(ReadOnlySpan<Vector2> controlPoints)
         {
             var result = new List<Vector2>(controlPoints.Length);
 

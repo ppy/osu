@@ -163,10 +163,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
                 {
                     case 1:
                     case 2:
-                        result = new LinearApproximator(allControlPoints).CreateLinear();
+                        result = new LinearApproximator().Approximate(allControlPoints);
                         break;
                     default:
-                        result = new BezierApproximator(allControlPoints).CreateBezier();
+                        result = new BezierApproximator().Approximate(allControlPoints);
                         break;
                 }
 

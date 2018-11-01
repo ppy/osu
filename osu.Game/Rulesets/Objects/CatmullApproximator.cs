@@ -7,25 +7,18 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public readonly ref struct CatmullApproximator
+    public readonly struct CatmullApproximator : IApproximator
     {
         /// <summary>
         /// The amount of pieces to calculate for each controlpoint quadruplet.
         /// </summary>
         private const int detail = 50;
 
-        private readonly ReadOnlySpan<Vector2> controlPoints;
-
-        public CatmullApproximator(ReadOnlySpan<Vector2> controlPoints)
-        {
-            this.controlPoints = controlPoints;
-        }
-
         /// <summary>
         /// Creates a piecewise-linear approximation of a Catmull-Rom spline.
         /// </summary>
         /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-        public List<Vector2> CreateCatmull()
+        public List<Vector2> Approximate(ReadOnlySpan<Vector2> controlPoints)
         {
             var result = new List<Vector2>((controlPoints.Length - 1) * detail * 2);
 

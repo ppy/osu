@@ -8,22 +8,15 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public readonly ref struct CircularArcApproximator
+    public readonly struct CircularArcApproximator : IApproximator
     {
         private const float tolerance = 0.1f;
-
-        private readonly ReadOnlySpan<Vector2> controlPoints;
-
-        public CircularArcApproximator(ReadOnlySpan<Vector2> controlPoints)
-        {
-            this.controlPoints = controlPoints;
-        }
 
         /// <summary>
         /// Creates a piecewise-linear approximation of a circular arc curve.
         /// </summary>
         /// <returns>A list of vectors representing the piecewise-linear approximation.</returns>
-        public List<Vector2> CreateArc()
+        public List<Vector2> Approximate(ReadOnlySpan<Vector2> controlPoints)
         {
             Vector2 a = controlPoints[0];
             Vector2 b = controlPoints[1];
