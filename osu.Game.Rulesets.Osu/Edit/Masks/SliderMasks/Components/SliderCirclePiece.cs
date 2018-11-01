@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
         {
             this.slider = slider;
             this.position = position;
+
+            slider.ControlPointsChanged += _ => UpdatePosition();
         }
 
         protected override void UpdatePosition()
@@ -23,10 +25,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
             switch (position)
             {
                 case SliderPosition.Start:
-                    Position = slider.StackedPosition + slider.Curve.PositionAt(0);
+                    Position = slider.StackedPosition + slider.Path.PositionAt(0);
                     break;
                 case SliderPosition.End:
-                    Position = slider.StackedPosition + slider.Curve.PositionAt(1);
+                    Position = slider.StackedPosition + slider.Path.PositionAt(1);
                     break;
             }
         }
