@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
                 new SliderBodyPiece(sliderObject),
                 headMask = new SliderCircleSelectionMask(slider.HeadCircle, sliderObject, SliderPosition.Start),
                 new SliderCircleSelectionMask(slider.TailCircle, sliderObject, SliderPosition.End),
-                new ControlPointVisualiser(sliderObject),
+                new PathControlPointVisualiser(sliderObject),
             };
         }
 

@@ -14,7 +14,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
 {
-    public class ControlPointPiece : CompositeDrawable
+    public class PathControlPointPiece : CompositeDrawable
     {
         private readonly Slider slider;
         private readonly int index;
@@ -25,25 +25,26 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
         [Resolved]
         private OsuColour colours { get; set; }
 
-        public ControlPointPiece(Slider slider, int index)
+        public PathControlPointPiece(Slider slider, int index)
         {
             this.slider = slider;
             this.index = index;
 
             Origin = Anchor.Centre;
-            Size = new Vector2(10);
+            AutoSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
                 path = new SmoothPath
                 {
-                    BypassAutoSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     PathWidth = 1
                 },
                 marker = new CircularContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Size = new Vector2(10),
                     Masking = true,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 }
@@ -69,50 +70,44 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
             path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
         }
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => marker.ReceivePositionalInputAt(screenSpacePos);
+
         protected override bool OnDragStart(DragStartEvent e) => true;
 
         protected override bool OnDrag(DragEvent e)
         {
+            var newControlPoints = slider.ControlPoints.ToArray();
+
             if (index == 0)
             {
                 // Special handling for the head - only the position of the slider changes
                 slider.Position += e.Delta;
 
                 // Since control points are relative to the position of the slider, they all need to be offset backwards by the delta
-                var newControlPoints = slider.ControlPoints.ToArray();
                 for (int i = 1; i < newControlPoints.Length; i++)
                     newControlPoints[i] -= e.Delta;
-
-                slider.ControlPoints = newControlPoints;
-                slider.Curve.Calculate(true);
             }
             else
-            {
-                var newControlPoints = slider.ControlPoints.ToArray();
                 newControlPoints[index] += e.Delta;
 
-                slider.ControlPoints = newControlPoints;
-                slider.Curve.Calculate(true);
-            }
+            if (isSegmentSeparatorWithNext)
+                newControlPoints[index + 1] = newControlPoints[index];
+
+            if (isSegmentSeparatorWithPrevious)
+                newControlPoints[index - 1] = newControlPoints[index];
+
+            slider.ControlPoints = newControlPoints;
+            slider.Path.Calculate(true);
 
             return true;
         }
 
         protected override bool OnDragEnd(DragEndEvent e) => true;
 
-        private bool isSegmentSeparator
-        {
-            get
-            {
-                bool separator = false;
+        private bool isSegmentSeparator => isSegmentSeparatorWithNext || isSegmentSeparatorWithPrevious;
 
-                if (index < slider.ControlPoints.Length - 1)
-                    separator |= slider.ControlPoints[index + 1] == slider.ControlPoints[index];
-                if (index > 0)
-                    separator |= slider.ControlPoints[index - 1] == slider.ControlPoints[index];
+        private bool isSegmentSeparatorWithNext => index < slider.ControlPoints.Length - 1 && slider.ControlPoints[index + 1] == slider.ControlPoints[index];
 
-                return separator;
-            }
-        }
+        private bool isSegmentSeparatorWithPrevious => index > 0 && slider.ControlPoints[index - 1] == slider.ControlPoints[index];
     }
 }

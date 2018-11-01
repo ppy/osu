@@ -45,10 +45,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
         {
             base.Update();
 
-            slider.Curve.Calculate();
+            slider.Path.Calculate();
 
             var vertices = new List<Vector2>();
-            slider.Curve.GetPathToProgress(vertices, 0, 1);
+            slider.Path.GetPathToProgress(vertices, 0, 1);
 
             body.SetVertices(vertices);
 

@@ -24,8 +24,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(SliderCircleSelectionMask),
             typeof(SliderBodyPiece),
             typeof(SliderCircle),
-            typeof(ControlPointVisualiser),
-            typeof(ControlPointPiece)
+            typeof(PathControlPointVisualiser),
+            typeof(PathControlPointPiece)
         };
 
         private readonly DrawableSlider drawableObject;
@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(150, 150),
                     new Vector2(300, 0)
                 },
-                CurveType = CurveType.Bezier,
+                PathType = PathType.Bezier,
                 Distance = 350
             };
 

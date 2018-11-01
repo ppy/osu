@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Catch.Tests
                         Vector2.Zero,
                         new Vector2(width * CatchPlayfield.BASE_WIDTH, 0)
                     },
-                    CurveType = CurveType.Linear,
+                    PathType = PathType.Linear,
                     Distance = width * CatchPlayfield.BASE_WIDTH,
                     StartTime = i * 2000,
                     NewCombo = i % 8 == 0

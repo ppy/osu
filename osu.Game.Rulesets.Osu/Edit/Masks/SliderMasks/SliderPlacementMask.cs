@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
                 new SliderBodyPiece(HitObject),
                 new SliderCirclePiece(HitObject, SliderPosition.Start),
                 new SliderCirclePiece(HitObject, SliderPosition.End),
-                new ControlPointVisualiser(HitObject),
+                new PathControlPointVisualiser(HitObject),
             };
 
             setState(PlacementState.Initial);
@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
         private void endCurve()
         {
             HitObject.ControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
-            HitObject.CurveType = HitObject.ControlPoints.Length > 2 ? CurveType.Bezier : CurveType.Linear;
+            HitObject.PathType = HitObject.ControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear;
             HitObject.Distance = segments.Sum(s => s.Distance);
 
             EndPlacement();
@@ -122,7 +122,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
                 segments[i].Calculate(i == segments.Count - 1 ? (Vector2?)cursor : null);
 
             HitObject.ControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
-            HitObject.CurveType = HitObject.ControlPoints.Length > 2 ? CurveType.Bezier : CurveType.Linear;
+            HitObject.PathType = HitObject.ControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear;
             HitObject.Distance = segments.Sum(s => s.Distance);
         }
 

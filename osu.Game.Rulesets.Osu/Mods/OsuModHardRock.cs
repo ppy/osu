@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 newControlPoints[i] = new Vector2(slider.ControlPoints[i].X, -slider.ControlPoints[i].Y);
 
             slider.ControlPoints = newControlPoints;
-            slider.Curve?.Calculate(); // Recalculate the slider curve
+            slider.Path?.Calculate(); // Recalculate the slider curve
         }
     }
 }

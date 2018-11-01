@@ -26,14 +26,14 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
             };
         }
 
-        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples)
+        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, PathType pathType, int repeatCount, List<List<SampleInfo>> repeatSamples)
         {
             return new ConvertSlider
             {
                 X = position.X,
                 ControlPoints = controlPoints,
                 Distance = length,
-                CurveType = curveType,
+                PathType = pathType,
                 RepeatSamples = repeatSamples,
                 RepeatCount = repeatCount
             };
