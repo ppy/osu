@@ -28,14 +28,14 @@ namespace osu.Game.Rulesets.Objects
             switch (PathType)
             {
                 case PathType.Linear:
-                    return new LinearApproximator().Approximate(subControlPoints);
+                    return PathApproximator.ApproximateLinear(subControlPoints);
                 case PathType.PerfectCurve:
                     //we can only use CircularArc iff we have exactly three control points and no dissection.
                     if (ControlPoints.Length != 3 || subControlPoints.Length != 3)
                         break;
 
                     // Here we have exactly 3 control points. Attempt to fit a circular arc.
-                    List<Vector2> subpath = new CircularArcApproximator().Approximate(subControlPoints);
+                    List<Vector2> subpath = PathApproximator.ApproximateCircularArc(subControlPoints);
 
                     // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
                     if (subpath.Count == 0)
@@ -43,10 +43,10 @@ namespace osu.Game.Rulesets.Objects
 
                     return subpath;
                 case PathType.Catmull:
-                    return new CatmullApproximator().Approximate(subControlPoints);
+                    return PathApproximator.ApproximateCatmull(subControlPoints);
             }
 
-            return new BezierApproximator().Approximate(subControlPoints);
+            return PathApproximator.ApproximateBezier(subControlPoints);
         }
 
         private void calculatePath()

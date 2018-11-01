@@ -8,9 +8,9 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components;
 using OpenTK;
@@ -164,10 +164,10 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
                 {
                     case 1:
                     case 2:
-                        result = new LinearApproximator().Approximate(allControlPoints);
+                        result = PathApproximator.ApproximateLinear(allControlPoints);
                         break;
                     default:
-                        result = new BezierApproximator().Approximate(allControlPoints);
+                        result = PathApproximator.ApproximateBezier(allControlPoints);
                         break;
                 }
 
