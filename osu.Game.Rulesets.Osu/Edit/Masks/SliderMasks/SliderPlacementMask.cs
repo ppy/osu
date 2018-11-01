@@ -107,17 +107,18 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
 
         private void endCurve()
         {
-            HitObject.ControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
-            HitObject.PathType = HitObject.ControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear;
-            HitObject.Distance = segments.Sum(s => s.Distance);
-
+            updateSlider();
             EndPlacement();
         }
 
         protected override void Update()
         {
             base.Update();
+            updateSlider();
+        }
 
+        private void updateSlider()
+        {
             for (int i = 0; i < segments.Count; i++)
                 segments[i].Calculate(i == segments.Count - 1 ? (Vector2?)cursor : null);
 
