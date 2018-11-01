@@ -15,24 +15,22 @@ namespace osu.Game.Online.Chat
     {
         private GameHost host;
         private DialogOverlay dialogOverlay;
-        private Bindable<bool> warnAboutOpeningExternal;
+        private Bindable<bool> externalLinkWarning;
 
         [BackgroundDependencyLoader(true)]
         private void load(GameHost host, DialogOverlay dialogOverlay, OsuConfigManager config)
         {
             this.host = host;
             this.dialogOverlay = dialogOverlay;
-            warnAboutOpeningExternal = config.GetBindable<bool>(OsuSetting.WarnAboutOpeningExternalLink);
+            externalLinkWarning = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning);
         }
 
         public void OpenUrlExternally(string url)
         {
-            void externalAction() => host.OpenUrlExternally(url);
-
-            if (warnAboutOpeningExternal)
-                dialogOverlay.Push(new ExternalLinkDialog(url, externalAction));
+            if (externalLinkWarning)
+                dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url)));
             else
-                externalAction();
+                host.OpenUrlExternally(url);
         }
     }
 }

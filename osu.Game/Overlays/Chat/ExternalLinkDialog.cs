@@ -14,7 +14,7 @@ namespace osu.Game.Overlays.Chat
             BodyText = url;
 
             Icon = FontAwesome.fa_warning;
-            HeaderText = "Confirm opening external link";
+            HeaderText = "Are you sure you want to open the following?";
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogOkButton

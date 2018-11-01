@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Online
                 new SettingsCheckbox
                 {
                     LabelText = "Warn about opening external links",
-                    Bindable = config.GetBindable<bool>(OsuSetting.WarnAboutOpeningExternalLink)
+                    Bindable = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning)
                 },
             };
         }
