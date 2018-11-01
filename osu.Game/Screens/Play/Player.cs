@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Play
         private const double cursor_idle_delay = 1000;
 
         public CursorContainer Cursor => RulesetContainer.Cursor;
-        public bool ProvidingUserCursor => (RulesetContainer?.Cursor != null || idleTracker?.MouseIdleTime > cursor_idle_delay) && !RulesetContainer.HasReplayLoaded.Value;
+        public bool ProvidingUserCursor => (RulesetContainer?.Cursor != null || idleTracker?.MouseIdleTime > cursor_idle_delay) && (!RulesetContainer?.HasReplayLoaded.Value ?? true);
 
         private IAdjustableClock sourceClock;
 
