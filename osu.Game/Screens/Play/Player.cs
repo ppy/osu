@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Play
 
         public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, APIAccess api, OsuConfigManager config, IdleTracker idleTracker)
         {
             this.idleTracker = idleTracker;
