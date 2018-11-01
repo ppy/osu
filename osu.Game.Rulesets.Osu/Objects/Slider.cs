@@ -22,7 +22,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
+        public event Action<Vector2[]> ControlPointsChanged;
+
+        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
@@ -50,24 +52,34 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        public SliderCurve Curve { get; } = new SliderCurve();
+        public SliderPath Path { get; } = new SliderPath();
 
         public Vector2[] ControlPoints
         {
-            get { return Curve.ControlPoints; }
-            set { Curve.ControlPoints = value; }
+            get => Path.ControlPoints;
+            set
+            {
+                if (Path.ControlPoints == value)
+                    return;
+                Path.ControlPoints = value;
+
+                ControlPointsChanged?.Invoke(value);
+
+                if (TailCircle != null)
+                    TailCircle.Position = EndPosition;
+            }
         }
 
-        public CurveType CurveType
+        public PathType PathType
         {
-            get { return Curve.CurveType; }
-            set { Curve.CurveType = value; }
+            get { return Path.PathType; }
+            set { Path.PathType = value; }
         }
 
         public double Distance
         {
-            get { return Curve.Distance; }
-            set { Curve.Distance = value; }
+            get { return Path.Distance; }
+            set { Path.Distance = value; }
         }
 
         public override Vector2 Position
@@ -177,7 +189,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createTicks()
         {
-            var length = Curve.Distance;
+            var length = Path.Distance;
             var tickDistance = MathHelper.Clamp(TickDistance, 0, length);
 
             if (tickDistance == 0) return;
@@ -216,7 +228,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                         SpanIndex = span,
                         SpanStartTime = spanStartTime,
                         StartTime = spanStartTime + timeProgress * SpanDuration,
-                        Position = Position + Curve.PositionAt(distanceProgress),
+                        Position = Position + Path.PositionAt(distanceProgress),
                         StackHeight = StackHeight,
                         Scale = Scale,
                         Samples = sampleList
@@ -234,7 +246,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                     RepeatIndex = repeatIndex,
                     SpanDuration = SpanDuration,
                     StartTime = StartTime + repeat * SpanDuration,
-                    Position = Position + Curve.PositionAt(repeat % 2),
+                    Position = Position + Path.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
                     Samples = new List<SampleInfo>(RepeatSamples[repeatIndex])

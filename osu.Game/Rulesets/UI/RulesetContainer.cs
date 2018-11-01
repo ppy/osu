@@ -238,6 +238,8 @@ namespace osu.Game.Rulesets.UI
 
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
+
+            applyBeatmapMods(Mods);
         }
 
         [BackgroundDependencyLoader]
@@ -255,16 +257,29 @@ namespace osu.Game.Rulesets.UI
                 KeyBindingInputManager.Add(Cursor);
 
             // Apply mods
-            applyMods(Mods, config);
+            applyRulesetMods(Mods, config);
 
             loadObjects();
+        }
+
+        /// <summary>
+        /// Applies the active mods to the Beatmap.
+        /// </summary>
+        /// <param name="mods"></param>
+        private void applyBeatmapMods(IEnumerable<Mod> mods)
+        {
+            if (mods == null)
+                return;
+
+            foreach (var mod in mods.OfType<IApplicableToBeatmap<TObject>>())
+                mod.ApplyToBeatmap(Beatmap);
         }
 
         /// <summary>
         /// Applies the active mods to this RulesetContainer.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyMods(IEnumerable<Mod> mods, OsuConfigManager config)
+        private void applyRulesetMods(IEnumerable<Mod> mods, OsuConfigManager config)
         {
             if (mods == null)
                 return;
