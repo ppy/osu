@@ -75,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public void Refresh()
         {
             // Generate the entire curve
-            slider.Curve.GetPathToProgress(CurrentCurve, 0, 1);
+            slider.Path.GetPathToProgress(CurrentCurve, 0, 1);
             SetVertices(CurrentCurve);
 
             // The body is sized to the full path size to avoid excessive autosize computations
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             SnakedStart = p0;
             SnakedEnd = p1;
 
-            slider.Curve.GetPathToProgress(CurrentCurve, p0, p1);
+            slider.Path.GetPathToProgress(CurrentCurve, p0, p1);
 
             SetVertices(CurrentCurve);
 
