@@ -14,7 +14,7 @@ using OpenTK.Graphics;
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
     /// <summary>
-    /// A layer that handles and displays drag selection for a collection of <see cref="HitObjectMask"/>s.
+    /// A layer that handles and displays drag selection for a collection of <see cref="SelectionMask"/>s.
     /// </summary>
     public class DragLayer : CompositeDrawable
     {
@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// <summary>
         /// Creates a new <see cref="DragLayer"/>.
         /// </summary>
-        /// <param name="maskContainer">The selectable <see cref="HitObjectMask"/>s.</param>
+        /// <param name="maskContainer">The selectable <see cref="SelectionMask"/>s.</param>
         public DragLayer(Action<RectangleF> performSelection)
         {
             this.performSelection = performSelection;

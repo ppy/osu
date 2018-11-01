@@ -8,11 +8,13 @@ using OpenTK.Graphics;
 using osu.Game.Tests.Resources;
 using System.Linq;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
 using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Skinning;
 
@@ -21,6 +23,25 @@ namespace osu.Game.Tests.Beatmaps.Formats
     [TestFixture]
     public class LegacyBeatmapDecoderTest
     {
+        [Test]
+        public void TestDecodeBeatmapVersion()
+        {
+            using (var resStream = Resource.OpenResource("beatmap-version.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var decoder = Decoder.GetDecoder<Beatmap>(stream);
+
+                stream.BaseStream.Position = 0;
+                stream.DiscardBufferedData();
+
+                var working = new TestWorkingBeatmap(decoder.Decode(stream));
+
+                Assert.AreEqual(6, working.BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(6, working.Beatmap.BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapVersion);
+            }
+        }
+
         [Test]
         public void TestDecodeBeatmapGeneral()
         {
