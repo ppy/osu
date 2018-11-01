@@ -13,4 +13,4 @@ about: For issues regarding game crashes or permanent freezes
 
 **Logs:** <!-- Attach your osu!lazer logs, you can find them under %appdata%\osu\logs in Windows, or under ~/.local/share/osu/ in Linux and macOS -->
 
-**Computer Specifications:** <!-- Attach your computer specifications, you can find them by using Speccy -->
+**Computer Specifications:** <!-- Attach your computer specifications, you can find them by using System Information in Windows, System Monitor in Linux, or About This Mac in macOS -->
