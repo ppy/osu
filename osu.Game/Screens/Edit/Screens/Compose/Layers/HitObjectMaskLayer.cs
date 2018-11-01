@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 AddMaskFor(obj);
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
+        protected override bool OnClick(ClickEvent e)
         {
             maskContainer.DeselectAll();
             return true;
