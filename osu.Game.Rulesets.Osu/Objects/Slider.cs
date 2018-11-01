@@ -22,9 +22,9 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public event Action<Vector2[]> ControlPointsChanged;
+        public event Action<SliderPath> PathChanged;
 
-        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
+        public double EndTime => StartTime + this.SpanCount() * Path.GetDistance() / Velocity;
         public double Duration => EndTime - StartTime;
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
@@ -52,35 +52,23 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        public SliderPath Path { get; } = new SliderPath();
+        private SliderPath path;
 
-        public Vector2[] ControlPoints
+        public SliderPath Path
         {
-            get => Path.ControlPoints;
+            get => path;
             set
             {
-                if (Path.ControlPoints == value)
-                    return;
-                Path.ControlPoints = value;
+                path = value;
 
-                ControlPointsChanged?.Invoke(value);
+                PathChanged?.Invoke(value);
 
                 if (TailCircle != null)
                     TailCircle.Position = EndPosition;
             }
         }
 
-        public PathType PathType
-        {
-            get { return Path.PathType; }
-            set { Path.PathType = value; }
-        }
-
-        public double Distance
-        {
-            get { return Path.Distance; }
-            set { Path.Distance = value; }
-        }
+        public double Distance => Path.GetDistance();
 
         public override Vector2 Position
         {
@@ -190,7 +178,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createTicks()
         {
-            var length = Path.Distance;
+            var length = Path.GetDistance();
             var tickDistance = MathHelper.Clamp(TickDistance, 0, length);
 
             if (tickDistance == 0) return;

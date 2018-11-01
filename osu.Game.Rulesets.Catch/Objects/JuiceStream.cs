@@ -10,7 +10,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
@@ -50,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             if (TickDistance == 0)
                 return;
 
-            var length = Path.Distance;
+            var length = Path.GetDistance();
             var tickDistance = Math.Min(TickDistance, length);
             var spanDuration = length / Velocity;
 
@@ -132,33 +131,23 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
         }
 
-        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
+        public double EndTime => StartTime + this.SpanCount() * Path.GetDistance() / Velocity;
 
         public float EndX => X + this.CurvePositionAt(1).X / CatchPlayfield.BASE_WIDTH;
 
         public double Duration => EndTime - StartTime;
 
-        public double Distance
+        private SliderPath path;
+
+        public SliderPath Path
         {
-            get { return Path.Distance; }
-            set { Path.Distance = value; }
+            get => path;
+            set => path = value;
         }
 
-        public SliderPath Path { get; } = new SliderPath();
-
-        public Vector2[] ControlPoints
-        {
-            get { return Path.ControlPoints; }
-            set { Path.ControlPoints = value; }
-        }
+        public double Distance => Path.GetDistance();
 
         public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
-
-        public PathType PathType
-        {
-            get { return Path.PathType; }
-            set { Path.PathType = value; }
-        }
 
         public double? LegacyLastTickOffset { get; set; }
     }

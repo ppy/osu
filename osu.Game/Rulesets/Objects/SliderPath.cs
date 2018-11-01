@@ -10,22 +10,31 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public class SliderPath
+    public readonly struct SliderPath
     {
-        public double Distance;
+        public readonly Vector2[] ControlPoints;
+        public readonly PathType Type;
+        public readonly double? ExpectedDistance;
 
-        public Vector2[] ControlPoints = Array.Empty<Vector2>();
+        public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
+        {
+            ControlPoints = controlPoints;
+            Type = type;
+            ExpectedDistance = expectedDistance;
 
-        public PathType PathType = PathType.PerfectCurve;
+            calculatedPath = new List<Vector2>();
+            cumulativeLength = new List<double>();
 
-        public Vector2 Offset;
+            calculatePath();
+            calculateCumulativeLength();
+        }
 
-        private readonly List<Vector2> calculatedPath = new List<Vector2>();
-        private readonly List<double> cumulativeLength = new List<double>();
+        private readonly List<Vector2> calculatedPath;
+        private readonly List<double> cumulativeLength;
 
         private List<Vector2> calculateSubpath(ReadOnlySpan<Vector2> subControlPoints)
         {
-            switch (PathType)
+            switch (Type)
             {
                 case PathType.Linear:
                     return PathApproximator.ApproximateLinear(subControlPoints);
@@ -77,49 +86,6 @@ namespace osu.Game.Rulesets.Objects
             }
         }
 
-        private void calculateCumulativeLengthAndTrimPath()
-        {
-            double l = 0;
-
-            cumulativeLength.Clear();
-            cumulativeLength.Add(l);
-
-            for (int i = 0; i < calculatedPath.Count - 1; ++i)
-            {
-                Vector2 diff = calculatedPath[i + 1] - calculatedPath[i];
-                double d = diff.Length;
-
-                // Shorten slider paths that are too long compared to what's
-                // in the .osu file.
-                if (Distance - l < d)
-                {
-                    calculatedPath[i + 1] = calculatedPath[i] + diff * (float)((Distance - l) / d);
-                    calculatedPath.RemoveRange(i + 2, calculatedPath.Count - 2 - i);
-
-                    l = Distance;
-                    cumulativeLength.Add(l);
-                    break;
-                }
-
-                l += d;
-                cumulativeLength.Add(l);
-            }
-
-            // Lengthen slider paths that are too short compared to what's
-            // in the .osu file.
-            if (l < Distance && calculatedPath.Count > 1)
-            {
-                Vector2 diff = calculatedPath[calculatedPath.Count - 1] - calculatedPath[calculatedPath.Count - 2];
-                double d = diff.Length;
-
-                if (d <= 0)
-                    return;
-
-                calculatedPath[calculatedPath.Count - 1] += diff * (float)((Distance - l) / d);
-                cumulativeLength[calculatedPath.Count - 1] = Distance;
-            }
-        }
-
         private void calculateCumulativeLength()
         {
             double l = 0;
@@ -132,21 +98,33 @@ namespace osu.Game.Rulesets.Objects
                 Vector2 diff = calculatedPath[i + 1] - calculatedPath[i];
                 double d = diff.Length;
 
+                // Shorted slider paths that are too long compared to the expected distance
+                if (ExpectedDistance.HasValue && ExpectedDistance - l < d)
+                {
+                    calculatedPath[i + 1] = calculatedPath[i] + diff * (float)((ExpectedDistance - l) / d);
+                    calculatedPath.RemoveRange(i + 2, calculatedPath.Count - 2 - i);
+
+                    l = ExpectedDistance.Value;
+                    cumulativeLength.Add(l);
+                    break;
+                }
+
                 l += d;
                 cumulativeLength.Add(l);
             }
 
-            Distance = l;
-        }
+            // Lengthen slider paths that are too short compared to the expected distance
+            if (ExpectedDistance.HasValue && l < ExpectedDistance && calculatedPath.Count > 1)
+            {
+                Vector2 diff = calculatedPath[calculatedPath.Count - 1] - calculatedPath[calculatedPath.Count - 2];
+                double d = diff.Length;
 
-        public void Calculate(bool updateDistance = false)
-        {
-            calculatePath();
+                if (d <= 0)
+                    return;
 
-            if (!updateDistance)
-                calculateCumulativeLengthAndTrimPath();
-            else
-                calculateCumulativeLength();
+                calculatedPath[calculatedPath.Count - 1] += diff * (float)((ExpectedDistance - l) / d);
+                cumulativeLength[calculatedPath.Count - 1] = ExpectedDistance.Value;
+            }
         }
 
         private int indexOfDistance(double d)
@@ -159,7 +137,7 @@ namespace osu.Game.Rulesets.Objects
 
         private double progressToDistance(double progress)
         {
-            return MathHelper.Clamp(progress, 0, 1) * Distance;
+            return MathHelper.Clamp(progress, 0, 1) * GetDistance();
         }
 
         private Vector2 interpolateVertices(int i, double d)
@@ -169,7 +147,7 @@ namespace osu.Game.Rulesets.Objects
 
             if (i <= 0)
                 return calculatedPath.First();
-            else if (i >= calculatedPath.Count)
+            if (i >= calculatedPath.Count)
                 return calculatedPath.Last();
 
             Vector2 p0 = calculatedPath[i - 1];
@@ -186,6 +164,8 @@ namespace osu.Game.Rulesets.Objects
             return p0 + (p1 - p0) * (float)w;
         }
 
+        public double GetDistance() => cumulativeLength.Count == 0 ? 0 : cumulativeLength[cumulativeLength.Count - 1];
+
         /// <summary>
         /// Computes the slider path until a given progress that ranges from 0 (beginning of the slider)
         /// to 1 (end of the slider) and stores the generated path in the given list.
@@ -195,23 +175,22 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="p1">End progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
         public void GetPathToProgress(List<Vector2> path, double p0, double p1)
         {
-            if (calculatedPath.Count == 0 && ControlPoints.Length > 0)
-                Calculate();
-
             double d0 = progressToDistance(p0);
             double d1 = progressToDistance(p1);
 
             path.Clear();
 
             int i = 0;
-            for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i) { }
+            for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i)
+            {
+            }
 
-            path.Add(interpolateVertices(i, d0) + Offset);
+            path.Add(interpolateVertices(i, d0));
 
             for (; i < calculatedPath.Count && cumulativeLength[i] <= d1; ++i)
-                path.Add(calculatedPath[i] + Offset);
+                path.Add(calculatedPath[i]);
 
-            path.Add(interpolateVertices(i, d1) + Offset);
+            path.Add(interpolateVertices(i, d1));
         }
 
         /// <summary>
@@ -222,11 +201,8 @@ namespace osu.Game.Rulesets.Objects
         /// <returns></returns>
         public Vector2 PositionAt(double progress)
         {
-            if (calculatedPath.Count == 0 && ControlPoints.Length > 0)
-                Calculate();
-
             double d = progressToDistance(progress);
-            return interpolateVertices(indexOfDistance(d), d) + Offset;
+            return interpolateVertices(indexOfDistance(d), d);
         }
     }
 }
