@@ -11,11 +11,18 @@ namespace osu.Game.Input
     public class IdleTracker : Component, IKeyBindingHandler<PlatformAction>
     {
         private double lastInteractionTime;
+        private double lastMouseInteractionTime;
         public double IdleTime => Clock.CurrentTime - lastInteractionTime;
+        public double MouseIdleTime => Clock.CurrentTime - lastMouseInteractionTime;
 
         private bool updateLastInteractionTime()
         {
             lastInteractionTime = Clock.CurrentTime;
+            return false;
+        }
+        private bool updateLastMouseInteractionTime()
+        {
+            lastMouseInteractionTime = Clock.CurrentTime;
             return false;
         }
 
@@ -27,11 +34,13 @@ namespace osu.Game.Input
         {
             switch (e)
             {
-                case KeyDownEvent _:
-                case KeyUpEvent _:
                 case MouseDownEvent _:
                 case MouseUpEvent _:
                 case MouseMoveEvent _:
+                    updateLastMouseInteractionTime();
+                    return updateLastInteractionTime();
+                case KeyDownEvent _:
+                case KeyUpEvent _:
                     return updateLastInteractionTime();
                 default:
                     return base.Handle(e);

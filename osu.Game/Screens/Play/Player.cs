@@ -21,6 +21,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
@@ -54,8 +55,10 @@ namespace osu.Game.Screens.Play
 
         public int RestartCount;
 
+        private const double cursor_idle_delay = 1000;
+
         public CursorContainer Cursor => RulesetContainer.Cursor;
-        public bool ProvidingUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded.Value;
+        public bool ProvidingUserCursor => (RulesetContainer?.Cursor != null || idleTracker?.MouseIdleTime > cursor_idle_delay) && !RulesetContainer.HasReplayLoaded.Value;
 
         private IAdjustableClock sourceClock;
 
@@ -72,6 +75,8 @@ namespace osu.Game.Screens.Play
 
         private SampleChannel sampleRestart;
 
+        private IdleTracker idleTracker;
+
         protected ScoreProcessor ScoreProcessor;
         protected RulesetContainer RulesetContainer;
 
@@ -84,8 +89,9 @@ namespace osu.Game.Screens.Play
         public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, APIAccess api, OsuConfigManager config)
+        private void load(AudioManager audio, APIAccess api, OsuConfigManager config, IdleTracker idleTracker)
         {
+            this.idleTracker = idleTracker;
             this.api = api;
 
             WorkingBeatmap working = Beatmap.Value;
