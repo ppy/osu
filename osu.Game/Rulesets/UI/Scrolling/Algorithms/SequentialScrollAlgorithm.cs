@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Timing;
 
-namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
+namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 {
     public class SequentialScrollAlgorithm : IScrollAlgorithm
     {
