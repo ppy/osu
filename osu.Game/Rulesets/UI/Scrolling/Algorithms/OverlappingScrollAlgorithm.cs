@@ -4,7 +4,7 @@
 using osu.Framework.Lists;
 using osu.Game.Rulesets.Timing;
 
-namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
+namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 {
     public class OverlappingScrollAlgorithm : IScrollAlgorithm
     {
