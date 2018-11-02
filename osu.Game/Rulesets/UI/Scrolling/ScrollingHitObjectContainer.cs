@@ -31,27 +31,27 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
-        private readonly ISpeedChangeVisualiser visualiser;
+        private readonly IScrollAlgorithm algorithm;
 
         private Cached initialStateCache = new Cached();
 
-        public ScrollingHitObjectContainer(SpeedChangeVisualisationMethod visualisationMethod)
+        public ScrollingHitObjectContainer(ScrollAlgorithm scrollAlgorithm)
         {
             RelativeSizeAxes = Axes.Both;
 
             TimeRange.ValueChanged += _ => initialStateCache.Invalidate();
             Direction.ValueChanged += _ => initialStateCache.Invalidate();
 
-            switch (visualisationMethod)
+            switch (scrollAlgorithm)
             {
-                case SpeedChangeVisualisationMethod.Sequential:
-                    visualiser = new SequentialSpeedChangeVisualiser(ControlPoints);
+                case ScrollAlgorithm.Sequential:
+                    algorithm = new SequentialScrollAlgorithm(ControlPoints);
                     break;
-                case SpeedChangeVisualisationMethod.Overlapping:
-                    visualiser = new OverlappingSpeedChangeVisualiser(ControlPoints);
+                case ScrollAlgorithm.Overlapping:
+                    algorithm = new OverlappingScrollAlgorithm(ControlPoints);
                     break;
-                case SpeedChangeVisualisationMethod.Constant:
-                    visualiser = new ConstantSpeedChangeVisualiser();
+                case ScrollAlgorithm.Constant:
+                    algorithm = new ConstantScrollAlgorithm();
                     break;
             }
         }
@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                         break;
                 }
 
-                visualiser.Reset();
+                algorithm.Reset();
 
                 foreach (var obj in Objects)
                     computeInitialStateRecursive(obj);
@@ -121,7 +121,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private void computeInitialStateRecursive(DrawableHitObject hitObject)
         {
-            hitObject.LifetimeStart = visualiser.GetDisplayStartTime(hitObject.HitObject.StartTime, TimeRange);
+            hitObject.LifetimeStart = algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, TimeRange);
 
             if (hitObject.HitObject is IHasEndTime endTime)
             {
@@ -129,11 +129,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 {
                     case ScrollingDirection.Up:
                     case ScrollingDirection.Down:
-                        hitObject.Height = visualiser.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, TimeRange, scrollLength);
+                        hitObject.Height = algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, TimeRange, scrollLength);
                         break;
                     case ScrollingDirection.Left:
                     case ScrollingDirection.Right:
-                        hitObject.Width = visualiser.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, TimeRange, scrollLength);
+                        hitObject.Width = algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, TimeRange, scrollLength);
                         break;
                 }
             }
@@ -161,16 +161,16 @@ namespace osu.Game.Rulesets.UI.Scrolling
             switch (Direction.Value)
             {
                 case ScrollingDirection.Up:
-                    hitObject.Y = visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
+                    hitObject.Y = algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
                     break;
                 case ScrollingDirection.Down:
-                    hitObject.Y = -visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
+                    hitObject.Y = -algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
                     break;
                 case ScrollingDirection.Left:
-                    hitObject.X = visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
+                    hitObject.X = algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
                     break;
                 case ScrollingDirection.Right:
-                    hitObject.X = -visualiser.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
+                    hitObject.X = -algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
                     break;
             }
         }

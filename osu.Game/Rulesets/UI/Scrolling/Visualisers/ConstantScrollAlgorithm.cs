@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
-    public class ConstantSpeedChangeVisualiser : ISpeedChangeVisualiser
+    public class ConstantScrollAlgorithm : IScrollAlgorithm
     {
         public double GetDisplayStartTime(double time, double timeRange) => time - timeRange;
 
