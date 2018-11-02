@@ -46,6 +46,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
 
             // Need to cause one update
             body.UpdateProgress(0);
+            body.Refresh();
         }
     }
 }
