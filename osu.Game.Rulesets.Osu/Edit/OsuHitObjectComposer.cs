@@ -31,6 +31,7 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
             new HitCircleCompositionTool(),
+            new SliderCompositionTool(),
             new SpinnerCompositionTool()
         };
 
