@@ -133,7 +133,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                         break;
                     case ScrollingDirection.Left:
                     case ScrollingDirection.Right:
-                        hitObject.Height = visualiser.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, TimeRange, scrollLength);
+                        hitObject.Width = visualiser.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, TimeRange, scrollLength);
                         break;
                 }
             }
