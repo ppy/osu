@@ -7,13 +7,13 @@ using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
-    public class SequentialSpeedChangeVisualiser : ISpeedChangeVisualiser
+    public class SequentialScrollAlgorithm : IScrollAlgorithm
     {
         private readonly Dictionary<double, double> positionCache;
 
         private readonly IReadOnlyList<MultiplierControlPoint> controlPoints;
 
-        public SequentialSpeedChangeVisualiser(IReadOnlyList<MultiplierControlPoint> controlPoints)
+        public SequentialScrollAlgorithm(IReadOnlyList<MultiplierControlPoint> controlPoints)
         {
             this.controlPoints = controlPoints;
 

@@ -6,13 +6,13 @@ using osu.Game.Rulesets.Timing;
 
 namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
-    public class OverlappingSpeedChangeVisualiser : ISpeedChangeVisualiser
+    public class OverlappingScrollAlgorithm : IScrollAlgorithm
     {
         private readonly MultiplierControlPoint searchPoint;
 
         private readonly SortedList<MultiplierControlPoint> controlPoints;
 
-        public OverlappingSpeedChangeVisualiser(SortedList<MultiplierControlPoint> controlPoints)
+        public OverlappingScrollAlgorithm(SortedList<MultiplierControlPoint> controlPoints)
         {
             this.controlPoints = controlPoints;
 

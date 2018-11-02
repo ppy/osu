@@ -3,7 +3,7 @@
 
 namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
 {
-    public interface ISpeedChangeVisualiser
+    public interface IScrollAlgorithm
     {
         /// <summary>
         /// Given a point in time, computes the time at which it enters the time range.
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.UI.Scrolling.Visualisers
         float PositionAt(double time, double currentTime, double timeRange, float scrollLength);
 
         /// <summary>
-        /// Resets this <see cref="ISpeedChangeVisualiser"/> to a default state.
+        /// Resets this <see cref="IScrollAlgorithm"/> to a default state.
         /// </summary>
         void Reset();
     }
