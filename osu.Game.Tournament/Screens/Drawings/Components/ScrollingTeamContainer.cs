@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
+using osu.Game.Graphics;
 using osu.Game.Tournament.Components;
 using OpenTK;
 using OpenTK.Graphics;
@@ -52,6 +53,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                     Origin = Anchor.Centre,
 
                     AutoSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(0.33f),
 
                     Masking = true,
                     CornerRadius = 10f,
@@ -358,6 +360,7 @@ namespace osu.Game.Tournament.Screens.Drawings.Components
                     outline = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Colour = OsuColour.Gray(0.33f),
                         Alpha = 0
                     },
                     Flag
