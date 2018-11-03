@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Video;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Tournament.Screens.Drawings;
 using osu.Game.Tournament.Screens.Ladder;
 using osu.Game.Tournament.Screens.TeamIntro;
 using OpenTK;
@@ -20,6 +21,7 @@ namespace osu.Game.Tournament.Tests
         private LadderManager bracket;
         private MapPoolScreen mapPool;
         private TeamIntroScreen teamIntro;
+        private DrawingsScreen drawings;
         private Container screens;
 
         [BackgroundDependencyLoader]
@@ -44,6 +46,7 @@ namespace osu.Game.Tournament.Tests
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Drawings", Action = () => setScreen(drawings) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "TeamIntro", Action = () => setScreen(teamIntro) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "MapPool", Action = () => setScreen(mapPool) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket", Action = () => setScreen(bracket) },
@@ -54,16 +57,19 @@ namespace osu.Game.Tournament.Tests
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    RelativePositionAxes = Axes.Both,
+                    X = 0.2f,
                     FillMode = FillMode.Fit,
                     FillAspectRatio = 16/9f,
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
+                    Anchor = Anchor.TopLeft,
+                    Origin = Anchor.TopLeft,
                     Size = new Vector2(0.8f, 1),
-                    Masking = true,
+                    //Masking = true,
                     Children = new Drawable[]
                     {
                         new VideoSprite(@"C:\Users\Dean\BG Side Logo - OWC.m4v")
                         {
+                            Loop = true,
                             RelativeSizeAxes = Axes.Both,
                             FillMode = FillMode.Fit,
                         },
@@ -75,7 +81,8 @@ namespace osu.Game.Tournament.Tests
                                 bracket = new LadderManager(Ladder),
                                 mapPool = new MapPoolScreen(Ladder.Groupings.First(g => g.Name == "Finals")),
                                 teamIntro = new TeamIntroScreen(Ladder.Teams.First(t => t.Acronym == "USA"), Ladder.Teams.First(t => t.Acronym == "JPN"),
-                                    Ladder.Groupings.First(g => g.Name == "Finals"))
+                                    Ladder.Groupings.First(g => g.Name == "Finals")),
+                                drawings = new DrawingsScreen()
                             }
                         },
                     }
