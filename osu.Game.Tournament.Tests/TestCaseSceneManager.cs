@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Video;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Screens.Drawings;
 using osu.Game.Tournament.Screens.Ladder;
+using osu.Game.Tournament.Screens.Showcase;
 using osu.Game.Tournament.Screens.TeamIntro;
 using OpenTK;
 using OpenTK.Graphics;
@@ -23,6 +24,7 @@ namespace osu.Game.Tournament.Tests
         private TeamIntroScreen teamIntro;
         private DrawingsScreen drawings;
         private Container screens;
+        private ShowcaseScreen showcase;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -47,6 +49,7 @@ namespace osu.Game.Tournament.Tests
                             Children = new Drawable[]
                             {
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Drawings", Action = () => setScreen(drawings) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Showcase", Action = () => setScreen(showcase) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "TeamIntro", Action = () => setScreen(teamIntro) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "MapPool", Action = () => setScreen(mapPool) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket", Action = () => setScreen(bracket) },
@@ -79,6 +82,7 @@ namespace osu.Game.Tournament.Tests
                             Children = new Drawable[]
                             {
                                 bracket = new LadderManager(Ladder),
+                                showcase = new ShowcaseScreen(),
                                 mapPool = new MapPoolScreen(Ladder.Groupings.First(g => g.Name == "Finals")),
                                 teamIntro = new TeamIntroScreen(Ladder.Teams.First(t => t.Acronym == "USA"), Ladder.Teams.First(t => t.Acronym == "JPN"),
                                     Ladder.Groupings.First(g => g.Name == "Finals")),

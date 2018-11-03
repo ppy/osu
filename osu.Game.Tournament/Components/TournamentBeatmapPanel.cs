@@ -20,11 +20,13 @@ namespace osu.Game.Tournament.Components
         private const float horizontal_padding = 10;
         private const float vertical_padding = 5;
 
+        public const float HEIGHT = 50;
+
         public TournamentBeatmapPanel(BeatmapInfo beatmap)
         {
             this.beatmap = beatmap;
             Width = 400;
-            Height = 50;
+            Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]
