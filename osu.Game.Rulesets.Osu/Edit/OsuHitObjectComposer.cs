@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks;
 using osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks;
+using osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
@@ -27,9 +28,11 @@ namespace osu.Game.Rulesets.Osu.Edit
         protected override RulesetContainer<OsuHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             => new OsuEditRulesetContainer(ruleset, beatmap);
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new[]
+        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
             new HitCircleCompositionTool(),
+            new SliderCompositionTool(),
+            new SpinnerCompositionTool()
         };
 
         protected override Container CreateLayerContainer() => new PlayfieldAdjustmentContainer { RelativeSizeAxes = Axes.Both };
@@ -42,6 +45,8 @@ namespace osu.Game.Rulesets.Osu.Edit
                     return new HitCircleSelectionMask(circle);
                 case DrawableSlider slider:
                     return new SliderSelectionMask(slider);
+                case DrawableSpinner spinner:
+                    return new SpinnerSelectionMask(spinner);
             }
 
             return base.CreateMaskFor(hitObject);
