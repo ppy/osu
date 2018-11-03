@@ -56,7 +56,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             var p3 = new Vector2(p2.X, c2.Y);
             var p4 = new Vector2(c2.X, p3.Y);
 
-            Positions = new[] { p1, p2, p3, p4 }.Select(ToLocalSpace).ToList();
+            Vertices = new[] { p1, p2, p3, p4 }.Select(ToLocalSpace).ToList();
         }
     }
 }
