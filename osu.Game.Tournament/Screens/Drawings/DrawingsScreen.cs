@@ -12,13 +12,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Graphics.Video;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
-using osu.Game.Screens.Backgrounds;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Drawings.Components;
 using OpenTK;
@@ -32,7 +33,7 @@ namespace osu.Game.Tournament.Screens.Drawings
 
         protected override bool HideOverlaysOnEnter => true;
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
+        protected override BackgroundScreen CreateBackground() => null;
 
         private ScrollingTeamContainer teamsContainer;
         private GroupContainer groupsContainer;
@@ -56,6 +57,8 @@ namespace osu.Game.Tournament.Screens.Drawings
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, Storage storage)
         {
+            RelativeSizeAxes = Axes.Both;
+
             this.storage = storage;
 
             TextureStore flagStore = new TextureStore();
@@ -79,168 +82,161 @@ namespace osu.Game.Tournament.Screens.Drawings
 
             Children = new Drawable[]
             {
-                new Box
+                // Main container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = new Color4(77, 77, 77, 255)
+                    Children = new Drawable[]
+                    {
+                        new VideoSprite(@"C:\Users\Dean\BG Logoless - OWC.m4v")
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Loop = true,
+                        },
+                        new Sprite
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            FillMode = FillMode.Fill,
+                            Texture = textures.Get(@"Backgrounds/Drawings/background.png")
+                        },
+                        // Visualiser
+                        new VisualiserContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+
+                            RelativeSizeAxes = Axes.X,
+                            Size = new Vector2(1, 10),
+
+                            Colour = new Color4(255, 204, 34, 255),
+
+                            Lines = 6
+                        },
+                        // Groups
+                        groupsContainer = new GroupContainer(drawingsConfig.Get<int>(DrawingsConfig.Groups), drawingsConfig.Get<int>(DrawingsConfig.TeamsPerGroup))
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+
+                            RelativeSizeAxes = Axes.Y,
+                            AutoSizeAxes = Axes.X,
+
+                            Padding = new MarginPadding
+                            {
+                                Top = 35f,
+                                Bottom = 35f
+                            }
+                        },
+                        // Scrolling teams
+                        teamsContainer = new ScrollingTeamContainer
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+
+                            RelativeSizeAxes = Axes.X,
+                        },
+                        // Scrolling team name
+                        fullTeamNameText = new OsuSpriteText
+                        {
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.TopCentre,
+
+                            Position = new Vector2(0, 45f),
+
+                            Colour = OsuColour.Gray(0.33f),
+
+                            Alpha = 0,
+
+                            Font = "Exo2.0-Light",
+                            TextSize = 42f
+                        }
+                    }
                 },
-                new Sprite
+                // Control panel container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    FillMode = FillMode.Fill,
-                    Texture = textures.Get(@"Backgrounds/Drawings/background.png")
-                },
-                new FillFlowContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
+                    AlwaysPresent = true,
+                    Width = 0.15f,
+                    Anchor = Anchor.TopRight,
 
                     Children = new Drawable[]
                     {
-                        // Main container
-                        new Container
+                        new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Width = 0.85f,
+                            Colour = new Color4(54, 54, 54, 255)
+                        },
+                        new OsuSpriteText
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+
+                            Text = "Control Panel",
+                            TextSize = 22f,
+                            Font = "Exo2.0-Bold"
+                        },
+                        new FillFlowContainer
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Width = 0.75f,
+
+                            Position = new Vector2(0, 35f),
+
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 5f),
 
                             Children = new Drawable[]
                             {
-                                // Visualiser
-                                new VisualiserContainer
+                                new TriangleButton
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-
                                     RelativeSizeAxes = Axes.X,
-                                    Size = new Vector2(1, 10),
 
-                                    Colour = new Color4(255, 204, 34, 255),
-
-                                    Lines = 6
+                                    Text = "Begin random",
+                                    Action = teamsContainer.StartScrolling,
                                 },
-                                // Groups
-                                groupsContainer = new GroupContainer(drawingsConfig.Get<int>(DrawingsConfig.Groups), drawingsConfig.Get<int>(DrawingsConfig.TeamsPerGroup))
+                                new TriangleButton
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-
-                                    RelativeSizeAxes = Axes.Y,
-                                    AutoSizeAxes = Axes.X,
-
-                                    Padding = new MarginPadding
-                                    {
-                                        Top = 35f,
-                                        Bottom = 35f
-                                    }
-                                },
-                                // Scrolling teams
-                                teamsContainer = new ScrollingTeamContainer
-                                {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.Centre,
-
                                     RelativeSizeAxes = Axes.X,
+
+                                    Text = "Stop random",
+                                    Action = teamsContainer.StopScrolling,
                                 },
-                                // Scrolling team name
-                                fullTeamNameText = new OsuSpriteText
+                                new TriangleButton
                                 {
-                                    Anchor = Anchor.Centre,
-                                    Origin = Anchor.TopCentre,
+                                    RelativeSizeAxes = Axes.X,
 
-                                    Position = new Vector2(0, 45f),
-
-                                    Alpha = 0,
-
-                                    Font = "Exo2.0-Light",
-                                    TextSize = 42f
+                                    Text = "Reload",
+                                    Action = reloadTeams
                                 }
                             }
                         },
-                        // Control panel container
-                        new Container
+                        new FillFlowContainer
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.15f,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.BottomCentre,
+
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Width = 0.75f,
+
+                            Position = new Vector2(0, -5f),
+
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 5f),
 
                             Children = new Drawable[]
                             {
-                                new Box
+                                new TriangleButton
                                 {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = new Color4(54, 54, 54, 255)
-                                },
-                                new OsuSpriteText
-                                {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-
-                                    Text = "Control Panel",
-                                    TextSize = 22f,
-                                    Font = "Exo2.0-Bold"
-                                },
-                                new FillFlowContainer
-                                {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-
                                     RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Width = 0.75f,
 
-                                    Position = new Vector2(0, 35f),
-
-                                    Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(0, 5f),
-
-                                    Children = new Drawable[]
-                                    {
-                                        new TriangleButton
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-
-                                            Text = "Begin random",
-                                            Action = teamsContainer.StartScrolling,
-                                        },
-                                        new TriangleButton
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-
-                                            Text = "Stop random",
-                                            Action = teamsContainer.StopScrolling,
-                                        },
-                                        new TriangleButton
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-
-                                            Text = "Reload",
-                                            Action = reloadTeams
-                                        }
-                                    }
-                                },
-                                new FillFlowContainer
-                                {
-                                    Anchor = Anchor.BottomCentre,
-                                    Origin = Anchor.BottomCentre,
-
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Width = 0.75f,
-
-                                    Position = new Vector2(0, -5f),
-
-                                    Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(0, 5f),
-
-                                    Children = new Drawable[]
-                                    {
-                                        new TriangleButton
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-
-                                            Text = "Reset",
-                                            Action = () => reset()
-                                        }
-                                    }
+                                    Text = "Reset",
+                                    Action = () => reset()
                                 }
                             }
                         }
