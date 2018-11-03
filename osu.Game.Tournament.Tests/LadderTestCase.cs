@@ -5,6 +5,7 @@ using System.IO;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
@@ -17,7 +18,10 @@ namespace osu.Game.Tournament.Tests
 {
     public abstract class LadderTestCase : OsuTestCase
     {
+        private const string bracket_filename = "bracket.json";
+
         protected LadderInfo Ladder;
+        private Storage storage;
 
         [Resolved]
         private APIAccess api { get; set; } = null;
@@ -26,9 +30,19 @@ namespace osu.Game.Tournament.Tests
         private RulesetStore rulesets { get; set; } = null;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(Storage storage)
         {
-            Ladder = File.Exists(@"bracket.json") ? JsonConvert.DeserializeObject<LadderInfo>(File.ReadAllText(@"bracket.json")) : new LadderInfo();
+            this.storage = storage;
+
+            string content = null;
+            if (storage.Exists(bracket_filename))
+            {
+                using (Stream stream = storage.GetStream(bracket_filename, FileAccess.Read, FileMode.Open))
+                using (var sr = new StreamReader(stream))
+                    content = sr.ReadToEnd();
+            }
+
+            Ladder = content != null ? JsonConvert.DeserializeObject<LadderInfo>(content) : new LadderInfo();
 
             bool addedInfo = false;
 
@@ -62,12 +76,16 @@ namespace osu.Game.Tournament.Tests
 
         protected virtual void SaveChanges()
         {
-            File.WriteAllText(@"bracket.json", JsonConvert.SerializeObject(Ladder,
-                new JsonSerializerSettings
-                {
-                    NullValueHandling = NullValueHandling.Ignore,
-                    DefaultValueHandling = DefaultValueHandling.Ignore
-                }));
+            using (var stream = storage.GetStream(bracket_filename, FileAccess.Write, FileMode.Create))
+            using (var sw = new StreamWriter(stream))
+            {
+                sw.Write(JsonConvert.SerializeObject(Ladder,
+                    new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        DefaultValueHandling = DefaultValueHandling.Ignore
+                    }));
+            }
         }
     }
 }
