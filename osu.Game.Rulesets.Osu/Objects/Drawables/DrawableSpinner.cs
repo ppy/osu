@@ -112,6 +112,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Alpha = 0
                 }
             };
+
+            s.PositionChanged += _ => Position = s.Position;
         }
 
         public float Progress => MathHelper.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
@@ -167,7 +169,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         protected override void Update()
         {
-            Disc.Tracking = OsuActionInputManager.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton);
+            Disc.Tracking = OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false;
             if (!spmCounter.IsPresent && Disc.Tracking)
                 spmCounter.FadeIn(HitObject.TimeFadeIn);
 
