@@ -88,7 +88,7 @@ namespace osu.Game.Tournament.Screens.Drawings
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new VideoSprite(@"C:\Users\Dean\BG Logoless - OWC.m4v")
+                        new VideoSprite(storage.GetStream("BG Logoless - OWC.m4v"))
                         {
                             RelativeSizeAxes = Axes.Both,
                             Loop = true,

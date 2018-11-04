@@ -2,9 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Video;
+using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens;
@@ -17,13 +19,25 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 {
     public class TeamIntroScreen : OsuScreen
     {
+        private readonly TournamentTeam team1;
+        private readonly TournamentTeam team2;
+        private readonly TournamentGrouping round;
+
         public TeamIntroScreen(TournamentTeam team1, TournamentTeam team2, TournamentGrouping round)
+        {
+            this.team1 = team1;
+            this.team2 = team2;
+            this.round = round;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(Storage storage)
         {
             RelativeSizeAxes = Axes.Both;
 
             InternalChildren = new Drawable[]
             {
-                new VideoSprite(@"C:\Users\Dean\BG Team - Both OWC.m4v")
+                new VideoSprite(storage.GetStream(@"BG Team - Both OWC.m4v"))
                 {
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
