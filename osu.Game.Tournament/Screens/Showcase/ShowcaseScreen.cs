@@ -1,11 +1,15 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Platform.Windows;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
@@ -21,7 +25,8 @@ namespace osu.Game.Tournament.Screens.Showcase
 {
     public class ShowcaseScreen : OsuScreen
     {
-        private readonly Container panelContainer;
+        private Container panel;
+        private readonly Container panelContents;
 
         [Resolved]
         private APIAccess api { get; set; } = null;
@@ -29,22 +34,78 @@ namespace osu.Game.Tournament.Screens.Showcase
         [Resolved]
         private RulesetStore rulesets { get; set; } = null;
 
+        private int lastBeatmapId;
+        private int lastMods;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = 1091460 });
-            req.Success += success;
-            api.Queue(req);
+            var stable = new StableStorage();
+
+            const string file_ipc_filename = "ipc.txt";
+
+            if (stable.Exists(file_ipc_filename))
+            {
+                Scheduler.AddDelayed(delegate
+                {
+                    try
+                    {
+                        using (var stream = stable.GetStream(file_ipc_filename))
+                        using (var sr = new StreamReader(stream))
+                        {
+                            var beatmapId = int.Parse(sr.ReadLine());
+                            var mods = int.Parse(sr.ReadLine());
+
+                            if (lastBeatmapId == beatmapId)
+                                return;
+
+                            lastMods = mods;
+                            lastBeatmapId = beatmapId;
+
+                            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = beatmapId });
+                            req.Success += success;
+                            api.Queue(req);
+                        }
+                    }
+                    catch
+                    {
+                        // file might be in use.
+                    }
+                }, 250, true);
+            }
         }
 
         private void success(APIBeatmap apiBeatmap)
         {
+            panel.FadeInFromZero(300, Easing.OutQuint);
+
             var beatmap = apiBeatmap.ToBeatmap(rulesets);
-            panelContainer.Children = new Drawable[]
+
+            var legacyMods = (LegacyMods)lastMods;
+            var bpm = beatmap.BeatmapSet.OnlineInfo.BPM;
+            var length = beatmap.OnlineInfo.Length;
+            string extra = "";
+
+            var ar = beatmap.BaseDifficulty.ApproachRate;
+            if ((legacyMods & LegacyMods.HardRock) > 0)
+            {
+                //ar *= 1.4f;
+                extra = "*";
+            }
+
+            if ((legacyMods & LegacyMods.DoubleTime) > 0)
+            {
+                //ar *= 1.5f;
+                bpm *= 1.5f;
+                length /= 1.5f;
+                extra = "*";
+            }
+
+            panelContents.Children = new Drawable[]
             {
                 new OsuSpriteText
                 {
-                    Text = $"Length {beatmap.OnlineInfo.Length}s",
+                    Text = $"Length {length}s",
                     Margin = new MarginPadding { Horizontal = 15, Vertical = 5 },
                     Colour = OsuColour.Gray(0.33f),
                     Anchor = Anchor.TopLeft,
@@ -52,7 +113,7 @@ namespace osu.Game.Tournament.Screens.Showcase
                 },
                 new OsuSpriteText
                 {
-                    Text = $"BPM {beatmap.BeatmapSet.OnlineInfo.BPM:0.#}",
+                    Text = $"BPM {bpm:0.#}",
                     Margin = new MarginPadding { Horizontal = 15, Vertical = 5 },
                     Colour = OsuColour.Gray(0.33f),
                     Anchor = Anchor.BottomLeft,
@@ -60,7 +121,7 @@ namespace osu.Game.Tournament.Screens.Showcase
                 },
                 new OsuSpriteText
                 {
-                    Text = $"AR {beatmap.BaseDifficulty.ApproachRate:0.#}",
+                    Text = $"AR {ar:0.#}{extra}",
                     Margin = new MarginPadding { Horizontal = 15, Vertical = 5 },
                     Colour = OsuColour.Gray(0.33f),
                     Anchor = Anchor.TopRight,
@@ -68,7 +129,7 @@ namespace osu.Game.Tournament.Screens.Showcase
                 },
                 new OsuSpriteText
                 {
-                    Text = $"Star Rating {beatmap.StarDifficulty:0.#}",
+                    Text = $"Star Rating {beatmap.StarDifficulty:0.#}{extra}",
                     Margin = new MarginPadding { Horizontal = 15, Vertical = 5 },
                     Colour = OsuColour.Gray(0.33f),
                     Anchor = Anchor.BottomRight,
@@ -95,7 +156,7 @@ namespace osu.Game.Tournament.Screens.Showcase
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     Y = -10,
-                    Width = 0.9f,
+                    Width = 0.95f,
                     Height = TournamentBeatmapPanel.HEIGHT,
                     CornerRadius = TournamentBeatmapPanel.HEIGHT / 2,
                     Children = new Drawable[]
@@ -105,7 +166,7 @@ namespace osu.Game.Tournament.Screens.Showcase
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.Gray(0.93f),
                         },
-                        new Container
+                        panel = new Container
                         {
                             Masking = true,
                             CornerRadius = TournamentBeatmapPanel.HEIGHT / 2,
@@ -120,7 +181,7 @@ namespace osu.Game.Tournament.Screens.Showcase
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = OsuColour.Gray(0.86f),
                                 },
-                                panelContainer = new Container
+                                panelContents = new Container
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 }
@@ -138,6 +199,45 @@ namespace osu.Game.Tournament.Screens.Showcase
                     }
                 }
             };
+        }
+
+        /// <summary>
+        /// A method of accessing an osu-stable install in a controlled fashion.
+        /// </summary>
+        private class StableStorage : WindowsStorage
+        {
+            protected override string LocateBasePath()
+            {
+                bool checkExists(string p) => Directory.Exists(Path.Combine(p, "Songs"));
+
+                string stableInstallPath;
+
+                try
+                {
+                    stableInstallPath = "E:\\osu!mappool";
+
+                    if (checkExists(stableInstallPath))
+                        return stableInstallPath;
+                }
+                catch
+                {
+                }
+
+                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
+                if (checkExists(stableInstallPath))
+                    return stableInstallPath;
+
+                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu");
+                if (checkExists(stableInstallPath))
+                    return stableInstallPath;
+
+                return null;
+            }
+
+            public StableStorage()
+                : base(string.Empty, null)
+            {
+            }
         }
     }
 }
