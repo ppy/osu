@@ -15,6 +15,9 @@ namespace osu.Game.Screens.Select
         private bool removeAutoModOnResume;
         private OsuScreen player;
 
+        private bool allowBeatmapRulesetChange = true;
+        public override bool AllowBeatmapRulesetChange => allowBeatmapRulesetChange;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -59,12 +62,14 @@ namespace osu.Game.Screens.Select
 
             Beatmap.Value.Track.Looping = false;
             Beatmap.Disabled = true;
+            allowBeatmapRulesetChange = false;
 
             SampleConfirm?.Play();
 
             LoadComponentAsync(player = new PlayerLoader(() => new Player()), l =>
             {
                 if (IsCurrentScreen) Push(player);
+                allowBeatmapRulesetChange = true;
             });
 
             return true;
