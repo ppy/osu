@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Video;
+using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Screens.Drawings;
 using osu.Game.Tournament.Screens.Ladder;
@@ -27,7 +28,7 @@ namespace osu.Game.Tournament.Tests
         private ShowcaseScreen showcase;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(Storage storage)
         {
             Children = new Drawable[]
             {
@@ -70,7 +71,7 @@ namespace osu.Game.Tournament.Tests
                     //Masking = true,
                     Children = new Drawable[]
                     {
-                        new VideoSprite(@"C:\Users\Dean\BG Side Logo - OWC.m4v")
+                        new VideoSprite(storage.GetStream(@"BG Side Logo - OWC.m4v"))
                         {
                             Loop = true,
                             RelativeSizeAxes = Axes.Both,

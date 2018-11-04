@@ -126,7 +126,7 @@ namespace osu.Game.Tournament.Screens.Showcase
                                 }
                             }
                         },
-                        new OsuLogo()
+                        new OsuLogo
                         {
                             Triangles = false,
                             Colour = OsuColour.Gray(0.33f),
