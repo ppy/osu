@@ -71,9 +71,10 @@ namespace osu.Game.Tournament.Tests
                     //Masking = true,
                     Children = new Drawable[]
                     {
-                        new VideoSprite(storage.GetStream(@"BG Side Logo - OWC.m4v"))
+                        new VideoSprite(storage.GetStream("BG Logoless - OWC.m4v"))
                         {
                             Loop = true,
+                            ShowLastFrameDuringHideCutoff = true,
                             RelativeSizeAxes = Axes.Both,
                             FillMode = FillMode.Fit,
                         },

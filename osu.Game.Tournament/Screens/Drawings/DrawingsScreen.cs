@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.Video;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -88,11 +87,6 @@ namespace osu.Game.Tournament.Screens.Drawings
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new VideoSprite(storage.GetStream("BG Logoless - OWC.m4v"))
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Loop = true,
-                        },
                         new Sprite
                         {
                             RelativeSizeAxes = Axes.Both,
