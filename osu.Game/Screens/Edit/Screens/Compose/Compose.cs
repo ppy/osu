@@ -9,24 +9,29 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Screens.Compose.Timeline;
 
 namespace osu.Game.Screens.Edit.Screens.Compose
 {
-    public class Compose : EditorScreen
+    [Cached(Type = typeof(IPlacementHandler))]
+    public class Compose : EditorScreen, IPlacementHandler
     {
         private const float vertical_margins = 10;
         private const float horizontal_margins = 20;
 
         private readonly BindableBeatDivisor beatDivisor = new BindableBeatDivisor();
 
-        private Container composerContainer;
+        private HitObjectComposer composer;
 
         [BackgroundDependencyLoader(true)]
         private void load([CanBeNull] BindableBeatDivisor beatDivisor)
         {
             if (beatDivisor != null)
                 this.beatDivisor.BindTo(beatDivisor);
+
+            Container composerContainer;
 
             Children = new Drawable[]
             {
@@ -101,7 +106,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose
                 return;
             }
 
-            var composer = ruleset.CreateHitObjectComposer();
+            composer = ruleset.CreateHitObjectComposer();
             if (composer == null)
             {
                 Logger.Log($"Ruleset {ruleset.Description} doesn't support hitobject composition.");
@@ -111,5 +116,13 @@ namespace osu.Game.Screens.Edit.Screens.Compose
 
             composerContainer.Child = composer;
         }
+
+        public void BeginPlacement(HitObject hitObject)
+        {
+        }
+
+        public void EndPlacement(HitObject hitObject) => composer.Add(hitObject);
+
+        public void Delete(HitObject hitObject) => composer.Remove(hitObject);
     }
 }

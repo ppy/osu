@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
 
-        protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
+        public override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
         {
             switch (h)
             {

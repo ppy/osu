@@ -7,11 +7,11 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 
-namespace osu.Game.Rulesets.Mania.Edit.Layers.Selection.Overlays
+namespace osu.Game.Rulesets.Mania.Edit.Masks
 {
-    public class NoteMask : HitObjectMask
+    public class NoteSelectionMask : SelectionMask
     {
-        public NoteMask(DrawableNote note)
+        public NoteSelectionMask(DrawableNote note)
             : base(note)
         {
             Scale = note.Scale;
