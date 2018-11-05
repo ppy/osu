@@ -377,5 +377,18 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(SampleInfo.HIT_CLAP, slider3.NodeSamples[2][1].Name);
             }
         }
+
+        [Test]
+        public void TestDecodeHitObjectNullAdditionBank()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+            using (var resStream = Resource.OpenResource("hitobject-no-addition-bank.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                Assert.AreEqual(hitObjects[0].Samples[0].Bank, hitObjects[0].Samples[1].Bank);
+            }
+        }
     }
 }
