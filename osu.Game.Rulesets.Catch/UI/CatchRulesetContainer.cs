@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         public override PassThroughInputManager CreateInputManager() => new CatchInputManager(Ruleset.RulesetInfo);
 
-        protected override DrawableHitObject<CatchHitObject> GetVisualRepresentation(CatchHitObject h)
+        public override DrawableHitObject<CatchHitObject> GetVisualRepresentation(CatchHitObject h)
         {
             switch (h)
             {
