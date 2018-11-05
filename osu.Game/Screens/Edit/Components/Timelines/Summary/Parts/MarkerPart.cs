@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -43,17 +44,23 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             return true;
         }
 
+        private ScheduledDelegate scheduledSeek;
+
         /// <summary>
         /// Seeks the <see cref="SummaryTimeline"/> to the time closest to a position on the screen relative to the <see cref="SummaryTimeline"/>.
         /// </summary>
         /// <param name="screenPosition">The position in screen coordinates.</param>
         private void seekToPosition(Vector2 screenPosition)
         {
-            if (Beatmap.Value == null)
-                return;
+            scheduledSeek?.Cancel();
+            scheduledSeek = Schedule(() =>
+            {
+                if (Beatmap.Value == null)
+                    return;
 
-            float markerPos = MathHelper.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
-            adjustableClock.Seek(markerPos / DrawWidth * Beatmap.Value.Track.Length);
+                float markerPos = MathHelper.Clamp(ToLocalSpace(screenPosition).X, 0, DrawWidth);
+                adjustableClock.Seek(markerPos / DrawWidth * Beatmap.Value.Track.Length);
+            });
         }
 
         protected override void Update()
