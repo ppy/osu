@@ -53,6 +53,8 @@ namespace osu.Game.Screens.Select
 
         public override bool HandleNonPositionalInput => AllowSelection;
         public override bool HandlePositionalInput => AllowSelection;
+        public override bool PropagateNonPositionalInputSubTree => AllowSelection;
+        public override bool PropagatePositionalInputSubTree => AllowSelection;
 
         /// <summary>
         /// Used to avoid firing null selections before the initial beatmaps have been loaded via <see cref="BeatmapSets"/>.
