@@ -19,7 +19,6 @@ namespace osu.Game.Beatmaps
         [JsonIgnore]
         public int ID { get; set; }
 
-        //TODO: should be in database
         public int BeatmapVersion;
 
         private int? onlineBeatmapID;

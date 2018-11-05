@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     StartTime = obj.StartTime,
                     Samples = obj.Samples,
                     ControlPoints = curveData.ControlPoints,
-                    CurveType = curveData.CurveType,
+                    PathType = curveData.PathType,
                     Distance = curveData.Distance,
                     NodeSamples = curveData.NodeSamples,
                     RepeatCount = curveData.RepeatCount,

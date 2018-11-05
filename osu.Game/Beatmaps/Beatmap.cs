@@ -48,7 +48,7 @@ namespace osu.Game.Beatmaps
         [JsonConverter(typeof(TypedListConverter<HitObject>))]
         public List<T> HitObjects = new List<T>();
 
-        IEnumerable<HitObject> IBeatmap.HitObjects => HitObjects;
+        IReadOnlyList<HitObject> IBeatmap.HitObjects => HitObjects;
 
         public virtual IEnumerable<BeatmapStatistic> GetStatistics() => Enumerable.Empty<BeatmapStatistic>();
 

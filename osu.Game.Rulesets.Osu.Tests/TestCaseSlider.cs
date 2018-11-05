@@ -108,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(239, 176),
-                ControlPoints = new List<Vector2>
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(154, 28),
@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-(distance / 2), 0),
-                ControlPoints = new List<Vector2>
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(distance, 0),
@@ -161,7 +161,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                ControlPoints = new List<Vector2>
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(200, 200),
@@ -181,10 +181,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
-                CurveType = CurveType.Linear,
+                PathType = PathType.Linear,
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                ControlPoints = new List<Vector2>
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(150, 75),
@@ -207,10 +207,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
-                CurveType = CurveType.Bezier,
+                PathType = PathType.Bezier,
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-200, 0),
-                ControlPoints = new List<Vector2>
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(150, 75),
@@ -232,10 +232,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var slider = new Slider
             {
-                CurveType = CurveType.Linear,
+                PathType = PathType.Linear,
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(0, 0),
-                ControlPoints = new List<Vector2>
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(-200, 0),
@@ -264,8 +264,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 StartTime = Time.Current + 1000,
                 Position = new Vector2(-100, 0),
-                CurveType = CurveType.Catmull,
-                ControlPoints = new List<Vector2>
+                PathType = PathType.Catmull,
+                ControlPoints = new[]
                 {
                     Vector2.Zero,
                     new Vector2(50, -50),
