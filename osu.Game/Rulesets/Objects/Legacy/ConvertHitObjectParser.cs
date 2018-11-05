@@ -245,7 +245,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
                 stringAddBank = null;
 
             bankInfo.Normal = stringBank;
-            bankInfo.Add = stringAddBank;
+            bankInfo.Add = string.IsNullOrEmpty(stringAddBank) ? stringBank : stringAddBank;
 
             if (split.Length > 2)
                 bankInfo.CustomSampleBank = int.Parse(split[2]);
