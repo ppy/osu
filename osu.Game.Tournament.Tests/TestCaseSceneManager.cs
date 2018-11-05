@@ -74,7 +74,6 @@ namespace osu.Game.Tournament.Tests
                         new VideoSprite(storage.GetStream("BG Logoless - OWC.m4v"))
                         {
                             Loop = true,
-                            ShowLastFrameDuringHideCutoff = true,
                             RelativeSizeAxes = Axes.Both,
                             FillMode = FillMode.Fit,
                         },
