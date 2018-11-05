@@ -333,5 +333,18 @@ namespace osu.Game.Tests.Beatmaps.Formats
 
             SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
         }
+
+        [Test]
+        public void TestDecodeHitObjectNullAdditionBank()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+            using (var resStream = Resource.OpenResource("hitobject-no-addition-bank.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                Assert.AreEqual(hitObjects[0].Samples[0].Bank, hitObjects[0].Samples[1].Bank);
+            }
+        }
     }
 }
