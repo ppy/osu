@@ -111,7 +111,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         internal float LazyTravelDistance;
 
-        public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
+        public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
+
         public int RepeatCount { get; set; }
 
         /// <summary>
@@ -169,7 +170,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             {
                 StartTime = StartTime,
                 Position = Position,
-                Samples = Samples,
+                Samples = getNodeSamples(0),
                 SampleControlPoint = SampleControlPoint,
                 IndexInCurrentCombo = IndexInCurrentCombo,
                 ComboIndex = ComboIndex,
@@ -249,9 +250,16 @@ namespace osu.Game.Rulesets.Osu.Objects
                     Position = Position + Path.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
-                    Samples = new List<SampleInfo>(RepeatSamples[repeatIndex])
+                    Samples = getNodeSamples(1 + repeatIndex)
                 });
             }
+        }
+
+        private List<SampleInfo> getNodeSamples(int nodeIndex)
+        {
+            if (nodeIndex < NodeSamples.Count)
+                return NodeSamples[nodeIndex];
+            return Samples;
         }
 
         public override Judgement CreateJudgement() => new OsuJudgement();
