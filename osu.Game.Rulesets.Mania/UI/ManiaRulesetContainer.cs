@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
-        protected override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
+        public override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {
             switch (h)
             {

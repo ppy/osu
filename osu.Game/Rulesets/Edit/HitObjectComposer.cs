@@ -13,6 +13,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Edit.Tools;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Edit.Screens.Compose.Layers;
@@ -22,21 +23,24 @@ namespace osu.Game.Rulesets.Edit
 {
     public abstract class HitObjectComposer : CompositeDrawable
     {
-        private readonly Ruleset ruleset;
-
         public IEnumerable<DrawableHitObject> HitObjects => rulesetContainer.Playfield.AllHitObjects;
 
-        protected ICompositionTool CurrentTool { get; private set; }
+        protected readonly Ruleset Ruleset;
+
+        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
         protected IRulesetConfigManager Config { get; private set; }
 
         private readonly List<Container> layerContainers = new List<Container>();
-        private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
-        private RulesetContainer rulesetContainer;
+        private EditRulesetContainer rulesetContainer;
 
-        protected HitObjectComposer(Ruleset ruleset)
+        private HitObjectMaskLayer maskLayer;
+        private PlacementContainer placementContainer;
+
+        internal HitObjectComposer(Ruleset ruleset)
         {
-            this.ruleset = ruleset;
+            Ruleset = ruleset;
 
             RelativeSizeAxes = Axes.Both;
         }
@@ -44,11 +48,11 @@ namespace osu.Game.Rulesets.Edit
         [BackgroundDependencyLoader]
         private void load(IBindableBeatmap beatmap, IFrameBasedClock framedClock)
         {
-            this.beatmap.BindTo(beatmap);
+            Beatmap.BindTo(beatmap);
 
             try
             {
-                rulesetContainer = CreateRulesetContainer(ruleset, beatmap.Value);
+                rulesetContainer = CreateRulesetContainer();
                 rulesetContainer.Clock = framedClock;
             }
             catch (Exception e)
@@ -57,14 +61,15 @@ namespace osu.Game.Rulesets.Edit
                 return;
             }
 
-            var layerBelowRuleset = new BorderLayer
-            {
-                RelativeSizeAxes = Axes.Both,
-                Child = CreateLayerContainer()
-            };
+            var layerBelowRuleset = CreateLayerContainer();
+            layerBelowRuleset.Child = new BorderLayer { RelativeSizeAxes = Axes.Both };
 
             var layerAboveRuleset = CreateLayerContainer();
-            layerAboveRuleset.Child = new HitObjectMaskLayer();
+            layerAboveRuleset.Children = new Drawable[]
+            {
+                maskLayer = new HitObjectMaskLayer(),
+                placementContainer = new PlacementContainer(),
+            };
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -107,8 +112,8 @@ namespace osu.Game.Rulesets.Edit
             };
 
             toolboxCollection.Items =
-                CompositionTools.Select(t => new RadioButton(t.Name, () => setCompositionTool(t)))
-                .Prepend(new RadioButton("Select", () => setCompositionTool(null)))
+                CompositionTools.Select(t => new RadioButton(t.Name, () => placementContainer.CurrentTool = t))
+                .Prepend(new RadioButton("Select", () => placementContainer.CurrentTool = null))
                 .ToList();
 
             toolboxCollection.Items[0].Select();
@@ -119,16 +124,9 @@ namespace osu.Game.Rulesets.Edit
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             dependencies.CacheAs(this);
-            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(ruleset);
+            Config = dependencies.Get<RulesetConfigCache>().GetConfigFor(Ruleset);
 
             return dependencies;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            rulesetContainer.Playfield.DisplayJudgements.Value = false;
         }
 
         protected override void UpdateAfterChildren()
@@ -144,17 +142,27 @@ namespace osu.Game.Rulesets.Edit
             });
         }
 
-        private void setCompositionTool(ICompositionTool tool) => CurrentTool = tool;
+        /// <summary>
+        /// Adds a <see cref="HitObject"/> to the <see cref="Beatmaps.Beatmap"/> and visualises it.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
+        public void Add(HitObject hitObject)
+        {
+            maskLayer.AddMaskFor(rulesetContainer.Add(hitObject));
+            placementContainer.Refresh();
+        }
 
-        protected virtual RulesetContainer CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap) => ruleset.CreateRulesetContainerWith(beatmap);
+        public void Remove(HitObject hitObject) => maskLayer.RemoveMaskFor(rulesetContainer.Remove(hitObject));
 
-        protected abstract IReadOnlyList<ICompositionTool> CompositionTools { get; }
+        internal abstract EditRulesetContainer CreateRulesetContainer();
+
+        protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
         /// <summary>
-        /// Creates a <see cref="HitObjectMask"/> for a specific <see cref="DrawableHitObject"/>.
+        /// Creates a <see cref="SelectionMask"/> for a specific <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
-        public virtual HitObjectMask CreateMaskFor(DrawableHitObject hitObject) => null;
+        public virtual SelectionMask CreateMaskFor(DrawableHitObject hitObject) => null;
 
         /// <summary>
         /// Creates a <see cref="MaskSelection"/> which outlines <see cref="DrawableHitObject"/>s
@@ -166,5 +174,19 @@ namespace osu.Game.Rulesets.Edit
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
         /// </summary>
         protected virtual Container CreateLayerContainer() => new Container { RelativeSizeAxes = Axes.Both };
+    }
+
+    public abstract class HitObjectComposer<TObject> : HitObjectComposer
+        where TObject : HitObject
+    {
+        protected HitObjectComposer(Ruleset ruleset)
+            : base(ruleset)
+        {
+        }
+
+        internal override EditRulesetContainer CreateRulesetContainer()
+            => new EditRulesetContainer<TObject>(CreateRulesetContainer(Ruleset, Beatmap.Value));
+
+        protected abstract RulesetContainer<TObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap);
     }
 }

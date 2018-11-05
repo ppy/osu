@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 TargetColumns = (int)Math.Max(1, roundedCircleSize);
             else
             {
-                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasEndTime) / beatmap.HitObjects.Count();
+                float percentSliderOrSpinner = (float)beatmap.HitObjects.Count(h => h is IHasEndTime) / beatmap.HitObjects.Count;
                 if (percentSliderOrSpinner < 0.2)
                     TargetColumns = 7;
                 else if (percentSliderOrSpinner < 0.3 || roundedCircleSize >= 5)
