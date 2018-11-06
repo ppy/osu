@@ -24,10 +24,10 @@ namespace osu.Game.Tournament.Tests
         private Storage storage;
 
         [Resolved]
-        private APIAccess api { get; set; } = null;
+        private APIAccess api { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; } = null;
+        private RulesetStore rulesets { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(Storage storage)

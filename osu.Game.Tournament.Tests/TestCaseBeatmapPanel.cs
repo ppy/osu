@@ -18,10 +18,10 @@ namespace osu.Game.Tournament.Tests
     public class TestCaseBeatmapPanel : OsuTestCase
     {
         [Resolved]
-        private APIAccess api { get; set; } = null;
+        private APIAccess api { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; } = null;
+        private RulesetStore rulesets { get; set; }
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {

@@ -26,7 +26,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private PlayerCheckbox losersCheckbox;
 
         [Resolved]
-        private LadderEditorInfo editorInfo { get; set; } = null;
+        private LadderEditorInfo editorInfo { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
