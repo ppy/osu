@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     /// <summary>
     /// A box which surrounds <see cref="SelectionMask"/>s and provides interactive handles, context menus etc.
     /// </summary>
-    public class MaskSelection : CompositeDrawable
+    public class SelectionBox : CompositeDrawable
     {
         public const float BORDER_RADIUS = 2;
 
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         [Resolved]
         private IPlacementHandler placementHandler { get; set; }
 
-        public MaskSelection()
+        public SelectionBox()
         {
             selectedMasks = new List<SelectionMask>();
 
@@ -147,7 +147,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         #endregion
 
         /// <summary>
-        /// Updates whether this <see cref="MaskSelection"/> is visible.
+        /// Updates whether this <see cref="SelectionBox"/> is visible.
         /// </summary>
         internal void UpdateVisibility()
         {
