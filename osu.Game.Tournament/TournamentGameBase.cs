@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
+using osu.Game.Tournament.Components;
 
 namespace osu.Game.Tournament
 {
@@ -87,12 +89,26 @@ namespace osu.Game.Tournament
                 }
             }
 
+            // link pairings to groupings
             foreach (var group in Ladder.Groupings)
             foreach (var id in group.Pairings)
                 Ladder.Pairings.Single(p => p.ID == id).Grouping.Value = group;
 
             Ladder.CurrentMatch.Value = Ladder.Pairings.FirstOrDefault(p => p.Current.Value);
 
+            // add full player info based on user IDs
+            foreach (var t in Ladder.Teams)
+            foreach (var p in t.Players)
+                if (p.Id == 1)
+                {
+                    var req = new GetUserRequest(p.Id);
+                    req.Success += i => p.Username = i.Username;
+                    req.Perform(API);
+
+                    addedInfo = true;
+                }
+
+            // add full beatmap info based on beatmap IDs
             foreach (var g in Ladder.Groupings)
             foreach (var b in g.Beatmaps)
                 if (b.BeatmapInfo == null)
@@ -102,6 +118,24 @@ namespace osu.Game.Tournament
                     req.Perform(API);
 
                     addedInfo = true;
+                }
+
+
+            List<TournamentTeam> countries;
+            using (Stream stream = Resources.GetStream("Resources/countries.json"))
+            using (var sr = new StreamReader(stream))
+                countries = JsonConvert.DeserializeObject<List<TournamentTeam>>(sr.ReadToEnd());
+
+            foreach (var t in Ladder.Teams)
+                if (string.IsNullOrEmpty(t.FullName))
+                {
+                    var result = countries.FirstOrDefault(c => c.Acronym == t.Acronym);
+                    if (result != null)
+                    {
+                        t.Acronym = result.Acronym;
+                        t.FlagName = result.FlagName;
+                        t.FullName = result.FullName;
+                    }
                 }
 
             if (addedInfo)
@@ -126,7 +160,6 @@ namespace osu.Game.Tournament
 
         protected override void Update()
         {
-
             base.Update();
             var minWidth = (int)(windowSize.Value.Height / 9f * 16 + 400);
             if (windowSize.Value.Width < minWidth)
