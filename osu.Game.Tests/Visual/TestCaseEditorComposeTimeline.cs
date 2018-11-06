@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Edit.Screens.Compose.Timeline;
+using osu.Game.Screens.Edit.Screens.Compose.Components.Timeline;
 using OpenTK.Graphics;
 
 namespace osu.Game.Tests.Visual

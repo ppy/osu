@@ -16,8 +16,8 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Edit.Screens.Compose.Layers;
-using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
+using osu.Game.Screens.Edit.Components.RadioButtons;
+using osu.Game.Screens.Edit.Screens.Compose.Components;
 
 namespace osu.Game.Rulesets.Edit
 {

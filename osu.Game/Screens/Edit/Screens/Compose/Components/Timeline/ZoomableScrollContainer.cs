@@ -9,7 +9,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using OpenTK;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
+namespace osu.Game.Screens.Edit.Screens.Compose.Components.Timeline
 {
     public class ZoomableScrollContainer : ScrollContainer
     {

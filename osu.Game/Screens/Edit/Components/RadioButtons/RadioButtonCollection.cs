@@ -2,12 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using OpenTK;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using OpenTK;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
+namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
     public class RadioButtonCollection : CompositeDrawable
     {

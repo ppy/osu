@@ -11,7 +11,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Screens.Edit.Screens.Compose.Timeline;
+using osu.Game.Screens.Edit.Screens.Compose.Components;
+using osu.Game.Screens.Edit.Screens.Compose.Components.Timeline;
 
 namespace osu.Game.Screens.Edit.Screens.Compose
 {
