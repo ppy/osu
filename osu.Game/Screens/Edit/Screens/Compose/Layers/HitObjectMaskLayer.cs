@@ -37,15 +37,15 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             maskSelection.DeselectAll = maskContainer.DeselectAll;
 
-            var dragLayer = new DragLayer(maskContainer.Select);
-            dragLayer.DragEnd += () => maskSelection.UpdateVisibility();
+            var dragBox = new DragBox(maskContainer.Select);
+            dragBox.DragEnd += () => maskSelection.UpdateVisibility();
 
             InternalChildren = new[]
             {
-                dragLayer,
+                dragBox,
                 maskSelection,
                 maskContainer,
-                dragLayer.CreateProxy()
+                dragBox.CreateProxy()
             };
 
             foreach (var obj in composer.HitObjects)
