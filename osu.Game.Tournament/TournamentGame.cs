@@ -80,6 +80,8 @@ namespace osu.Game.Tournament
         {
             base.LoadComplete();
             Add(new TournamentSceneManager());
+
+            MenuCursorContainer.Cursor.Alpha = 0;
         }
 
         protected virtual void SaveChanges()
