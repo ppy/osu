@@ -10,11 +10,11 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
 {
-    public class SliderSelectionMask : SelectionMask
+    public class SliderSelectionBlueprint : SelectionBlueprint
     {
-        private readonly SliderCircleSelectionMask headMask;
+        private readonly SliderCircleSelectionBlueprint headBlueprint;
 
-        public SliderSelectionMask(DrawableSlider slider)
+        public SliderSelectionBlueprint(DrawableSlider slider)
             : base(slider)
         {
             var sliderObject = (Slider)slider.HitObject;
@@ -22,12 +22,12 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
             InternalChildren = new Drawable[]
             {
                 new SliderBodyPiece(sliderObject),
-                headMask = new SliderCircleSelectionMask(slider.HeadCircle, sliderObject, SliderPosition.Start),
-                new SliderCircleSelectionMask(slider.TailCircle, sliderObject, SliderPosition.End),
+                headBlueprint = new SliderCircleSelectionBlueprint(slider.HeadCircle, sliderObject, SliderPosition.Start),
+                new SliderCircleSelectionBlueprint(slider.TailCircle, sliderObject, SliderPosition.End),
                 new PathControlPointVisualiser(sliderObject),
             };
         }
 
-        public override Vector2 SelectionPoint => headMask.SelectionPoint;
+        public override Vector2 SelectionPoint => headBlueprint.SelectionPoint;
     }
 }

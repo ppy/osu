@@ -148,27 +148,27 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
         public void Add(HitObject hitObject)
         {
-            blueprintContainer.AddMaskFor(rulesetContainer.Add(hitObject));
+            blueprintContainer.AddBlueprintFor(rulesetContainer.Add(hitObject));
             placementContainer.Refresh();
         }
 
-        public void Remove(HitObject hitObject) => blueprintContainer.RemoveMaskFor(rulesetContainer.Remove(hitObject));
+        public void Remove(HitObject hitObject) => blueprintContainer.RemoveBlueprintFor(rulesetContainer.Remove(hitObject));
 
         internal abstract EditRulesetContainer CreateRulesetContainer();
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
         /// <summary>
-        /// Creates a <see cref="SelectionMask"/> for a specific <see cref="DrawableHitObject"/>.
+        /// Creates a <see cref="SelectionBlueprint"/> for a specific <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
-        public virtual SelectionMask CreateMaskFor(DrawableHitObject hitObject) => null;
+        public virtual SelectionBlueprint CreateMaskFor(DrawableHitObject hitObject) => null;
 
         /// <summary>
         /// Creates a <see cref="SelectionBox"/> which outlines <see cref="DrawableHitObject"/>s
         /// and handles hitobject pattern adjustments.
         /// </summary>
-        public virtual SelectionBox CreateMaskSelection() => new SelectionBox();
+        public virtual SelectionBox CreateSelectionBox() => new SelectionBox();
 
         /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.

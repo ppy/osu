@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(SpinnerSelectionMask),
+            typeof(SpinnerSelectionBlueprint),
             typeof(SpinnerPiece)
         };
 
@@ -45,6 +45,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
-        protected override SelectionMask CreateMask() => new SpinnerSelectionMask(drawableSpinner) { Size = new Vector2(0.5f) };
+        protected override SelectionBlueprint CreateMask() => new SpinnerSelectionBlueprint(drawableSpinner) { Size = new Vector2(0.5f) };
     }
 }

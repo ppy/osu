@@ -12,7 +12,7 @@ namespace osu.Game.Tests.Visual
 {
     public abstract class HitObjectSelectionMaskTestCase : OsuTestCase
     {
-        private SelectionMask mask;
+        private SelectionBlueprint blueprint;
 
         protected override Container<Drawable> Content => content ?? base.Content;
         private readonly Container content;
@@ -29,19 +29,19 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            base.Content.Add(mask = CreateMask());
-            mask.SelectionRequested += (_, __) => mask.Select();
+            base.Content.Add(blueprint = CreateMask());
+            blueprint.SelectionRequested += (_, __) => blueprint.Select();
 
-            AddStep("Select", () => mask.Select());
-            AddStep("Deselect", () => mask.Deselect());
+            AddStep("Select", () => blueprint.Select());
+            AddStep("Deselect", () => blueprint.Deselect());
         }
 
         protected override bool OnClick(ClickEvent e)
         {
-            mask.Deselect();
+            blueprint.Deselect();
             return true;
         }
 
-        protected abstract SelectionMask CreateMask();
+        protected abstract SelectionBlueprint CreateMask();
     }
 }

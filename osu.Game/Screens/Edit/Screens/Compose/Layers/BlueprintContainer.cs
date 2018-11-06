@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         private SelectionBlueprintContainer selectionBlueprints;
         private SelectionBox selectionBox;
 
-        private IEnumerable<SelectionMask> aliveMasks => selectionBlueprints.Children.Where(c => c.IsAlive);
+        private IEnumerable<SelectionBlueprint> selections => selectionBlueprints.Children.Where(c => c.IsAlive);
 
         [Resolved]
         private HitObjectComposer composer { get; set; }
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         [BackgroundDependencyLoader]
         private void load()
         {
-            selectionBox = composer.CreateMaskSelection();
+            selectionBox = composer.CreateSelectionBox();
             selectionBox.DeselectAll = deselectAll;
 
             var dragBox = new DragBox(select);
@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             };
 
             foreach (var obj in composer.HitObjects)
-                AddMaskFor(obj);
+                AddBlueprintFor(obj);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -61,14 +61,14 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// Adds a mask for a <see cref="DrawableHitObject"/> which adds movement support.
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create a mask for.</param>
-        public void AddMaskFor(DrawableHitObject hitObject)
+        public void AddBlueprintFor(DrawableHitObject hitObject)
         {
             var mask = composer.CreateMaskFor(hitObject);
             if (mask == null)
                 return;
 
-            mask.Selected += onMaskSelected;
-            mask.Deselected += onMaskDeselected;
+            mask.Selected += onBlueprintSelected;
+            mask.Deselected += onBlueprintDeselected;
             mask.SelectionRequested += onSelectionRequested;
             mask.DragRequested += onDragRequested;
 
@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// Removes a mask for a <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> for which to remove the mask.</param>
-        public void RemoveMaskFor(DrawableHitObject hitObject)
+        public void RemoveBlueprintFor(DrawableHitObject hitObject)
         {
             var maskToRemove = selectionBlueprints.Single(m => m.HitObject == hitObject);
             if (maskToRemove == null)
@@ -87,8 +87,8 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             maskToRemove.Deselect();
 
-            maskToRemove.Selected -= onMaskSelected;
-            maskToRemove.Deselected -= onMaskDeselected;
+            maskToRemove.Selected -= onBlueprintSelected;
+            maskToRemove.Deselected -= onBlueprintDeselected;
             maskToRemove.SelectionRequested -= onSelectionRequested;
             maskToRemove.DragRequested -= onDragRequested;
 
@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// <param name="rect">The rectangle to perform a selection on in screen-space coordinates.</param>
         private void select(RectangleF rect)
         {
-            foreach (var mask in aliveMasks.ToList())
+            foreach (var mask in selections.ToList())
             {
                 if (mask.IsPresent && rect.Contains(mask.SelectionPoint))
                     mask.Select();
@@ -111,38 +111,38 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         }
 
         /// <summary>
-        /// Deselects all selected <see cref="SelectionMask"/>s.
+        /// Deselects all selected <see cref="SelectionBlueprint"/>s.
         /// </summary>
-        private void deselectAll() => aliveMasks.ToList().ForEach(m => m.Deselect());
+        private void deselectAll() => selections.ToList().ForEach(m => m.Deselect());
 
-        private void onMaskSelected(SelectionMask mask)
+        private void onBlueprintSelected(SelectionBlueprint blueprint)
         {
-            selectionBox.HandleSelected(mask);
-            selectionBlueprints.ChangeChildDepth(mask, 1);
+            selectionBox.HandleSelected(blueprint);
+            selectionBlueprints.ChangeChildDepth(blueprint, 1);
         }
 
-        private void onMaskDeselected(SelectionMask mask)
+        private void onBlueprintDeselected(SelectionBlueprint blueprint)
         {
-            selectionBox.HandleDeselected(mask);
-            selectionBlueprints.ChangeChildDepth(mask, 0);
+            selectionBox.HandleDeselected(blueprint);
+            selectionBlueprints.ChangeChildDepth(blueprint, 0);
         }
 
-        private void onSelectionRequested(SelectionMask mask, InputState state) => selectionBox.HandleSelectionRequested(mask, state);
+        private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionBox.HandleSelectionRequested(blueprint, state);
 
-        private void onDragRequested(SelectionMask mask, Vector2 delta, InputState state) => selectionBox.HandleDrag(mask, delta, state);
+        private void onDragRequested(SelectionBlueprint blueprint, Vector2 delta, InputState state) => selectionBox.HandleDrag(blueprint, delta, state);
 
-        private class SelectionBlueprintContainer : Container<SelectionMask>
+        private class SelectionBlueprintContainer : Container<SelectionBlueprint>
         {
             protected override int Compare(Drawable x, Drawable y)
             {
-                if (!(x is SelectionMask xMask) || !(y is SelectionMask yMask))
+                if (!(x is SelectionBlueprint xBlueprint) || !(y is SelectionBlueprint yBlueprint))
                     return base.Compare(x, y);
-                return Compare(xMask, yMask);
+                return Compare(xBlueprint, yBlueprint);
             }
 
-            public int Compare(SelectionMask x, SelectionMask y)
+            public int Compare(SelectionBlueprint x, SelectionBlueprint y)
             {
-                // dpeth is used to denote selected status (we always want selected masks to handle input first).
+                // dpeth is used to denote selected status (we always want selected blueprints to handle input first).
                 int d = x.Depth.CompareTo(y.Depth);
                 if (d != 0)
                     return d;

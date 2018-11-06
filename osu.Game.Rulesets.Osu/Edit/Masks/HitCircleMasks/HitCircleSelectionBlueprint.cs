@@ -8,9 +8,9 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks
 {
-    public class HitCircleSelectionMask : SelectionMask
+    public class HitCircleSelectionBlueprint : SelectionBlueprint
     {
-        public HitCircleSelectionMask(DrawableHitCircle hitCircle)
+        public HitCircleSelectionBlueprint(DrawableHitCircle hitCircle)
             : base(hitCircle)
         {
             InternalChild = new HitCirclePiece((HitCircle)hitCircle.HitObject);
