@@ -4,16 +4,20 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Lists;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 
 namespace osu.Game.Tests.Visual
 {
@@ -44,6 +48,10 @@ namespace osu.Game.Tests.Visual
                 }
             });
 
+            AddStep("Constant scroll", () => setScrollAlgorithm(ScrollAlgorithm.Constant));
+            AddStep("Overlapping scroll", () => setScrollAlgorithm(ScrollAlgorithm.Overlapping));
+            AddStep("Sequential scroll", () => setScrollAlgorithm(ScrollAlgorithm.Sequential));
+
             AddSliderStep("Time range", 100, 10000, 5000, v => playfields.ForEach(p => p.VisibleTimeRange.Value = v));
             AddStep("Add control point", () => addControlPoint(Time.Current + 5000));
         }
@@ -52,7 +60,7 @@ namespace osu.Game.Tests.Visual
         {
             base.LoadComplete();
 
-            playfields.ForEach(p => p.HitObjects.AddControlPoint(new MultiplierControlPoint(0)));
+            playfields.ForEach(p => p.ControlPoints.Add(new MultiplierControlPoint(0)));
 
             for (int i = 0; i <= 5000; i += 1000)
                 addHitObject(Time.Current + i);
@@ -75,9 +83,9 @@ namespace osu.Game.Tests.Visual
         {
             playfields.ForEach(p =>
             {
-                p.HitObjects.AddControlPoint(new MultiplierControlPoint(time) { DifficultyPoint = { SpeedMultiplier = 3 } });
-                p.HitObjects.AddControlPoint(new MultiplierControlPoint(time + 2000) { DifficultyPoint = { SpeedMultiplier = 2 } });
-                p.HitObjects.AddControlPoint(new MultiplierControlPoint(time + 3000) { DifficultyPoint = { SpeedMultiplier = 1 } });
+                p.ControlPoints.Add(new MultiplierControlPoint(time) { DifficultyPoint = { SpeedMultiplier = 3 } });
+                p.ControlPoints.Add(new MultiplierControlPoint(time + 2000) { DifficultyPoint = { SpeedMultiplier = 2 } });
+                p.ControlPoints.Add(new MultiplierControlPoint(time + 3000) { DifficultyPoint = { SpeedMultiplier = 1 } });
 
                 TestDrawableControlPoint createDrawablePoint(double t)
                 {
@@ -111,10 +119,18 @@ namespace osu.Game.Tests.Visual
             }
         }
 
+        private void setScrollAlgorithm(ScrollAlgorithm algorithm) => playfields.ForEach(p => p.ScrollAlgorithm = algorithm);
 
         private class TestPlayfield : ScrollingPlayfield
         {
             public new ScrollingDirection Direction => base.Direction;
+
+            public SortedList<MultiplierControlPoint> ControlPoints => algorithm.ControlPoints;
+
+            public ScrollAlgorithm ScrollAlgorithm { set => algorithm.Algorithm = value; }
+
+            [Cached(Type = typeof(IScrollAlgorithm))]
+            private readonly TestScrollAlgorithm algorithm = new TestScrollAlgorithm();
 
             public TestPlayfield(ScrollingDirection direction)
             {
@@ -137,6 +153,49 @@ namespace osu.Game.Tests.Visual
                     }
                 };
             }
+        }
+
+        private class TestScrollAlgorithm : IScrollAlgorithm
+        {
+            public readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
+
+            private IScrollAlgorithm implementation;
+
+            public TestScrollAlgorithm()
+            {
+                Algorithm = ScrollAlgorithm.Constant;
+            }
+
+            public ScrollAlgorithm Algorithm
+            {
+                set
+                {
+                    switch (value)
+                    {
+                        case ScrollAlgorithm.Constant:
+                            implementation = new ConstantScrollAlgorithm();
+                            break;
+                        case ScrollAlgorithm.Overlapping:
+                            implementation = new OverlappingScrollAlgorithm(ControlPoints);
+                            break;
+                        case ScrollAlgorithm.Sequential:
+                            implementation = new SequentialScrollAlgorithm(ControlPoints);
+                            break;
+                    }
+                }
+            }
+
+            public double GetDisplayStartTime(double time, double timeRange)
+                => implementation.GetDisplayStartTime(time, timeRange);
+
+            public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
+                => implementation.GetLength(startTime, endTime, timeRange, scrollLength);
+
+            public float PositionAt(double time, double currentTime, double timeRange, float scrollLength)
+                => implementation.PositionAt(time, currentTime, timeRange, scrollLength);
+
+            public void Reset()
+                => implementation.Reset();
         }
 
         private class TestDrawableControlPoint : DrawableHitObject<HitObject>

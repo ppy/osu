@@ -1,11 +1,11 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Lists;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
@@ -31,29 +31,17 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
-        private readonly IScrollAlgorithm algorithm;
+        [Resolved]
+        private IScrollAlgorithm algorithm { get; set; }
 
         private Cached initialStateCache = new Cached();
 
-        public ScrollingHitObjectContainer(ScrollVisualisationMethod visualisationMethod)
+        public ScrollingHitObjectContainer()
         {
             RelativeSizeAxes = Axes.Both;
 
             TimeRange.ValueChanged += _ => initialStateCache.Invalidate();
             Direction.ValueChanged += _ => initialStateCache.Invalidate();
-
-            switch (visualisationMethod)
-            {
-                case ScrollVisualisationMethod.Sequential:
-                    algorithm = new SequentialScrollAlgorithm(ControlPoints);
-                    break;
-                case ScrollVisualisationMethod.Overlapping:
-                    algorithm = new OverlappingScrollAlgorithm(ControlPoints);
-                    break;
-                case ScrollVisualisationMethod.Constant:
-                    algorithm = new ConstantScrollAlgorithm();
-                    break;
-            }
         }
 
         public override void Add(DrawableHitObject hitObject)
@@ -65,20 +53,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         public override bool Remove(DrawableHitObject hitObject)
         {
             var result = base.Remove(hitObject);
-            if (result)
-                initialStateCache.Invalidate();
-            return result;
-        }
-
-        public void AddControlPoint(MultiplierControlPoint controlPoint)
-        {
-            ControlPoints.Add(controlPoint);
-            initialStateCache.Invalidate();
-        }
-
-        public bool RemoveControlPoint(MultiplierControlPoint controlPoint)
-        {
-            var result = ControlPoints.Remove(controlPoint);
             if (result)
                 initialStateCache.Invalidate();
             return result;
