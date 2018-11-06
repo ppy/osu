@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     public class BlueprintContainer : CompositeDrawable
     {
         private SelectionBlueprintContainer selectionBlueprints;
-        private MaskSelection maskSelection;
+        private SelectionBox selectionBox;
 
         private IEnumerable<SelectionMask> aliveMasks => selectionBlueprints.Children.Where(c => c.IsAlive);
 
@@ -33,16 +33,16 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         [BackgroundDependencyLoader]
         private void load()
         {
-            maskSelection = composer.CreateMaskSelection();
-            maskSelection.DeselectAll = deselectAll;
+            selectionBox = composer.CreateMaskSelection();
+            selectionBox.DeselectAll = deselectAll;
 
             var dragBox = new DragBox(select);
-            dragBox.DragEnd += () => maskSelection.UpdateVisibility();
+            dragBox.DragEnd += () => selectionBox.UpdateVisibility();
 
             InternalChildren = new[]
             {
                 dragBox,
-                maskSelection,
+                selectionBox,
                 selectionBlueprints = new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both },
                 dragBox.CreateProxy()
             };
@@ -117,19 +117,19 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         private void onMaskSelected(SelectionMask mask)
         {
-            maskSelection.HandleSelected(mask);
+            selectionBox.HandleSelected(mask);
             selectionBlueprints.ChangeChildDepth(mask, 1);
         }
 
         private void onMaskDeselected(SelectionMask mask)
         {
-            maskSelection.HandleDeselected(mask);
+            selectionBox.HandleDeselected(mask);
             selectionBlueprints.ChangeChildDepth(mask, 0);
         }
 
-        private void onSelectionRequested(SelectionMask mask, InputState state) => maskSelection.HandleSelectionRequested(mask, state);
+        private void onSelectionRequested(SelectionMask mask, InputState state) => selectionBox.HandleSelectionRequested(mask, state);
 
-        private void onDragRequested(SelectionMask mask, Vector2 delta, InputState state) => maskSelection.HandleDrag(mask, delta, state);
+        private void onDragRequested(SelectionMask mask, Vector2 delta, InputState state) => selectionBox.HandleDrag(mask, delta, state);
 
         private class SelectionBlueprintContainer : Container<SelectionMask>
         {
