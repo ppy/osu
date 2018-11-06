@@ -22,10 +22,10 @@ namespace osu.Game.Tournament.Tests
             });
         }
 
-        protected override void SaveChanges()
+        protected override void Dispose(bool isDisposing)
         {
+            base.Dispose(isDisposing);
             Ladder = manager.CreateInfo();
-            base.SaveChanges();
         }
     }
 }

@@ -47,10 +47,10 @@ namespace osu.Game.Tournament.Tests
                 items.Add(new GroupingRow(g));
         }
 
-        protected override void SaveChanges()
+        protected override void Dispose(bool isDisposing)
         {
             Ladder.Groupings = items.Children.Select(c => c.Grouping).ToList();
-            base.SaveChanges();
+            base.Dispose(isDisposing);
         }
 
         private void addNew() => items.Add(new GroupingRow(new TournamentGrouping()));
