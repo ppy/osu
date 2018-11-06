@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Edit
             }
 
             var layerBelowRuleset = CreateLayerContainer();
-            layerBelowRuleset.Child = new BorderLayer { RelativeSizeAxes = Axes.Both };
+            layerBelowRuleset.Child = new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both };
 
             var layerAboveRuleset = CreateLayerContainer();
             layerAboveRuleset.Child = new BlueprintContainer();
