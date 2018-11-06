@@ -12,7 +12,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.Components.Timeline
+namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class Timeline : ZoomableScrollContainer
     {

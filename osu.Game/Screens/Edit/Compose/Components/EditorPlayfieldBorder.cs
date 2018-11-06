@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.Components
+namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
     /// Provides a border around the playfield.

@@ -3,7 +3,6 @@
 
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
-using OpenTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,10 +10,11 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Screens.Edit.Screens.Compose.Components;
-using osu.Game.Screens.Edit.Screens.Compose.Components.Timeline;
+using osu.Game.Screens.Edit.Compose.Components;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
+using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Edit.Screens.Compose
+namespace osu.Game.Screens.Edit.Compose
 {
     [Cached(Type = typeof(IPlacementHandler))]
     public class Compose : EditorScreen, IPlacementHandler

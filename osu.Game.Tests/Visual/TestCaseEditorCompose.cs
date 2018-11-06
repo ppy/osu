@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Osu;
-using osu.Game.Screens.Edit.Screens.Compose;
+using osu.Game.Screens.Edit.Compose;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual

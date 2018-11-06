@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Edit.Screens.Design
+namespace osu.Game.Screens.Edit.Design
 {
     public class Design : EditorScreen
     {

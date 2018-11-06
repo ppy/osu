@@ -4,7 +4,7 @@
 using System;
 using osu.Game.Graphics.UserInterface;
 
-namespace osu.Game.Screens.Edit.Menus
+namespace osu.Game.Screens.Edit.Components.Menus
 {
     public class EditorMenuItem : OsuMenuItem
     {

@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Screens.Edit.Screens.Compose;
-using osu.Game.Screens.Edit.Screens.Compose.Components;
+using osu.Game.Screens.Edit;
+using osu.Game.Screens.Edit.Compose.Components;
 using OpenTK;
 
 namespace osu.Game.Tests.Visual

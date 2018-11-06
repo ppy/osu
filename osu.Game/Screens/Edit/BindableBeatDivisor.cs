@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using osu.Framework.Configuration;
 
-namespace osu.Game.Screens.Edit.Screens.Compose
+namespace osu.Game.Screens.Edit
 {
     public class BindableBeatDivisor : BindableNumber<int>
     {

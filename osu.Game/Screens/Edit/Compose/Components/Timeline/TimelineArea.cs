@@ -8,7 +8,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using OpenTK;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.Components.Timeline
+namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class TimelineArea : CompositeDrawable
     {
