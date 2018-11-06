@@ -15,7 +15,7 @@ using OpenTK;
 namespace osu.Game.Rulesets.Edit
 {
     /// <summary>
-    /// A mask placed above a <see cref="DrawableHitObject"/> adding editing functionality.
+    /// A blueprint placed above a <see cref="DrawableHitObject"/> adding editing functionality.
     /// </summary>
     public class SelectionBlueprint : CompositeDrawable, IStateful<SelectionState>
     {

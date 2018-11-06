@@ -12,6 +12,6 @@ namespace osu.Game.Rulesets.Edit.Tools
             Name = name;
         }
 
-        public abstract PlacementBlueprint CreatePlacementMask();
+        public abstract PlacementBlueprint CreatePlacementBlueprint();
     }
 }

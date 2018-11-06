@@ -15,6 +15,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        public override PlacementBlueprint CreatePlacementMask() => new SpinnerPlacementBlueprint();
+        public override PlacementBlueprint CreatePlacementBlueprint() => new SpinnerPlacementBlueprint();
     }
 }

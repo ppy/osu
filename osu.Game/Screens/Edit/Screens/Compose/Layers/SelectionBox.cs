@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     {
         public const float BORDER_RADIUS = 2;
 
-        private readonly List<SelectionBlueprint> selectedMasks;
+        private readonly List<SelectionBlueprint> selectedBlueprints;
 
         private Drawable outline;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         public SelectionBox()
         {
-            selectedMasks = new List<SelectionBlueprint>();
+            selectedBlueprints = new List<SelectionBlueprint>();
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
@@ -64,9 +64,9 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         {
             // Todo: Various forms of snapping
 
-            foreach (var mask in selectedMasks)
+            foreach (var blueprint in selectedBlueprints)
             {
-                switch (mask.HitObject.HitObject)
+                switch (blueprint.HitObject.HitObject)
                 {
                     case IHasEditablePosition editablePosition:
                         editablePosition.OffsetPosition(delta);
@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
             switch (e.Key)
             {
                 case Key.Delete:
-                    foreach (var h in selectedMasks.ToList())
+                    foreach (var h in selectedBlueprints.ToList())
                         placementHandler.Delete(h.HitObject.HitObject);
                     return true;
             }
@@ -96,33 +96,33 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         #region Selection Handling
 
         /// <summary>
-        /// Bind an action to deselect all selected masks.
+        /// Bind an action to deselect all selected blueprints.
         /// </summary>
         public Action DeselectAll { private get; set; }
 
         /// <summary>
-        /// Handle a mask becoming selected.
+        /// Handle a blueprint becoming selected.
         /// </summary>
-        /// <param name="blueprint">The mask.</param>
-        public void HandleSelected(SelectionBlueprint blueprint) => selectedMasks.Add(blueprint);
+        /// <param name="blueprint">The blueprint.</param>
+        public void HandleSelected(SelectionBlueprint blueprint) => selectedBlueprints.Add(blueprint);
 
         /// <summary>
-        /// Handle a mask becoming deselected.
+        /// Handle a blueprint becoming deselected.
         /// </summary>
-        /// <param name="blueprint">The mask.</param>
+        /// <param name="blueprint">The blueprint.</param>
         public void HandleDeselected(SelectionBlueprint blueprint)
         {
-            selectedMasks.Remove(blueprint);
+            selectedBlueprints.Remove(blueprint);
 
-            // We don't want to update visibility if > 0, since we may be deselecting masks during drag-selection
-            if (selectedMasks.Count == 0)
+            // We don't want to update visibility if > 0, since we may be deselecting blueprints during drag-selection
+            if (selectedBlueprints.Count == 0)
                 UpdateVisibility();
         }
 
         /// <summary>
-        /// Handle a mask requesting selection.
+        /// Handle a blueprint requesting selection.
         /// </summary>
-        /// <param name="blueprint">The mask.</param>
+        /// <param name="blueprint">The blueprint.</param>
         public void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
         {
             if (state.Keyboard.ControlPressed)
@@ -151,7 +151,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// </summary>
         internal void UpdateVisibility()
         {
-            if (selectedMasks.Count > 0)
+            if (selectedBlueprints.Count > 0)
                 Show();
             else
                 Hide();
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         {
             base.Update();
 
-            if (selectedMasks.Count == 0)
+            if (selectedBlueprints.Count == 0)
                 return;
 
             // Move the rectangle to cover the hitobjects
@@ -170,10 +170,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
             bool hasSelection = false;
 
-            foreach (var mask in selectedMasks)
+            foreach (var blueprint in selectedBlueprints)
             {
-                topLeft = Vector2.ComponentMin(topLeft, ToLocalSpace(mask.SelectionQuad.TopLeft));
-                bottomRight = Vector2.ComponentMax(bottomRight, ToLocalSpace(mask.SelectionQuad.BottomRight));
+                topLeft = Vector2.ComponentMin(topLeft, ToLocalSpace(blueprint.SelectionQuad.TopLeft));
+                bottomRight = Vector2.ComponentMax(bottomRight, ToLocalSpace(blueprint.SelectionQuad.BottomRight));
             }
 
             topLeft -= new Vector2(5);

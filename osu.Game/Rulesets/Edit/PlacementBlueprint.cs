@@ -16,7 +16,7 @@ using OpenTK;
 namespace osu.Game.Rulesets.Edit
 {
     /// <summary>
-    /// A mask which governs the creation of a new <see cref="HitObject"/> to actualisation.
+    /// A blueprint which governs the creation of a new <see cref="HitObject"/> to actualisation.
     /// </summary>
     public abstract class PlacementBlueprint : CompositeDrawable, IRequireHighFrequencyMousePosition
     {

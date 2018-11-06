@@ -125,7 +125,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         {
             placementBlueprintContainer.Clear();
 
-            var blueprint = CurrentTool?.CreatePlacementMask();
+            var blueprint = CurrentTool?.CreatePlacementBlueprint();
             if (blueprint != null)
                 placementBlueprintContainer.Child = blueprint;
         }
