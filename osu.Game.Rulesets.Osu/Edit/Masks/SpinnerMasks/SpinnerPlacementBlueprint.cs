@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Osu.UI;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks
 {
-    public class SpinnerPlacementMask : PlacementMask
+    public class SpinnerPlacementBlueprint : PlacementBlueprint
     {
         public new Spinner HitObject => (Spinner)base.HitObject;
 
@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks
 
         private bool isPlacingEnd;
 
-        public SpinnerPlacementMask()
+        public SpinnerPlacementBlueprint()
             : base(new Spinner { Position = OsuPlayfield.BASE_SIZE / 2 })
         {
             InternalChild = piece = new SpinnerPiece(HitObject) { Alpha = 0.5f };

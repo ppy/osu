@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual
     public abstract class HitObjectPlacementMaskTestCase : OsuTestCase, IPlacementHandler
     {
         private readonly Container hitObjectContainer;
-        private PlacementMask currentMask;
+        private PlacementBlueprint currentBlueprint;
 
         protected HitObjectPlacementMaskTestCase()
         {
@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(currentMask = CreateMask());
+            Add(currentBlueprint = CreateMask());
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -51,8 +51,8 @@ namespace osu.Game.Tests.Visual
         {
             hitObjectContainer.Add(CreateHitObject(hitObject));
 
-            Remove(currentMask);
-            Add(currentMask = CreateMask());
+            Remove(currentBlueprint);
+            Add(currentBlueprint = CreateMask());
         }
 
         public void Delete(HitObject hitObject)
@@ -60,6 +60,6 @@ namespace osu.Game.Tests.Visual
         }
 
         protected abstract DrawableHitObject CreateHitObject(HitObject hitObject);
-        protected abstract PlacementMask CreateMask();
+        protected abstract PlacementBlueprint CreateMask();
     }
 }

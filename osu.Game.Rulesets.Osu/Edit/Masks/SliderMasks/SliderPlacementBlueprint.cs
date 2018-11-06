@@ -18,7 +18,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
 {
-    public class SliderPlacementMask : PlacementMask
+    public class SliderPlacementBlueprint : PlacementBlueprint
     {
         public new Objects.Slider HitObject => (Objects.Slider)base.HitObject;
 
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
 
         private PlacementState state;
 
-        public SliderPlacementMask()
+        public SliderPlacementBlueprint()
             : base(new Objects.Slider())
         {
             RelativeSizeAxes = Axes.Both;

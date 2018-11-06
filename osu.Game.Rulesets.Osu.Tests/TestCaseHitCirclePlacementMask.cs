@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Osu.Tests
     public class TestCaseHitCirclePlacementMask : HitObjectPlacementMaskTestCase
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableHitCircle((HitCircle)hitObject);
-        protected override PlacementMask CreateMask() => new HitCirclePlacementMask();
+        protected override PlacementBlueprint CreateMask() => new HitCirclePlacementBlueprint();
     }
 }

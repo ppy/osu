@@ -8,11 +8,11 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks
 {
-    public class HitCirclePlacementMask : PlacementMask
+    public class HitCirclePlacementBlueprint : PlacementBlueprint
     {
         public new HitCircle HitObject => (HitCircle)base.HitObject;
 
-        public HitCirclePlacementMask()
+        public HitCirclePlacementBlueprint()
             : base(new HitCircle())
         {
             InternalChild = new HitCirclePiece(HitObject);
