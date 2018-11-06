@@ -3,6 +3,7 @@
 
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -28,6 +29,9 @@ namespace osu.Game.Tournament
         [Cached]
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
+        [Cached]
+        private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
+
         private Bindable<Size> windowSize;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -51,6 +55,10 @@ namespace osu.Game.Tournament
                 }
 
             Ladder = content != null ? JsonConvert.DeserializeObject<LadderInfo>(content) : new LadderInfo();
+
+            //todo: temp
+            currentMatch.Value = Ladder.Pairings.FirstOrDefault();
+
             dependencies.Cache(Ladder);
 
             bool addedInfo = false;

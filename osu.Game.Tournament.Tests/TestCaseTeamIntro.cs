@@ -3,22 +3,28 @@
 
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Game.Tournament.Screens.Ladder.Components;
 using osu.Game.Tournament.Screens.TeamIntro;
 
 namespace osu.Game.Tournament.Tests
 {
     public class TestCaseTeamIntro : LadderTestCase
     {
+        [Cached]
+        private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            var team1 = Ladder.Teams.FirstOrDefault(t => t.Acronym == "USA");
-            var team2 = Ladder.Teams.FirstOrDefault(t => t.Acronym == "JPN");
+            var pairing = new MatchPairing();
+            pairing.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == "USA");
+            pairing.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == "JPN");
+            pairing.Grouping.Value = Ladder.Groupings.FirstOrDefault(g => g.Name == "Finals");
+            currentMatch.Value = pairing;
 
-            var round = Ladder.Groupings.FirstOrDefault(g => g.Name == "Finals");
-
-            Add(new TeamIntroScreen(team1, team2, round)
+            Add(new TeamIntroScreen()
             {
                 FillMode = FillMode.Fit,
                 FillAspectRatio = 16 / 9f
