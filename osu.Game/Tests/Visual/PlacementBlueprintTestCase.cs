@@ -8,7 +8,7 @@ using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Screens.Edit.Screens.Compose;
+using osu.Game.Screens.Edit.Compose;
 
 namespace osu.Game.Tests.Visual
 {

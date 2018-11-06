@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Screens.Edit.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
@@ -16,10 +15,8 @@ using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Edit.Screens;
-using osu.Game.Screens.Edit.Screens.Compose;
-using osu.Game.Screens.Edit.Screens.Design;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Screens.Edit.Components.Menus;
 
 namespace osu.Game.Screens.Edit
 {
@@ -169,10 +166,10 @@ namespace osu.Game.Screens.Edit
             switch (mode)
             {
                 case EditorScreenMode.Compose:
-                    currentScreen = new Compose();
+                    currentScreen = new Compose.Compose();
                     break;
                 case EditorScreenMode.Design:
-                    currentScreen = new Design();
+                    currentScreen = new Design.Design();
                     break;
                 default:
                     currentScreen = new EditorScreen();

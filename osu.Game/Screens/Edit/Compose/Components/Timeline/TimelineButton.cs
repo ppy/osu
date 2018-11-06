@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterface;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.Components.Timeline
+namespace osu.Game.Screens.Edit.Compose.Components.Timeline
 {
     public class TimelineButton : CompositeDrawable
     {

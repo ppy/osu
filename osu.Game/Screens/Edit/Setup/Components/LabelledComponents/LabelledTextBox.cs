@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -10,8 +9,9 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents
+namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
 {
     public class LabelledTextBox : CompositeDrawable
     {

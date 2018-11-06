@@ -3,7 +3,7 @@
 
 using System.ComponentModel;
 
-namespace osu.Game.Screens.Edit.Screens
+namespace osu.Game.Screens.Edit
 {
     public enum EditorScreenMode
     {

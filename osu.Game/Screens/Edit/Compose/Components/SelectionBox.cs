@@ -16,7 +16,7 @@ using osu.Game.Rulesets.Edit.Types;
 using OpenTK;
 using OpenTK.Input;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.Components
+namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
     /// A box which surrounds <see cref="SelectionBlueprint"/>s and provides interactive handles, context menus etc.

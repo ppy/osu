@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.Components
+namespace osu.Game.Screens.Edit.Compose.Components
 {
     public class BlueprintContainer : CompositeDrawable
     {

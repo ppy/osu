@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 
-namespace osu.Game.Screens.Edit.Screens
+namespace osu.Game.Screens.Edit
 {
     /// <summary>
     /// TODO: eventually make this inherit Screen and add a local scren stack inside the Editor.

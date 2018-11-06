@@ -16,8 +16,8 @@ using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks;
 using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Screens.Edit.Screens.Compose;
-using osu.Game.Screens.Edit.Screens.Compose.Components;
+using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual

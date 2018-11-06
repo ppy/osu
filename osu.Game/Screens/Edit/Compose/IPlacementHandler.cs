@@ -3,7 +3,7 @@
 
 using osu.Game.Rulesets.Objects;
 
-namespace osu.Game.Screens.Edit.Screens.Compose
+namespace osu.Game.Screens.Edit.Compose
 {
     public interface IPlacementHandler
     {
