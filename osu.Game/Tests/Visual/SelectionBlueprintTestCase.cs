@@ -10,14 +10,14 @@ using osu.Game.Rulesets.Edit;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class HitObjectSelectionMaskTestCase : OsuTestCase
+    public abstract class SelectionBlueprintTestCase : OsuTestCase
     {
         private SelectionBlueprint blueprint;
 
         protected override Container<Drawable> Content => content ?? base.Content;
         private readonly Container content;
 
-        protected HitObjectSelectionMaskTestCase()
+        protected SelectionBlueprintTestCase()
         {
             base.Content.Add(content = new Container
             {

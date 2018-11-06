@@ -12,11 +12,11 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestCaseHitCircleSelectionMask : HitObjectSelectionMaskTestCase
+    public class TestCaseHitCircleSelectionBlueprint : SelectionBlueprintTestCase
     {
         private readonly DrawableHitCircle drawableObject;
 
-        public TestCaseHitCircleSelectionMask()
+        public TestCaseHitCircleSelectionBlueprint()
         {
             var hitCircle = new HitCircle { Position = new Vector2(256, 192) };
             hitCircle.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });
