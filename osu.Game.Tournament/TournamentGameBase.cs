@@ -15,7 +15,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
-using osu.Game.Tournament.Screens.Ladder.Components;
 
 namespace osu.Game.Tournament
 {
@@ -30,9 +29,6 @@ namespace osu.Game.Tournament
 
         [Cached]
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
-
-        [Cached]
-        private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
 
         private Bindable<Size> windowSize;
 
@@ -95,6 +91,8 @@ namespace osu.Game.Tournament
             foreach (var id in group.Pairings)
                 Ladder.Pairings.Single(p => p.ID == id).Grouping.Value = group;
 
+            Ladder.CurrentMatch.Value = Ladder.Pairings.FirstOrDefault(p => p.Current.Value);
+
             foreach (var g in Ladder.Groupings)
             foreach (var b in g.Beatmaps)
                 if (b.BeatmapInfo == null)
@@ -105,9 +103,6 @@ namespace osu.Game.Tournament
 
                     addedInfo = true;
                 }
-
-            //todo: temp
-            currentMatch.Value = Ladder.Pairings.FirstOrDefault();
 
             if (addedInfo)
                 SaveChanges();

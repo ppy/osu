@@ -23,12 +23,15 @@ using SixLabors.Primitives;
 
 namespace osu.Game.Tournament.Screens.Ladder
 {
+    [Cached]
     public class LadderManager : CompositeDrawable, IHasContextMenu
     {
         public readonly List<TournamentTeam> Teams;
         private readonly Container<DrawableMatchPairing> pairingsContainer;
         private readonly Container<Path> paths;
         private readonly Container headings;
+
+        private readonly LadderInfo info;
 
         private readonly ScrollableContainer scrollContent;
 
@@ -37,6 +40,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         public LadderManager(LadderInfo info)
         {
+            this.info = info;
             editorInfo.Teams = Teams = info.Teams;
             editorInfo.Groupings = info.Groupings;
 
@@ -255,5 +259,14 @@ namespace osu.Game.Tournament.Screens.Ladder
         }
 
         public void Remove(MatchPairing pairing) => pairingsContainer.FirstOrDefault(p => p.Pairing == pairing)?.Remove();
+
+        public void SetCurrent(MatchPairing pairing)
+        {
+            if (info.CurrentMatch.Value != null)
+                info.CurrentMatch.Value.Current.Value = false;
+
+            info.CurrentMatch.Value = pairing;
+            info.CurrentMatch.Value.Current.Value = true;
+        }
     }
 }

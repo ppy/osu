@@ -126,9 +126,15 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         }
 
         //TODO: use OnClick instead once we have per-button clicks.
-        protected override bool OnMouseUp(MouseUpEvent e)
+        protected override bool OnClick(ClickEvent e)
         {
             if (Team == null || editorInfo.EditingEnabled) return false;
+
+            if (!pairing.Current.Value)
+            {
+                manager.SetCurrent(pairing);
+                return true;
+            }
 
             if (e.Button == MouseButton.Left)
             {
@@ -176,6 +182,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
                 return new MenuItem[]
                 {
+                    new OsuMenuItem("Set as current", MenuItemType.Standard, () => manager.SetCurrent(pairing)),
                     new OsuMenuItem("Join with", MenuItemType.Standard, () => manager.RequestJoin(pairing, false)),
                     new OsuMenuItem("Join with (loser)", MenuItemType.Standard, () => manager.RequestJoin(pairing, true)),
                     new OsuMenuItem("Remove", MenuItemType.Destructive, () => manager.Remove(pairing)),

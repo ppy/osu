@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Tests.Visual;
-using osu.Game.Tournament.Screens.Ladder.Components;
 
 namespace osu.Game.Tournament.Tests
 {
