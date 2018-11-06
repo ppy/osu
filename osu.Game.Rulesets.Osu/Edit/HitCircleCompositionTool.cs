@@ -15,6 +15,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        public override PlacementBlueprint CreatePlacementMask() => new HitCirclePlacementBlueprint();
+        public override PlacementBlueprint CreatePlacementBlueprint() => new HitCirclePlacementBlueprint();
     }
 }
