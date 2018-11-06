@@ -22,11 +22,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation)
         {
-            Direction.Value = ScrollingDirection.Down;
-
             Container explodingFruitContainer;
 
             Anchor = Anchor.TopCentre;

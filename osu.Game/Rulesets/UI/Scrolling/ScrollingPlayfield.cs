@@ -52,19 +52,20 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         protected virtual bool UserScrollSpeedAdjustment => true;
 
+        protected readonly IBindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+
         /// <summary>
         /// The container that contains the <see cref="DrawableHitObject"/>s.
         /// </summary>
         public new ScrollingHitObjectContainer HitObjects => (ScrollingHitObjectContainer)HitObjectContainer;
 
-        /// <summary>
-        /// The direction in which <see cref="DrawableHitObject"/>s in this <see cref="ScrollingPlayfield"/> should scroll.
-        /// </summary>
-        protected readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+        [Resolved]
+        private IScrollingInfo scrollingInfo { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            Direction.BindTo(scrollingInfo.Direction);
             HitObjects.TimeRange.BindTo(VisibleTimeRange);
         }
 
@@ -88,11 +89,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         public bool OnReleased(GlobalAction action) => false;
 
-        protected sealed override HitObjectContainer CreateHitObjectContainer()
-        {
-            var container = new ScrollingHitObjectContainer();
-            container.Direction.BindTo(Direction);
-            return container;
-        }
+        protected sealed override HitObjectContainer CreateHitObjectContainer() => new ScrollingHitObjectContainer();
     }
 }
