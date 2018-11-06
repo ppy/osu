@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -67,36 +66,8 @@ namespace osu.Game.Tournament.Screens.Ladder
                 }
             };
 
-            // assign teams
-            foreach (var pairing in info.Pairings)
-            {
-                pairing.Team1.Value = info.Teams.FirstOrDefault(t => t.Acronym == pairing.Team1Acronym);
-                pairing.Team2.Value = info.Teams.FirstOrDefault(t => t.Acronym == pairing.Team2Acronym);
-            }
-
-            // assign progressions
-            foreach (var pair in info.Progressions)
-            {
-                var src = info.Pairings.FirstOrDefault(p => p.ID == pair.Item1);
-                var dest = info.Pairings.FirstOrDefault(p => p.ID == pair.Item2);
-
-                if (src == null) throw new InvalidOperationException();
-
-                if (dest != null)
-                {
-                    if (pair.Losers)
-                        src.LosersProgression.Value = dest;
-                    else
-                        src.Progression.Value = dest;
-                }
-            }
-
             foreach (var pairing in info.Pairings)
                 addPairing(pairing);
-
-            foreach (var group in info.Groupings)
-            foreach (var id in group.Pairings)
-                info.Pairings.Single(p => p.ID == id).Grouping.Value = group;
 
             // todo: fix this
             Scheduler.AddDelayed(() => layout.Invalidate(), 100, true);

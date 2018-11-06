@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -56,12 +57,37 @@ namespace osu.Game.Tournament
 
             Ladder = content != null ? JsonConvert.DeserializeObject<LadderInfo>(content) : new LadderInfo();
 
-            //todo: temp
-            currentMatch.Value = Ladder.Pairings.FirstOrDefault();
-
             dependencies.Cache(Ladder);
 
             bool addedInfo = false;
+
+            // assign teams
+            foreach (var pairing in Ladder.Pairings)
+            {
+                pairing.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == pairing.Team1Acronym);
+                pairing.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == pairing.Team2Acronym);
+            }
+
+            // assign progressions
+            foreach (var pair in Ladder.Progressions)
+            {
+                var src = Ladder.Pairings.FirstOrDefault(p => p.ID == pair.Item1);
+                var dest = Ladder.Pairings.FirstOrDefault(p => p.ID == pair.Item2);
+
+                if (src == null) throw new InvalidOperationException();
+
+                if (dest != null)
+                {
+                    if (pair.Losers)
+                        src.LosersProgression.Value = dest;
+                    else
+                        src.Progression.Value = dest;
+                }
+            }
+
+            foreach (var group in Ladder.Groupings)
+            foreach (var id in group.Pairings)
+                Ladder.Pairings.Single(p => p.ID == id).Grouping.Value = group;
 
             foreach (var g in Ladder.Groupings)
             foreach (var b in g.Beatmaps)
@@ -73,6 +99,9 @@ namespace osu.Game.Tournament
 
                     addedInfo = true;
                 }
+
+            //todo: temp
+            currentMatch.Value = Ladder.Pairings.FirstOrDefault();
 
             if (addedInfo)
                 SaveChanges();
