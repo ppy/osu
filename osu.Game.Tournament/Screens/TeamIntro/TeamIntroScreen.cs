@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Video;
@@ -19,30 +20,34 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 {
     public class TeamIntroScreen : OsuScreen
     {
-        private readonly TournamentTeam team1;
-        private readonly TournamentTeam team2;
-        private readonly TournamentGrouping round;
+        private VideoSprite background;
 
-        public TeamIntroScreen(TournamentTeam team1, TournamentTeam team2, TournamentGrouping round)
-        {
-            this.team1 = team1;
-            this.team2 = team2;
-            this.round = round;
-        }
+        [Resolved]
+        private Bindable<MatchPairing> currentMatch { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(Storage storage)
         {
             RelativeSizeAxes = Axes.Both;
 
+            background = new VideoSprite(storage.GetStream(@"BG Team - Both OWC.m4v"))
+            {
+                RelativeSizeAxes = Axes.Both,
+                Loop = true,
+            };
+
+            currentMatch.BindValueChanged(matchChanged, true);
+        }
+
+        private void matchChanged(MatchPairing pairing)
+        {
+            if (pairing == null)
+                return;
+
             InternalChildren = new Drawable[]
             {
-                new VideoSprite(storage.GetStream(@"BG Team - Both OWC.m4v"))
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Loop = true,
-                },
-                new TeamWithPlayers(team1, true)
+                background,
+                new TeamWithPlayers(pairing.Team1, true)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.5f,
@@ -50,7 +55,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight
                 },
-                new TeamWithPlayers(team2)
+                new TeamWithPlayers(pairing.Team2)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Width = 0.5f,
@@ -58,7 +63,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft
                 },
-                new RoundDisplay(round)
+                new RoundDisplay(pairing.Grouping)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.25f,
