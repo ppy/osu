@@ -58,9 +58,9 @@ namespace osu.Game.Tournament.Screens
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Showcase", Action = () => setScreen(showcase) },
                                 new Container { RelativeSizeAxes = Axes.X, Height = 50 },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket", Action = () => setScreen(bracket) },
+                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "TeamIntro", Action = () => setScreen(teamIntro) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "MapPool", Action = () => setScreen(mapPool) },
-                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Gameplay", Action = () => setScreen(gameplay) },
                             }
                         },
@@ -92,8 +92,7 @@ namespace osu.Game.Tournament.Screens
                                 bracket = new LadderManager(ladder),
                                 showcase = new ShowcaseScreen(),
                                 mapPool = new MapPoolScreen(ladder.Groupings.First(g => g.Name == "Finals")),
-                                teamIntro = new TeamIntroScreen(ladder.Teams.First(t => t.Acronym == "USA"), ladder.Teams.First(t => t.Acronym == "JPN"),
-                                    ladder.Groupings.First(g => g.Name == "Finals")),
+                                teamIntro = new TeamIntroScreen(),
                                 drawings = new DrawingsScreen(),
                                 gameplay = new GameplayScreen()
                             }
