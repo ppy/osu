@@ -36,7 +36,6 @@ namespace osu.Game.Rulesets.Edit
         private EditRulesetContainer rulesetContainer;
 
         private BlueprintContainer blueprintContainer;
-        private PlacementContainer placementContainer;
 
         internal HitObjectComposer(Ruleset ruleset)
         {
@@ -65,11 +64,7 @@ namespace osu.Game.Rulesets.Edit
             layerBelowRuleset.Child = new BorderLayer { RelativeSizeAxes = Axes.Both };
 
             var layerAboveRuleset = CreateLayerContainer();
-            layerAboveRuleset.Children = new Drawable[]
-            {
-                blueprintContainer = new BlueprintContainer(),
-                placementContainer = new PlacementContainer(),
-            };
+            layerAboveRuleset.Child = new BlueprintContainer();
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -112,8 +107,8 @@ namespace osu.Game.Rulesets.Edit
             };
 
             toolboxCollection.Items =
-                CompositionTools.Select(t => new RadioButton(t.Name, () => placementContainer.CurrentTool = t))
-                .Prepend(new RadioButton("Select", () => placementContainer.CurrentTool = null))
+                CompositionTools.Select(t => new RadioButton(t.Name, () => blueprintContainer.CurrentTool = t))
+                .Prepend(new RadioButton("Select", () => blueprintContainer.CurrentTool = null))
                 .ToList();
 
             toolboxCollection.Items[0].Select();
@@ -146,11 +141,7 @@ namespace osu.Game.Rulesets.Edit
         /// Adds a <see cref="HitObject"/> to the <see cref="Beatmaps.Beatmap"/> and visualises it.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
-        public void Add(HitObject hitObject)
-        {
-            blueprintContainer.AddBlueprintFor(rulesetContainer.Add(hitObject));
-            placementContainer.Refresh();
-        }
+        public void Add(HitObject hitObject) => blueprintContainer.AddBlueprintFor(rulesetContainer.Add(hitObject));
 
         public void Remove(HitObject hitObject) => blueprintContainer.RemoveBlueprintFor(rulesetContainer.Remove(hitObject));
 

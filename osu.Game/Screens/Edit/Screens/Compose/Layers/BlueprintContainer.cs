@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects.Drawables;
 using OpenTK;
 
@@ -18,6 +19,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     public class BlueprintContainer : CompositeDrawable
     {
         private SelectionBlueprintContainer selectionBlueprints;
+        private Container<PlacementMask> placementBlueprintContainer;
         private SelectionBox selectionBox;
 
         private IEnumerable<SelectionBlueprint> selections => selectionBlueprints.Children.Where(c => c.IsAlive);
@@ -44,11 +46,70 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 dragBox,
                 selectionBox,
                 selectionBlueprints = new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both },
+                placementBlueprintContainer = new Container<PlacementMask> { RelativeSizeAxes = Axes.Both },
                 dragBox.CreateProxy()
             };
 
             foreach (var obj in composer.HitObjects)
                 AddBlueprintFor(obj);
+        }
+
+        private HitObjectCompositionTool currentTool;
+
+        /// <summary>
+        /// The current placement tool.
+        /// </summary>
+        public HitObjectCompositionTool CurrentTool
+        {
+            get => currentTool;
+            set
+            {
+                if (currentTool == value)
+                    return;
+                currentTool = value;
+
+                refreshTool();
+            }
+        }
+
+        /// <summary>
+        /// Adds a blueprint for a <see cref="DrawableHitObject"/> which adds movement support.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create a blueprint for.</param>
+        public void AddBlueprintFor(DrawableHitObject hitObject)
+        {
+            refreshTool();
+
+            var blueprint = composer.CreateMaskFor(hitObject);
+            if (blueprint == null)
+                return;
+
+            blueprint.Selected += onBlueprintSelected;
+            blueprint.Deselected += onBlueprintDeselected;
+            blueprint.SelectionRequested += onSelectionRequested;
+            blueprint.DragRequested += onDragRequested;
+
+            selectionBlueprints.Add(blueprint);
+        }
+
+        /// <summary>
+        /// Removes a blueprint for a <see cref="DrawableHitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="DrawableHitObject"/> for which to remove the blueprint.</param>
+        public void RemoveBlueprintFor(DrawableHitObject hitObject)
+        {
+            var blueprint = selectionBlueprints.Single(m => m.HitObject == hitObject);
+            if (blueprint == null)
+                return;
+
+            blueprint.Deselect();
+
+            blueprint.Selected -= onBlueprintSelected;
+            blueprint.Deselected -= onBlueprintDeselected;
+            blueprint.SelectionRequested -= onSelectionRequested;
+            blueprint.DragRequested -= onDragRequested;
+
+            selectionBlueprints.Remove(blueprint);
         }
 
         protected override bool OnClick(ClickEvent e)
@@ -58,42 +119,17 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         }
 
         /// <summary>
-        /// Adds a mask for a <see cref="DrawableHitObject"/> which adds movement support.
+        /// Refreshes the current placement tool.
         /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create a mask for.</param>
-        public void AddBlueprintFor(DrawableHitObject hitObject)
+        private void refreshTool()
         {
-            var mask = composer.CreateMaskFor(hitObject);
-            if (mask == null)
-                return;
+            placementBlueprintContainer.Clear();
 
-            mask.Selected += onBlueprintSelected;
-            mask.Deselected += onBlueprintDeselected;
-            mask.SelectionRequested += onSelectionRequested;
-            mask.DragRequested += onDragRequested;
-
-            selectionBlueprints.Add(mask);
+            var blueprint = CurrentTool?.CreatePlacementMask();
+            if (blueprint != null)
+                placementBlueprintContainer.Child = blueprint;
         }
 
-        /// <summary>
-        /// Removes a mask for a <see cref="DrawableHitObject"/>.
-        /// </summary>
-        /// <param name="hitObject">The <see cref="DrawableHitObject"/> for which to remove the mask.</param>
-        public void RemoveBlueprintFor(DrawableHitObject hitObject)
-        {
-            var maskToRemove = selectionBlueprints.Single(m => m.HitObject == hitObject);
-            if (maskToRemove == null)
-                return;
-
-            maskToRemove.Deselect();
-
-            maskToRemove.Selected -= onBlueprintSelected;
-            maskToRemove.Deselected -= onBlueprintDeselected;
-            maskToRemove.SelectionRequested -= onSelectionRequested;
-            maskToRemove.DragRequested -= onDragRequested;
-
-            selectionBlueprints.Remove(maskToRemove);
-        }
 
         /// <summary>
         /// Select all masks in a given rectangle selection area.
@@ -101,12 +137,12 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// <param name="rect">The rectangle to perform a selection on in screen-space coordinates.</param>
         private void select(RectangleF rect)
         {
-            foreach (var mask in selections.ToList())
+            foreach (var blueprint in selections.ToList())
             {
-                if (mask.IsPresent && rect.Contains(mask.SelectionPoint))
-                    mask.Select();
+                if (blueprint.IsPresent && rect.Contains(blueprint.SelectionPoint))
+                    blueprint.Select();
                 else
-                    mask.Deselect();
+                    blueprint.Deselect();
             }
         }
 
