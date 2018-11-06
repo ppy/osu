@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Osu.Tests
     public class TestCaseSliderPlacementMask : HitObjectPlacementMaskTestCase
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableSlider((Slider)hitObject);
-        protected override PlacementMask CreateMask() => new SliderPlacementMask();
+        protected override PlacementBlueprint CreateMask() => new SliderPlacementBlueprint();
     }
 }

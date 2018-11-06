@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A mask which governs the creation of a new <see cref="HitObject"/> to actualisation.
     /// </summary>
-    public abstract class PlacementMask : CompositeDrawable, IRequireHighFrequencyMousePosition
+    public abstract class PlacementBlueprint : CompositeDrawable, IRequireHighFrequencyMousePosition
     {
         /// <summary>
         /// The <see cref="HitObject"/> that is being placed.
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Edit
         [Resolved]
         private IPlacementHandler placementHandler { get; set; }
 
-        protected PlacementMask(HitObject hitObject)
+        protected PlacementBlueprint(HitObject hitObject)
         {
             HitObject = hitObject;
 
@@ -62,7 +62,7 @@ namespace osu.Game.Rulesets.Edit
 
         /// <summary>
         /// Signals that the placement of <see cref="HitObject"/> has finished.
-        /// This will destroy this <see cref="PlacementMask"/>, and add the <see cref="HitObject"/> to the <see cref="Beatmap"/>.
+        /// This will destroy this <see cref="PlacementBlueprint"/>, and add the <see cref="HitObject"/> to the <see cref="Beatmap"/>.
         /// </summary>
         protected void EndPlacement()
         {

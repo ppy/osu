@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
     public class BlueprintContainer : CompositeDrawable
     {
         private SelectionBlueprintContainer selectionBlueprints;
-        private Container<PlacementMask> placementBlueprintContainer;
+        private Container<PlacementBlueprint> placementBlueprintContainer;
         private SelectionBox selectionBox;
 
         private IEnumerable<SelectionBlueprint> selections => selectionBlueprints.Children.Where(c => c.IsAlive);
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
                 dragBox,
                 selectionBox,
                 selectionBlueprints = new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both },
-                placementBlueprintContainer = new Container<PlacementMask> { RelativeSizeAxes = Axes.Both },
+                placementBlueprintContainer = new Container<PlacementBlueprint> { RelativeSizeAxes = Axes.Both },
                 dragBox.CreateProxy()
             };
 
