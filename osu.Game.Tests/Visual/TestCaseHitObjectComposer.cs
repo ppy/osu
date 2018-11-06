@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual
             typeof(DragBox),
             typeof(HitObjectComposer),
             typeof(OsuHitObjectComposer),
-            typeof(HitObjectMaskLayer),
+            typeof(BlueprintContainer),
             typeof(NotNullAttribute),
             typeof(HitCirclePiece),
             typeof(HitCircleSelectionMask),

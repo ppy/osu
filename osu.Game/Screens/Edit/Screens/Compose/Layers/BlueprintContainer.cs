@@ -11,14 +11,14 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
-    public class HitObjectMaskLayer : CompositeDrawable
+    public class BlueprintContainer : CompositeDrawable
     {
         private MaskContainer maskContainer;
 
         [Resolved]
         private HitObjectComposer composer { get; set; }
 
-        public HitObjectMaskLayer()
+        public BlueprintContainer()
         {
             RelativeSizeAxes = Axes.Both;
         }
