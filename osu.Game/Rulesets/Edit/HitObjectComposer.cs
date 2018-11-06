@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Edit
 
         private EditRulesetContainer rulesetContainer;
 
-        private HitObjectMaskLayer maskLayer;
+        private BlueprintContainer blueprintContainer;
         private PlacementContainer placementContainer;
 
         internal HitObjectComposer(Ruleset ruleset)
@@ -67,7 +67,7 @@ namespace osu.Game.Rulesets.Edit
             var layerAboveRuleset = CreateLayerContainer();
             layerAboveRuleset.Children = new Drawable[]
             {
-                maskLayer = new HitObjectMaskLayer(),
+                blueprintContainer = new BlueprintContainer(),
                 placementContainer = new PlacementContainer(),
             };
 
@@ -148,11 +148,11 @@ namespace osu.Game.Rulesets.Edit
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
         public void Add(HitObject hitObject)
         {
-            maskLayer.AddMaskFor(rulesetContainer.Add(hitObject));
+            blueprintContainer.AddMaskFor(rulesetContainer.Add(hitObject));
             placementContainer.Refresh();
         }
 
-        public void Remove(HitObject hitObject) => maskLayer.RemoveMaskFor(rulesetContainer.Remove(hitObject));
+        public void Remove(HitObject hitObject) => blueprintContainer.RemoveMaskFor(rulesetContainer.Remove(hitObject));
 
         internal abstract EditRulesetContainer CreateRulesetContainer();
 
