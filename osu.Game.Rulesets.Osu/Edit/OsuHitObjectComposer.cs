@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override Container CreateLayerContainer() => new PlayfieldAdjustmentContainer { RelativeSizeAxes = Axes.Both };
 
-        public override SelectionBlueprint CreateMaskFor(DrawableHitObject hitObject)
+        public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
         {
             switch (hitObject)
             {
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Osu.Edit
                     return new SpinnerSelectionBlueprint(spinner);
             }
 
-            return base.CreateMaskFor(hitObject);
+            return base.CreateBlueprintFor(hitObject);
         }
     }
 }

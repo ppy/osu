@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         {
             refreshTool();
 
-            var blueprint = composer.CreateMaskFor(hitObject);
+            var blueprint = composer.CreateBlueprintFor(hitObject);
             if (blueprint == null)
                 return;
 
