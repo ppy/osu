@@ -3,9 +3,8 @@
 
 using osu.Framework.Configuration;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.UI.Scrolling;
 
-namespace osu.Game.Rulesets.Mania.UI
+namespace osu.Game.Rulesets.UI.Scrolling
 {
     public interface IScrollingInfo
     {
