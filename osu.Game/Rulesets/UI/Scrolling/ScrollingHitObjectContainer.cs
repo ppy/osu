@@ -5,10 +5,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Lists;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 
 namespace osu.Game.Rulesets.UI.Scrolling
@@ -23,11 +21,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
             MinValue = 0,
             MaxValue = double.MaxValue
         };
-
-        /// <summary>
-        /// The control points that adjust the scrolling speed.
-        /// </summary>
-        protected readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
 
         public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
