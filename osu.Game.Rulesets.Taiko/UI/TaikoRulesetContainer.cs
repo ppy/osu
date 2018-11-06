@@ -27,6 +27,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         public TaikoRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+            Direction.Value = ScrollingDirection.Left;
         }
 
         [BackgroundDependencyLoader]

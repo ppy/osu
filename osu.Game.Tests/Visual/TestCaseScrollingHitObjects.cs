@@ -4,20 +4,17 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Lists;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 
 namespace osu.Game.Tests.Visual
 {
@@ -26,6 +23,7 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Playfield) };
 
+        private readonly ScrollingTestContainer[] scrollContainers = new ScrollingTestContainer[4];
         private readonly TestPlayfield[] playfields = new TestPlayfield[4];
 
         public TestCaseScrollingHitObjects()
@@ -37,13 +35,29 @@ namespace osu.Game.Tests.Visual
                 {
                     new Drawable[]
                     {
-                        playfields[0] = new TestPlayfield(ScrollingDirection.Up),
-                        playfields[1] = new TestPlayfield(ScrollingDirection.Down)
+                        scrollContainers[0] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = playfields[0] = new TestPlayfield()
+                        },
+                        scrollContainers[1] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = playfields[1] = new TestPlayfield()
+                        },
                     },
                     new Drawable[]
                     {
-                        playfields[2] = new TestPlayfield(ScrollingDirection.Left),
-                        playfields[3] = new TestPlayfield(ScrollingDirection.Right)
+                        scrollContainers[2] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = playfields[2] = new TestPlayfield()
+                        },
+                        scrollContainers[3] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = playfields[3] = new TestPlayfield()
+                        }
                     }
                 }
             });
@@ -60,7 +74,7 @@ namespace osu.Game.Tests.Visual
         {
             base.LoadComplete();
 
-            playfields.ForEach(p => p.ControlPoints.Add(new MultiplierControlPoint(0)));
+            scrollContainers.ForEach(c => c.ControlPoints.Add(new MultiplierControlPoint(0)));
 
             for (int i = 0; i <= 5000; i += 1000)
                 addHitObject(Time.Current + i);
@@ -81,12 +95,15 @@ namespace osu.Game.Tests.Visual
 
         private void addControlPoint(double time)
         {
+            scrollContainers.ForEach(c =>
+            {
+                c.ControlPoints.Add(new MultiplierControlPoint(time) { DifficultyPoint = { SpeedMultiplier = 3 } });
+                c.ControlPoints.Add(new MultiplierControlPoint(time + 2000) { DifficultyPoint = { SpeedMultiplier = 2 } });
+                c.ControlPoints.Add(new MultiplierControlPoint(time + 3000) { DifficultyPoint = { SpeedMultiplier = 1 } });
+            });
+
             playfields.ForEach(p =>
             {
-                p.ControlPoints.Add(new MultiplierControlPoint(time) { DifficultyPoint = { SpeedMultiplier = 3 } });
-                p.ControlPoints.Add(new MultiplierControlPoint(time + 2000) { DifficultyPoint = { SpeedMultiplier = 2 } });
-                p.ControlPoints.Add(new MultiplierControlPoint(time + 3000) { DifficultyPoint = { SpeedMultiplier = 1 } });
-
                 TestDrawableControlPoint createDrawablePoint(double t)
                 {
                     var obj = new TestDrawableControlPoint(p.Direction, t);
@@ -119,23 +136,14 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        private void setScrollAlgorithm(ScrollAlgorithm algorithm) => playfields.ForEach(p => p.ScrollAlgorithm = algorithm);
+        private void setScrollAlgorithm(ScrollAlgorithm algorithm) => scrollContainers.ForEach(c => c.ScrollAlgorithm = algorithm);
 
         private class TestPlayfield : ScrollingPlayfield
         {
-            public new ScrollingDirection Direction => base.Direction;
+            public new ScrollingDirection Direction => base.Direction.Value;
 
-            public SortedList<MultiplierControlPoint> ControlPoints => algorithm.ControlPoints;
-
-            public ScrollAlgorithm ScrollAlgorithm { set => algorithm.Algorithm = value; }
-
-            [Cached(Type = typeof(IScrollAlgorithm))]
-            private readonly TestScrollAlgorithm algorithm = new TestScrollAlgorithm();
-
-            public TestPlayfield(ScrollingDirection direction)
+            public TestPlayfield()
             {
-                base.Direction.Value = direction;
-
                 Padding = new MarginPadding(2);
 
                 InternalChildren = new Drawable[]
@@ -153,49 +161,6 @@ namespace osu.Game.Tests.Visual
                     }
                 };
             }
-        }
-
-        private class TestScrollAlgorithm : IScrollAlgorithm
-        {
-            public readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
-
-            private IScrollAlgorithm implementation;
-
-            public TestScrollAlgorithm()
-            {
-                Algorithm = ScrollAlgorithm.Constant;
-            }
-
-            public ScrollAlgorithm Algorithm
-            {
-                set
-                {
-                    switch (value)
-                    {
-                        case ScrollAlgorithm.Constant:
-                            implementation = new ConstantScrollAlgorithm();
-                            break;
-                        case ScrollAlgorithm.Overlapping:
-                            implementation = new OverlappingScrollAlgorithm(ControlPoints);
-                            break;
-                        case ScrollAlgorithm.Sequential:
-                            implementation = new SequentialScrollAlgorithm(ControlPoints);
-                            break;
-                    }
-                }
-            }
-
-            public double GetDisplayStartTime(double time, double timeRange)
-                => implementation.GetDisplayStartTime(time, timeRange);
-
-            public float GetLength(double startTime, double endTime, double timeRange, float scrollLength)
-                => implementation.GetLength(startTime, endTime, timeRange, scrollLength);
-
-            public float PositionAt(double time, double currentTime, double timeRange, float scrollLength)
-                => implementation.PositionAt(time, currentTime, timeRange, scrollLength);
-
-            public void Reset()
-                => implementation.Reset();
         }
 
         private class TestDrawableControlPoint : DrawableHitObject<HitObject>

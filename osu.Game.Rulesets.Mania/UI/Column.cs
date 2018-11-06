@@ -16,7 +16,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class Column : ManiaScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
+    public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
         private const float column_width = 45;
         private const float special_column_width = 70;
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             explosionContainer.Add(new HitExplosion(judgedObject)
             {
-                Anchor = Direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre
+                Anchor = Direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre
             });
         }
 

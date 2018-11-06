@@ -22,10 +22,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
             MaxValue = double.MaxValue
         };
 
-        public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
         [Resolved]
         private IScrollAlgorithm algorithm { get; set; }
+
+        [Resolved]
+        private IScrollingInfo scrollingInfo { get; set; }
 
         private Cached initialStateCache = new Cached();
 
@@ -34,7 +37,13 @@ namespace osu.Game.Rulesets.UI.Scrolling
             RelativeSizeAxes = Axes.Both;
 
             TimeRange.ValueChanged += _ => initialStateCache.Invalidate();
-            Direction.ValueChanged += _ => initialStateCache.Invalidate();
+            direction.ValueChanged += _ => initialStateCache.Invalidate();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            direction.BindTo(scrollingInfo.Direction);
         }
 
         public override void Add(DrawableHitObject hitObject)
@@ -67,7 +76,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (!initialStateCache.IsValid)
             {
-                switch (Direction.Value)
+                switch (direction.Value)
                 {
                     case ScrollingDirection.Up:
                     case ScrollingDirection.Down:
@@ -92,7 +101,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (hitObject.HitObject is IHasEndTime endTime)
             {
-                switch (Direction.Value)
+                switch (direction.Value)
                 {
                     case ScrollingDirection.Up:
                     case ScrollingDirection.Down:
@@ -125,7 +134,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private void updatePosition(DrawableHitObject hitObject, double currentTime)
         {
-            switch (Direction.Value)
+            switch (direction.Value)
             {
                 case ScrollingDirection.Up:
                     hitObject.Y = algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);

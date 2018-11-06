@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -23,6 +24,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
         where TObject : HitObject
         where TPlayfield : ScrollingPlayfield
     {
+        protected readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
+
+        protected virtual ScrollAlgorithm ScrollAlgorithm => ScrollAlgorithm.Sequential;
+
         /// <summary>
         /// Provides the default <see cref="MultiplierControlPoint"/>s that adjust the scrolling rate of <see cref="HitObject"/>s
         /// inside this <see cref="RulesetContainer{TPlayfield,TObject}"/>.
@@ -30,7 +35,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <returns></returns>
         private readonly SortedList<MultiplierControlPoint> controlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 
-        protected virtual ScrollAlgorithm ScrollAlgorithm => ScrollAlgorithm.Sequential;
+        private IScrollingInfo scrollingInfo;
 
         [Cached(Type = typeof(IScrollAlgorithm))]
         private readonly IScrollAlgorithm algorithm;
@@ -55,6 +60,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
         [BackgroundDependencyLoader]
         private void load()
         {
+            scrollingInfo.Direction.BindTo(Direction);
+
             // Calculate default multiplier control points
             var lastTimingPoint = new TimingControlPoint();
             var lastDifficultyPoint = new DifficultyControlPoint();
@@ -98,6 +105,23 @@ namespace osu.Game.Rulesets.UI.Scrolling
             // If we have no control points, add a default one
             if (controlPoints.Count == 0)
                 controlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier });
+        }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            if ((scrollingInfo = dependencies.Get<IScrollingInfo>()) == null)
+                dependencies.CacheAs(scrollingInfo = CreateScrollingInfo());
+
+            return dependencies;
+        }
+
+        protected virtual IScrollingInfo CreateScrollingInfo() => new ScrollingInfo();
+
+        private class ScrollingInfo : IScrollingInfo
+        {
+            public IBindable<ScrollingDirection> Direction { get; } = new Bindable<ScrollingDirection>();
         }
     }
 }

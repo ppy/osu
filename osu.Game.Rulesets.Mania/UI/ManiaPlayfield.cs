@@ -10,11 +10,12 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI.Scrolling;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : ManiaScrollingPlayfield
+    public class ManiaPlayfield : ScrollingPlayfield
     {
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
 

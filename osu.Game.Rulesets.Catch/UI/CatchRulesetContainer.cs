@@ -24,6 +24,7 @@ namespace osu.Game.Rulesets.Catch.UI
         public CatchRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+            Direction.Value = ScrollingDirection.Down;
         }
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);
