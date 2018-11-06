@@ -25,7 +25,13 @@ namespace osu.Game.Tournament.Tests
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            Ladder = manager.CreateInfo();
+
+            var newInfo = manager.CreateInfo();
+
+            Ladder.Teams = newInfo.Teams;
+            Ladder.Groupings = newInfo.Groupings;
+            Ladder.Pairings = newInfo.Pairings;
+            Ladder.Progressions = newInfo.Progressions;
         }
     }
 }

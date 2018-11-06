@@ -23,77 +23,116 @@ using OpenTK;
 
 namespace osu.Game.Tournament.Screens.Showcase
 {
-    public class ShowcaseScreen : OsuScreen
+    public class SongBar : CompositeDrawable
     {
-        private readonly Container panel;
-        private readonly Container panelContents;
+        private BeatmapInfo beatmap;
 
-        [Resolved]
-        private APIAccess api { get; set; }
+        public BeatmapInfo Beatmap
+        {
+            get { return beatmap; }
+            set
+            {
+                if (beatmap == value)
+                    return;
 
-        [Resolved]
-        private RulesetStore rulesets { get; set; }
+                beatmap = value;
+                update();
+            }
+        }
 
-        private int lastBeatmapId;
-        private int lastMods;
+        private LegacyMods mods;
+
+        public LegacyMods Mods
+        {
+            get { return mods; }
+            set
+            {
+                mods = value;
+                update();
+            }
+        }
+
+        private Container panelContents;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            var stable = new StableStorage();
+            RelativeSizeAxes = Axes.Both;
 
-            const string file_ipc_filename = "ipc.txt";
-
-            if (stable.Exists(file_ipc_filename))
+            InternalChildren = new Drawable[]
             {
-                Scheduler.AddDelayed(delegate
+                new Container
                 {
-                    try
+                    Masking = true,
+                    RelativeSizeAxes = Axes.X,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Y = -10,
+                    Width = 0.95f,
+                    Height = TournamentBeatmapPanel.HEIGHT,
+                    CornerRadius = TournamentBeatmapPanel.HEIGHT / 2,
+                    Children = new Drawable[]
                     {
-                        using (var stream = stable.GetStream(file_ipc_filename))
-                        using (var sr = new StreamReader(stream))
+                        new Box
                         {
-                            var beatmapId = int.Parse(sr.ReadLine());
-                            var mods = int.Parse(sr.ReadLine());
-
-                            if (lastBeatmapId == beatmapId)
-                                return;
-
-                            lastMods = mods;
-                            lastBeatmapId = beatmapId;
-
-                            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = beatmapId });
-                            req.Success += success;
-                            api.Queue(req);
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = OsuColour.Gray(0.93f),
+                        },
+                        new Container
+                        {
+                            Masking = true,
+                            CornerRadius = TournamentBeatmapPanel.HEIGHT / 2,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            Width = 0.7f,
+                            Children = new Drawable[]
+                            {
+                                new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    Colour = OsuColour.Gray(0.86f),
+                                },
+                                panelContents = new Container
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                }
+                            }
+                        },
+                        new OsuLogo
+                        {
+                            Triangles = false,
+                            Colour = OsuColour.Gray(0.33f),
+                            Scale = new Vector2(0.08f),
+                            Margin = new MarginPadding(50),
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
                         }
                     }
-                    catch
-                    {
-                        // file might be in use.
-                    }
-                }, 250, true);
-            }
+                }
+            };
         }
 
-        private void success(APIBeatmap apiBeatmap)
+        private void update()
         {
-            panel.FadeInFromZero(300, Easing.OutQuint);
+            if (beatmap == null)
+            {
+                panelContents.Clear();
+                return;
+            }
 
-            var beatmap = apiBeatmap.ToBeatmap(rulesets);
-
-            var legacyMods = (LegacyMods)lastMods;
             var bpm = beatmap.BeatmapSet.OnlineInfo.BPM;
             var length = beatmap.OnlineInfo.Length;
             string extra = "";
 
             var ar = beatmap.BaseDifficulty.ApproachRate;
-            if ((legacyMods & LegacyMods.HardRock) > 0)
+            if ((mods & LegacyMods.HardRock) > 0)
             {
                 //ar *= 1.4f;
                 extra = "*";
             }
 
-            if ((legacyMods & LegacyMods.DoubleTime) > 0)
+            if ((mods & LegacyMods.DoubleTime) > 0)
             {
                 //ar *= 1.5f;
                 bpm *= 1.5f;
@@ -142,63 +181,73 @@ namespace osu.Game.Tournament.Screens.Showcase
                 }
             };
         }
+    }
+
+    public class ShowcaseScreen : OsuScreen
+    {
+        [Resolved]
+        private APIAccess api { get; set; }
+
+        [Resolved]
+        private RulesetStore rulesets { get; set; }
+
+        private int lastBeatmapId;
+        private int lastMods;
+
+        private readonly SongBar songBar;
 
         public ShowcaseScreen()
         {
-            RelativeSizeAxes = Axes.Both;
-
-            Children = new Drawable[]
+            Add(songBar = new SongBar
             {
-                new Container
+                Anchor = Anchor.BottomCentre,
+                Origin = Anchor.BottomCentre
+            });
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var stable = new StableStorage();
+
+            const string file_ipc_filename = "ipc.txt";
+
+            if (stable.Exists(file_ipc_filename))
+            {
+                Scheduler.AddDelayed(delegate
                 {
-                    Masking = true,
-                    RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Y = -10,
-                    Width = 0.95f,
-                    Height = TournamentBeatmapPanel.HEIGHT,
-                    CornerRadius = TournamentBeatmapPanel.HEIGHT / 2,
-                    Children = new Drawable[]
+                    try
                     {
-                        new Box
+                        using (var stream = stable.GetStream(file_ipc_filename))
+                        using (var sr = new StreamReader(stream))
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.Gray(0.93f),
-                        },
-                        panel = new Container
-                        {
-                            Masking = true,
-                            CornerRadius = TournamentBeatmapPanel.HEIGHT / 2,
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Width = 0.7f,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = OsuColour.Gray(0.86f),
-                                },
-                                panelContents = new Container
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                }
-                            }
-                        },
-                        new OsuLogo
-                        {
-                            Triangles = false,
-                            Colour = OsuColour.Gray(0.33f),
-                            Scale = new Vector2(0.08f),
-                            Margin = new MarginPadding(50),
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
+                            var beatmapId = int.Parse(sr.ReadLine());
+                            var mods = int.Parse(sr.ReadLine());
+
+                            if (lastBeatmapId == beatmapId)
+                                return;
+
+                            lastMods = mods;
+                            lastBeatmapId = beatmapId;
+
+                            var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = beatmapId });
+                            req.Success += success;
+                            api.Queue(req);
                         }
                     }
-                }
-            };
+                    catch
+                    {
+                        // file might be in use.
+                    }
+                }, 250, true);
+            }
+        }
+
+        private void success(APIBeatmap apiBeatmap)
+        {
+            songBar.FadeInFromZero(300, Easing.OutQuint);
+            songBar.Mods = (LegacyMods)lastMods;
+            songBar.Beatmap = apiBeatmap.ToBeatmap(rulesets);
         }
 
         /// <summary>
