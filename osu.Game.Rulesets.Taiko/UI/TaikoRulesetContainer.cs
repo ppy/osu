@@ -14,6 +14,7 @@ using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Taiko.Replays;
 using System.Linq;
 using osu.Framework.Input;
+using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -21,6 +22,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public class TaikoRulesetContainer : ScrollingRulesetContainer<TaikoPlayfield, TaikoHitObject>
     {
+        protected override ScrollAlgorithm ScrollAlgorithm => ScrollAlgorithm.Overlapping;
+
         public TaikoRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {

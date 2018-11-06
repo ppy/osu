@@ -3,6 +3,7 @@
 
 using osu.Framework.Input;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
@@ -18,6 +19,8 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchRulesetContainer : ScrollingRulesetContainer<CatchPlayfield, CatchHitObject>
     {
+        protected override ScrollAlgorithm ScrollAlgorithm => ScrollAlgorithm.Constant;
+
         public CatchRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {

@@ -4,13 +4,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
+using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
@@ -27,11 +28,28 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// inside this <see cref="RulesetContainer{TPlayfield,TObject}"/>.
         /// </summary>
         /// <returns></returns>
-        protected readonly SortedList<MultiplierControlPoint> DefaultControlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
+        private readonly SortedList<MultiplierControlPoint> controlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
+
+        protected virtual ScrollAlgorithm ScrollAlgorithm => ScrollAlgorithm.Sequential;
+
+        [Cached(Type = typeof(IScrollAlgorithm))]
+        private readonly IScrollAlgorithm algorithm;
 
         protected ScrollingRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+            switch (ScrollAlgorithm)
+            {
+                case ScrollAlgorithm.Sequential:
+                    algorithm = new SequentialScrollAlgorithm(controlPoints);
+                    break;
+                case ScrollAlgorithm.Overlapping:
+                    algorithm = new OverlappingScrollAlgorithm(controlPoints);
+                    break;
+                case ScrollAlgorithm.Constant:
+                    algorithm = new ConstantScrollAlgorithm();
+                    break;
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -75,19 +93,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
                             // Collapse sections with the same start time
                             .GroupBy(s => s.StartTime).Select(g => g.Last()).OrderBy(s => s.StartTime);
 
-            DefaultControlPoints.AddRange(timingChanges);
+            controlPoints.AddRange(timingChanges);
 
             // If we have no control points, add a default one
-            if (DefaultControlPoints.Count == 0)
-                DefaultControlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier });
-
-            DefaultControlPoints.ForEach(c => applySpeedAdjustment(c, Playfield));
-        }
-
-        private void applySpeedAdjustment(MultiplierControlPoint controlPoint, ScrollingPlayfield playfield)
-        {
-            playfield.HitObjects.AddControlPoint(controlPoint);
-            playfield.NestedPlayfields?.OfType<ScrollingPlayfield>().ForEach(p => applySpeedAdjustment(controlPoint, p));
+            if (controlPoints.Count == 0)
+                controlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier });
         }
     }
 }
