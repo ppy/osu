@@ -20,8 +20,8 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(SliderSelectionMask),
-            typeof(SliderCircleSelectionMask),
+            typeof(SliderSelectionBlueprint),
+            typeof(SliderCircleSelectionBlueprint),
             typeof(SliderBodyPiece),
             typeof(SliderCircle),
             typeof(PathControlPointVisualiser),
@@ -50,6 +50,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             Add(drawableObject = new DrawableSlider(slider));
         }
 
-        protected override SelectionMask CreateMask() => new SliderSelectionMask(drawableObject);
+        protected override SelectionBlueprint CreateMask() => new SliderSelectionBlueprint(drawableObject);
     }
 }

@@ -8,9 +8,9 @@ using osu.Game.Rulesets.Osu.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
 {
-    public class SliderCircleSelectionMask : SelectionMask
+    public class SliderCircleSelectionBlueprint : SelectionBlueprint
     {
-        public SliderCircleSelectionMask(DrawableOsuHitObject hitObject, Slider slider, SliderPosition position)
+        public SliderCircleSelectionBlueprint(DrawableOsuHitObject hitObject, Slider slider, SliderPosition position)
             : base(hitObject)
         {
             InternalChild = new SliderCirclePiece(slider, position);

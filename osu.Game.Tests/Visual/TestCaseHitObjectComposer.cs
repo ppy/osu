@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual
             typeof(BlueprintContainer),
             typeof(NotNullAttribute),
             typeof(HitCirclePiece),
-            typeof(HitCircleSelectionMask),
+            typeof(HitCircleSelectionBlueprint),
             typeof(HitCirclePlacementMask),
         };
 

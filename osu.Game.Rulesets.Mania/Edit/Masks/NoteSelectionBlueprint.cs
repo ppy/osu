@@ -9,9 +9,9 @@ using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Mania.Edit.Masks
 {
-    public class NoteSelectionMask : SelectionMask
+    public class NoteSelectionBlueprint : SelectionBlueprint
     {
-        public NoteSelectionMask(DrawableNote note)
+        public NoteSelectionBlueprint(DrawableNote note)
             : base(note)
         {
             Scale = note.Scale;

@@ -15,7 +15,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Edit.Masks
 {
-    public class HoldNoteSelectionMask : SelectionMask
+    public class HoldNoteSelectionBlueprint : SelectionBlueprint
     {
         public new DrawableHoldNote HitObject => (DrawableHoldNote)base.HitObject;
 
@@ -23,13 +23,13 @@ namespace osu.Game.Rulesets.Mania.Edit.Masks
 
         private readonly BodyPiece body;
 
-        public HoldNoteSelectionMask(DrawableHoldNote hold)
+        public HoldNoteSelectionBlueprint(DrawableHoldNote hold)
             : base(hold)
         {
             InternalChildren = new Drawable[]
             {
-                new HoldNoteNoteSelectionMask(hold.Head),
-                new HoldNoteNoteSelectionMask(hold.Tail),
+                new HoldNoteNoteSelectionBlueprint(hold.Head),
+                new HoldNoteNoteSelectionBlueprint(hold.Tail),
                 body = new BodyPiece
                 {
                     AccentColour = Color4.Transparent
@@ -59,9 +59,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Masks
                 Y -= HitObject.Tail.DrawHeight;
         }
 
-        private class HoldNoteNoteSelectionMask : NoteSelectionMask
+        private class HoldNoteNoteSelectionBlueprint : NoteSelectionBlueprint
         {
-            public HoldNoteNoteSelectionMask(DrawableNote note)
+            public HoldNoteNoteSelectionBlueprint(DrawableNote note)
                 : base(note)
             {
                 Select();

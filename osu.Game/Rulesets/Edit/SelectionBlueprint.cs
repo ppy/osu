@@ -17,31 +17,31 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A mask placed above a <see cref="DrawableHitObject"/> adding editing functionality.
     /// </summary>
-    public class SelectionMask : CompositeDrawable, IStateful<SelectionState>
+    public class SelectionBlueprint : CompositeDrawable, IStateful<SelectionState>
     {
         /// <summary>
-        /// Invoked when this <see cref="SelectionMask"/> has been selected.
+        /// Invoked when this <see cref="SelectionBlueprint"/> has been selected.
         /// </summary>
-        public event Action<SelectionMask> Selected;
+        public event Action<SelectionBlueprint> Selected;
 
         /// <summary>
-        /// Invoked when this <see cref="SelectionMask"/> has been deselected.
+        /// Invoked when this <see cref="SelectionBlueprint"/> has been deselected.
         /// </summary>
-        public event Action<SelectionMask> Deselected;
+        public event Action<SelectionBlueprint> Deselected;
 
         /// <summary>
-        /// Invoked when this <see cref="SelectionMask"/> has requested selection.
+        /// Invoked when this <see cref="SelectionBlueprint"/> has requested selection.
         /// Will fire even if already selected. Does not actually perform selection.
         /// </summary>
-        public event Action<SelectionMask, InputState> SelectionRequested;
+        public event Action<SelectionBlueprint, InputState> SelectionRequested;
 
         /// <summary>
-        /// Invoked when this <see cref="SelectionMask"/> has requested drag.
+        /// Invoked when this <see cref="SelectionBlueprint"/> has requested drag.
         /// </summary>
-        public event Action<SelectionMask, Vector2, InputState> DragRequested;
+        public event Action<SelectionBlueprint, Vector2, InputState> DragRequested;
 
         /// <summary>
-        /// The <see cref="DrawableHitObject"/> which this <see cref="SelectionMask"/> applies to.
+        /// The <see cref="DrawableHitObject"/> which this <see cref="SelectionBlueprint"/> applies to.
         /// </summary>
         public readonly DrawableHitObject HitObject;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Edit
         public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
 
-        public SelectionMask(DrawableHitObject hitObject)
+        public SelectionBlueprint(DrawableHitObject hitObject)
         {
             HitObject = hitObject;
 
@@ -86,12 +86,12 @@ namespace osu.Game.Rulesets.Edit
         }
 
         /// <summary>
-        /// Selects this <see cref="SelectionMask"/>, causing it to become visible.
+        /// Selects this <see cref="SelectionBlueprint"/>, causing it to become visible.
         /// </summary>
         public void Select() => State = SelectionState.Selected;
 
         /// <summary>
-        /// Deselects this <see cref="SelectionMask"/>, causing it to become invisible.
+        /// Deselects this <see cref="SelectionBlueprint"/>, causing it to become invisible.
         /// </summary>
         public void Deselect() => State = SelectionState.NotSelected;
 
@@ -135,12 +135,12 @@ namespace osu.Game.Rulesets.Edit
         }
 
         /// <summary>
-        /// The screen-space point that causes this <see cref="SelectionMask"/> to be selected.
+        /// The screen-space point that causes this <see cref="SelectionBlueprint"/> to be selected.
         /// </summary>
         public virtual Vector2 SelectionPoint => HitObject.ScreenSpaceDrawQuad.Centre;
 
         /// <summary>
-        /// The screen-space quad that outlines this <see cref="SelectionMask"/> for selections.
+        /// The screen-space quad that outlines this <see cref="SelectionBlueprint"/> for selections.
         /// </summary>
         public virtual Quad SelectionQuad => HitObject.ScreenSpaceDrawQuad;
     }

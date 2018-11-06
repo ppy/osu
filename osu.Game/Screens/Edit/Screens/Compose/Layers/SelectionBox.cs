@@ -19,13 +19,13 @@ using OpenTK.Input;
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
     /// <summary>
-    /// A box which surrounds <see cref="SelectionMask"/>s and provides interactive handles, context menus etc.
+    /// A box which surrounds <see cref="SelectionBlueprint"/>s and provides interactive handles, context menus etc.
     /// </summary>
     public class SelectionBox : CompositeDrawable
     {
         public const float BORDER_RADIUS = 2;
 
-        private readonly List<SelectionMask> selectedMasks;
+        private readonly List<SelectionBlueprint> selectedMasks;
 
         private Drawable outline;
 
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         public SelectionBox()
         {
-            selectedMasks = new List<SelectionMask>();
+            selectedMasks = new List<SelectionBlueprint>();
 
             RelativeSizeAxes = Axes.Both;
             AlwaysPresent = true;
@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 
         #region User Input Handling
 
-        public void HandleDrag(SelectionMask m, Vector2 delta, InputState state)
+        public void HandleDrag(SelectionBlueprint m, Vector2 delta, InputState state)
         {
             // Todo: Various forms of snapping
 
@@ -103,16 +103,16 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// <summary>
         /// Handle a mask becoming selected.
         /// </summary>
-        /// <param name="mask">The mask.</param>
-        public void HandleSelected(SelectionMask mask) => selectedMasks.Add(mask);
+        /// <param name="blueprint">The mask.</param>
+        public void HandleSelected(SelectionBlueprint blueprint) => selectedMasks.Add(blueprint);
 
         /// <summary>
         /// Handle a mask becoming deselected.
         /// </summary>
-        /// <param name="mask">The mask.</param>
-        public void HandleDeselected(SelectionMask mask)
+        /// <param name="blueprint">The mask.</param>
+        public void HandleDeselected(SelectionBlueprint blueprint)
         {
-            selectedMasks.Remove(mask);
+            selectedMasks.Remove(blueprint);
 
             // We don't want to update visibility if > 0, since we may be deselecting masks during drag-selection
             if (selectedMasks.Count == 0)
@@ -122,23 +122,23 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         /// <summary>
         /// Handle a mask requesting selection.
         /// </summary>
-        /// <param name="mask">The mask.</param>
-        public void HandleSelectionRequested(SelectionMask mask, InputState state)
+        /// <param name="blueprint">The mask.</param>
+        public void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
         {
             if (state.Keyboard.ControlPressed)
             {
-                if (mask.IsSelected)
-                    mask.Deselect();
+                if (blueprint.IsSelected)
+                    blueprint.Deselect();
                 else
-                    mask.Select();
+                    blueprint.Select();
             }
             else
             {
-                if (mask.IsSelected)
+                if (blueprint.IsSelected)
                     return;
 
                 DeselectAll?.Invoke();
-                mask.Select();
+                blueprint.Select();
             }
 
             UpdateVisibility();

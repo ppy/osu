@@ -9,11 +9,11 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks
 {
-    public class SpinnerSelectionMask : SelectionMask
+    public class SpinnerSelectionBlueprint : SelectionBlueprint
     {
         private readonly SpinnerPiece piece;
 
-        public SpinnerSelectionMask(DrawableSpinner spinner)
+        public SpinnerSelectionBlueprint(DrawableSpinner spinner)
             : base(spinner)
         {
             InternalChild = piece = new SpinnerPiece((Spinner)spinner.HitObject);
