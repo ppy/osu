@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Edit
         /// Creates a <see cref="SelectionBlueprint"/> for a specific <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
-        public virtual SelectionBlueprint CreateMaskFor(DrawableHitObject hitObject) => null;
+        public virtual SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) => null;
 
         /// <summary>
         /// Creates a <see cref="SelectionBox"/> which outlines <see cref="DrawableHitObject"/>s

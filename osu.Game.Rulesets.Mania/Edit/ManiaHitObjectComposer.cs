@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => Array.Empty<HitObjectCompositionTool>();
 
-        public override SelectionBlueprint CreateMaskFor(DrawableHitObject hitObject)
+        public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
         {
             switch (hitObject)
             {
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.Edit
                     return new HoldNoteSelectionBlueprint(holdNote);
             }
 
-            return base.CreateMaskFor(hitObject);
+            return base.CreateBlueprintFor(hitObject);
         }
     }
 }
