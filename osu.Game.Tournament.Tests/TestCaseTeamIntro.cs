@@ -24,7 +24,7 @@ namespace osu.Game.Tournament.Tests
             pairing.Grouping.Value = Ladder.Groupings.FirstOrDefault(g => g.Name == "Finals");
             currentMatch.Value = pairing;
 
-            Add(new TeamIntroScreen()
+            Add(new TeamIntroScreen
             {
                 FillMode = FillMode.Fit,
                 FillAspectRatio = 16 / 9f
