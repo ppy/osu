@@ -16,7 +16,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestCaseSliderSelectionMask : HitObjectSelectionMaskTestCase
+    public class TestCaseSliderSelectionBlueprint : SelectionBlueprintTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private readonly DrawableSlider drawableObject;
 
-        public TestCaseSliderSelectionMask()
+        public TestCaseSliderSelectionBlueprint()
         {
             var slider = new Slider
             {

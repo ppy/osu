@@ -13,12 +13,12 @@ using osu.Game.Screens.Edit.Screens.Compose;
 namespace osu.Game.Tests.Visual
 {
     [Cached(Type = typeof(IPlacementHandler))]
-    public abstract class HitObjectPlacementMaskTestCase : OsuTestCase, IPlacementHandler
+    public abstract class PlacementBlueprintTestCase : OsuTestCase, IPlacementHandler
     {
         private readonly Container hitObjectContainer;
         private PlacementBlueprint currentBlueprint;
 
-        protected HitObjectPlacementMaskTestCase()
+        protected PlacementBlueprintTestCase()
         {
             Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize = 2;
 

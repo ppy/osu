@@ -11,7 +11,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestCaseSliderPlacementMask : HitObjectPlacementMaskTestCase
+    public class TestCaseSliderPlacementBlueprint : PlacementBlueprintTestCase
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableSlider((Slider)hitObject);
         protected override PlacementBlueprint CreateMask() => new SliderPlacementBlueprint();

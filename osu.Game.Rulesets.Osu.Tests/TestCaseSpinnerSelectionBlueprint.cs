@@ -17,7 +17,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestCaseSpinnerSelectionMask : HitObjectSelectionMaskTestCase
+    public class TestCaseSpinnerSelectionBlueprint : SelectionBlueprintTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private readonly DrawableSpinner drawableSpinner;
 
-        public TestCaseSpinnerSelectionMask()
+        public TestCaseSpinnerSelectionBlueprint()
         {
             var spinner = new Spinner
             {
