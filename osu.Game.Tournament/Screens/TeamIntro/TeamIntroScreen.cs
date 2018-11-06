@@ -96,7 +96,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
                                 Text = "COMING UP NEXT",
-                                Font = "Exo2.0-SemiBold",
+                                Font = "Aquatico-Regular",
                                 TextSize = 15,
                             },
                             new OsuSpriteText
@@ -105,7 +105,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
                                 Text = group?.Name.Value ?? "Unknown Grouping",
-                                Font = "Exo2.0-Light",
+                                Font = "Aquatico-Light",
                                 Spacing = new Vector2(10, 0),
                                 TextSize = 50,
                             },
@@ -113,6 +113,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                             {
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
+                                Font = "Aquatico-Light",
                                 Colour = col,
                                 Text = (group?.StartDate.Value ?? DateTimeOffset.Now).ToString("dd MMMM HH:mm UTC"),
                                 TextSize = 20,
@@ -150,7 +151,6 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         Anchor = !left ? Anchor.CentreRight : Anchor.CentreLeft,
                         Origin = !left ? Anchor.CentreRight : Anchor.CentreLeft,
                         RelativePositionAxes = Axes.Both,
-                        X = left ? 0.1f : -0.1f,
                     },
                 };
 
@@ -160,6 +160,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         players.Add(new OsuSpriteText
                         {
                             Text = p.Username,
+                            Font = "Aquatico-Regular",
                             TextSize = 24,
                             Colour = colour,
                             Anchor = left ? Anchor.CentreRight : Anchor.CentreLeft,
@@ -194,7 +195,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                 Text = team?.FullName.ToUpper() ?? "???",
                                 TextSize = 40,
                                 Colour = Color4.Black,
-                                Font = "Exo2.0-Light",
+                                Font = "Aquatico-Light",
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                             },
