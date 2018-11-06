@@ -23,7 +23,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private Bindable<MatchPairing> globalSelection;
 
         [Resolved(CanBeNull = true)]
-        private LadderEditorInfo editorInfo { get; set; } = null;
+        private LadderEditorInfo editorInfo { get; set; }
 
         public DrawableMatchPairing(MatchPairing pairing)
         {

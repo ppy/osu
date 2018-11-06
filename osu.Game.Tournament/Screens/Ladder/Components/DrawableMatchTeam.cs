@@ -37,7 +37,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private LadderManager manager;
 
         [Resolved(CanBeNull = true)]
-        private LadderEditorInfo editorInfo { get; set; } = null;
+        private LadderEditorInfo editorInfo { get; set; }
 
         public DrawableMatchTeam(Bindable<TournamentTeam> team, MatchPairing pairing, bool losers)
             : base(team)

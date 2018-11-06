@@ -25,14 +25,14 @@ namespace osu.Game.Tournament.Screens.Showcase
 {
     public class ShowcaseScreen : OsuScreen
     {
-        private Container panel;
+        private readonly Container panel;
         private readonly Container panelContents;
 
         [Resolved]
-        private APIAccess api { get; set; } = null;
+        private APIAccess api { get; set; }
 
         [Resolved]
-        private RulesetStore rulesets { get; set; } = null;
+        private RulesetStore rulesets { get; set; }
 
         private int lastBeatmapId;
         private int lastMods;
