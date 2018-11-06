@@ -11,6 +11,7 @@ using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
 using osu.Game.Tournament.Screens.Drawings;
+using osu.Game.Tournament.Screens.Gameplay;
 using osu.Game.Tournament.Screens.Ladder;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osu.Game.Tournament.Screens.MapPool;
@@ -25,6 +26,7 @@ namespace osu.Game.Tournament.Screens
     {
         private LadderManager bracket;
         private MapPoolScreen mapPool;
+        private GameplayScreen gameplay;
         private TeamIntroScreen teamIntro;
         private DrawingsScreen drawings;
         private Container screens;
@@ -54,9 +56,12 @@ namespace osu.Game.Tournament.Screens
                             {
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Drawings", Action = () => setScreen(drawings) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Showcase", Action = () => setScreen(showcase) },
+                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket", Action = () => setScreen(bracket) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "TeamIntro", Action = () => setScreen(teamIntro) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "MapPool", Action = () => setScreen(mapPool) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket", Action = () => setScreen(bracket) },
+                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Gameplay", Action = () => setScreen(gameplay) },
                             }
                         },
                     },
@@ -89,7 +94,8 @@ namespace osu.Game.Tournament.Screens
                                 mapPool = new MapPoolScreen(ladder.Groupings.First(g => g.Name == "Finals")),
                                 teamIntro = new TeamIntroScreen(ladder.Teams.First(t => t.Acronym == "USA"), ladder.Teams.First(t => t.Acronym == "JPN"),
                                     ladder.Groupings.First(g => g.Name == "Finals")),
-                                drawings = new DrawingsScreen()
+                                drawings = new DrawingsScreen(),
+                                gameplay = new GameplayScreen()
                             }
                         },
                     }
