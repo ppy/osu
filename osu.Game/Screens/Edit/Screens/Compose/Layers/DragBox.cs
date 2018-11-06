@@ -8,15 +8,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Game.Rulesets.Edit;
 using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Screens.Compose.Layers
 {
     /// <summary>
-    /// A layer that handles and displays drag selection for a collection of <see cref="SelectionMask"/>s.
+    /// A box that displays the drag selection and provides selection events for users to handle.
     /// </summary>
-    public class DragLayer : CompositeDrawable
+    public class DragBox : CompositeDrawable
     {
         private readonly Action<RectangleF> performSelection;
 
@@ -28,10 +27,10 @@ namespace osu.Game.Screens.Edit.Screens.Compose.Layers
         private Drawable box;
 
         /// <summary>
-        /// Creates a new <see cref="DragLayer"/>.
+        /// Creates a new <see cref="DragBox"/>.
         /// </summary>
-        /// <param name="maskContainer">The selectable <see cref="SelectionMask"/>s.</param>
-        public DragLayer(Action<RectangleF> performSelection)
+        /// <param name="performSelection">A delegate that performs drag selection.</param>
+        public DragBox(Action<RectangleF> performSelection)
         {
             this.performSelection = performSelection;
 
