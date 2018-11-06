@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
@@ -59,6 +60,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             if (direction.Value == ScrollingDirection.Down)
                 Y -= HitObject.Tail.DrawHeight;
         }
+
+        public override Quad SelectionQuad => ScreenSpaceDrawQuad;
 
         private class HoldNoteNoteSelectionBlueprint : NoteSelectionBlueprint
         {
