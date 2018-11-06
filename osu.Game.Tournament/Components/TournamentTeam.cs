@@ -39,7 +39,7 @@ namespace osu.Game.Tournament.Components
         }
 
         [JsonProperty]
-        public List<User> Players { get; set; }
+        public List<User> Players { get; set; } = new List<User>();
 
         public override string ToString() => FullName ?? Acronym;
     }
