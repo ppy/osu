@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using OpenTK;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
+namespace osu.Game.Screens.Edit.Screens.Compose.Components.Timeline
 {
     public class CentreMarker : CompositeDrawable
     {

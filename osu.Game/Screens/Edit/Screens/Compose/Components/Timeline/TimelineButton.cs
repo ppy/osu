@@ -2,15 +2,15 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using OpenTK;
+using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
+namespace osu.Game.Screens.Edit.Screens.Compose.Components.Timeline
 {
     public class TimelineButton : CompositeDrawable
     {

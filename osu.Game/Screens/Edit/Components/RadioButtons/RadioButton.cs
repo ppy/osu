@@ -4,7 +4,7 @@
 using System;
 using osu.Framework.Configuration;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.RadioButtons
+namespace osu.Game.Screens.Edit.Components.RadioButtons
 {
     public class RadioButton
     {

@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using OpenTK.Graphics;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.Layers
+namespace osu.Game.Screens.Edit.Screens.Compose.Components
 {
     /// <summary>
     /// A box that displays the drag selection and provides selection events for users to handle.

@@ -1,14 +1,14 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using OpenTK;
 
-namespace osu.Game.Screens.Edit.Screens.Compose.Timeline
+namespace osu.Game.Screens.Edit.Screens.Compose.Components.Timeline
 {
     public class TimelineArea : CompositeDrawable
     {

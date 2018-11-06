@@ -19,7 +19,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 
-namespace osu.Game.Screens.Edit.Screens.Compose
+namespace osu.Game.Screens.Edit.Screens.Compose.Components
 {
     public class BeatDivisorControl : CompositeDrawable
     {
