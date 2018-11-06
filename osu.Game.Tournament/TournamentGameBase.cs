@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Drawing;
 using System.IO;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
@@ -27,15 +28,19 @@ namespace osu.Game.Tournament
         [Cached]
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
+        private Bindable<Size> windowSize;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             return dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
         }
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load(Storage storage, FrameworkConfigManager frameworkConfig)
         {
             this.storage = storage;
+
+            windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
 
             string content = null;
             if (storage.Exists(bracket_filename))
@@ -79,6 +84,18 @@ namespace osu.Game.Tournament
         protected override void LoadComplete()
         {
             MenuCursorContainer.Cursor.Alpha = 0;
+        }
+
+        protected override void Update()
+        {
+
+            base.Update();
+            var minWidth = (int)(windowSize.Value.Height / 9f * 16 + 400);
+            if (windowSize.Value.Width < minWidth)
+            {
+                // todo: can be removed after ppy/osu-framework#1975
+                windowSize.Value = Host.Window.ClientSize = new Size(minWidth, windowSize.Value.Height);
+            }
         }
 
         protected virtual void SaveChanges()
