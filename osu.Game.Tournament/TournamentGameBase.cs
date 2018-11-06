@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
@@ -43,6 +44,11 @@ namespace osu.Game.Tournament
         [BackgroundDependencyLoader]
         private void load(Storage storage, FrameworkConfigManager frameworkConfig)
         {
+            Resources.AddStore(new DllResourceStore(@"osu.Game.Tournament.dll"));
+
+            Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Regular"));
+            Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Light"));
+
             this.storage = storage;
 
             windowSize = frameworkConfig.GetBindable<Size>(FrameworkSetting.WindowedSize);
