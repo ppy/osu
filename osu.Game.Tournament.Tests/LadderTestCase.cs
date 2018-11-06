@@ -9,8 +9,7 @@ namespace osu.Game.Tournament.Tests
 {
     public class LadderTestCase : OsuTestCase
     {
-
         [Resolved]
-        protected LadderInfo Ladder { get; set; }
+        protected LadderInfo Ladder { get; private set; }
     }
 }

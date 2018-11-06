@@ -7,7 +7,7 @@ using osu.Game.Screens.Backgrounds;
 
 namespace osu.Game.Tournament.Tests
 {
-    public class TournamentTestBrowser : TournamentGame
+    public class TournamentTestBrowser : TournamentGameBase
     {
         protected override void LoadComplete()
         {
