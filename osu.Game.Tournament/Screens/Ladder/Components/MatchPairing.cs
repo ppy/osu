@@ -43,6 +43,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [JsonIgnore]
         public readonly Bindable<MatchPairing> LosersProgression = new Bindable<MatchPairing>();
 
+        /// <summary>
+        /// Should not be set directly. Use LadderInfo.CurrentMatch.Value = this instead.
+        /// </summary>
+        public readonly Bindable<bool> Current = new Bindable<bool>();
+
         public readonly Bindable<DateTimeOffset> Date = new Bindable<DateTimeOffset>();
 
         public Point Position;

@@ -20,6 +20,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         public readonly MatchPairing Pairing;
         private readonly FillFlowContainer<DrawableMatchTeam> flow;
         private readonly Drawable selectionBox;
+        private readonly Drawable currentMatchSelectionBox;
         private Bindable<MatchPairing> globalSelection;
 
         [Resolved(CanBeNull = true)]
@@ -49,6 +50,18 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Colour = Color4.YellowGreen,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
+                currentMatchSelectionBox = new Container
+                {
+                    CornerRadius = 5,
+                    Masking = true,
+                    Scale = new Vector2(1.05f),
+                    RelativeSizeAxes = Axes.Both,
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Alpha = 0,
+                    Colour = Color4.OrangeRed,
+                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                },
                 flow = new FillFlowContainer<DrawableMatchTeam>
                 {
                     AutoSizeAxes = Axes.Both,
@@ -65,8 +78,17 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             pairing.Progression.BindValueChanged(_ => updateProgression());
             pairing.LosersProgression.BindValueChanged(_ => updateProgression());
             pairing.Losers.BindValueChanged(_ => updateTeams());
+            pairing.Current.BindValueChanged(_ => updateCurrentMatch(), true);
 
             updateTeams();
+        }
+
+        private void updateCurrentMatch()
+        {
+            if (Pairing.Current.Value)
+                currentMatchSelectionBox.Show();
+            else
+                currentMatchSelectionBox.Hide();
         }
 
         private bool selected;
@@ -144,7 +166,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             var instaWinAmount = Pairing.Grouping.Value.BestOf / 2;
 
-            Pairing.Completed.Value = Pairing.Grouping.Value.BestOf > 0 && (Pairing.Team1Score + Pairing.Team2Score >= Pairing.Grouping.Value.BestOf || Pairing.Team1Score > instaWinAmount || Pairing.Team2Score > instaWinAmount);
+            Pairing.Completed.Value = Pairing.Grouping.Value.BestOf > 0
+                                      && (Pairing.Team1Score + Pairing.Team2Score >= Pairing.Grouping.Value.BestOf || Pairing.Team1Score > instaWinAmount || Pairing.Team2Score > instaWinAmount);
         }
 
         protected override void LoadComplete()

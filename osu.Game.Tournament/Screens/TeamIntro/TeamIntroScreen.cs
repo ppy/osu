@@ -3,7 +3,6 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Video;
@@ -20,33 +19,42 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 {
     public class TeamIntroScreen : OsuScreen
     {
-        private VideoSprite background;
+        private Container mainContainer;
 
         [Resolved]
-        private Bindable<MatchPairing> currentMatch { get; set; }
+        private LadderInfo ladderInfo { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(Storage storage)
         {
             RelativeSizeAxes = Axes.Both;
 
-            background = new VideoSprite(storage.GetStream(@"BG Team - Both OWC.m4v"))
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Loop = true,
+                new VideoSprite(storage.GetStream(@"BG Team - Both OWC.m4v"))
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Loop = true,
+                },
+                mainContainer = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                }
             };
 
-            currentMatch.BindValueChanged(matchChanged, true);
+            ladderInfo.CurrentMatch.BindValueChanged(matchChanged, true);
         }
 
         private void matchChanged(MatchPairing pairing)
         {
             if (pairing == null)
-                return;
-
-            InternalChildren = new Drawable[]
             {
-                background,
+                mainContainer.Clear();
+                return;
+            }
+
+            mainContainer.Children = new Drawable[]
+            {
                 new TeamWithPlayers(pairing.Team1, true)
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -148,6 +156,8 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                         AutoSizeAxes = Axes.Both,
                         Spacing = new Vector2(0, 5),
                         Padding = new MarginPadding(20),
+
+
                         Anchor = !left ? Anchor.CentreRight : Anchor.CentreLeft,
                         Origin = !left ? Anchor.CentreRight : Anchor.CentreLeft,
                         RelativePositionAxes = Axes.Both,

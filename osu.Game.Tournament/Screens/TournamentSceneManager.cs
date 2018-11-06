@@ -13,7 +13,6 @@ using osu.Game.Screens;
 using osu.Game.Tournament.Screens.Drawings;
 using osu.Game.Tournament.Screens.Gameplay;
 using osu.Game.Tournament.Screens.Ladder;
-using osu.Game.Tournament.Screens.Ladder.Components;
 using osu.Game.Tournament.Screens.MapPool;
 using osu.Game.Tournament.Screens.Showcase;
 using osu.Game.Tournament.Screens.TeamIntro;
