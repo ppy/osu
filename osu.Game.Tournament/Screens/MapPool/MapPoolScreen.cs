@@ -7,10 +7,12 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using OpenTK;
 using OpenTK.Input;
@@ -22,6 +24,14 @@ namespace osu.Game.Tournament.Screens.MapPool
         private readonly FillFlowContainer<TournamentBeatmapPanel> maps;
 
         private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
+
+        private TeamColour pickColour;
+        private ChoiceType pickType;
+
+        private readonly TriangleButton buttonRedBan;
+        private readonly TriangleButton buttonBlueBan;
+        private readonly TriangleButton buttonRedPick;
+        private readonly TriangleButton buttonBluePick;
 
         public MapPoolScreen()
         {
@@ -71,13 +81,20 @@ namespace osu.Game.Tournament.Screens.MapPool
             };
         }
 
-        private TeamColour pickColour;
-        private ChoiceType pickType;
+        [BackgroundDependencyLoader]
+        private void load(LadderInfo ladder, FileBasedIPC ipc)
+        {
+            currentMatch.BindValueChanged(matchChanged);
+            currentMatch.BindTo(ladder.CurrentMatch);
 
-        private readonly TriangleButton buttonRedBan;
-        private readonly TriangleButton buttonBlueBan;
-        private readonly TriangleButton buttonRedPick;
-        private readonly TriangleButton buttonBluePick;
+            ipc.Beatmap.BindValueChanged(beatmapChanged);
+        }
+
+        private void beatmapChanged(BeatmapInfo beatmap)
+        {
+            if (beatmap.OnlineBeatmapID != null)
+                addForBeatmap(beatmap.OnlineBeatmapID.Value);
+        }
 
         private void setMode(TeamColour colour, ChoiceType choiceType)
         {
@@ -106,17 +123,8 @@ namespace osu.Game.Tournament.Screens.MapPool
             var map = maps.FirstOrDefault(m => m.ReceivePositionalInputAt(e.ScreenSpaceMousePosition));
             if (map != null)
             {
-                if (e.Button == MouseButton.Left)
-                {
-                    currentMatch.Value.PicksBans.Add(new BeatmapChoice
-                    {
-                        Team = pickColour,
-                        Type = pickType,
-                        BeatmapID = map.Beatmap.OnlineBeatmapID ?? -1
-                    });
-
-                    setNextMode();
-                }
+                if (e.Button == MouseButton.Left && map.Beatmap.OnlineBeatmapID != null)
+                    addForBeatmap(map.Beatmap.OnlineBeatmapID.Value);
                 else
                 {
                     var existing = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == map.Beatmap.OnlineBeatmapID);
@@ -133,11 +141,24 @@ namespace osu.Game.Tournament.Screens.MapPool
             return base.OnMouseDown(e);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder)
+        private void addForBeatmap(int beatmapId)
         {
-            currentMatch.BindValueChanged(matchChanged);
-            currentMatch.BindTo(ladder.CurrentMatch);
+            if (currentMatch.Value.Grouping.Value.Beatmaps.All(b => b.BeatmapInfo.OnlineBeatmapID != beatmapId))
+                // don't attempt to add if the beatmap isn't in our pool
+                return;
+
+            if (currentMatch.Value.PicksBans.Any(p => p.BeatmapID == beatmapId))
+                // don't attempt to add if already exists.
+                return;
+
+            currentMatch.Value.PicksBans.Add(new BeatmapChoice
+            {
+                Team = pickColour,
+                Type = pickType,
+                BeatmapID = beatmapId
+            });
+
+            setNextMode();
         }
 
         private void matchChanged(MatchPairing match)
