@@ -76,6 +76,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Config.BindWith(ManiaSetting.ScrollDirection, configDirection);
             configDirection.BindValueChanged(v => Direction.Value = (ScrollingDirection)v, true);
+
+            Config.BindWith(ManiaSetting.ScrollTime, TimeRange);
         }
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)

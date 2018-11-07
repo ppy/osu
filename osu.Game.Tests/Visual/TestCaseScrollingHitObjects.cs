@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual
             AddStep("Overlapping scroll", () => setScrollAlgorithm(ScrollAlgorithm.Overlapping));
             AddStep("Sequential scroll", () => setScrollAlgorithm(ScrollAlgorithm.Sequential));
 
-            AddSliderStep("Time range", 100, 10000, 5000, v => playfields.ForEach(p => p.VisibleTimeRange.Value = v));
+            AddSliderStep("Time range", 100, 10000, 5000, v => scrollContainers.ForEach(c => c.TimeRange = v));
             AddStep("Add control point", () => addControlPoint(Time.Current + 5000));
         }
 

@@ -144,8 +144,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public void AddColumn(Column c)
         {
-            c.VisibleTimeRange.BindTo(VisibleTimeRange);
-
             topLevelContainer.Add(c.TopLevelContainer.CreateProxy());
             columnFlow.Add(c);
             AddNested(c);

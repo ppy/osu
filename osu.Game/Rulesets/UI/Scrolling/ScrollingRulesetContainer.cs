@@ -5,10 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Configuration;
+using osu.Game.Input.Bindings;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
@@ -20,13 +23,50 @@ namespace osu.Game.Rulesets.UI.Scrolling
     /// A type of <see cref="RulesetContainer{TPlayfield,TObject}"/> that supports a <see cref="ScrollingPlayfield"/>.
     /// <see cref="HitObject"/>s inside this <see cref="RulesetContainer{TPlayfield,TObject}"/> will scroll within the playfield.
     /// </summary>
-    public abstract class ScrollingRulesetContainer<TPlayfield, TObject> : RulesetContainer<TPlayfield, TObject>
+    public abstract class ScrollingRulesetContainer<TPlayfield, TObject> : RulesetContainer<TPlayfield, TObject>, IKeyBindingHandler<GlobalAction>
         where TObject : HitObject
         where TPlayfield : ScrollingPlayfield
     {
+        /// <summary>
+        /// The default span of time visible by the length of the scrolling axes.
+        /// This is clamped between <see cref="time_span_min"/> and <see cref="time_span_max"/>.
+        /// </summary>
+        private const double time_span_default = 1500;
+
+        /// <summary>
+        /// The minimum span of time that may be visible by the length of the scrolling axes.
+        /// </summary>
+        private const double time_span_min = 50;
+
+        /// <summary>
+        /// The maximum span of time that may be visible by the length of the scrolling axes.
+        /// </summary>
+        private const double time_span_max = 10000;
+
+        /// <summary>
+        /// The step increase/decrease of the span of time visible by the length of the scrolling axes.
+        /// </summary>
+        private const double time_span_step = 200;
+
         protected readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
+        /// <summary>
+        /// The span of time that is visible by the length of the scrolling axes.
+        /// For example, only hit objects with start time less than or equal to 1000 will be visible with <see cref="TimeRange"/> = 1000.
+        /// </summary>
+        protected readonly BindableDouble TimeRange = new BindableDouble(time_span_default)
+        {
+            Default = time_span_default,
+            MinValue = time_span_min,
+            MaxValue = time_span_max
+        };
+
         protected virtual ScrollAlgorithm ScrollAlgorithm => ScrollAlgorithm.Sequential;
+
+        /// <summary>
+        /// Whether the player can change <see cref="VisibleTimeRange"/>.
+        /// </summary>
+        protected virtual bool UserScrollSpeedAdjustment => true;
 
         /// <summary>
         /// Provides the default <see cref="MultiplierControlPoint"/>s that adjust the scrolling rate of <see cref="HitObject"/>s
@@ -45,6 +85,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             scrollingInfo = new LocalScrollingInfo();
             scrollingInfo.Direction.BindTo(Direction);
+            scrollingInfo.TimeRange.BindTo(TimeRange);
 
             switch (ScrollAlgorithm)
             {
@@ -108,9 +149,31 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 controlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier });
         }
 
+        public bool OnPressed(GlobalAction action)
+        {
+            if (!UserScrollSpeedAdjustment)
+                return false;
+
+            switch (action)
+            {
+                case GlobalAction.IncreaseScrollSpeed:
+                    this.TransformBindableTo(TimeRange, TimeRange - time_span_step, 200, Easing.OutQuint);
+                    return true;
+                case GlobalAction.DecreaseScrollSpeed:
+                    this.TransformBindableTo(TimeRange, TimeRange + time_span_step, 200, Easing.OutQuint);
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action) => false;
+
         private class LocalScrollingInfo : IScrollingInfo
         {
             public IBindable<ScrollingDirection> Direction { get; } = new Bindable<ScrollingDirection>();
+
+            public IBindable<double> TimeRange { get; } = new BindableDouble();
 
             public IScrollAlgorithm Algorithm { get; set; }
         }

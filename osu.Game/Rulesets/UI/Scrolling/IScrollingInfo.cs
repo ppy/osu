@@ -15,6 +15,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
         IBindable<ScrollingDirection> Direction { get; }
 
         /// <summary>
+        ///
+        /// </summary>
+        IBindable<double> TimeRange { get; }
+
+        /// <summary>
         /// The algorithm which controls <see cref="HitObject"/> positions and sizes.
         /// </summary>
         IScrollAlgorithm Algorithm { get; }
