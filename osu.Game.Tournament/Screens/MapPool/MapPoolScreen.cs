@@ -15,6 +15,7 @@ using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using OpenTK;
+using OpenTK.Graphics;
 using OpenTK.Input;
 
 namespace osu.Game.Tournament.Screens.MapPool
@@ -75,7 +76,14 @@ namespace osu.Game.Tournament.Screens.MapPool
                             RelativeSizeAxes = Axes.X,
                             Text = "Blue Pick",
                             Action = () => setMode(TeamColour.Blue, ChoiceType.Pick)
-                        }
+                        },
+                        new ControlPanel.Spacer(),
+                        new TriangleButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Reset",
+                            Action = reset
+                        },
                     }
                 }
             };
@@ -101,12 +109,12 @@ namespace osu.Game.Tournament.Screens.MapPool
             pickColour = colour;
             pickType = choiceType;
 
-            var enabled = currentMatch.Value.PicksBans.Count == 0;
+            Color4 setColour(bool active) => active ? Color4.White : Color4.Gray;
 
-            buttonRedBan.Enabled.Value = enabled || pickColour == TeamColour.Red && pickType == ChoiceType.Ban;
-            buttonBlueBan.Enabled.Value = enabled || pickColour == TeamColour.Blue && pickType == ChoiceType.Ban;
-            buttonRedPick.Enabled.Value = enabled || pickColour == TeamColour.Red && pickType == ChoiceType.Pick;
-            buttonBluePick.Enabled.Value = enabled || pickColour == TeamColour.Blue && pickType == ChoiceType.Pick;
+            buttonRedBan.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Ban);
+            buttonBlueBan.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Ban);
+            buttonRedPick.Colour = setColour(pickColour == TeamColour.Red && pickType == ChoiceType.Pick);
+            buttonBluePick.Colour = setColour(pickColour == TeamColour.Blue && pickType == ChoiceType.Pick);
         }
 
         private void setNextMode()
@@ -139,6 +147,12 @@ namespace osu.Game.Tournament.Screens.MapPool
             }
 
             return base.OnMouseDown(e);
+        }
+
+        private void reset()
+        {
+            currentMatch.Value.PicksBans.Clear();
+            setNextMode();
         }
 
         private void addForBeatmap(int beatmapId)
