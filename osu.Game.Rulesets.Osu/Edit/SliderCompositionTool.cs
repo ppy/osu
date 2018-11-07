@@ -15,6 +15,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        public override PlacementMask CreatePlacementMask() => new SliderPlacementMask();
+        public override PlacementBlueprint CreatePlacementBlueprint() => new SliderPlacementBlueprint();
     }
 }
