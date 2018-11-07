@@ -18,15 +18,12 @@ namespace osu.Game.Tests.Visual
     /// </summary>
     public class ScrollingTestContainer : Container
     {
-        public SortedList<MultiplierControlPoint> ControlPoints => scrollAlgorithm.ControlPoints;
+        public SortedList<MultiplierControlPoint> ControlPoints => scrollingInfo.Algorithm.ControlPoints;
 
-        public ScrollAlgorithm ScrollAlgorithm { set => scrollAlgorithm.Algorithm = value; }
+        public ScrollAlgorithm ScrollAlgorithm { set => scrollingInfo.Algorithm.Algorithm = value; }
 
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly TestScrollingInfo scrollingInfo = new TestScrollingInfo();
-
-        [Cached(Type = typeof(IScrollAlgorithm))]
-        private readonly TestScrollAlgorithm scrollAlgorithm = new TestScrollAlgorithm();
 
         public ScrollingTestContainer(ScrollingDirection direction)
         {
@@ -39,6 +36,9 @@ namespace osu.Game.Tests.Visual
         {
             public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
             IBindable<ScrollingDirection> IScrollingInfo.Direction => Direction;
+
+            public readonly TestScrollAlgorithm Algorithm = new TestScrollAlgorithm();
+            IScrollAlgorithm IScrollingInfo.Algorithm => Algorithm;
         }
 
         private class TestScrollAlgorithm : IScrollAlgorithm
