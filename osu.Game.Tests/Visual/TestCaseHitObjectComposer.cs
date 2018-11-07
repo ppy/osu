@@ -16,8 +16,8 @@ using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks;
 using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Screens.Edit.Screens.Compose;
-using osu.Game.Screens.Edit.Screens.Compose.Layers;
+using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit.Compose.Components;
 using osu.Game.Tests.Beatmaps;
 
 namespace osu.Game.Tests.Visual
@@ -28,15 +28,15 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(MaskSelection),
-            typeof(DragLayer),
+            typeof(SelectionBox),
+            typeof(DragBox),
             typeof(HitObjectComposer),
             typeof(OsuHitObjectComposer),
-            typeof(HitObjectMaskLayer),
+            typeof(BlueprintContainer),
             typeof(NotNullAttribute),
             typeof(HitCirclePiece),
-            typeof(HitCircleSelectionMask),
-            typeof(HitCirclePlacementMask),
+            typeof(HitCircleSelectionBlueprint),
+            typeof(HitCirclePlacementBlueprint),
         };
 
         private HitObjectComposer composer;

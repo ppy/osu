@@ -16,8 +16,8 @@ using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Edit.Screens.Compose.Layers;
-using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
+using osu.Game.Screens.Edit.Components.RadioButtons;
+using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -35,8 +35,7 @@ namespace osu.Game.Rulesets.Edit
 
         private EditRulesetContainer rulesetContainer;
 
-        private HitObjectMaskLayer maskLayer;
-        private PlacementContainer placementContainer;
+        private BlueprintContainer blueprintContainer;
 
         internal HitObjectComposer(Ruleset ruleset)
         {
@@ -62,14 +61,10 @@ namespace osu.Game.Rulesets.Edit
             }
 
             var layerBelowRuleset = CreateLayerContainer();
-            layerBelowRuleset.Child = new BorderLayer { RelativeSizeAxes = Axes.Both };
+            layerBelowRuleset.Child = new EditorPlayfieldBorder { RelativeSizeAxes = Axes.Both };
 
             var layerAboveRuleset = CreateLayerContainer();
-            layerAboveRuleset.Children = new Drawable[]
-            {
-                maskLayer = new HitObjectMaskLayer(),
-                placementContainer = new PlacementContainer(),
-            };
+            layerAboveRuleset.Child = new BlueprintContainer();
 
             layerContainers.Add(layerBelowRuleset);
             layerContainers.Add(layerAboveRuleset);
@@ -112,8 +107,8 @@ namespace osu.Game.Rulesets.Edit
             };
 
             toolboxCollection.Items =
-                CompositionTools.Select(t => new RadioButton(t.Name, () => placementContainer.CurrentTool = t))
-                .Prepend(new RadioButton("Select", () => placementContainer.CurrentTool = null))
+                CompositionTools.Select(t => new RadioButton(t.Name, () => blueprintContainer.CurrentTool = t))
+                .Prepend(new RadioButton("Select", () => blueprintContainer.CurrentTool = null))
                 .ToList();
 
             toolboxCollection.Items[0].Select();
@@ -146,29 +141,25 @@ namespace osu.Game.Rulesets.Edit
         /// Adds a <see cref="HitObject"/> to the <see cref="Beatmaps.Beatmap"/> and visualises it.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
-        public void Add(HitObject hitObject)
-        {
-            maskLayer.AddMaskFor(rulesetContainer.Add(hitObject));
-            placementContainer.Refresh();
-        }
+        public void Add(HitObject hitObject) => blueprintContainer.AddBlueprintFor(rulesetContainer.Add(hitObject));
 
-        public void Remove(HitObject hitObject) => maskLayer.RemoveMaskFor(rulesetContainer.Remove(hitObject));
+        public void Remove(HitObject hitObject) => blueprintContainer.RemoveBlueprintFor(rulesetContainer.Remove(hitObject));
 
         internal abstract EditRulesetContainer CreateRulesetContainer();
 
         protected abstract IReadOnlyList<HitObjectCompositionTool> CompositionTools { get; }
 
         /// <summary>
-        /// Creates a <see cref="SelectionMask"/> for a specific <see cref="DrawableHitObject"/>.
+        /// Creates a <see cref="SelectionBlueprint"/> for a specific <see cref="DrawableHitObject"/>.
         /// </summary>
         /// <param name="hitObject">The <see cref="DrawableHitObject"/> to create the overlay for.</param>
-        public virtual SelectionMask CreateMaskFor(DrawableHitObject hitObject) => null;
+        public virtual SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) => null;
 
         /// <summary>
-        /// Creates a <see cref="MaskSelection"/> which outlines <see cref="DrawableHitObject"/>s
+        /// Creates a <see cref="SelectionBox"/> which outlines <see cref="DrawableHitObject"/>s
         /// and handles hitobject pattern adjustments.
         /// </summary>
-        public virtual MaskSelection CreateMaskSelection() => new MaskSelection();
+        public virtual SelectionBox CreateSelectionBox() => new SelectionBox();
 
         /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.
