@@ -15,6 +15,6 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableSpinner((Spinner)hitObject);
 
-        protected override PlacementBlueprint CreateMask() => new SpinnerPlacementBlueprint();
+        protected override PlacementBlueprint CreateBlueprint() => new SpinnerPlacementBlueprint();
     }
 }
