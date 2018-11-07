@@ -17,6 +17,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.IPC;
 
 namespace osu.Game.Tournament
 {
@@ -33,6 +34,7 @@ namespace osu.Game.Tournament
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private Bindable<Size> windowSize;
+        private FileBasedIPC ipc;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
@@ -62,6 +64,9 @@ namespace osu.Game.Tournament
             Ladder = content != null ? JsonConvert.DeserializeObject<LadderInfo>(content) : new LadderInfo();
 
             dependencies.Cache(Ladder);
+
+            dependencies.Cache(ipc = new FileBasedIPC());
+            Add(ipc);
 
             bool addedInfo = false;
 
