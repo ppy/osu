@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
@@ -147,93 +146,36 @@ namespace osu.Game.Tournament.Screens.Drawings
                     }
                 },
                 // Control panel container
-                new Container
+                new ControlPanel
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    AlwaysPresent = true,
-                    Width = 0.15f,
-                    Anchor = Anchor.TopRight,
-
-                    Children = new Drawable[]
+                    new TriangleButton
                     {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = new Color4(54, 54, 54, 255)
-                        },
-                        new OsuSpriteText
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
+                        RelativeSizeAxes = Axes.X,
 
-                            Text = "Control Panel",
-                            TextSize = 22f,
-                            Font = "Exo2.0-Bold"
-                        },
-                        new FillFlowContainer
-                        {
-                            Anchor = Anchor.TopCentre,
-                            Origin = Anchor.TopCentre,
+                        Text = "Begin random",
+                        Action = teamsContainer.StartScrolling,
+                    },
+                    new TriangleButton
+                    {
+                        RelativeSizeAxes = Axes.X,
 
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Width = 0.75f,
+                        Text = "Stop random",
+                        Action = teamsContainer.StopScrolling,
+                    },
+                    new TriangleButton
+                    {
+                        RelativeSizeAxes = Axes.X,
 
-                            Position = new Vector2(0, 35f),
+                        Text = "Reload",
+                        Action = reloadTeams
+                    },
+                    new ControlPanel.Spacer(),
+                    new TriangleButton
+                    {
+                        RelativeSizeAxes = Axes.X,
 
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 5f),
-
-                            Children = new Drawable[]
-                            {
-                                new TriangleButton
-                                {
-                                    RelativeSizeAxes = Axes.X,
-
-                                    Text = "Begin random",
-                                    Action = teamsContainer.StartScrolling,
-                                },
-                                new TriangleButton
-                                {
-                                    RelativeSizeAxes = Axes.X,
-
-                                    Text = "Stop random",
-                                    Action = teamsContainer.StopScrolling,
-                                },
-                                new TriangleButton
-                                {
-                                    RelativeSizeAxes = Axes.X,
-
-                                    Text = "Reload",
-                                    Action = reloadTeams
-                                }
-                            }
-                        },
-                        new FillFlowContainer
-                        {
-                            Anchor = Anchor.BottomCentre,
-                            Origin = Anchor.BottomCentre,
-
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Width = 0.75f,
-
-                            Position = new Vector2(0, -5f),
-
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 5f),
-
-                            Children = new Drawable[]
-                            {
-                                new TriangleButton
-                                {
-                                    RelativeSizeAxes = Axes.X,
-
-                                    Text = "Reset",
-                                    Action = () => reset()
-                                }
-                            }
-                        }
+                        Text = "Reset",
+                        Action = () => reset()
                     }
                 }
             };
