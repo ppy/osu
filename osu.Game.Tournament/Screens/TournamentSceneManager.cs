@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -88,9 +87,9 @@ namespace osu.Game.Tournament.Screens
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                bracket = new LadderManager(ladder),
+                                bracket = new LadderManager(),
                                 showcase = new ShowcaseScreen(),
-                                mapPool = new MapPoolScreen(ladder.Groupings.First(g => g.Name == "Finals")),
+                                mapPool = new MapPoolScreen(),
                                 teamIntro = new TeamIntroScreen(),
                                 drawings = new DrawingsScreen(),
                                 gameplay = new GameplayScreen()

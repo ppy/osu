@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 using osu.Framework.Configuration;
 using osu.Game.Tournament.Components;
@@ -34,6 +35,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public readonly Bindable<bool> Losers = new Bindable<bool>();
 
+        public readonly ObservableCollection<BeatmapChoice> PicksBans = new ObservableCollection<BeatmapChoice>();
+
         [JsonIgnore]
         public readonly Bindable<TournamentGrouping> Grouping = new Bindable<TournamentGrouping>();
 
@@ -58,7 +61,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             Team2.BindValueChanged(t => Team2Acronym = t?.Acronym, true);
         }
 
-        public MatchPairing(TournamentTeam team1 = null, TournamentTeam team2 = null) : this()
+        public MatchPairing(TournamentTeam team1 = null, TournamentTeam team2 = null)
+            : this()
         {
             Team1.Value = team1;
             Team2.Value = team2;

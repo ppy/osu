@@ -26,20 +26,24 @@ namespace osu.Game.Tournament.Screens.Ladder
     [Cached]
     public class LadderManager : CompositeDrawable, IHasContextMenu
     {
-        public readonly List<TournamentTeam> Teams;
-        private readonly Container<DrawableMatchPairing> pairingsContainer;
-        private readonly Container<Path> paths;
-        private readonly Container headings;
+        public List<TournamentTeam> Teams;
+        private Container<DrawableMatchPairing> pairingsContainer;
+        private Container<Path> paths;
+        private Container headings;
 
-        private readonly LadderInfo info;
+        private LadderInfo info;
 
-        private readonly ScrollableContainer scrollContent;
+        private ScrollableContainer scrollContent;
 
         [Cached]
-        private readonly LadderEditorInfo editorInfo = new LadderEditorInfo();
+        private LadderEditorInfo editorInfo = new LadderEditorInfo();
 
-        public LadderManager(LadderInfo info)
+        [BackgroundDependencyLoader]
+        private void load(LadderInfo info, OsuColour colours)
         {
+            normalPathColour = colours.BlueDarker.Darken(2);
+            losersPathColour = colours.YellowDarker.Darken(2);
+
             this.info = info;
             editorInfo.Teams = Teams = info.Teams;
             editorInfo.Groupings = info.Groupings;
@@ -127,13 +131,6 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         private Color4 normalPathColour;
         private Color4 losersPathColour;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            normalPathColour = colours.BlueDarker.Darken(2);
-            losersPathColour = colours.YellowDarker.Darken(2);
-        }
 
         private void updateLayout()
         {
