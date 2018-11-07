@@ -24,15 +24,20 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
         }
 
+        private DependencyContainer dependencies;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IScrollingInfo>(new ScrollingInfo());
-            return dependencies;
-        }
+            => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         protected override RulesetContainer<ManiaHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
-            => new ManiaEditRulesetContainer(ruleset, beatmap);
+        {
+            var rulesetContainer = new ManiaEditRulesetContainer(ruleset, beatmap);
+
+            // This is the earliest we can cache the scrolling info to ourselves, before masks are added to the hierarchy and inject it
+            dependencies.CacheAs(rulesetContainer.ScrollingInfo);
+
+            return rulesetContainer;
+        }
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => Array.Empty<HitObjectCompositionTool>();
 
@@ -47,11 +52,6 @@ namespace osu.Game.Rulesets.Mania.Edit
             }
 
             return base.CreateBlueprintFor(hitObject);
-        }
-
-        private class ScrollingInfo : IScrollingInfo
-        {
-            public IBindable<ScrollingDirection> Direction { get; } = new Bindable<ScrollingDirection>();
         }
     }
 }

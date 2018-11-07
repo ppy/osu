@@ -35,7 +35,8 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <returns></returns>
         private readonly SortedList<MultiplierControlPoint> controlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 
-        private IScrollingInfo scrollingInfo;
+        [Cached(Type = typeof(IScrollingInfo))]
+        protected readonly IScrollingInfo ScrollingInfo;
 
         [Cached(Type = typeof(IScrollAlgorithm))]
         private readonly IScrollAlgorithm algorithm;
@@ -55,13 +56,14 @@ namespace osu.Game.Rulesets.UI.Scrolling
                     algorithm = new ConstantScrollAlgorithm();
                     break;
             }
+
+            ScrollingInfo = CreateScrollingInfo();
+            ScrollingInfo.Direction.BindTo(Direction);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            scrollingInfo.Direction.BindTo(Direction);
-
             // Calculate default multiplier control points
             var lastTimingPoint = new TimingControlPoint();
             var lastDifficultyPoint = new DifficultyControlPoint();
@@ -107,19 +109,9 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 controlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier });
         }
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+        protected virtual IScrollingInfo CreateScrollingInfo() => new LocalScrollingInfo();
 
-            if ((scrollingInfo = dependencies.Get<IScrollingInfo>()) == null)
-                dependencies.CacheAs(scrollingInfo = CreateScrollingInfo());
-
-            return dependencies;
-        }
-
-        protected virtual IScrollingInfo CreateScrollingInfo() => new ScrollingInfo();
-
-        private class ScrollingInfo : IScrollingInfo
+        private class LocalScrollingInfo : IScrollingInfo
         {
             public IBindable<ScrollingDirection> Direction { get; } = new Bindable<ScrollingDirection>();
         }
