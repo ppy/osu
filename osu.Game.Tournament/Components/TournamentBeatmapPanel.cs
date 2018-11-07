@@ -132,19 +132,35 @@ namespace osu.Game.Tournament.Components
 
             if (found != null)
             {
+                BorderThickness = 6;
+
                 switch (found.Team)
                 {
                     case TeamColour.Red:
-                        Colour = Color4.Red;
+                        BorderColour = Color4.Red;
                         break;
                     case TeamColour.Blue:
-                        Colour = Color4.Blue;
+                        BorderColour = Color4.Blue;
+                        break;
+                }
+
+                switch (found.Type)
+                {
+                    case ChoiceType.Pick:
+                        Colour = Color4.White;
+                        Alpha = 1;
+                        break;
+                    case ChoiceType.Ban:
+                        Colour = Color4.Gray;
+                        Alpha = 0.5f;
                         break;
                 }
             }
             else
             {
                 Colour = Color4.White;
+                BorderThickness = 0;
+                Alpha = 1;
             }
         }
 
