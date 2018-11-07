@@ -1,7 +1,11 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -10,28 +14,35 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Tournament.Screens.Ladder.Components;
 using OpenTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
     public class TournamentBeatmapPanel : CompositeDrawable
     {
-        private readonly BeatmapInfo beatmap;
+        public readonly BeatmapInfo Beatmap;
+
         private const float horizontal_padding = 10;
         private const float vertical_padding = 5;
 
         public const float HEIGHT = 50;
 
+        private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
+
         public TournamentBeatmapPanel(BeatmapInfo beatmap)
         {
-            this.beatmap = beatmap;
+            Beatmap = beatmap;
             Width = 400;
             Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(LadderInfo ladder)
         {
+            currentMatch.BindValueChanged(matchChanged);
+            currentMatch.BindTo(ladder.CurrentMatch);
+
             CornerRadius = 25;
             Masking = true;
 
@@ -46,7 +57,7 @@ namespace osu.Game.Tournament.Components
                 {
                     RelativeSizeAxes = Axes.Both,
                     Colour = OsuColour.Gray(0.5f),
-                    BeatmapSet = beatmap.BeatmapSet,
+                    BeatmapSet = Beatmap.BeatmapSet,
                 },
                 new FillFlowContainer
                 {
@@ -62,8 +73,8 @@ namespace osu.Game.Tournament.Components
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = new LocalisedString((
-                                $"{beatmap.Metadata.ArtistUnicode} - {beatmap.Metadata.TitleUnicode}",
-                                $"{beatmap.Metadata.Artist} - {beatmap.Metadata.Title}")),
+                                $"{Beatmap.Metadata.ArtistUnicode} - {Beatmap.Metadata.TitleUnicode}",
+                                $"{Beatmap.Metadata.Artist} - {Beatmap.Metadata.Title}")),
                             Font = @"Exo2.0-BoldItalic",
                         },
                         new FillFlowContainer
@@ -84,7 +95,7 @@ namespace osu.Game.Tournament.Components
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = beatmap.Metadata.AuthorString,
+                                    Text = Beatmap.Metadata.AuthorString,
                                     Font = @"Exo2.0-BoldItalic",
                                     Padding = new MarginPadding { Right = 20 },
                                     TextSize = 14
@@ -98,7 +109,7 @@ namespace osu.Game.Tournament.Components
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = beatmap.Version,
+                                    Text = Beatmap.Version,
                                     Font = @"Exo2.0-BoldItalic",
                                     TextSize = 14
                                 },
@@ -107,6 +118,47 @@ namespace osu.Game.Tournament.Components
                     },
                 },
             });
+        }
+
+        private void matchChanged(MatchPairing match)
+        {
+            match.PicksBans.CollectionChanged += picksBansOnCollectionChanged;
+            updateState();
+        }
+
+        private void updateState()
+        {
+            var found = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap.OnlineBeatmapID);
+
+            if (found != null)
+            {
+                switch (found.Team)
+                {
+                    case TeamColour.Red:
+                        Colour = Color4.Red;
+                        break;
+                    case TeamColour.Blue:
+                        Colour = Color4.Blue;
+                        break;
+                }
+            }
+            else
+            {
+                Colour = Color4.White;
+            }
+        }
+
+        private void picksBansOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            var list = (ObservableCollection<BeatmapChoice>)sender;
+            if (sender != currentMatch.Value.PicksBans)
+            {
+                // todo: we need a last attribute in bindable valuechanged events badly.
+                list.CollectionChanged -= picksBansOnCollectionChanged;
+                return;
+            }
+
+            updateState();
         }
     }
 }
