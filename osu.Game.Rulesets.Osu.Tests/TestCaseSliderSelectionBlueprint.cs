@@ -7,8 +7,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks;
-using osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
@@ -50,6 +50,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             Add(drawableObject = new DrawableSlider(slider));
         }
 
-        protected override SelectionBlueprint CreateMask() => new SliderSelectionBlueprint(drawableObject);
+        protected override SelectionBlueprint CreateBlueprint() => new SliderSelectionBlueprint(drawableObject);
     }
 }

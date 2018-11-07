@@ -12,11 +12,11 @@ using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using OpenTK;
 using OpenTK.Input;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
+namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
     public class SliderPlacementBlueprint : PlacementBlueprint
     {
