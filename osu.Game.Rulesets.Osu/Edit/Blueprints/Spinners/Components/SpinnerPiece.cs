@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks.Components
+namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
 {
     public class SpinnerPiece : CompositeDrawable
     {
