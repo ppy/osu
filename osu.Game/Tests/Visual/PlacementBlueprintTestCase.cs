@@ -32,7 +32,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(currentBlueprint = CreateMask());
+            Add(currentBlueprint = CreateBlueprint());
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.Visual
             hitObjectContainer.Add(CreateHitObject(hitObject));
 
             Remove(currentBlueprint);
-            Add(currentBlueprint = CreateMask());
+            Add(currentBlueprint = CreateBlueprint());
         }
 
         public void Delete(HitObject hitObject)
@@ -60,6 +60,6 @@ namespace osu.Game.Tests.Visual
         }
 
         protected abstract DrawableHitObject CreateHitObject(HitObject hitObject);
-        protected abstract PlacementBlueprint CreateMask();
+        protected abstract PlacementBlueprint CreateBlueprint();
     }
 }

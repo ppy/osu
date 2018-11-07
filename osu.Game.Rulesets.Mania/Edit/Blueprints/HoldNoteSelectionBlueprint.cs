@@ -13,7 +13,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Rulesets.Mania.Edit.Masks
+namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public class HoldNoteSelectionBlueprint : SelectionBlueprint
     {

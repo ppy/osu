@@ -2,12 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks.Components;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using OpenTK;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks
+namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
 {
     public class SpinnerSelectionBlueprint : SelectionBlueprint
     {

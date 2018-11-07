@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            base.Content.Add(blueprint = CreateMask());
+            base.Content.Add(blueprint = CreateBlueprint());
             blueprint.SelectionRequested += (_, __) => blueprint.Select();
 
             AddStep("Select", () => blueprint.Select());
@@ -42,6 +42,6 @@ namespace osu.Game.Tests.Visual
             return true;
         }
 
-        protected abstract SelectionBlueprint CreateMask();
+        protected abstract SelectionBlueprint CreateBlueprint();
     }
 }

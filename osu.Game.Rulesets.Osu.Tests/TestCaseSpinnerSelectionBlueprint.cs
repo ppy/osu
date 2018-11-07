@@ -8,8 +8,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks;
-using osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks.Components;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
@@ -45,6 +45,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
-        protected override SelectionBlueprint CreateMask() => new SpinnerSelectionBlueprint(drawableSpinner) { Size = new Vector2(0.5f) };
+        protected override SelectionBlueprint CreateBlueprint() => new SpinnerSelectionBlueprint(drawableSpinner) { Size = new Vector2(0.5f) };
     }
 }
