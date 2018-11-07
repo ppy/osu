@@ -17,6 +17,8 @@ using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit.Design;
 
 namespace osu.Game.Screens.Edit
 {
@@ -166,10 +168,10 @@ namespace osu.Game.Screens.Edit
             switch (mode)
             {
                 case EditorScreenMode.Compose:
-                    currentScreen = new Compose.Compose();
+                    currentScreen = new ComposeScreen();
                     break;
                 case EditorScreenMode.Design:
-                    currentScreen = new Design.Design();
+                    currentScreen = new DesignScreen();
                     break;
                 default:
                     currentScreen = new EditorScreen();

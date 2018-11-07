@@ -14,13 +14,13 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseEditorCompose : EditorClockTestCase
     {
-        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Compose) };
+        public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(ComposeScreen) };
 
         [BackgroundDependencyLoader]
         private void load()
         {
             Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo);
-            Child = new Compose();
+            Child = new ComposeScreen();
         }
     }
 }

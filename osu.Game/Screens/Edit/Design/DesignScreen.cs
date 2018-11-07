@@ -9,9 +9,9 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Design
 {
-    public class Design : EditorScreen
+    public class DesignScreen : EditorScreen
     {
-        public Design()
+        public DesignScreen()
         {
             Add(new Container
             {
