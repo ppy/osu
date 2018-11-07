@@ -22,6 +22,8 @@ namespace osu.Game.Tests.Visual
 
         public ScrollAlgorithm ScrollAlgorithm { set => scrollingInfo.Algorithm.Algorithm = value; }
 
+        public double TimeRange { set => scrollingInfo.TimeRange.Value = value; }
+
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly TestScrollingInfo scrollingInfo = new TestScrollingInfo();
 
@@ -36,6 +38,9 @@ namespace osu.Game.Tests.Visual
         {
             public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
             IBindable<ScrollingDirection> IScrollingInfo.Direction => Direction;
+
+            public readonly Bindable<double> TimeRange = new Bindable<double>(1000) { Value = 1000 };
+            IBindable<double> IScrollingInfo.TimeRange => TimeRange;
 
             public readonly TestScrollAlgorithm Algorithm = new TestScrollAlgorithm();
             IScrollAlgorithm IScrollingInfo.Algorithm => Algorithm;

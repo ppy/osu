@@ -20,8 +20,6 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private readonly CatcherArea catcherArea;
 
-        protected override bool UserScrollSpeedAdjustment => false;
-
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation)
         {
             Container explodingFruitContainer;
@@ -50,8 +48,6 @@ namespace osu.Game.Rulesets.Catch.UI
                     HitObjectContainer
                 }
             };
-
-            VisibleTimeRange.Value = BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
         }
 
         public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.AttemptCatch(obj);

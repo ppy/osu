@@ -21,10 +21,13 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         protected override ScrollAlgorithm ScrollAlgorithm => ScrollAlgorithm.Constant;
 
+        protected override bool UserScrollSpeedAdjustment => false;
+
         public CatchRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
             Direction.Value = ScrollingDirection.Down;
+            TimeRange.Value = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450);
         }
 
         public override ScoreProcessor CreateScoreProcessor() => new CatchScoreProcessor(this);

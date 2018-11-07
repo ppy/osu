@@ -24,10 +24,13 @@ namespace osu.Game.Rulesets.Taiko.UI
     {
         protected override ScrollAlgorithm ScrollAlgorithm => ScrollAlgorithm.Overlapping;
 
+        protected override bool UserScrollSpeedAdjustment => false;
+
         public TaikoRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
             Direction.Value = ScrollingDirection.Left;
+            TimeRange.Value = 7000;
         }
 
         [BackgroundDependencyLoader]
