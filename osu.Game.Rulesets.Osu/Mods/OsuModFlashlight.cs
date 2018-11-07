@@ -32,7 +32,10 @@ namespace osu.Game.Rulesets.Osu.Mods
         private class Flashlight : Drawable, IRequireHighFrequencyMousePosition
         {
             private Shader shader;
-            private readonly MousePositionWrapper mousePosWrapper = new MousePositionWrapper();
+            private readonly MousePositionWrapper mousePosWrapper = new MousePositionWrapper
+            {
+                FlashlightSize = 300f
+            };
 
             protected override DrawNode CreateDrawNode() => new FlashlightDrawNode();
 
@@ -45,7 +48,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                 flashNode.Shader = shader;
                 flashNode.ScreenSpaceDrawQuad = ScreenSpaceDrawQuad;
                 flashNode.MousePosWrapper = mousePosWrapper;
-                flashNode.FlashlightSize = 100f;
             }
 
             [BackgroundDependencyLoader]
@@ -64,6 +66,8 @@ namespace osu.Game.Rulesets.Osu.Mods
         private class MousePositionWrapper
         {
             public Vector2 MousePosition;
+            public float FlashlightSize;
+            public bool FlashlightUniformUpdated;
         }
 
         private class FlashlightDrawNode : DrawNode
@@ -71,8 +75,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             public Shader Shader;
             public Quad ScreenSpaceDrawQuad;
             public MousePositionWrapper MousePosWrapper;
-            public float FlashlightSize;
-            private bool sizeSet;
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
@@ -80,8 +82,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
                 Shader.Bind();
                 // ReSharper disable once AssignmentInConditionalExpression
-                if(sizeSet = !sizeSet)
-                    Shader.GetUniform<float>("flashlightSize").UpdateValue(ref FlashlightSize);
+                if(MousePosWrapper.FlashlightUniformUpdated = !MousePosWrapper.FlashlightUniformUpdated)
+                    Shader.GetUniform<float>("flashlightSize").UpdateValue(ref MousePosWrapper.FlashlightSize);
 
                 Shader.GetUniform<Vector2>("mousePos").UpdateValue(ref MousePosWrapper.MousePosition);
 
