@@ -17,7 +17,7 @@ using OpenTK.Graphics;
 namespace osu.Game.Screens.Edit.Compose
 {
     [Cached(Type = typeof(IPlacementHandler))]
-    public class Compose : EditorScreen, IPlacementHandler
+    public class ComposeScreen : EditorScreen, IPlacementHandler
     {
         private const float vertical_margins = 10;
         private const float horizontal_margins = 20;
