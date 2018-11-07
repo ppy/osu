@@ -24,6 +24,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             Add(drawableObject = new DrawableHitCircle(hitCircle));
         }
 
-        protected override SelectionBlueprint CreateMask() => new HitCircleSelectionBlueprint(drawableObject);
+        protected override SelectionBlueprint CreateBlueprint() => new HitCircleSelectionBlueprint(drawableObject);
     }
 }

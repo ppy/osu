@@ -50,6 +50,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             Add(drawableObject = new DrawableSlider(slider));
         }
 
-        protected override SelectionBlueprint CreateMask() => new SliderSelectionBlueprint(drawableObject);
+        protected override SelectionBlueprint CreateBlueprint() => new SliderSelectionBlueprint(drawableObject);
     }
 }

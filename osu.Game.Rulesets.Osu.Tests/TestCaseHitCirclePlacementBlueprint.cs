@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Osu.Tests
     public class TestCaseHitCirclePlacementBlueprint : PlacementBlueprintTestCase
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableHitCircle((HitCircle)hitObject);
-        protected override PlacementBlueprint CreateMask() => new HitCirclePlacementBlueprint();
+        protected override PlacementBlueprint CreateBlueprint() => new HitCirclePlacementBlueprint();
     }
 }

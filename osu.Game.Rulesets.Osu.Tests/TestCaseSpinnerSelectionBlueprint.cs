@@ -45,6 +45,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
         }
 
-        protected override SelectionBlueprint CreateMask() => new SpinnerSelectionBlueprint(drawableSpinner) { Size = new Vector2(0.5f) };
+        protected override SelectionBlueprint CreateBlueprint() => new SpinnerSelectionBlueprint(drawableSpinner) { Size = new Vector2(0.5f) };
     }
 }
