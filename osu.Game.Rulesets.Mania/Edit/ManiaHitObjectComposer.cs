@@ -10,10 +10,8 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {

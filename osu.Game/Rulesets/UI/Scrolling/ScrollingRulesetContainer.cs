@@ -35,30 +35,29 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// <returns></returns>
         private readonly SortedList<MultiplierControlPoint> controlPoints = new SortedList<MultiplierControlPoint>(Comparer<MultiplierControlPoint>.Default);
 
-        [Cached(Type = typeof(IScrollingInfo))]
-        protected readonly IScrollingInfo ScrollingInfo;
+        protected IScrollingInfo ScrollingInfo => scrollingInfo;
 
-        [Cached(Type = typeof(IScrollAlgorithm))]
-        private readonly IScrollAlgorithm algorithm;
+        [Cached(Type = typeof(IScrollingInfo))]
+        private readonly LocalScrollingInfo scrollingInfo;
 
         protected ScrollingRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+            scrollingInfo = new LocalScrollingInfo();
+            scrollingInfo.Direction.BindTo(Direction);
+
             switch (ScrollAlgorithm)
             {
                 case ScrollAlgorithm.Sequential:
-                    algorithm = new SequentialScrollAlgorithm(controlPoints);
+                    scrollingInfo.Algorithm = new SequentialScrollAlgorithm(controlPoints);
                     break;
                 case ScrollAlgorithm.Overlapping:
-                    algorithm = new OverlappingScrollAlgorithm(controlPoints);
+                    scrollingInfo.Algorithm = new OverlappingScrollAlgorithm(controlPoints);
                     break;
                 case ScrollAlgorithm.Constant:
-                    algorithm = new ConstantScrollAlgorithm();
+                    scrollingInfo.Algorithm = new ConstantScrollAlgorithm();
                     break;
             }
-
-            ScrollingInfo = CreateScrollingInfo();
-            ScrollingInfo.Direction.BindTo(Direction);
         }
 
         [BackgroundDependencyLoader]
@@ -109,11 +108,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
                 controlPoints.Add(new MultiplierControlPoint { Velocity = Beatmap.BeatmapInfo.BaseDifficulty.SliderMultiplier });
         }
 
-        protected virtual IScrollingInfo CreateScrollingInfo() => new LocalScrollingInfo();
-
         private class LocalScrollingInfo : IScrollingInfo
         {
             public IBindable<ScrollingDirection> Direction { get; } = new Bindable<ScrollingDirection>();
+
+            public IScrollAlgorithm Algorithm { get; set; }
         }
     }
 }

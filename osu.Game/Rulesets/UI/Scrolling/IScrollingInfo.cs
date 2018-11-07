@@ -3,6 +3,7 @@
 
 using osu.Framework.Configuration;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
@@ -12,5 +13,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// The direction <see cref="HitObject"/>s should scroll in.
         /// </summary>
         IBindable<ScrollingDirection> Direction { get; }
+
+        /// <summary>
+        /// The algorithm which controls <see cref="HitObject"/> positions and sizes.
+        /// </summary>
+        IScrollAlgorithm Algorithm { get; }
     }
 }
