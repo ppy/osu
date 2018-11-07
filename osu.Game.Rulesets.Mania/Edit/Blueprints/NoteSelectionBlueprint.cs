@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 
-namespace osu.Game.Rulesets.Mania.Edit.Masks
+namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public class NoteSelectionBlueprint : SelectionBlueprint
     {

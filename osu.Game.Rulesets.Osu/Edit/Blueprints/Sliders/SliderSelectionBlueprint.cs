@@ -3,12 +3,12 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using OpenTK;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
+namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
     public class SliderSelectionBlueprint : SelectionBlueprint
     {

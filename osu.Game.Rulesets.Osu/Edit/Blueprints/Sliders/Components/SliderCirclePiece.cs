@@ -1,10 +1,10 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
+namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class SliderCirclePiece : HitCirclePiece
     {

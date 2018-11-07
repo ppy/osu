@@ -2,11 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks
+namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
     public class SliderCircleSelectionBlueprint : SelectionBlueprint
     {

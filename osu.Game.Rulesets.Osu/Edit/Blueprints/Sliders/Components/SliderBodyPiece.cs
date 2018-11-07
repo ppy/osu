@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 using OpenTK.Graphics;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
+namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class SliderBodyPiece : CompositeDrawable
     {

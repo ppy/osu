@@ -4,7 +4,7 @@
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
@@ -14,6 +14,6 @@ namespace osu.Game.Rulesets.Osu.Tests
     public class TestCaseHitCirclePlacementBlueprint : PlacementBlueprintTestCase
     {
         protected override DrawableHitObject CreateHitObject(HitObject hitObject) => new DrawableHitCircle((HitCircle)hitObject);
-        protected override PlacementBlueprint CreateMask() => new HitCirclePlacementBlueprint();
+        protected override PlacementBlueprint CreateBlueprint() => new HitCirclePlacementBlueprint();
     }
 }
