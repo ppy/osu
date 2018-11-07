@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using OpenTK;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components
+namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 {
     public class HitCirclePiece : CompositeDrawable
     {

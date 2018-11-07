@@ -3,10 +3,10 @@
 
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks
+namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
 {
     public class HitCirclePlacementBlueprint : PlacementBlueprint
     {
