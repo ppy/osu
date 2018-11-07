@@ -12,7 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using OpenTK;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks.Components
+namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class PathControlPointPiece : CompositeDrawable
     {

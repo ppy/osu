@@ -2,11 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks.Components;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks
+namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
 {
     public class HitCircleSelectionBlueprint : SelectionBlueprint
     {

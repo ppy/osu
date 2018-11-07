@@ -4,11 +4,11 @@
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks.Components;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.UI;
 
-namespace osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks
+namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
 {
     public class SpinnerPlacementBlueprint : PlacementBlueprint
     {
