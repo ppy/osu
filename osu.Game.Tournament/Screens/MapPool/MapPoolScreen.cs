@@ -157,6 +157,9 @@ namespace osu.Game.Tournament.Screens.MapPool
 
         private void addForBeatmap(int beatmapId)
         {
+            if (currentMatch.Value == null)
+                return;
+
             if (currentMatch.Value.Grouping.Value.Beatmaps.All(b => b.BeatmapInfo.OnlineBeatmapID != beatmapId))
                 // don't attempt to add if the beatmap isn't in our pool
                 return;
