@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Video;
@@ -21,11 +22,10 @@ namespace osu.Game.Tournament.Screens.TeamIntro
     {
         private Container mainContainer;
 
-        [Resolved]
-        private LadderInfo ladderInfo { get; set; }
+        private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage)
+        private void load(LadderInfo ladder, Storage storage)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -42,7 +42,8 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                 }
             };
 
-            ladderInfo.CurrentMatch.BindValueChanged(matchChanged, true);
+            currentMatch.BindValueChanged(matchChanged);
+            currentMatch.BindTo(ladder.CurrentMatch);
         }
 
         private void matchChanged(MatchPairing pairing)
