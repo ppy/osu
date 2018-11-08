@@ -110,9 +110,9 @@ namespace osu.Game
 
             dependencies.Cache(contextFactory = new DatabaseContextFactory(Host.Storage));
 
-            var largeStore = new LargeTextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
-            largeStore.AddStore(new TextureLoaderStore(new OnlineStore()));
-            dependencies.Cache(largeStore);
+            LargeTextureStore = new LargeTextureStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(Resources, @"Textures")));
+            LargeTextureStore.AddStore(new TextureLoaderStore(new OnlineStore()));
+            dependencies.Cache(LargeTextureStore);
 
             dependencies.CacheAs(this);
             dependencies.Cache(LocalConfig);
@@ -242,6 +242,8 @@ namespace osu.Game
         }
 
         private readonly List<ICanAcceptFiles> fileImporters = new List<ICanAcceptFiles>();
+
+        protected LargeTextureStore LargeTextureStore;
 
         public void Import(params string[] paths)
         {
