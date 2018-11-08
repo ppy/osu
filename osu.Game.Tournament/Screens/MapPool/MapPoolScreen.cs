@@ -180,12 +180,17 @@ namespace osu.Game.Tournament.Screens.MapPool
 
         private void matchChanged(MatchPairing match)
         {
-            foreach (var b in match.Grouping.Value.Beatmaps)
-                maps.Add(new TournamentBeatmapPanel(b.BeatmapInfo)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                });
+            maps.Clear();
+
+            if (match.Grouping.Value != null)
+            {
+                foreach (var b in match.Grouping.Value.Beatmaps)
+                    maps.Add(new TournamentBeatmapPanel(b.BeatmapInfo)
+                    {
+                        Anchor = Anchor.TopCentre,
+                        Origin = Anchor.TopCentre,
+                    });
+            }
         }
     }
 }
