@@ -11,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
@@ -47,25 +46,12 @@ namespace osu.Game.Tournament.Screens.Drawings
 
         public ITeamList TeamList;
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, Storage storage)
         {
             RelativeSizeAxes = Axes.Both;
 
             this.storage = storage;
-
-            TextureStore flagStore = new TextureStore();
-            // Local flag store
-            flagStore.AddStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), "Drawings")));
-            // Default texture store
-            flagStore.AddStore(textures);
-
-            dependencies.Cache(flagStore);
 
             if (TeamList == null)
                 TeamList = new StorageBackedTeamList(storage);

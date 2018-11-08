@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
@@ -48,6 +49,8 @@ namespace osu.Game.Tournament
 
             Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Regular"));
             Fonts.AddStore(new GlyphStore(Resources, @"Resources/Fonts/Aquatico-Light"));
+
+            Textures.AddStore(new TextureLoaderStore(new ResourceStore<byte[]>(new StorageBackedResourceStore(storage))));
 
             this.storage = storage;
 
@@ -124,7 +127,6 @@ namespace osu.Game.Tournament
 
                     addedInfo = true;
                 }
-
 
             List<TournamentTeam> countries;
             using (Stream stream = Resources.GetStream("Resources/countries.json"))
