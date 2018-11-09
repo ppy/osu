@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -393,10 +393,10 @@ namespace osu.Game.Overlays
                     api.Queue(req);
                     return;
                 }
-            }
 
-            // let's fetch a small number of messages to bring us up-to-date with the backlog.
-            fetchInitialMessages(channel);
+                // let's fetch a small number of messages to bring us up-to-date with the backlog.
+                fetchInitialMessages(channel);
+            }
 
             if (CurrentChannel == null)
                 CurrentChannel = channel;
