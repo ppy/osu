@@ -2,23 +2,20 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Objects;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class PathControlPointVisualiser : CompositeDrawable
+    public class PathControlPointVisualiser : SliderPiece
     {
-        private readonly IBindable<Vector2[]> controlPointsBindable = new Bindable<Vector2[]>();
-
         private readonly Slider slider;
 
         private readonly Container<PathControlPointPiece> pieces;
 
         public PathControlPointVisualiser(Slider slider)
+            : base(slider)
         {
             this.slider = slider;
 
@@ -28,8 +25,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            controlPointsBindable.BindValueChanged(_ => updatePathControlPoints());
-            controlPointsBindable.BindTo(slider.ControlPointsBindable);
+            ControlPointsBindable.BindValueChanged(_ => updatePathControlPoints(), true);
         }
 
         private void updatePathControlPoints()

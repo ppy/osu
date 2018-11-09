@@ -3,8 +3,6 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
@@ -13,15 +11,13 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class SliderBodyPiece : CompositeDrawable
+    public class SliderBodyPiece : SliderPiece
     {
-        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
-        private readonly IBindable<float> scaleBindable = new Bindable<float>();
-
         private readonly Slider slider;
         private readonly ManualSliderBody body;
 
         public SliderBodyPiece(Slider slider)
+            : base(slider)
         {
             this.slider = slider;
 
@@ -37,11 +33,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             body.BorderColour = colours.Yellow;
 
-            positionBindable.BindValueChanged(_ => updatePosition());
-            scaleBindable.BindValueChanged(v => body.PathWidth = v * 64);
-
-            positionBindable.BindTo(slider.PositionBindable);
-            scaleBindable.BindTo(slider.ScaleBindable);
+            PositionBindable.BindValueChanged(_ => updatePosition(), true);
+            ScaleBindable.BindValueChanged(v => body.PathWidth = v * 64, true);
         }
 
         private void updatePosition() => Position = slider.StackedPosition;

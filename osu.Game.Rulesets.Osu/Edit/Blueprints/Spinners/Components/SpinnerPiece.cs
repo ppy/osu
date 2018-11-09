@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,17 +12,14 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
 {
-    public class SpinnerPiece : CompositeDrawable
+    public class SpinnerPiece : HitObjectPiece
     {
-        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
-        private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
-        private readonly IBindable<float> scaleBindable = new Bindable<float>();
-
         private readonly Spinner spinner;
         private readonly CircularContainer circle;
         private readonly RingPiece ring;
 
         public SpinnerPiece(Spinner spinner)
+            : base(spinner)
         {
             this.spinner = spinner;
 
@@ -57,13 +53,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
         {
             Colour = colours.Yellow;
 
-            positionBindable.BindValueChanged(_ => updatePosition());
-            stackHeightBindable.BindValueChanged(_ => updatePosition());
-            scaleBindable.BindValueChanged(v => ring.Scale = new Vector2(v));
-
-            positionBindable.BindTo(spinner.PositionBindable);
-            stackHeightBindable.BindTo(spinner.StackHeightBindable);
-            scaleBindable.BindTo(spinner.ScaleBindable);
+            PositionBindable.BindValueChanged(_ => updatePosition(), true);
+            StackHeightBindable.BindValueChanged(_ => updatePosition());
+            ScaleBindable.BindValueChanged(v => ring.Scale = new Vector2(v), true);
         }
 
         private void updatePosition() => Position = spinner.Position;
