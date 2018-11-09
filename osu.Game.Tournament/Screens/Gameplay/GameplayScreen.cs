@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Logging;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
@@ -20,43 +19,65 @@ namespace osu.Game.Tournament.Screens.Gameplay
 {
     public class GameplayScreen : BeatmapInfoScreen
     {
+        private BindableBool warmup = new BindableBool();
+
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder, TextureStore textures)
         {
-            Add(new Container
+            AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                Height = 100,
-                Children = new Drawable[]
+                new Container
                 {
-                    new Sprite
+                    RelativeSizeAxes = Axes.X,
+                    Height = 100,
+                    Children = new Drawable[]
                     {
-                        Y = 5,
-                        Texture = textures.Get("game-screen-logo"),
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        FillMode = FillMode.Fit,
-                        RelativeSizeAxes = Axes.Both,
-                        Size = Vector2.One
+                        new Sprite
+                        {
+                            Y = 5,
+                            Texture = textures.Get("game-screen-logo"),
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            FillMode = FillMode.Fit,
+                            RelativeSizeAxes = Axes.Both,
+                            Size = Vector2.One
+                        },
+                        new RoundDisplay
+                        {
+                            Y = 10,
+                            Anchor = Anchor.BottomCentre,
+                            Origin = Anchor.TopCentre,
+                        },
+                        new TeamScoreDisplay(TeamColour.Red)
+                        {
+                            Anchor = Anchor.TopLeft,
+                            Origin = Anchor.TopLeft,
+                        },
+                        new TeamScoreDisplay(TeamColour.Blue)
+                        {
+                            Anchor = Anchor.TopRight,
+                            Origin = Anchor.TopRight,
+                        },
                     },
-                    new RoundDisplay
-                    {
-                        Y = 10,
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.TopCentre,
-                    },
-                    new TeamScoreDisplay(TeamColour.Red)
-                    {
-                        Anchor = Anchor.TopLeft,
-                        Origin = Anchor.TopLeft,
-                    },
-                    new TeamScoreDisplay(TeamColour.Blue)
-                    {
-                        Anchor = Anchor.TopRight,
-                        Origin = Anchor.TopRight,
-                    }
                 },
+                new ControlPanel
+                {
+                    Children = new Drawable[]
+                    {
+                        new TriangleButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Toggle warmup",
+                            Action = toggleWarmup
+                        }
+                    }
+                }
             });
+        }
+
+        private void toggleWarmup()
+        {
+            warmup.Toggle();
         }
 
         private class TeamScoreDisplay : CompositeDrawable
