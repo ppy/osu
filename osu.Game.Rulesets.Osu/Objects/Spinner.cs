@@ -7,7 +7,6 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Osu.Judgements;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -32,10 +31,5 @@ namespace osu.Game.Rulesets.Osu.Objects
         }
 
         public override Judgement CreateJudgement() => new OsuJudgement();
-
-        public override void OffsetPosition(Vector2 offset)
-        {
-            // for now we don't want to allow spinners to be moved around.
-        }
     }
 }
