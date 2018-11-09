@@ -163,6 +163,7 @@ namespace osu.Game.Tournament
         protected override void LoadComplete()
         {
             MenuCursorContainer.Cursor.Alpha = 0;
+            base.LoadComplete();
         }
 
         protected override void Update()
