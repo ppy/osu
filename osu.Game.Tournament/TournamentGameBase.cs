@@ -186,7 +186,7 @@ namespace osu.Game.Tournament
                     new JsonSerializerSettings
                     {
                         NullValueHandling = NullValueHandling.Ignore,
-                        DefaultValueHandling = DefaultValueHandling.Ignore
+                        DefaultValueHandling = DefaultValueHandling.Ignore,
                     }));
             }
         }
