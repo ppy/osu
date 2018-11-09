@@ -1,13 +1,18 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class SliderCirclePiece : HitCirclePiece
     {
+        private readonly IBindable<Vector2[]> controlPointsBindable = new Bindable<Vector2[]>();
+
         private readonly Slider slider;
         private readonly SliderPosition position;
 
@@ -16,8 +21,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             this.slider = slider;
             this.position = position;
+        }
 
-            slider.ControlPointsChanged += _ => UpdatePosition();
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            controlPointsBindable.BindValueChanged(_ => UpdatePosition());
+            controlPointsBindable.BindTo(slider.ControlPointsBindable);
         }
 
         protected override void UpdatePosition()

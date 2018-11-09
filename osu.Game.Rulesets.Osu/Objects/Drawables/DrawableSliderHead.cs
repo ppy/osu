@@ -2,6 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
 
@@ -9,17 +11,25 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderHead : DrawableHitCircle
     {
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+        private readonly IBindable<Vector2[]> controlPointsBindable = new Bindable<Vector2[]>();
+
         private readonly Slider slider;
 
         public DrawableSliderHead(Slider slider, HitCircle h)
             : base(h)
         {
             this.slider = slider;
+        }
 
-            h.PositionChanged += _ => updatePosition();
-            slider.ControlPointsChanged += _ => updatePosition();
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            positionBindable.BindValueChanged(_ => updatePosition());
+            controlPointsBindable.BindValueChanged(_ => updatePosition());
 
-            updatePosition();
+            positionBindable.BindTo(HitObject.PositionBindable);
+            controlPointsBindable.BindTo(slider.ControlPointsBindable);
         }
 
         protected override void Update()

@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
@@ -14,6 +15,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class SliderBodyPiece : CompositeDrawable
     {
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+
         private readonly Slider slider;
         private readonly ManualSliderBody body;
 
@@ -26,9 +30,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 AccentColour = Color4.Transparent,
                 PathWidth = slider.Scale * 64
             };
-
-            slider.PositionChanged += _ => updatePosition();
-            slider.ScaleChanged += _ => body.PathWidth = slider.Scale * 64;
         }
 
         [BackgroundDependencyLoader]
@@ -36,7 +37,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             body.BorderColour = colours.Yellow;
 
-            updatePosition();
+            positionBindable.BindValueChanged(_ => updatePosition());
+            scaleBindable.BindValueChanged(v => body.PathWidth = v * 64);
+
+            positionBindable.BindTo(slider.PositionBindable);
+            scaleBindable.BindTo(slider.ScaleBindable);
         }
 
         private void updatePosition() => Position = slider.StackedPosition;

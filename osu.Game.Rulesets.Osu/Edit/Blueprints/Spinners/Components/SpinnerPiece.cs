@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -14,8 +15,13 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
 {
     public class SpinnerPiece : CompositeDrawable
     {
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+        private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
+        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+
         private readonly Spinner spinner;
         private readonly CircularContainer circle;
+        private readonly RingPiece ring;
 
         public SpinnerPiece(Spinner spinner)
         {
@@ -27,7 +33,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
             FillMode = FillMode.Fit;
             Size = new Vector2(1.3f);
 
-            RingPiece ring;
             InternalChildren = new Drawable[]
             {
                 circle = new CircularContainer
@@ -45,18 +50,20 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components
             };
 
             ring.Scale = new Vector2(spinner.Scale);
-
-            spinner.PositionChanged += _ => updatePosition();
-            spinner.StackHeightChanged += _ => updatePosition();
-            spinner.ScaleChanged += _ => ring.Scale = new Vector2(spinner.Scale);
-
-            updatePosition();
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             Colour = colours.Yellow;
+
+            positionBindable.BindValueChanged(_ => updatePosition());
+            stackHeightBindable.BindValueChanged(_ => updatePosition());
+            scaleBindable.BindValueChanged(v => ring.Scale = new Vector2(v));
+
+            positionBindable.BindTo(spinner.PositionBindable);
+            stackHeightBindable.BindTo(spinner.StackHeightBindable);
+            scaleBindable.BindTo(spinner.ScaleBindable);
         }
 
         private void updatePosition() => Position = spinner.Position;

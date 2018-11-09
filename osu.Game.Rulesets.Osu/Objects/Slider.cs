@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
+using osu.Framework.Configuration;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -21,8 +22,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// Scoring distance with a speed-adjusted beat length of 1 second.
         /// </summary>
         private const float base_scoring_distance = 100;
-
-        public event Action<Vector2[]> ControlPointsChanged;
 
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
         public double Duration => EndTime - StartTime;
@@ -54,16 +53,15 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public SliderPath Path { get; } = new SliderPath();
 
+        public readonly Bindable<Vector2[]> ControlPointsBindable = new Bindable<Vector2[]>(Array.Empty<Vector2>());
+
         public Vector2[] ControlPoints
         {
-            get => Path.ControlPoints;
+            get => ControlPointsBindable;
             set
             {
-                if (Path.ControlPoints == value)
-                    return;
+                ControlPointsBindable.Value = value;
                 Path.ControlPoints = value;
-
-                ControlPointsChanged?.Invoke(value);
 
                 if (TailCircle != null)
                     TailCircle.Position = EndPosition;
