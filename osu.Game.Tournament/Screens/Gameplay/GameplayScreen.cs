@@ -8,12 +8,14 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using OpenTK;
 using OpenTK.Graphics;
+using OpenTK.Input;
 
 namespace osu.Game.Tournament.Screens.Gameplay
 {
@@ -119,12 +121,30 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 teamChanged(currentTeam.Value);
             }
 
+
+            protected override bool OnMouseDown(MouseDownEvent e)
+            {
+                switch (e.Button)
+                {
+                    case MouseButton.Left:
+                        if (currentTeamScore.Value < currentMatch.Value.PointsToWin)
+                            currentTeamScore.Value++;
+                        return true;
+                    case MouseButton.Right:
+                        if (currentTeamScore.Value > 0)
+                            currentTeamScore.Value--;
+                        return true;
+                }
+
+                return base.OnMouseDown(e);
+            }
+
             private void teamChanged(TournamentTeam team)
             {
                 InternalChildren = new Drawable[]
                 {
                     new TeamDisplay(team, teamColour == TeamColour.Red ? red : blue, teamColour != TeamColour.Red),
-                    new ScoreDisplay(currentTeamScore, teamColour != TeamColour.Red, currentMatch.Value.Grouping.Value.BestOf / 2 + 1)
+                    new ScoreDisplay(currentTeamScore, teamColour != TeamColour.Red, currentMatch.Value.PointsToWin)
                 };
             }
         }
