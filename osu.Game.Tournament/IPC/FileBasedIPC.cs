@@ -27,6 +27,8 @@ namespace osu.Game.Tournament.IPC
 
         public readonly Bindable<LegacyMods> Mods = new Bindable<LegacyMods>();
 
+        private int lastBeatmapId;
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -45,8 +47,9 @@ namespace osu.Game.Tournament.IPC
                             var beatmapId = int.Parse(sr.ReadLine());
                             var mods = int.Parse(sr.ReadLine());
 
-                            if (Beatmap.Value?.OnlineBeatmapID != beatmapId)
+                            if (lastBeatmapId != beatmapId)
                             {
+                                lastBeatmapId = beatmapId;
                                 var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = beatmapId });
                                 req.Success += b => Beatmap.Value = b.ToBeatmap(Rulesets);
                                 API.Queue(req);
