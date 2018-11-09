@@ -255,6 +255,9 @@ namespace osu.Game.Tournament.Screens.Ladder
             }
         }
 
+        // todo: remove after ppy/osu-framework#1980 is merged.
+        public override bool HandlePositionalInput => true;
+
         public void Remove(MatchPairing pairing) => pairingsContainer.FirstOrDefault(p => p.Pairing == pairing)?.Remove();
 
         public void SetCurrent(MatchPairing pairing)
