@@ -19,7 +19,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 {
     public class GameplayScreen : BeatmapInfoScreen
     {
-        private BindableBool warmup = new BindableBool();
+        private readonly BindableBool warmup = new BindableBool();
 
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder, TextureStore textures)
