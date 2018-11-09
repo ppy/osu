@@ -107,7 +107,7 @@ namespace osu.Game.Tournament
             // add full player info based on user IDs
             foreach (var t in Ladder.Teams)
             foreach (var p in t.Players)
-                if (p.Id == 1)
+                if (string.IsNullOrEmpty(p.Username))
                 {
                     var req = new GetUserRequest(p.Id);
                     req.Success += i => p.Username = i.Username;
