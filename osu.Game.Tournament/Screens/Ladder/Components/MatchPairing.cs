@@ -74,6 +74,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [JsonIgnore]
         public TournamentTeam Loser => !Completed.Value ? null : Team1Score.Value > Team2Score.Value ? Team2.Value : Team1.Value;
 
+        public int PointsToWin => Grouping.Value.BestOf / 2 + 1;
+
         /// <summary>
         /// Remove scores from the match, in case of a false click or false start.
         /// </summary>
