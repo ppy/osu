@@ -1,7 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
@@ -15,7 +15,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using OpenTK;
 using OpenTK.Graphics;
@@ -26,27 +25,23 @@ namespace osu.Game.Tournament.Screens.Ladder
     [Cached]
     public class LadderManager : CompositeDrawable, IHasContextMenu
     {
-        public List<TournamentTeam> Teams;
         private Container<DrawableMatchPairing> pairingsContainer;
         private Container<Path> paths;
         private Container headings;
-
-        private LadderInfo info;
 
         private ScrollableContainer scrollContent;
 
         [Cached]
         private LadderEditorInfo editorInfo = new LadderEditorInfo();
 
+        [Resolved]
+        private LadderInfo ladderInfo { get; set; }
+
         [BackgroundDependencyLoader]
-        private void load(LadderInfo info, OsuColour colours)
+        private void load(OsuColour colours)
         {
             normalPathColour = colours.BlueDarker.Darken(2);
             losersPathColour = colours.YellowDarker.Darken(2);
-
-            this.info = info;
-            editorInfo.Teams = Teams = info.Teams;
-            editorInfo.Groupings = info.Groupings;
 
             RelativeSizeAxes = Axes.Both;
 
@@ -74,32 +69,29 @@ namespace osu.Game.Tournament.Screens.Ladder
                 }
             };
 
-            foreach (var pairing in info.Pairings)
+            foreach (var pairing in ladderInfo.Pairings)
                 addPairing(pairing);
 
             // todo: fix this
             Scheduler.AddDelayed(() => layout.Invalidate(), 100, true);
         }
 
-        public LadderInfo CreateInfo()
+        private void updateInfo()
         {
-            var pairings = pairingsContainer.Select(p => p.Pairing).ToList();
+            ladderInfo.Pairings = pairingsContainer.Select(p => p.Pairing).ToList();
+            foreach (var g in ladderInfo.Groupings)
+                g.Pairings = ladderInfo.Pairings.Where(p => p.Grouping.Value == g).Select(p => p.ID).ToList();
 
-            foreach (var g in editorInfo.Groupings)
-                g.Pairings = pairings.Where(p => p.Grouping.Value == g).Select(p => p.ID).ToList();
-
-            return new LadderInfo
-            {
-                Pairings = pairings,
-                Progressions = pairings.Where(p => p.Progression.Value != null).Select(p => new TournamentProgression(p.ID, p.Progression.Value.ID)).Concat(
-                                           pairings.Where(p => p.LosersProgression.Value != null).Select(p => new TournamentProgression(p.ID, p.LosersProgression.Value.ID, true)))
-                                       .ToList(),
-                Teams = editorInfo.Teams,
-                Groupings = editorInfo.Groupings
-            };
+            ladderInfo.Progressions = ladderInfo.Pairings.Where(p => p.Progression.Value != null).Select(p => new TournamentProgression(p.ID, p.Progression.Value.ID)).Concat(
+                                        ladderInfo.Pairings.Where(p => p.LosersProgression.Value != null).Select(p => new TournamentProgression(p.ID, p.LosersProgression.Value.ID, true)))
+                                       .ToList();
         }
 
-        private void addPairing(MatchPairing pairing) => pairingsContainer.Add(new DrawableMatchPairing(pairing));
+        private void addPairing(MatchPairing pairing)
+        {
+            pairingsContainer.Add(new DrawableMatchPairing(pairing));
+            updateInfo();
+        }
 
         public MenuItem[] ContextMenuItems
         {
@@ -154,7 +146,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                 }
             }
 
-            foreach (var group in editorInfo.Groupings)
+            foreach (var group in ladderInfo.Groupings)
             {
                 var topPairing = pairingsContainer.Where(p => !p.Pairing.Losers && p.Pairing.Grouping.Value == group).OrderBy(p => p.Y).FirstOrDefault();
 
@@ -168,7 +160,7 @@ namespace osu.Game.Tournament.Screens.Ladder
                 });
             }
 
-            foreach (var group in editorInfo.Groupings)
+            foreach (var group in ladderInfo.Groupings)
             {
                 var topPairing = pairingsContainer.Where(p => p.Pairing.Losers && p.Pairing.Grouping.Value == group).OrderBy(p => p.Y).FirstOrDefault();
 
@@ -183,25 +175,42 @@ namespace osu.Game.Tournament.Screens.Ladder
             }
 
             layout.Validate();
+            updateInfo();
         }
 
-        public void RequestJoin(MatchPairing pairing, bool losers) => scrollContent.Add(new JoinRequestHandler(pairingsContainer, pairing, losers));
+        public void RequestJoin(MatchPairing pairing, bool losers) => scrollContent.Add(new JoinRequestHandler(pairingsContainer, pairing, losers, updateInfo));
+
+        // todo: remove after ppy/osu-framework#1980 is merged.
+        public override bool HandlePositionalInput => true;
+
+        public void Remove(MatchPairing pairing) => pairingsContainer.FirstOrDefault(p => p.Pairing == pairing)?.Remove();
+
+        public void SetCurrent(MatchPairing pairing)
+        {
+            if (ladderInfo.CurrentMatch.Value != null)
+                ladderInfo.CurrentMatch.Value.Current.Value = false;
+
+            ladderInfo.CurrentMatch.Value = pairing;
+            ladderInfo.CurrentMatch.Value.Current.Value = true;
+        }
 
         private class JoinRequestHandler : CompositeDrawable
         {
             private readonly Container<DrawableMatchPairing> pairingsContainer;
             public readonly MatchPairing Source;
             private readonly bool losers;
+            private readonly Action complete;
 
             private ProgressionPath path;
 
-            public JoinRequestHandler(Container<DrawableMatchPairing> pairingsContainer, MatchPairing source, bool losers)
+            public JoinRequestHandler(Container<DrawableMatchPairing> pairingsContainer, MatchPairing source, bool losers, Action complete)
             {
                 this.pairingsContainer = pairingsContainer;
                 RelativeSizeAxes = Axes.Both;
 
                 Source = source;
                 this.losers = losers;
+                this.complete = complete;
                 if (losers)
                     Source.LosersProgression.Value = null;
                 else
@@ -247,26 +256,13 @@ namespace osu.Game.Tournament.Screens.Ladder
                             Source.Progression.Value = found.Pairing;
                     }
 
+                    complete?.Invoke();
                     Expire();
                     return true;
                 }
 
                 return false;
             }
-        }
-
-        // todo: remove after ppy/osu-framework#1980 is merged.
-        public override bool HandlePositionalInput => true;
-
-        public void Remove(MatchPairing pairing) => pairingsContainer.FirstOrDefault(p => p.Pairing == pairing)?.Remove();
-
-        public void SetCurrent(MatchPairing pairing)
-        {
-            if (info.CurrentMatch.Value != null)
-                info.CurrentMatch.Value.Current.Value = false;
-
-            info.CurrentMatch.Value = pairing;
-            info.CurrentMatch.Value.Current.Value = true;
         }
     }
 }

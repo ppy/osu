@@ -28,12 +28,15 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [Resolved]
         private LadderEditorInfo editorInfo { get; set; }
 
+        [Resolved]
+        private LadderInfo ladderInfo { get; set; }
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            var teamEntries = editorInfo.Teams;
+            var teamEntries = ladderInfo.Teams;
 
-            var groupingOptions = editorInfo.Groupings.Select(g => new KeyValuePair<string, TournamentGrouping>(g.Name, g))
+            var groupingOptions = ladderInfo.Groupings.Select(g => new KeyValuePair<string, TournamentGrouping>(g.Name, g))
                                             .Prepend(new KeyValuePair<string, TournamentGrouping>("None", new TournamentGrouping()));
 
             Children = new Drawable[]

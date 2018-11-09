@@ -10,28 +10,14 @@ namespace osu.Game.Tournament.Tests
 {
     public class TestCaseLadderManager : LadderTestCase
     {
-        private LadderManager manager;
-
         [BackgroundDependencyLoader]
         private void load()
         {
             Add(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = manager = new LadderManager()
+                Child = new LadderManager()
             });
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            var newInfo = manager.CreateInfo();
-
-            Ladder.Teams = newInfo.Teams;
-            Ladder.Groupings = newInfo.Groupings;
-            Ladder.Pairings = newInfo.Pairings;
-            Ladder.Progressions = newInfo.Progressions;
         }
     }
 }
