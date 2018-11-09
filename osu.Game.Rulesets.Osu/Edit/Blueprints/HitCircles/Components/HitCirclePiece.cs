@@ -2,9 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
@@ -12,15 +10,12 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 {
-    public class HitCirclePiece : CompositeDrawable
+    public class HitCirclePiece : HitObjectPiece
     {
-        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
-        private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
-        private readonly IBindable<float> scaleBindable = new Bindable<float>();
-
         private readonly HitCircle hitCircle;
 
         public HitCirclePiece(HitCircle hitCircle)
+            : base(hitCircle)
         {
             this.hitCircle = hitCircle;
             Origin = Anchor.Centre;
@@ -37,13 +32,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
         {
             Colour = colours.Yellow;
 
-            positionBindable.BindValueChanged(_ => UpdatePosition());
-            stackHeightBindable.BindValueChanged(_ => UpdatePosition());
-            scaleBindable.BindValueChanged(v => Scale = new Vector2(v));
-
-            positionBindable.BindTo(hitCircle.PositionBindable);
-            stackHeightBindable.BindTo(hitCircle.StackHeightBindable);
-            scaleBindable.BindTo(hitCircle.ScaleBindable);
+            PositionBindable.BindValueChanged(_ => UpdatePosition(), true);
+            StackHeightBindable.BindValueChanged(_ => UpdatePosition());
+            ScaleBindable.BindValueChanged(v => Scale = new Vector2(v), true);
         }
 
         protected virtual void UpdatePosition() => Position = hitCircle.StackedPosition;
