@@ -12,7 +12,6 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
-using osu.Game.Rulesets.Edit.Types;
 using OpenTK;
 using OpenTK.Input;
 
@@ -60,19 +59,12 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region User Input Handling
 
-        public void HandleDrag(SelectionBlueprint m, Vector2 delta, InputState state)
+        public void HandleDrag(DragEvent dragEvent)
         {
             // Todo: Various forms of snapping
 
             foreach (var blueprint in selectedBlueprints)
-            {
-                switch (blueprint.HitObject.HitObject)
-                {
-                    case IHasEditablePosition editablePosition:
-                        editablePosition.OffsetPosition(delta);
-                        break;
-                }
-            }
+                blueprint.AdjustPosition(dragEvent);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
