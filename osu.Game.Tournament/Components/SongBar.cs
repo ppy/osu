@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -11,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Menu;
 using OpenTK;
+using OpenTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {
@@ -44,6 +46,28 @@ namespace osu.Game.Tournament.Components
         }
 
         private Container panelContents;
+        private Container innerPanel;
+        private Container outerPanel;
+
+        private const float main_width = 0.97f;
+
+        public bool Expanded
+        {
+            set
+            {
+                if (value)
+                {
+                    innerPanel.ResizeWidthTo(0.7f, 800, Easing.OutQuint);
+                    outerPanel.ResizeWidthTo(main_width, 800, Easing.OutQuint);
+                }
+                else
+                {
+                    innerPanel.ResizeWidthTo(1, 800, Easing.OutQuint);
+                    outerPanel.ResizeWidthTo(0.3f, 800, Easing.OutQuint);
+                }
+            }
+        }
+
 
         [BackgroundDependencyLoader]
         private void load()
@@ -52,12 +76,20 @@ namespace osu.Game.Tournament.Components
 
             InternalChildren = new Drawable[]
             {
-                new Container
+                outerPanel = new Container
                 {
                     Masking = true,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Colour = Color4.Black.Opacity(0.2f),
+                        Type = EdgeEffectType.Shadow,
+                        Radius = 5,
+                    },
                     RelativeSizeAxes = Axes.X,
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    RelativePositionAxes = Axes.X,
+                    X = -(1 - main_width) / 2,
                     Y = -10,
                     Width = 0.95f,
                     Height = TournamentBeatmapPanel.HEIGHT,
@@ -69,7 +101,7 @@ namespace osu.Game.Tournament.Components
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.Gray(0.93f),
                         },
-                        new Container
+                        innerPanel = new Container
                         {
                             Masking = true,
                             CornerRadius = TournamentBeatmapPanel.HEIGHT / 2,
