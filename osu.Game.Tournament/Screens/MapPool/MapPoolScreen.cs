@@ -13,6 +13,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Screens.Gameplay;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using OpenTK;
 using OpenTK.Graphics;
@@ -38,9 +39,11 @@ namespace osu.Game.Tournament.Screens.MapPool
         {
             InternalChildren = new Drawable[]
             {
+                new MatchHeader(),
                 maps = new FillFlowContainer<TournamentBeatmapPanel>
                 {
-                    Spacing = new Vector2(20),
+                    Y = 100,
+                    Spacing = new Vector2(10),
                     Padding = new MarginPadding(50),
                     Direction = FillDirection.Full,
                     RelativeSizeAxes = Axes.Both,
