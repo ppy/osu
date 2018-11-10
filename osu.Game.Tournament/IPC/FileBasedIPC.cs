@@ -6,6 +6,7 @@ using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Framework.Platform.Windows;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
@@ -15,6 +16,15 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Tournament.IPC
 {
+    public enum TourneyState
+    {
+        Initialising,
+        Idle,
+        WaitingForClients,
+        Playing,
+        Ranking
+    }
+
     public class FileBasedIPC : Component
     {
         [Resolved]
@@ -27,7 +37,11 @@ namespace osu.Game.Tournament.IPC
 
         public readonly Bindable<LegacyMods> Mods = new Bindable<LegacyMods>();
 
+        public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
+
         private int lastBeatmapId;
+        public int Score1;
+        public int Score2;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -35,6 +49,8 @@ namespace osu.Game.Tournament.IPC
             var stable = new StableStorage();
 
             const string file_ipc_filename = "ipc.txt";
+            const string file_ipc_state_filename = "ipc-state.txt";
+            const string file_ipc_scores_filename = "ipc-scores.txt";
 
             if (stable.Exists(file_ipc_filename))
                 Scheduler.AddDelayed(delegate
@@ -62,6 +78,35 @@ namespace osu.Game.Tournament.IPC
                     {
                         // file might be in use.
                     }
+
+                    try
+                    {
+                        using (var stream = stable.GetStream(file_ipc_state_filename))
+                        using (var sr = new StreamReader(stream))
+                        {
+                            State.Value = (TourneyState)Enum.Parse(typeof(TourneyState), sr.ReadLine());
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log(e.ToString(), LoggingTarget.Runtime);
+                        // file might be in use.
+                    }
+
+                    try
+                    {
+                        using (var stream = stable.GetStream(file_ipc_scores_filename))
+                        using (var sr = new StreamReader(stream))
+                        {
+                            Score1 = int.Parse(sr.ReadLine());
+                            Score2 = int.Parse(sr.ReadLine());
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Log(e.ToString(), LoggingTarget.Runtime);
+                        // file might be in use.
+                    }
                 }, 250, true);
         }
 
@@ -72,33 +117,46 @@ namespace osu.Game.Tournament.IPC
         {
             protected override string LocateBasePath()
             {
+
                 bool checkExists(string p)
                 {
-                    return Directory.Exists(Path.Combine(p, "Songs"));
+                    return File.Exists(Path.Combine(p, "ipc.txt"));
                 }
 
-                string stableInstallPath;
+                string stableInstallPath = string.Empty;
 
                 try
                 {
-                    stableInstallPath = "E:\\osu!mappool";
+                    try
+                    {
+                        stableInstallPath = "E:\\osu!tourney";
 
+                        if (checkExists(stableInstallPath))
+                            return stableInstallPath;
+
+                        stableInstallPath = "E:\\osu!mappool";
+
+                        if (checkExists(stableInstallPath))
+                            return stableInstallPath;
+                    }
+                    catch
+                    {
+                    }
+
+                    stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
                     if (checkExists(stableInstallPath))
                         return stableInstallPath;
+
+                    stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu");
+                    if (checkExists(stableInstallPath))
+                        return stableInstallPath;
+
+                    return null;
                 }
-                catch
+                finally
                 {
+                    Logger.Log($"Stable path for tourney usage: {stableInstallPath}");
                 }
-
-                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"osu!");
-                if (checkExists(stableInstallPath))
-                    return stableInstallPath;
-
-                stableInstallPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".osu");
-                if (checkExists(stableInstallPath))
-                    return stableInstallPath;
-
-                return null;
             }
 
             public StableStorage()
