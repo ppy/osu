@@ -5,13 +5,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
-using osu.Game.Screens;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 
 namespace osu.Game.Tournament.Screens
 {
-    public abstract class BeatmapInfoScreen : OsuScreen
+    public abstract class BeatmapInfoScreen : TournamentScreen
     {
         protected readonly SongBar SongBar;
 
