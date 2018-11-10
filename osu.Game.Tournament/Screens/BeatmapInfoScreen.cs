@@ -19,8 +19,8 @@ namespace osu.Game.Tournament.Screens
         {
             Add(SongBar = new SongBar
             {
-                Anchor = Anchor.BottomCentre,
-                Origin = Anchor.BottomCentre
+                Anchor = Anchor.BottomRight,
+                Origin = Anchor.BottomRight,
             });
         }
 

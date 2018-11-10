@@ -54,7 +54,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             Colour = Color4.Gray,
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle warmup",
-                            Action = toggleWarmup
+                            Action = () => warmup.Toggle()
                         }
                     }
                 }
@@ -64,6 +64,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
             State.BindTo(ipc.State);
 
             currentMatch.BindTo(ladder.CurrentMatch);
+
+            warmup.BindValueChanged(w => warmupButton.Colour = !w ? Color4.White : Color4.Gray, true);
         }
 
         private void stateChanged(TourneyState state)
@@ -77,15 +79,18 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 else
                     currentMatch.Value.Team2Score.Value++;
             }
-        }
 
-        private void toggleWarmup()
-        {
-            warmup.Toggle();
-            if (warmup.Value)
-                warmupButton.Colour = Color4.White;
+            if (state == TourneyState.Idle)
+            {
+                // show chat
+                SongBar.Expanded = false;
+            }
             else
-                warmupButton.Colour = Color4.Gray;
+            {
+                SongBar.Expanded = true;
+            }
+
+
         }
     }
 }

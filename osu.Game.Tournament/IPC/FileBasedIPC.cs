@@ -87,9 +87,8 @@ namespace osu.Game.Tournament.IPC
                             State.Value = (TourneyState)Enum.Parse(typeof(TourneyState), sr.ReadLine());
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
-                        Logger.Log(e.ToString(), LoggingTarget.Runtime);
                         // file might be in use.
                     }
 
@@ -102,9 +101,8 @@ namespace osu.Game.Tournament.IPC
                             Score2 = int.Parse(sr.ReadLine());
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
-                        Logger.Log(e.ToString(), LoggingTarget.Runtime);
                         // file might be in use.
                     }
                 }, 250, true);
