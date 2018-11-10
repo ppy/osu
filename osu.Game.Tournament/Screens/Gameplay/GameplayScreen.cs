@@ -1,11 +1,13 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using Microsoft.Diagnostics.Runtime.Interop;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
@@ -68,6 +70,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
             warmup.BindValueChanged(w => warmupButton.Colour = !w ? Color4.White : Color4.Gray, true);
         }
 
+        private ScheduledDelegate scheduledBarContract;
+
         private void stateChanged(TourneyState state)
         {
             if (state == TourneyState.Ranking)
@@ -80,17 +84,21 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     currentMatch.Value.Team2Score.Value++;
             }
 
-            if (state == TourneyState.Idle)
-            {
-                // show chat
-                SongBar.Expanded = false;
-            }
-            else
-            {
-                SongBar.Expanded = true;
-            }
+            scheduledBarContract?.Cancel();
 
-
+            switch (state)
+            {
+                case TourneyState.Idle:
+                    // show chat
+                    SongBar.Expanded = false;
+                    break;
+                case TourneyState.Ranking:
+                    scheduledBarContract = Scheduler.AddDelayed(() => SongBar.Expanded = false, 15000);
+                    break;
+                default:
+                    SongBar.Expanded = true;
+                    break;
+            }
         }
     }
 }
