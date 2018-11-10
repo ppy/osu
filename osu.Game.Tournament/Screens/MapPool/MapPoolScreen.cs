@@ -103,6 +103,9 @@ namespace osu.Game.Tournament.Screens.MapPool
 
         private void beatmapChanged(BeatmapInfo beatmap)
         {
+            if (currentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) < 2)
+                return;
+
             if (beatmap.OnlineBeatmapID != null)
                 addForBeatmap(beatmap.OnlineBeatmapID.Value);
         }
@@ -126,7 +129,10 @@ namespace osu.Game.Tournament.Screens.MapPool
 
             var nextColour = (currentMatch.Value.PicksBans.LastOrDefault()?.Team ?? roll_winner) == TeamColour.Red ? TeamColour.Blue : TeamColour.Red;
 
-            setMode(nextColour, currentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) >= 2 ? ChoiceType.Pick : ChoiceType.Ban);
+            if (pickType == ChoiceType.Ban && currentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) >= 2)
+                setMode(pickColour, ChoiceType.Pick);
+            else
+                setMode(nextColour, currentMatch.Value.PicksBans.Count(p => p.Type == ChoiceType.Ban) >= 2 ? ChoiceType.Pick : ChoiceType.Ban);
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
