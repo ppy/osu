@@ -23,7 +23,7 @@ using SixLabors.Primitives;
 namespace osu.Game.Tournament.Screens.Ladder
 {
     [Cached]
-    public class LadderManager : CompositeDrawable, IHasContextMenu
+    public class LadderManager : TournamentScreen, IHasContextMenu
     {
         private Container<DrawableMatchPairing> pairingsContainer;
         private Container<Path> paths;

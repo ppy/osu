@@ -10,7 +10,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Screens.Gameplay;
@@ -21,7 +20,7 @@ using OpenTK.Input;
 
 namespace osu.Game.Tournament.Screens.MapPool
 {
-    public class MapPoolScreen : OsuScreen
+    public class MapPoolScreen : TournamentScreen
     {
         private readonly FillFlowContainer<TournamentBeatmapPanel> maps;
 

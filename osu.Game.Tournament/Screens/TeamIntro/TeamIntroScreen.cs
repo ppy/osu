@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Video;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Screens;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using OpenTK;
@@ -18,7 +17,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.TeamIntro
 {
-    public class TeamIntroScreen : OsuScreen
+    public class TeamIntroScreen : TournamentScreen, IProvideVideo
     {
         private Container mainContainer;
 

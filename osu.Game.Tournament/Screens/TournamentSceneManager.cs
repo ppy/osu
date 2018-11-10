@@ -29,6 +29,7 @@ namespace osu.Game.Tournament.Screens
         private DrawingsScreen drawings;
         private Container screens;
         private ShowcaseScreen showcase;
+        private VideoSprite video;
 
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder, Storage storage)
@@ -76,7 +77,7 @@ namespace osu.Game.Tournament.Screens
                     //Masking = true,
                     Children = new Drawable[]
                     {
-                        new VideoSprite(storage.GetStream("BG Logoless - OWC.m4v"))
+                        video = new VideoSprite(storage.GetStream("BG Logoless - OWC.m4v"))
                         {
                             Loop = true,
                             RelativeSizeAxes = Axes.Both,
@@ -107,9 +108,15 @@ namespace osu.Game.Tournament.Screens
             foreach (var s in screens.Children)
             {
                 if (s == screen)
-                    s.FadeIn(100);
+                {
+                    s.Show();
+                    if (s is IProvideVideo)
+                        video.FadeOut(200);
+                    else
+                        video.Show();
+                }
                 else
-                    s.FadeOut(100);
+                    s.Hide();
             }
         }
     }
