@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using Microsoft.Diagnostics.Runtime.Interop;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -33,17 +32,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
             AddRange(new Drawable[]
             {
                 new MatchHeader(),
-                // new CustomChatOverlay
-                // {
-                //     Anchor = Anchor.BottomCentre,
-                //     Origin = Anchor.BottomCentre,
-                //     Size = new Vector2(0.4f, 1)
-                // },
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
                     Height = 720 / 1080f,
                     Colour = new Color4(0, 255, 0, 255),
+                    Y = 16,
                     Anchor = Anchor.Centre,
                     Origin= Anchor.Centre,
                 },
@@ -53,7 +47,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     {
                         warmupButton = new TriangleButton
                         {
-                            Colour = Color4.Gray,
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle warmup",
                             Action = () => warmup.Toggle()
@@ -65,9 +58,10 @@ namespace osu.Game.Tournament.Screens.Gameplay
             State.BindValueChanged(stateChanged);
             State.BindTo(ipc.State);
 
+            currentMatch.BindValueChanged(m => warmup.Value = m.Team1Score + m.Team2Score == 0);
             currentMatch.BindTo(ladder.CurrentMatch);
 
-            warmup.BindValueChanged(w => warmupButton.Colour = !w ? Color4.White : Color4.Gray, true);
+            warmup.BindValueChanged(w => warmupButton.Alpha = !w ? 0.5f : 1, true);
         }
 
         private ScheduledDelegate scheduledBarContract;
