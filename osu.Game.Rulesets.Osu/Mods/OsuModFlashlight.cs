@@ -1,95 +1,65 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using osu.Framework.Allocation;
+using JetBrains.Annotations;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.OpenGL.Vertices;
-using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Shaders;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
-using osu.Game.Rulesets.UI;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
-    public class OsuModFlashlight : ModFlashlight, IApplicableToRulesetContainer<OsuHitObject>
+    public class OsuModFlashlight : ModFlashlight<OsuHitObject>
     {
         public override double ScoreMultiplier => 1.12;
 
-        public void ApplyToRulesetContainer(RulesetContainer<OsuHitObject> rulesetContainer)
+        private const float default_flashlight_size = 180;
+
+        public override Flashlight CreateFlashlight() => new OsuFlashlight();
+
+        private class OsuFlashlight : Flashlight, IRequireHighFrequencyMousePosition
         {
-            rulesetContainer.KeyBindingInputManager.Add(new Flashlight
+            public OsuFlashlight()
             {
-                RelativeSizeAxes = Axes.Both,
-            });
-        }
-
-        private class Flashlight : Drawable, IRequireHighFrequencyMousePosition
-        {
-            private Shader shader;
-            private readonly MousePositionWrapper mousePosWrapper = new MousePositionWrapper
-            {
-                FlashlightSize = 300f
-            };
-
-            protected override DrawNode CreateDrawNode() => new FlashlightDrawNode();
-
-            protected override void ApplyDrawNode(DrawNode node)
-            {
-                base.ApplyDrawNode(node);
-
-                var flashNode = (FlashlightDrawNode)node;
-
-                flashNode.Shader = shader;
-                flashNode.ScreenSpaceDrawQuad = ScreenSpaceDrawQuad;
-                flashNode.MousePosWrapper = mousePosWrapper;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(ShaderManager shaderManager)
-            {
-                shader = shaderManager.Load(VertexShaderDescriptor.POSITION, "Flashlight");
+                MousePosWrapper.CircularFlashlightSize = getSizeFor(0);
+                MousePosWrapper.Rectangular = false;
             }
 
             protected override bool OnMouseMove(MouseMoveEvent e)
             {
-                mousePosWrapper.MousePosition = e.ScreenSpaceMousePosition;
+                MousePosWrapper.FlashlightPosition = e.ScreenSpaceMousePosition;
+                MousePosWrapper.FlashlightPositionChanged = true;
                 return base.OnMouseMove(e);
             }
-        }
 
-        private class MousePositionWrapper
-        {
-            public Vector2 MousePosition;
-            public float FlashlightSize;
-            public bool FlashlightUniformUpdated;
-        }
-
-        private class FlashlightDrawNode : DrawNode
-        {
-            public Shader Shader;
-            public Quad ScreenSpaceDrawQuad;
-            public MousePositionWrapper MousePosWrapper;
-
-            public override void Draw(Action<TexturedVertex2D> vertexAction)
+            [UsedImplicitly]
+            private float flashlightSize
             {
-                base.Draw(vertexAction);
+                set
+                {
+                    if (MousePosWrapper.CircularFlashlightSize == value) return;
 
-                Shader.Bind();
-                // ReSharper disable once AssignmentInConditionalExpression
-                if(MousePosWrapper.FlashlightUniformUpdated = !MousePosWrapper.FlashlightUniformUpdated)
-                    Shader.GetUniform<float>("flashlightSize").UpdateValue(ref MousePosWrapper.FlashlightSize);
+                    MousePosWrapper.CircularFlashlightSize = value;
+                    MousePosWrapper.CircularFlashlightSizeChanged = true;
+                }
 
-                Shader.GetUniform<Vector2>("mousePos").UpdateValue(ref MousePosWrapper.MousePosition);
+                get => MousePosWrapper.CircularFlashlightSize;
+            }
 
-                Texture.WhitePixel.DrawQuad(ScreenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: vertexAction);
+            private float getSizeFor(int combo)
+            {
+                if (combo > 200)
+                    return default_flashlight_size * 0.8f;
+                else if (combo > 100)
+                    return default_flashlight_size * 0.9f;
+                else
+                    return default_flashlight_size;
+            }
 
-                Shader.Unbind();
+            protected override void OnComboChange(int newCombo)
+            {
+                this.TransformTo(nameof(flashlightSize), getSizeFor(newCombo), FLASHLIGHT_FADE_DURATION);
             }
         }
     }

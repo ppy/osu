@@ -1,12 +1,93 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using JetBrains.Annotations;
+using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Rulesets.Taiko.UI;
+using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
-    public class TaikoModFlashlight : ModFlashlight
+    public class TaikoModFlashlight : ModFlashlight<TaikoHitObject>
     {
         public override double ScoreMultiplier => 1.12;
+
+        private const float default_flashlight_size = 250;
+
+        public override Flashlight CreateFlashlight() => new TaikoFlashlight(playfield);
+
+        private TaikoPlayfield playfield;
+
+        public override void ApplyToRulesetContainer(RulesetContainer<TaikoHitObject> rulesetContainer)
+        {
+            playfield = (TaikoPlayfield)rulesetContainer.Playfield;
+            base.ApplyToRulesetContainer(rulesetContainer);
+        }
+
+        private class TaikoFlashlight : Flashlight
+        {
+            private readonly TaikoPlayfield taikoPlayfield;
+
+            public TaikoFlashlight(TaikoPlayfield taikoPlayfield)
+            {
+                this.taikoPlayfield = taikoPlayfield;
+                MousePosWrapper.CircularFlashlightSize = getSizeFor(0);
+                MousePosWrapper.Rectangular = false;
+            }
+
+            [UsedImplicitly]
+            private float flashlightSize
+            {
+                set
+                {
+                    if (MousePosWrapper.CircularFlashlightSize == value) return;
+
+                    MousePosWrapper.CircularFlashlightSize = value;
+                    MousePosWrapper.CircularFlashlightSizeChanged = true;
+                }
+
+                get => MousePosWrapper.CircularFlashlightSize;
+            }
+
+            private float getSizeFor(int combo)
+            {
+                if (combo > 200)
+                    return default_flashlight_size * 0.8f;
+                else if (combo > 100)
+                    return default_flashlight_size * 0.9f;
+                else
+                    return default_flashlight_size;
+            }
+
+            protected override void OnComboChange(int newCombo)
+            {
+                this.TransformTo(nameof(flashlightSize), getSizeFor(newCombo), FLASHLIGHT_FADE_DURATION);
+            }
+
+            public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
+            {
+                if ((invalidation & Invalidation.DrawSize) > 0)
+                {
+                    Schedule(() =>
+                    {
+                        MousePosWrapper.FlashlightPosition = taikoPlayfield.HitExplosionContainer.ScreenSpaceDrawQuad.Centre;
+                        MousePosWrapper.FlashlightPositionChanged = true;
+                    });
+                }
+
+                return base.Invalidate(invalidation, source, shallPropagate);
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+
+                MousePosWrapper.FlashlightPosition = taikoPlayfield.HitExplosionContainer.ScreenSpaceDrawQuad.Centre;
+                MousePosWrapper.FlashlightPositionChanged = true;
+            }
+        }
     }
 }
