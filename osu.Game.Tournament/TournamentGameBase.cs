@@ -19,6 +19,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Rulesets;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Screens.Ladder.Components;
 
 namespace osu.Game.Tournament
 {
@@ -33,6 +34,9 @@ namespace osu.Game.Tournament
 
         [Cached]
         private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+
+        [Cached]
+        private LadderEditorInfo editorInfo = new LadderEditorInfo();
 
         private Bindable<Size> windowSize;
         private FileBasedIPC ipc;

@@ -36,6 +36,19 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private readonly Func<bool> isWinner;
         private LadderManager manager;
 
+        [Resolved]
+        private LadderInfo ladderInfo { get; set; }
+
+        private void setCurrent()
+        {
+            //todo: tournamentgamebase?
+            if (ladderInfo.CurrentMatch.Value != null)
+                ladderInfo.CurrentMatch.Value.Current.Value = false;
+
+            ladderInfo.CurrentMatch.Value = pairing;
+            ladderInfo.CurrentMatch.Value.Current.Value = true;
+        }
+
         [Resolved(CanBeNull = true)]
         private LadderEditorInfo editorInfo { get; set; }
 
@@ -132,7 +145,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             if (!pairing.Current.Value)
             {
-                manager.SetCurrent(pairing);
+                setCurrent();
                 return true;
             }
 
@@ -182,7 +195,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
                 return new MenuItem[]
                 {
-                    new OsuMenuItem("Set as current", MenuItemType.Standard, () => manager.SetCurrent(pairing)),
+                    new OsuMenuItem("Set as current", MenuItemType.Standard, setCurrent),
                     new OsuMenuItem("Join with", MenuItemType.Standard, () => manager.RequestJoin(pairing, false)),
                     new OsuMenuItem("Join with (loser)", MenuItemType.Standard, () => manager.RequestJoin(pairing, true)),
                     new OsuMenuItem("Remove", MenuItemType.Destructive, () => manager.Remove(pairing)),

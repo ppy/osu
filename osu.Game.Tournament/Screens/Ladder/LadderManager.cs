@@ -31,8 +31,8 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         private ScrollableContainer scrollContent;
 
-        [Cached]
-        private LadderEditorInfo editorInfo = new LadderEditorInfo();
+        [Resolved]
+        private LadderEditorInfo editorInfo { get; set;}
 
         [Resolved]
         private LadderInfo ladderInfo { get; set; }
@@ -184,15 +184,6 @@ namespace osu.Game.Tournament.Screens.Ladder
         public override bool HandlePositionalInput => true;
 
         public void Remove(MatchPairing pairing) => pairingsContainer.FirstOrDefault(p => p.Pairing == pairing)?.Remove();
-
-        public void SetCurrent(MatchPairing pairing)
-        {
-            if (ladderInfo.CurrentMatch.Value != null)
-                ladderInfo.CurrentMatch.Value.Current.Value = false;
-
-            ladderInfo.CurrentMatch.Value = pairing;
-            ladderInfo.CurrentMatch.Value.Current.Value = true;
-        }
 
         private class JoinRequestHandler : CompositeDrawable
         {
