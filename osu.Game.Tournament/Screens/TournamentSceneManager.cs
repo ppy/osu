@@ -16,6 +16,7 @@ using osu.Game.Tournament.Screens.MapPool;
 using osu.Game.Tournament.Screens.Schedule;
 using osu.Game.Tournament.Screens.Showcase;
 using osu.Game.Tournament.Screens.TeamIntro;
+using osu.Game.Tournament.Screens.TeamWin;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -27,6 +28,7 @@ namespace osu.Game.Tournament.Screens
         private LadderManager bracket;
         private MapPoolScreen mapPool;
         private GameplayScreen gameplay;
+        private TeamWinScreen winner;
         private TeamIntroScreen teamIntro;
         private DrawingsScreen drawings;
         private Container screens;
@@ -64,6 +66,8 @@ namespace osu.Game.Tournament.Screens
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "TeamIntro", Action = () => setScreen(teamIntro) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "MapPool", Action = () => setScreen(mapPool) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Gameplay", Action = () => setScreen(gameplay) },
+                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Win", Action = () => setScreen(winner) },
                             }
                         },
                     },
@@ -97,7 +101,8 @@ namespace osu.Game.Tournament.Screens
                                 mapPool = new MapPoolScreen(),
                                 teamIntro = new TeamIntroScreen(),
                                 drawings = new DrawingsScreen(),
-                                gameplay = new GameplayScreen()
+                                gameplay = new GameplayScreen(),
+                                winner = new TeamWinScreen()
                             }
                         },
                     }
