@@ -1,17 +1,18 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
+using osu.Game.Tournament.Screens.Showcase;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -24,7 +25,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
         private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, Storage storage)
+        private void load(TextureStore textures, LadderInfo ladder, Storage storage)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -35,6 +36,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
                 },
+                new TournamentLogo(),
                 mainContainer = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
