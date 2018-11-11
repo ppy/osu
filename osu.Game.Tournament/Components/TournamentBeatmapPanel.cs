@@ -146,7 +146,7 @@ namespace osu.Game.Tournament.Components
             if (found != null)
             {
                 if (doFlash)
-                    flash.FadeOutFromOne(500).Loop(0, 10);
+                    flash?.FadeOutFromOne(500).Loop(0, 10);
 
                 BorderThickness = 6;
 
