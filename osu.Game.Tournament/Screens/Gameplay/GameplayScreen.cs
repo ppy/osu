@@ -35,9 +35,9 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Height = 720 / 1080f,
+                    Height = 718 / 1080f,
                     Colour = new Color4(0, 255, 0, 255),
-                    Y = 16,
+                    Y = 14,
                     Anchor = Anchor.Centre,
                     Origin= Anchor.Centre,
                 },
