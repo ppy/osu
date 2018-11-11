@@ -6,13 +6,13 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
+using osu.Game.Tournament.Screens.Showcase;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
@@ -28,16 +28,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
             Height = 100;
             Children = new Drawable[]
             {
-                new Sprite
-                {
-                    Y = 5,
-                    Texture = textures.Get("game-screen-logo"),
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    FillMode = FillMode.Fit,
-                    RelativeSizeAxes = Axes.Both,
-                    Size = Vector2.One
-                },
+                new TournamentLogo(),
                 new RoundDisplay
                 {
                     Y = 10,
