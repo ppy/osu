@@ -29,6 +29,7 @@ namespace osu.Game.Tournament.Components
         public const float HEIGHT = 50;
 
         private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
+        private Box flash;
 
         public TournamentBeatmapPanel(BeatmapInfo beatmap)
         {
@@ -117,6 +118,13 @@ namespace osu.Game.Tournament.Components
                         }
                     },
                 },
+                flash = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Gray,
+                    Blending = BlendingMode.Additive,
+                    Alpha = 0,
+                },
             });
         }
 
@@ -126,12 +134,20 @@ namespace osu.Game.Tournament.Components
             updateState();
         }
 
+        private BeatmapChoice choice;
+
         private void updateState()
         {
             var found = currentMatch.Value.PicksBans.FirstOrDefault(p => p.BeatmapID == Beatmap.OnlineBeatmapID);
 
+            bool doFlash = found != choice;
+            choice = found;
+
             if (found != null)
             {
+                if (doFlash)
+                    flash.FadeOutFromOne(500).Loop(0, 10);
+
                 BorderThickness = 6;
 
                 switch (found.Team)
