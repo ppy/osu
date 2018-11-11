@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         public const float BASE_WIDTH = 512;
 
-        private readonly CatcherArea catcherArea;
+        internal readonly CatcherArea CatcherArea;
 
         protected override bool UserScrollSpeedAdjustment => false;
 
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    catcherArea = new CatcherArea(difficulty)
+                    CatcherArea = new CatcherArea(difficulty)
                     {
                         GetVisualRepresentation = getVisualRepresentation,
                         ExplodingFruitTarget = explodingFruitContainer,
@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Catch.UI
             VisibleTimeRange.Value = BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
         }
 
-        public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.AttemptCatch(obj);
+        public bool CheckIfWeCanCatch(CatchHitObject obj) => CatcherArea.AttemptCatch(obj);
 
         public override void Add(DrawableHitObject h)
         {
@@ -72,6 +72,6 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
-            => catcherArea.OnResult((DrawableCatchHitObject)judgedObject, result);
+            => CatcherArea.OnResult((DrawableCatchHitObject)judgedObject, result);
     }
 }

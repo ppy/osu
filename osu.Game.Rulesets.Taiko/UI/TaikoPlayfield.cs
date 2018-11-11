@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override SpeedChangeVisualisationMethod VisualisationMethod => SpeedChangeVisualisationMethod.Overlapping;
 
-        private readonly Container<HitExplosion> hitExplosionContainer;
+        internal readonly Container<HitExplosion> HitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
         private readonly JudgementContainer<DrawableTaikoJudgement> judgementContainer;
 
@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 Masking = true,
                                 Children = new Drawable[]
                                 {
-                                    hitExplosionContainer = new Container<HitExplosion>
+                                    HitExplosionContainer = new Container<HitExplosion>
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         FillMode = FillMode.Fit,
@@ -243,7 +243,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 case TaikoStrongJudgement _:
                     if (result.IsHit)
-                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
+                        HitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
                     break;
                 default:
                     judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
@@ -259,7 +259,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                     bool isRim = judgedObject.HitObject is RimHit;
 
-                    hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
+                    HitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
 
                     if (judgedObject.HitObject.Kiai)
                         kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));

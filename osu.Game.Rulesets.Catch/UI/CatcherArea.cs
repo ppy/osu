@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         public const float CATCHER_SIZE = 100;
 
-        protected readonly Catcher MovableCatcher;
+        protected internal readonly Catcher MovableCatcher;
 
         public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> GetVisualRepresentation;
 
