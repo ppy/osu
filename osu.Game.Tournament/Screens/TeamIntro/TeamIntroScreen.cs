@@ -71,7 +71,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft
                 },
-                new RoundDisplay(pairing.Grouping)
+                new RoundDisplay(pairing)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.25f,
@@ -83,7 +83,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
 
         private class RoundDisplay : CompositeDrawable
         {
-            public RoundDisplay(TournamentGrouping group)
+            public RoundDisplay(MatchPairing pairing)
             {
                 var col = OsuColour.Gray(0.33f);
 
@@ -112,7 +112,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 Colour = col,
-                                Text = group?.Name.Value ?? "Unknown Grouping",
+                                Text = pairing.Grouping.Value?.Name.Value ?? "Unknown Grouping",
                                 Font = "Aquatico-Light",
                                 Spacing = new Vector2(10, 0),
                                 TextSize = 50,
@@ -123,7 +123,7 @@ namespace osu.Game.Tournament.Screens.TeamIntro
                                 Origin = Anchor.TopCentre,
                                 Font = "Aquatico-Light",
                                 Colour = col,
-                                Text = (group?.StartDate.Value ?? DateTimeOffset.Now).ToString("dd MMMM HH:mm UTC"),
+                                Text = pairing.Date.Value.ToUniversalTime().ToString("dd MMMM HH:mm UTC"),
                                 TextSize = 20,
                             },
                         }
