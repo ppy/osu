@@ -18,7 +18,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     public class DrawableMatchPairing : CompositeDrawable
     {
         public readonly MatchPairing Pairing;
-        private readonly FillFlowContainer<DrawableMatchTeam> flow;
+        protected readonly FillFlowContainer<DrawableMatchTeam> Flow;
         private readonly Drawable selectionBox;
         private readonly Drawable currentMatchSelectionBox;
         private Bindable<MatchPairing> globalSelection;
@@ -62,7 +62,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Colour = Color4.OrangeRed,
                     Child = new Box { RelativeSizeAxes = Axes.Both }
                 },
-                flow = new FillFlowContainer<DrawableMatchTeam>
+                Flow = new FillFlowContainer<DrawableMatchTeam>
                 {
                     AutoSizeAxes = Axes.Both,
                     Direction = FillDirection.Vertical,
@@ -195,7 +195,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             if (Pairing.Team1.Value == null || Pairing.Team2.Value == null)
                 Pairing.CancelMatchStart();
 
-            flow.Children = new[]
+            Flow.Children = new[]
             {
                 new DrawableMatchTeam(Pairing.Team1, Pairing, Pairing.Losers),
                 new DrawableMatchTeam(Pairing.Team2, Pairing, Pairing.Losers)

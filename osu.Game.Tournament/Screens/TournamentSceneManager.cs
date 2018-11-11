@@ -13,6 +13,7 @@ using osu.Game.Tournament.Screens.Drawings;
 using osu.Game.Tournament.Screens.Gameplay;
 using osu.Game.Tournament.Screens.Ladder;
 using osu.Game.Tournament.Screens.MapPool;
+using osu.Game.Tournament.Screens.Schedule;
 using osu.Game.Tournament.Screens.Showcase;
 using osu.Game.Tournament.Screens.TeamIntro;
 using OpenTK;
@@ -22,6 +23,7 @@ namespace osu.Game.Tournament.Screens
 {
     public class TournamentSceneManager : OsuScreen
     {
+        private ScheduleScreen schedule;
         private LadderManager bracket;
         private MapPoolScreen mapPool;
         private GameplayScreen gameplay;
@@ -56,6 +58,7 @@ namespace osu.Game.Tournament.Screens
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Drawings", Action = () => setScreen(drawings) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Showcase", Action = () => setScreen(showcase) },
                                 new Container { RelativeSizeAxes = Axes.X, Height = 50 },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Schedule", Action = () => setScreen(schedule) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket", Action = () => setScreen(bracket) },
                                 new Container { RelativeSizeAxes = Axes.X, Height = 50 },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "TeamIntro", Action = () => setScreen(teamIntro) },
@@ -88,6 +91,7 @@ namespace osu.Game.Tournament.Screens
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
+                                schedule = new ScheduleScreen(),
                                 bracket = new LadderManager(),
                                 showcase = new ShowcaseScreen(),
                                 mapPool = new MapPoolScreen(),
