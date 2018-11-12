@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Types;
 using OpenTK;
@@ -41,6 +42,7 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="expectedDistance">A user-set distance of the path that may be shorter or longer than the true distance between all
         /// <paramref name="controlPoints"/>. The path will be shortened/lengthened to match this length.
         /// If null, the path will use the true distance between all <paramref name="controlPoints"/>.</param>
+        [JsonConstructor]
         public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
         {
             this = default;
