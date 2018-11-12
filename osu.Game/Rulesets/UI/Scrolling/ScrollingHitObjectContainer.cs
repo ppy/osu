@@ -1,59 +1,39 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Lists;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Timing;
-using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
     public class ScrollingHitObjectContainer : HitObjectContainer
     {
-        /// <summary>
-        /// The duration required to scroll through one length of the <see cref="ScrollingHitObjectContainer"/> before any control point adjustments.
-        /// </summary>
-        public readonly BindableDouble TimeRange = new BindableDouble
-        {
-            MinValue = 0,
-            MaxValue = double.MaxValue
-        };
+        private readonly IBindable<double> timeRange = new BindableDouble();
 
-        /// <summary>
-        /// The control points that adjust the scrolling speed.
-        /// </summary>
-        protected readonly SortedList<MultiplierControlPoint> ControlPoints = new SortedList<MultiplierControlPoint>();
+        private readonly IBindable<ScrollingDirection> direction = new Bindable<ScrollingDirection>();
 
-        public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
-
-        private readonly IScrollAlgorithm algorithm;
+        [Resolved]
+        private IScrollingInfo scrollingInfo { get; set; }
 
         private Cached initialStateCache = new Cached();
 
-        public ScrollingHitObjectContainer(ScrollVisualisationMethod visualisationMethod)
+        public ScrollingHitObjectContainer()
         {
             RelativeSizeAxes = Axes.Both;
+        }
 
-            TimeRange.ValueChanged += _ => initialStateCache.Invalidate();
-            Direction.ValueChanged += _ => initialStateCache.Invalidate();
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            direction.BindTo(scrollingInfo.Direction);
+            timeRange.BindTo(scrollingInfo.TimeRange);
 
-            switch (visualisationMethod)
-            {
-                case ScrollVisualisationMethod.Sequential:
-                    algorithm = new SequentialScrollAlgorithm(ControlPoints);
-                    break;
-                case ScrollVisualisationMethod.Overlapping:
-                    algorithm = new OverlappingScrollAlgorithm(ControlPoints);
-                    break;
-                case ScrollVisualisationMethod.Constant:
-                    algorithm = new ConstantScrollAlgorithm();
-                    break;
-            }
+            direction.ValueChanged += _ => initialStateCache.Invalidate();
+            timeRange.ValueChanged += _ => initialStateCache.Invalidate();
         }
 
         public override void Add(DrawableHitObject hitObject)
@@ -65,20 +45,6 @@ namespace osu.Game.Rulesets.UI.Scrolling
         public override bool Remove(DrawableHitObject hitObject)
         {
             var result = base.Remove(hitObject);
-            if (result)
-                initialStateCache.Invalidate();
-            return result;
-        }
-
-        public void AddControlPoint(MultiplierControlPoint controlPoint)
-        {
-            ControlPoints.Add(controlPoint);
-            initialStateCache.Invalidate();
-        }
-
-        public bool RemoveControlPoint(MultiplierControlPoint controlPoint)
-        {
-            var result = ControlPoints.Remove(controlPoint);
             if (result)
                 initialStateCache.Invalidate();
             return result;
@@ -100,7 +66,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             if (!initialStateCache.IsValid)
             {
-                switch (Direction.Value)
+                switch (direction.Value)
                 {
                     case ScrollingDirection.Up:
                     case ScrollingDirection.Down:
@@ -111,7 +77,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
                         break;
                 }
 
-                algorithm.Reset();
+                scrollingInfo.Algorithm.Reset();
 
                 foreach (var obj in Objects)
                     computeInitialStateRecursive(obj);
@@ -121,19 +87,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private void computeInitialStateRecursive(DrawableHitObject hitObject)
         {
-            hitObject.LifetimeStart = algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, TimeRange);
+            hitObject.LifetimeStart = scrollingInfo.Algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, timeRange.Value);
 
             if (hitObject.HitObject is IHasEndTime endTime)
             {
-                switch (Direction.Value)
+                switch (direction.Value)
                 {
                     case ScrollingDirection.Up:
                     case ScrollingDirection.Down:
-                        hitObject.Height = algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, TimeRange, scrollLength);
+                        hitObject.Height = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, timeRange.Value, scrollLength);
                         break;
                     case ScrollingDirection.Left:
                     case ScrollingDirection.Right:
-                        hitObject.Width = algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, TimeRange, scrollLength);
+                        hitObject.Width = scrollingInfo.Algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, timeRange.Value, scrollLength);
                         break;
                 }
             }
@@ -158,19 +124,19 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private void updatePosition(DrawableHitObject hitObject, double currentTime)
         {
-            switch (Direction.Value)
+            switch (direction.Value)
             {
                 case ScrollingDirection.Up:
-                    hitObject.Y = algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
+                    hitObject.Y = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
                     break;
                 case ScrollingDirection.Down:
-                    hitObject.Y = -algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
+                    hitObject.Y = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
                     break;
                 case ScrollingDirection.Left:
-                    hitObject.X = algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
+                    hitObject.X = scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
                     break;
                 case ScrollingDirection.Right:
-                    hitObject.X = -algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
+                    hitObject.X = -scrollingInfo.Algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, timeRange.Value, scrollLength);
                     break;
             }
         }

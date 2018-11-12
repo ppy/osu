@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Judgements;
@@ -39,10 +38,6 @@ namespace osu.Game.Rulesets.Taiko.UI
         /// </summary>
         private const float left_area_size = 240;
 
-        protected override bool UserScrollSpeedAdjustment => false;
-
-        protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
-
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
         private readonly JudgementContainer<DrawableTaikoJudgement> judgementContainer;
@@ -59,8 +54,6 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         public TaikoPlayfield(ControlPointInfo controlPoints)
         {
-            Direction.Value = ScrollingDirection.Left;
-
             InternalChild = new PlayfieldAdjustmentContainer
             {
                 Anchor = Anchor.CentreLeft,
@@ -200,8 +193,6 @@ namespace osu.Game.Rulesets.Taiko.UI
                     }
                 }
             };
-
-            VisibleTimeRange.Value = 7000;
         }
 
         [BackgroundDependencyLoader]
