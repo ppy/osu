@@ -62,9 +62,9 @@ namespace osu.Game.Tests.Visual
                 }
             });
 
-            AddStep("Constant scroll", () => setScrollAlgorithm(ScrollAlgorithm.Constant));
-            AddStep("Overlapping scroll", () => setScrollAlgorithm(ScrollAlgorithm.Overlapping));
-            AddStep("Sequential scroll", () => setScrollAlgorithm(ScrollAlgorithm.Sequential));
+            AddStep("Constant scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Constant));
+            AddStep("Overlapping scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Overlapping));
+            AddStep("Sequential scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Sequential));
 
             AddSliderStep("Time range", 100, 10000, 5000, v => scrollContainers.ForEach(c => c.TimeRange = v));
             AddStep("Add control point", () => addControlPoint(Time.Current + 5000));
@@ -136,7 +136,7 @@ namespace osu.Game.Tests.Visual
             }
         }
 
-        private void setScrollAlgorithm(ScrollAlgorithm algorithm) => scrollContainers.ForEach(c => c.ScrollAlgorithm = algorithm);
+        private void setScrollAlgorithm(ScrollVisualisationMethod algorithm) => scrollContainers.ForEach(c => c.ScrollAlgorithm = algorithm);
 
         private class TestPlayfield : ScrollingPlayfield
         {
