@@ -10,7 +10,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public readonly struct SliderPath
+    public struct SliderPath
     {
         /// <summary>
         /// The control points of the path.
@@ -18,18 +18,20 @@ namespace osu.Game.Rulesets.Objects
         public readonly Vector2[] ControlPoints;
 
         /// <summary>
-        /// The type of path.
-        /// </summary>
-        public readonly PathType Type;
-
-        /// <summary>
         /// The user-set distance of the path. If non-null, <see cref="Distance"/> will match this value,
         /// and the path will be shortened/lengthened to match this length.
         /// </summary>
         public readonly double? ExpectedDistance;
 
-        private readonly List<Vector2> calculatedPath;
-        private readonly List<double> cumulativeLength;
+        /// <summary>
+        /// The type of path.
+        /// </summary>
+        public readonly PathType Type;
+
+        private List<Vector2> calculatedPath;
+        private List<double> cumulativeLength;
+
+        private bool isInitialised;
 
         /// <summary>
         /// Creates a new <see cref="SliderPath"/>.
@@ -41,21 +43,26 @@ namespace osu.Game.Rulesets.Objects
         /// If null, the path will use the true distance between all <paramref name="controlPoints"/>.</param>
         public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
         {
+            this = default;
+
             ControlPoints = controlPoints;
             Type = type;
             ExpectedDistance = expectedDistance;
 
-            calculatedPath = new List<Vector2>();
-            cumulativeLength = new List<double>();
-
-            calculatePath();
-            calculateCumulativeLength();
+            ensureInitialised();
         }
 
         /// <summary>
         /// The distance of the path after lengthening/shortening to account for <see cref="ExpectedDistance"/>.
         /// </summary>
-        public double Distance => cumulativeLength.Count == 0 ? 0 : cumulativeLength[cumulativeLength.Count - 1];
+        public double Distance
+        {
+            get
+            {
+                ensureInitialised();
+                return cumulativeLength.Count == 0 ? 0 : cumulativeLength[cumulativeLength.Count - 1];
+            }
+        }
 
         /// <summary>
         /// Computes the slider path until a given progress that ranges from 0 (beginning of the slider)
@@ -66,6 +73,8 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="p1">End progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
         public void GetPathToProgress(List<Vector2> path, double p0, double p1)
         {
+            ensureInitialised();
+
             double d0 = progressToDistance(p0);
             double d1 = progressToDistance(p1);
 
@@ -92,8 +101,23 @@ namespace osu.Game.Rulesets.Objects
         /// <returns></returns>
         public Vector2 PositionAt(double progress)
         {
+            ensureInitialised();
+
             double d = progressToDistance(progress);
             return interpolateVertices(indexOfDistance(d), d);
+        }
+
+        private void ensureInitialised()
+        {
+            if (isInitialised)
+                return;
+            isInitialised = true;
+
+            calculatedPath = new List<Vector2>();
+            cumulativeLength = new List<double>();
+
+            calculatePath();
+            calculateCumulativeLength();
         }
 
         private List<Vector2> calculateSubpath(ReadOnlySpan<Vector2> subControlPoints)
