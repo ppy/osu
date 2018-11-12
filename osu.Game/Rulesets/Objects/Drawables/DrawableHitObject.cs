@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.TypeExtensions;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -167,13 +166,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds)
-        {
-            if (!AllJudged)
-                return false;
-
-            return base.UpdateSubTreeMasking(source, maskingBounds);
-        }
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => AllJudged && base.ComputeIsMaskedAway(maskingBounds);
 
         protected override void UpdateAfterChildren()
         {
