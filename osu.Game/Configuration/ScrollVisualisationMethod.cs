@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace osu.Game.Configuration
 {
-    public enum ScrollAlgorithm
+    public enum ScrollVisualisationMethod
     {
         [Description("Sequential")]
         Sequential,
