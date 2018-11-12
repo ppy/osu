@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Timers;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -36,6 +37,7 @@ namespace osu.Game.Screens.Menu
 
         public const float BUTTON_WIDTH = 140f;
         public const float WEDGE_WIDTH = 20;
+        private const float idle_timer_timeout = 10000;
 
         private OsuLogo logo;
 
@@ -61,11 +63,13 @@ namespace osu.Game.Screens.Menu
 
         private readonly List<Button> buttonsTopLevel = new List<Button>();
         private readonly List<Button> buttonsPlay = new List<Button>();
+        private readonly Timer idleTimer = new Timer(idle_timer_timeout);
 
         private SampleChannel sampleBack;
 
         public ButtonSystem()
         {
+            idleTimer.Elapsed += idleTimer_elapsed;
             RelativeSizeAxes = Axes.Both;
 
             Child = buttonArea = new ButtonArea();
@@ -189,6 +193,15 @@ namespace osu.Game.Screens.Menu
                         b.ButtonSystemState = state;
                 }
 
+                if (state == ButtonSystemState.TopLevel)
+                {
+                    idleTimer.Start();
+                }
+                else
+                {
+                    idleTimer.Stop();
+                }
+
                 StateChanged?.Invoke(State);
             }
         }
@@ -257,6 +270,15 @@ namespace osu.Game.Screens.Menu
                 case ButtonSystemState.EnteringMode:
                     logoTracking = true;
                     break;
+            }
+        }
+
+        private void idleTimer_elapsed(object sender, EventArgs e)
+        {
+            idleTimer.Stop();
+            if (State == ButtonSystemState.TopLevel)
+            {
+                goBack();
             }
         }
 
