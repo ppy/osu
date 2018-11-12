@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// </summary>
         public SliderPath Path { get; set; }
 
-        public double Distance => Path.GetDistance();
+        public double Distance => Path.Distance;
 
         public List<List<SampleInfo>> NodeSamples { get; set; }
         public int RepeatCount { get; set; }

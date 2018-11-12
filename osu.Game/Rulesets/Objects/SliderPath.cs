@@ -137,7 +137,7 @@ namespace osu.Game.Rulesets.Objects
 
         private double progressToDistance(double progress)
         {
-            return MathHelper.Clamp(progress, 0, 1) * GetDistance();
+            return MathHelper.Clamp(progress, 0, 1) * Distance;
         }
 
         private Vector2 interpolateVertices(int i, double d)
@@ -164,7 +164,7 @@ namespace osu.Game.Rulesets.Objects
             return p0 + (p1 - p0) * (float)w;
         }
 
-        public double GetDistance() => cumulativeLength.Count == 0 ? 0 : cumulativeLength[cumulativeLength.Count - 1];
+        public double Distance => cumulativeLength.Count == 0 ? 0 : cumulativeLength[cumulativeLength.Count - 1];
 
         /// <summary>
         /// Computes the slider path until a given progress that ranges from 0 (beginning of the slider)
