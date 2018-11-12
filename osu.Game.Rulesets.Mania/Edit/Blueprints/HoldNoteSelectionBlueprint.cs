@@ -26,8 +26,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         public HoldNoteSelectionBlueprint(DrawableHoldNote hold)
             : base(hold)
         {
-            RelativeSizeAxes = Axes.None;
-
             InternalChildren = new Drawable[]
             {
                 new HoldNoteNoteSelectionBlueprint(hold.Head),
