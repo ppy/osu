@@ -16,8 +16,8 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    [Cached]
-    public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>
+    [Cached(Type = typeof(IManiaHitObjectComposer))]
+    public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>, IManiaHitObjectComposer
     {
         public ManiaHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
