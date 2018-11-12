@@ -12,13 +12,33 @@ namespace osu.Game.Rulesets.Objects
 {
     public readonly struct SliderPath
     {
+        /// <summary>
+        /// The control points of the path.
+        /// </summary>
         public readonly ReadOnlyMemory<Vector2> ControlPoints;
+
+        /// <summary>
+        /// The type of path.
+        /// </summary>
         public readonly PathType Type;
+
+        /// <summary>
+        /// The user-set distance of the path. If non-null, <see cref="Distance"/> will match this value,
+        /// and the path will be shortened/lengthened to match this length.
+        /// </summary>
         public readonly double? ExpectedDistance;
 
         private readonly List<Vector2> calculatedPath;
         private readonly List<double> cumulativeLength;
 
+        /// <summary>
+        /// Creates a new <see cref="SliderPath"/>.
+        /// </summary>
+        /// <param name="type">The type of path.</param>
+        /// <param name="controlPoints">The control points of the path.</param>
+        /// <param name="expectedDistance">A user-set distance of the path that may be shorter or longer than the true distance between all
+        /// <paramref name="controlPoints"/>. The path will be shortened/lengthened to match this length.
+        /// If null, the path will use the true distance between all <paramref name="controlPoints"/>.</param>
         public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
         {
             ControlPoints = controlPoints;
@@ -32,6 +52,9 @@ namespace osu.Game.Rulesets.Objects
             calculateCumulativeLength();
         }
 
+        /// <summary>
+        /// The distance of the path after lengthening/shortening to account for <see cref="ExpectedDistance"/>.
+        /// </summary>
         public double Distance => cumulativeLength.Count == 0 ? 0 : cumulativeLength[cumulativeLength.Count - 1];
 
         /// <summary>
