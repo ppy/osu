@@ -24,7 +24,6 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -97,7 +96,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
-        protected override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
+        public override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {
             switch (h)
             {
@@ -109,8 +108,6 @@ namespace osu.Game.Rulesets.Mania.UI
                     return null;
             }
         }
-
-        protected override Vector2 PlayfieldArea => new Vector2(1, 0.8f);
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
     }

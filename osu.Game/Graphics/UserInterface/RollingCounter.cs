@@ -134,7 +134,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual void ResetCount()
         {
-            SetCountWithoutRolling(default(T));
+            SetCountWithoutRolling(default);
         }
 
         /// <summary>

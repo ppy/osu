@@ -23,29 +23,35 @@ namespace osu.Game.Rulesets.Osu.UI
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
         public OsuPlayfield()
-            : base(BASE_SIZE.X)
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
 
-            AddRange(new Drawable[]
+            Size = new Vector2(0.75f);
+
+            InternalChild = new PlayfieldAdjustmentContainer
             {
-                connectionLayer = new FollowPointRenderer
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 2,
-                },
-                judgementLayer = new JudgementContainer<DrawableOsuJudgement>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = 1,
-                },
-                approachCircles = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Depth = -1,
-                },
-            });
+                    connectionLayer = new FollowPointRenderer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Depth = 2,
+                    },
+                    judgementLayer = new JudgementContainer<DrawableOsuJudgement>
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Depth = 1,
+                    },
+                    HitObjectContainer,
+                    approachCircles = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Depth = -1,
+                    },
+                }
+            };
         }
 
         public override void Add(DrawableHitObject h)
@@ -72,7 +78,8 @@ namespace osu.Game.Rulesets.Osu.UI
             DrawableOsuJudgement explosion = new DrawableOsuJudgement(result, judgedObject)
             {
                 Origin = Anchor.Centre,
-                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition
+                Position = ((OsuHitObject)judgedObject.HitObject).StackedEndPosition,
+                Scale = new Vector2(((OsuHitObject)judgedObject.HitObject).Scale * 1.65f)
             };
 
             judgementLayer.Add(explosion);

@@ -8,18 +8,17 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Screens.Edit.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Edit.Screens;
-using osu.Game.Screens.Edit.Screens.Compose;
-using osu.Game.Screens.Edit.Screens.Design;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit.Design;
 
 namespace osu.Game.Screens.Edit
 {
@@ -169,10 +168,10 @@ namespace osu.Game.Screens.Edit
             switch (mode)
             {
                 case EditorScreenMode.Compose:
-                    currentScreen = new Compose();
+                    currentScreen = new ComposeScreen();
                     break;
                 case EditorScreenMode.Design:
-                    currentScreen = new Design();
+                    currentScreen = new DesignScreen();
                     break;
                 default:
                     currentScreen = new EditorScreen();
@@ -182,9 +181,9 @@ namespace osu.Game.Screens.Edit
             LoadComponentAsync(currentScreen, screenContainer.Add);
         }
 
-        protected override bool OnScroll(InputState state)
+        protected override bool OnScroll(ScrollEvent e)
         {
-            if (state.Mouse.ScrollDelta.X + state.Mouse.ScrollDelta.Y > 0)
+            if (e.ScrollDelta.X + e.ScrollDelta.Y > 0)
                 clock.SeekBackward(!clock.IsRunning);
             else
                 clock.SeekForward(!clock.IsRunning);

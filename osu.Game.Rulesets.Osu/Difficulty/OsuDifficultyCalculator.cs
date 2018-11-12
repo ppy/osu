@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double sectionLength = section_length * timeRate;
 
             // The first object doesn't generate a strain, so we begin with an incremented section end
-            double currentSectionEnd = 2 * sectionLength;
+            double currentSectionEnd = Math.Ceiling(beatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
 
             foreach (OsuDifficultyHitObject h in difficultyBeatmap)
             {
@@ -65,7 +65,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
             double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
 
-            int maxCombo = beatmap.HitObjects.Count();
+            int maxCombo = beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
             maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
 

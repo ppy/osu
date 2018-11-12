@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Screens.Edit.Screens.Compose.RadioButtons;
+using osu.Game.Screens.Edit.Components.RadioButtons;
 
 namespace osu.Game.Tests.Visual
 {

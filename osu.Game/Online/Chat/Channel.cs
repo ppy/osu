@@ -48,11 +48,6 @@ namespace osu.Game.Online.Chat
         public event Action<Message> MessageRemoved;
 
         /// <summary>
-        /// Signalles if the current user joined this channel or not. Defaults to false.
-        /// </summary>
-        public readonly Bindable<bool> Joined = new Bindable<bool>();
-
-        /// <summary>
         /// Signalles whether the channels target is a private channel or public channel.
         /// </summary>
         public TargetType Target { get; protected set; }
@@ -68,10 +63,20 @@ namespace osu.Game.Online.Chat
         public string Topic;
 
         [JsonProperty(@"type")]
-        public string Type;
+        public ChannelType Type;
 
         [JsonProperty(@"channel_id")]
         public long Id;
+
+        [JsonProperty(@"last_message_id")]
+        public long? LastMessageId;
+
+        /// <summary>
+        /// Signalles if the current user joined this channel or not. Defaults to false.
+        /// </summary>
+        public Bindable<bool> Joined = new Bindable<bool>();
+
+        public const int MAX_HISTORY = 300;
 
         [JsonConstructor]
         public Channel()
@@ -90,6 +95,8 @@ namespace osu.Game.Online.Chat
             NewMessagesArrived?.Invoke(new[] { message });
         }
 
+        public bool MessagesLoaded { get; private set; }
+
         /// <summary>
         /// Adds new messages to the channel and purges old messages. Triggers the <see cref="NewMessagesArrived"/> event.
         /// </summary>
@@ -98,7 +105,14 @@ namespace osu.Game.Online.Chat
         {
             messages = messages.Except(Messages).ToArray();
 
+            if (messages.Length == 0) return;
+
             Messages.AddRange(messages);
+            MessagesLoaded = true;
+
+            var maxMessageId = messages.Max(m => m.Id);
+            if (maxMessageId > LastMessageId)
+                LastMessageId = maxMessageId;
 
             purgeOldMessages();
 

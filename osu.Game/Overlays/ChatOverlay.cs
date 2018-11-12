@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using OpenTK;
 using OpenTK.Graphics;
 using osu.Framework.Allocation;
@@ -12,7 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -47,7 +46,7 @@ namespace osu.Game.Overlays
         private readonly ChannelTabControl channelTabControl;
 
         private readonly Container chatContainer;
-        private readonly Container tabsArea;
+        private readonly TabsArea tabsArea;
         private readonly Box chatBackground;
         private readonly Box tabBackground;
 
@@ -56,8 +55,7 @@ namespace osu.Game.Overlays
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
 
-
-        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceiveMouseInputAt(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.ReceiveMouseInputAt(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceivePositionalInputAt(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.ReceivePositionalInputAt(screenSpacePos);
 
         public ChatOverlay()
         {
@@ -141,11 +139,8 @@ namespace osu.Game.Overlays
                                 loading = new LoadingAnimation(),
                             }
                         },
-                        tabsArea = new Container
+                        tabsArea = new TabsArea
                         {
-                            Name = @"tabs area",
-                            RelativeSizeAxes = Axes.X,
-                            Height = TAB_AREA_HEIGHT,
                             Children = new Drawable[]
                             {
                                 tabBackground = new Box
@@ -258,25 +253,22 @@ namespace osu.Game.Overlays
         private double startDragChatHeight;
         private bool isDragging;
 
-        protected override bool OnDragStart(InputState state)
+        protected override bool OnDragStart(DragStartEvent e)
         {
             isDragging = tabsArea.IsHovered;
 
             if (!isDragging)
-                return base.OnDragStart(state);
+                return base.OnDragStart(e);
 
             startDragChatHeight = ChatHeight.Value;
             return true;
         }
 
-        protected override bool OnDrag(InputState state)
+        protected override bool OnDrag(DragEvent e)
         {
             if (isDragging)
             {
-                Trace.Assert(state.Mouse.PositionMouseDown != null);
-
-                // ReSharper disable once PossibleInvalidOperationException
-                double targetChatHeight = startDragChatHeight - (state.Mouse.Position.Y - state.Mouse.PositionMouseDown.Value.Y) / Parent.DrawSize.Y;
+                double targetChatHeight = startDragChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
 
                 // If the channel selection screen is shown, mind its minimum height
                 if (channelSelection.State == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
@@ -288,19 +280,19 @@ namespace osu.Game.Overlays
             return true;
         }
 
-        protected override bool OnDragEnd(InputState state)
+        protected override bool OnDragEnd(DragEndEvent e)
         {
             isDragging = false;
-            return base.OnDragEnd(state);
+            return base.OnDragEnd(e);
         }
 
         public override bool AcceptsFocus => true;
 
-        protected override void OnFocus(InputState state)
+        protected override void OnFocus(FocusEvent e)
         {
             //this is necessary as textbox is masked away and therefore can't get focus :(
             GetContainingInputManager().ChangeFocus(textbox);
-            base.OnFocus(state);
+            base.OnFocus(e);
         }
 
         protected override void PopIn()
@@ -334,6 +326,7 @@ namespace osu.Game.Overlays
             ChatHeight.TriggerChange();
 
             chatBackground.Colour = colours.ChatBlue;
+
             loading.Show();
 
             this.channelManager = channelManager;
@@ -376,6 +369,19 @@ namespace osu.Game.Overlays
                 channelManager.PostMessage(text);
 
             textbox.Text = string.Empty;
+        }
+
+        private class TabsArea : Container
+        {
+            // IsHovered is used
+            public override bool HandlePositionalInput => true;
+
+            public TabsArea()
+            {
+                Name = @"tabs area";
+                RelativeSizeAxes = Axes.X;
+                Height = TAB_AREA_HEIGHT;
+            }
         }
     }
 }

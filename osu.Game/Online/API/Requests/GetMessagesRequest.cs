@@ -1,38 +1,20 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using osu.Framework.IO.Network;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetMessagesRequest : APIMessagesRequest
+    public class GetMessagesRequest : APIRequest<List<Message>>
     {
-        private readonly IEnumerable<Channel> channels;
+        private readonly Channel channel;
 
-        public GetMessagesRequest(IEnumerable<Channel> channels, long? sinceId) : base(sinceId)
+        public GetMessagesRequest(Channel channel)
         {
-            if (channels == null)
-                throw new ArgumentNullException(nameof(channels));
-            if (channels.Any(c => c.Target != TargetType.Channel))
-                throw new ArgumentException($"All channels in the argument channels must have a {nameof(Channel.Target)} of {nameof(TargetType.Channel)}");
-
-            this.channels = channels;
+            this.channel = channel;
         }
 
-        protected override WebRequest CreateWebRequest()
-        {
-            string channelString = string.Join(",", channels.Select(x => x.Id));
-
-            var req = base.CreateWebRequest();
-            req.AddParameter(@"channels", channelString);
-
-            return req;
-        }
-
-        protected override string Target => @"chat/messages";
+        protected override string Target => $@"chat/channels/{channel.Id}/messages";
     }
 }
