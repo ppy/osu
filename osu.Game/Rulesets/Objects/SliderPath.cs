@@ -16,6 +16,9 @@ namespace osu.Game.Rulesets.Objects
         public readonly PathType Type;
         public readonly double? ExpectedDistance;
 
+        private readonly List<Vector2> calculatedPath;
+        private readonly List<double> cumulativeLength;
+
         public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
         {
             ControlPoints = controlPoints;
@@ -29,8 +32,46 @@ namespace osu.Game.Rulesets.Objects
             calculateCumulativeLength();
         }
 
-        private readonly List<Vector2> calculatedPath;
-        private readonly List<double> cumulativeLength;
+        public double Distance => cumulativeLength.Count == 0 ? 0 : cumulativeLength[cumulativeLength.Count - 1];
+
+        /// <summary>
+        /// Computes the slider path until a given progress that ranges from 0 (beginning of the slider)
+        /// to 1 (end of the slider) and stores the generated path in the given list.
+        /// </summary>
+        /// <param name="path">The list to be filled with the computed path.</param>
+        /// <param name="p0">Start progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        /// <param name="p1">End progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        public void GetPathToProgress(List<Vector2> path, double p0, double p1)
+        {
+            double d0 = progressToDistance(p0);
+            double d1 = progressToDistance(p1);
+
+            path.Clear();
+
+            int i = 0;
+            for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i)
+            {
+            }
+
+            path.Add(interpolateVertices(i, d0));
+
+            for (; i < calculatedPath.Count && cumulativeLength[i] <= d1; ++i)
+                path.Add(calculatedPath[i]);
+
+            path.Add(interpolateVertices(i, d1));
+        }
+
+        /// <summary>
+        /// Computes the position on the slider at a given progress that ranges from 0 (beginning of the path)
+        /// to 1 (end of the path).
+        /// </summary>
+        /// <param name="progress">Ranges from 0 (beginning of the path) to 1 (end of the path).</param>
+        /// <returns></returns>
+        public Vector2 PositionAt(double progress)
+        {
+            double d = progressToDistance(progress);
+            return interpolateVertices(indexOfDistance(d), d);
+        }
 
         private List<Vector2> calculateSubpath(ReadOnlySpan<Vector2> subControlPoints)
         {
@@ -162,47 +203,6 @@ namespace osu.Game.Rulesets.Objects
 
             double w = (d - d0) / (d1 - d0);
             return p0 + (p1 - p0) * (float)w;
-        }
-
-        public double Distance => cumulativeLength.Count == 0 ? 0 : cumulativeLength[cumulativeLength.Count - 1];
-
-        /// <summary>
-        /// Computes the slider path until a given progress that ranges from 0 (beginning of the slider)
-        /// to 1 (end of the slider) and stores the generated path in the given list.
-        /// </summary>
-        /// <param name="path">The list to be filled with the computed path.</param>
-        /// <param name="p0">Start progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
-        /// <param name="p1">End progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
-        public void GetPathToProgress(List<Vector2> path, double p0, double p1)
-        {
-            double d0 = progressToDistance(p0);
-            double d1 = progressToDistance(p1);
-
-            path.Clear();
-
-            int i = 0;
-            for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i)
-            {
-            }
-
-            path.Add(interpolateVertices(i, d0));
-
-            for (; i < calculatedPath.Count && cumulativeLength[i] <= d1; ++i)
-                path.Add(calculatedPath[i]);
-
-            path.Add(interpolateVertices(i, d1));
-        }
-
-        /// <summary>
-        /// Computes the position on the slider at a given progress that ranges from 0 (beginning of the path)
-        /// to 1 (end of the path).
-        /// </summary>
-        /// <param name="progress">Ranges from 0 (beginning of the path) to 1 (end of the path).</param>
-        /// <returns></returns>
-        public Vector2 PositionAt(double progress)
-        {
-            double d = progressToDistance(progress);
-            return interpolateVertices(indexOfDistance(d), d);
         }
     }
 }
