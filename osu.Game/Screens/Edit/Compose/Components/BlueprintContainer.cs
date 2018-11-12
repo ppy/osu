@@ -12,7 +12,6 @@ using osu.Framework.Input.States;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -165,7 +164,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionBox.HandleSelectionRequested(blueprint, state);
 
-        private void onDragRequested(SelectionBlueprint blueprint, Vector2 delta, InputState state) => selectionBox.HandleDrag(blueprint, delta, state);
+        private void onDragRequested(DragEvent dragEvent) => selectionBox.HandleDrag(dragEvent);
 
         private class SelectionBlueprintContainer : Container<SelectionBlueprint>
         {
