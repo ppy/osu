@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             if (TickDistance == 0)
                 return;
 
-            var length = Path.GetDistance();
+            var length = Path.Distance;
             var tickDistance = Math.Min(TickDistance, length);
             var spanDuration = length / Velocity;
 
@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             }
         }
 
-        public double EndTime => StartTime + this.SpanCount() * Path.GetDistance() / Velocity;
+        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
 
         public float EndX => X + this.CurvePositionAt(1).X / CatchPlayfield.BASE_WIDTH;
 
@@ -145,7 +145,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             set => path = value;
         }
 
-        public double Distance => Path.GetDistance();
+        public double Distance => Path.Distance;
 
         public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
 

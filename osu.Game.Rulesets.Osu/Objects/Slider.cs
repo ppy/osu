@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public event Action<SliderPath> PathChanged;
 
-        public double EndTime => StartTime + this.SpanCount() * Path.GetDistance() / Velocity;
+        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        public double Distance => Path.GetDistance();
+        public double Distance => Path.Distance;
 
         public override Vector2 Position
         {
@@ -178,7 +178,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createTicks()
         {
-            var length = Path.GetDistance();
+            var length = Path.Distance;
             var tickDistance = MathHelper.Clamp(TickDistance, 0, length);
 
             if (tickDistance == 0) return;
