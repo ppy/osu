@@ -7,11 +7,10 @@ using osu.Game.Rulesets.Objects;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Edit.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasEditablePosition
+    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition
     {
         public const double OBJECT_RADIUS = 64;
 
@@ -99,8 +98,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }
-
-        public virtual void OffsetPosition(Vector2 offset) => Position += offset;
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
     }
