@@ -57,6 +57,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The distance of the path after lengthening/shortening to account for <see cref="ExpectedDistance"/>.
         /// </summary>
+        [JsonIgnore]
         public double Distance
         {
             get
