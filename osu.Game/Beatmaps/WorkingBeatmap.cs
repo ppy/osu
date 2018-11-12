@@ -41,8 +41,13 @@ namespace osu.Game.Beatmaps
             beatmap = new RecyclableLazy<IBeatmap>(() =>
             {
                 var b = GetBeatmap() ?? new Beatmap();
-                // use the database-backed info.
+
+                // The original beatmap version needs to be preserved as the database doesn't contain it
+                BeatmapInfo.BeatmapVersion = b.BeatmapInfo.BeatmapVersion;
+
+                // Use the database-backed info for more up-to-date values (beatmap id, ranked status, etc)
                 b.BeatmapInfo = BeatmapInfo;
+
                 return b;
             });
 

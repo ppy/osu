@@ -16,13 +16,10 @@ namespace osu.Game.Online.Chat
 
         //todo: this should be inside sender.
         [JsonProperty(@"sender_id")]
-        public int UserId;
+        public long UserId;
 
-        [JsonProperty(@"target_type")]
-        public TargetType TargetType;
-
-        [JsonProperty(@"target_id")]
-        public long TargetId;
+        [JsonProperty(@"channel_id")]
+        public long ChannelId;
 
         [JsonProperty(@"is_action")]
         public bool IsAction;

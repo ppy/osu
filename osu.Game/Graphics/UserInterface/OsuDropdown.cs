@@ -30,7 +30,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (accentColour == default(Color4))
+            if (accentColour == default)
                 accentColour = colours.PinkDarker;
             updateAccentColour();
         }
@@ -51,6 +51,8 @@ namespace osu.Game.Graphics.UserInterface
         #region OsuDropdownMenu
         protected class OsuDropdownMenu : DropdownMenu, IHasAccentColour
         {
+            public override bool HandleNonPositionalInput => State == MenuState.Open;
+
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
             public OsuDropdownMenu()
             {
@@ -97,6 +99,9 @@ namespace osu.Game.Graphics.UserInterface
             #region DrawableOsuDropdownMenuItem
             public class DrawableOsuDropdownMenuItem : DrawableDropdownMenuItem, IHasAccentColour
             {
+                // IsHovered is used
+                public override bool HandlePositionalInput => true;
+
                 private Color4? accentColour;
                 public Color4 AccentColour
                 {

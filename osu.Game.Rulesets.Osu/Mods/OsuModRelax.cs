@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Input.States;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
@@ -77,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 wasLeft = !wasLeft;
             }
 
-            osuInputManager.HandleCustomInput(new InputState(), state);
+            state.Apply(osuInputManager.CurrentState, osuInputManager);
         }
 
         public void ApplyToRulesetContainer(RulesetContainer<OsuHitObject> rulesetContainer)

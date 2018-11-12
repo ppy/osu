@@ -3,8 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using OpenTK;
 using osu.Game.Screens.Play.PlayerSettings;
 using OpenTK.Input;
@@ -51,22 +50,22 @@ namespace osu.Game.Screens.Play.HUD
         protected override void PopOut() => this.FadeOut(fade_duration);
 
         //We want to handle keyboard inputs all the time in order to trigger ToggleVisibility() when not visible
-        public override bool HandleKeyboardInput => true;
+        public override bool HandleNonPositionalInput => true;
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (args.Repeat) return false;
+            if (e.Repeat) return false;
 
-            if (state.Keyboard.ControlPressed)
+            if (e.ControlPressed)
             {
-                if (args.Key == Key.H && ReplayLoaded)
+                if (e.Key == Key.H && ReplayLoaded)
                 {
                     ToggleVisibility();
                     return true;
                 }
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
     }
 }

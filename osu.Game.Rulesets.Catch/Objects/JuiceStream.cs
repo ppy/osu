@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Objects
             if (TickDistance == 0)
                 return;
 
-            var length = Curve.Distance;
+            var length = Path.Distance;
             var tickDistance = Math.Min(TickDistance, length);
             var spanDuration = length / Velocity;
 
@@ -95,7 +95,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         AddNested(new TinyDroplet
                         {
                             StartTime = t,
-                            X = X + Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
+                            X = X + Path.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
                             Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                             {
                                 Bank = s.Bank,
@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         AddNested(new Droplet
                         {
                             StartTime = time,
-                            X = X + Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
+                            X = X + Path.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
                             Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                             {
                                 Bank = s.Bank,
@@ -127,12 +127,12 @@ namespace osu.Game.Rulesets.Catch.Objects
                 {
                     Samples = Samples,
                     StartTime = spanStartTime + spanDuration,
-                    X = X + Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
+                    X = X + Path.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
                 });
             }
         }
 
-        public double EndTime => StartTime + this.SpanCount() * Curve.Distance / Velocity;
+        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
 
         public float EndX => X + this.CurvePositionAt(1).X / CatchPlayfield.BASE_WIDTH;
 
@@ -140,24 +140,24 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public double Distance
         {
-            get { return Curve.Distance; }
-            set { Curve.Distance = value; }
+            get { return Path.Distance; }
+            set { Path.Distance = value; }
         }
 
-        public SliderCurve Curve { get; } = new SliderCurve();
+        public SliderPath Path { get; } = new SliderPath();
 
-        public List<Vector2> ControlPoints
+        public Vector2[] ControlPoints
         {
-            get { return Curve.ControlPoints; }
-            set { Curve.ControlPoints = value; }
+            get { return Path.ControlPoints; }
+            set { Path.ControlPoints = value; }
         }
 
-        public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
+        public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
 
-        public CurveType CurveType
+        public PathType PathType
         {
-            get { return Curve.CurveType; }
-            set { Curve.CurveType = value; }
+            get { return Path.PathType; }
+            set { Path.PathType = value; }
         }
 
         public double? LegacyLastTickOffset { get; set; }

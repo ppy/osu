@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.TypeExtensions;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -78,8 +77,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         private bool judgementOccurred;
 
         public bool Interactive = true;
-        public override bool HandleKeyboardInput => Interactive;
-        public override bool HandleMouseInput => Interactive;
+        public override bool HandleNonPositionalInput => Interactive;
+        public override bool HandlePositionalInput => Interactive;
 
         public override bool RemoveWhenNotAlive => false;
         public override bool RemoveCompletedTransforms => false;
@@ -145,7 +144,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
         /// <summary>
-        /// Plays all the hitsounds for this <see cref="DrawableHitObject"/>.
+        /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
         /// </summary>
         public void PlaySamples() => Samples?.Play();
 
@@ -167,13 +166,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds)
-        {
-            if (!AllJudged)
-                return false;
-
-            return base.UpdateSubTreeMasking(source, maskingBounds);
-        }
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => AllJudged && base.ComputeIsMaskedAway(maskingBounds);
 
         protected override void UpdateAfterChildren()
         {
