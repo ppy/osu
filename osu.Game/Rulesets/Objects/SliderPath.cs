@@ -14,11 +14,6 @@ namespace osu.Game.Rulesets.Objects
     public struct SliderPath : IEquatable<SliderPath>
     {
         /// <summary>
-        /// The control points of the path.
-        /// </summary>
-        public readonly Vector2[] ControlPoints;
-
-        /// <summary>
         /// The user-set distance of the path. If non-null, <see cref="Distance"/> will match this value,
         /// and the path will be shortened/lengthened to match this length.
         /// </summary>
@@ -28,6 +23,9 @@ namespace osu.Game.Rulesets.Objects
         /// The type of path.
         /// </summary>
         public readonly PathType Type;
+
+        [JsonProperty]
+        private Vector2[] controlPoints;
 
         private List<Vector2> calculatedPath;
         private List<double> cumulativeLength;
@@ -46,12 +44,25 @@ namespace osu.Game.Rulesets.Objects
         public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
         {
             this = default;
+            this.controlPoints = controlPoints;
 
-            ControlPoints = controlPoints;
             Type = type;
             ExpectedDistance = expectedDistance;
 
             ensureInitialised();
+        }
+
+        /// <summary>
+        /// The control points of the path.
+        /// </summary>
+        [JsonIgnore]
+        public ReadOnlySpan<Vector2> ControlPoints
+        {
+            get
+            {
+                ensureInitialised();
+                return controlPoints.AsSpan();
+            }
         }
 
         /// <summary>
@@ -116,6 +127,7 @@ namespace osu.Game.Rulesets.Objects
                 return;
             isInitialised = true;
 
+            controlPoints = controlPoints ?? Array.Empty<Vector2>();
             calculatedPath = new List<Vector2>();
             cumulativeLength = new List<double>();
 
@@ -166,7 +178,7 @@ namespace osu.Game.Rulesets.Objects
 
                 if (i == ControlPoints.Length - 1 || ControlPoints[i] == ControlPoints[i + 1])
                 {
-                    ReadOnlySpan<Vector2> cpSpan = ControlPoints.AsSpan().Slice(start, end - start);
+                    ReadOnlySpan<Vector2> cpSpan = ControlPoints.Slice(start, end - start);
 
                     foreach (Vector2 t in calculateSubpath(cpSpan))
                         if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
