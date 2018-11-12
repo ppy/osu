@@ -35,22 +35,22 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         private Cached initialStateCache = new Cached();
 
-        public ScrollingHitObjectContainer(ScrollAlgorithm scrollAlgorithm)
+        public ScrollingHitObjectContainer(ScrollVisualisationMethod visualisationMethod)
         {
             RelativeSizeAxes = Axes.Both;
 
             TimeRange.ValueChanged += _ => initialStateCache.Invalidate();
             Direction.ValueChanged += _ => initialStateCache.Invalidate();
 
-            switch (scrollAlgorithm)
+            switch (visualisationMethod)
             {
-                case ScrollAlgorithm.Sequential:
+                case ScrollVisualisationMethod.Sequential:
                     algorithm = new SequentialScrollAlgorithm(ControlPoints);
                     break;
-                case ScrollAlgorithm.Overlapping:
+                case ScrollVisualisationMethod.Overlapping:
                     algorithm = new OverlappingScrollAlgorithm(ControlPoints);
                     break;
-                case ScrollAlgorithm.Constant:
+                case ScrollVisualisationMethod.Constant:
                     algorithm = new ConstantScrollAlgorithm();
                     break;
             }

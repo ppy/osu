@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        protected override ScrollAlgorithm ScrollAlgorithm => ScrollAlgorithm.Overlapping;
+        protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
