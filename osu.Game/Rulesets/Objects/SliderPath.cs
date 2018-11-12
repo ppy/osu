@@ -11,7 +11,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public struct SliderPath
+    public struct SliderPath : IEquatable<SliderPath>
     {
         /// <summary>
         /// The control points of the path.
@@ -253,6 +253,22 @@ namespace osu.Game.Rulesets.Objects
 
             double w = (d - d0) / (d1 - d0);
             return p0 + (p1 - p0) * (float)w;
+        }
+
+        public bool Equals(SliderPath other)
+        {
+            if (ControlPoints == null && other.ControlPoints != null)
+                return false;
+            if (other.ControlPoints == null && ControlPoints != null)
+                return false;
+
+            return ControlPoints.SequenceEqual(other.ControlPoints) && ExpectedDistance.Equals(other.ExpectedDistance) && Type == other.Type;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is SliderPath other && Equals(other);
         }
     }
 }
