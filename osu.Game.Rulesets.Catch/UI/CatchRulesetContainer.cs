@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatchRulesetContainer : ScrollingRulesetContainer<CatchPlayfield, CatchHitObject>
     {
-        protected override ScrollAlgorithm ScrollAlgorithm => ScrollAlgorithm.Constant;
+        protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Constant;
 
         protected override bool UserScrollSpeedAdjustment => false;
 

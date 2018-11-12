@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public class TaikoRulesetContainer : ScrollingRulesetContainer<TaikoPlayfield, TaikoHitObject>
     {
-        protected override ScrollAlgorithm ScrollAlgorithm => ScrollAlgorithm.Overlapping;
+        protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Overlapping;
 
         protected override bool UserScrollSpeedAdjustment => false;
 

@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual
     {
         public SortedList<MultiplierControlPoint> ControlPoints => scrollingInfo.Algorithm.ControlPoints;
 
-        public ScrollAlgorithm ScrollAlgorithm { set => scrollingInfo.Algorithm.Algorithm = value; }
+        public ScrollVisualisationMethod ScrollAlgorithm { set => scrollingInfo.Algorithm.Algorithm = value; }
 
         public double TimeRange { set => scrollingInfo.TimeRange.Value = value; }
 
@@ -54,22 +54,22 @@ namespace osu.Game.Tests.Visual
 
             public TestScrollAlgorithm()
             {
-                Algorithm = ScrollAlgorithm.Constant;
+                Algorithm = ScrollVisualisationMethod.Constant;
             }
 
-            public ScrollAlgorithm Algorithm
+            public ScrollVisualisationMethod Algorithm
             {
                 set
                 {
                     switch (value)
                     {
-                        case ScrollAlgorithm.Constant:
+                        case ScrollVisualisationMethod.Constant:
                             implementation = new ConstantScrollAlgorithm();
                             break;
-                        case ScrollAlgorithm.Overlapping:
+                        case ScrollVisualisationMethod.Overlapping:
                             implementation = new OverlappingScrollAlgorithm(ControlPoints);
                             break;
-                        case ScrollAlgorithm.Sequential:
+                        case ScrollVisualisationMethod.Sequential:
                             implementation = new SequentialScrollAlgorithm(ControlPoints);
                             break;
                     }

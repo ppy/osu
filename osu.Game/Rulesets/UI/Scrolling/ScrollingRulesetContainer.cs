@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
             MaxValue = time_span_max
         };
 
-        protected virtual ScrollAlgorithm ScrollAlgorithm => ScrollAlgorithm.Sequential;
+        protected virtual ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Sequential;
 
         /// <summary>
         /// Whether the player can change <see cref="VisibleTimeRange"/>.
@@ -87,15 +87,15 @@ namespace osu.Game.Rulesets.UI.Scrolling
             scrollingInfo.Direction.BindTo(Direction);
             scrollingInfo.TimeRange.BindTo(TimeRange);
 
-            switch (ScrollAlgorithm)
+            switch (VisualisationMethod)
             {
-                case ScrollAlgorithm.Sequential:
+                case ScrollVisualisationMethod.Sequential:
                     scrollingInfo.Algorithm = new SequentialScrollAlgorithm(controlPoints);
                     break;
-                case ScrollAlgorithm.Overlapping:
+                case ScrollVisualisationMethod.Overlapping:
                     scrollingInfo.Algorithm = new OverlappingScrollAlgorithm(controlPoints);
                     break;
-                case ScrollAlgorithm.Constant:
+                case ScrollVisualisationMethod.Constant:
                     scrollingInfo.Algorithm = new ConstantScrollAlgorithm();
                     break;
             }
