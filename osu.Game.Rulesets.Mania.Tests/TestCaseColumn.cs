@@ -49,8 +49,8 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Spacing = new Vector2(20, 0),
                 Children = new[]
                 {
-                    createColumn(ScrollingDirection.Up, ManiaAction.Key1),
-                    createColumn(ScrollingDirection.Down, ManiaAction.Key2)
+                    createColumn(ScrollingDirection.Up, ManiaAction.Key1, 0),
+                    createColumn(ScrollingDirection.Down, ManiaAction.Key2, 1)
                 }
             };
         }
@@ -85,9 +85,9 @@ namespace osu.Game.Rulesets.Mania.Tests
             }
         }
 
-        private Drawable createColumn(ScrollingDirection direction, ManiaAction action)
+        private Drawable createColumn(ScrollingDirection direction, ManiaAction action, int index)
         {
-            var column = new Column
+            var column = new Column(index)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

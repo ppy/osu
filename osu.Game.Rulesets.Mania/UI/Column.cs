@@ -21,6 +21,11 @@ namespace osu.Game.Rulesets.Mania.UI
         private const float column_width = 45;
         private const float special_column_width = 70;
 
+        /// <summary>
+        /// The index of this column as part of the whole playfield.
+        /// </summary>
+        public readonly int Index;
+
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
         private readonly ColumnBackground background;
@@ -30,8 +35,10 @@ namespace osu.Game.Rulesets.Mania.UI
         internal readonly Container TopLevelContainer;
         private readonly Container explosionContainer;
 
-        public Column()
+        public Column(int index)
         {
+            Index = index;
+
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
 

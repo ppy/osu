@@ -123,7 +123,7 @@ namespace osu.Game.Rulesets.Mania.UI
             for (int i = 0; i < definition.Columns; i++)
             {
                 var isSpecial = definition.IsSpecialColumn(i);
-                var column = new Column
+                var column = new Column(firstColumnIndex + i)
                 {
                     IsSpecial = isSpecial,
                     Action = { Value = isSpecial ? specialColumnStartAction++ : normalColumnStartAction++ }
