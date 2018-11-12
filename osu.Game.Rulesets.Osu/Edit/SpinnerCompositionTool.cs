@@ -3,7 +3,7 @@
 
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
-using osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Edit
@@ -15,6 +15,6 @@ namespace osu.Game.Rulesets.Osu.Edit
         {
         }
 
-        public override PlacementMask CreatePlacementMask() => new SpinnerPlacementMask();
+        public override PlacementBlueprint CreatePlacementBlueprint() => new SpinnerPlacementBlueprint();
     }
 }
