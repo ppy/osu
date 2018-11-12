@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         protected new T HitObject => (T)base.HitObject;
 
         [Resolved]
-        private ManiaHitObjectComposer composer { get; set; }
+        private IManiaHitObjectComposer composer { get; set; }
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
