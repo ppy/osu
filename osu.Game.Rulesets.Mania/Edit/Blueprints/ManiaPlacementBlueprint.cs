@@ -34,10 +34,18 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             if (column == null)
                 return 0;
 
-            return scrollingInfo.Algorithm.TimeAt(column.HitObjectContainer.ToLocalSpace(applyPositionOffset(screenSpacePosition)).Y,
+            var hitObjectContainer = column.HitObjectContainer;
+
+            // If we're scrolling downwards, a position of 0 is actually further away from the hit target
+            // so we need to flip the vertical coordinate in the hitobject container's space
+            var hitObjectPos = column.HitObjectContainer.ToLocalSpace(applyPositionOffset(screenSpacePosition)).Y;
+            if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
+                hitObjectPos = hitObjectContainer.DrawHeight - hitObjectPos;
+
+            return scrollingInfo.Algorithm.TimeAt(hitObjectPos,
                 EditorClock.CurrentTime,
                 scrollingInfo.TimeRange.Value,
-                column.HitObjectContainer.DrawHeight);
+                hitObjectContainer.DrawHeight);
         }
 
         protected Column ColumnAt(Vector2 screenSpacePosition)
