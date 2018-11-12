@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
             var newControlPoints = new Vector2[slider.Path.ControlPoints.Length];
             for (int i = 0; i < slider.Path.ControlPoints.Length; i++)
-                newControlPoints[i] = new Vector2(slider.Path.ControlPoints[i].X, -slider.Path.ControlPoints[i].Y);
+                newControlPoints[i] = new Vector2(slider.Path.ControlPoints.Span[i].X, -slider.Path.ControlPoints.Span[i].Y);
 
             slider.Path = new SliderPath(slider.Path.Type, newControlPoints, slider.Path.ExpectedDistance);
         }

@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Objects
 {
     public readonly struct SliderPath
     {
-        public readonly Vector2[] ControlPoints;
+        public readonly ReadOnlyMemory<Vector2> ControlPoints;
         public readonly PathType Type;
         public readonly double? ExpectedDistance;
 
@@ -73,9 +73,9 @@ namespace osu.Game.Rulesets.Objects
             {
                 end++;
 
-                if (i == ControlPoints.Length - 1 || ControlPoints[i] == ControlPoints[i + 1])
+                if (i == ControlPoints.Length - 1 || ControlPoints.Span[i] == ControlPoints.Span[i + 1])
                 {
-                    ReadOnlySpan<Vector2> cpSpan = ControlPoints.AsSpan().Slice(start, end - start);
+                    ReadOnlySpan<Vector2> cpSpan = ControlPoints.Span.Slice(start, end - start);
 
                     foreach (Vector2 t in calculateSubpath(cpSpan))
                         if (calculatedPath.Count == 0 || calculatedPath.Last() != t)

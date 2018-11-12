@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -56,7 +55,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             base.Update();
 
-            Position = slider.StackedPosition + slider.Path.ControlPoints[index];
+            Position = slider.StackedPosition + slider.Path.ControlPoints.Span[index];
 
             marker.Colour = isSegmentSeparator ? colours.Red : colours.Yellow;
 
@@ -65,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             if (index != slider.Path.ControlPoints.Length - 1)
             {
                 path.AddVertex(Vector2.Zero);
-                path.AddVertex(slider.Path.ControlPoints[index + 1] - slider.Path.ControlPoints[index]);
+                path.AddVertex(slider.Path.ControlPoints.Span[index + 1] - slider.Path.ControlPoints.Span[index]);
             }
 
             path.OriginPosition = path.PositionInBoundingBox(Vector2.Zero);
@@ -106,8 +105,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private bool isSegmentSeparator => isSegmentSeparatorWithNext || isSegmentSeparatorWithPrevious;
 
-        private bool isSegmentSeparatorWithNext => index < slider.Path.ControlPoints.Length - 1 && slider.Path.ControlPoints[index + 1] == slider.Path.ControlPoints[index];
+        private bool isSegmentSeparatorWithNext => index < slider.Path.ControlPoints.Length - 1 && slider.Path.ControlPoints.Span[index + 1] == slider.Path.ControlPoints.Span[index];
 
-        private bool isSegmentSeparatorWithPrevious => index > 0 && slider.Path.ControlPoints[index - 1] == slider.Path.ControlPoints[index];
+        private bool isSegmentSeparatorWithPrevious => index > 0 && slider.Path.ControlPoints.Span[index - 1] == slider.Path.ControlPoints.Span[index];
     }
 }
