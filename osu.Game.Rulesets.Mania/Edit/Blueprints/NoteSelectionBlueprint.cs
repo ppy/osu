@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
@@ -14,8 +13,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         public NoteSelectionBlueprint(DrawableNote note)
             : base(note)
         {
-            RelativeSizeAxes = Axes.None;
-
             Scale = note.Scale;
 
             CornerRadius = 5;
