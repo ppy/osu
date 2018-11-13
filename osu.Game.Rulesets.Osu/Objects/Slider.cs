@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createSliderEnds()
         {
-            HeadCircle = new SliderCircle(this)
+            HeadCircle = new SliderCircle
             {
                 StartTime = StartTime,
                 Position = Position,
@@ -176,7 +176,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 ComboIndex = ComboIndex,
             };
 
-            TailCircle = new SliderTailCircle(this)
+            TailCircle = new SliderTailCircle
             {
                 StartTime = EndTime,
                 Position = EndPosition,

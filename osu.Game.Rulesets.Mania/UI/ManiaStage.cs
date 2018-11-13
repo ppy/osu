@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Mania.UI
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    public class ManiaStage : ManiaScrollingPlayfield
+    public class ManiaStage : ScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
 
@@ -144,8 +144,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public void AddColumn(Column c)
         {
-            c.VisibleTimeRange.BindTo(VisibleTimeRange);
-
             topLevelContainer.Add(c.TopLevelContainer.CreateProxy());
             columnFlow.Add(c);
             AddNested(c);
