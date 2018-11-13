@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Edit
 {
     public abstract class HitObjectComposer : CompositeDrawable
     {
-        public IEnumerable<DrawableHitObject> HitObjects => rulesetContainer.Playfield.AllHitObjects;
+        public IEnumerable<DrawableHitObject> HitObjects => RulesetContainer.Playfield.AllHitObjects;
 
         protected readonly Ruleset Ruleset;
 
@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Edit
 
         private readonly List<Container> layerContainers = new List<Container>();
 
-        private EditRulesetContainer rulesetContainer;
+        public EditRulesetContainer RulesetContainer { get; private set; }
 
         private BlueprintContainer blueprintContainer;
 
@@ -51,8 +51,8 @@ namespace osu.Game.Rulesets.Edit
 
             try
             {
-                rulesetContainer = CreateRulesetContainer();
-                rulesetContainer.Clock = framedClock;
+                RulesetContainer = CreateRulesetContainer();
+                RulesetContainer.Clock = framedClock;
             }
             catch (Exception e)
             {
@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Edit
                             Children = new Drawable[]
                             {
                                 layerBelowRuleset,
-                                rulesetContainer,
+                                RulesetContainer,
                                 layerAboveRuleset
                             }
                         }
@@ -130,10 +130,10 @@ namespace osu.Game.Rulesets.Edit
 
             layerContainers.ForEach(l =>
             {
-                l.Anchor = rulesetContainer.Playfield.Anchor;
-                l.Origin = rulesetContainer.Playfield.Origin;
-                l.Position = rulesetContainer.Playfield.Position;
-                l.Size = rulesetContainer.Playfield.Size;
+                l.Anchor = RulesetContainer.Playfield.Anchor;
+                l.Origin = RulesetContainer.Playfield.Origin;
+                l.Position = RulesetContainer.Playfield.Position;
+                l.Size = RulesetContainer.Playfield.Size;
             });
         }
 
@@ -141,9 +141,9 @@ namespace osu.Game.Rulesets.Edit
         /// Adds a <see cref="HitObject"/> to the <see cref="Beatmaps.Beatmap"/> and visualises it.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
-        public void Add(HitObject hitObject) => blueprintContainer.AddBlueprintFor(rulesetContainer.Add(hitObject));
+        public void Add(HitObject hitObject) => blueprintContainer.AddBlueprintFor(RulesetContainer.Add(hitObject));
 
-        public void Remove(HitObject hitObject) => blueprintContainer.RemoveBlueprintFor(rulesetContainer.Remove(hitObject));
+        public void Remove(HitObject hitObject) => blueprintContainer.RemoveBlueprintFor(RulesetContainer.Remove(hitObject));
 
         internal abstract EditRulesetContainer CreateRulesetContainer();
 
