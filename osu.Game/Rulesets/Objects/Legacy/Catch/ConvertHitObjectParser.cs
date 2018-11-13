@@ -50,9 +50,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
                 X = position.X,
                 NewCombo = FirstObject || newCombo,
                 ComboOffset = comboOffset,
-                ControlPoints = controlPoints,
-                Distance = length,
-                PathType = pathType,
+                Path = new SliderPath(pathType, controlPoints, length),
                 NodeSamples = nodeSamples,
                 RepeatCount = repeatCount
             };
