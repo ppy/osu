@@ -85,6 +85,9 @@ namespace osu.Game.Tests.Visual
             public float PositionAt(double time, double currentTime, double timeRange, float scrollLength)
                 => implementation.PositionAt(time, currentTime, timeRange, scrollLength);
 
+            public double TimeAt(float position, double currentTime, double timeRange, float scrollLength)
+                => implementation.TimeAt(position, currentTime, timeRange, scrollLength);
+
             public void Reset()
                 => implementation.Reset();
         }
