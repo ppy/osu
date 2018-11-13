@@ -104,6 +104,14 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Hide", profile.Hide);
             AddStep("Show without reload", profile.Show);
+
+            AddStep("Show ppy with null Country fields", () => profile.ShowUser(new User
+            {
+                Username = @"ppy",
+                Id = 2,
+                Country = new Country { FullName = null, FlagName = null },
+                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c6.jpg"
+            }, api.IsLoggedIn));
         }
 
         private void checkSupporterTag(bool isSupporter)

@@ -31,11 +31,11 @@ namespace osu.Game.Overlays.Profile
 
         public readonly SupporterIcon SupporterTag;
         private readonly Container coverContainer;
+        private readonly Container profileInfo;
         private readonly Sprite levelBadge;
         private readonly SpriteText levelText;
         private readonly GradeBadge gradeSSPlus, gradeSS, gradeSPlus, gradeS, gradeA;
         private readonly Box colourBar;
-        private readonly DrawableFlag countryFlag;
         private readonly BadgeContainer badgeContainer;
 
         private const float cover_height = 350;
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Profile
                                         Radius = 4,
                                     },
                                 },
-                                new Container
+                                profileInfo = new Container
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
@@ -128,13 +128,6 @@ namespace osu.Game.Overlays.Profile
                                                 },
                                             }
                                         },
-                                        countryFlag = new DrawableFlag(user.Country)
-                                        {
-                                            Anchor = Anchor.BottomLeft,
-                                            Origin = Anchor.BottomLeft,
-                                            Width = 30,
-                                            Height = 20
-                                        }
                                     }
                                 },
                                 badgeContainer = new BadgeContainer
@@ -369,9 +362,23 @@ namespace osu.Game.Overlays.Profile
 
             if (user.Country != null)
             {
-                infoTextLeft.AddText("From ", lightText);
-                infoTextLeft.AddText(user.Country.FullName, boldItalic);
-                countryFlag.Country = user.Country;
+                if (user.Country.FullName != null)
+                {
+                    infoTextLeft.AddText("From ", lightText);
+                    infoTextLeft.AddText(user.Country.FullName, boldItalic);
+                }
+
+                if (user.Country.FlagName != null)
+                {
+                    profileInfo.Add(
+                        new DrawableFlag(user.Country)
+                        {
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
+                            Width = 30,
+                            Height = 20,
+                        });
+                }
             }
 
             infoTextLeft.NewParagraph();
