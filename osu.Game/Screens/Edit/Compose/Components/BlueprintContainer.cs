@@ -134,10 +134,15 @@ namespace osu.Game.Screens.Edit.Compose.Components
         {
             base.Update();
 
-            if (composer.RulesetContainer.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position))
-                currentPlacement?.Show();
-            else if (currentPlacement?.PlacementBegun == false)
-                currentPlacement?.Hide();
+            if (currentPlacement != null)
+            {
+                bool cursorInPlayfield = composer.RulesetContainer.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
+
+                if (cursorInPlayfield)
+                    currentPlacement.State = PlacementState.Shown;
+                else if (currentPlacement?.PlacementBegun == false)
+                    currentPlacement.State = PlacementState.Hidden;
+            }
         }
 
         /// <summary>
@@ -152,7 +157,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
             if (blueprint != null)
                 placementBlueprintContainer.Child = currentPlacement = blueprint;
         }
-
 
         /// <summary>
         /// Select all masks in a given rectangle selection area.
