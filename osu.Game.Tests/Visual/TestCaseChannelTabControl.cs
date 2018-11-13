@@ -106,6 +106,7 @@ namespace osu.Game.Tests.Visual
         {
             channelTabControl.AddChannel(new Channel
             {
+                Type = ChannelType.Public,
                 Name = name
             });
         }
