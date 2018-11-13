@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Chat.Tabs
         public PrivateChannelTabItem(Channel value)
             : base(value)
         {
-            if (value.Target != TargetType.User)
+            if (value.Type != ChannelType.PM)
                 throw new ArgumentException("Argument value needs to have the targettype user!");
 
             AddRange(new Drawable[]
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             Masking = true,
-                            Child = new DelayedLoadWrapper(new Avatar(value.JoinedUsers.First())
+                            Child = new DelayedLoadWrapper(new Avatar(value.Users.First())
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 OnLoadComplete = d => d.FadeInFromZero(300, Easing.OutQuint),
@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Chat.Tabs
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            var user = Value.JoinedUsers.First();
+            var user = Value.Users.First();
 
             BackgroundActive = user.Colour != null ? OsuColour.FromHex(user.Colour) : colours.BlueDark;
             BackgroundInactive = BackgroundActive.Darken(0.5f);

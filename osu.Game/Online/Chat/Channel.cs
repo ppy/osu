@@ -17,9 +17,19 @@ namespace osu.Game.Online.Chat
         public readonly int MaxHistory = 300;
 
         /// <summary>
-        /// Contains every joined user except the current logged in user.
+        /// Contains every joined user except the current logged in user. Currently only returned for PM channels.
         /// </summary>
-        public readonly ObservableCollection<User> JoinedUsers = new ObservableCollection<User>();
+        public readonly ObservableCollection<User> Users = new ObservableCollection<User>();
+
+        [JsonProperty(@"users")]
+        private long[] userIds
+        {
+            set
+            {
+                foreach (var id in value)
+                    Users.Add(new User { Id = id });
+            }
+        }
 
         /// <summary>
         /// Contains all the messages send in the channel.
@@ -46,11 +56,6 @@ namespace osu.Game.Online.Chat
         /// An event that fires when a pending message gets removed.
         /// </summary>
         public event Action<Message> MessageRemoved;
-
-        /// <summary>
-        /// Signalles whether the channels target is a private channel or public channel.
-        /// </summary>
-        public TargetType Target { get; protected set; }
 
         public bool ReadOnly => false; //todo not yet used.
 
