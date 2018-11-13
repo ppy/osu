@@ -37,6 +37,8 @@ namespace osu.Game.Rulesets.Edit
             HitObject = hitObject;
 
             RelativeSizeAxes = Axes.Both;
+
+            Alpha = 0;
         }
 
         [BackgroundDependencyLoader]
@@ -49,7 +51,7 @@ namespace osu.Game.Rulesets.Edit
             ApplyDefaultsToHitObject();
         }
 
-        private bool placementBegun;
+        public bool PlacementBegun { get; private set; }
 
         /// <summary>
         /// Signals that the placement of <see cref="HitObject"/> has started.
@@ -57,7 +59,7 @@ namespace osu.Game.Rulesets.Edit
         protected void BeginPlacement()
         {
             placementHandler.BeginPlacement(HitObject);
-            placementBegun = true;
+            PlacementBegun = true;
         }
 
         /// <summary>
@@ -66,7 +68,7 @@ namespace osu.Game.Rulesets.Edit
         /// </summary>
         protected void EndPlacement()
         {
-            if (!placementBegun)
+            if (!PlacementBegun)
                 BeginPlacement();
             placementHandler.EndPlacement(HitObject);
         }

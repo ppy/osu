@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Rulesets.Edit;
@@ -18,13 +19,18 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public class BlueprintContainer : CompositeDrawable
     {
         private SelectionBlueprintContainer selectionBlueprints;
+
         private Container<PlacementBlueprint> placementBlueprintContainer;
+        private PlacementBlueprint currentPlacement;
+
         private SelectionBox selectionBox;
 
         private IEnumerable<SelectionBlueprint> selections => selectionBlueprints.Children.Where(c => c.IsAlive);
 
         [Resolved]
         private HitObjectComposer composer { get; set; }
+
+        private InputManager inputManager;
 
         public BlueprintContainer()
         {
@@ -51,6 +57,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             foreach (var obj in composer.HitObjects)
                 AddBlueprintFor(obj);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
         }
 
         private HitObjectCompositionTool currentTool;
@@ -117,16 +130,27 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return true;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (composer.RulesetContainer.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position))
+                currentPlacement?.Show();
+            else if (currentPlacement?.PlacementBegun == false)
+                currentPlacement?.Hide();
+        }
+
         /// <summary>
         /// Refreshes the current placement tool.
         /// </summary>
         private void refreshTool()
         {
             placementBlueprintContainer.Clear();
+            currentPlacement = null;
 
             var blueprint = CurrentTool?.CreatePlacementBlueprint();
             if (blueprint != null)
-                placementBlueprintContainer.Child = blueprint;
+                placementBlueprintContainer.Child = currentPlacement = blueprint;
         }
 
 
