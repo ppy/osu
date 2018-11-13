@@ -19,15 +19,15 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
             InternalChild = pieces = new Container<PathControlPointPiece> { RelativeSizeAxes = Axes.Both };
 
-            slider.ControlPointsChanged += _ => updatePathControlPoints();
+            slider.PathChanged += _ => updatePathControlPoints();
             updatePathControlPoints();
         }
 
         private void updatePathControlPoints()
         {
-            while (slider.ControlPoints.Length > pieces.Count)
+            while (slider.Path.ControlPoints.Length > pieces.Count)
                 pieces.Add(new PathControlPointPiece(slider, pieces.Count));
-            while (slider.ControlPoints.Length < pieces.Count)
+            while (slider.Path.ControlPoints.Length < pieces.Count)
                 pieces.Remove(pieces[pieces.Count - 1]);
         }
     }

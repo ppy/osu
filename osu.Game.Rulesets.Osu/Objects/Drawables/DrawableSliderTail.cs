@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             AlwaysPresent = true;
 
             hitCircle.PositionChanged += _ => updatePosition();
-            slider.ControlPointsChanged += _ => updatePosition();
+            slider.PathChanged += _ => updatePosition();
 
             updatePosition();
         }
