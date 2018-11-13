@@ -22,10 +22,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             InternalChild = new EditNotePiece { RelativeSizeAxes = Axes.X };
         }
 
-        protected override bool OnMouseMove(MouseMoveEvent e)
+        protected override void Update()
         {
-            Position = e.MousePosition;
-            return true;
+            base.Update();
+
+            Position = SnappedMousePosition;
         }
 
         protected override bool OnClick(ClickEvent e)

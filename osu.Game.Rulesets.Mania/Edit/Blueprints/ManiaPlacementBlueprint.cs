@@ -3,6 +3,8 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
@@ -16,6 +18,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
     {
         protected new T HitObject => (T)base.HitObject;
 
+        /// <summary>
+        /// The current mouse position, snapped to the closest column.
+        /// </summary>
+        protected Vector2 SnappedMousePosition { get; private set; }
+
         [Resolved]
         private IManiaHitObjectComposer composer { get; set; }
 
@@ -26,6 +33,31 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             : base(hitObject)
         {
             RelativeSizeAxes = Axes.None;
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            updateSnappedPosition(e);
+            return true;
+        }
+
+        private ScheduledDelegate scheduledSnappedPositionUpdate;
+
+        private void updateSnappedPosition(MouseMoveEvent e)
+        {
+            scheduledSnappedPositionUpdate?.Cancel();
+            scheduledSnappedPositionUpdate = Schedule(() =>
+            {
+                Column column = ColumnAt(e.ScreenSpaceMousePosition);
+                if (column == null)
+                    SnappedMousePosition = e.MousePosition;
+                else
+                {
+                    // Snap to the column
+                    var parentPos = Parent.ToLocalSpace(column.ToScreenSpace(new Vector2(column.DrawWidth / 2, 0)));
+                    SnappedMousePosition = new Vector2(parentPos.X, e.MousePosition.Y);
+                }
+            });
         }
 
         protected double TimeAt(Vector2 screenSpacePosition)

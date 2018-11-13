@@ -13,6 +13,7 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -172,5 +173,9 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public bool OnReleased(ManiaAction action) => false;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+            // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
+            => DrawRectangle.Inflate(new Vector2(1, 0)).Contains(ToLocalSpace(screenSpacePos));
     }
 }
