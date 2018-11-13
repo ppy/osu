@@ -10,7 +10,6 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
@@ -138,27 +137,17 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public double Duration => EndTime - StartTime;
 
-        public double Distance
+        private SliderPath path;
+
+        public SliderPath Path
         {
-            get { return Path.Distance; }
-            set { Path.Distance = value; }
+            get => path;
+            set => path = value;
         }
 
-        public SliderPath Path { get; } = new SliderPath();
-
-        public Vector2[] ControlPoints
-        {
-            get { return Path.ControlPoints; }
-            set { Path.ControlPoints = value; }
-        }
+        public double Distance => Path.Distance;
 
         public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
-
-        public PathType PathType
-        {
-            get { return Path.PathType; }
-            set { Path.PathType = value; }
-        }
 
         public double? LegacyLastTickOffset { get; set; }
     }
