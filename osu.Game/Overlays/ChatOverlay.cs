@@ -153,7 +153,7 @@ namespace osu.Game.Overlays
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     RelativeSizeAxes = Axes.Both,
-                                    OnRequestLeave = channel => channelManager.JoinedChannels.Remove(channel)
+                                    OnRequestLeave = channel => channelManager.LeaveChannel(channel)
                                 },
                             }
                         },
@@ -176,15 +176,9 @@ namespace osu.Game.Overlays
                 else
                     textbox.HoldFocus = true;
             };
-            channelSelection.OnRequestJoin = channel =>
-            {
-                if (!channelManager.JoinedChannels.Contains(channel))
-                {
-                    channelManager.JoinedChannels.Add(channel);
-                    channelManager.FetchInitalMessages(channel);
-                }
-            };
-            channelSelection.OnRequestLeave = channel => channelManager.JoinedChannels.Remove(channel);
+
+            channelSelection.OnRequestJoin = channel => channelManager.JoinChannel(channel);
+            channelSelection.OnRequestLeave = channel => channelManager.LeaveChannel(channel);
         }
 
         private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
@@ -195,18 +189,16 @@ namespace osu.Game.Overlays
                     foreach (Channel newChannel in args.NewItems)
                     {
                         channelTabControl.AddChannel(newChannel);
-
-                        newChannel.Joined.Value = true;
                     }
+
                     break;
                 case NotifyCollectionChangedAction.Remove:
                     foreach (Channel removedChannel in args.OldItems)
                     {
                         channelTabControl.RemoveChannel(removedChannel);
-
-                        loadedChannels.Remove(loadedChannels.Find(c => c.Channel == removedChannel ));
-                        removedChannel.Joined.Value = false;
+                        loadedChannels.Remove(loadedChannels.Find(c => c.Channel == removedChannel));
                     }
+
                     break;
             }
         }

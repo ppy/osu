@@ -54,11 +54,11 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         protected override TabItem<Channel> CreateTabItem(Channel value)
         {
-            switch (value.Target)
+            switch (value.Type)
             {
-                case TargetType.Channel:
+                case ChannelType.Public:
                     return new ChannelTabItem(value) { OnRequestClose = tabCloseRequested };
-                case TargetType.User:
+                case ChannelType.PM:
                     return new PrivateChannelTabItem(value) { OnRequestClose = tabCloseRequested };
                 default:
                     throw new InvalidOperationException("Only TargetType User and Channel are supported.");

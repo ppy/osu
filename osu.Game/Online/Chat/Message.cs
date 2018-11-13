@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using Newtonsoft.Json;
 using osu.Game.Users;
 
@@ -68,13 +67,5 @@ namespace osu.Game.Online.Chat
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         public override int GetHashCode() => Id.GetHashCode();
-    }
-
-    public enum TargetType
-    {
-        [Description(@"channel")]
-        Channel,
-        [Description(@"user")]
-        User
     }
 }

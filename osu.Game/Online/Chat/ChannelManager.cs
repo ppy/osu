@@ -39,12 +39,12 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// The Channels the player has joined
         /// </summary>
-        public ObservableCollection<Channel> JoinedChannels { get; } = new ObservableCollection<Channel>();
+        public ObservableCollection<Channel> JoinedChannels { get; } = new ObservableCollection<Channel>(); //todo: should be publicly readonly
 
         /// <summary>
         /// The channels available for the player to join
         /// </summary>
-        public ObservableCollection<Channel> AvailableChannels { get; } = new ObservableCollection<Channel>();
+        public ObservableCollection<Channel> AvailableChannels { get; } = new ObservableCollection<Channel>(); //todo: should be publicly readonly
 
         /*private readonly IncomingMessagesHandler privateMessagesHandler;*/
 
@@ -54,12 +54,6 @@ namespace osu.Game.Online.Chat
         public ChannelManager()
         {
             CurrentChannel.ValueChanged += currentChannelChanged;
-
-            /*channelMessagesHandler = new IncomingMessagesHandler(
-                lastId => new GetMessagesRequest(JoinedChannels.Where(c => c.Target == TargetType.Channel)), handleChannelMessages);
-
-            privateMessagesHandler = new IncomingMessagesHandler(
-                lastId => new GetPrivateMessagesRequest(lastId),handleUserMessages);*/
         }
 
         /// <summary>
@@ -85,14 +79,13 @@ namespace osu.Game.Online.Chat
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
 
-            CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Target == TargetType.User && c.Id == user.Id)
-                                   ?? new PrivateChannel { User = user };
+            CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Users.Any(u => u.Id == user.Id))
+                                   ?? new Channel { Name = user.Username, Users = { user } };
         }
 
         private void currentChannelChanged(Channel channel)
         {
-            if (!JoinedChannels.Contains(channel))
-                JoinedChannels.Add(channel);
+            JoinChannel(channel);
         }
 
         /// <summary>
@@ -169,71 +162,6 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        private void fetchNewMessages()
-        {
-            /*if (channelMessagesHandler.CanRequestNewMessages)
-                channelMessagesHandler.RequestNewMessages(api);
-
-            if (privateMessagesHandler.CanRequestNewMessages)
-                privateMessagesHandler.RequestNewMessages(api);*/
-        }
-
-        private void handleUserMessages(IEnumerable<Message> messages)
-        {
-            var joinedPrivateChannels = JoinedChannels.Where(c => c.Target == TargetType.User).ToList();
-
-            Channel getChannelForUser(User user)
-            {
-                var channel = joinedPrivateChannels.FirstOrDefault(c => c.Id == user.Id);
-
-                if (channel == null)
-                {
-                    channel = new PrivateChannel { User = user };
-                    JoinedChannels.Add(channel);
-                    joinedPrivateChannels.Add(channel);
-                }
-
-                return channel;
-            }
-
-            long localUserId = api.LocalUser.Value.Id;
-
-            var outgoingGroups = messages.Where(m => m.Sender.Id == localUserId).GroupBy(m => m.ChannelId);
-            var incomingGroups = messages.Where(m => m.Sender.Id != localUserId).GroupBy(m => m.UserId);
-
-            foreach (var group in incomingGroups)
-            {
-                var targetUser = group.First().Sender;
-
-                var channel = getChannelForUser(targetUser);
-
-                channel.AddNewMessages(group.ToArray());
-
-                var outgoingTargetMessages = outgoingGroups.FirstOrDefault(g => g.Key == targetUser.Id);
-                if (outgoingTargetMessages != null)
-                    channel.AddNewMessages(outgoingTargetMessages.ToArray());
-            }
-
-            // Because of the way the API provides data right now, outgoing messages do not contain required
-            // user (or in the future, target channel) metadata. As such we need to do a second request
-            // to find out the specifics of the user.
-            var withoutReplyGroups = outgoingGroups.Where(g => joinedPrivateChannels.All(m => m.Id != g.Key));
-
-            foreach (var withoutReplyGroup in withoutReplyGroups)
-            {
-                var userReq = new GetUserRequest(withoutReplyGroup.First().ChannelId);
-
-                userReq.Failure += exception => Logger.Error(exception, "Failed to get user informations.");
-                userReq.Success += user =>
-                {
-                    var channel = getChannelForUser(user);
-                    channel.AddNewMessages(withoutReplyGroup.ToArray());
-                };
-
-                api.Queue(userReq);
-            }
-        }
-
         private void handleChannelMessages(IEnumerable<Message> messages)
         {
             var channels = JoinedChannels.ToList();
@@ -246,32 +174,24 @@ namespace osu.Game.Online.Chat
         {
             var req = new ListChannelsRequest();
 
+            //var joinDefaults = JoinedChannels.Count == 0;
+
             req.Success += channels =>
             {
                 foreach (var channel in channels)
                 {
-                    if (JoinedChannels.Any(c => c.Id == channel.Id))
-                        continue;
-
                     // add as available if not already
                     if (AvailableChannels.All(c => c.Id != channel.Id))
                         AvailableChannels.Add(channel);
 
                     // join any channels classified as "defaults"
-                    if (defaultChannels.Any(c => c.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        JoinedChannels.Add(channel);
-
-                        FetchInitalMessages(channel);
-                    }
+                    /*if (joinDefaults && defaultChannels.Any(c => c.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
+                        JoinChannel(channel);*/
                 }
-
-                fetchNewMessages();
             };
             req.Failure += error =>
             {
                 Logger.Error(error, "Fetching channel list failed");
-
                 initializeDefaultChannels();
             };
 
@@ -285,12 +205,68 @@ namespace osu.Game.Online.Chat
         /// right now it caps out at 50 messages and therefore only returns one channel's worth of content.
         /// </summary>
         /// <param name="channel">The channel </param>
-        public void FetchInitalMessages(Channel channel)
+        private void fetchInitalMessages(Channel channel)
         {
             var fetchInitialMsgReq = new GetMessagesRequest(channel);
             fetchInitialMsgReq.Success += handleChannelMessages;
             fetchInitialMsgReq.Failure += exception => Logger.Error(exception, $"Failed to fetch inital messages for the channel {channel.Name}");
             api.Queue(fetchInitialMsgReq);
+        }
+
+        public void JoinChannel(Channel channel)
+        {
+            if (channel == null) return;
+
+            // ReSharper disable once AccessToModifiedClosure
+            var existing = JoinedChannels.FirstOrDefault(c => c.Id == channel.Id);
+
+            if (existing != null)
+            {
+                // if we already have this channel loaded, we don't want to make a second one.
+                channel = existing;
+            }
+            else
+            {
+                var foundSelf = channel.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
+                if (foundSelf != null)
+                    channel.Users.Remove(foundSelf);
+
+                JoinedChannels.Add(channel);
+
+                if (channel.Type == ChannelType.Public && !channel.Joined)
+                {
+                    var req = new JoinChannelRequest(channel, api.LocalUser);
+                    req.Success += () => JoinChannel(channel);
+                    req.Failure += ex => LeaveChannel(channel);
+                    api.Queue(req);
+                    return;
+                }
+            }
+
+            if (CurrentChannel.Value == null)
+                CurrentChannel.Value = channel;
+
+            if (!channel.Joined.Value)
+            {
+                // let's fetch a small number of messages to bring us up-to-date with the backlog.
+                fetchInitalMessages(channel);
+                channel.Joined.Value = true;
+            }
+        }
+
+        public void LeaveChannel(Channel channel)
+        {
+            if (channel == null) return;
+
+            if (channel == CurrentChannel.Value) CurrentChannel.Value = null;
+
+            JoinedChannels.Remove(channel);
+
+            if (channel.Joined.Value)
+            {
+                api.Queue(new LeaveChannelRequest(channel, api.LocalUser));
+                channel.Joined.Value = false;
+            }
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
@@ -301,16 +277,51 @@ namespace osu.Game.Online.Chat
                     if (JoinedChannels.Count == 0)
                         initializeDefaultChannels();
 
-                    fetchMessagesScheduleder = Scheduler.AddDelayed(fetchNewMessages, 1000, true);
+                    fetchUpdates();
                     break;
                 default:
-                    /*channelMessagesHandler.CancelOngoingRequests();
-                    privateMessagesHandler.CancelOngoingRequests();*/
-
                     fetchMessagesScheduleder?.Cancel();
                     fetchMessagesScheduleder = null;
                     break;
             }
+        }
+
+        private long lastMessageId;
+        private const int update_poll_interval = 1000;
+
+        private void fetchUpdates()
+        {
+            fetchMessagesScheduleder?.Cancel();
+            fetchMessagesScheduleder = Scheduler.AddDelayed(() =>
+            {
+                var fetchReq = new GetUpdatesRequest(lastMessageId);
+
+                fetchReq.Success += updates =>
+                {
+                    if (updates?.Presence != null)
+                    {
+                        foreach (var channel in updates.Presence)
+                        {
+                            JoinChannel(AvailableChannels.FirstOrDefault(c => c.Id == channel.Id) ?? channel);
+                        }
+
+                        //todo: handle left channels
+
+                        handleChannelMessages(updates.Messages);
+
+                        foreach (var group in updates.Messages.GroupBy(m => m.ChannelId))
+                            JoinedChannels.FirstOrDefault(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
+
+                        lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
+                    }
+
+                    fetchUpdates();
+                };
+
+                fetchReq.Failure += delegate { fetchUpdates(); };
+
+                api.Queue(fetchReq);
+            }, update_poll_interval);
         }
 
         [BackgroundDependencyLoader]

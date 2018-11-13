@@ -87,15 +87,18 @@ namespace osu.Game.Tests.Visual
 
         private void addRandomUser()
         {
-            channelTabControl.AddChannel(new PrivateChannel
+            channelTabControl.AddChannel(new Channel
             {
-                User = users?.Count > 0
+                Users =
+                {
+                    users?.Count > 0
                         ? users[RNG.Next(0, users.Count - 1)]
                         : new User
                         {
                             Id = RNG.Next(),
                             Username = "testuser" + RNG.Next(1000)
                         }
+                }
             });
         }
 
