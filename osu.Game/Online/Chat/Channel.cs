@@ -100,7 +100,7 @@ namespace osu.Game.Online.Chat
             NewMessagesArrived?.Invoke(new[] { message });
         }
 
-        public bool MessagesLoaded { get; private set; }
+        public bool MessagesLoaded;
 
         /// <summary>
         /// Adds new messages to the channel and purges old messages. Triggers the <see cref="NewMessagesArrived"/> event.
@@ -113,7 +113,6 @@ namespace osu.Game.Online.Chat
             if (messages.Length == 0) return;
 
             Messages.AddRange(messages);
-            MessagesLoaded = true;
 
             var maxMessageId = messages.Max(m => m.Id);
             if (maxMessageId > LastMessageId)
