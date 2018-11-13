@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
@@ -14,6 +15,13 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             : base(hitObject)
         {
             RelativeSizeAxes = Axes.None;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            Position = Parent.ToLocalSpace(HitObject.ToScreenSpace(Vector2.Zero));
         }
 
         public override void AdjustPosition(DragEvent dragEvent)

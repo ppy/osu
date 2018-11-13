@@ -32,7 +32,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             base.Update();
 
             Size = HitObject.DrawSize;
-            Position = Parent.ToLocalSpace(HitObject.ScreenSpaceDrawQuad.TopLeft);
         }
     }
 }
