@@ -1,6 +1,8 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -18,8 +20,18 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A blueprint which governs the creation of a new <see cref="HitObject"/> to actualisation.
     /// </summary>
-    public abstract class PlacementBlueprint : CompositeDrawable, IRequireHighFrequencyMousePosition
+    public abstract class PlacementBlueprint : CompositeDrawable, IStateful<PlacementState>, IRequireHighFrequencyMousePosition
     {
+        /// <summary>
+        /// Invoked when <see cref="State"/> has changed.
+        /// </summary>
+        public event Action<PlacementState> StateChanged;
+
+        /// <summary>
+        /// Whether the <see cref="HitObject"/> is currently being placed, but has not necessarily finished being placed.
+        /// </summary>
+        public bool PlacementBegun { get; private set; }
+
         /// <summary>
         /// The <see cref="HitObject"/> that is being placed.
         /// </summary>
@@ -51,7 +63,25 @@ namespace osu.Game.Rulesets.Edit
             ApplyDefaultsToHitObject();
         }
 
-        public bool PlacementBegun { get; private set; }
+        private PlacementState state;
+
+        public PlacementState State
+        {
+            get => state;
+            set
+            {
+                if (state == value)
+                    return;
+                state = value;
+
+                if (state == PlacementState.Shown)
+                    Show();
+                else
+                    Hide();
+
+                StateChanged?.Invoke(value);
+            }
+        }
 
         /// <summary>
         /// Signals that the placement of <see cref="HitObject"/> has started.
@@ -94,5 +124,11 @@ namespace osu.Game.Rulesets.Edit
                     return false;
             }
         }
+    }
+
+    public enum PlacementState
+    {
+        Hidden,
+        Shown,
     }
 }
