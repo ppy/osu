@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             this.slider = slider;
 
             h.PositionChanged += _ => updatePosition();
-            slider.ControlPointsChanged += _ => updatePosition();
+            slider.PathChanged += _ => updatePosition();
 
             updatePosition();
         }
