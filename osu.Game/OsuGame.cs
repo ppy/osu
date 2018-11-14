@@ -31,6 +31,7 @@ using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.Chat;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
@@ -179,12 +180,6 @@ namespace osu.Game
         }
 
         private ScheduledDelegate scoreLoad;
-
-        /// <summary>
-        /// Open chat to a channel matching the provided name, if present.
-        /// </summary>
-        /// <param name="channelName">The name of the channel.</param>
-        public void OpenChannel(string channelName) => chat.OpenChannel(chat.AvailableChannels.Find(c => c.Name == channelName));
 
         /// <summary>
         /// Show a beatmap set as an overlay.
@@ -343,6 +338,11 @@ namespace osu.Game
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
             loadComponentSingleFile(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
+            loadComponentSingleFile(new ChannelManager(), channelManager =>
+            {
+                dependencies.Cache(channelManager);
+                AddInternal(channelManager);
+            });
             loadComponentSingleFile(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
             loadComponentSingleFile(settings = new MainSettings
             {
