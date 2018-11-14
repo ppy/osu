@@ -10,45 +10,46 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Game.Rulesets.Mania.Configuration;
-using osu.Game.Rulesets.Mania.Edit.Masks;
-using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
     public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>
     {
-        protected new ManiaConfigManager Config => (ManiaConfigManager)base.Config;
-
         public ManiaHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
         {
         }
 
+        private DependencyContainer dependencies;
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IScrollingInfo>(new ManiaScrollingInfo(Config));
-            return dependencies;
-        }
+            => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         protected override RulesetContainer<ManiaHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
-            => new ManiaEditRulesetContainer(ruleset, beatmap);
+        {
+            var rulesetContainer = new ManiaEditRulesetContainer(ruleset, beatmap);
+
+            // This is the earliest we can cache the scrolling info to ourselves, before masks are added to the hierarchy and inject it
+            dependencies.CacheAs(rulesetContainer.ScrollingInfo);
+
+            return rulesetContainer;
+        }
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => Array.Empty<HitObjectCompositionTool>();
 
-        public override SelectionMask CreateMaskFor(DrawableHitObject hitObject)
+        public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
         {
             switch (hitObject)
             {
                 case DrawableNote note:
-                    return new NoteSelectionMask(note);
+                    return new NoteSelectionBlueprint(note);
                 case DrawableHoldNote holdNote:
-                    return new HoldNoteSelectionMask(holdNote);
+                    return new HoldNoteSelectionBlueprint(holdNote);
             }
 
-            return base.CreateMaskFor(hitObject);
+            return base.CreateBlueprintFor(hitObject);
         }
     }
 }

@@ -31,9 +31,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
             return new ConvertSlider
             {
                 X = position.X,
-                ControlPoints = controlPoints,
-                Distance = length,
-                PathType = pathType,
+                Path = new SliderPath(pathType, controlPoints, length),
                 NodeSamples = nodeSamples,
                 RepeatCount = repeatCount
             };
