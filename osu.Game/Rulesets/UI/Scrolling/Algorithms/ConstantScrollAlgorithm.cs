@@ -17,6 +17,9 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
         public float PositionAt(double time, double currentTime, double timeRange, float scrollLength)
             => (float)((time - currentTime) / timeRange * scrollLength);
 
+        public double TimeAt(float position, double currentTime, double timeRange, float scrollLength)
+            => position * timeRange / scrollLength + currentTime;
+
         public void Reset()
         {
         }

@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Linq;
 using OpenTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Input.Bindings;
@@ -16,7 +16,7 @@ using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class Column : ManiaScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
+    public class Column : ScrollingPlayfield, IKeyBindingHandler<ManiaAction>, IHasAccentColour
     {
         private const float column_width = 45;
         private const float special_column_width = 70;
@@ -134,7 +134,7 @@ namespace osu.Game.Rulesets.Mania.UI
             hitObject.AccentColour = AccentColour;
             hitObject.OnNewResult += OnNewResult;
 
-            HitObjects.Add(hitObject);
+            HitObjectContainer.Add(hitObject);
         }
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
             explosionContainer.Add(new HitExplosion(judgedObject)
             {
-                Anchor = Direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre
+                Anchor = Direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre
             });
         }
 
@@ -154,10 +154,10 @@ namespace osu.Game.Rulesets.Mania.UI
                 return false;
 
             var nextObject =
-                HitObjects.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current) ??
+                HitObjectContainer.AliveObjects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current) ??
                 // fallback to non-alive objects to find next off-screen object
-                HitObjects.Objects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current) ??
-                HitObjects.Objects.LastOrDefault();
+                HitObjectContainer.Objects.FirstOrDefault(h => h.HitObject.StartTime > Time.Current) ??
+                HitObjectContainer.Objects.LastOrDefault();
 
             nextObject?.PlaySamples();
 

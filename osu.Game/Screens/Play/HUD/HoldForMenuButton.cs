@@ -8,16 +8,18 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using OpenTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
-    public class QuitButton : FillFlowContainer
+    public class HoldForMenuButton : FillFlowContainer
     {
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
@@ -30,7 +32,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private readonly OsuSpriteText text;
 
-        public QuitButton()
+        public HoldForMenuButton()
         {
             Direction = FillDirection.Horizontal;
             Spacing = new Vector2(20, 0);
@@ -79,7 +81,7 @@ namespace osu.Game.Screens.Play.HUD
                     Alpha, MathHelper.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
         }
 
-        private class Button : HoldToConfirmContainer
+        private class Button : HoldToConfirmContainer, IKeyBindingHandler<GlobalAction>
         {
             private SpriteIcon icon;
             private CircularProgress circularProgress;
@@ -89,6 +91,30 @@ namespace osu.Game.Screens.Play.HUD
 
             public Action HoverGained;
             public Action HoverLost;
+
+            public bool OnPressed(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        BeginConfirm();
+                        return true;
+                }
+
+                return false;
+            }
+
+            public bool OnReleased(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        AbortConfirm();
+                        return true;
+                }
+
+                return false;
+            }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
