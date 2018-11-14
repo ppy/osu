@@ -29,8 +29,11 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            base.Content.Add(blueprint = CreateBlueprint());
+            blueprint = CreateBlueprint();
+            blueprint.Depth = float.MinValue;
             blueprint.SelectionRequested += (_, __) => blueprint.Select();
+
+            Add(blueprint);
 
             AddStep("Select", () => blueprint.Select());
             AddStep("Deselect", () => blueprint.Deselect());
