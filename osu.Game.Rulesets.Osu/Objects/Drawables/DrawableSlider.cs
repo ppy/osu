@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Ball.Scale = new Vector2(HitObject.Scale);
             };
 
-            slider.ControlPointsChanged += _ => Body.Refresh();
+            slider.PathChanged += _ => Body.Refresh();
         }
 
         public override Color4 AccentColour

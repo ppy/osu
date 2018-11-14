@@ -51,9 +51,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
                 Position = position,
                 NewCombo = FirstObject || newCombo,
                 ComboOffset = comboOffset,
-                ControlPoints = controlPoints,
-                Distance = Math.Max(0, length),
-                PathType = pathType,
+                Path = new SliderPath(pathType, controlPoints, Math.Max(0, length)),
                 NodeSamples = nodeSamples,
                 RepeatCount = repeatCount
             };

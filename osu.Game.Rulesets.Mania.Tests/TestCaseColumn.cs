@@ -14,6 +14,7 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Tests.Visual;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -93,7 +94,6 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Height = 0.85f,
                 AccentColour = Color4.OrangeRed,
                 Action = { Value = action },
-                VisibleTimeRange = { Value = 2000 }
             };
 
             columns.Add(column);
@@ -104,6 +104,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.X,
                 RelativeSizeAxes = Axes.Y,
+                TimeRange = 2000,
                 Child = column
             };
         }
