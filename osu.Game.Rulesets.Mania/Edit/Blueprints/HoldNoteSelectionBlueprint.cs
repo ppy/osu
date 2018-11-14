@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -14,7 +13,7 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class HoldNoteSelectionBlueprint : SelectionBlueprint
+    public class HoldNoteSelectionBlueprint : ManiaSelectionBlueprint
     {
         public new DrawableHoldNote HitObject => (DrawableHoldNote)base.HitObject;
 
