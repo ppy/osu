@@ -46,8 +46,6 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public ObservableCollection<Channel> AvailableChannels { get; } = new ObservableCollection<Channel>(); //todo: should be publicly readonly
 
-        /*private readonly IncomingMessagesHandler privateMessagesHandler;*/
-
         private IAPIProvider api;
         private ScheduledDelegate fetchMessagesScheduleder;
 
@@ -130,12 +128,14 @@ namespace osu.Game.Online.Chat
                 if (currentChannel.Type == ChannelType.PM && !currentChannel.Joined)
                 {
                     var createNewPrivateMessageRequest = new CreateNewPrivateMessageRequest(currentChannel.Users.First(), message);
+
                     createNewPrivateMessageRequest.Success += createRes =>
                     {
                         currentChannel.Id = createRes.ChannelID;
                         currentChannel.ReplaceMessage(message, createRes.Message);
                         dequeueAndRun();
                     };
+
                     createNewPrivateMessageRequest.Failure += exception =>
                     {
                         Logger.Error(exception, "Posting message failed.");
@@ -148,17 +148,20 @@ namespace osu.Game.Online.Chat
                 }
 
                 var req = new PostMessageRequest(message);
+
                 req.Success += m =>
                 {
                     currentChannel.ReplaceMessage(message, m);
                     dequeueAndRun();
                 };
+
                 req.Failure += exception =>
                 {
                     Logger.Error(exception, "Posting message failed.");
                     currentChannel.ReplaceMessage(message, null);
                     dequeueAndRun();
                 };
+
                 api.Queue(req);
             });
 
