@@ -66,8 +66,7 @@ namespace osu.Game.Online.Chat
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
-            CurrentChannel.Value = AvailableChannels.FirstOrDefault(c => c.Name == name)
-                                   ?? throw new ChannelNotFoundException(name);
+            CurrentChannel.Value = AvailableChannels.FirstOrDefault(c => c.Name == name) ?? throw new ChannelNotFoundException(name);
         }
 
         /// <summary>
@@ -83,11 +82,7 @@ namespace osu.Game.Online.Chat
                                    ?? new Channel { Name = user.Username, Users = { user } };
         }
 
-        private void currentChannelChanged(Channel channel)
-        {
-            JoinChannel(channel);
-        }
-
+        private void currentChannelChanged(Channel channel) => JoinChannel(channel);
 
         /// <summary>
         /// Ensure we run post actions in sequence, once at a time.
@@ -258,7 +253,7 @@ namespace osu.Game.Online.Chat
             fetchInitialMsgReq.Success += messages =>
             {
                 handleChannelMessages(messages);
-                channel.MessagesLoaded = true; // this will mark the channel as having received messages even if tehre were none.
+                channel.MessagesLoaded = true; // this will mark the channel as having received messages even if there were none.
             };
 
             api.Queue(fetchInitialMsgReq);
