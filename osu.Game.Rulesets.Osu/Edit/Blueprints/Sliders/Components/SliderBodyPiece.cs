@@ -43,8 +43,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             base.Update();
 
-            slider.Path.Calculate();
-
             var vertices = new List<Vector2>();
             slider.Path.GetPathToProgress(vertices, 0, 1);
 

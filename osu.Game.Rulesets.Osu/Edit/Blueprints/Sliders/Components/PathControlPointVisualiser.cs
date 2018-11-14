@@ -30,9 +30,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 
         private void updatePathControlPoints()
         {
-            while (slider.ControlPoints.Length > pieces.Count)
+            while (slider.Path.ControlPoints.Length > pieces.Count)
                 pieces.Add(new PathControlPointPiece(slider, pieces.Count));
-            while (slider.ControlPoints.Length < pieces.Count)
+            while (slider.Path.ControlPoints.Length < pieces.Count)
                 pieces.Remove(pieces[pieces.Count - 1]);
         }
     }
