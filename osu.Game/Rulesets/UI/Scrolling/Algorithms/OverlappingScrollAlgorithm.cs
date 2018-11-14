@@ -3,6 +3,7 @@
 
 using osu.Framework.Lists;
 using osu.Game.Rulesets.Timing;
+using OpenTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 {
@@ -35,6 +36,33 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 
         public float PositionAt(double time, double currentTime, double timeRange, float scrollLength)
             => (float)((time - currentTime) / timeRange * controlPointAt(time).Multiplier * scrollLength);
+
+        public double TimeAt(float position, double currentTime, double timeRange, float scrollLength)
+        {
+            // Find the control point relating to the position.
+            // Note: Due to velocity adjustments, overlapping control points will provide multiple valid time values for a single position
+            // As such, this operation provides unexpected results by using the latter of the control points.
+
+            int i = 0;
+            float pos = 0;
+
+            for (; i < controlPoints.Count; i++)
+            {
+                float lastPos = pos;
+                pos = PositionAt(controlPoints[i].StartTime, currentTime, timeRange, scrollLength);
+
+                if (pos > position)
+                {
+                    i--;
+                    pos = lastPos;
+                    break;
+                }
+            }
+
+            i = MathHelper.Clamp(i, 0, controlPoints.Count - 1);
+
+            return controlPoints[i].StartTime + (position - pos) * timeRange / controlPoints[i].Multiplier / scrollLength;
+        }
 
         public void Reset()
         {
