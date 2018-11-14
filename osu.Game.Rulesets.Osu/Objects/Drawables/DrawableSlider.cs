@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using OpenTK.Graphics;
 
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
-        private readonly IBindable<Vector2[]> controlPointsBindable = new Bindable<Vector2[]>();
+        private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
 
         public DrawableSlider(Slider s)
             : base(s)
@@ -103,11 +104,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Ball.Scale = new Vector2(HitObject.Scale);
             });
 
-            controlPointsBindable.BindValueChanged(_ => Body.Refresh());
-
             positionBindable.BindTo(HitObject.PositionBindable);
             scaleBindable.BindTo(HitObject.ScaleBindable);
-            controlPointsBindable.BindTo(slider.ControlPointsBindable);
+            pathBindable.BindTo(slider.PathBindable);
+
+            pathBindable.BindValueChanged(_ => Body.Refresh());
         }
 
         public override Color4 AccentColour

@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            ControlPointsBindable.BindValueChanged(_ => updatePathControlPoints(), true);
+            PathBindable.BindValueChanged(_ => updatePathControlPoints(), true);
         }
 
         private void updatePathControlPoints()

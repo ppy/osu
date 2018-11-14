@@ -51,19 +51,12 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        private SliderPath path;
+        public readonly Bindable<SliderPath> PathBindable = new Bindable<SliderPath>();
 
         public SliderPath Path
         {
-            get => path;
-            set
-            {
-                path = value;
-
-                PathChanged?.Invoke(value);
-                if (TailCircle != null)
-                    TailCircle.Position = EndPosition;
-            }
+            get => PathBindable.Value;
+            set => PathBindable.Value = value;
         }
 
         public double Distance => Path.Distance;
@@ -162,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                 ComboIndex = ComboIndex,
             };
 
-            TailCircle = new SliderTailCircle
+            TailCircle = new SliderTailCircle(this)
             {
                 StartTime = EndTime,
                 Position = EndPosition,
