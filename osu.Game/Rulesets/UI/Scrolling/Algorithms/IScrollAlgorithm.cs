@@ -37,6 +37,16 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
         float PositionAt(double time, double currentTime, double timeRange, float scrollLength);
 
         /// <summary>
+        /// Computes the time which brings a point to a provided spatial position given the current time.
+        /// </summary>
+        /// <param name="position">The absolute spatial position.</param>
+        /// <param name="currentTime">The current time.</param>
+        /// <param name="timeRange">The amount of visible time.</param>
+        /// <param name="scrollLength">The absolute spatial length through <see cref="timeRange"/>.</param>
+        /// <returns>The time at which <see cref="PositionAt(t)"/> == <paramref name="position"/>.</returns>
+        double TimeAt(float position, double currentTime, double timeRange, float scrollLength);
+
+        /// <summary>
         /// Resets this <see cref="IScrollAlgorithm"/> to a default state.
         /// </summary>
         void Reset();
