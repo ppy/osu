@@ -35,6 +35,36 @@ namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
             return (float)((relativePositionAtCached(time, timeRange) - timelinePosition) * scrollLength);
         }
 
+        public double TimeAt(float position, double currentTime, double timeRange, float scrollLength)
+        {
+            // Convert the position to a length relative to time = 0
+            double length = position / scrollLength + relativePositionAt(currentTime, timeRange);
+
+            // We need to consider all timing points until the specified time and not just the currently-active one,
+            // since each timing point individually affects the positions of _all_ hitobjects after its start time
+            for (int i = 0; i < controlPoints.Count; i++)
+            {
+                var current = controlPoints[i];
+                var next = i < controlPoints.Count - 1 ? controlPoints[i + 1] : null;
+
+                // Duration of the current control point
+                var currentDuration = (next?.StartTime ?? double.PositiveInfinity) - current.StartTime;
+
+                // Figure out the length of control point
+                var currentLength = currentDuration / timeRange * current.Multiplier;
+
+                if (currentLength > length)
+                {
+                    // The point is within this control point
+                    return current.StartTime + length * timeRange / current.Multiplier;
+                }
+
+                length -= currentLength;
+            }
+
+            return 0; // Should never occur
+        }
+
         private double relativePositionAtCached(double time, double timeRange)
         {
             if (!positionCache.TryGetValue(time, out double existing))
