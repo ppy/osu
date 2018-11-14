@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override FontAwesome Icon => FontAwesome.fa_paint_brush;
 
-        private readonly Bindable<SkinDescription> dropdownBindable = new Bindable<SkinDescription>();
+        private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo>();
         private readonly Bindable<int> configBindable = new Bindable<int>();
 
         private SkinManager skins;
@@ -60,18 +60,18 @@ namespace osu.Game.Overlays.Settings.Sections
             config.BindWith(OsuSetting.Skin, configBindable);
 
             skinDropdown.Bindable = dropdownBindable;
-            skinDropdown.Items = skins.GetAllUsableSkins().Select(s => new SkinDescription { Id = s.ID, Name = s.ToString() }).ToArray();
+            skinDropdown.Items = skins.GetAllUsableSkins().ToArray();
 
             // Todo: This should not be necessary when OsuConfigManager is databased
-            if (skinDropdown.Items.All(s => s.Id != configBindable.Value))
+            if (skinDropdown.Items.All(s => s.ID != configBindable.Value))
                 configBindable.Value = 0;
 
-            configBindable.BindValueChanged(v => dropdownBindable.Value = skinDropdown.Items.Single(s => s.Id == v), true);
-            dropdownBindable.BindValueChanged(v => configBindable.Value = v.Id);
+            configBindable.BindValueChanged(v => dropdownBindable.Value = skinDropdown.Items.Single(s => s.ID == v), true);
+            dropdownBindable.BindValueChanged(v => configBindable.Value = v.ID);
         }
 
-        private void itemRemoved(SkinInfo s) => skinDropdown.Items = skinDropdown.Items.Where(i => i.Id != s.ID).ToArray();
-        private void itemAdded(SkinInfo s) => skinDropdown.Items = skinDropdown.Items.Append(new SkinDescription { Id = s.ID, Name = s.ToString() }).ToArray();
+        private void itemRemoved(SkinInfo s) => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != s.ID).ToArray();
+        private void itemAdded(SkinInfo s) => skinDropdown.Items = skinDropdown.Items.Append(s).ToArray();
 
         protected override void Dispose(bool isDisposing)
         {
@@ -89,20 +89,14 @@ namespace osu.Game.Overlays.Settings.Sections
             public override string TooltipText => Current.Value.ToString(@"0.##x");
         }
 
-        private class SkinSettingsDropdown : SettingsDropdown<SkinDescription>
+        private class SkinSettingsDropdown : SettingsDropdown<SkinInfo>
         {
-            protected override OsuDropdown<SkinDescription> CreateDropdown() => new SkinDropdownControl { Items = Items };
+            protected override OsuDropdown<SkinInfo> CreateDropdown() => new SkinDropdownControl { Items = Items };
 
             private class SkinDropdownControl : DropdownControl
             {
-                protected override string GenerateItemText(SkinDescription item) => item.Name;
+                protected override string GenerateItemText(SkinInfo item) => item.ToString();
             }
-        }
-
-        private struct SkinDescription
-        {
-            public int Id;
-            public string Name;
         }
     }
 }
