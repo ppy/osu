@@ -2,22 +2,17 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
 
-namespace osu.Game.Rulesets.Mania.Edit.Blueprints
+namespace osu.Game.Rulesets.Mania.Edit.Masks
 {
-    public class ManiaSelectionBlueprint : SelectionBlueprint
+    public abstract class ManiaSelectionBlueprint : SelectionBlueprint
     {
-        public ManiaSelectionBlueprint(DrawableHitObject hitObject)
+        protected ManiaSelectionBlueprint(DrawableHitObject hitObject)
             : base(hitObject)
         {
             RelativeSizeAxes = Axes.None;
-        }
-
-        public override void AdjustPosition(DragEvent dragEvent)
-        {
         }
     }
 }
