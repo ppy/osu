@@ -22,8 +22,7 @@ namespace osu.Game.Rulesets.Mania.Mods
         {
             public ManiaFlashlight()
             {
-                MousePosWrapper.Rectangular = true;
-                MousePosWrapper.RectangularFlashlightSize = new Vector2(0, default_flashlight_size);
+                FlashlightSize = new Vector2(0, default_flashlight_size);
             }
 
             public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
@@ -32,11 +31,9 @@ namespace osu.Game.Rulesets.Mania.Mods
                 {
                     Schedule(() =>
                     {
-                        MousePosWrapper.RectangularFlashlightSize.X = DrawWidth;
-                        MousePosWrapper.RectangularFlashlightSizeChanged = true;
+                        FlashlightSize = new Vector2(DrawWidth, FlashlightSize.Y);
 
-                        MousePosWrapper.FlashlightPosition = ScreenSpaceDrawQuad.Centre;
-                        MousePosWrapper.FlashlightPositionChanged = true;
+                        FlashlightPosition = DrawPosition + DrawSize / 2;
                     });
                 }
 
@@ -47,13 +44,13 @@ namespace osu.Game.Rulesets.Mania.Mods
             {
             }
 
+            protected override string FragmentShader => "RectangularFlashlight";
+
             protected override void LoadComplete()
             {
-                MousePosWrapper.RectangularFlashlightSize.X = DrawWidth;
-                MousePosWrapper.RectangularFlashlightSizeChanged = true;
+                FlashlightSize = new Vector2(DrawWidth, FlashlightSize.Y);
 
-                MousePosWrapper.FlashlightPosition = ScreenSpaceDrawQuad.Centre;
-                MousePosWrapper.FlashlightPositionChanged = true;
+                FlashlightPosition = DrawPosition + DrawSize / 2;
             }
         }
     }

@@ -1,13 +1,12 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using JetBrains.Annotations;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
@@ -34,22 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             public TaikoFlashlight(TaikoPlayfield taikoPlayfield)
             {
                 this.taikoPlayfield = taikoPlayfield;
-                MousePosWrapper.CircularFlashlightSize = getSizeFor(0);
-                MousePosWrapper.Rectangular = false;
-            }
-
-            [UsedImplicitly]
-            private float flashlightSize
-            {
-                set
-                {
-                    if (MousePosWrapper.CircularFlashlightSize == value) return;
-
-                    MousePosWrapper.CircularFlashlightSize = value;
-                    MousePosWrapper.CircularFlashlightSizeChanged = true;
-                }
-
-                get => MousePosWrapper.CircularFlashlightSize;
+                FlashlightSize = new Vector2(0, getSizeFor(0));
             }
 
             private float getSizeFor(int combo)
@@ -64,8 +48,10 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
             protected override void OnComboChange(int newCombo)
             {
-                this.TransformTo(nameof(flashlightSize), getSizeFor(newCombo), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, getSizeFor(newCombo)), FLASHLIGHT_FADE_DURATION);
             }
+
+            protected override string FragmentShader => "CircularFlashlight";
 
             public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
             {
@@ -73,8 +59,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
                 {
                     Schedule(() =>
                     {
-                        MousePosWrapper.FlashlightPosition = taikoPlayfield.HitExplosionContainer.ScreenSpaceDrawQuad.Centre;
-                        MousePosWrapper.FlashlightPositionChanged = true;
+                        FlashlightPosition = taikoPlayfield.HitTarget.ToSpaceOfOtherDrawable(taikoPlayfield.HitTarget.OriginPosition, this);
                     });
                 }
 
@@ -85,8 +70,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
             {
                 base.LoadComplete();
 
-                MousePosWrapper.FlashlightPosition = taikoPlayfield.HitExplosionContainer.ScreenSpaceDrawQuad.Centre;
-                MousePosWrapper.FlashlightPositionChanged = true;
+                FlashlightPosition = taikoPlayfield.HitTarget.ToSpaceOfOtherDrawable(taikoPlayfield.HitTarget.OriginPosition, this);
             }
         }
     }

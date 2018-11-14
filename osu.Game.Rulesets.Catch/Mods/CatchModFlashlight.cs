@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using JetBrains.Annotations;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {
@@ -33,30 +33,16 @@ namespace osu.Game.Rulesets.Catch.Mods
             public CatchFlashlight(CatchPlayfield playfield)
             {
                 this.playfield = playfield;
-                MousePosWrapper.CircularFlashlightSize = getSizeFor(0);
-                MousePosWrapper.Rectangular = false;
+                FlashlightSize = new Vector2(0, getSizeFor(0));
             }
 
             protected override void Update()
             {
                 base.Update();
 
-                MousePosWrapper.FlashlightPosition = (playfield.CatcherArea.MovableCatcher.ScreenSpaceDrawQuad.TopLeft + playfield.CatcherArea.MovableCatcher.ScreenSpaceDrawQuad.TopRight) / 2;
-                MousePosWrapper.FlashlightPositionChanged = true;
-            }
+                var catcher = playfield.CatcherArea.MovableCatcher;
 
-            [UsedImplicitly]
-            private float flashlightSize
-            {
-                set
-                {
-                    if (MousePosWrapper.CircularFlashlightSize == value) return;
-
-                    MousePosWrapper.CircularFlashlightSize = value;
-                    MousePosWrapper.CircularFlashlightSizeChanged = true;
-                }
-
-                get => MousePosWrapper.CircularFlashlightSize;
+                FlashlightPosition = catcher.ToSpaceOfOtherDrawable(catcher.Position, this);
             }
 
             private float getSizeFor(int combo)
@@ -71,8 +57,10 @@ namespace osu.Game.Rulesets.Catch.Mods
 
             protected override void OnComboChange(int newCombo)
             {
-                this.TransformTo(nameof(flashlightSize), getSizeFor(newCombo), FLASHLIGHT_FADE_DURATION);
+                this.TransformTo(nameof(FlashlightSize), new Vector2(0, getSizeFor(newCombo)), FLASHLIGHT_FADE_DURATION);
             }
+
+            protected override string FragmentShader => "CircularFlashlight";
         }
     }
 }

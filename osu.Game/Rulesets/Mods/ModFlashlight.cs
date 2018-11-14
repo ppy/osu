@@ -55,7 +55,6 @@ namespace osu.Game.Rulesets.Mods
         {
             internal BindableInt Combo;
             private Shader shader;
-            protected readonly FlashlightUniformWrapper MousePosWrapper = new FlashlightUniformWrapper();
 
             protected override DrawNode CreateDrawNode() => new FlashlightDrawNode();
 
@@ -71,13 +70,14 @@ namespace osu.Game.Rulesets.Mods
 
                 flashNode.Shader = shader;
                 flashNode.ScreenSpaceDrawQuad = ScreenSpaceDrawQuad;
-                flashNode.MousePosWrapper = MousePosWrapper;
+                flashNode.MousePosWrapper.FlashlightPosition = Vector2Extensions.Transform(FlashlightPosition, DrawInfo.Matrix);
+                flashNode.MousePosWrapper.FlashlightSize = Vector2Extensions.Transform(FlashlightSize, DrawInfo.Matrix);
             }
 
             [BackgroundDependencyLoader]
             private void load(ShaderManager shaderManager)
             {
-                shader = shaderManager.Load("PositionAndColour", "Flashlight");
+                shader = shaderManager.Load("PositionAndColour", FragmentShader);
             }
 
             protected override void LoadComplete()
@@ -90,27 +90,48 @@ namespace osu.Game.Rulesets.Mods
 
                 foreach (var breakPeriod in Breaks)
                 {
+                    if (breakPeriod.Duration < FLASHLIGHT_FADE_DURATION * 2) continue;
+
                     this.Delay(breakPeriod.StartTime + FLASHLIGHT_FADE_DURATION).FadeOutFromOne(FLASHLIGHT_FADE_DURATION);
                     this.Delay(breakPeriod.EndTime - FLASHLIGHT_FADE_DURATION).FadeInFromZero(FLASHLIGHT_FADE_DURATION);
                 }
             }
 
             protected abstract void OnComboChange(int newCombo);
+
+            protected abstract string FragmentShader { get; }
+
+            private Vector2 flashlightPosition;
+            protected Vector2 FlashlightPosition
+            {
+                get => flashlightPosition;
+                set
+                {
+                    if (flashlightPosition == value) return;
+
+                    flashlightPosition = value;
+                    Invalidate(Invalidation.DrawNode);
+                }
+            }
+
+            private Vector2 flashlightSize;
+            protected Vector2 FlashlightSize
+            {
+                get => flashlightSize;
+                set
+                {
+                    if (flashlightSize == value) return;
+
+                    flashlightSize = value;
+                    Invalidate(Invalidation.DrawNode);
+                }
+            }
         }
 
-        public class FlashlightUniformWrapper
+        public struct FlashlightUniformWrapper
         {
-            public bool Rectangular;
-            public bool RectangularChanged = true;
-
             public Vector2 FlashlightPosition;
-            public bool FlashlightPositionChanged = true;
-
-            public float CircularFlashlightSize;
-            public bool CircularFlashlightSizeChanged = true;
-
-            public Vector2 RectangularFlashlightSize;
-            public bool RectangularFlashlightSizeChanged = true;
+            public Vector2 FlashlightSize;
         }
 
         private class FlashlightDrawNode : DrawNode
@@ -125,29 +146,8 @@ namespace osu.Game.Rulesets.Mods
 
                 Shader.Bind();
 
-                if (MousePosWrapper.RectangularChanged)
-                {
-                    Shader.GetUniform<bool>("rectangular").UpdateValue(ref MousePosWrapper.Rectangular);
-                    MousePosWrapper.RectangularChanged = false;
-                }
-
-                if (MousePosWrapper.FlashlightPositionChanged)
-                {
-                    Shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref MousePosWrapper.FlashlightPosition);
-                    MousePosWrapper.FlashlightPositionChanged = false;
-                }
-
-                if (MousePosWrapper.CircularFlashlightSizeChanged)
-                {
-                    Shader.GetUniform<float>("circularFlashlightSize").UpdateValue(ref MousePosWrapper.CircularFlashlightSize);
-                    MousePosWrapper.CircularFlashlightSizeChanged = false;
-                }
-
-                if (MousePosWrapper.RectangularFlashlightSizeChanged)
-                {
-                    Shader.GetUniform<Vector2>("rectangularFlashlightSize").UpdateValue(ref MousePosWrapper.RectangularFlashlightSize);
-                    MousePosWrapper.RectangularFlashlightSizeChanged = false;
-                }
+                Shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref MousePosWrapper.FlashlightPosition);
+                Shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref MousePosWrapper.FlashlightSize);
 
                 Texture.WhitePixel.DrawQuad(ScreenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: vertexAction);
 
