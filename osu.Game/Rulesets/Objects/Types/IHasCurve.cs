@@ -14,16 +14,6 @@ namespace osu.Game.Rulesets.Objects.Types
         /// The curve.
         /// </summary>
         SliderPath Path { get; }
-
-        /// <summary>
-        /// The control points that shape the curve.
-        /// </summary>
-        Vector2[] ControlPoints { get; }
-
-        /// <summary>
-        /// The type of curve.
-        /// </summary>
-        PathType PathType { get; }
     }
 
     public static class HasCurveExtensions
