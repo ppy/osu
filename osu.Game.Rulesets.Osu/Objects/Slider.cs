@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public event Action<Vector2[]> ControlPointsChanged;
+        public event Action<SliderPath> PathChanged;
 
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
         public double Duration => EndTime - StartTime;
@@ -52,35 +52,23 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        public SliderPath Path { get; } = new SliderPath();
+        private SliderPath path;
 
-        public Vector2[] ControlPoints
+        public SliderPath Path
         {
-            get => Path.ControlPoints;
+            get => path;
             set
             {
-                if (Path.ControlPoints == value)
-                    return;
-                Path.ControlPoints = value;
+                path = value;
 
-                ControlPointsChanged?.Invoke(value);
+                PathChanged?.Invoke(value);
 
                 if (TailCircle != null)
                     TailCircle.Position = EndPosition;
             }
         }
 
-        public PathType PathType
-        {
-            get { return Path.PathType; }
-            set { Path.PathType = value; }
-        }
-
-        public double Distance
-        {
-            get { return Path.Distance; }
-            set { Path.Distance = value; }
-        }
+        public double Distance => Path.Distance;
 
         public override Vector2 Position
         {
@@ -111,7 +99,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         internal float LazyTravelDistance;
 
-        public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
+        public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
+
         public int RepeatCount { get; set; }
 
         /// <summary>
@@ -165,17 +154,17 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createSliderEnds()
         {
-            HeadCircle = new SliderCircle(this)
+            HeadCircle = new SliderCircle
             {
                 StartTime = StartTime,
                 Position = Position,
-                Samples = Samples,
+                Samples = getNodeSamples(0),
                 SampleControlPoint = SampleControlPoint,
                 IndexInCurrentCombo = IndexInCurrentCombo,
                 ComboIndex = ComboIndex,
             };
 
-            TailCircle = new SliderTailCircle(this)
+            TailCircle = new SliderTailCircle
             {
                 StartTime = EndTime,
                 Position = EndPosition,
@@ -249,9 +238,16 @@ namespace osu.Game.Rulesets.Osu.Objects
                     Position = Position + Path.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
-                    Samples = new List<SampleInfo>(RepeatSamples[repeatIndex])
+                    Samples = getNodeSamples(1 + repeatIndex)
                 });
             }
+        }
+
+        private List<SampleInfo> getNodeSamples(int nodeIndex)
+        {
+            if (nodeIndex < NodeSamples.Count)
+                return NodeSamples[nodeIndex];
+            return Samples;
         }
 
         public override Judgement CreateJudgement() => new OsuJudgement();

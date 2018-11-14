@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Objects.Drawables;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.Configuration;
-using osu.Game.Rulesets.Mania.Edit.Masks;
+using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI;
 
@@ -38,17 +38,17 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => Array.Empty<HitObjectCompositionTool>();
 
-        public override SelectionMask CreateMaskFor(DrawableHitObject hitObject)
+        public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
         {
             switch (hitObject)
             {
                 case DrawableNote note:
-                    return new NoteSelectionMask(note);
+                    return new NoteSelectionBlueprint(note);
                 case DrawableHoldNote holdNote:
-                    return new HoldNoteSelectionMask(holdNote);
+                    return new HoldNoteSelectionBlueprint(holdNote);
             }
 
-            return base.CreateMaskFor(hitObject);
+            return base.CreateBlueprintFor(hitObject);
         }
     }
 }
