@@ -114,11 +114,11 @@ namespace osu.Game.Tests.Visual
 
         private class TestPlayfield : ScrollingPlayfield
         {
-            public new readonly ScrollingDirection Direction;
+            public new ScrollingDirection Direction => base.Direction;
 
             public TestPlayfield(ScrollingDirection direction)
             {
-                Direction = direction;
+                base.Direction.Value = direction;
 
                 Padding = new MarginPadding(2);
 
