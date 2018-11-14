@@ -43,9 +43,10 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         protected override SpeedChangeVisualisationMethod VisualisationMethod => SpeedChangeVisualisationMethod.Overlapping;
 
-        internal readonly Container<HitExplosion> HitExplosionContainer;
+        private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
         private readonly JudgementContainer<DrawableTaikoJudgement> judgementContainer;
+        internal readonly HitTarget HitTarget;
 
         private readonly Container topLevelHitContainer;
 
@@ -103,13 +104,13 @@ namespace osu.Game.Rulesets.Taiko.UI
                                 Masking = true,
                                 Children = new Drawable[]
                                 {
-                                    HitExplosionContainer = new Container<HitExplosion>
+                                    hitExplosionContainer = new Container<HitExplosion>
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         FillMode = FillMode.Fit,
                                         Blending = BlendingMode.Additive,
                                     },
-                                    new HitTarget
+                                    HitTarget = new HitTarget
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.Centre,
@@ -243,7 +244,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             {
                 case TaikoStrongJudgement _:
                     if (result.IsHit)
-                        HitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
+                        hitExplosionContainer.Children.FirstOrDefault(e => e.JudgedObject == ((DrawableStrongNestedHit)judgedObject).MainObject)?.VisualiseSecondHit();
                     break;
                 default:
                     judgementContainer.Add(new DrawableTaikoJudgement(result, judgedObject)
@@ -259,7 +260,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
                     bool isRim = judgedObject.HitObject is RimHit;
 
-                    HitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
+                    hitExplosionContainer.Add(new HitExplosion(judgedObject, isRim));
 
                     if (judgedObject.HitObject.Kiai)
                         kiaiExplosionContainer.Add(new KiaiHitExplosion(judgedObject, isRim));
