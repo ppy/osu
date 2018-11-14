@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using Newtonsoft.Json;
 using osu.Game.Users;
 
@@ -16,10 +15,10 @@ namespace osu.Game.Online.Chat
 
         //todo: this should be inside sender.
         [JsonProperty(@"sender_id")]
-        public int UserId;
+        public long UserId;
 
         [JsonProperty(@"channel_id")]
-        public int ChannelId;
+        public long ChannelId;
 
         [JsonProperty(@"is_action")]
         public bool IsAction;
@@ -68,13 +67,5 @@ namespace osu.Game.Online.Chat
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         public override int GetHashCode() => Id.GetHashCode();
-    }
-
-    public enum TargetType
-    {
-        [Description(@"channel")]
-        Channel,
-        [Description(@"user")]
-        User
     }
 }
