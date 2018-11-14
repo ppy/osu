@@ -245,7 +245,7 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            var track = (current?.TrackLoaded ?? false) ? current.Track : null;
+            var track = current?.TrackLoaded ?? false ? current.Track : null;
 
             if (track?.IsDummyDevice == false)
             {
