@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Rulesets.Edit;
@@ -29,8 +28,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         [Resolved]
         private HitObjectComposer composer { get; set; }
-
-        private InputManager inputManager;
 
         public BlueprintContainer()
         {
@@ -57,13 +54,6 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             foreach (var obj in composer.HitObjects)
                 AddBlueprintFor(obj);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            inputManager = GetContainingInputManager();
         }
 
         private HitObjectCompositionTool currentTool;
@@ -136,9 +126,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
             if (currentPlacement != null)
             {
-                bool cursorInPlayfield = composer.RulesetContainer.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
-
-                if (cursorInPlayfield)
+                if (composer.CursorInPlacementArea)
                     currentPlacement.State = PlacementState.Shown;
                 else if (currentPlacement?.PlacementBegun == false)
                     currentPlacement.State = PlacementState.Hidden;
