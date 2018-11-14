@@ -3,9 +3,9 @@
 
 using osu.Framework.Configuration;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.UI.Scrolling;
+using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 
-namespace osu.Game.Rulesets.Mania.UI
+namespace osu.Game.Rulesets.UI.Scrolling
 {
     public interface IScrollingInfo
     {
@@ -13,5 +13,15 @@ namespace osu.Game.Rulesets.Mania.UI
         /// The direction <see cref="HitObject"/>s should scroll in.
         /// </summary>
         IBindable<ScrollingDirection> Direction { get; }
+
+        /// <summary>
+        ///
+        /// </summary>
+        IBindable<double> TimeRange { get; }
+
+        /// <summary>
+        /// The algorithm which controls <see cref="HitObject"/> positions and sizes.
+        /// </summary>
+        IScrollAlgorithm Algorithm { get; }
     }
 }
