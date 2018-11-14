@@ -50,14 +50,13 @@ namespace osu.Game.Tests.Visual
         private void load(OsuColour colours)
         {
             linkColour = colours.Blue;
-            Dependencies.Cache(new ChatOverlay
-            {
-                AvailableChannels =
-                {
-                    new Channel { Name = "#english" },
-                    new Channel { Name = "#japanese" }
-                }
-            });
+
+            var chatManager = new ChannelManager();
+            chatManager.AvailableChannels.Add(new Channel { Name = "#english"});
+            chatManager.AvailableChannels.Add(new Channel { Name = "#japanese" });
+            Dependencies.Cache(chatManager);
+
+            Dependencies.Cache(new ChatOverlay());
 
             testLinksGeneral();
             testEcho();
