@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Edit
 {
     public abstract class HitObjectComposer : CompositeDrawable
     {
-        public IEnumerable<DrawableHitObject> HitObjects => RulesetContainer.Playfield.AllHitObjects;
+        public IEnumerable<DrawableHitObject> HitObjects => rulesetContainer.Playfield.AllHitObjects;
 
         protected readonly Ruleset Ruleset;
 
@@ -33,9 +34,11 @@ namespace osu.Game.Rulesets.Edit
 
         private readonly List<Container> layerContainers = new List<Container>();
 
-        public EditRulesetContainer RulesetContainer { get; private set; }
+        private EditRulesetContainer rulesetContainer;
 
         private BlueprintContainer blueprintContainer;
+
+        private InputManager inputManager;
 
         internal HitObjectComposer(Ruleset ruleset)
         {
@@ -51,8 +54,8 @@ namespace osu.Game.Rulesets.Edit
 
             try
             {
-                RulesetContainer = CreateRulesetContainer();
-                RulesetContainer.Clock = framedClock;
+                rulesetContainer = CreateRulesetContainer();
+                rulesetContainer.Clock = framedClock;
             }
             catch (Exception e)
             {
@@ -94,7 +97,7 @@ namespace osu.Game.Rulesets.Edit
                             Children = new Drawable[]
                             {
                                 layerBelowRuleset,
-                                RulesetContainer,
+                                rulesetContainer,
                                 layerAboveRuleset
                             }
                         }
@@ -114,6 +117,13 @@ namespace osu.Game.Rulesets.Edit
             toolboxCollection.Items[0].Select();
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
+        }
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -130,20 +140,25 @@ namespace osu.Game.Rulesets.Edit
 
             layerContainers.ForEach(l =>
             {
-                l.Anchor = RulesetContainer.Playfield.Anchor;
-                l.Origin = RulesetContainer.Playfield.Origin;
-                l.Position = RulesetContainer.Playfield.Position;
-                l.Size = RulesetContainer.Playfield.Size;
+                l.Anchor = rulesetContainer.Playfield.Anchor;
+                l.Origin = rulesetContainer.Playfield.Origin;
+                l.Position = rulesetContainer.Playfield.Position;
+                l.Size = rulesetContainer.Playfield.Size;
             });
         }
+
+        /// <summary>
+        /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.
+        /// </summary>
+        public virtual bool CursorInPlacementArea => rulesetContainer.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
 
         /// <summary>
         /// Adds a <see cref="HitObject"/> to the <see cref="Beatmaps.Beatmap"/> and visualises it.
         /// </summary>
         /// <param name="hitObject">The <see cref="HitObject"/> to add.</param>
-        public void Add(HitObject hitObject) => blueprintContainer.AddBlueprintFor(RulesetContainer.Add(hitObject));
+        public void Add(HitObject hitObject) => blueprintContainer.AddBlueprintFor(rulesetContainer.Add(hitObject));
 
-        public void Remove(HitObject hitObject) => blueprintContainer.RemoveBlueprintFor(RulesetContainer.Remove(hitObject));
+        public void Remove(HitObject hitObject) => blueprintContainer.RemoveBlueprintFor(rulesetContainer.Remove(hitObject));
 
         internal abstract EditRulesetContainer CreateRulesetContainer();
 
