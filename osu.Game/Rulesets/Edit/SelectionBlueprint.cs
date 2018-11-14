@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A blueprint placed above a <see cref="DrawableHitObject"/> adding editing functionality.
     /// </summary>
-    public class SelectionBlueprint : CompositeDrawable, IStateful<SelectionState>
+    public abstract class SelectionBlueprint : CompositeDrawable, IStateful<SelectionState>
     {
         /// <summary>
         /// Invoked when this <see cref="SelectionBlueprint"/> has been selected.
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Invoked when this <see cref="SelectionBlueprint"/> has requested drag.
         /// </summary>
-        public event Action<SelectionBlueprint, Vector2, InputState> DragRequested;
+        public event Action<DragEvent> DragRequested;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="SelectionBlueprint"/> applies to.
@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Edit
         public override bool HandlePositionalInput => ShouldBeAlive;
         public override bool RemoveWhenNotAlive => false;
 
-        public SelectionBlueprint(DrawableHitObject hitObject)
+        protected SelectionBlueprint(DrawableHitObject hitObject)
         {
             HitObject = hitObject;
 
@@ -130,9 +130,11 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnDrag(DragEvent e)
         {
-            DragRequested?.Invoke(this, e.Delta, e.CurrentState);
+            DragRequested?.Invoke(e);
             return true;
         }
+
+        public abstract void AdjustPosition(DragEvent dragEvent);
 
         /// <summary>
         /// The screen-space point that causes this <see cref="SelectionBlueprint"/> to be selected.
