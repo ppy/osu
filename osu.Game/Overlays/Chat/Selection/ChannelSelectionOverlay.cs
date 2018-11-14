@@ -18,7 +18,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osu.Game.Graphics.Containers;
 
-namespace osu.Game.Overlays.Chat
+namespace osu.Game.Overlays.Chat.Selection
 {
     public class ChannelSelectionOverlay : OsuFocusedOverlayContainer
     {
@@ -34,23 +34,6 @@ namespace osu.Game.Overlays.Chat
 
         public Action<Channel> OnRequestJoin;
         public Action<Channel> OnRequestLeave;
-
-        public IEnumerable<ChannelSection> Sections
-        {
-            set
-            {
-                sectionsFlow.ChildrenEnumerable = value;
-
-                foreach (ChannelSection s in sectionsFlow.Children)
-                {
-                    foreach (ChannelListItem c in s.ChannelFlow.Children)
-                    {
-                        c.OnRequestJoin = channel => { OnRequestJoin?.Invoke(channel); };
-                        c.OnRequestLeave = channel => { OnRequestLeave?.Invoke(channel); };
-                    }
-                }
-            }
-        }
 
         public ChannelSelectionOverlay()
         {
@@ -138,6 +121,30 @@ namespace osu.Game.Overlays.Chat
             };
 
             search.Current.ValueChanged += newValue => sectionsFlow.SearchTerm = newValue;
+        }
+
+        public void UpdateAvailableChannels(IEnumerable<Channel> channels)
+        {
+            Scheduler.Add(() =>
+            {
+                sectionsFlow.ChildrenEnumerable = new[]
+                {
+                    new ChannelSection
+                    {
+                        Header = "All Channels",
+                        Channels = channels,
+                    },
+                };
+
+                foreach (ChannelSection s in sectionsFlow.Children)
+                {
+                    foreach (ChannelListItem c in s.ChannelFlow.Children)
+                    {
+                        c.OnRequestJoin = channel => { OnRequestJoin?.Invoke(channel); };
+                        c.OnRequestLeave = channel => { OnRequestLeave?.Invoke(channel); };
+                    }
+                }
+            });
         }
 
         [BackgroundDependencyLoader]
