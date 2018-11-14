@@ -8,9 +8,9 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Osu.Edit.Masks.HitCircleMasks;
-using osu.Game.Rulesets.Osu.Edit.Masks.SliderMasks;
-using osu.Game.Rulesets.Osu.Edit.Masks.SpinnerMasks;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
+using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
@@ -37,19 +37,19 @@ namespace osu.Game.Rulesets.Osu.Edit
 
         protected override Container CreateLayerContainer() => new PlayfieldAdjustmentContainer { RelativeSizeAxes = Axes.Both };
 
-        public override SelectionMask CreateMaskFor(DrawableHitObject hitObject)
+        public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
         {
             switch (hitObject)
             {
                 case DrawableHitCircle circle:
-                    return new HitCircleSelectionMask(circle);
+                    return new HitCircleSelectionBlueprint(circle);
                 case DrawableSlider slider:
-                    return new SliderSelectionMask(slider);
+                    return new SliderSelectionBlueprint(slider);
                 case DrawableSpinner spinner:
-                    return new SpinnerSelectionMask(spinner);
+                    return new SpinnerSelectionBlueprint(spinner);
             }
 
-            return base.CreateMaskFor(hitObject);
+            return base.CreateBlueprintFor(hitObject);
         }
     }
 }
