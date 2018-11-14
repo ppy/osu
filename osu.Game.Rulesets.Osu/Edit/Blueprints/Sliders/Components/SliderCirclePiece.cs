@@ -3,15 +3,15 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
     public class SliderCirclePiece : HitCirclePiece
     {
-        private readonly IBindable<Vector2[]> controlPointsBindable = new Bindable<Vector2[]>();
+        private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
 
         private readonly Slider slider;
         private readonly SliderPosition position;
@@ -26,8 +26,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            controlPointsBindable.BindValueChanged(_ => UpdatePosition());
-            controlPointsBindable.BindTo(slider.ControlPointsBindable);
+            pathBindable.BindTo(slider.PathBindable);
+            pathBindable.BindValueChanged(_ => UpdatePosition(), true);
         }
 
         protected override void UpdatePosition()

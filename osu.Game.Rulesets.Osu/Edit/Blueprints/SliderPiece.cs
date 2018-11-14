@@ -3,8 +3,8 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Objects;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints
 {
@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
     /// </summary>
     public abstract class SliderPiece : HitObjectPiece
     {
-        protected readonly IBindable<Vector2[]> ControlPointsBindable = new Bindable<Vector2[]>();
+        protected readonly IBindable<SliderPath> PathBindable = new Bindable<SliderPath>();
 
         private readonly Slider slider;
 
@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
         [BackgroundDependencyLoader]
         private void load()
         {
-            ControlPointsBindable.BindTo(slider.ControlPointsBindable);
+            PathBindable.BindTo(slider.PathBindable);
         }
     }
 }
