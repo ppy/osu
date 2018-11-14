@@ -247,7 +247,7 @@ namespace osu.Game.Overlays
 
             var track = (current?.TrackLoaded ?? false) ? current.Track : null;
 
-            if (track != null && !track.IsDummyDevice)
+            if (track?.IsDummyDevice == false)
             {
                 progressBar.EndTime = track.Length;
                 progressBar.CurrentTime = track.CurrentTime;
