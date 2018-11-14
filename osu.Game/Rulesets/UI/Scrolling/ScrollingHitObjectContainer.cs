@@ -7,8 +7,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Lists;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Timing;
-using osu.Game.Rulesets.UI.Scrolling.Visualisers;
+using osu.Game.Rulesets.UI.Scrolling.Algorithms;
 
 namespace osu.Game.Rulesets.UI.Scrolling
 {
@@ -30,11 +31,11 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
         public readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
+        private readonly IScrollAlgorithm algorithm;
+
         private Cached initialStateCache = new Cached();
 
-        private readonly ISpeedChangeVisualiser speedChangeVisualiser;
-
-        public ScrollingHitObjectContainer(SpeedChangeVisualisationMethod visualisationMethod)
+        public ScrollingHitObjectContainer(ScrollVisualisationMethod visualisationMethod)
         {
             RelativeSizeAxes = Axes.Both;
 
@@ -43,14 +44,14 @@ namespace osu.Game.Rulesets.UI.Scrolling
 
             switch (visualisationMethod)
             {
-                case SpeedChangeVisualisationMethod.Sequential:
-                    speedChangeVisualiser = new SequentialSpeedChangeVisualiser(ControlPoints);
+                case ScrollVisualisationMethod.Sequential:
+                    algorithm = new SequentialScrollAlgorithm(ControlPoints);
                     break;
-                case SpeedChangeVisualisationMethod.Overlapping:
-                    speedChangeVisualiser = new OverlappingSpeedChangeVisualiser(ControlPoints);
+                case ScrollVisualisationMethod.Overlapping:
+                    algorithm = new OverlappingScrollAlgorithm(ControlPoints);
                     break;
-                case SpeedChangeVisualisationMethod.Constant:
-                    speedChangeVisualiser = new ConstantSpeedChangeVisualiser();
+                case ScrollVisualisationMethod.Constant:
+                    algorithm = new ConstantScrollAlgorithm();
                     break;
             }
         }
@@ -91,14 +92,58 @@ namespace osu.Game.Rulesets.UI.Scrolling
             return base.Invalidate(invalidation, source, shallPropagate);
         }
 
+        private float scrollLength;
+
         protected override void Update()
         {
             base.Update();
 
             if (!initialStateCache.IsValid)
             {
-                speedChangeVisualiser.ComputeInitialStates(Objects, Direction, TimeRange, DrawSize);
+                switch (Direction.Value)
+                {
+                    case ScrollingDirection.Up:
+                    case ScrollingDirection.Down:
+                        scrollLength = DrawSize.Y;
+                        break;
+                    default:
+                        scrollLength = DrawSize.X;
+                        break;
+                }
+
+                algorithm.Reset();
+
+                foreach (var obj in Objects)
+                    computeInitialStateRecursive(obj);
                 initialStateCache.Validate();
+            }
+        }
+
+        private void computeInitialStateRecursive(DrawableHitObject hitObject)
+        {
+            hitObject.LifetimeStart = algorithm.GetDisplayStartTime(hitObject.HitObject.StartTime, TimeRange);
+
+            if (hitObject.HitObject is IHasEndTime endTime)
+            {
+                switch (Direction.Value)
+                {
+                    case ScrollingDirection.Up:
+                    case ScrollingDirection.Down:
+                        hitObject.Height = algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, TimeRange, scrollLength);
+                        break;
+                    case ScrollingDirection.Left:
+                    case ScrollingDirection.Right:
+                        hitObject.Width = algorithm.GetLength(hitObject.HitObject.StartTime, endTime.EndTime, TimeRange, scrollLength);
+                        break;
+                }
+            }
+
+            foreach (var obj in hitObject.NestedHitObjects)
+            {
+                computeInitialStateRecursive(obj);
+
+                // Nested hitobjects don't need to scroll, but they do need accurate positions
+                updatePosition(obj, hitObject.HitObject.StartTime);
             }
         }
 
@@ -106,8 +151,28 @@ namespace osu.Game.Rulesets.UI.Scrolling
         {
             base.UpdateAfterChildrenLife();
 
-            // We need to calculate this as soon as possible after lifetimes so that hitobjects get the final say in their positions
-            speedChangeVisualiser.UpdatePositions(AliveObjects, Direction, Time.Current, TimeRange, DrawSize);
+            // We need to calculate hitobject positions as soon as possible after lifetimes so that hitobjects get the final say in their positions
+            foreach (var obj in AliveObjects)
+                updatePosition(obj, Time.Current);
+        }
+
+        private void updatePosition(DrawableHitObject hitObject, double currentTime)
+        {
+            switch (Direction.Value)
+            {
+                case ScrollingDirection.Up:
+                    hitObject.Y = algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
+                    break;
+                case ScrollingDirection.Down:
+                    hitObject.Y = -algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
+                    break;
+                case ScrollingDirection.Left:
+                    hitObject.X = algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
+                    break;
+                case ScrollingDirection.Right:
+                    hitObject.X = -algorithm.PositionAt(hitObject.HitObject.StartTime, currentTime, TimeRange, scrollLength);
+                    break;
+            }
         }
     }
 }
