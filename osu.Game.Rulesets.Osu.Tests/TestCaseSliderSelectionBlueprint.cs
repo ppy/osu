@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
@@ -35,14 +36,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             var slider = new Slider
             {
                 Position = new Vector2(256, 192),
-                ControlPoints = new[]
+                Path = new SliderPath(PathType.Bezier, new[]
                 {
                     Vector2.Zero,
                     new Vector2(150, 150),
                     new Vector2(300, 0)
-                },
-                PathType = PathType.Bezier,
-                Distance = 350
+                })
             };
 
             slider.ApplyDefaults(new ControlPointInfo(), new BeatmapDifficulty { CircleSize = 2 });
