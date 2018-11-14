@@ -51,34 +51,22 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        public SliderPath Path { get; } = new SliderPath();
+        private SliderPath path;
 
-        public readonly Bindable<Vector2[]> ControlPointsBindable = new Bindable<Vector2[]>(Array.Empty<Vector2>());
-
-        public Vector2[] ControlPoints
+        public SliderPath Path
         {
-            get => ControlPointsBindable;
+            get => path;
             set
             {
-                ControlPointsBindable.Value = value;
-                Path.ControlPoints = value;
+                path = value;
 
+                PathChanged?.Invoke(value);
                 if (TailCircle != null)
                     TailCircle.Position = EndPosition;
             }
         }
 
-        public PathType PathType
-        {
-            get { return Path.PathType; }
-            set { Path.PathType = value; }
-        }
-
-        public double Distance
-        {
-            get { return Path.Distance; }
-            set { Path.Distance = value; }
-        }
+        public double Distance => Path.Distance;
 
         public override Vector2 Position
         {
