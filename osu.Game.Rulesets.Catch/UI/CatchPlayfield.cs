@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
         protected override bool UserScrollSpeedAdjustment => false;
 
-        protected override SpeedChangeVisualisationMethod VisualisationMethod => SpeedChangeVisualisationMethod.Constant;
+        protected override ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Constant;
 
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation)
         {

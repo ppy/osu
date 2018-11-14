@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.UI.Scrolling
         /// </summary>
         protected readonly Bindable<ScrollingDirection> Direction = new Bindable<ScrollingDirection>();
 
-        protected virtual SpeedChangeVisualisationMethod VisualisationMethod => SpeedChangeVisualisationMethod.Sequential;
+        protected virtual ScrollVisualisationMethod VisualisationMethod => ScrollVisualisationMethod.Sequential;
 
         [BackgroundDependencyLoader]
         private void load()
