@@ -107,10 +107,16 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             private void teamChanged(TournamentTeam team)
             {
+                var colour = teamColour == TeamColour.Red ? red : blue;
+                var flip = teamColour != TeamColour.Red;
+
                 InternalChildren = new Drawable[]
                 {
-                    new TeamDisplay(team, teamColour == TeamColour.Red ? red : blue, teamColour != TeamColour.Red),
-                    new ScoreDisplay(currentTeamScore, teamColour != TeamColour.Red, currentMatch.Value.PointsToWin)
+                    new TeamDisplay(team, colour, flip),
+                    new ScoreDisplay(currentTeamScore, flip, currentMatch.Value.PointsToWin)
+                    {
+                        Colour = colour
+                    }
                 };
             }
         }
@@ -133,7 +139,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     X = (flip ? -1 : 1) * 90,
                     Y = 5,
                     Scale = flip ? new Vector2(-1, 1) : Vector2.One,
-                    Colour = new Color4(95, 41, 60, 255),
                 };
 
                 currentTeamScore.BindValueChanged(scoreChanged);
