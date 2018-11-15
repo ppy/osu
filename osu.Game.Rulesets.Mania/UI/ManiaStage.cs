@@ -152,8 +152,18 @@ namespace osu.Game.Rulesets.Mania.UI
         public override void Add(DrawableHitObject h)
         {
             var maniaObject = (ManiaHitObject)h.HitObject;
-            int columnIndex = maniaObject.Column - firstColumnIndex;
-            Columns.ElementAt(columnIndex).Add(h);
+
+            int columnIndex = -1;
+
+            maniaObject.ColumnBindable.BindValueChanged(_ =>
+            {
+                if (columnIndex != -1)
+                    Columns.ElementAt(columnIndex).Remove(h);
+
+                columnIndex = maniaObject.Column - firstColumnIndex;
+                Columns.ElementAt(columnIndex).Add(h);
+            }, true);
+
             h.OnNewResult += OnNewResult;
         }
 

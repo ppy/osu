@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         public Column ColumnAt(Vector2 screenSpacePosition) => ((ManiaPlayfield)RulesetContainer.Playfield).GetColumnByPosition(screenSpacePosition);
 
+        public int TotalColumns => ((ManiaPlayfield)RulesetContainer.Playfield).TotalColumns;
+
         protected override RulesetContainer<ManiaHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
         {
             var rulesetContainer = new ManiaEditRulesetContainer(ruleset, beatmap);
