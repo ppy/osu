@@ -26,11 +26,13 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Input;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
 using osu.Game.Input.Bindings;
+using osu.Game.Online.Chat;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using OpenTK.Graphics;
@@ -84,6 +86,8 @@ namespace osu.Game
         }
 
         public float ToolbarOffset => Toolbar.Position.Y + Toolbar.DrawHeight;
+
+        private IdleTracker idleTracker;
 
         public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
@@ -179,12 +183,6 @@ namespace osu.Game
         }
 
         private ScheduledDelegate scoreLoad;
-
-        /// <summary>
-        /// Open chat to a channel matching the provided name, if present.
-        /// </summary>
-        /// <param name="channelName">The name of the channel.</param>
-        public void OpenChannel(string channelName) => chat.OpenChannel(chat.AvailableChannels.Find(c => c.Name == channelName));
 
         /// <summary>
         /// Show a beatmap set as an overlay.
@@ -316,6 +314,7 @@ namespace osu.Game
                 },
                 mainContent = new Container { RelativeSizeAxes = Axes.Both },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
+                idleTracker = new IdleTracker { RelativeSizeAxes = Axes.Both }
             });
 
             loadComponentSingleFile(screenStack = new Loader(), d =>
@@ -343,6 +342,11 @@ namespace osu.Game
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
             loadComponentSingleFile(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
+            loadComponentSingleFile(new ChannelManager(), channelManager =>
+            {
+                dependencies.Cache(channelManager);
+                AddInternal(channelManager);
+            });
             loadComponentSingleFile(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
             loadComponentSingleFile(settings = new MainSettings
             {
@@ -372,6 +376,7 @@ namespace osu.Game
                 Depth = -6,
             }, overlayContent.Add);
 
+            dependencies.Cache(idleTracker);
             dependencies.Cache(settings);
             dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
