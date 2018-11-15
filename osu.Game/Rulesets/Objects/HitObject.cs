@@ -3,7 +3,6 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -56,7 +55,7 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public HitWindows HitWindows { get; set; }
 
-        private readonly SortedList<HitObject> nestedHitObjects = new SortedList<HitObject>(compareObjects);
+        private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
 
         [JsonIgnore]
         public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects;
@@ -73,6 +72,8 @@ namespace osu.Game.Rulesets.Objects
             nestedHitObjects.Clear();
 
             CreateNestedHitObjects();
+
+            nestedHitObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
 
             foreach (var h in nestedHitObjects)
             {
@@ -114,7 +115,5 @@ namespace osu.Game.Rulesets.Objects
         /// </para>
         /// </summary>
         protected virtual HitWindows CreateHitWindows() => new HitWindows();
-
-        private static int compareObjects(HitObject first, HitObject second) => first.StartTime.CompareTo(second.StartTime);
     }
 }

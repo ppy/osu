@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using OpenTK;
 using OpenTK.Graphics;
@@ -81,6 +82,8 @@ namespace osu.Game.Overlays.Chat
             Padding = new MarginPadding { Left = padding, Right = padding };
         }
 
+        private ChannelManager chatManager;
+
         private Message message;
         private OsuSpriteText username;
         private LinkFlowContainer contentFlow;
@@ -104,9 +107,9 @@ namespace osu.Game.Overlays.Chat
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, ChatOverlay chat)
+        private void load(OsuColour colours, ChannelManager chatManager)
         {
-            this.chat = chat;
+            this.chatManager = chatManager;
             customUsernameColour = colours.ChatBlue;
         }
 
@@ -215,8 +218,6 @@ namespace osu.Game.Overlays.Chat
             FinishTransforms(true);
         }
 
-        private ChatOverlay chat;
-
         private void updateMessageContent()
         {
             this.FadeTo(message is LocalEchoMessage ? 0.4f : 1.0f, 500, Easing.OutQuint);
@@ -226,7 +227,7 @@ namespace osu.Game.Overlays.Chat
             username.Text = $@"{message.Sender.Username}" + (senderHasBackground || message.IsAction ? "" : ":");
 
             // remove non-existent channels from the link list
-            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chat?.AvailableChannels.Any(c => c.Name == link.Argument) != true);
+            message.Links.RemoveAll(link => link.Action == LinkAction.OpenChannel && chatManager?.AvailableChannels.Any(c => c.Name == link.Argument) != true);
 
             contentFlow.Clear();
             contentFlow.AddLinks(message.DisplayContent, message.Links);
@@ -236,20 +237,24 @@ namespace osu.Game.Overlays.Chat
         {
             private readonly User sender;
 
+            private Action startChatAction;
+
             public MessageSender(User sender)
             {
                 this.sender = sender;
             }
 
             [BackgroundDependencyLoader(true)]
-            private void load(UserProfileOverlay profile)
+            private void load(UserProfileOverlay profile, ChannelManager chatManager)
             {
                 Action = () => profile?.ShowUser(sender);
+                startChatAction = () => chatManager?.OpenPrivateChannel(sender);
             }
 
             public MenuItem[] ContextMenuItems => new MenuItem[]
             {
                 new OsuMenuItem("View Profile", MenuItemType.Highlighted, Action),
+                new OsuMenuItem("Start Chat", MenuItemType.Standard, startChatAction),
             };
         }
     }
