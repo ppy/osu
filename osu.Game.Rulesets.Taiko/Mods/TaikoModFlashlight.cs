@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
@@ -28,6 +29,7 @@ namespace osu.Game.Rulesets.Taiko.Mods
 
         private class TaikoFlashlight : Flashlight
         {
+            private readonly Cached flashlightProperties = new Cached();
             private readonly TaikoPlayfield taikoPlayfield;
 
             public TaikoFlashlight(TaikoPlayfield taikoPlayfield)
@@ -57,20 +59,21 @@ namespace osu.Game.Rulesets.Taiko.Mods
             {
                 if ((invalidation & Invalidation.DrawSize) > 0)
                 {
-                    Schedule(() =>
-                    {
-                        FlashlightPosition = taikoPlayfield.HitTarget.ToSpaceOfOtherDrawable(taikoPlayfield.HitTarget.OriginPosition, this);
-                    });
+                    flashlightProperties.Invalidate();
                 }
 
                 return base.Invalidate(invalidation, source, shallPropagate);
             }
 
-            protected override void LoadComplete()
+            protected override void Update()
             {
-                base.LoadComplete();
+                base.Update();
 
-                FlashlightPosition = taikoPlayfield.HitTarget.ToSpaceOfOtherDrawable(taikoPlayfield.HitTarget.OriginPosition, this);
+                if (!flashlightProperties.IsValid)
+                {
+                    FlashlightPosition = taikoPlayfield.HitTarget.ToSpaceOfOtherDrawable(taikoPlayfield.HitTarget.OriginPosition, this);
+                    flashlightProperties.Validate();
+                }
             }
         }
     }

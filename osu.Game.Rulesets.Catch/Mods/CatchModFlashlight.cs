@@ -40,9 +40,9 @@ namespace osu.Game.Rulesets.Catch.Mods
             {
                 base.Update();
 
-                var catcher = playfield.CatcherArea.MovableCatcher;
+                var catcherArea = playfield.CatcherArea;
 
-                FlashlightPosition = catcher.ToSpaceOfOtherDrawable(catcher.Position, this);
+                FlashlightPosition = catcherArea.ToSpaceOfOtherDrawable(catcherArea.MovableCatcher.DrawPosition, this);
             }
 
             private float getSizeFor(int combo)

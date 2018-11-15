@@ -70,8 +70,8 @@ namespace osu.Game.Rulesets.Mods
 
                 flashNode.Shader = shader;
                 flashNode.ScreenSpaceDrawQuad = ScreenSpaceDrawQuad;
-                flashNode.MousePosWrapper.FlashlightPosition = Vector2Extensions.Transform(FlashlightPosition, DrawInfo.Matrix);
-                flashNode.MousePosWrapper.FlashlightSize = Vector2Extensions.Transform(FlashlightSize, DrawInfo.Matrix);
+                flashNode.FlashlightPosition = Vector2Extensions.Transform(FlashlightPosition, DrawInfo.Matrix);
+                flashNode.FlashlightSize = Vector2Extensions.Transform(FlashlightSize, DrawInfo.Matrix);
             }
 
             [BackgroundDependencyLoader]
@@ -128,17 +128,12 @@ namespace osu.Game.Rulesets.Mods
             }
         }
 
-        public struct FlashlightUniformWrapper
-        {
-            public Vector2 FlashlightPosition;
-            public Vector2 FlashlightSize;
-        }
-
         private class FlashlightDrawNode : DrawNode
         {
             public Shader Shader;
             public Quad ScreenSpaceDrawQuad;
-            public FlashlightUniformWrapper MousePosWrapper;
+            public Vector2 FlashlightPosition;
+            public Vector2 FlashlightSize;
 
             public override void Draw(Action<TexturedVertex2D> vertexAction)
             {
@@ -146,8 +141,8 @@ namespace osu.Game.Rulesets.Mods
 
                 Shader.Bind();
 
-                Shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref MousePosWrapper.FlashlightPosition);
-                Shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref MousePosWrapper.FlashlightSize);
+                Shader.GetUniform<Vector2>("flashlightPos").UpdateValue(ref FlashlightPosition);
+                Shader.GetUniform<Vector2>("flashlightSize").UpdateValue(ref FlashlightSize);
 
                 Texture.WhitePixel.DrawQuad(ScreenSpaceDrawQuad, DrawColourInfo.Colour, vertexAction: vertexAction);
 

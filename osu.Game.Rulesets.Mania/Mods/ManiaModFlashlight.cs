@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
@@ -20,6 +21,8 @@ namespace osu.Game.Rulesets.Mania.Mods
 
         private class ManiaFlashlight : Flashlight
         {
+            private readonly Cached flashlightProperties = new Cached();
+
             public ManiaFlashlight()
             {
                 FlashlightSize = new Vector2(0, default_flashlight_size);
@@ -29,15 +32,23 @@ namespace osu.Game.Rulesets.Mania.Mods
             {
                 if ((invalidation & Invalidation.DrawSize) > 0)
                 {
-                    Schedule(() =>
-                    {
-                        FlashlightSize = new Vector2(DrawWidth, FlashlightSize.Y);
-
-                        FlashlightPosition = DrawPosition + DrawSize / 2;
-                    });
+                    flashlightProperties.Invalidate();
                 }
 
                 return base.Invalidate(invalidation, source, shallPropagate);
+            }
+
+            protected override void Update()
+            {
+                base.Update();
+
+                if (!flashlightProperties.IsValid)
+                {
+                    FlashlightSize = new Vector2(DrawWidth, FlashlightSize.Y);
+
+                    FlashlightPosition = DrawPosition + DrawSize / 2;
+                    flashlightProperties.Validate();
+                }
             }
 
             protected override void OnComboChange(int newCombo)
@@ -45,13 +56,6 @@ namespace osu.Game.Rulesets.Mania.Mods
             }
 
             protected override string FragmentShader => "RectangularFlashlight";
-
-            protected override void LoadComplete()
-            {
-                FlashlightSize = new Vector2(DrawWidth, FlashlightSize.Y);
-
-                FlashlightPosition = DrawPosition + DrawSize / 2;
-            }
         }
     }
 }
