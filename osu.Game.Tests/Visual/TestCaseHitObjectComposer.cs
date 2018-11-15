@@ -11,6 +11,7 @@ using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles;
@@ -53,12 +54,11 @@ namespace osu.Game.Tests.Visual
                     new Slider
                     {
                         Position = new Vector2(128, 256),
-                        ControlPoints = new[]
+                        Path = new SliderPath(PathType.Linear, new[]
                         {
                             Vector2.Zero,
                             new Vector2(216, 0),
-                        },
-                        Distance = 216,
+                        }),
                         Scale = 0.5f,
                     }
                 },

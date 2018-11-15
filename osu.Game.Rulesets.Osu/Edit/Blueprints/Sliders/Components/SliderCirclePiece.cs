@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             this.slider = slider;
             this.position = position;
 
-            slider.ControlPointsChanged += _ => UpdatePosition();
+            slider.PathChanged += _ => UpdatePosition();
         }
 
         protected override void UpdatePosition()
