@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
-        public readonly QuitButton HoldToQuit;
+        public readonly HoldForMenuButton HoldToQuit;
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         private Bindable<bool> showHud;
@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Play
                         Children = new Drawable[]
                         {
                             KeyCounter = CreateKeyCounter(adjustableClock as IFrameBasedClock),
-                            HoldToQuit = CreateQuitButton(),
+                            HoldToQuit = CreateHoldForMenuButton(),
                         }
                     }
                 }
@@ -219,7 +219,7 @@ namespace osu.Game.Screens.Play
             RelativeSizeAxes = Axes.X,
         };
 
-        protected virtual QuitButton CreateQuitButton() => new QuitButton
+        protected virtual HoldForMenuButton CreateHoldForMenuButton() => new HoldForMenuButton
         {
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,

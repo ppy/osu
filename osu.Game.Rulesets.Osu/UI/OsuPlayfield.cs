@@ -84,5 +84,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
             judgementLayer.Add(explosion);
         }
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);
     }
 }
