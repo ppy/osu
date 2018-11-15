@@ -8,6 +8,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderTail : DrawableOsuHitObject, IRequireTracking
     {
+        private readonly Slider slider;
+
         /// <summary>
         /// The judgement text is provided by the <see cref="DrawableSlider"/>.
         /// </summary>
@@ -18,6 +20,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public DrawableSliderTail(Slider slider, SliderTailCircle hitCircle)
             : base(hitCircle)
         {
+            this.slider = slider;
+
             Origin = Anchor.Centre;
 
             RelativeSizeAxes = Axes.Both;
@@ -25,7 +29,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             AlwaysPresent = true;
 
-            Position = HitObject.Position - slider.Position;
+            hitCircle.PositionChanged += _ => updatePosition();
+            slider.PathChanged += _ => updatePosition();
+
+            updatePosition();
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -33,5 +40,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             if (!userTriggered && timeOffset >= 0)
                 ApplyResult(r => r.Type = Tracking ? HitResult.Great : HitResult.Miss);
         }
+
+        private void updatePosition() => Position = HitObject.Position - slider.Position;
     }
 }

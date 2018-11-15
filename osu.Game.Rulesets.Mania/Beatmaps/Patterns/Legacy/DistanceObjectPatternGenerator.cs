@@ -470,7 +470,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             double segmentTime = (EndTime - HitObject.StartTime) / spanCount;
 
             int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
-            return curveData.RepeatSamples[index];
+            return curveData.NodeSamples[index];
         }
 
         /// <summary>
