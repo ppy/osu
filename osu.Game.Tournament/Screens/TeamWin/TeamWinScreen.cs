@@ -47,7 +47,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                     RelativeSizeAxes = Axes.Both,
                     Loop = true,
                 },
-                new TournamentLogo()
+                new TournamentLogo
                 {
                     Y = 40,
                 },
@@ -163,7 +163,6 @@ namespace osu.Game.Tournament.Screens.TeamWin
 
             public TeamWithPlayers(TournamentTeam team, bool left = false)
             {
-                FillFlowContainer players;
                 var colour = left ? red : blue;
                 InternalChildren = new Drawable[]
                 {
@@ -172,7 +171,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                     },
-                    players = new FillFlowContainer
+                    new FillFlowContainer
                     {
                         Direction = FillDirection.Vertical,
                         AutoSizeAxes = Axes.Both,

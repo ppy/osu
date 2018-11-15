@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -36,8 +35,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             var teamEntries = ladderInfo.Teams;
 
-            var groupingOptions = ladderInfo.Groupings.Select(g => new KeyValuePair<string, TournamentGrouping>(g.Name, g))
-                                            .Prepend(new KeyValuePair<string, TournamentGrouping>("None", new TournamentGrouping()));
+            var groupingOptions = ladderInfo.Groupings.Prepend(new TournamentGrouping());
 
             Children = new Drawable[]
             {
@@ -80,7 +78,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 textboxTeam2 = new OsuTextBox { RelativeSizeAxes = Axes.X, Height = 20 },
                 groupingDropdown = new SettingsDropdown<TournamentGrouping>
                 {
-                    Bindable = new Bindable<TournamentGrouping> { Default = groupingOptions.First().Value },
+                    Bindable = new Bindable<TournamentGrouping> { Default = groupingOptions.First() },
                     Items = groupingOptions
                 },
                 losersCheckbox = new PlayerCheckbox
@@ -94,7 +92,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 textboxTeam1.Text = selection?.Team1.Value?.Acronym;
                 textboxTeam2.Text = selection?.Team2.Value?.Acronym;
-                groupingDropdown.Bindable.Value = selection?.Grouping.Value ?? groupingOptions.First().Value;
+                groupingDropdown.Bindable.Value = selection?.Grouping.Value ?? groupingOptions.First();
                 losersCheckbox.Current.Value = selection?.Losers.Value ?? false;
             };
 
