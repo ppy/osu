@@ -22,5 +22,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         public readonly Bindable<DateTimeOffset> StartDate = new Bindable<DateTimeOffset>();
 
         public List<int> Pairings = new List<int>();
+
+        public override string ToString() => Name.Value ?? "None";
     }
 }
