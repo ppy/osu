@@ -1,0 +1,101 @@
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
+using osu.Framework.Threading;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.UI;
+using osu.Game.Rulesets.UI.Scrolling;
+using OpenTK;
+
+namespace osu.Game.Rulesets.Mania.Edit.Blueprints
+{
+    public class ManiaPlacementBlueprint<T> : PlacementBlueprint
+        where T : ManiaHitObject
+    {
+        protected new T HitObject => (T)base.HitObject;
+
+        /// <summary>
+        /// The current mouse position, snapped to the closest column.
+        /// </summary>
+        protected Vector2 SnappedMousePosition { get; private set; }
+
+        [Resolved]
+        private IManiaHitObjectComposer composer { get; set; }
+
+        [Resolved]
+        private IScrollingInfo scrollingInfo { get; set; }
+
+        public ManiaPlacementBlueprint(T hitObject)
+            : base(hitObject)
+        {
+            RelativeSizeAxes = Axes.None;
+        }
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
+        {
+            updateSnappedPosition(e);
+            return true;
+        }
+
+        private ScheduledDelegate scheduledSnappedPositionUpdate;
+
+        private void updateSnappedPosition(MouseMoveEvent e)
+        {
+            scheduledSnappedPositionUpdate?.Cancel();
+            scheduledSnappedPositionUpdate = Schedule(() =>
+            {
+                Column column = ColumnAt(e.ScreenSpaceMousePosition);
+                if (column == null)
+                    SnappedMousePosition = e.MousePosition;
+                else
+                {
+                    // Snap to the column
+                    var parentPos = Parent.ToLocalSpace(column.ToScreenSpace(new Vector2(column.DrawWidth / 2, 0)));
+                    SnappedMousePosition = new Vector2(parentPos.X, e.MousePosition.Y);
+                }
+            });
+        }
+
+        protected double TimeAt(Vector2 screenSpacePosition)
+        {
+            var column = ColumnAt(screenSpacePosition);
+            if (column == null)
+                return 0;
+
+            var hitObjectContainer = column.HitObjectContainer;
+
+            // If we're scrolling downwards, a position of 0 is actually further away from the hit target
+            // so we need to flip the vertical coordinate in the hitobject container's space
+            var hitObjectPos = column.HitObjectContainer.ToLocalSpace(applyPositionOffset(screenSpacePosition)).Y;
+            if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
+                hitObjectPos = hitObjectContainer.DrawHeight - hitObjectPos;
+
+            return scrollingInfo.Algorithm.TimeAt(hitObjectPos,
+                EditorClock.CurrentTime,
+                scrollingInfo.TimeRange.Value,
+                hitObjectContainer.DrawHeight);
+        }
+
+        protected Column ColumnAt(Vector2 screenSpacePosition)
+            => composer.ColumnAt(applyPositionOffset(screenSpacePosition));
+
+        private Vector2 applyPositionOffset(Vector2 position)
+        {
+            switch (scrollingInfo.Direction.Value)
+            {
+                case ScrollingDirection.Up:
+                    position.Y -= DrawHeight / 2;
+                    break;
+                case ScrollingDirection.Down:
+                    position.Y += DrawHeight / 2;
+                    break;
+            }
+
+            return position;
+        }
+    }
+}

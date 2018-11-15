@@ -54,6 +54,33 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
 
+        /// <summary>
+        /// Retrieves a column from a screen-space position.
+        /// </summary>
+        /// <param name="screenSpacePosition">The screen-space position.</param>
+        /// <returns>The column which the <paramref name="screenSpacePosition"/> lies in.</returns>
+        public Column GetColumnByPosition(Vector2 screenSpacePosition)
+        {
+            Column found = null;
+
+            foreach (var stage in stages)
+            {
+                foreach (var column in stage.Columns)
+                {
+                    if (column.ReceivePositionalInputAt(screenSpacePosition))
+                    {
+                        found = column;
+                        break;
+                    }
+                }
+
+                if (found != null)
+                    break;
+            }
+
+            return found;
+        }
+
         private ManiaStage getStageByColumn(int column)
         {
             int sum = 0;

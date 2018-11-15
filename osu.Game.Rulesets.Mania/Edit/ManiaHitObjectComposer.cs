@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Edit.Tools;
@@ -11,11 +10,14 @@ using osu.Game.Rulesets.Objects.Drawables;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
+using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>
+    [Cached(Type = typeof(IManiaHitObjectComposer))]
+    public class ManiaHitObjectComposer : HitObjectComposer<ManiaHitObject>, IManiaHitObjectComposer
     {
         public ManiaHitObjectComposer(Ruleset ruleset)
             : base(ruleset)
@@ -27,6 +29,8 @@ namespace osu.Game.Rulesets.Mania.Edit
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
+        public Column ColumnAt(Vector2 screenSpacePosition) => ((ManiaPlayfield)RulesetContainer.Playfield).GetColumnByPosition(screenSpacePosition);
+
         protected override RulesetContainer<ManiaHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
         {
             var rulesetContainer = new ManiaEditRulesetContainer(ruleset, beatmap);
@@ -37,7 +41,10 @@ namespace osu.Game.Rulesets.Mania.Edit
             return rulesetContainer;
         }
 
-        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => Array.Empty<HitObjectCompositionTool>();
+        protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
+        {
+            new NoteCompositionTool()
+        };
 
         public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
         {
