@@ -36,6 +36,8 @@ namespace osu.Game.Screens.Play
 {
     public class Player : ScreenWithBeatmapBackground, IProvideCursor
     {
+        protected override bool AllowBackButton => false; // handled by HoldForMenuButton
+
         protected override float BackgroundParallaxAmount => 0.1f;
 
         protected override bool HideOverlaysOnEnter => true;

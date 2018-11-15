@@ -5,7 +5,6 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Judgements;
@@ -21,14 +20,8 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private readonly CatcherArea catcherArea;
 
-        protected override bool UserScrollSpeedAdjustment => false;
-
-        protected override SpeedChangeVisualisationMethod VisualisationMethod => SpeedChangeVisualisationMethod.Constant;
-
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation)
         {
-            Direction.Value = ScrollingDirection.Down;
-
             Container explodingFruitContainer;
 
             Anchor = Anchor.TopCentre;
@@ -55,8 +48,6 @@ namespace osu.Game.Rulesets.Catch.UI
                     HitObjectContainer
                 }
             };
-
-            VisibleTimeRange.Value = BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
         }
 
         public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.AttemptCatch(obj);
