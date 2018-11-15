@@ -22,10 +22,7 @@ namespace osu.Game.Graphics.Containers
 
         protected virtual bool PlaySamplesOnStateChange => true;
 
-        protected override bool BlockNonPositionalInput => true;
-
         private PreviewTrackManager previewTrackManager;
-
 
         protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
