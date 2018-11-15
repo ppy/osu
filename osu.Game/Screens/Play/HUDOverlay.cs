@@ -105,11 +105,6 @@ namespace osu.Game.Screens.Play
                 });
             }
 
-            // todo: the stuff below should probably not be in this base implementation, but in each individual class.
-            ComboCounter.AccentColour = colours.BlueLighter;
-            AccuracyCounter.AccentColour = colours.BlueLighter;
-            ScoreCounter.AccentColour = colours.BlueLighter;
-
             var shd = HealthDisplay as StandardHealthDisplay;
             if (shd != null)
             {
