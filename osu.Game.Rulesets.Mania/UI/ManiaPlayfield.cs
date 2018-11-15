@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -80,6 +81,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
             return found;
         }
+
+        /// <summary>
+        /// Retrieves the total amount of columns across all stages in this playfield.
+        /// </summary>
+        public int TotalColumns => stages.Sum(s => s.Columns.Count);
 
         private ManiaStage getStageByColumn(int column)
         {
