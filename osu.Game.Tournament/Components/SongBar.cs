@@ -163,7 +163,7 @@ namespace osu.Game.Tournament.Components
             {
                 new OsuSpriteText
                 {
-                    Text = $"Length {length}s",
+                    Text = $"Length {length:0}s",
                     Margin = new MarginPadding { Horizontal = 15, Vertical = 5 },
                     Colour = OsuColour.Gray(0.33f),
                     Anchor = Anchor.TopLeft,
