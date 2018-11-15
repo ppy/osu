@@ -104,7 +104,10 @@ namespace osu.Game.Tournament
             // link pairings to groupings
             foreach (var group in Ladder.Groupings)
             foreach (var id in group.Pairings)
-                Ladder.Pairings.Single(p => p.ID == id).Grouping.Value = group;
+            {
+                var found = Ladder.Pairings.FirstOrDefault(p => p.ID == id);
+                if (found != null) found.Grouping.Value = group;
+            }
 
             Ladder.CurrentMatch.Value = Ladder.Pairings.FirstOrDefault(p => p.Current.Value);
 
