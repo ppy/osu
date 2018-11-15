@@ -24,7 +24,7 @@ namespace osu.Game.Tournament.Screens
         }
 
         [BackgroundDependencyLoader]
-        private void load(FileBasedIPC ipc)
+        private void load(MatchIPCInfo ipc)
         {
             ipc.Beatmap.BindValueChanged(beatmapChanged, true);
             ipc.Mods.BindValueChanged(modsChanged, true);

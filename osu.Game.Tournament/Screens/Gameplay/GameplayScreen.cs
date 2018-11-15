@@ -4,12 +4,14 @@
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using OpenTK.Graphics;
 
@@ -23,23 +25,62 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
         private TriangleButton warmupButton;
-        private FileBasedIPC ipc;
+        private MatchIPCInfo ipc;
+
+        private readonly Color4 red = new Color4(186, 0, 18, 255);
+        private readonly Color4 blue = new Color4(17, 136, 170, 255);
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, TextureStore textures, FileBasedIPC ipc)
+        private void load(LadderInfo ladder, TextureStore textures, MatchIPCInfo ipc)
         {
             this.ipc = ipc;
             AddRange(new Drawable[]
             {
                 new MatchHeader(),
-                new Box
+                new FillFlowContainer
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Height = 718 / 1080f,
-                    Colour = new Color4(0, 255, 0, 255),
-                    Y = 14,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Direction = FillDirection.Vertical,
                     Anchor = Anchor.Centre,
-                    Origin= Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
+                            {
+                                new Circle
+                                {
+                                    Name = "top bar red",
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 10,
+                                    Width = 0.5f,
+                                    Colour = red,
+                                },
+                                new Circle
+                                {
+                                    Name = "top bar blue",
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 10,
+                                    Width = 0.5f,
+                                    Colour = blue,
+                                    Anchor = Anchor.TopRight,
+                                    Origin = Anchor.TopRight,
+                                },
+                            }
+                        },
+                        new Box
+                        {
+                            // chroma key area for stable gameplay
+                            Name = "chroma",
+                            RelativeSizeAxes = Axes.X,
+                            Height = 480,
+                            Colour = new Color4(0, 255, 0, 255),
+                        },
+                    }
                 },
                 new ControlPanel
                 {

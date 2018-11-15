@@ -4,8 +4,6 @@
 using System;
 using System.IO;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
-using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Framework.Platform.Windows;
 using osu.Game.Beatmaps;
@@ -16,16 +14,7 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Tournament.IPC
 {
-    public enum TourneyState
-    {
-        Initialising,
-        Idle,
-        WaitingForClients,
-        Playing,
-        Ranking
-    }
-
-    public class FileBasedIPC : Component
+    public class FileBasedIPC : MatchIPCInfo
     {
         [Resolved]
         protected APIAccess API { get; private set; }
@@ -33,15 +22,7 @@ namespace osu.Game.Tournament.IPC
         [Resolved]
         protected RulesetStore Rulesets { get; private set; }
 
-        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
-
-        public readonly Bindable<LegacyMods> Mods = new Bindable<LegacyMods>();
-
-        public readonly Bindable<TourneyState> State = new Bindable<TourneyState>();
-
         private int lastBeatmapId;
-        public int Score1;
-        public int Score2;
 
         [BackgroundDependencyLoader]
         private void load()
@@ -97,8 +78,8 @@ namespace osu.Game.Tournament.IPC
                         using (var stream = stable.GetStream(file_ipc_scores_filename))
                         using (var sr = new StreamReader(stream))
                         {
-                            Score1 = int.Parse(sr.ReadLine());
-                            Score2 = int.Parse(sr.ReadLine());
+                            Score1.Value = int.Parse(sr.ReadLine());
+                            Score2.Value = int.Parse(sr.ReadLine());
                         }
                     }
                     catch (Exception)

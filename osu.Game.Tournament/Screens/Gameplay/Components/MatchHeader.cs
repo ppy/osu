@@ -17,7 +17,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Input;
 
-namespace osu.Game.Tournament.Screens.Gameplay
+namespace osu.Game.Tournament.Screens.Gameplay.Components
 {
     public class MatchHeader : Container
     {
@@ -113,7 +113,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 InternalChildren = new Drawable[]
                 {
                     new TeamDisplay(team, colour, flip),
-                    new ScoreDisplay(currentTeamScore, flip, currentMatch.Value.PointsToWin)
+                    new TeamScore(currentTeamScore, flip, currentMatch.Value.PointsToWin)
                     {
                         Colour = colour
                     }
@@ -121,12 +121,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
             }
         }
 
-        private class ScoreDisplay : CompositeDrawable
+        private class TeamScore : CompositeDrawable
         {
             private readonly Bindable<int?> currentTeamScore = new Bindable<int?>();
             private readonly StarCounter counter;
 
-            public ScoreDisplay(Bindable<int?> score, bool flip, int count)
+            public TeamScore(Bindable<int?> score, bool flip, int count)
             {
                 var anchor = flip ? Anchor.CentreRight : Anchor.CentreLeft;
 
