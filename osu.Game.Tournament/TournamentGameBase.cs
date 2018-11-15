@@ -72,7 +72,7 @@ namespace osu.Game.Tournament
 
             dependencies.Cache(Ladder);
 
-            dependencies.Cache(ipc = new FileBasedIPC());
+            dependencies.CacheAs<MatchIPCInfo>(ipc = new FileBasedIPC());
             Add(ipc);
 
             bool addedInfo = false;

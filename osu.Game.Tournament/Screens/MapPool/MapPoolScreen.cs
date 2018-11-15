@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
-using osu.Game.Tournament.Screens.Gameplay;
+using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using OpenTK;
 using OpenTK.Graphics;
@@ -92,7 +92,7 @@ namespace osu.Game.Tournament.Screens.MapPool
         }
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, FileBasedIPC ipc)
+        private void load(LadderInfo ladder, MatchIPCInfo ipc)
         {
             currentMatch.BindValueChanged(matchChanged);
             currentMatch.BindTo(ladder.CurrentMatch);
