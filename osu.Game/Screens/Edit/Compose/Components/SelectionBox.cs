@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             // Todo: Various forms of snapping
 
             foreach (var blueprint in selectedBlueprints)
-                blueprint.AdjustPosition(dragEvent);
+                blueprint.AdjustPosition(dragEvent, selectedBlueprints.Select(b => b.HitObject));
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

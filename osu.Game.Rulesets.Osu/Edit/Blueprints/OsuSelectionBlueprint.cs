@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -17,6 +18,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints
         {
         }
 
-        public override void AdjustPosition(DragEvent dragEvent) => OsuObject.Position += dragEvent.Delta;
+        public override void AdjustPosition(DragEvent dragEvent, IEnumerable<DrawableHitObject> selectedObjects) => OsuObject.Position += dragEvent.Delta;
     }
 }

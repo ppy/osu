@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
@@ -38,7 +39,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             Position = Parent.ToLocalSpace(HitObject.ToScreenSpace(Vector2.Zero));
         }
 
-        public override void AdjustPosition(DragEvent dragEvent)
+        public override void AdjustPosition(DragEvent dragEvent, IEnumerable<DrawableHitObject> selectedObjects)
         {
             var objectParent = HitObject.Parent;
 
