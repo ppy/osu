@@ -18,7 +18,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public class BlueprintContainer : CompositeDrawable
     {
         private SelectionBlueprintContainer selectionBlueprints;
+
         private Container<PlacementBlueprint> placementBlueprintContainer;
+        private PlacementBlueprint currentPlacement;
+
         private SelectionBox selectionBox;
 
         private IEnumerable<SelectionBlueprint> selections => selectionBlueprints.Children.Where(c => c.IsAlive);
@@ -117,18 +120,31 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return true;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (currentPlacement != null)
+            {
+                if (composer.CursorInPlacementArea)
+                    currentPlacement.State = PlacementState.Shown;
+                else if (currentPlacement?.PlacementBegun == false)
+                    currentPlacement.State = PlacementState.Hidden;
+            }
+        }
+
         /// <summary>
         /// Refreshes the current placement tool.
         /// </summary>
         private void refreshTool()
         {
             placementBlueprintContainer.Clear();
+            currentPlacement = null;
 
             var blueprint = CurrentTool?.CreatePlacementBlueprint();
             if (blueprint != null)
-                placementBlueprintContainer.Child = blueprint;
+                placementBlueprintContainer.Child = currentPlacement = blueprint;
         }
-
 
         /// <summary>
         /// Select all masks in a given rectangle selection area.
