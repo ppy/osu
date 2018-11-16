@@ -109,8 +109,8 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         {
             base.UpdateAfterChildren();
 
-            score1Text.X = -Math.Max(score1Text.DrawWidth / 2, score1Bar.DrawWidth);
-            score2Text.X = Math.Max(score2Text.DrawWidth / 2, score2Bar.DrawWidth);
+            score1Text.X = -Math.Max(5 + score1Text.DrawWidth / 2, score1Bar.DrawWidth);
+            score2Text.X = Math.Max(5 + score2Text.DrawWidth / 2, score2Bar.DrawWidth);
         }
 
         private class MatchScoreCounter : ScoreCounter
