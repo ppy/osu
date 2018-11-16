@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -9,13 +10,13 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Screens.Ladder.Components;
 
-namespace osu.Game.Tournament.Tests
+namespace osu.Game.Tournament.Screens.Groupings
 {
-    public class TestCaseGroupingManager : LadderTestCase
+    public class GroupingsEditorScreen : TournamentScreen, IProvideVideo
     {
         private readonly FillFlowContainer<GroupingRow> items;
 
-        public TestCaseGroupingManager()
+        public GroupingsEditorScreen()
         {
             Add(new FillFlowContainer
             {
@@ -37,29 +38,37 @@ namespace osu.Game.Tournament.Tests
                     },
                 }
             });
-
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            foreach (var g in Ladder.Groupings)
-                items.Add(new GroupingRow(g));
+            foreach (var g in LadderInfo.Groupings)
+                items.Add(new GroupingRow(g, updateGroupings));
         }
 
-        protected override void Dispose(bool isDisposing)
+        protected override void LoadComplete()
         {
-            Ladder.Groupings = items.Children.Select(c => c.Grouping).ToList();
-            base.Dispose(isDisposing);
+            base.LoadComplete();
+            Scheduler.AddDelayed(() => LadderInfo.Groupings = items.Children.Select(c => c.Grouping).ToList(), 500, true);
         }
 
-        private void addNew() => items.Add(new GroupingRow(new TournamentGrouping()));
+        private void addNew()
+        {
+            items.Add(new GroupingRow(new TournamentGrouping(), updateGroupings));
+            updateGroupings();
+        }
+
+        private void updateGroupings()
+        {
+            LadderInfo.Groupings = items.Children.Select(c => c.Grouping).ToList();
+        }
 
         public class GroupingRow : CompositeDrawable
         {
             public readonly TournamentGrouping Grouping;
 
-            public GroupingRow(TournamentGrouping grouping)
+            public GroupingRow(TournamentGrouping grouping, Action onDelete)
             {
                 Grouping = grouping;
                 InternalChildren = new Drawable[]
@@ -77,7 +86,11 @@ namespace osu.Game.Tournament.Tests
                             {
                                 Width = 0.1f,
                                 Text = "Delete",
-                                Action = () => Expire()
+                                Action = () =>
+                                {
+                                    Expire();
+                                    onDelete();
+                                }
                             },
                         }
                     }
