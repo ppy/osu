@@ -14,6 +14,7 @@ using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using OpenTK;
@@ -64,6 +65,8 @@ namespace osu.Game.Screens.Menu
 
         private SampleChannel sampleBack;
 
+        private IdleTracker idleTracker;
+
         public ButtonSystem()
         {
             RelativeSizeAxes = Axes.Both;
@@ -102,9 +105,10 @@ namespace osu.Game.Screens.Menu
         private OsuGame game;
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuGame game)
+        private void load(AudioManager audio, OsuGame game, IdleTracker idleTracker)
         {
             this.game = game;
+            this.idleTracker = idleTracker;
             sampleBack = audio.Sample.Get(@"Menu/button-back-select");
         }
 
@@ -266,8 +270,8 @@ namespace osu.Game.Screens.Menu
 
         protected override void Update()
         {
-            //if (OsuGame.IdleTime > 6000 && State != MenuState.Exit)
-            //    State = MenuState.Initial;
+            if (idleTracker?.IdleTime > 6000 && State != ButtonSystemState.Exit)
+                State = ButtonSystemState.Initial;
 
             base.Update();
 
