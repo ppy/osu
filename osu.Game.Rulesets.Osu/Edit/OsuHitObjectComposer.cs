@@ -15,6 +15,7 @@ using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
@@ -34,6 +35,8 @@ namespace osu.Game.Rulesets.Osu.Edit
             new SliderCompositionTool(),
             new SpinnerCompositionTool()
         };
+
+        public override SelectionBox CreateSelectionBox() => new OsuSelectionBox();
 
         protected override Container CreateLayerContainer() => new PlayfieldAdjustmentContainer { RelativeSizeAxes = Axes.Both };
 

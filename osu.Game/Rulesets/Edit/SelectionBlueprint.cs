@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -134,8 +133,6 @@ namespace osu.Game.Rulesets.Edit
             DragRequested?.Invoke(e);
             return true;
         }
-
-        public abstract void AdjustPosition(DragEvent dragEvent, IEnumerable<DrawableHitObject> selectedObjects);
 
         /// <summary>
         /// The screen-space point that causes this <see cref="SelectionBlueprint"/> to be selected.
