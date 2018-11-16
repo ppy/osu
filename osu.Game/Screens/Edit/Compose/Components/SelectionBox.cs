@@ -12,6 +12,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using OpenTK;
 using OpenTK.Input;
 
@@ -24,7 +25,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
     {
         public const float BORDER_RADIUS = 2;
 
+        protected IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
+
+        protected IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject.HitObject);
 
         private Drawable outline;
 
@@ -59,12 +63,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region User Input Handling
 
-        public void HandleDrag(DragEvent dragEvent)
+        public virtual void HandleDrag(DragEvent dragEvent)
         {
-            // Todo: Various forms of snapping
-
-            foreach (var blueprint in selectedBlueprints)
-                blueprint.AdjustPosition(dragEvent, selectedBlueprints.Select(b => b.HitObject));
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -90,19 +90,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Bind an action to deselect all selected blueprints.
         /// </summary>
-        public Action DeselectAll { private get; set; }
+        internal Action DeselectAll { private get; set; }
 
         /// <summary>
         /// Handle a blueprint becoming selected.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
-        public void HandleSelected(SelectionBlueprint blueprint) => selectedBlueprints.Add(blueprint);
+        internal void HandleSelected(SelectionBlueprint blueprint) => selectedBlueprints.Add(blueprint);
 
         /// <summary>
         /// Handle a blueprint becoming deselected.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
-        public void HandleDeselected(SelectionBlueprint blueprint)
+        internal void HandleDeselected(SelectionBlueprint blueprint)
         {
             selectedBlueprints.Remove(blueprint);
 
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Handle a blueprint requesting selection.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
-        public void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
+        internal void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
         {
             if (state.Keyboard.ControlPressed)
             {

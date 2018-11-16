@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Compose.Components;
 using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
@@ -47,6 +48,8 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
             new NoteCompositionTool()
         };
+
+        public override SelectionBox CreateSelectionBox() => new ManiaSelectionBox();
 
         public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
         {
