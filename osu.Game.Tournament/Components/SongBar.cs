@@ -48,14 +48,23 @@ namespace osu.Game.Tournament.Components
         private Container panelContents;
         private Container innerPanel;
         private Container outerPanel;
+        private TournamentBeatmapPanel panel;
+
+        private float panelWidth => expanded ? 0.6f : 1;
 
         private const float main_width = 0.97f;
 
+        private bool expanded;
+
         public bool Expanded
         {
+            get => expanded;
             set
             {
-                if (value)
+                expanded = value;
+                panel.ResizeWidthTo(panelWidth, 800, Easing.OutQuint);
+
+                if (expanded)
                 {
                     innerPanel.ResizeWidthTo(0.7f, 800, Easing.OutQuint);
                     outerPanel.ResizeWidthTo(main_width, 800, Easing.OutQuint);
@@ -63,7 +72,7 @@ namespace osu.Game.Tournament.Components
                 else
                 {
                     innerPanel.ResizeWidthTo(1, 800, Easing.OutQuint);
-                    outerPanel.ResizeWidthTo(0.3f, 800, Easing.OutQuint);
+                    outerPanel.ResizeWidthTo(0.2f, 800, Easing.OutQuint);
                 }
             }
         }
@@ -91,7 +100,7 @@ namespace osu.Game.Tournament.Components
                     RelativePositionAxes = Axes.X,
                     X = -(1 - main_width) / 2,
                     Y = -10,
-                    Width = 0.95f,
+                    Width = main_width,
                     Height = TournamentBeatmapPanel.HEIGHT,
                     CornerRadius = TournamentBeatmapPanel.HEIGHT / 2,
                     Children = new Drawable[]
@@ -100,6 +109,15 @@ namespace osu.Game.Tournament.Components
                         {
                             RelativeSizeAxes = Axes.Both,
                             Colour = OsuColour.Gray(0.93f),
+                        },
+                        new OsuLogo
+                        {
+                            Triangles = false,
+                            Colour = OsuColour.Gray(0.33f),
+                            Scale = new Vector2(0.08f),
+                            Margin = new MarginPadding(50),
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
                         },
                         innerPanel = new Container
                         {
@@ -121,15 +139,6 @@ namespace osu.Game.Tournament.Components
                                     RelativeSizeAxes = Axes.Both,
                                 }
                             }
-                        },
-                        new OsuLogo
-                        {
-                            Triangles = false,
-                            Colour = OsuColour.Gray(0.33f),
-                            Scale = new Vector2(0.08f),
-                            Margin = new MarginPadding(50),
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
                         }
                     }
                 }
@@ -193,10 +202,12 @@ namespace osu.Game.Tournament.Components
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight
                 },
-                new TournamentBeatmapPanel(beatmap)
+                panel = new TournamentBeatmapPanel(beatmap)
                 {
                     Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Size = new Vector2(panelWidth, 1)
                 }
             };
         }

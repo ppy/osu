@@ -91,6 +91,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             RelativeSizeAxes = Axes.X,
                             Text = "Toggle warmup",
                             Action = () => warmup.Toggle()
+                        },
+                        new TriangleButton
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            Text = "Toggle chat",
+                            Action = () => { State.Value = State.Value == TourneyState.Idle ? TourneyState.Playing : TourneyState.Idle; }
                         }
                     }
                 }
