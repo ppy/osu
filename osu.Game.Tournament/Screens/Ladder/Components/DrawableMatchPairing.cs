@@ -30,8 +30,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             Pairing = pairing;
 
-            Position = new Vector2(pairing.Position.X, pairing.Position.Y);
-
             AutoSizeAxes = Axes.Both;
 
             Margin = new MarginPadding(5);
@@ -69,6 +67,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     Spacing = new Vector2(2)
                 }
             };
+
             pairing.Team1.BindValueChanged(_ => updateTeams());
             pairing.Team2.BindValueChanged(_ => updateTeams());
             pairing.Team1Score.BindValueChanged(_ => updateWinConditions());
@@ -79,6 +78,11 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             pairing.LosersProgression.BindValueChanged(_ => updateProgression());
             pairing.Losers.BindValueChanged(_ => updateTeams());
             pairing.Current.BindValueChanged(_ => updateCurrentMatch(), true);
+            pairing.Position.BindValueChanged(pos =>
+            {
+                if (IsDragged) return;
+                Position = new Vector2(pos.X, pos.Y);
+            }, true);
 
             updateTeams();
         }
@@ -205,13 +209,13 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             updateWinConditions();
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e) => e.Button == MouseButton.Left && editorInfo.EditingEnabled;
+        protected override bool OnMouseDown(MouseDownEvent e) => e.Button == MouseButton.Left && editorInfo != null;
 
-        protected override bool OnDragStart(DragStartEvent e) => editorInfo.EditingEnabled;
+        protected override bool OnDragStart(DragStartEvent e) => editorInfo != null;
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (Selected && editorInfo.EditingEnabled && e.Key == Key.Delete)
+            if (Selected && editorInfo != null && e.Key == Key.Delete)
             {
                 Remove();
                 return true;
@@ -222,7 +226,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (!editorInfo.EditingEnabled)
+            if (editorInfo == null)
                 return false;
 
             Selected = true;
@@ -237,7 +241,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             this.MoveToOffset(e.Delta);
 
             var pos = Position;
-            Pairing.Position = new Point((int)pos.X, (int)pos.Y);
+            Pairing.Position.Value = new Point((int)pos.X, (int)pos.Y);
             return true;
         }
 

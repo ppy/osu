@@ -25,7 +25,8 @@ namespace osu.Game.Tournament.Screens
     public class TournamentSceneManager : OsuScreen
     {
         private ScheduleScreen schedule;
-        private LadderManager bracket;
+        private LadderScreen bracket;
+        private LadderEditorScreen bracketEditor;
         private MapPoolScreen mapPool;
         private GameplayScreen gameplay;
         private TeamWinScreen winner;
@@ -57,6 +58,8 @@ namespace osu.Game.Tournament.Screens
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket Editor", Action = () => setScreen(bracketEditor) },
+                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Drawings", Action = () => setScreen(drawings) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Showcase", Action = () => setScreen(showcase) },
                                 new Container { RelativeSizeAxes = Axes.X, Height = 50 },
@@ -96,7 +99,8 @@ namespace osu.Game.Tournament.Screens
                             Children = new Drawable[]
                             {
                                 schedule = new ScheduleScreen(),
-                                bracket = new LadderManager(),
+                                bracket = new LadderScreen(),
+                                bracketEditor = new LadderEditorScreen(),
                                 showcase = new ShowcaseScreen(),
                                 mapPool = new MapPoolScreen(),
                                 teamIntro = new TeamIntroScreen(),

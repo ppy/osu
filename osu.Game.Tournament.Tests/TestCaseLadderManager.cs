@@ -16,7 +16,7 @@ namespace osu.Game.Tournament.Tests
             Add(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new LadderManager()
+                Child = new LadderScreen()
             });
         }
     }
