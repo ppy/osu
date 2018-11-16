@@ -42,7 +42,7 @@ namespace osu.Game.Tournament.Screens.MapPool
                 maps = new FillFlowContainer<TournamentBeatmapPanel>
                 {
                     Y = 100,
-                    Spacing = new Vector2(10),
+                    Spacing = new Vector2(10, 20),
                     Padding = new MarginPadding(50),
                     Direction = FillDirection.Full,
                     RelativeSizeAxes = Axes.Both,
