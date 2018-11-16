@@ -53,7 +53,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public readonly Bindable<DateTimeOffset> Date = new Bindable<DateTimeOffset>();
 
-        public Point Position;
+        public readonly Bindable<Point> Position = new Bindable<Point>();
 
         public MatchPairing()
         {

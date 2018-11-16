@@ -34,7 +34,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private Color4 colourNormal;
 
         private readonly Func<bool> isWinner;
-        private LadderManager manager;
+        private LadderEditorScreen ladderEditor;
 
         [Resolved]
         private LadderInfo ladderInfo { get; set; }
@@ -80,9 +80,9 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, LadderManager manager)
+        private void load(OsuColour colours, LadderEditorScreen ladderEditor)
         {
-            this.manager = manager;
+            this.ladderEditor = ladderEditor;
 
             colourWinner = losers ? colours.YellowDarker : colours.BlueDarker;
             colourNormal = OsuColour.Gray(0.2f);
@@ -141,7 +141,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         //TODO: use OnClick instead once we have per-button clicks.
         protected override bool OnClick(ClickEvent e)
         {
-            if (Team == null || editorInfo.EditingEnabled) return false;
+            if (Team == null || editorInfo != null) return false;
 
             if (!pairing.Current.Value)
             {
@@ -190,15 +190,15 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         {
             get
             {
-                if (!editorInfo.EditingEnabled)
+                if (editorInfo == null)
                     return new MenuItem[0];
 
                 return new MenuItem[]
                 {
                     new OsuMenuItem("Set as current", MenuItemType.Standard, setCurrent),
-                    new OsuMenuItem("Join with", MenuItemType.Standard, () => manager.RequestJoin(pairing, false)),
-                    new OsuMenuItem("Join with (loser)", MenuItemType.Standard, () => manager.RequestJoin(pairing, true)),
-                    new OsuMenuItem("Remove", MenuItemType.Destructive, () => manager.Remove(pairing)),
+                    new OsuMenuItem("Join with", MenuItemType.Standard, () => ladderEditor.RequestJoin(pairing, false)),
+                    new OsuMenuItem("Join with (loser)", MenuItemType.Standard, () => ladderEditor.RequestJoin(pairing, true)),
+                    new OsuMenuItem("Remove", MenuItemType.Destructive, () => ladderEditor.Remove(pairing)),
                 };
             }
         }

@@ -39,11 +39,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
             Children = new Drawable[]
             {
-                new PlayerCheckbox
-                {
-                    Bindable = editorInfo.EditingEnabled,
-                    LabelText = "Enable editing"
-                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.X,
@@ -118,16 +113,6 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             {
                 if (editorInfo.Selected.Value != null)
                     editorInfo.Selected.Value.Losers.Value = losers;
-            };
-
-            // sliderBestOf.Bindable.ValueChanged += val =>
-            // {
-            //     if (editorInfo.Selected.Value != null) editorInfo.Selected.Value.BestOf.Value = (int)val;
-            // };
-
-            editorInfo.EditingEnabled.ValueChanged += enabled =>
-            {
-                if (!enabled) editorInfo.Selected.Value = null;
             };
         }
     }
