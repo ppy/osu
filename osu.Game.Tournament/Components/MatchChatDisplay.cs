@@ -12,6 +12,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
+using osu.Game.Tournament.IPC;
 using OpenTK;
 using OpenTK.Graphics;
 
@@ -25,7 +26,7 @@ namespace osu.Game.Tournament.Components
 
         public MatchChatDisplay()
         {
-            CornerRadius = 5;
+            CornerRadius = 10;
             Masking = true;
 
             InternalChildren = new Drawable[]
@@ -51,13 +52,46 @@ namespace osu.Game.Tournament.Components
             Channel.BindValueChanged(channelChanged);
         }
 
+        private readonly Bindable<string> chatChannel = new Bindable<string>();
+
+        private ChannelManager manager;
+
+        [BackgroundDependencyLoader(true)]
+        private void load(MatchIPCInfo ipc)
+        {
+            if (ipc != null)
+            {
+                AddInternal(manager = new ChannelManager());
+
+                Channel.BindTo(manager.CurrentChannel);
+
+                chatChannel.BindTo(ipc.ChatChannel);
+                chatChannel.BindValueChanged(channelString =>
+                {
+                    if (string.IsNullOrWhiteSpace(channelString))
+                        return;
+
+                    int id = int.Parse(channelString);
+
+                    var channel = manager.JoinedChannels.FirstOrDefault(ch => ch.Id == id) ?? new Channel
+                    {
+                        Id = id,
+                        Type = ChannelType.Public
+                    };
+
+                    manager.JoinChannel(channel);
+                    manager.CurrentChannel.Value = channel;
+
+                }, true);
+            }
+        }
+
         private void channelChanged(Channel channel)
         {
             if (lastChannel != null)
                 lastChannel.NewMessagesArrived -= newMessages;
 
             lastChannel = channel;
-
             channel.NewMessagesArrived += newMessages;
         }
 

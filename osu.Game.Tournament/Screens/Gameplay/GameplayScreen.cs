@@ -13,6 +13,7 @@ using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
@@ -82,6 +83,14 @@ namespace osu.Game.Tournament.Screens.Gameplay
                         },
                     }
                 },
+                chat = new MatchChatDisplay
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Size = new Vector2(0.45f, 120),
+                    Margin = new MarginPadding(10),
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                },
                 new ControlPanel
                 {
                     Children = new Drawable[]
@@ -102,8 +111,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 }
             });
 
-            State.BindValueChanged(stateChanged);
             State.BindTo(ipc.State);
+            State.BindValueChanged(stateChanged, true);
 
             currentMatch.BindValueChanged(m => warmup.Value = m.Team1Score + m.Team2Score == 0);
             currentMatch.BindTo(ladder.CurrentMatch);
@@ -112,6 +121,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         }
 
         private ScheduledDelegate scheduledBarContract;
+        private MatchChatDisplay chat;
 
         private void stateChanged(TourneyState state)
         {
@@ -132,12 +142,21 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 case TourneyState.Idle:
                     // show chat
                     SongBar.Expanded = false;
+                    using (chat.BeginDelayedSequence(500))
+                    {
+                        chat.FadeIn(300);
+                        chat.MoveToY(100).MoveToY(0, 500, Easing.OutQuint);
+                    }
+
                     break;
                 case TourneyState.Ranking:
                     scheduledBarContract = Scheduler.AddDelayed(() => SongBar.Expanded = false, 15000);
                     break;
                 default:
-                    SongBar.Expanded = true;
+                    chat.FadeOut(200);
+                    chat.MoveToY(100, 500, Easing.In);
+                    using (SongBar.BeginDelayedSequence(300, true))
+                        SongBar.Expanded = true;
                     break;
             }
         }
