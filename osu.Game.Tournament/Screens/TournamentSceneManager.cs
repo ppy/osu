@@ -11,6 +11,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
 using osu.Game.Tournament.Screens.Drawings;
 using osu.Game.Tournament.Screens.Gameplay;
+using osu.Game.Tournament.Screens.Groupings;
 using osu.Game.Tournament.Screens.Ladder;
 using osu.Game.Tournament.Screens.MapPool;
 using osu.Game.Tournament.Screens.Schedule;
@@ -27,6 +28,7 @@ namespace osu.Game.Tournament.Screens
         private ScheduleScreen schedule;
         private LadderScreen bracket;
         private LadderEditorScreen bracketEditor;
+        private GroupingsEditorScreen groupingsEditor;
         private MapPoolScreen mapPool;
         private GameplayScreen gameplay;
         private TeamWinScreen winner;
@@ -59,6 +61,7 @@ namespace osu.Game.Tournament.Screens
                             Children = new Drawable[]
                             {
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket Editor", Action = () => setScreen(bracketEditor) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Groupings Editor", Action = () => setScreen(groupingsEditor) },
                                 new Container { RelativeSizeAxes = Axes.X, Height = 50 },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Drawings", Action = () => setScreen(drawings) },
                                 new OsuButton { RelativeSizeAxes = Axes.X, Text = "Showcase", Action = () => setScreen(showcase) },
@@ -101,6 +104,7 @@ namespace osu.Game.Tournament.Screens
                                 schedule = new ScheduleScreen(),
                                 bracket = new LadderScreen(),
                                 bracketEditor = new LadderEditorScreen(),
+                                groupingsEditor = new GroupingsEditorScreen(),
                                 showcase = new ShowcaseScreen(),
                                 mapPool = new MapPoolScreen(),
                                 teamIntro = new TeamIntroScreen(),

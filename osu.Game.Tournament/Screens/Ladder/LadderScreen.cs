@@ -22,9 +22,6 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         protected ScrollableContainer ScrollContent;
 
-        [Resolved]
-        protected LadderInfo LadderInfo { get; private set; }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {

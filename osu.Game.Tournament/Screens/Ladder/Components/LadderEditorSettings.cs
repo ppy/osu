@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
@@ -115,5 +116,15 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                     editorInfo.Selected.Value.Losers.Value = losers;
             };
         }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            return false;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+        }
+
     }
 }
