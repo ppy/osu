@@ -53,6 +53,7 @@ namespace osu.Game.Tournament.IPC
                             }
 
                             Mods.Value = (LegacyMods)mods;
+                            ChatChannel.Value = sr.ReadLine();
                         }
                     }
                     catch

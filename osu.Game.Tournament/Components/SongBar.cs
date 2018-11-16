@@ -62,7 +62,7 @@ namespace osu.Game.Tournament.Components
             set
             {
                 expanded = value;
-                panel.ResizeWidthTo(panelWidth, 800, Easing.OutQuint);
+                panel?.ResizeWidthTo(panelWidth, 800, Easing.OutQuint);
 
                 if (expanded)
                 {
@@ -72,7 +72,7 @@ namespace osu.Game.Tournament.Components
                 else
                 {
                     innerPanel.ResizeWidthTo(1, 800, Easing.OutQuint);
-                    outerPanel.ResizeWidthTo(0.2f, 800, Easing.OutQuint);
+                    outerPanel.ResizeWidthTo(0.25f, 800, Easing.OutQuint);
                 }
             }
         }
