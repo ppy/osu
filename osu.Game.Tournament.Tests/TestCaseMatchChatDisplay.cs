@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Online.Chat;
 using osu.Game.Tests.Visual;
 using osu.Game.Tournament.Components;
+using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osu.Game.Users;
 using OpenTK;
@@ -38,6 +39,9 @@ namespace osu.Game.Tournament.Tests
 
         [Cached]
         private LadderInfo ladderInfo = new LadderInfo();
+
+        [Cached]
+        private MatchIPCInfo matchInfo = new MatchIPCInfo(); // hide parent
 
         public TestCaseMatchChatDisplay()
         {
