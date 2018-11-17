@@ -9,12 +9,17 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
+using osu.Framework.IO.Stores;
 using osu.Framework.Localisation;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Screens.Ladder.Components;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Tournament.Components
@@ -22,6 +27,7 @@ namespace osu.Game.Tournament.Components
     public class TournamentBeatmapPanel : CompositeDrawable
     {
         public readonly BeatmapInfo Beatmap;
+        private readonly string mods;
 
         private const float horizontal_padding = 10;
         private const float vertical_padding = 5;
@@ -31,15 +37,16 @@ namespace osu.Game.Tournament.Components
         private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
         private Box flash;
 
-        public TournamentBeatmapPanel(BeatmapInfo beatmap)
+        public TournamentBeatmapPanel(BeatmapInfo beatmap, string mods = null)
         {
             Beatmap = beatmap;
+            this.mods = mods;
             Width = 400;
             Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder)
+        private void load(LadderInfo ladder, Storage storage)
         {
             currentMatch.BindValueChanged(matchChanged);
             currentMatch.BindTo(ladder.CurrentMatch);
@@ -126,6 +133,16 @@ namespace osu.Game.Tournament.Components
                     Alpha = 0,
                 },
             });
+
+            if (!string.IsNullOrEmpty(mods))
+                AddInternal(new Sprite
+                {
+                    Texture = new TextureStore(new TextureLoaderStore(new StorageBackedResourceStore(storage))).Get($"mods/{mods}"),
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreRight,
+                    Margin = new MarginPadding(20),
+                    Scale = new Vector2(0.5f)
+                });
         }
 
         private void matchChanged(MatchPairing match)
