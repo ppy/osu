@@ -4,13 +4,13 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
+using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
 
 namespace osu.Game.Tournament.Screens.Groupings
@@ -74,7 +74,7 @@ namespace osu.Game.Tournament.Screens.Groupings
             updateGroupings();
         }
 
-            private void updateGroupings()
+        private void updateGroupings()
         {
             LadderInfo.Groupings = items.Children.Select(c => c.Grouping).ToList();
         }
@@ -115,38 +115,6 @@ namespace osu.Game.Tournament.Screens.Groupings
 
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
-            }
-        }
-    }
-
-    public class DateTextBox : SettingsTextBox
-    {
-        public DateTextBox()
-        {
-            base.Bindable = new Bindable<string>();
-            ((OsuTextBox)Control).OnCommit = (sender, newText) => {
-                try
-                {
-                    bindable.Value = DateTimeOffset.Parse(sender.Text);
-                }
-                catch
-                {
-                    bindable.TriggerChange();
-                }
-            };
-        }
-
-        // hold a reference to the provided bindable so we don't have to in every settings section.
-        private Bindable<DateTimeOffset> bindable;
-
-        public new Bindable<DateTimeOffset> Bindable
-        {
-            get { return bindable; }
-
-            set
-            {
-                bindable = value;
-                bindable.BindValueChanged(dto => base.Bindable.Value = dto.ToUniversalTime().ToString(), true);
             }
         }
     }
