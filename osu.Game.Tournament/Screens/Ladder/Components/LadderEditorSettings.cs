@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -11,6 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Play.PlayerSettings;
+using osu.Game.Tournament.Screens.Groupings;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
@@ -24,6 +26,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         private OsuTextBox textboxTeam2;
         private SettingsDropdown<TournamentGrouping> groupingDropdown;
         private PlayerCheckbox losersCheckbox;
+        private DateTextBox dateTimeBox;
 
         [Resolved]
         private LadderEditorInfo editorInfo { get; set; }
@@ -81,6 +84,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 {
                     LabelText = "Losers Bracket",
                     Bindable = new Bindable<bool>()
+                },
+                dateTimeBox = new DateTextBox
+                {
+                    Bindable = new Bindable<DateTimeOffset>()
                 }
             };
 
@@ -90,6 +97,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 textboxTeam2.Text = selection?.Team2.Value?.Acronym;
                 groupingDropdown.Bindable.Value = selection?.Grouping.Value ?? groupingOptions.First();
                 losersCheckbox.Current.Value = selection?.Losers.Value ?? false;
+                dateTimeBox.Bindable.Value = selection?.Date.Value ?? DateTimeOffset.UtcNow;
             };
 
             textboxTeam1.OnCommit = (val, newText) =>
@@ -107,7 +115,14 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             groupingDropdown.Bindable.ValueChanged += grouping =>
             {
                 if (editorInfo.Selected.Value != null)
+                {
                     editorInfo.Selected.Value.Grouping.Value = grouping;
+                    if (editorInfo.Selected.Value.Date.Value < grouping.StartDate.Value)
+                    {
+                        editorInfo.Selected.Value.Date.Value = grouping.StartDate.Value;
+                        editorInfo.Selected.TriggerChange();
+                    }
+                }
             };
 
             losersCheckbox.Current.ValueChanged += losers =>
@@ -115,6 +130,18 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 if (editorInfo.Selected.Value != null)
                     editorInfo.Selected.Value.Losers.Value = losers;
             };
+
+            dateTimeBox.Bindable.ValueChanged += date =>
+            {
+                if (editorInfo.Selected.Value != null)
+                    editorInfo.Selected.Value.Date.Value = date;
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            this.FadeIn();
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -125,6 +152,5 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         protected override void OnHoverLost(HoverLostEvent e)
         {
         }
-
     }
 }
