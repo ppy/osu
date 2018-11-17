@@ -1,6 +1,8 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -24,19 +26,10 @@ using OpenTK.Graphics;
 
 namespace osu.Game.Tournament.Screens
 {
+    [Cached]
     public class TournamentSceneManager : OsuScreen
     {
-        private ScheduleScreen schedule;
-        private LadderScreen bracket;
-        private LadderEditorScreen bracketEditor;
-        private GroupingsEditorScreen groupingsEditor;
-        private MapPoolScreen mapPool;
-        private GameplayScreen gameplay;
-        private TeamWinScreen winner;
-        private TeamIntroScreen teamIntro;
-        private DrawingsScreen drawings;
         private Container screens;
-        private ShowcaseScreen showcase;
         private VideoSprite video;
 
         //todo: make less temporary
@@ -81,16 +74,16 @@ namespace osu.Game.Tournament.Screens
                             RelativeSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
-                                schedule = new ScheduleScreen(),
-                                bracket = new LadderScreen(),
-                                bracketEditor = new LadderEditorScreen(),
-                                groupingsEditor = new GroupingsEditorScreen(),
-                                showcase = new ShowcaseScreen(),
-                                mapPool = new MapPoolScreen(),
-                                teamIntro = new TeamIntroScreen(),
-                                drawings = new DrawingsScreen(),
-                                gameplay = new GameplayScreen(),
-                                winner = new TeamWinScreen()
+                                new ScheduleScreen(),
+                                new LadderScreen(),
+                                new LadderEditorScreen(),
+                                new GroupingsEditorScreen(),
+                                new ShowcaseScreen(),
+                                new MapPoolScreen(),
+                                new TeamIntroScreen(),
+                                new DrawingsScreen(),
+                                new GameplayScreen(),
+                                new TeamWinScreen()
                             }
                         },
                         chatContainer = new Container
@@ -117,31 +110,34 @@ namespace osu.Game.Tournament.Screens
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket Editor", Action = () => setScreen(bracketEditor) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Groupings Editor", Action = () => setScreen(groupingsEditor) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket Editor", Action = () => SetScreen(typeof(LadderEditorScreen)) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Groupings Editor", Action = () => SetScreen(typeof(GroupingsEditorScreen)) },
                                 new Container { RelativeSizeAxes = Axes.X, Height = 50 },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Drawings", Action = () => setScreen(drawings) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Showcase", Action = () => setScreen(showcase) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Drawings", Action = () => SetScreen(typeof(DrawingsScreen)) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Showcase", Action = () => SetScreen(typeof(ShowcaseScreen)) },
                                 new Container { RelativeSizeAxes = Axes.X, Height = 50 },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Schedule", Action = () => setScreen(schedule) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket", Action = () => setScreen(bracket) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Schedule", Action = () => SetScreen(typeof(ScheduleScreen)) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket", Action = () => SetScreen(typeof(LadderScreen)) },
                                 new Container { RelativeSizeAxes = Axes.X, Height = 50 },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "TeamIntro", Action = () => setScreen(teamIntro) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "MapPool", Action = () => setScreen(mapPool) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Gameplay", Action = () => setScreen(gameplay) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "TeamIntro", Action = () => SetScreen(typeof(TeamIntroScreen)) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "MapPool", Action = () => SetScreen(typeof(MapPoolScreen)) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Gameplay", Action = () => SetScreen(typeof(GameplayScreen)) },
                                 new Container { RelativeSizeAxes = Axes.X, Height = 50 },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Win", Action = () => setScreen(winner) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Win", Action = () => SetScreen(typeof(TeamWinScreen)) },
                             }
                         },
                     },
                 },
             };
 
-            setScreen(teamIntro);
+            SetScreen(typeof(ScheduleScreen));
         }
 
-        private void setScreen(Drawable screen)
+        public void SetScreen(Type screenType)
         {
+            var screen = screens.FirstOrDefault(s => s.GetType() == screenType);
+            if (screen == null) return;
+
             foreach (var s in screens.Children)
             {
                 if (s == screen)

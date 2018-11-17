@@ -13,6 +13,8 @@ using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
+using osu.Game.Tournament.Screens.MapPool;
+using osu.Game.Tournament.Screens.TeamWin;
 using OpenTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
@@ -29,6 +31,9 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         private readonly Color4 red = new Color4(186, 0, 18, 255);
         private readonly Color4 blue = new Color4(17, 136, 170, 255);
+
+        [Resolved]
+        private TournamentSceneManager sceneManager { get; set; }
 
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder, TextureStore textures, MatchIPCInfo ipc, MatchChatDisplay chat)
@@ -119,9 +124,11 @@ namespace osu.Game.Tournament.Screens.Gameplay
             warmup.BindValueChanged(w => warmupButton.Alpha = !w ? 0.5f : 1, true);
         }
 
-        private ScheduledDelegate scheduledBarContract;
+        private ScheduledDelegate scheduledOperation;
         private MatchChatDisplay chat;
         private MatchScoreDisplay scoreDisplay;
+
+        private TourneyState lastState;
 
         private void stateChanged(TourneyState state)
         {
@@ -135,7 +142,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     currentMatch.Value.Team2Score.Value++;
             }
 
-            scheduledBarContract?.Cancel();
+            scheduledOperation?.Cancel();
 
             void expand()
             {
@@ -160,15 +167,26 @@ namespace osu.Game.Tournament.Screens.Gameplay
             {
                 case TourneyState.Idle:
                     contract();
+
+                    if (lastState == TourneyState.Ranking)
+                    {
+                        if (currentMatch.Value?.Completed == true)
+                            scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, 4000);
+                        else if (currentMatch.Value?.Completed == false)
+                            scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, 4000);
+                    }
+
                     break;
                 case TourneyState.Ranking:
-                    scheduledBarContract = Scheduler.AddDelayed(contract, 10000);
+                    scheduledOperation = Scheduler.AddDelayed(contract, 10000);
                     break;
                 default:
                     chat.Expand();
                     expand();
                     break;
             }
+
+            lastState = state;
         }
     }
 }
