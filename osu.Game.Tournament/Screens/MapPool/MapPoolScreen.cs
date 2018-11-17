@@ -193,7 +193,7 @@ namespace osu.Game.Tournament.Screens.MapPool
             if (match.Grouping.Value != null)
             {
                 foreach (var b in match.Grouping.Value.Beatmaps)
-                    maps.Add(new TournamentBeatmapPanel(b.BeatmapInfo)
+                    maps.Add(new TournamentBeatmapPanel(b.BeatmapInfo, b.Mods)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
