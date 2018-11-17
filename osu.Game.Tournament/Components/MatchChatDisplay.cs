@@ -199,11 +199,11 @@ namespace osu.Game.Tournament.Components
                 }
                 else if (info.CurrentMatch.Value.Team1.Value.Players.Any(u => u.Id == message.Sender.Id))
                 {
-                    colourBox.Colour = red;
+                    senderText.Colour = colourBox.Colour = red;
                 }
                 else if (info.CurrentMatch.Value.Team2.Value.Players.Any(u => u.Id == message.Sender.Id))
                 {
-                    colourBox.Colour = blue;
+                    senderText.Colour = colourBox.Colour = blue;
                 }
             }
         }
