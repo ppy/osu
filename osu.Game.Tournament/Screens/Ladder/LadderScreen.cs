@@ -8,13 +8,15 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
+using osu.Framework.Graphics.Video;
+using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using OpenTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Ladder
 {
-    public class LadderScreen : TournamentScreen
+    public class LadderScreen : TournamentScreen, IProvideVideo
     {
         protected Container<DrawableMatchPairing> PairingsContainer;
         private Container<Path> paths;
@@ -23,7 +25,7 @@ namespace osu.Game.Tournament.Screens.Ladder
         protected ScrollableContainer ScrollContent;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, Storage storage)
         {
             normalPathColour = colours.BlueDarker.Darken(2);
             losersPathColour = colours.YellowDarker.Darken(2);
@@ -35,6 +37,11 @@ namespace osu.Game.Tournament.Screens.Ladder
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
+                    new VideoSprite(storage.GetStream(@"BG Side Logo - OWC.m4v"))
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Loop = true,
+                    },
                     ScrollContent = new ScrollableContainer
                     {
                         RelativeSizeAxes = Axes.Both,
