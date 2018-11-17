@@ -27,7 +27,18 @@ namespace osu.Game.Tournament.IPC
         [BackgroundDependencyLoader]
         private void load()
         {
-            var stable = new StableStorage();
+
+            StableStorage stable;
+
+            try
+            {
+                stable = new StableStorage();
+            }
+            catch
+            {
+                Logger.Log("Stable installation could not be found; disabling file based IPC");
+                return;
+            }
 
             const string file_ipc_filename = "ipc.txt";
             const string file_ipc_state_filename = "ipc-state.txt";
