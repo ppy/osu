@@ -12,7 +12,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Play.PlayerSettings;
-using osu.Game.Tournament.Screens.Groupings;
+using osu.Game.Tournament.Components;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {
