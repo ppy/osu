@@ -86,6 +86,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 chat = new MatchChatDisplay
                 {
                     RelativeSizeAxes = Axes.X,
+                    Y = 100,
                     Size = new Vector2(0.45f, 120),
                     Margin = new MarginPadding(10),
                     Anchor = Anchor.BottomCentre,
@@ -137,26 +138,34 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             scheduledBarContract?.Cancel();
 
+            void expand()
+            {
+                chat.FadeOut(200);
+                chat.MoveToY(100, 500, Easing.In);
+                using (SongBar.BeginDelayedSequence(300, true))
+                    SongBar.Expanded = true;
+            }
+
+            void contract()
+            {
+                SongBar.Expanded = false;
+                using (chat.BeginDelayedSequence(500))
+                {
+                    chat.FadeIn(300);
+                    chat.MoveToY(0, 500, Easing.OutQuint);
+                }
+            }
+
             switch (state)
             {
                 case TourneyState.Idle:
-                    // show chat
-                    SongBar.Expanded = false;
-                    using (chat.BeginDelayedSequence(500))
-                    {
-                        chat.FadeIn(300);
-                        chat.MoveToY(100).MoveToY(0, 500, Easing.OutQuint);
-                    }
-
+                    contract();
                     break;
                 case TourneyState.Ranking:
-                    scheduledBarContract = Scheduler.AddDelayed(() => SongBar.Expanded = false, 15000);
+                    scheduledBarContract = Scheduler.AddDelayed(contract, 10000);
                     break;
                 default:
-                    chat.FadeOut(200);
-                    chat.MoveToY(100, 500, Easing.In);
-                    using (SongBar.BeginDelayedSequence(300, true))
-                        SongBar.Expanded = true;
+                    expand();
                     break;
             }
         }
