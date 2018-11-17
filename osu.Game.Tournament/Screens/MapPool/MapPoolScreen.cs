@@ -22,7 +22,7 @@ namespace osu.Game.Tournament.Screens.MapPool
 {
     public class MapPoolScreen : TournamentScreen
     {
-        private readonly FillFlowContainer<TournamentBeatmapPanel> maps;
+        private readonly FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>> mapFlows;
 
         private readonly Bindable<MatchPairing> currentMatch = new Bindable<MatchPairing>();
 
@@ -39,12 +39,12 @@ namespace osu.Game.Tournament.Screens.MapPool
             InternalChildren = new Drawable[]
             {
                 new MatchHeader(),
-                maps = new FillFlowContainer<TournamentBeatmapPanel>
+                mapFlows = new FillFlowContainer<FillFlowContainer<TournamentBeatmapPanel>>
                 {
                     Y = 100,
                     Spacing = new Vector2(10, 20),
                     Padding = new MarginPadding(50),
-                    Direction = FillDirection.Full,
+                    Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new ControlPanel
@@ -136,7 +136,9 @@ namespace osu.Game.Tournament.Screens.MapPool
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            var map = maps.FirstOrDefault(m => m.ReceivePositionalInputAt(e.ScreenSpaceMousePosition));
+            var maps = mapFlows.Select(f => f.FirstOrDefault(m => m.ReceivePositionalInputAt(e.ScreenSpaceMousePosition)));
+            var map = maps.FirstOrDefault(m => m != null);
+
             if (map != null)
             {
                 if (e.Button == MouseButton.Left && map.Beatmap.OnlineBeatmapID != null)
@@ -188,16 +190,34 @@ namespace osu.Game.Tournament.Screens.MapPool
 
         private void matchChanged(MatchPairing match)
         {
-            maps.Clear();
+            mapFlows.Clear();
 
             if (match.Grouping.Value != null)
             {
+                FillFlowContainer<TournamentBeatmapPanel> currentFlow = null;
+                string currentMod = null;
+
                 foreach (var b in match.Grouping.Value.Beatmaps)
-                    maps.Add(new TournamentBeatmapPanel(b.BeatmapInfo, b.Mods)
+                {
+                    if (currentFlow == null || currentMod != b.Mods)
+                    {
+                        mapFlows.Add(currentFlow = new FillFlowContainer<TournamentBeatmapPanel>
+                        {
+                            Spacing = new Vector2(10, 20),
+                            Direction = FillDirection.Full,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        });
+
+                        currentMod = b.Mods;
+                    }
+
+                    currentFlow.Add(new TournamentBeatmapPanel(b.BeatmapInfo, b.Mods)
                     {
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                     });
+                }
             }
         }
     }
