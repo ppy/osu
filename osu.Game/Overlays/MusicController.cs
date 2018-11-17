@@ -253,9 +253,6 @@ namespace osu.Game.Overlays
                 progressBar.CurrentTime = track.CurrentTime;
 
                 playButton.Icon = track.IsRunning ? FontAwesome.fa_pause_circle_o : FontAwesome.fa_play_circle_o;
-
-                if (track.HasCompleted && !track.Looping && !beatmap.Disabled && beatmapSets.Any())
-                    next();
             }
             else
             {
@@ -333,15 +330,25 @@ namespace osu.Game.Overlays
 
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
+
+                current.Track.Completed -= currentTrackCompleted;
             }
 
             current = beatmap;
+            if (current != null)
+                current.Track.Completed += currentTrackCompleted;
 
             progressBar.CurrentTime = 0;
 
             updateDisplay(current, direction);
 
             queuedDirection = null;
+        }
+
+        private void currentTrackCompleted()
+        {
+            if (!beatmap.Disabled && beatmapSets.Any())
+                next();
         }
 
         private ScheduledDelegate pendingBeatmapSwitch;
