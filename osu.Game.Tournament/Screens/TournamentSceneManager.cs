@@ -45,41 +45,6 @@ namespace osu.Game.Tournament.Screens
             {
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 200,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            Colour = Color4.Black,
-                            RelativeSizeAxes = Axes.Both,
-                        },
-                        new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Direction = FillDirection.Vertical,
-                            Children = new Drawable[]
-                            {
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket Editor", Action = () => setScreen(bracketEditor) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Groupings Editor", Action = () => setScreen(groupingsEditor) },
-                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Drawings", Action = () => setScreen(drawings) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Showcase", Action = () => setScreen(showcase) },
-                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Schedule", Action = () => setScreen(schedule) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket", Action = () => setScreen(bracket) },
-                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "TeamIntro", Action = () => setScreen(teamIntro) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "MapPool", Action = () => setScreen(mapPool) },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Gameplay", Action = () => setScreen(gameplay) },
-                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
-                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Win", Action = () => setScreen(winner) },
-                            }
-                        },
-                    },
-                },
-                new Container
-                {
                     RelativeSizeAxes = Axes.Both,
                     X = 200,
                     FillMode = FillMode.Fit,
@@ -114,6 +79,41 @@ namespace osu.Game.Tournament.Screens
                             }
                         },
                     }
+                },
+                new Container
+                {
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 200,
+                    Children = new Drawable[]
+                    {
+                        new Box
+                        {
+                            Colour = Color4.Black,
+                            RelativeSizeAxes = Axes.Both,
+                        },
+                        new FillFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
+                            {
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket Editor", Action = () => setScreen(bracketEditor) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Groupings Editor", Action = () => setScreen(groupingsEditor) },
+                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Drawings", Action = () => setScreen(drawings) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Showcase", Action = () => setScreen(showcase) },
+                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Schedule", Action = () => setScreen(schedule) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Bracket", Action = () => setScreen(bracket) },
+                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "TeamIntro", Action = () => setScreen(teamIntro) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "MapPool", Action = () => setScreen(mapPool) },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Gameplay", Action = () => setScreen(gameplay) },
+                                new Container { RelativeSizeAxes = Axes.X, Height = 50 },
+                                new OsuButton { RelativeSizeAxes = Axes.X, Text = "Win", Action = () => setScreen(winner) },
+                            }
+                        },
+                    },
                 },
             };
 
