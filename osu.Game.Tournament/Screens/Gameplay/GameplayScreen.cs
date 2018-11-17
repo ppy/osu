@@ -13,7 +13,6 @@ using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
-using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
@@ -32,9 +31,11 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private readonly Color4 blue = new Color4(17, 136, 170, 255);
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, TextureStore textures, MatchIPCInfo ipc)
+        private void load(LadderInfo ladder, TextureStore textures, MatchIPCInfo ipc, MatchChatDisplay chat)
         {
+            this.chat = chat;
             this.ipc = ipc;
+
             AddRange(new Drawable[]
             {
                 new MatchHeader(),
@@ -82,15 +83,6 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             Colour = new Color4(0, 255, 0, 255),
                         },
                     }
-                },
-                chat = new MatchChatDisplay
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Y = 100,
-                    Size = new Vector2(0.45f, 120),
-                    Margin = new MarginPadding(10),
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
                 },
                 scoreDisplay = new MatchScoreDisplay
                 {
@@ -147,8 +139,8 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
             void expand()
             {
-                chat.FadeOut(200);
-                chat.MoveToY(100, 500, Easing.In);
+                chat.Expand();
+
                 using (BeginDelayedSequence(300, true))
                 {
                     scoreDisplay.FadeIn(100);
@@ -161,10 +153,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 SongBar.Expanded = false;
                 scoreDisplay.FadeOut(100);
                 using (chat.BeginDelayedSequence(500))
-                {
-                    chat.FadeIn(300);
-                    chat.MoveToY(0, 500, Easing.OutQuint);
-                }
+                    chat.Contract();
             }
 
             switch (state)
@@ -176,6 +165,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     scheduledBarContract = Scheduler.AddDelayed(contract, 10000);
                     break;
                 default:
+                    chat.Expand();
                     expand();
                     break;
             }

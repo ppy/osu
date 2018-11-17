@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Video;
 using osu.Framework.Platform;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
+using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Drawings;
 using osu.Game.Tournament.Screens.Gameplay;
 using osu.Game.Tournament.Screens.Groupings;
@@ -38,6 +39,20 @@ namespace osu.Game.Tournament.Screens
         private ShowcaseScreen showcase;
         private VideoSprite video;
 
+        //todo: make less temporary
+        [Cached]
+        private MatchChatDisplay chat = new MatchChatDisplay
+        {
+            RelativeSizeAxes = Axes.X,
+            Y = 100,
+            Size = new Vector2(0.45f, 120),
+            Margin = new MarginPadding(10),
+            Anchor = Anchor.BottomCentre,
+            Origin = Anchor.BottomCentre,
+        };
+
+        private Container chatContainer;
+
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder, Storage storage)
         {
@@ -48,7 +63,7 @@ namespace osu.Game.Tournament.Screens
                     RelativeSizeAxes = Axes.Both,
                     X = 200,
                     FillMode = FillMode.Fit,
-                    FillAspectRatio = 16/9f,
+                    FillAspectRatio = 16 / 9f,
                     Anchor = Anchor.TopLeft,
                     Origin = Anchor.TopLeft,
                     Size = new Vector2(0.8f, 1),
@@ -77,6 +92,11 @@ namespace osu.Game.Tournament.Screens
                                 gameplay = new GameplayScreen(),
                                 winner = new TeamWinScreen()
                             }
+                        },
+                        chatContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = chat
                         },
                     }
                 },
@@ -134,6 +154,17 @@ namespace osu.Game.Tournament.Screens
                 }
                 else
                     s.Hide();
+            }
+
+            switch (screen)
+            {
+                case GameplayScreen _:
+                case MapPoolScreen _:
+                    chatContainer.FadeIn(100);
+                    break;
+                default:
+                    chatContainer.FadeOut(100);
+                    break;
             }
         }
     }
