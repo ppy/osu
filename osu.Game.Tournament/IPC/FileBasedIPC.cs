@@ -43,6 +43,7 @@ namespace osu.Game.Tournament.IPC
             const string file_ipc_filename = "ipc.txt";
             const string file_ipc_state_filename = "ipc-state.txt";
             const string file_ipc_scores_filename = "ipc-scores.txt";
+            const string file_ipc_channel_filename = "ipc-channel.txt";
 
             if (stable.Exists(file_ipc_filename))
                 Scheduler.AddDelayed(delegate
@@ -72,10 +73,22 @@ namespace osu.Game.Tournament.IPC
                             }
 
                             Mods.Value = (LegacyMods)mods;
-                            ChatChannel.Value = sr.ReadLine();
                         }
                     }
                     catch
+                    {
+                        // file might be in use.
+                    }
+
+                    try
+                    {
+                        using (var stream = stable.GetStream(file_ipc_channel_filename))
+                        using (var sr = new StreamReader(stream))
+                        {
+                            ChatChannel.Value = sr.ReadLine();
+                        }
+                    }
+                    catch (Exception)
                     {
                         // file might be in use.
                     }
