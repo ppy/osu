@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Video;
 using osu.Framework.Platform;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using OpenTK;
@@ -107,7 +108,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                                 Colour = Color4.Black,
                                 TextSize = 20
                             },
-                            new SchedulePairing(currentMatch),
+                            new SchedulePairing(currentMatch, false),
                             new OsuSpriteText
                             {
                                 Text = "Start Time " + pairing.Date.Value.ToUniversalTime().ToString("HH:mm UTC"),
@@ -122,10 +123,29 @@ namespace osu.Game.Tournament.Screens.Schedule
 
         public class SchedulePairing : DrawableMatchPairing
         {
-            public SchedulePairing(MatchPairing pairing)
+            public SchedulePairing(MatchPairing pairing, bool showTimestamp = true)
                 : base(pairing)
             {
                 Flow.Direction = FillDirection.Horizontal;
+
+                if (showTimestamp)
+                {
+                    AddInternal(new DrawableDate(Pairing.Date.Value)
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopLeft,
+                        Colour = Color4.Black,
+                        Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
+                    });
+                    AddInternal(new OsuSpriteText
+                    {
+                        Anchor = Anchor.BottomRight,
+                        Origin = Anchor.BottomLeft,
+                        Colour = Color4.Black,
+                        Margin = new MarginPadding { Horizontal = 10, Vertical = 5 },
+                        Text = pairing.Date.Value.ToUniversalTime().ToString("HH:mm UTC")
+                    });
+                }
             }
         }
 
