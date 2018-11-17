@@ -61,10 +61,6 @@ namespace osu.Game.Tournament.Components
         {
             if (ipc != null)
             {
-                AddInternal(manager = new ChannelManager());
-
-                Channel.BindTo(manager.CurrentChannel);
-
                 chatChannel.BindTo(ipc.ChatChannel);
                 chatChannel.BindValueChanged(channelString =>
                 {
@@ -73,7 +69,18 @@ namespace osu.Game.Tournament.Components
 
                     int id = int.Parse(channelString);
 
-                    var channel = manager.JoinedChannels.FirstOrDefault(ch => ch.Id == id) ?? new Channel
+                    if (id <= 0) return;
+
+                    if (manager == null)
+                    {
+                        AddInternal(manager = new ChannelManager());
+                        Channel.BindTo(manager.CurrentChannel);
+                    }
+
+                    foreach (var ch in manager.JoinedChannels.ToList())
+                        manager.LeaveChannel(ch);
+
+                    var channel = new Channel
                     {
                         Id = id,
                         Type = ChannelType.Public
@@ -81,7 +88,6 @@ namespace osu.Game.Tournament.Components
 
                     manager.JoinChannel(channel);
                     manager.CurrentChannel.Value = channel;
-
                 }, true);
             }
         }
@@ -92,6 +98,10 @@ namespace osu.Game.Tournament.Components
                 lastChannel.NewMessagesArrived -= newMessages;
 
             lastChannel = channel;
+            messagesFlow.Clear();
+
+            if (channel == null) return;
+
             channel.NewMessagesArrived += newMessages;
         }
 
