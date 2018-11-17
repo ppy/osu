@@ -4,8 +4,11 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 using osu.Game.Tournament.Screens.Ladder.Components;
@@ -18,24 +21,36 @@ namespace osu.Game.Tournament.Screens.Groupings
 
         public GroupingsEditorScreen()
         {
-            Add(new FillFlowContainer
+            AddRange(new Drawable[]
             {
-                Direction = FillDirection.Vertical,
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                new Box
                 {
-                    items = new FillFlowContainer<GroupingRow>
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = OsuColour.Gray(0.2f),
+                },
+                new FillFlowContainer
+                {
+                    Direction = FillDirection.Vertical,
+                    RelativeSizeAxes = Axes.Both,
+                    Width = 0.9f,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Children = new Drawable[]
                     {
-                        Direction = FillDirection.Vertical,
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                    },
-                    new TriangleButton
-                    {
-                        Width = 100,
-                        Text = "Add",
-                        Action = addNew
-                    },
+                        items = new FillFlowContainer<GroupingRow>
+                        {
+                            Direction = FillDirection.Vertical,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                        },
+                        new TriangleButton
+                        {
+                            Margin = new MarginPadding(20),
+                            Width = 100,
+                            Text = "Add",
+                            Action = addNew
+                        },
+                    }
                 }
             });
         }
@@ -55,11 +70,11 @@ namespace osu.Game.Tournament.Screens.Groupings
 
         private void addNew()
         {
-            items.Add(new GroupingRow(new TournamentGrouping(), updateGroupings));
+            items.Add(new GroupingRow(new TournamentGrouping { StartDate = { Value = DateTimeOffset.UtcNow } }, updateGroupings));
             updateGroupings();
         }
 
-        private void updateGroupings()
+            private void updateGroupings()
         {
             LadderInfo.Groupings = items.Children.Select(c => c.Grouping).ToList();
         }
@@ -75,8 +90,9 @@ namespace osu.Game.Tournament.Screens.Groupings
                 {
                     new FillFlowContainer
                     {
-                        Direction = FillDirection.Horizontal,
-                        RelativeSizeAxes = Axes.Both,
+                        Direction = FillDirection.Full,
+                        RelativeSizeAxes = Axes.X,
+                        AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]
                         {
                             new SettingsTextBox { Width = 0.3f, Bindable = Grouping.Name },
@@ -92,12 +108,45 @@ namespace osu.Game.Tournament.Screens.Groupings
                                     onDelete();
                                 }
                             },
+                            new DateTextBox { Width = 0.3f, Bindable = Grouping.StartDate },
                         }
                     }
                 };
 
                 RelativeSizeAxes = Axes.X;
-                Height = 40;
+                AutoSizeAxes = Axes.Y;
+            }
+        }
+    }
+
+    public class DateTextBox : SettingsTextBox
+    {
+        public DateTextBox()
+        {
+            base.Bindable = new Bindable<string>();
+            ((OsuTextBox)Control).OnCommit = (sender, newText) => {
+                try
+                {
+                    bindable.Value = DateTimeOffset.Parse(sender.Text);
+                }
+                catch
+                {
+                    bindable.TriggerChange();
+                }
+            };
+        }
+
+        // hold a reference to the provided bindable so we don't have to in every settings section.
+        private Bindable<DateTimeOffset> bindable;
+
+        public new Bindable<DateTimeOffset> Bindable
+        {
+            get { return bindable; }
+
+            set
+            {
+                bindable = value;
+                bindable.BindValueChanged(dto => base.Bindable.Value = dto.ToUniversalTime().ToString(), true);
             }
         }
     }
