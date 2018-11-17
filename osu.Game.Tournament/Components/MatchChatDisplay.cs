@@ -207,5 +207,17 @@ namespace osu.Game.Tournament.Components
                 }
             }
         }
+
+        public void Contract()
+        {
+            this.FadeIn(300);
+            this.MoveToY(0, 500, Easing.OutQuint);
+        }
+
+        public void Expand()
+        {
+            this.FadeOut(200);
+            this.MoveToY(100, 500, Easing.In);
+        }
     }
 }
