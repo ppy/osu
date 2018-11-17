@@ -75,7 +75,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.4f,
                                     ChildrenEnumerable = ladder.Pairings
-                                                               .Where(p => p.Completed.Value)
+                                                               .Where(p => p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null)
                                                                .OrderByDescending(p => p.Date.Value)
                                                                .Take(8)
                                                                .Select(p => new SchedulePairing(p))
@@ -85,7 +85,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.6f,
                                     ChildrenEnumerable = ladder.Pairings
-                                                               .Where(p => !p.Completed.Value)
+                                                               .Where(p => !p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null)
                                                                .OrderBy(p => p.Date.Value)
                                                                .Take(8)
                                                                .Select(p => new SchedulePairing(p))
