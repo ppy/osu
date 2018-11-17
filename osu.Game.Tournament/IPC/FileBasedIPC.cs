@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
 using osu.Framework.Platform.Windows;
@@ -25,9 +26,8 @@ namespace osu.Game.Tournament.IPC
         private int lastBeatmapId;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(LadderInfo ladder)
         {
-
             StableStorage stable;
 
             try
@@ -58,9 +58,17 @@ namespace osu.Game.Tournament.IPC
                             if (lastBeatmapId != beatmapId)
                             {
                                 lastBeatmapId = beatmapId;
-                                var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = beatmapId });
-                                req.Success += b => Beatmap.Value = b.ToBeatmap(Rulesets);
-                                API.Queue(req);
+
+                                var existing = ladder.CurrentMatch.Value?.Grouping.Value?.Beatmaps.FirstOrDefault(b => b.ID == beatmapId && b.BeatmapInfo != null);
+
+                                if (existing != null)
+                                    Beatmap.Value = existing.BeatmapInfo;
+                                else
+                                {
+                                    var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = beatmapId });
+                                    req.Success += b => Beatmap.Value = b.ToBeatmap(Rulesets);
+                                    API.Queue(req);
+                                }
                             }
 
                             Mods.Value = (LegacyMods)mods;
