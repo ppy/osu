@@ -92,6 +92,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                 },
+                scoreDisplay = new MatchScoreDisplay
+                {
+                    Y = -65,
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                },
                 new ControlPanel
                 {
                     Children = new Drawable[]
@@ -123,6 +129,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         private ScheduledDelegate scheduledBarContract;
         private MatchChatDisplay chat;
+        private MatchScoreDisplay scoreDisplay;
 
         private void stateChanged(TourneyState state)
         {
@@ -142,13 +149,17 @@ namespace osu.Game.Tournament.Screens.Gameplay
             {
                 chat.FadeOut(200);
                 chat.MoveToY(100, 500, Easing.In);
-                using (SongBar.BeginDelayedSequence(300, true))
+                using (BeginDelayedSequence(300, true))
+                {
+                    scoreDisplay.FadeIn(100);
                     SongBar.Expanded = true;
+                }
             }
 
             void contract()
             {
                 SongBar.Expanded = false;
+                scoreDisplay.FadeOut(100);
                 using (chat.BeginDelayedSequence(500))
                 {
                     chat.FadeIn(300);
