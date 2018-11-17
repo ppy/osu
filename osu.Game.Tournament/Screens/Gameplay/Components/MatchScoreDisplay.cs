@@ -35,6 +35,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         public MatchScoreDisplay()
         {
             RelativeSizeAxes = Axes.X;
+            AutoSizeAxes = Axes.Y;
 
             InternalChildren = new Drawable[]
             {
@@ -102,12 +103,12 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
             var diff = Math.Max(score1.Value, score2.Value) - Math.Min(score1.Value, score2.Value);
 
             losingBar.ResizeWidthTo(0, 400, Easing.OutQuint);
-            winningBar.ResizeWidthTo((float)Math.Pow(diff / 1000000f, 0.5), 400, Easing.OutQuint);
+            winningBar.ResizeWidthTo((float)Math.Pow(diff / 1000000f, 0.5) / 2, 400, Easing.OutQuint);
         }
 
-        protected override void UpdateAfterChildren()
+        protected override void Update()
         {
-            base.UpdateAfterChildren();
+            base.Update();
 
             score1Text.X = -Math.Max(5 + score1Text.DrawWidth / 2, score1Bar.DrawWidth);
             score2Text.X = Math.Max(5 + score2Text.DrawWidth / 2, score2Bar.DrawWidth);
