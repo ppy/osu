@@ -7,11 +7,13 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
+using osu.Game.Tournament.Screens.Gameplay;
 using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using OpenTK;
@@ -165,6 +167,11 @@ namespace osu.Game.Tournament.Screens.MapPool
             setNextMode();
         }
 
+        [Resolved]
+        private TournamentSceneManager sceneManager { get; set; }
+
+        private ScheduledDelegate scheduledChange;
+
         private void addForBeatmap(int beatmapId)
         {
             if (currentMatch.Value == null)
@@ -186,6 +193,12 @@ namespace osu.Game.Tournament.Screens.MapPool
             });
 
             setNextMode();
+
+            if (pickType == ChoiceType.Pick)
+            {
+                scheduledChange?.Cancel();
+                scheduledChange = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(GameplayScreen)); }, 10000);
+            }
         }
 
         private void matchChanged(MatchPairing match)
