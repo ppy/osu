@@ -41,6 +41,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
         private readonly JudgementContainer<DrawableTaikoJudgement> judgementContainer;
+        internal readonly HitTarget HitTarget;
 
         private readonly Container topLevelHitContainer;
 
@@ -102,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                         FillMode = FillMode.Fit,
                                         Blending = BlendingMode.Additive,
                                     },
-                                    new HitTarget
+                                    HitTarget = new HitTarget
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.Centre,
