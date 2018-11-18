@@ -8,8 +8,10 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using OpenTK.Graphics;
 
@@ -25,6 +27,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public readonly SnakingSliderBody Body;
         public readonly SliderBall Ball;
+
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+        private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
 
         public DrawableSlider(Slider s)
             : base(s)
@@ -83,15 +89,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 components.Add(drawableRepeatPoint);
                 AddNested(drawableRepeatPoint);
             }
+        }
 
-            HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
-            HitObject.ScaleChanged += _ =>
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.SnakingInSliders, Body.SnakingIn);
+            config.BindWith(OsuSetting.SnakingOutSliders, Body.SnakingOut);
+
+            positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            scaleBindable.BindValueChanged(v =>
             {
                 Body.PathWidth = HitObject.Scale * 64;
                 Ball.Scale = new Vector2(HitObject.Scale);
-            };
+            });
 
-            slider.PathChanged += _ => Body.Refresh();
+            positionBindable.BindTo(HitObject.PositionBindable);
+            scaleBindable.BindTo(HitObject.ScaleBindable);
+            pathBindable.BindTo(slider.PathBindable);
+
+            pathBindable.BindValueChanged(_ => Body.Refresh());
         }
 
         public override Color4 AccentColour
@@ -106,13 +123,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 foreach (var drawableHitObject in NestedHitObjects)
                     drawableHitObject.AccentColour = AccentColour;
             }
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            config.BindWith(OsuSetting.SnakingInSliders, Body.SnakingIn);
-            config.BindWith(OsuSetting.SnakingOutSliders, Body.SnakingOut);
         }
 
         public bool Tracking;

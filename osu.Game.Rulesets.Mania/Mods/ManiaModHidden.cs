@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Mania.Mods
@@ -10,6 +11,6 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override string Description => @"Keys fade out before you hit them!";
         public override double ScoreMultiplier => 1;
-        public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModFlashlight<ManiaHitObject>) };
     }
 }
