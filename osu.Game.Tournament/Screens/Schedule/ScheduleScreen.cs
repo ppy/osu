@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -76,7 +77,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.4f,
                                     ChildrenEnumerable = ladder.Pairings
-                                                               .Where(p => p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null)
+                                                               .Where(p => p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
                                                                .OrderByDescending(p => p.Date.Value)
                                                                .Take(8)
                                                                .Select(p => new SchedulePairing(p))
@@ -86,7 +87,7 @@ namespace osu.Game.Tournament.Screens.Schedule
                                     RelativeSizeAxes = Axes.Both,
                                     Width = 0.6f,
                                     ChildrenEnumerable = ladder.Pairings
-                                                               .Where(p => !p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null)
+                                                               .Where(p => !p.Completed.Value && p.Team1.Value != null && p.Team2.Value != null && Math.Abs(p.Date.Value.DayOfYear - DateTimeOffset.UtcNow.DayOfYear) < 4)
                                                                .OrderBy(p => p.Date.Value)
                                                                .Take(8)
                                                                .Select(p => new SchedulePairing(p))
