@@ -16,7 +16,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             this.slider = slider;
 
-            Position = HitObject.Position - slider.Position;
+            h.PositionChanged += _ => updatePosition();
+            slider.PathChanged += _ => updatePosition();
+
+            updatePosition();
         }
 
         protected override void Update()
@@ -33,5 +36,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public Action<double> OnShake;
 
         protected override void Shake(double maximumLength) => OnShake?.Invoke(maximumLength);
+
+        private void updatePosition() => Position = HitObject.Position - slider.Position;
     }
 }

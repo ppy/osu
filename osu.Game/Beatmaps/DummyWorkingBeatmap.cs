@@ -26,15 +26,7 @@ namespace osu.Game.Beatmaps
                     Title = "no beatmaps available!"
                 },
                 BeatmapSet = new BeatmapSetInfo(),
-                BaseDifficulty = new BeatmapDifficulty
-                {
-                    DrainRate = 0,
-                    CircleSize = 0,
-                    OverallDifficulty = 0,
-                    ApproachRate = 0,
-                    SliderMultiplier = 0,
-                    SliderTickRate = 0,
-                },
+                BaseDifficulty = new BeatmapDifficulty(),
                 Ruleset = new DummyRulesetInfo()
             })
         {
