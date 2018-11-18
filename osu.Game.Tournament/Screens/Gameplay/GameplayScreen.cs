@@ -15,6 +15,7 @@ using osu.Game.Tournament.Screens.Gameplay.Components;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osu.Game.Tournament.Screens.MapPool;
 using osu.Game.Tournament.Screens.TeamWin;
+using OpenTK;
 using OpenTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Gameplay
@@ -48,6 +49,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
+                    Y = 5,
                     Direction = FillDirection.Vertical,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -63,7 +65,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                                 {
                                     Name = "top bar red",
                                     RelativeSizeAxes = Axes.X,
-                                    Height = 10,
+                                    Height = 8,
                                     Width = 0.5f,
                                     Colour = red,
                                 },
@@ -71,7 +73,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                                 {
                                     Name = "top bar blue",
                                     RelativeSizeAxes = Axes.X,
-                                    Height = 10,
+                                    Height = 9,
                                     Width = 0.5f,
                                     Colour = blue,
                                     Anchor = Anchor.TopRight,
@@ -84,14 +86,15 @@ namespace osu.Game.Tournament.Screens.Gameplay
                             // chroma key area for stable gameplay
                             Name = "chroma",
                             RelativeSizeAxes = Axes.X,
-                            Height = 480,
+                            Height = 500,
                             Colour = new Color4(0, 255, 0, 255),
                         },
                     }
                 },
                 scoreDisplay = new MatchScoreDisplay
                 {
-                    Y = -65,
+                    Y = -60,
+                    Scale = new Vector2(0.86f),
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                 },
@@ -168,7 +171,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                 case TourneyState.Idle:
                     contract();
 
-                    if (lastState == TourneyState.Ranking)
+                    if (lastState == TourneyState.Ranking && !warmup.Value)
                     {
                         if (currentMatch.Value?.Completed == true)
                             scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, 4000);

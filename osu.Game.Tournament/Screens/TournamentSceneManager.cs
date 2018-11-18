@@ -38,7 +38,7 @@ namespace osu.Game.Tournament.Screens
         {
             RelativeSizeAxes = Axes.X,
             Y = 100,
-            Size = new Vector2(0.45f, 120),
+            Size = new Vector2(0.45f, 112),
             Margin = new MarginPadding(10),
             Anchor = Anchor.BottomCentre,
             Origin = Anchor.BottomCentre,
