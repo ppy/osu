@@ -7,22 +7,23 @@ using osu.Game.Rulesets.Objects;
 using OpenTK;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Edit.Types;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
-    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasEditablePosition
+    public abstract class OsuHitObject : HitObject, IHasComboInformation, IHasPosition
     {
         public const double OBJECT_RADIUS = 64;
 
         public event Action<Vector2> PositionChanged;
+        public event Action<int> StackHeightChanged;
+        public event Action<float> ScaleChanged;
 
         public double TimePreempt = 600;
         public double TimeFadeIn = 400;
 
         private Vector2 position;
 
-        public Vector2 Position
+        public virtual Vector2 Position
         {
             get => position;
             set
@@ -44,13 +45,39 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public Vector2 StackedEndPosition => EndPosition + StackOffset;
 
-        public virtual int StackHeight { get; set; }
+        private int stackHeight;
+
+        public int StackHeight
+        {
+            get => stackHeight;
+            set
+            {
+                if (stackHeight == value)
+                    return;
+                stackHeight = value;
+
+                StackHeightChanged?.Invoke(value);
+            }
+        }
 
         public Vector2 StackOffset => new Vector2(StackHeight * Scale * -6.4f);
 
         public double Radius => OBJECT_RADIUS * Scale;
 
-        public float Scale { get; set; } = 1;
+        private float scale = 1;
+
+        public float Scale
+        {
+            get => scale;
+            set
+            {
+                if (scale == value)
+                    return;
+                scale = value;
+
+                ScaleChanged?.Invoke(value);
+            }
+        }
 
         public virtual bool NewCombo { get; set; }
 
@@ -71,8 +98,6 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             Scale = (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5) / 2;
         }
-
-        public virtual void OffsetPosition(Vector2 offset) => Position += offset;
 
         protected override HitWindows CreateHitWindows() => new OsuHitWindows();
     }

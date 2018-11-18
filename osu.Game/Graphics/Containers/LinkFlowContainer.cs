@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Framework.Logging;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
@@ -20,14 +21,15 @@ namespace osu.Game.Graphics.Containers
         }
 
         private OsuGame game;
-
+        private ChannelManager channelManager;
         private Action showNotImplementedError;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, NotificationOverlay notifications)
+        private void load(OsuGame game, NotificationOverlay notifications, ChannelManager channelManager)
         {
             // will be null in tests
             this.game = game;
+            this.channelManager = channelManager;
 
             showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
@@ -77,7 +79,15 @@ namespace osu.Game.Graphics.Containers
                                 game?.ShowBeatmapSet(setId);
                             break;
                         case LinkAction.OpenChannel:
-                            game?.OpenChannel(linkArgument);
+                            try
+                            {
+                                channelManager?.OpenChannel(linkArgument);
+                            }
+                            catch (ChannelNotFoundException e)
+                            {
+                                Logger.Log($"The requested channel \"{linkArgument}\" does not exist");
+                            }
+
                             break;
                         case LinkAction.OpenEditorTimestamp:
                         case LinkAction.JoinMultiplayerMatch:

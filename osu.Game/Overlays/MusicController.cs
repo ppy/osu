@@ -245,10 +245,10 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            if (current?.TrackLoaded ?? false)
-            {
-                var track = current.Track;
+            var track = current?.TrackLoaded ?? false ? current.Track : null;
 
+            if (track?.IsDummyDevice == false)
+            {
                 progressBar.EndTime = track.Length;
                 progressBar.CurrentTime = track.CurrentTime;
 
@@ -258,7 +258,11 @@ namespace osu.Game.Overlays
                     next();
             }
             else
+            {
+                progressBar.CurrentTime = 0;
+                progressBar.EndTime = 1;
                 playButton.Icon = FontAwesome.fa_play_circle_o;
+            }
         }
 
         private void play()
