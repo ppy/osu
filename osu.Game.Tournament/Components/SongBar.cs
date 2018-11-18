@@ -188,7 +188,7 @@ namespace osu.Game.Tournament.Components
                 },
                 new OsuSpriteText
                 {
-                    Text = $"CS{beatmap.BaseDifficulty.CircleSize:0.#} / AR {ar:0.#}{extra}",
+                    Text = $"CS {beatmap.BaseDifficulty.CircleSize:0.#} / AR {ar:0.#}{extra}",
                     Margin = new MarginPadding { Horizontal = 15, Vertical = 5 },
                     Colour = OsuColour.Gray(0.33f),
                     Anchor = Anchor.TopRight,
