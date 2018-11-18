@@ -193,17 +193,17 @@ namespace osu.Game.Tournament.Components
                     },
                 };
 
-                if (message.Sender.Colour != null)
+                if (info.CurrentMatch.Value.Team1.Value.Players.Any(u => u.Id == message.Sender.Id))
                 {
-                    senderText.Colour = colourBox.Colour = OsuColour.FromHex(message.Sender.Colour);
-                }
-                else if (info.CurrentMatch.Value.Team1.Value.Players.Any(u => u.Id == message.Sender.Id))
-                {
-                    senderText.Colour = colourBox.Colour = red;
+                    colourBox.Colour = red;
                 }
                 else if (info.CurrentMatch.Value.Team2.Value.Players.Any(u => u.Id == message.Sender.Id))
                 {
-                    senderText.Colour = colourBox.Colour = blue;
+                    colourBox.Colour = blue;
+                }
+                else if (message.Sender.Colour != null)
+                {
+                    senderText.Colour = colourBox.Colour = OsuColour.FromHex(message.Sender.Colour);
                 }
             }
         }
