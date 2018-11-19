@@ -37,10 +37,13 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             Column column = ColumnAt(e.ScreenSpaceMousePosition);
+
             if (column == null)
                 SnappedMousePosition = e.MousePosition;
             else
             {
+                Width = column.DrawWidth;
+                
                 // Snap to the column
                 var parentPos = Parent.ToLocalSpace(column.ToScreenSpace(new Vector2(column.DrawWidth / 2, 0)));
                 SnappedMousePosition = new Vector2(parentPos.X, e.MousePosition.Y);

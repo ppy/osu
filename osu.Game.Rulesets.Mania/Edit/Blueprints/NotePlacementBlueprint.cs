@@ -17,7 +17,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             Origin = Anchor.Centre;
 
             AutoSizeAxes = Axes.Y;
-            Width = 45;
 
             InternalChild = new EditNotePiece { RelativeSizeAxes = Axes.X };
         }
