@@ -6,6 +6,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
 using OpenTK;
@@ -34,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             {
                 var hitObject = blueprint.HitObject;
 
-                var objectParent = hitObject.Parent;
+                var objectParent = (HitObjectContainer)hitObject.Parent;
 
                 // Using the hitobject position is required since AdjustPosition can be invoked multiple times per frame
                 // without the position having been updated by the parenting ScrollingHitObjectContainer
@@ -49,10 +50,14 @@ namespace osu.Game.Rulesets.Mania.Edit
                 else
                     targetPosition = hitObject.Position.Y;
 
+                objectParent.Remove(hitObject);
+
                 hitObject.HitObject.StartTime = scrollingInfo.Algorithm.TimeAt(targetPosition,
                     editorClock.CurrentTime,
                     scrollingInfo.TimeRange.Value,
                     objectParent.DrawHeight);
+
+                objectParent.Add(hitObject);
             }
 
             adjustColumn(dragEvent);
