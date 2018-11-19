@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play.HUD
                 Alpha = 1;
             else
                 Alpha = Interpolation.ValueAt(
-                    MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000),
+                    MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 200),
                     Alpha, MathHelper.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
         }
 
