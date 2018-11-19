@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     RelativeSizeAxes = Axes.Both,
                     Child = Content = new Container { RelativeSizeAxes = Axes.Both }
                 },
-                proxiedContent = new Container { RelativeSizeAxes = Axes.Both }
+                proxiedContent = new ProxiedContentContainer { RelativeSizeAxes = Axes.Both }
             };
         }
 
@@ -75,6 +75,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public abstract bool OnPressed(TaikoAction action);
         public virtual bool OnReleased(TaikoAction action) => false;
+
+        private class ProxiedContentContainer : Container
+        {
+            public override double LifetimeStart => Parent?.LifetimeStart ?? base.LifetimeStart;
+            public override double LifetimeEnd => Parent?.LifetimeEnd ?? base.LifetimeEnd;
+        }
     }
 
     public abstract class DrawableTaikoHitObject<TaikoHitType> : DrawableTaikoHitObject
