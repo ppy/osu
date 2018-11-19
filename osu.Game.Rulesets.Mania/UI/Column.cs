@@ -145,6 +145,15 @@ namespace osu.Game.Rulesets.Mania.UI
             HitObjectContainer.Add(hitObject);
         }
 
+        public override bool Remove(DrawableHitObject h)
+        {
+            if (!base.Remove(h))
+                return false;
+
+            h.OnNewResult -= OnNewResult;
+            return true;
+        }
+
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements)
