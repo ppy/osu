@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using OpenTK;
@@ -21,6 +22,11 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         /// The current mouse position, snapped to the closest column.
         /// </summary>
         protected Vector2 SnappedMousePosition { get; private set; }
+
+        /// <summary>
+        /// The width of the closest column to the current mouse position.
+        /// </summary>
+        protected float SnappedWidth { get; private set; }
 
         [Resolved]
         private IManiaHitObjectComposer composer { get; set; }
@@ -42,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 SnappedMousePosition = e.MousePosition;
             else
             {
-                Width = column.DrawWidth;
+                SnappedWidth = column.DrawWidth;
 
                 // Snap to the column
                 var parentPos = Parent.ToLocalSpace(column.ToScreenSpace(new Vector2(column.DrawWidth / 2, 0)));
@@ -80,10 +86,10 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             switch (scrollingInfo.Direction.Value)
             {
                 case ScrollingDirection.Up:
-                    position.Y -= DrawHeight / 2;
+                    position.Y -= NotePiece.NOTE_HEIGHT / 2;
                     break;
                 case ScrollingDirection.Down:
-                    position.Y += DrawHeight / 2;
+                    position.Y += NotePiece.NOTE_HEIGHT / 2;
                     break;
             }
 

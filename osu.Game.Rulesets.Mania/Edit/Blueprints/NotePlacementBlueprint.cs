@@ -25,6 +25,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.Update();
 
+            Width = SnappedWidth;
             Position = SnappedMousePosition;
         }
 
