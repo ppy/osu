@@ -78,8 +78,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         private class ProxiedContentContainer : Container
         {
-            public override double LifetimeStart => Parent.LifetimeStart;
-            public override double LifetimeEnd => Parent.LifetimeEnd;
+            public override double LifetimeStart => Parent?.LifetimeStart ?? base.LifetimeStart;
+            public override double LifetimeEnd => Parent?.LifetimeEnd ?? base.LifetimeEnd;
         }
     }
 
