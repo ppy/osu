@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
     /// <summary>
     /// Represents length-wise portion of a hold note.
     /// </summary>
-    internal class BodyPiece : Container, IHasAccentColour
+    public class BodyPiece : Container, IHasAccentColour
     {
         private readonly Container subtractionLayer;
 
