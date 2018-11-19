@@ -150,7 +150,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.
         /// </summary>
-        public virtual bool CursorInPlacementArea => rulesetContainer.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
+        public virtual bool CursorInPlacementArea => RulesetContainer.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
 
         /// <summary>
         /// Adds a <see cref="HitObject"/> to the <see cref="Beatmaps.Beatmap"/> and visualises it.
