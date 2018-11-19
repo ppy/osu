@@ -19,9 +19,9 @@ using OpenTK.Input;
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
-    /// A box which surrounds <see cref="SelectionBlueprint"/>s and provides interactive handles, context menus etc.
+    /// A component which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
     /// </summary>
-    public class SelectionBox : CompositeDrawable
+    public class SelectionHandler : CompositeDrawable
     {
         public const float BORDER_RADIUS = 2;
 
@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [Resolved]
         private IPlacementHandler placementHandler { get; set; }
 
-        public SelectionBox()
+        public SelectionHandler()
         {
             selectedBlueprints = new List<SelectionBlueprint>();
 
@@ -63,6 +63,10 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region User Input Handling
 
+        /// <summary>
+        /// Handles the selected <see cref="DrawableHitObject"/>s being dragged.
+        /// </summary>
+        /// <param name="dragEvent">The drag event.</param>
         public virtual void HandleDrag(DragEvent dragEvent)
         {
         }
@@ -139,7 +143,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #endregion
 
         /// <summary>
-        /// Updates whether this <see cref="SelectionBox"/> is visible.
+        /// Updates whether this <see cref="SelectionHandler"/> is visible.
         /// </summary>
         internal void UpdateVisibility()
         {

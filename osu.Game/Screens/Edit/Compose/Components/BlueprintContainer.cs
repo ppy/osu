@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         private Container<PlacementBlueprint> placementBlueprintContainer;
         private PlacementBlueprint currentPlacement;
 
-        private SelectionBox selectionBox;
+        private SelectionHandler selectionHandler;
 
         private IEnumerable<SelectionBlueprint> selections => selectionBlueprints.Children.Where(c => c.IsAlive);
 
@@ -37,16 +37,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            selectionBox = composer.CreateSelectionBox();
-            selectionBox.DeselectAll = deselectAll;
+            selectionHandler = composer.CreateSelectionHandler();
+            selectionHandler.DeselectAll = deselectAll;
 
             var dragBox = new DragBox(select);
-            dragBox.DragEnd += () => selectionBox.UpdateVisibility();
+            dragBox.DragEnd += () => selectionHandler.UpdateVisibility();
 
             InternalChildren = new[]
             {
                 dragBox,
-                selectionBox,
+                selectionHandler,
                 selectionBlueprints = new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both },
                 placementBlueprintContainer = new Container<PlacementBlueprint> { RelativeSizeAxes = Axes.Both },
                 dragBox.CreateProxy()
@@ -168,19 +168,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void onBlueprintSelected(SelectionBlueprint blueprint)
         {
-            selectionBox.HandleSelected(blueprint);
+            selectionHandler.HandleSelected(blueprint);
             selectionBlueprints.ChangeChildDepth(blueprint, 1);
         }
 
         private void onBlueprintDeselected(SelectionBlueprint blueprint)
         {
-            selectionBox.HandleDeselected(blueprint);
+            selectionHandler.HandleDeselected(blueprint);
             selectionBlueprints.ChangeChildDepth(blueprint, 0);
         }
 
-        private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionBox.HandleSelectionRequested(blueprint, state);
+        private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionHandler.HandleSelectionRequested(blueprint, state);
 
-        private void onDragRequested(DragEvent dragEvent) => selectionBox.HandleDrag(dragEvent);
+        private void onDragRequested(DragEvent dragEvent) => selectionHandler.HandleDrag(dragEvent);
 
         private class SelectionBlueprintContainer : Container<SelectionBlueprint>
         {

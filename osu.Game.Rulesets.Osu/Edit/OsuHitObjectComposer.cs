@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Edit
             new SpinnerCompositionTool()
         };
 
-        public override SelectionBox CreateSelectionBox() => new OsuSelectionBox();
+        public override SelectionHandler CreateSelectionHandler() => new OsuSelectionHandler();
 
         protected override Container CreateLayerContainer() => new PlayfieldAdjustmentContainer { RelativeSizeAxes = Axes.Both };
 

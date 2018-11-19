@@ -49,7 +49,7 @@ namespace osu.Game.Rulesets.Mania.Edit
             new NoteCompositionTool()
         };
 
-        public override SelectionBox CreateSelectionBox() => new ManiaSelectionBox();
+        public override SelectionHandler CreateSelectionHandler() => new ManiaSelectionHandler();
 
         public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
         {
