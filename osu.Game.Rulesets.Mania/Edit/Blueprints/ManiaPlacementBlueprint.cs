@@ -4,7 +4,6 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
@@ -13,7 +12,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public class ManiaPlacementBlueprint<T> : PlacementBlueprint
+    public abstract class ManiaPlacementBlueprint<T> : PlacementBlueprint
         where T : ManiaHitObject
     {
         protected new T HitObject => (T)base.HitObject;
@@ -29,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
 
-        public ManiaPlacementBlueprint(T hitObject)
+        protected ManiaPlacementBlueprint(T hitObject)
             : base(hitObject)
         {
             RelativeSizeAxes = Axes.None;
@@ -37,27 +36,17 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            updateSnappedPosition(e);
-            return true;
-        }
-
-        private ScheduledDelegate scheduledSnappedPositionUpdate;
-
-        private void updateSnappedPosition(MouseMoveEvent e)
-        {
-            scheduledSnappedPositionUpdate?.Cancel();
-            scheduledSnappedPositionUpdate = Schedule(() =>
+            Column column = ColumnAt(e.ScreenSpaceMousePosition);
+            if (column == null)
+                SnappedMousePosition = e.MousePosition;
+            else
             {
-                Column column = ColumnAt(e.ScreenSpaceMousePosition);
-                if (column == null)
-                    SnappedMousePosition = e.MousePosition;
-                else
-                {
-                    // Snap to the column
-                    var parentPos = Parent.ToLocalSpace(column.ToScreenSpace(new Vector2(column.DrawWidth / 2, 0)));
-                    SnappedMousePosition = new Vector2(parentPos.X, e.MousePosition.Y);
-                }
-            });
+                // Snap to the column
+                var parentPos = Parent.ToLocalSpace(column.ToScreenSpace(new Vector2(column.DrawWidth / 2, 0)));
+                SnappedMousePosition = new Vector2(parentPos.X, e.MousePosition.Y);
+            }
+
+            return true;
         }
 
         protected double TimeAt(Vector2 screenSpacePosition)
