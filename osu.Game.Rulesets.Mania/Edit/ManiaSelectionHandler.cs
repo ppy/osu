@@ -13,7 +13,7 @@ using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
-    public class ManiaSelectionBox : SelectionBox
+    public class ManiaSelectionHandler : SelectionHandler
     {
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }

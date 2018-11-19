@@ -8,7 +8,7 @@ using osu.Game.Screens.Edit.Compose.Components;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
-    public class OsuSelectionBox : SelectionBox
+    public class OsuSelectionHandler : SelectionHandler
     {
         public override void HandleDrag(DragEvent dragEvent)
         {
