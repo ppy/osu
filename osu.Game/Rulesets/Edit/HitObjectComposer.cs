@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -36,6 +37,8 @@ namespace osu.Game.Rulesets.Edit
         protected EditRulesetContainer RulesetContainer { get; private set; }
 
         private BlueprintContainer blueprintContainer;
+
+        private InputManager inputManager;
 
         internal HitObjectComposer(Ruleset ruleset)
         {
@@ -114,6 +117,13 @@ namespace osu.Game.Rulesets.Edit
             toolboxCollection.Items[0].Select();
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            inputManager = GetContainingInputManager();
+        }
+
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
@@ -136,6 +146,11 @@ namespace osu.Game.Rulesets.Edit
                 l.Size = RulesetContainer.Playfield.Size;
             });
         }
+
+        /// <summary>
+        /// Whether the user's cursor is currently in an area of the <see cref="HitObjectComposer"/> that is valid for placement.
+        /// </summary>
+        public virtual bool CursorInPlacementArea => rulesetContainer.Playfield.ReceivePositionalInputAt(inputManager.CurrentState.Mouse.Position);
 
         /// <summary>
         /// Adds a <see cref="HitObject"/> to the <see cref="Beatmaps.Beatmap"/> and visualises it.

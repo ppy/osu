@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -90,6 +91,13 @@ namespace osu.Game.Screens.Play.HUD
                     }
                 },
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            AccentColour = colours.BlueLighter;
+            GlowColour = colours.BlueDarker;
         }
 
         public void Flash(JudgementResult result)
