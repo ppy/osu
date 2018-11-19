@@ -1,16 +1,19 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
+using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public class HoldNotePlacementBlueprint : ManiaPlacementBlueprint<HoldNote>
     {
+        private readonly EditBodyPiece bodyPiece;
         private readonly EditNotePiece headPiece;
         private readonly EditNotePiece tailPiece;
 
@@ -21,8 +24,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             RelativeSizeAxes = Axes.Both;
 
-            InternalChildren = new[]
+            InternalChildren = new Drawable[]
             {
+                bodyPiece = new EditBodyPiece { Origin = Anchor.TopCentre },
                 headPiece = new EditNotePiece { Origin = Anchor.Centre },
                 tailPiece = new EditNotePiece { Origin = Anchor.Centre }
             };
@@ -35,14 +39,20 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             switch (state)
             {
                 case PlacementState.Start:
-                    headPiece.Position = SnappedMousePosition;
-                    headPiece.Width = SnappedWidth;
+                    headPiece.Position = tailPiece.Position = SnappedMousePosition;
+                    headPiece.Width = tailPiece.Width = SnappedWidth;
                     break;
                 case PlacementState.End:
-                    tailPiece.Position = SnappedMousePosition;
-                    tailPiece.Width = headPiece.Width;
+                    tailPiece.Position = new Vector2(headPiece.Position.X, SnappedMousePosition.Y);
                     break;
             }
+
+            var topPosition = new Vector2(headPiece.DrawPosition.X, Math.Min(headPiece.DrawPosition.Y, tailPiece.DrawPosition.Y));
+            var bottomPosition = new Vector2(headPiece.DrawPosition.X, Math.Max(headPiece.DrawPosition.Y, tailPiece.DrawPosition.Y));
+
+            bodyPiece.Position = topPosition;
+            bodyPiece.Width = headPiece.Width;
+            bodyPiece.Height = (bottomPosition - topPosition).Y;
         }
 
         protected override bool OnMouseDown(MouseDownEvent e)
@@ -74,7 +84,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             HitObject.Duration = endTime - HitObject.StartTime;
 
             EndPlacement();
-
             return true;
         }
 
