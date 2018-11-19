@@ -8,7 +8,7 @@ using osu.Framework.Input.Events;
 
 namespace osu.Game.Input
 {
-    public class IdleTracker : Component, IKeyBindingHandler<PlatformAction>
+    public class IdleTracker : Component, IKeyBindingHandler<PlatformAction>, IHandleGlobalInput
     {
         private double lastInteractionTime;
         public double IdleTime => Clock.CurrentTime - lastInteractionTime;
