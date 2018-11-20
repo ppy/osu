@@ -3,8 +3,8 @@
 
 using System;
 using System.Linq;
-using OpenTK;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;

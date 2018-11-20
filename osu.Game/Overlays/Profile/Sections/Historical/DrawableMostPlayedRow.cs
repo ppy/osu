@@ -8,7 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Historical
 {

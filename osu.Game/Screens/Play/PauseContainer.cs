@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {

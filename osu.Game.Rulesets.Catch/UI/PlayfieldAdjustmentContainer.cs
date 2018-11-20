@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {

@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Music
 {

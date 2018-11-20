@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Framework.Graphics;

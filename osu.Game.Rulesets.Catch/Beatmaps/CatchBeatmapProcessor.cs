@@ -8,7 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK;
+using osuTK;
 using osu.Game.Rulesets.Catch.MathUtils;
 
 namespace osu.Game.Rulesets.Catch.Beatmaps
