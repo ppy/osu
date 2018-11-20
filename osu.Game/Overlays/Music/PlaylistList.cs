@@ -83,20 +83,20 @@ namespace osu.Game.Overlays.Music
                 beatmapBacking.ValueChanged += _ => updateSelectedSet();
             }
 
-            private void addBeatmapSet(BeatmapSetInfo obj)
+            private void addBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
             {
                 var newItem = new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) };
 
                 items.Add(newItem);
                 items.SetLayoutPosition(newItem, items.Count - 1);
-            }
+            });
 
-            private void removeBeatmapSet(BeatmapSetInfo obj)
+            private void removeBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
             {
                 var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == obj.ID);
                 if (itemToRemove != null)
                     items.Remove(itemToRemove);
-            }
+            });
 
             private void updateSelectedSet()
             {
