@@ -174,11 +174,11 @@ namespace osu.Game.Overlays.Direct
             };
         }
 
-        private void setAdded(BeatmapSetInfo s)
+        private void setAdded(BeatmapSetInfo s) => Schedule(() =>
         {
             if (s.OnlineBeatmapSetID == SetInfo.OnlineBeatmapSetID)
                 progressBar.FadeOut(500);
-        }
+        });
 
         protected override void LoadComplete()
         {
