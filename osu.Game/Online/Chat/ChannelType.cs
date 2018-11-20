@@ -5,7 +5,11 @@ namespace osu.Game.Online.Chat
 {
     public enum ChannelType
     {
+        Public,
+        Multiplayer,
+        Spectator,
+        Temporary,
         PM,
-        Public
+        Group,
     }
 }
