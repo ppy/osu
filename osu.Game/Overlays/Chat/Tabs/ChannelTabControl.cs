@@ -6,7 +6,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
-using OpenTK;
+using osuTK;
 using osu.Framework.Configuration;
 using System;
 using System.Linq;

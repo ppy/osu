@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps.Formats;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {

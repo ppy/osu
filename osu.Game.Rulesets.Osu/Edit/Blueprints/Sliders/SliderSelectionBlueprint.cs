@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
