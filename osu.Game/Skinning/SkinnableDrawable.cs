@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Graphics;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Skinning
 {

@@ -18,8 +18,8 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Tournament.Components;
 using osu.Game.Screens.Tournament.Teams;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Framework.Graphics.Shapes;
 

@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
-using OpenTK;
+using osuTK;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;

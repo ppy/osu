@@ -16,7 +16,7 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat.Tabs;
 using osu.Game.Users;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {

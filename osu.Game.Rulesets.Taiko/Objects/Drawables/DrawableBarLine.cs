@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using OpenTK;
+using osuTK;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables

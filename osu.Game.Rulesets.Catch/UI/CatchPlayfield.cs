@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {

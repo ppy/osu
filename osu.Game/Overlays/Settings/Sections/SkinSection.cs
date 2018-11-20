@@ -9,7 +9,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections
 {

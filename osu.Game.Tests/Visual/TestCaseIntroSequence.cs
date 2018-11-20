@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;

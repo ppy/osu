@@ -4,8 +4,8 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
