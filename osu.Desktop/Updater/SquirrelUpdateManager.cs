@@ -14,8 +14,8 @@ using osu.Game;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using Squirrel;
 using LogLevel = Splat.LogLevel;
 
