@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -362,12 +362,6 @@ namespace osu.Game.Online.Chat
                             }
                         }
 
-                        if (!channelsInitialised)
-                        {
-                            channelsInitialised = true;
-                            // we want this to run after the first presence so we can see if the user is in any channels already.
-                            initializeChannels();
-                        }
 
                         //todo: handle left channels
 
@@ -377,6 +371,13 @@ namespace osu.Game.Online.Chat
                             JoinedChannels.FirstOrDefault(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
 
                         lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
+                    }
+
+                    if (!channelsInitialised)
+                    {
+                        channelsInitialised = true;
+                        // we want this to run after the first presence so we can see if the user is in any channels already.
+                        initializeChannels();
                     }
 
                     fetchUpdates();
