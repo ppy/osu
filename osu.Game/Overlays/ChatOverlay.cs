@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -20,7 +19,6 @@ using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
-using System.Linq;
 
 namespace osu.Game.Overlays
 {
