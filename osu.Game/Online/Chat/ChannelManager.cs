@@ -387,7 +387,6 @@ namespace osu.Game.Online.Chat
                             JoinChannel(channel, true);
                         }
 
-
                         //todo: handle left channels
 
                         handleChannelMessages(updates.Messages);
