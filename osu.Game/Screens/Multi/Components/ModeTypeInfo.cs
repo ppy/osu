@@ -6,7 +6,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.Multiplayer;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens.Multi.Components
 {

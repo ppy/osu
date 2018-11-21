@@ -7,7 +7,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Objects
 {

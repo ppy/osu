@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using OpenTK.Input;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.Containers
 {

@@ -15,7 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
