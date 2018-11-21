@@ -11,7 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
