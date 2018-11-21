@@ -293,8 +293,8 @@ namespace osu.Game.Online.Chat
                     found.Users.Remove(foundSelf);
             }
 
-            if (joined == null && addToJoined) JoinedChannels.Add(found);
-            if (available == null && addToAvailable) AvailableChannels.Add(found);
+            if (joined == null && addToJoined) joinedChannels.Add(found);
+            if (available == null && addToAvailable) availableChannels.Add(found);
 
             return found;
         }
