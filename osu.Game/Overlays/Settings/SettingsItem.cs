@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -15,7 +15,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {

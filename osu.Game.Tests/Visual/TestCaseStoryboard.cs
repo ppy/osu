@@ -10,7 +10,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
 using osu.Game.Storyboards.Drawables;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {

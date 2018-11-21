@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens.Menu
 {

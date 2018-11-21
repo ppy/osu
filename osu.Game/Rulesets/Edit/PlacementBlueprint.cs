@@ -13,7 +13,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Compose;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {

@@ -6,7 +6,7 @@ using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
