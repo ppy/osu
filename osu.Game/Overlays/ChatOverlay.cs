@@ -20,6 +20,7 @@ using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
+using System.Linq;
 
 namespace osu.Game.Overlays
 {
@@ -209,7 +210,8 @@ namespace osu.Game.Overlays
             {
                 textbox.Current.Disabled = true;
                 currentChannelContainer.Clear(false);
-                channelTabControl.Current.Value = null;
+                // channelTabControl does not support setting it to null.
+                channelTabControl.Current.Value = channelTabControl.Items.First();
                 return;
             }
 
