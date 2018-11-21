@@ -312,16 +312,20 @@ namespace osu.Game.Online.Chat
             // ensure we are joined to the channel
             if (!channel.Joined.Value)
             {
-                if (!alreadyJoined && channel.Type == ChannelType.Public)
+                if (alreadyJoined)
+                    channel.Joined.Value = true;
+                else
                 {
-                    var req = new JoinChannelRequest(channel, api.LocalUser);
-                    req.Success += () => JoinChannel(channel, true);
-                    req.Failure += ex => LeaveChannel(channel);
-                    api.Queue(req);
-                    return channel;
+                    switch (channel.Type)
+                    {
+                        case ChannelType.Public:
+                            var req = new JoinChannelRequest(channel, api.LocalUser);
+                            req.Success += () => JoinChannel(channel, true);
+                            req.Failure += ex => LeaveChannel(channel);
+                            api.Queue(req);
+                            return channel;
+                    }
                 }
-
-                channel.Joined.Value = true;
             }
 
             if (CurrentChannel.Value == null)
