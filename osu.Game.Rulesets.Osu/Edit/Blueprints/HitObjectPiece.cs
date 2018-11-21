@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Objects;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints
 {

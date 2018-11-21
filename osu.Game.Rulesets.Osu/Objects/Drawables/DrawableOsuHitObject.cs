@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables

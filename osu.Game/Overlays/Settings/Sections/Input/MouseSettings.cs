@@ -59,8 +59,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             rawInputToggle.ValueChanged += enabled =>
             {
                 // this is temporary until we support per-handler settings.
-                const string raw_mouse_handler = @"OpenTKRawMouseHandler";
-                const string standard_mouse_handler = @"OpenTKMouseHandler";
+                const string raw_mouse_handler = @"OsuTKRawMouseHandler";
+                const string standard_mouse_handler = @"OsuTKMouseHandler";
 
                 ignoredInputHandler.Value = enabled ? standard_mouse_handler : raw_mouse_handler;
             };

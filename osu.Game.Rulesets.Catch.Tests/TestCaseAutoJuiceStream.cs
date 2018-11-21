@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {

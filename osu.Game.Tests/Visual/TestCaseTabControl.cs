@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select.Filter;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Visual
 {

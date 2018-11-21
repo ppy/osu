@@ -9,7 +9,7 @@ using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Skinning;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -70,8 +70,8 @@ namespace osu.Game.Overlays.Settings.Sections
             dropdownBindable.BindValueChanged(v => configBindable.Value = v.ID);
         }
 
-        private void itemRemoved(SkinInfo s) => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != s.ID).ToArray();
-        private void itemAdded(SkinInfo s) => skinDropdown.Items = skinDropdown.Items.Append(s).ToArray();
+        private void itemRemoved(SkinInfo s) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != s.ID).ToArray());
+        private void itemAdded(SkinInfo s) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Append(s).ToArray());
 
         protected override void Dispose(bool isDisposing)
         {
