@@ -16,6 +16,7 @@ using NUnit.Framework;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Tests.Visual
 {
@@ -52,8 +53,9 @@ namespace osu.Game.Tests.Visual
             linkColour = colours.Blue;
 
             var chatManager = new ChannelManager();
-            chatManager.AvailableChannels.Add(new Channel { Name = "#english"});
-            chatManager.AvailableChannels.Add(new Channel { Name = "#japanese" });
+            BindableCollection<Channel> availableChannels = (BindableCollection<Channel>)chatManager.AvailableChannels;
+            availableChannels.Add(new Channel { Name = "#english"});
+            availableChannels.Add(new Channel { Name = "#japanese" });
             Dependencies.Cache(chatManager);
 
             Dependencies.Cache(new ChatOverlay());
