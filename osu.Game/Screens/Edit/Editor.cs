@@ -187,15 +187,19 @@ namespace osu.Game.Screens.Edit
         protected override bool OnScroll(ScrollEvent e)
         {
             scrollAccumulation += e.ScrollDelta.X + e.ScrollDelta.Y * (e.IsPrecise ? 0.1 : 1);
-            if (Math.Abs(scrollAccumulation) < 1)
-                return true;
 
-            if (scrollAccumulation > 0)
-                clock.SeekBackward(!clock.IsRunning);
-            else
-                clock.SeekForward(!clock.IsRunning);
+            const int precision = 1;
 
-            scrollAccumulation = 0;
+            while (Math.Abs(scrollAccumulation) > precision)
+            {
+                if (scrollAccumulation > 0)
+                    clock.SeekBackward(!clock.IsRunning);
+                else
+                    clock.SeekForward(!clock.IsRunning);
+
+                scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
+            }
+
             return true;
         }
 
