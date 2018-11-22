@@ -25,7 +25,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
         private void load(LadderInfo ladder, TextureStore textures)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 100;
+            Height = 95;
             Children = new Drawable[]
             {
                 new TournamentLogo(),

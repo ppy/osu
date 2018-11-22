@@ -45,20 +45,28 @@ namespace osu.Game.Tournament.Screens.Gameplay
             AddRange(new Drawable[]
             {
                 new MatchHeader(),
-                new FillFlowContainer
+                new Container
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Y = 5,
-                    Direction = FillDirection.Vertical,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Children = new Drawable[]
                     {
+                        new Box
+                        {
+                            // chroma key area for stable gameplay
+                            Name = "chroma",
+                            RelativeSizeAxes = Axes.X,
+                            Height = 512,
+                            Colour = new Color4(0, 255, 0, 255),
+                        },
                         new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
+                            Y = -4,
                             Children = new Drawable[]
                             {
                                 new Circle
@@ -73,7 +81,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
                                 {
                                     Name = "top bar blue",
                                     RelativeSizeAxes = Axes.X,
-                                    Height = 9,
+                                    Height = 8,
                                     Width = 0.5f,
                                     Colour = blue,
                                     Anchor = Anchor.TopRight,
@@ -81,20 +89,12 @@ namespace osu.Game.Tournament.Screens.Gameplay
                                 },
                             }
                         },
-                        new Box
-                        {
-                            // chroma key area for stable gameplay
-                            Name = "chroma",
-                            RelativeSizeAxes = Axes.X,
-                            Height = 500,
-                            Colour = new Color4(0, 255, 0, 255),
-                        },
                     }
                 },
                 scoreDisplay = new MatchScoreDisplay
                 {
                     Y = -60,
-                    Scale = new Vector2(0.86f),
+                    Scale = new Vector2(0.8f),
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                 },
