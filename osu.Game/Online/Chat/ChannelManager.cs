@@ -272,11 +272,13 @@ namespace osu.Game.Online.Chat
         {
             Channel found = null;
 
-            var available = AvailableChannels.FirstOrDefault(c => c.Id == lookup.Id);
+            bool lookupCondition(Channel ch) => lookup.Id > 0 ? ch.Id == lookup.Id : lookup.Name == ch.Name;
+
+            var available = AvailableChannels.FirstOrDefault(lookupCondition);
             if (available != null)
                 found = available;
 
-            var joined = JoinedChannels.FirstOrDefault(c => c.Id == lookup.Id);
+            var joined = JoinedChannels.FirstOrDefault(lookupCondition);
             if (found == null && joined != null)
                 found = joined;
 
