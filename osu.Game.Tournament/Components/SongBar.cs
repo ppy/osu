@@ -158,17 +158,22 @@ namespace osu.Game.Tournament.Components
 
             var bpm = beatmap.BeatmapSet.OnlineInfo.BPM;
             var length = beatmap.OnlineInfo.Length;
-            string extra = "";
+            string hardRockExtra = "";
+            string srExtra = "";
 
             var ar = beatmap.BaseDifficulty.ApproachRate;
-            if ((mods & LegacyMods.HardRock) > 0) extra = "*";
+            if ((mods & LegacyMods.HardRock) > 0)
+            {
+                hardRockExtra = "*";
+                srExtra = "*";
+            }
 
             if ((mods & LegacyMods.DoubleTime) > 0)
             {
                 //ar *= 1.5f;
                 bpm *= 1.5f;
                 length /= 1.5f;
-                extra = "*";
+                srExtra = "*";
             }
 
             panelContents.Children = new Drawable[]
@@ -191,7 +196,7 @@ namespace osu.Game.Tournament.Components
                 },
                 new OsuSpriteText
                 {
-                    Text = $"CS {beatmap.BaseDifficulty.CircleSize:0.#} / AR {ar:0.#}{extra}",
+                    Text = $"CS {beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra} / AR {ar:0.#}{srExtra} / OD {beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}",
                     Margin = new MarginPadding { Horizontal = 15, Vertical = 5 },
                     Colour = OsuColour.Gray(0.33f),
                     Anchor = Anchor.TopRight,
@@ -199,7 +204,7 @@ namespace osu.Game.Tournament.Components
                 },
                 new OsuSpriteText
                 {
-                    Text = $"Star Rating {beatmap.StarDifficulty:0.#}{extra}",
+                    Text = $"Star Rating {beatmap.StarDifficulty:0.#}{srExtra}",
                     Margin = new MarginPadding { Horizontal = 15, Vertical = 5 },
                     Colour = OsuColour.Gray(0.33f),
                     Anchor = Anchor.BottomRight,
