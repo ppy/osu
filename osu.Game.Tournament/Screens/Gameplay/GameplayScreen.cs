@@ -135,61 +135,66 @@ namespace osu.Game.Tournament.Screens.Gameplay
 
         private void stateChanged(TourneyState state)
         {
-            if (state == TourneyState.Ranking)
+            try
             {
-                if (warmup.Value) return;
-
-                if (ipc.Score1 > ipc.Score2)
-                    currentMatch.Value.Team1Score.Value++;
-                else
-                    currentMatch.Value.Team2Score.Value++;
-            }
-
-            scheduledOperation?.Cancel();
-
-            void expand()
-            {
-                chat.Expand();
-
-                using (BeginDelayedSequence(300, true))
+                if (state == TourneyState.Ranking)
                 {
-                    scoreDisplay.FadeIn(100);
-                    SongBar.Expanded = true;
+                    if (warmup.Value) return;
+
+                    if (ipc.Score1 > ipc.Score2)
+                        currentMatch.Value.Team1Score.Value++;
+                    else
+                        currentMatch.Value.Team2Score.Value++;
+                }
+
+                scheduledOperation?.Cancel();
+
+                void expand()
+                {
+                    chat.Expand();
+
+                    using (BeginDelayedSequence(300, true))
+                    {
+                        scoreDisplay.FadeIn(100);
+                        SongBar.Expanded = true;
+                    }
+                }
+
+                void contract()
+                {
+                    SongBar.Expanded = false;
+                    scoreDisplay.FadeOut(100);
+                    using (chat.BeginDelayedSequence(500))
+                        chat.Contract();
+                }
+
+                switch (state)
+                {
+                    case TourneyState.Idle:
+                        contract();
+
+                        if (lastState == TourneyState.Ranking && !warmup.Value)
+                        {
+                            if (currentMatch.Value?.Completed == true)
+                                scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, 4000);
+                            else if (currentMatch.Value?.Completed == false)
+                                scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, 4000);
+                        }
+
+                        break;
+                    case TourneyState.Ranking:
+                        scheduledOperation = Scheduler.AddDelayed(contract, 10000);
+                        break;
+                    default:
+                        chat.Expand();
+                        expand();
+                        break;
                 }
             }
-
-            void contract()
+            finally
             {
-                SongBar.Expanded = false;
-                scoreDisplay.FadeOut(100);
-                using (chat.BeginDelayedSequence(500))
-                    chat.Contract();
+                lastState = state;
             }
-
-            switch (state)
-            {
-                case TourneyState.Idle:
-                    contract();
-
-                    if (lastState == TourneyState.Ranking && !warmup.Value)
-                    {
-                        if (currentMatch.Value?.Completed == true)
-                            scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(TeamWinScreen)); }, 4000);
-                        else if (currentMatch.Value?.Completed == false)
-                            scheduledOperation = Scheduler.AddDelayed(() => { sceneManager?.SetScreen(typeof(MapPoolScreen)); }, 4000);
-                    }
-
-                    break;
-                case TourneyState.Ranking:
-                    scheduledOperation = Scheduler.AddDelayed(contract, 10000);
-                    break;
-                default:
-                    chat.Expand();
-                    expand();
-                    break;
-            }
-
-            lastState = state;
         }
     }
 }
