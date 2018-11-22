@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Users;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 {

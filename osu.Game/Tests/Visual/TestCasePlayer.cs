@@ -11,7 +11,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
