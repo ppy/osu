@@ -53,6 +53,7 @@ namespace osu.Game.Tournament.Components
         private float panelWidth => expanded ? 0.6f : 1;
 
         private const float main_width = 0.97f;
+        private const float inner_panel_width = 0.7f;
 
         private bool expanded;
 
@@ -66,7 +67,7 @@ namespace osu.Game.Tournament.Components
 
                 if (expanded)
                 {
-                    innerPanel.ResizeWidthTo(0.7f, 800, Easing.OutQuint);
+                    innerPanel.ResizeWidthTo(inner_panel_width, 800, Easing.OutQuint);
                     outerPanel.ResizeWidthTo(main_width, 800, Easing.OutQuint);
                 }
                 else
@@ -126,7 +127,7 @@ namespace osu.Game.Tournament.Components
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativeSizeAxes = Axes.Both,
-                            Width = 0.7f,
+                            Width = inner_panel_width,
                             Children = new Drawable[]
                             {
                                 new Box
@@ -143,6 +144,8 @@ namespace osu.Game.Tournament.Components
                     }
                 }
             };
+
+            Expanded = true;
         }
 
         private void update()
