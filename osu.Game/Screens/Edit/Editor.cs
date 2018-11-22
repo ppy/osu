@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osuTK.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Screens.Backgrounds;
@@ -181,12 +182,20 @@ namespace osu.Game.Screens.Edit
             LoadComponentAsync(currentScreen, screenContainer.Add);
         }
 
+        private double scrollAccumulation;
+
         protected override bool OnScroll(ScrollEvent e)
         {
-            if (e.ScrollDelta.X + e.ScrollDelta.Y > 0)
+            scrollAccumulation += e.ScrollDelta.X + e.ScrollDelta.Y * (e.IsPrecise ? 0.1 : 1);
+            if (Math.Abs(scrollAccumulation) < 1)
+                return true;
+
+            if (scrollAccumulation > 0)
                 clock.SeekBackward(!clock.IsRunning);
             else
                 clock.SeekForward(!clock.IsRunning);
+
+            scrollAccumulation = 0;
             return true;
         }
 
