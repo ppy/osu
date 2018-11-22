@@ -6,7 +6,7 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Mods
 {

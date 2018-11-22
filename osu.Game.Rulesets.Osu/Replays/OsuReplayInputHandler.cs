@@ -6,7 +6,7 @@ using System.Linq;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Replays;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {

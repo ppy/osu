@@ -10,7 +10,7 @@ using osu.Framework.Input.StateChanges.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Platform;
 using osu.Game.Rulesets.UI;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Input.Handlers
 {

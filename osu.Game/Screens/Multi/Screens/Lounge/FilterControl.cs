@@ -4,7 +4,7 @@
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Screens.Lounge
 {
