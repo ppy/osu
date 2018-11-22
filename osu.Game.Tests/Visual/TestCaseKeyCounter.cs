@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Screens.Play;
-using OpenTK.Input;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual
 {

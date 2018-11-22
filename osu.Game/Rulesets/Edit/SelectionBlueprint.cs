@@ -10,7 +10,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
