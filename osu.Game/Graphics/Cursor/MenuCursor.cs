@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -13,7 +13,7 @@ using System;
 using JetBrains.Annotations;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
-using OpenTK.Input;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.Cursor
 {

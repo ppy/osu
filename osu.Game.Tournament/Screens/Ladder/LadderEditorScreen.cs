@@ -12,8 +12,8 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Screens.Ladder.Components;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using SixLabors.Primitives;
 
 namespace osu.Game.Tournament.Screens.Ladder

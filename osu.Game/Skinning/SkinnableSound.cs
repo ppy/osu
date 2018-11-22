@@ -31,6 +31,8 @@ namespace osu.Game.Skinning
 
         public void Play() => channels?.ForEach(c => c.Play());
 
+        public override bool IsPresent => false; // We don't need to receive updates.
+
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
             channels = samples.Select(s =>

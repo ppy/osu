@@ -4,7 +4,7 @@
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Lines;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tournament.Screens.Ladder.Components
 {

@@ -30,7 +30,7 @@ using osu.Game.IO;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
-using OpenTK.Input;
+using osuTK.Input;
 using DebugUtils = osu.Game.Utils.DebugUtils;
 
 namespace osu.Game

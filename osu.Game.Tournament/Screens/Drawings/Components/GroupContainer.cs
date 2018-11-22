@@ -8,7 +8,7 @@ using System.Text;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Tournament.Components;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tournament.Screens.Drawings.Components
 {

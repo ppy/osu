@@ -16,7 +16,7 @@ using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
-using OpenTK.Input;
+using osuTK.Input;
 using static osu.Game.Input.Handlers.ReplayInputHandler;
 using JoystickState = osu.Framework.Input.States.JoystickState;
 using KeyboardState = osu.Framework.Input.States.KeyboardState;

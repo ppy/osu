@@ -19,8 +19,8 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Drawings.Components;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Drawings
 {

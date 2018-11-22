@@ -7,7 +7,7 @@ using System.IO;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {

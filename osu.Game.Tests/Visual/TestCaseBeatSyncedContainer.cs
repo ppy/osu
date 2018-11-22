@@ -13,7 +13,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Lists;
 
 namespace osu.Game.Tests.Visual
