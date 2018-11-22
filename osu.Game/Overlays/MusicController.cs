@@ -406,6 +406,8 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
+            playlist.State = Visibility.Hidden;
+
             this.FadeOut(transition_length, Easing.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);
         }
