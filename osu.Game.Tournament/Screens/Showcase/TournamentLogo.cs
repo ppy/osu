@@ -15,7 +15,7 @@ namespace osu.Game.Tournament.Screens.Showcase
         public TournamentLogo()
         {
             RelativeSizeAxes = Axes.X;
-            Height = 100;
+            Height = 95;
             Margin = new MarginPadding { Vertical = 5 };
         }
 
