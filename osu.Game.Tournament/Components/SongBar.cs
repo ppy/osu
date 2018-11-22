@@ -11,8 +11,8 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Menu;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Components
 {

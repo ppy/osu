@@ -13,7 +13,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {

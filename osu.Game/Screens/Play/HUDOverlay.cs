@@ -9,15 +9,14 @@ using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Screens.Play.HUD;
-using OpenTK;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -89,7 +88,7 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, NotificationOverlay notificationOverlay, OsuColour colours)
+        private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
         {
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
             showHud.ValueChanged += hudVisibility => content.FadeTo(hudVisibility ? 1 : 0, duration);
@@ -103,18 +102,6 @@ namespace osu.Game.Screens.Play
                 {
                     Text = @"The score overlay is currently disabled. You can toggle this by pressing Shift+Tab."
                 });
-            }
-
-            // todo: the stuff below should probably not be in this base implementation, but in each individual class.
-            ComboCounter.AccentColour = colours.BlueLighter;
-            AccuracyCounter.AccentColour = colours.BlueLighter;
-            ScoreCounter.AccentColour = colours.BlueLighter;
-
-            var shd = HealthDisplay as StandardHealthDisplay;
-            if (shd != null)
-            {
-                shd.AccentColour = colours.BlueLighter;
-                shd.GlowColour = colours.BlueDarker;
             }
         }
 

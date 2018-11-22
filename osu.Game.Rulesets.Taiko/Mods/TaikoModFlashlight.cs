@@ -7,7 +7,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Rulesets.UI;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {

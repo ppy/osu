@@ -4,7 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens.Play.Break
 {

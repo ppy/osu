@@ -10,7 +10,7 @@ using osu.Game.Tournament.Components;
 using osu.Game.Tournament.IPC;
 using osu.Game.Tournament.Screens.Ladder.Components;
 using osu.Game.Users;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tournament.Tests
 {

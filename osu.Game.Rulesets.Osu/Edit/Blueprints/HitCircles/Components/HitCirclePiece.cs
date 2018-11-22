@@ -3,19 +3,19 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 {
-    public class HitCirclePiece : CompositeDrawable
+    public class HitCirclePiece : HitObjectPiece
     {
         private readonly HitCircle hitCircle;
 
         public HitCirclePiece(HitCircle hitCircle)
+            : base(hitCircle)
         {
             this.hitCircle = hitCircle;
             Origin = Anchor.Centre;
@@ -25,10 +25,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
             CornerRadius = Size.X / 2;
 
             InternalChild = new RingPiece();
-
-            hitCircle.PositionChanged += _ => UpdatePosition();
-            hitCircle.StackHeightChanged += _ => UpdatePosition();
-            hitCircle.ScaleChanged += _ => Scale = new Vector2(hitCircle.Scale);
         }
 
         [BackgroundDependencyLoader]
@@ -36,7 +32,9 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
         {
             Colour = colours.Yellow;
 
-            UpdatePosition();
+            PositionBindable.BindValueChanged(_ => UpdatePosition(), true);
+            StackHeightBindable.BindValueChanged(_ => UpdatePosition());
+            ScaleBindable.BindValueChanged(v => Scale = new Vector2(v), true);
         }
 
         protected virtual void UpdatePosition() => Position = hitCircle.StackedPosition;

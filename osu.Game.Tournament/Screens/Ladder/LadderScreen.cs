@@ -12,7 +12,7 @@ using osu.Framework.Graphics.Video;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
 using osu.Game.Tournament.Screens.Ladder.Components;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Ladder
 {

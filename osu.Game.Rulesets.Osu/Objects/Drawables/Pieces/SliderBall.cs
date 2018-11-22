@@ -7,9 +7,9 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Game.Skinning;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {

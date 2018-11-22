@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 using osu.Framework.Allocation;
-using OpenTK;
+using osuTK;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;

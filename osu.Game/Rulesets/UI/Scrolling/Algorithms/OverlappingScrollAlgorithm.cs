@@ -3,7 +3,7 @@
 
 using osu.Framework.Lists;
 using osu.Game.Rulesets.Timing;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.UI.Scrolling.Algorithms
 {
