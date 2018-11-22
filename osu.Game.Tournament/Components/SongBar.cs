@@ -1,11 +1,13 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Graphics;
@@ -178,37 +180,25 @@ namespace osu.Game.Tournament.Components
 
             panelContents.Children = new Drawable[]
             {
-                new OsuSpriteText
+                new DiffPiece(("Length", TimeSpan.FromSeconds(length).ToString(@"mm\:ss")))
                 {
-                    Text = $"Length {length:0}s",
-                    Margin = new MarginPadding { Horizontal = 15, Vertical = 5 },
-                    Colour = OsuColour.Gray(0.33f),
-                    Anchor = Anchor.TopLeft,
-                    Origin = Anchor.TopLeft,
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.BottomLeft,
                 },
-                new OsuSpriteText
+                new DiffPiece(("BPM", $"{bpm:0.#}"))
                 {
-                    Text = $"BPM {bpm:0.#}",
-                    Margin = new MarginPadding { Horizontal = 15, Vertical = 5 },
-                    Colour = OsuColour.Gray(0.33f),
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft
+                    Anchor = Anchor.CentreLeft,
+                    Origin = Anchor.TopLeft
                 },
-                new OsuSpriteText
+                new DiffPiece(("CS", $"{beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"), ("AR", $"{ar:0.#}{srExtra}"), ("OD", $"{beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"))
                 {
-                    Text = $"CS {beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra} / AR {ar:0.#}{srExtra} / OD {beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}",
-                    Margin = new MarginPadding { Horizontal = 15, Vertical = 5 },
-                    Colour = OsuColour.Gray(0.33f),
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight
-                },
-                new OsuSpriteText
-                {
-                    Text = $"Star Rating {beatmap.StarDifficulty:0.#}{srExtra}",
-                    Margin = new MarginPadding { Horizontal = 15, Vertical = 5 },
-                    Colour = OsuColour.Gray(0.33f),
-                    Anchor = Anchor.BottomRight,
+                    Anchor = Anchor.CentreRight,
                     Origin = Anchor.BottomRight
+                },
+                new DiffPiece(("Star Rating", $"{beatmap.StarDifficulty:0.#}{srExtra}"))
+                {
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.TopRight
                 },
                 panel = new TournamentBeatmapPanel(beatmap)
                 {
@@ -219,5 +209,38 @@ namespace osu.Game.Tournament.Components
                 }
             };
         }
+
+        public class DiffPiece : TextFlowContainer
+        {
+            public DiffPiece(params (string heading, string content)[] tuples)
+            {
+                Margin = new MarginPadding { Horizontal = 15, Vertical = 1 };
+                AutoSizeAxes = Axes.Both;
+
+                void cp(SpriteText s, Color4 colour)
+                {
+                    s.Colour = colour;
+                    s.TextSize = 15;
+                    s.Font = @"Exo2.0-Bold";
+                }
+
+                bool first = true;
+                foreach (var t in tuples)
+                {
+                    if (!first)
+                        AddText(" / ", s =>
+                        {
+                            cp(s, OsuColour.Gray(0.33f));
+                            s.Spacing = new Vector2(-2, 0);
+                        });
+
+                    AddText(new OsuSpriteText { Text = t.heading }, s => cp(s, OsuColour.Gray(0.33f)));
+                    AddText(" ", s => cp(s, OsuColour.Gray(0.33f)));
+                    AddText(new OsuSpriteText { Text = t.content }, s => cp(s, OsuColour.Gray(0.5f)));
+                    first = false;
+                }
+            }
+        }
     }
 }
+
