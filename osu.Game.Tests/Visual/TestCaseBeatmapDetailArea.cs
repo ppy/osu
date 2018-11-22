@@ -4,7 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Select;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Visual
 {

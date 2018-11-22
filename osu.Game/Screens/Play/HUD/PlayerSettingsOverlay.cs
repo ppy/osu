@@ -4,9 +4,9 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
-using OpenTK;
+using osuTK;
 using osu.Game.Screens.Play.PlayerSettings;
-using OpenTK.Input;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Play.HUD
 {
