@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
+using osu.Game.Overlays.Settings.Sections.Online;
 
 namespace osu.Game.Overlays.Settings.Sections
 {
@@ -15,6 +16,7 @@ namespace osu.Game.Overlays.Settings.Sections
         {
             Children = new Drawable[]
             {
+                new WebSettings()
             };
         }
     }
