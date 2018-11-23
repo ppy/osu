@@ -3,7 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using System.Collections.Generic;

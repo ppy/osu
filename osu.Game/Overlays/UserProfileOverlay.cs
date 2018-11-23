@@ -16,8 +16,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {

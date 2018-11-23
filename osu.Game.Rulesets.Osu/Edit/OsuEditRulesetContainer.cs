@@ -5,7 +5,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.UI;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit
 {
