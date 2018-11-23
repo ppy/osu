@@ -50,7 +50,9 @@ namespace osu.Game
     {
         public Toolbar Toolbar;
 
-        private ChatOverlay chat;
+        private ChatOverlay chatOverlay;
+
+        private ChannelManager channelManager;
 
         private MusicController musicController;
 
@@ -338,12 +340,8 @@ namespace osu.Game
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
             loadComponentSingleFile(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
-            loadComponentSingleFile(new ChannelManager(), channelManager =>
-            {
-                dependencies.Cache(channelManager);
-                AddInternal(channelManager);
-            });
-            loadComponentSingleFile(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
+            loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal);
+            loadComponentSingleFile(chatOverlay = new ChatOverlay { Depth = -1 }, mainContent.Add);
             loadComponentSingleFile(settings = new MainSettings
             {
                 GetToolbarHeight = () => ToolbarOffset,
@@ -376,7 +374,8 @@ namespace osu.Game
             dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
             dependencies.Cache(direct);
-            dependencies.Cache(chat);
+            dependencies.Cache(chatOverlay);
+            dependencies.Cache(channelManager);
             dependencies.Cache(userProfile);
             dependencies.Cache(musicController);
             dependencies.Cache(beatmapSetOverlay);
@@ -409,7 +408,7 @@ namespace osu.Game
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct };
+            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, social, direct };
             overlays.AddRange(singleDisplayOverlays);
 
             foreach (var overlay in singleDisplayOverlays)
@@ -534,7 +533,7 @@ namespace osu.Game
             switch (action)
             {
                 case GlobalAction.ToggleChat:
-                    chat.ToggleVisibility();
+                    chatOverlay.ToggleVisibility();
                     return true;
                 case GlobalAction.ToggleSocial:
                     social.ToggleVisibility();
