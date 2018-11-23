@@ -186,7 +186,7 @@ namespace osu.Game.Screens.Edit
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            scrollAccumulation += e.ScrollDelta.X + e.ScrollDelta.Y * (e.IsPrecise ? 0.1 : 1);
+            scrollAccumulation += (e.ScrollDelta.X + e.ScrollDelta.Y) * (e.IsPrecise ? 0.1 : 1);
 
             const int precision = 1;
 
