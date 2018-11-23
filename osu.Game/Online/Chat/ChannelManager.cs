@@ -77,7 +77,7 @@ namespace osu.Game.Online.Chat
                 throw new ArgumentNullException(nameof(user));
 
             CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Users.Any(u => u.Id == user.Id))
-                                   ?? new Channel { Name = user.Username, Users = { user } };
+                                   ?? new Channel { Name = user.Username, Users = { user }, Type = ChannelType.PM };
         }
 
         private void currentChannelChanged(Channel channel) => JoinChannel(channel);
@@ -223,13 +223,11 @@ namespace osu.Game.Online.Chat
             {
                 foreach (var channel in channels)
                 {
-                    // add as available if not already
-                    if (AvailableChannels.All(c => c.Id != channel.Id))
-                        AvailableChannels.Add(channel);
+                    var ch = getChannel(channel, addToAvailable: true);
 
                     // join any channels classified as "defaults"
                     if (joinDefaults && defaultChannels.Any(c => c.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
-                        JoinChannel(channel);
+                        JoinChannel(ch);
                 }
             };
             req.Failure += error =>
@@ -262,37 +260,73 @@ namespace osu.Game.Online.Chat
             api.Queue(fetchInitialMsgReq);
         }
 
-        public void JoinChannel(Channel channel)
+        /// <summary>
+        /// Find an existing channel instance for the provided channel. Lookup is performed basd on ID.
+        /// The provided channel may be used if an existing instance is not found.
+        /// </summary>
+        /// <param name="lookup">A candidate channel to be used for lookup or permanently on lookup failure.</param>
+        /// <param name="addToAvailable">Whether the channel should be added to <see cref="AvailableChannels"/> if not already.</param>
+        /// <param name="addToJoined">Whether the channel should be added to <see cref="JoinedChannels"/> if not already.</param>
+        /// <returns>The found channel.</returns>
+        private Channel getChannel(Channel lookup, bool addToAvailable = false, bool addToJoined = false)
         {
-            if (channel == null) return;
+            Channel found = null;
 
-            // ReSharper disable once AccessToModifiedClosure
-            var existing = JoinedChannels.FirstOrDefault(c => c.Id == channel.Id);
+            bool lookupCondition(Channel ch) => lookup.Id > 0 ? ch.Id == lookup.Id : lookup.Name == ch.Name;
 
-            if (existing != null)
+            var available = AvailableChannels.FirstOrDefault(lookupCondition);
+            if (available != null)
+                found = available;
+
+            var joined = JoinedChannels.FirstOrDefault(lookupCondition);
+            if (found == null && joined != null)
+                found = joined;
+
+            if (found == null)
             {
-                // if we already have this channel loaded, we don't want to make a second one.
-                channel = existing;
-            }
-            else
-            {
-                var foundSelf = channel.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
+                found = lookup;
+
+                // if we're using a channel object from the server, we want to remove ourselves from the users list.
+                // this is because we check the first user in the channel to display a name/icon on tabs for now.
+                var foundSelf = found.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
                 if (foundSelf != null)
-                    channel.Users.Remove(foundSelf);
+                    found.Users.Remove(foundSelf);
+            }
 
-                JoinedChannels.Add(channel);
+            if (joined == null && addToJoined) JoinedChannels.Add(found);
+            if (available == null && addToAvailable) AvailableChannels.Add(found);
 
-                if (channel.Type == ChannelType.Public && !channel.Joined)
+            return found;
+        }
+
+        /// <summary>
+        /// Joins a channel if it has not already been joined.
+        /// </summary>
+        /// <param name="channel">The channel to join.</param>
+        /// <param name="alreadyJoined">Whether the channel has already been joined server-side. Will skip a join request.</param>
+        /// <returns>The joined channel. Note that this may not match the parameter channel as it is a backed object.</returns>
+        public Channel JoinChannel(Channel channel, bool alreadyJoined = false)
+        {
+            if (channel == null) return null;
+
+            channel = getChannel(channel, addToJoined: true);
+
+            // ensure we are joined to the channel
+            if (!channel.Joined.Value)
+            {
+                if (alreadyJoined)
+                    channel.Joined.Value = true;
+                else
                 {
-                    var req = new JoinChannelRequest(channel, api.LocalUser);
-                    req.Success += () =>
+                    switch (channel.Type)
                     {
-                        channel.Joined.Value = true;
-                        JoinChannel(channel);
-                    };
-                    req.Failure += ex => LeaveChannel(channel);
-                    api.Queue(req);
-                    return;
+                        case ChannelType.Public:
+                            var req = new JoinChannelRequest(channel, api.LocalUser);
+                            req.Success += () => JoinChannel(channel, true);
+                            req.Failure += ex => LeaveChannel(channel);
+                            api.Queue(req);
+                            return channel;
+                    }
                 }
             }
 
@@ -304,6 +338,8 @@ namespace osu.Game.Online.Chat
                 // let's fetch a small number of messages to bring us up-to-date with the backlog.
                 fetchInitalMessages(channel);
             }
+
+            return channel;
         }
 
         public void LeaveChannel(Channel channel)
@@ -353,20 +389,8 @@ namespace osu.Game.Online.Chat
                     {
                         foreach (var channel in updates.Presence)
                         {
-                            if (!channel.Joined.Value)
-                            {
-                                // we received this from the server so should mark the channel already joined.
-                                channel.Joined.Value = true;
-
-                                JoinChannel(channel);
-                            }
-                        }
-
-                        if (!channelsInitialised)
-                        {
-                            channelsInitialised = true;
-                            // we want this to run after the first presence so we can see if the user is in any channels already.
-                            initializeChannels();
+                            // we received this from the server so should mark the channel already joined.
+                            JoinChannel(channel, true);
                         }
 
                         //todo: handle left channels
@@ -377,6 +401,13 @@ namespace osu.Game.Online.Chat
                             JoinedChannels.FirstOrDefault(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
 
                         lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
+                    }
+
+                    if (!channelsInitialised)
+                    {
+                        channelsInitialised = true;
+                        // we want this to run after the first presence so we can see if the user is in any channels already.
+                        initializeChannels();
                     }
 
                     fetchUpdates();

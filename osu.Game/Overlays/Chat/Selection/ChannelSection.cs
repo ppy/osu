@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;

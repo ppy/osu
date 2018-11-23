@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -24,6 +25,9 @@ namespace osu.Game.Graphics.UserInterface
             DisplayedCountSpriteText.FixedWidth = true;
             Current.Value = DisplayedCount = 1.0f;
         }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
 
         protected override string FormatCount(double count)
         {

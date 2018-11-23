@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics.Containers;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
