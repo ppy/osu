@@ -5,11 +5,13 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets.Scoring;
@@ -20,7 +22,7 @@ using osuTK.Input;
 
 namespace osu.Game.Screens.Play
 {
-    public class HUDOverlay : Container
+    public class HUDOverlay : Container, IKeyBindingHandler<GlobalAction>
     {
         private const int duration = 100;
 
@@ -155,6 +157,30 @@ namespace osu.Game.Screens.Play
             }
 
             return base.OnKeyDown(e);
+        }
+
+        public bool OnPressed(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Back:
+                    if (!showHud)
+                        HoldToQuit.Action.Invoke();
+                    return true;
+            }
+
+            return false;
+        }
+
+        public bool OnReleased(GlobalAction action)
+        {
+            switch (action)
+            {
+                case GlobalAction.Back:
+                    return !showHud;
+            }
+
+            return false;
         }
 
         protected virtual RollingCounter<double> CreateAccuracyCounter() => new PercentageCounter
