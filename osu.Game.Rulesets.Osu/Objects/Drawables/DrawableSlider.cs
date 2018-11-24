@@ -1,17 +1,19 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -23,8 +25,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public readonly DrawableHitCircle HeadCircle;
         public readonly DrawableSliderTail TailCircle;
 
-        public readonly SliderBody Body;
+        public readonly SnakingSliderBody Body;
         public readonly SliderBall Ball;
+
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+        private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
 
         public DrawableSlider(Slider s)
             : base(s)
@@ -38,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             InternalChildren = new Drawable[]
             {
-                Body = new SliderBody(s)
+                Body = new SnakingSliderBody(s)
                 {
                     PathWidth = s.Scale * 64,
                 },
@@ -83,8 +89,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 components.Add(drawableRepeatPoint);
                 AddNested(drawableRepeatPoint);
             }
+        }
 
-            HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            config.BindWith(OsuSetting.SnakingInSliders, Body.SnakingIn);
+            config.BindWith(OsuSetting.SnakingOutSliders, Body.SnakingOut);
+
+            positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            scaleBindable.BindValueChanged(v =>
+            {
+                Body.PathWidth = HitObject.Scale * 64;
+                Ball.Scale = new Vector2(HitObject.Scale);
+            });
+
+            positionBindable.BindTo(HitObject.PositionBindable);
+            scaleBindable.BindTo(HitObject.ScaleBindable);
+            pathBindable.BindTo(slider.PathBindable);
+
+            pathBindable.BindValueChanged(_ => Body.Refresh());
         }
 
         public override Color4 AccentColour
@@ -101,13 +125,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             }
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            config.BindWith(OsuSetting.SnakingInSliders, Body.SnakingIn);
-            config.BindWith(OsuSetting.SnakingOutSliders, Body.SnakingOut);
-        }
-
         public bool Tracking;
 
         protected override void Update()
@@ -119,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             double completionProgress = MathHelper.Clamp((Time.Current - slider.StartTime) / slider.Duration, 0, 1);
 
             foreach (var c in components.OfType<ISliderProgress>()) c.UpdateProgress(completionProgress);
-            foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Curve.PositionAt(Body.SnakedStart ?? 0), slider.Curve.PositionAt(Body.SnakedEnd ?? 0));
+            foreach (var c in components.OfType<ITrackSnaking>()) c.UpdateSnakingPosition(slider.Path.PositionAt(Body.SnakedStart ?? 0), slider.Path.PositionAt(Body.SnakedEnd ?? 0));
             foreach (var t in components.OfType<IRequireTracking>()) t.Tracking = Ball.Tracking;
 
             Size = Body.Size;

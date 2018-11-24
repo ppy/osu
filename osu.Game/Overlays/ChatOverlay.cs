@@ -1,11 +1,10 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using OpenTK;
-using OpenTK.Graphics;
+using System.Collections.Specialized;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -13,32 +12,30 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
+using osu.Game.Overlays.Chat.Selection;
+using osu.Game.Overlays.Chat.Tabs;
 
 namespace osu.Game.Overlays
 {
-    public class ChatOverlay : OsuFocusedOverlayContainer, IOnlineComponent
+    public class ChatOverlay : OsuFocusedOverlayContainer
     {
         private const float textbox_height = 60;
         private const float channel_selection_min_height = 0.3f;
 
-        private ScheduledDelegate messageRequest;
+        private ChannelManager channelManager;
 
         private readonly Container<DrawableChannel> currentChannelContainer;
+        private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
 
         private readonly LoadingAnimation loading;
 
         private readonly FocusedTextBox textbox;
-
-        private APIAccess api;
 
         private const int transition_length = 500;
 
@@ -46,9 +43,7 @@ namespace osu.Game.Overlays
 
         public const float TAB_AREA_HEIGHT = 50;
 
-        private GetUpdatesRequest fetchReq;
-
-        private readonly ChatTabControl channelTabs;
+        private readonly ChannelTabControl channelTabControl;
 
         private readonly Container chatContainer;
         private readonly TabsArea tabsArea;
@@ -57,7 +52,6 @@ namespace osu.Game.Overlays
 
         public Bindable<double> ChatHeight { get; set; }
 
-        public List<Channel> AvailableChannels { get; private set; } = new List<Channel>();
         private readonly Container channelSelectionContainer;
         private readonly ChannelSelectionOverlay channelSelection;
 
@@ -154,10 +148,12 @@ namespace osu.Game.Overlays
                                     RelativeSizeAxes = Axes.Both,
                                     Colour = Color4.Black,
                                 },
-                                channelTabs = new ChatTabControl
+                                channelTabControl = new ChannelTabControl
                                 {
+                                    Anchor = Anchor.BottomLeft,
+                                    Origin = Anchor.BottomLeft,
                                     RelativeSizeAxes = Axes.Both,
-                                    OnRequestLeave = removeChannel,
+                                    OnRequestLeave = channel => channelManager.LeaveChannel(channel)
                                 },
                             }
                         },
@@ -165,11 +161,11 @@ namespace osu.Game.Overlays
                 },
             };
 
-            channelTabs.Current.ValueChanged += newChannel => CurrentChannel = newChannel;
-            channelTabs.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
+            channelTabControl.Current.ValueChanged += chat => channelManager.CurrentChannel.Value = chat;
+            channelTabControl.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
             channelSelection.StateChanged += state =>
             {
-                channelTabs.ChannelSelectorActive.Value = state == Visibility.Visible;
+                channelTabControl.ChannelSelectorActive.Value = state == Visibility.Visible;
 
                 if (state == Visibility.Visible)
                 {
@@ -180,12 +176,73 @@ namespace osu.Game.Overlays
                 else
                     textbox.HoldFocus = true;
             };
+
+            channelSelection.OnRequestJoin = channel => channelManager.JoinChannel(channel);
+            channelSelection.OnRequestLeave = channel => channelManager.LeaveChannel(channel);
+        }
+
+        private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (Channel newChannel in args.NewItems)
+                    {
+                        channelTabControl.AddChannel(newChannel);
+                    }
+
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (Channel removedChannel in args.OldItems)
+                    {
+                        channelTabControl.RemoveChannel(removedChannel);
+                        loadedChannels.Remove(loadedChannels.Find(c => c.Channel == removedChannel));
+                    }
+
+                    break;
+            }
+        }
+
+        private void currentChannelChanged(Channel channel)
+        {
+            if (channel == null)
+            {
+                textbox.Current.Disabled = true;
+                currentChannelContainer.Clear(false);
+                return;
+            }
+
+            textbox.Current.Disabled = channel.ReadOnly;
+
+            if (channelTabControl.Current.Value != channel)
+                Scheduler.Add(() => channelTabControl.Current.Value = channel);
+
+            var loaded = loadedChannels.Find(d => d.Channel == channel);
+            if (loaded == null)
+            {
+                currentChannelContainer.FadeOut(500, Easing.OutQuint);
+                loading.Show();
+
+                loaded = new DrawableChannel(channel);
+                loadedChannels.Add(loaded);
+                LoadComponentAsync(loaded, l =>
+                {
+                    loading.Hide();
+
+                    currentChannelContainer.Clear(false);
+                    currentChannelContainer.Add(loaded);
+                    currentChannelContainer.FadeIn(500, Easing.OutQuint);
+                });
+            }
+            else
+            {
+                currentChannelContainer.Clear(false);
+                Scheduler.Add(() => currentChannelContainer.Add(loaded));
+            }
         }
 
         private double startDragChatHeight;
         private bool isDragging;
-
-        public void OpenChannel(Channel channel) => addChannel(channel);
 
         protected override bool OnDragStart(DragStartEvent e)
         {
@@ -220,19 +277,6 @@ namespace osu.Game.Overlays
             return base.OnDragEnd(e);
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
-        {
-            switch (state)
-            {
-                case APIState.Online:
-                    initializeChannels();
-                    break;
-                default:
-                    messageRequest?.Cancel();
-                    break;
-            }
-        }
-
         public override bool AcceptsFocus => true;
 
         protected override void OnFocus(FocusEvent e)
@@ -261,11 +305,8 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api, OsuConfigManager config, OsuColour colours)
+        private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager)
         {
-            this.api = api;
-            api.Register(this);
-
             ChatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
             ChatHeight.ValueChanged += h =>
             {
@@ -276,267 +317,49 @@ namespace osu.Game.Overlays
             ChatHeight.TriggerChange();
 
             chatBackground.Colour = colours.ChatBlue;
-        }
 
-        private long lastMessageId;
-
-        private readonly List<Channel> careChannels = new List<Channel>();
-
-        private readonly List<DrawableChannel> loadedChannels = new List<DrawableChannel>();
-
-        private void initializeChannels()
-        {
             loading.Show();
 
-            messageRequest?.Cancel();
+            this.channelManager = channelManager;
+            channelManager.CurrentChannel.ValueChanged += currentChannelChanged;
+            channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
+            channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
 
-            ListChannelsRequest req = new ListChannelsRequest();
-            req.Success += delegate (List<Channel> channels)
-            {
-                AvailableChannels = channels;
-
-                Scheduler.Add(delegate
-                {
-                    //todo: decide how to handle default channels for a user now that they are saved server-side.
-                    addChannel(channels.Find(c => c.Name == @"#lazer"));
-                    addChannel(channels.Find(c => c.Name == @"#osu"));
-
-                    channelSelection.OnRequestJoin = addChannel;
-                    channelSelection.OnRequestLeave = removeChannel;
-                    channelSelection.Sections = new[]
-                    {
-                        new ChannelSection
-                        {
-                            Header = "All Channels",
-                            Channels = channels,
-                        },
-                    };
-                });
-
-                messageRequest = Scheduler.AddDelayed(fetchUpdates, 1000, true);
-            };
-
-            api.Queue(req);
+            //for the case that channelmanager was faster at fetching the channels than our attachment to CollectionChanged.
+            channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
+            joinedChannelsChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, channelManager.JoinedChannels));
         }
 
-        private Channel currentChannel;
-
-        protected Channel CurrentChannel
+        private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            get
+            channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (channelManager != null)
             {
-                return currentChannel;
+                channelManager.CurrentChannel.ValueChanged -= currentChannelChanged;
+                channelManager.JoinedChannels.CollectionChanged -= joinedChannelsChanged;
+                channelManager.AvailableChannels.CollectionChanged -= availableChannelsChanged;
             }
-
-            set
-            {
-                if (currentChannel == value) return;
-
-                if (value == null)
-                {
-                    currentChannel = null;
-                    textbox.Current.Disabled = true;
-                    currentChannelContainer.Clear(false);
-                    return;
-                }
-
-                currentChannel = value;
-
-                textbox.Current.Disabled = currentChannel.ReadOnly;
-                channelTabs.Current.Value = value;
-
-                var loaded = loadedChannels.Find(d => d.Channel == value);
-                if (loaded == null)
-                {
-                    currentChannelContainer.FadeOut(500, Easing.OutQuint);
-                    loading.Show();
-
-                    loaded = new DrawableChannel(currentChannel);
-                    loadedChannels.Add(loaded);
-                    LoadComponentAsync(loaded, l =>
-                    {
-                        if (currentChannel.MessagesLoaded)
-                            loading.Hide();
-
-                        currentChannelContainer.Clear(false);
-                        currentChannelContainer.Add(loaded);
-                        currentChannelContainer.FadeIn(500, Easing.OutQuint);
-                    });
-                }
-                else
-                {
-                    currentChannelContainer.Clear(false);
-                    currentChannelContainer.Add(loaded);
-                }
-            }
-        }
-
-        private void addChannel(Channel channel)
-        {
-            if (channel == null) return;
-
-            // ReSharper disable once AccessToModifiedClosure
-            var existing = careChannels.Find(c => c.Id == channel.Id);
-
-            if (existing != null)
-            {
-                // if we already have this channel loaded, we don't want to make a second one.
-                channel = existing;
-            }
-            else
-            {
-                careChannels.Add(channel);
-                channelTabs.AddItem(channel);
-
-                if (channel.Type == ChannelType.Public && !channel.Joined)
-                {
-                    var req = new JoinChannelRequest(channel, api.LocalUser);
-                    req.Success += () => addChannel(channel);
-                    req.Failure += ex => removeChannel(channel);
-                    api.Queue(req);
-                    return;
-                }
-            }
-
-            // let's fetch a small number of messages to bring us up-to-date with the backlog.
-            fetchInitialMessages(channel);
-
-            if (CurrentChannel == null)
-                CurrentChannel = channel;
-
-            channel.Joined.Value = true;
-        }
-
-        private void removeChannel(Channel channel)
-        {
-            if (channel == null) return;
-
-            if (channel == CurrentChannel) CurrentChannel = null;
-
-            careChannels.Remove(channel);
-            loadedChannels.Remove(loadedChannels.Find(c => c.Channel == channel));
-            channelTabs.RemoveItem(channel);
-
-            api.Queue(new LeaveChannelRequest(channel, api.LocalUser));
-            channel.Joined.Value = false;
-        }
-
-        private void fetchInitialMessages(Channel channel)
-        {
-            var req = new GetMessagesRequest(channel);
-            req.Success += messages =>
-            {
-                channel.AddNewMessages(messages.ToArray());
-                if (channel == currentChannel)
-                    loading.Hide();
-            };
-
-            api.Queue(req);
-        }
-
-        private void fetchUpdates()
-        {
-            if (fetchReq != null) return;
-
-            fetchReq = new GetUpdatesRequest(lastMessageId);
-
-            fetchReq.Success += updates =>
-            {
-                if (updates?.Presence != null)
-                {
-                    foreach (var channel in updates.Presence)
-                    {
-                        if (careChannels.Find(c => c.Id == channel.Id) == null)
-                        {
-                            channel.Joined.Value = true;
-                            addChannel(channel);
-                        }
-                    }
-
-                    foreach (var group in updates.Messages.GroupBy(m => m.ChannelId))
-                        careChannels.Find(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
-
-                    lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
-                }
-
-                fetchReq = null;
-            };
-
-            fetchReq.Failure += delegate
-            {
-                fetchReq = null;
-            };
-
-            api.Queue(fetchReq);
         }
 
         private void postMessage(TextBox textbox, bool newText)
         {
-            var postText = textbox.Text;
+            var text = textbox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
+            if (text[0] == '/')
+                channelManager.PostCommand(text.Substring(1));
+            else
+                channelManager.PostMessage(text);
 
             textbox.Text = string.Empty;
-
-            if (string.IsNullOrWhiteSpace(postText))
-                return;
-
-            var target = currentChannel;
-
-            if (target == null) return;
-
-            if (!api.IsLoggedIn)
-            {
-                target.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
-                return;
-            }
-
-            bool isAction = false;
-
-            if (postText[0] == '/')
-            {
-                string[] parameters = postText.Substring(1).Split(new[] { ' ' }, 2);
-                string command = parameters[0];
-                string content = parameters.Length == 2 ? parameters[1] : string.Empty;
-
-                switch (command)
-                {
-                    case "me":
-
-                        if (string.IsNullOrWhiteSpace(content))
-                        {
-                            currentChannel.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
-                            return;
-                        }
-
-                        isAction = true;
-                        postText = content;
-                        break;
-
-                    case "help":
-                        currentChannel.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
-                        return;
-
-                    default:
-                        currentChannel.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
-                        return;
-                }
-            }
-
-            var message = new LocalEchoMessage
-            {
-                Sender = api.LocalUser.Value,
-                Timestamp = DateTimeOffset.Now,
-                ChannelId = target.Id,
-                IsAction = isAction,
-                Content = postText
-            };
-
-            var req = new PostMessageRequest(message);
-
-            target.AddLocalEcho(message);
-            req.Failure += e => target.ReplaceMessage(message, null);
-            req.Success += m => target.ReplaceMessage(message, m);
-
-            api.Queue(req);
         }
 
         private class TabsArea : Container

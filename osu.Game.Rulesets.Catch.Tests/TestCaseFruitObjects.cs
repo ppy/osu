@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
 using osu.Game.Tests.Visual;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {

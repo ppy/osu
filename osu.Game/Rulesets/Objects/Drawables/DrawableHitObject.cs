@@ -7,7 +7,6 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.TypeExtensions;
-using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Game.Audio;
 using osu.Game.Graphics;
@@ -15,7 +14,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -145,7 +144,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public event Action<DrawableHitObject, ArmedState> ApplyCustomUpdateState;
 
         /// <summary>
-        /// Plays all the hitsounds for this <see cref="DrawableHitObject"/>.
+        /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
         /// </summary>
         public void PlaySamples() => Samples?.Play();
 
@@ -167,13 +166,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
             }
         }
 
-        public override bool UpdateSubTreeMasking(Drawable source, RectangleF maskingBounds)
-        {
-            if (!AllJudged)
-                return false;
-
-            return base.UpdateSubTreeMasking(source, maskingBounds);
-        }
+        protected override bool ComputeIsMaskedAway(RectangleF maskingBounds) => AllJudged && base.ComputeIsMaskedAway(maskingBounds);
 
         protected override void UpdateAfterChildren()
         {

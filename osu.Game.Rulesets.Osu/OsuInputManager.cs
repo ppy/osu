@@ -45,10 +45,10 @@ namespace osu.Game.Rulesets.Osu
 
     public enum OsuAction
     {
-        [Description("Left Button")]
+        [Description("Left button")]
         LeftButton,
 
-        [Description("Right Button")]
+        [Description("Right button")]
         RightButton
     }
 }

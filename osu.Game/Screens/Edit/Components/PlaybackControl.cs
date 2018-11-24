@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Edit.Components
                 new OsuSpriteText
                 {
                     Origin = Anchor.BottomLeft,
-                    Text = "Playback Speed",
+                    Text = "Playback speed",
                     RelativePositionAxes = Axes.Y,
                     Y = 0.5f,
                     Padding = new MarginPadding { Left = 45 }

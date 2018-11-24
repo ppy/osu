@@ -1,7 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
+using osuTK;
 using osu.Game.Beatmaps.Timing;
 
 namespace osu.Game.Beatmaps.ControlPoints
@@ -16,7 +16,7 @@ namespace osu.Game.Beatmaps.ControlPoints
         /// <summary>
         /// The beat length at this control point.
         /// </summary>
-        public double BeatLength
+        public virtual double BeatLength
         {
             get => beatLength;
             set => beatLength = MathHelper.Clamp(value, 6, 60000);

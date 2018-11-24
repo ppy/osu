@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -36,6 +36,11 @@ namespace osu.Game.Rulesets.Osu.Mods
         {
             var osuObject = (OsuHitObject)drawable.HitObject;
             Vector2 origin = drawable.Position;
+
+            // Wiggle the repeat points with the slider instead of independently.
+            // Also fixes an issue with repeat points being positioned incorrectly.
+            if (osuObject is RepeatPoint)
+                return;
 
             Random objRand = new Random((int)osuObject.StartTime);
 

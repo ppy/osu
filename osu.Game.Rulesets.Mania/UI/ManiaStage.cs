@@ -15,23 +15,22 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     /// <summary>
     /// A collection of <see cref="Column"/>s.
     /// </summary>
-    public class ManiaStage : ManiaScrollingPlayfield
+    public class ManiaStage : ScrollingPlayfield
     {
         public const float HIT_TARGET_POSITION = 50;
 
         public IReadOnlyList<Column> Columns => columnFlow.Children;
         private readonly FillFlowContainer<Column> columnFlow;
 
-        protected override Container<Drawable> Content => barLineContainer;
-        private readonly Container<Drawable> barLineContainer;
+        private readonly Container barLineContainer;
 
         public Container<DrawableManiaJudgement> Judgements => judgements;
         private readonly JudgementContainer<DrawableManiaJudgement> judgements;
@@ -105,6 +104,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                 Anchor = Anchor.TopCentre,
                                 Origin = Anchor.TopCentre,
                                 RelativeSizeAxes = Axes.Y,
+                                Child = HitObjectContainer
                             }
                         },
                         judgements = new JudgementContainer<DrawableManiaJudgement>
@@ -144,8 +144,6 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public void AddColumn(Column c)
         {
-            c.VisibleTimeRange.BindTo(VisibleTimeRange);
-
             topLevelContainer.Add(c.TopLevelContainer.CreateProxy());
             columnFlow.Add(c);
             AddNested(c);

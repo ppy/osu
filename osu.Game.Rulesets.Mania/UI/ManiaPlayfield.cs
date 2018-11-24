@@ -1,19 +1,19 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : ManiaScrollingPlayfield
+    public class ManiaPlayfield : ScrollingPlayfield
     {
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
 
@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
             if (stageDefinitions.Count <= 0)
                 throw new ArgumentException("Can't have zero or fewer stages.");
+
+            Size = new Vector2(1, 0.8f);
 
             GridContainer playfieldGrid;
             AddInternal(playfieldGrid = new GridContainer
@@ -38,7 +40,6 @@ namespace osu.Game.Rulesets.Mania.UI
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
                 var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
-                newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
 
                 playfieldGrid.Content[0][i] = newStage;
 
@@ -64,12 +65,6 @@ namespace osu.Game.Rulesets.Mania.UI
             }
 
             return null;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(ManiaConfigManager maniaConfig)
-        {
-            maniaConfig.BindWith(ManiaSetting.ScrollTime, VisibleTimeRange);
         }
     }
 }
