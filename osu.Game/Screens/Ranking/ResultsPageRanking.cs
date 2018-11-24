@@ -7,7 +7,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Ranking

@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {

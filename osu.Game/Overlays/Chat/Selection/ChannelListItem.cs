@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -15,7 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Chat;
 using osu.Game.Graphics.Containers;
 
-namespace osu.Game.Overlays.Chat
+namespace osu.Game.Overlays.Chat.Selection
 {
     public class ChannelListItem : OsuClickableContainer, IFilterable
     {

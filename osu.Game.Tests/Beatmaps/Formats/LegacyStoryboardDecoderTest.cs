@@ -4,7 +4,7 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Storyboards;
