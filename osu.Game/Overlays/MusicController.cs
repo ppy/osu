@@ -406,6 +406,10 @@ namespace osu.Game.Overlays
         {
             base.PopOut();
 
+            // This is here mostly as a performance fix.
+            // If the playlist is not hidden it will update children even when the music controller is hidden (due to AlwaysPresent).
+            playlist.State = Visibility.Hidden;
+
             this.FadeOut(transition_length, Easing.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);
         }
