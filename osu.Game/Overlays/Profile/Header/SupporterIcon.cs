@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {

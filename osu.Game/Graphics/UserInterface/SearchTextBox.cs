@@ -3,8 +3,8 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using OpenTK;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {

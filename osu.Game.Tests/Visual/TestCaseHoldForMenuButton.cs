@@ -7,31 +7,31 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Screens.Play.HUD;
-using OpenTK;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
     [Description("'Hold to Quit' UI element")]
-    public class TestCaseQuitButton : ManualInputManagerTestCase
+    public class TestCaseHoldForMenuButton : ManualInputManagerTestCase
     {
         private bool exitAction;
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            QuitButton quitButton;
+            HoldForMenuButton holdForMenuButton;
 
-            Add(quitButton = new QuitButton
+            Add(holdForMenuButton = new HoldForMenuButton
             {
                 Origin = Anchor.BottomRight,
                 Anchor = Anchor.BottomRight,
                 Action = () => exitAction = true
             });
 
-            var text = quitButton.Children.OfType<SpriteText>().First();
+            var text = holdForMenuButton.Children.OfType<SpriteText>().First();
 
-            AddStep("Trigger text fade in", () => InputManager.MoveMouseTo(quitButton));
+            AddStep("Trigger text fade in", () => InputManager.MoveMouseTo(holdForMenuButton));
             AddUntilStep(() => text.IsPresent && !exitAction, "Text visible");
             AddStep("Trigger text fade out", () => InputManager.MoveMouseTo(Vector2.One));
             AddUntilStep(() => !text.IsPresent && !exitAction, "Text is not visible");
@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual
             AddStep("Trigger exit action", () =>
             {
                 exitAction = false;
-                InputManager.MoveMouseTo(quitButton);
+                InputManager.MoveMouseTo(holdForMenuButton);
                 InputManager.PressButton(MouseButton.Left);
             });
 
@@ -47,7 +47,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("action not triggered", () => !exitAction);
 
             AddStep("Trigger exit action", () => InputManager.PressButton(MouseButton.Left));
-            AddUntilStep(() => exitAction, $"{nameof(quitButton.Action)} was triggered");
+            AddUntilStep(() => exitAction, $"{nameof(holdForMenuButton.Action)} was triggered");
         }
     }
 }

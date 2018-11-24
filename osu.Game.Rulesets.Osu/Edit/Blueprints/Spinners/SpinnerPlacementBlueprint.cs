@@ -37,6 +37,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
 
                 isPlacingEnd = true;
                 piece.FadeTo(1f, 150, Easing.OutQuint);
+
+                BeginPlacement();
             }
 
             return true;

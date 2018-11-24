@@ -5,8 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using OpenTK.Graphics;
-using osu.Framework.Allocation;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
@@ -55,15 +54,11 @@ namespace osu.Game.Overlays.Chat
             Channel.PendingMessageResolved += pendingMessageResolved;
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            newMessagesArrived(Channel.Messages);
-        }
-
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            newMessagesArrived(Channel.Messages);
             scrollToEnd();
         }
 
@@ -79,7 +74,7 @@ namespace osu.Game.Overlays.Chat
         private void newMessagesArrived(IEnumerable<Message> newMessages)
         {
             // Add up to last Channel.MAX_HISTORY messages
-            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MAX_HISTORY));
+            var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MaxHistory));
 
             flow.AddRange(displayMessages.Select(m => new ChatLine(m)));
 
@@ -89,7 +84,7 @@ namespace osu.Game.Overlays.Chat
                 scrollToEnd();
 
             var staleMessages = flow.Children.Where(c => c.LifetimeEnd == double.MaxValue).ToArray();
-            int count = staleMessages.Length - Channel.MAX_HISTORY;
+            int count = staleMessages.Length - Channel.MaxHistory;
 
             for (int i = 0; i < count; i++)
             {
