@@ -4,42 +4,150 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Objects
 {
-    public class SliderPath
+    public struct SliderPath : IEquatable<SliderPath>
     {
-        public double Distance;
+        /// <summary>
+        /// The user-set distance of the path. If non-null, <see cref="Distance"/> will match this value,
+        /// and the path will be shortened/lengthened to match this length.
+        /// </summary>
+        public readonly double? ExpectedDistance;
 
-        public Vector2[] ControlPoints;
+        /// <summary>
+        /// The type of path.
+        /// </summary>
+        public readonly PathType Type;
 
-        public PathType PathType = PathType.PerfectCurve;
+        [JsonProperty]
+        private Vector2[] controlPoints;
 
-        public Vector2 Offset;
+        private List<Vector2> calculatedPath;
+        private List<double> cumulativeLength;
 
-        private readonly List<Vector2> calculatedPath = new List<Vector2>();
-        private readonly List<double> cumulativeLength = new List<double>();
+        private bool isInitialised;
+
+        /// <summary>
+        /// Creates a new <see cref="SliderPath"/>.
+        /// </summary>
+        /// <param name="type">The type of path.</param>
+        /// <param name="controlPoints">The control points of the path.</param>
+        /// <param name="expectedDistance">A user-set distance of the path that may be shorter or longer than the true distance between all
+        /// <paramref name="controlPoints"/>. The path will be shortened/lengthened to match this length.
+        /// If null, the path will use the true distance between all <paramref name="controlPoints"/>.</param>
+        [JsonConstructor]
+        public SliderPath(PathType type, Vector2[] controlPoints, double? expectedDistance = null)
+        {
+            this = default;
+            this.controlPoints = controlPoints;
+
+            Type = type;
+            ExpectedDistance = expectedDistance;
+
+            ensureInitialised();
+        }
+
+        /// <summary>
+        /// The control points of the path.
+        /// </summary>
+        [JsonIgnore]
+        public ReadOnlySpan<Vector2> ControlPoints
+        {
+            get
+            {
+                ensureInitialised();
+                return controlPoints.AsSpan();
+            }
+        }
+
+        /// <summary>
+        /// The distance of the path after lengthening/shortening to account for <see cref="ExpectedDistance"/>.
+        /// </summary>
+        [JsonIgnore]
+        public double Distance
+        {
+            get
+            {
+                ensureInitialised();
+                return cumulativeLength.Count == 0 ? 0 : cumulativeLength[cumulativeLength.Count - 1];
+            }
+        }
+
+        /// <summary>
+        /// Computes the slider path until a given progress that ranges from 0 (beginning of the slider)
+        /// to 1 (end of the slider) and stores the generated path in the given list.
+        /// </summary>
+        /// <param name="path">The list to be filled with the computed path.</param>
+        /// <param name="p0">Start progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        /// <param name="p1">End progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
+        public void GetPathToProgress(List<Vector2> path, double p0, double p1)
+        {
+            ensureInitialised();
+
+            double d0 = progressToDistance(p0);
+            double d1 = progressToDistance(p1);
+
+            path.Clear();
+
+            int i = 0;
+            for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i)
+            {
+            }
+
+            path.Add(interpolateVertices(i, d0));
+
+            for (; i < calculatedPath.Count && cumulativeLength[i] <= d1; ++i)
+                path.Add(calculatedPath[i]);
+
+            path.Add(interpolateVertices(i, d1));
+        }
+
+        /// <summary>
+        /// Computes the position on the slider at a given progress that ranges from 0 (beginning of the path)
+        /// to 1 (end of the path).
+        /// </summary>
+        /// <param name="progress">Ranges from 0 (beginning of the path) to 1 (end of the path).</param>
+        /// <returns></returns>
+        public Vector2 PositionAt(double progress)
+        {
+            ensureInitialised();
+
+            double d = progressToDistance(progress);
+            return interpolateVertices(indexOfDistance(d), d);
+        }
+
+        private void ensureInitialised()
+        {
+            if (isInitialised)
+                return;
+            isInitialised = true;
+
+            controlPoints = controlPoints ?? Array.Empty<Vector2>();
+            calculatedPath = new List<Vector2>();
+            cumulativeLength = new List<double>();
+
+            calculatePath();
+            calculateCumulativeLength();
+        }
 
         private List<Vector2> calculateSubpath(ReadOnlySpan<Vector2> subControlPoints)
         {
-            switch (PathType)
+            switch (Type)
             {
                 case PathType.Linear:
-                    var result = new List<Vector2>(subControlPoints.Length);
-                    foreach (var c in subControlPoints)
-                        result.Add(c);
-
-                    return result;
+                    return PathApproximator.ApproximateLinear(subControlPoints);
                 case PathType.PerfectCurve:
                     //we can only use CircularArc iff we have exactly three control points and no dissection.
                     if (ControlPoints.Length != 3 || subControlPoints.Length != 3)
                         break;
 
                     // Here we have exactly 3 control points. Attempt to fit a circular arc.
-                    List<Vector2> subpath = new CircularArcApproximator(subControlPoints).CreateArc();
+                    List<Vector2> subpath = PathApproximator.ApproximateCircularArc(subControlPoints);
 
                     // If for some reason a circular arc could not be fit to the 3 given points, fall back to a numerically stable bezier approximation.
                     if (subpath.Count == 0)
@@ -47,10 +155,10 @@ namespace osu.Game.Rulesets.Objects
 
                     return subpath;
                 case PathType.Catmull:
-                    return new CatmullApproximator(subControlPoints).CreateCatmull();
+                    return PathApproximator.ApproximateCatmull(subControlPoints);
             }
 
-            return new BezierApproximator(subControlPoints).CreateBezier();
+            return PathApproximator.ApproximateBezier(subControlPoints);
         }
 
         private void calculatePath()
@@ -70,7 +178,7 @@ namespace osu.Game.Rulesets.Objects
 
                 if (i == ControlPoints.Length - 1 || ControlPoints[i] == ControlPoints[i + 1])
                 {
-                    ReadOnlySpan<Vector2> cpSpan = ControlPoints.AsSpan().Slice(start, end - start);
+                    ReadOnlySpan<Vector2> cpSpan = ControlPoints.Slice(start, end - start);
 
                     foreach (Vector2 t in calculateSubpath(cpSpan))
                         if (calculatedPath.Count == 0 || calculatedPath.Last() != t)
@@ -78,49 +186,6 @@ namespace osu.Game.Rulesets.Objects
 
                     start = end;
                 }
-            }
-        }
-
-        private void calculateCumulativeLengthAndTrimPath()
-        {
-            double l = 0;
-
-            cumulativeLength.Clear();
-            cumulativeLength.Add(l);
-
-            for (int i = 0; i < calculatedPath.Count - 1; ++i)
-            {
-                Vector2 diff = calculatedPath[i + 1] - calculatedPath[i];
-                double d = diff.Length;
-
-                // Shorten slider paths that are too long compared to what's
-                // in the .osu file.
-                if (Distance - l < d)
-                {
-                    calculatedPath[i + 1] = calculatedPath[i] + diff * (float)((Distance - l) / d);
-                    calculatedPath.RemoveRange(i + 2, calculatedPath.Count - 2 - i);
-
-                    l = Distance;
-                    cumulativeLength.Add(l);
-                    break;
-                }
-
-                l += d;
-                cumulativeLength.Add(l);
-            }
-
-            // Lengthen slider paths that are too short compared to what's
-            // in the .osu file.
-            if (l < Distance && calculatedPath.Count > 1)
-            {
-                Vector2 diff = calculatedPath[calculatedPath.Count - 1] - calculatedPath[calculatedPath.Count - 2];
-                double d = diff.Length;
-
-                if (d <= 0)
-                    return;
-
-                calculatedPath[calculatedPath.Count - 1] += diff * (float)((Distance - l) / d);
-                cumulativeLength[calculatedPath.Count - 1] = Distance;
             }
         }
 
@@ -136,21 +201,33 @@ namespace osu.Game.Rulesets.Objects
                 Vector2 diff = calculatedPath[i + 1] - calculatedPath[i];
                 double d = diff.Length;
 
+                // Shorted slider paths that are too long compared to the expected distance
+                if (ExpectedDistance.HasValue && ExpectedDistance - l < d)
+                {
+                    calculatedPath[i + 1] = calculatedPath[i] + diff * (float)((ExpectedDistance - l) / d);
+                    calculatedPath.RemoveRange(i + 2, calculatedPath.Count - 2 - i);
+
+                    l = ExpectedDistance.Value;
+                    cumulativeLength.Add(l);
+                    break;
+                }
+
                 l += d;
                 cumulativeLength.Add(l);
             }
 
-            Distance = l;
-        }
+            // Lengthen slider paths that are too short compared to the expected distance
+            if (ExpectedDistance.HasValue && l < ExpectedDistance && calculatedPath.Count > 1)
+            {
+                Vector2 diff = calculatedPath[calculatedPath.Count - 1] - calculatedPath[calculatedPath.Count - 2];
+                double d = diff.Length;
 
-        public void Calculate(bool updateDistance = false)
-        {
-            calculatePath();
+                if (d <= 0)
+                    return;
 
-            if (!updateDistance)
-                calculateCumulativeLengthAndTrimPath();
-            else
-                calculateCumulativeLength();
+                calculatedPath[calculatedPath.Count - 1] += diff * (float)((ExpectedDistance - l) / d);
+                cumulativeLength[calculatedPath.Count - 1] = ExpectedDistance.Value;
+            }
         }
 
         private int indexOfDistance(double d)
@@ -173,7 +250,7 @@ namespace osu.Game.Rulesets.Objects
 
             if (i <= 0)
                 return calculatedPath.First();
-            else if (i >= calculatedPath.Count)
+            if (i >= calculatedPath.Count)
                 return calculatedPath.Last();
 
             Vector2 p0 = calculatedPath[i - 1];
@@ -190,47 +267,20 @@ namespace osu.Game.Rulesets.Objects
             return p0 + (p1 - p0) * (float)w;
         }
 
-        /// <summary>
-        /// Computes the slider path until a given progress that ranges from 0 (beginning of the slider)
-        /// to 1 (end of the slider) and stores the generated path in the given list.
-        /// </summary>
-        /// <param name="path">The list to be filled with the computed path.</param>
-        /// <param name="p0">Start progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
-        /// <param name="p1">End progress. Ranges from 0 (beginning of the slider) to 1 (end of the slider).</param>
-        public void GetPathToProgress(List<Vector2> path, double p0, double p1)
+        public bool Equals(SliderPath other)
         {
-            if (calculatedPath.Count == 0 && ControlPoints.Length > 0)
-                Calculate();
+            if (ControlPoints == null && other.ControlPoints != null)
+                return false;
+            if (other.ControlPoints == null && ControlPoints != null)
+                return false;
 
-            double d0 = progressToDistance(p0);
-            double d1 = progressToDistance(p1);
-
-            path.Clear();
-
-            int i = 0;
-            for (; i < calculatedPath.Count && cumulativeLength[i] < d0; ++i) { }
-
-            path.Add(interpolateVertices(i, d0) + Offset);
-
-            for (; i < calculatedPath.Count && cumulativeLength[i] <= d1; ++i)
-                path.Add(calculatedPath[i] + Offset);
-
-            path.Add(interpolateVertices(i, d1) + Offset);
+            return ControlPoints.SequenceEqual(other.ControlPoints) && ExpectedDistance.Equals(other.ExpectedDistance) && Type == other.Type;
         }
 
-        /// <summary>
-        /// Computes the position on the slider at a given progress that ranges from 0 (beginning of the path)
-        /// to 1 (end of the path).
-        /// </summary>
-        /// <param name="progress">Ranges from 0 (beginning of the path) to 1 (end of the path).</param>
-        /// <returns></returns>
-        public Vector2 PositionAt(double progress)
+        public override bool Equals(object obj)
         {
-            if (calculatedPath.Count == 0 && ControlPoints.Length > 0)
-                Calculate();
-
-            double d = progressToDistance(progress);
-            return interpolateVertices(indexOfDistance(d), d) + Offset;
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is SliderPath other && Equals(other);
         }
     }
 }

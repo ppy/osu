@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK;
+using osuTK;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;

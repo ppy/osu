@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Taiko.Beatmaps
 
                 if (!isForCurrentRuleset && tickSpacing > 0 && osuDuration < 2 * speedAdjustedBeatLength)
                 {
-                    List<List<SampleInfo>> allSamples = curveData != null ? curveData.RepeatSamples : new List<List<SampleInfo>>(new[] { samples });
+                    List<List<SampleInfo>> allSamples = curveData != null ? curveData.NodeSamples : new List<List<SampleInfo>>(new[] { samples });
 
                     int i = 0;
                     for (double j = obj.StartTime; j <= obj.StartTime + taikoDuration + tickSpacing / 8; j += tickSpacing)

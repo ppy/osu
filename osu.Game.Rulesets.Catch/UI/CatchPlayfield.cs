@@ -5,13 +5,12 @@ using System;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -19,16 +18,10 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         public const float BASE_WIDTH = 512;
 
-        private readonly CatcherArea catcherArea;
-
-        protected override bool UserScrollSpeedAdjustment => false;
-
-        protected override SpeedChangeVisualisationMethod VisualisationMethod => SpeedChangeVisualisationMethod.Constant;
+        internal readonly CatcherArea CatcherArea;
 
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation)
         {
-            Direction.Value = ScrollingDirection.Down;
-
             Container explodingFruitContainer;
 
             Anchor = Anchor.TopCentre;
@@ -45,7 +38,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
-                    catcherArea = new CatcherArea(difficulty)
+                    CatcherArea = new CatcherArea(difficulty)
                     {
                         GetVisualRepresentation = getVisualRepresentation,
                         ExplodingFruitTarget = explodingFruitContainer,
@@ -55,11 +48,9 @@ namespace osu.Game.Rulesets.Catch.UI
                     HitObjectContainer
                 }
             };
-
-            VisibleTimeRange.Value = BeatmapDifficulty.DifficultyRange(difficulty.ApproachRate, 1800, 1200, 450);
         }
 
-        public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.AttemptCatch(obj);
+        public bool CheckIfWeCanCatch(CatchHitObject obj) => CatcherArea.AttemptCatch(obj);
 
         public override void Add(DrawableHitObject h)
         {
@@ -72,6 +63,6 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
-            => catcherArea.OnResult((DrawableCatchHitObject)judgedObject, result);
+            => CatcherArea.OnResult((DrawableCatchHitObject)judgedObject, result);
     }
 }

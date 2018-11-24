@@ -2,11 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK;
+using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
+using osu.Framework.Configuration;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -21,8 +22,6 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// Scoring distance with a speed-adjusted beat length of 1 second.
         /// </summary>
         private const float base_scoring_distance = 100;
-
-        public event Action<Vector2[]> ControlPointsChanged;
 
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
         public double Duration => EndTime - StartTime;
@@ -52,35 +51,15 @@ namespace osu.Game.Rulesets.Osu.Objects
             }
         }
 
-        public SliderPath Path { get; } = new SliderPath();
+        public readonly Bindable<SliderPath> PathBindable = new Bindable<SliderPath>();
 
-        public Vector2[] ControlPoints
+        public SliderPath Path
         {
-            get => Path.ControlPoints;
-            set
-            {
-                if (Path.ControlPoints == value)
-                    return;
-                Path.ControlPoints = value;
-
-                ControlPointsChanged?.Invoke(value);
-
-                if (TailCircle != null)
-                    TailCircle.Position = EndPosition;
-            }
+            get => PathBindable.Value;
+            set => PathBindable.Value = value;
         }
 
-        public PathType PathType
-        {
-            get { return Path.PathType; }
-            set { Path.PathType = value; }
-        }
-
-        public double Distance
-        {
-            get { return Path.Distance; }
-            set { Path.Distance = value; }
-        }
+        public double Distance => Path.Distance;
 
         public override Vector2 Position
         {
@@ -111,7 +90,8 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         internal float LazyTravelDistance;
 
-        public List<List<SampleInfo>> RepeatSamples { get; set; } = new List<List<SampleInfo>>();
+        public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
+
         public int RepeatCount { get; set; }
 
         /// <summary>
@@ -165,11 +145,11 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createSliderEnds()
         {
-            HeadCircle = new SliderCircle(this)
+            HeadCircle = new SliderCircle
             {
                 StartTime = StartTime,
                 Position = Position,
-                Samples = Samples,
+                Samples = getNodeSamples(0),
                 SampleControlPoint = SampleControlPoint,
                 IndexInCurrentCombo = IndexInCurrentCombo,
                 ComboIndex = ComboIndex,
@@ -249,9 +229,16 @@ namespace osu.Game.Rulesets.Osu.Objects
                     Position = Position + Path.PositionAt(repeat % 2),
                     StackHeight = StackHeight,
                     Scale = Scale,
-                    Samples = new List<SampleInfo>(RepeatSamples[repeatIndex])
+                    Samples = getNodeSamples(1 + repeatIndex)
                 });
             }
+        }
+
+        private List<SampleInfo> getNodeSamples(int nodeIndex)
+        {
+            if (nodeIndex < NodeSamples.Count)
+                return NodeSamples[nodeIndex];
+            return Samples;
         }
 
         public override Judgement CreateJudgement() => new OsuJudgement();

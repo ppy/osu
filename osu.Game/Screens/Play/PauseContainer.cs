@@ -9,8 +9,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
+using osuTK.Graphics;
 using osu.Game.Rulesets.UI;
-using OpenTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
