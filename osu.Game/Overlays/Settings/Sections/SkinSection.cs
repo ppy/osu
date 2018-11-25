@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.Settings.Sections
                 if (v == random_skin_info)
                     randomizeSkin();
                 else
-                    configBindable.Value = v.ID;
+                    configBindable.Value = v?.ID ?? 0;
             });
         }
 
