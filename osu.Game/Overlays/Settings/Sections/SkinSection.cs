@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -24,7 +26,12 @@ namespace osu.Game.Overlays.Settings.Sections
         private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo>();
         private readonly Bindable<int> configBindable = new Bindable<int>();
 
+        private static readonly SkinInfo randomSkinInfo = new RandomSkinInfo();
+
         private SkinManager skins;
+        private SkinInfo[] usableSkins;
+
+        private Random random = new Random();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, SkinManager skins)
@@ -59,15 +66,32 @@ namespace osu.Game.Overlays.Settings.Sections
 
             config.BindWith(OsuSetting.Skin, configBindable);
 
+            usableSkins = skins.GetAllUsableSkins().ToArray();
+
             skinDropdown.Bindable = dropdownBindable;
-            skinDropdown.Items = skins.GetAllUsableSkins().ToArray();
+            skinDropdown.Items = usableSkins.Concat(new[] { randomSkinInfo });
 
             // Todo: This should not be necessary when OsuConfigManager is databased
             if (skinDropdown.Items.All(s => s.ID != configBindable.Value))
                 configBindable.Value = 0;
 
             configBindable.BindValueChanged(v => dropdownBindable.Value = skinDropdown.Items.Single(s => s.ID == v), true);
-            dropdownBindable.BindValueChanged(v => configBindable.Value = v.ID);
+            dropdownBindable.BindValueChanged(v =>
+            {
+                if (v == randomSkinInfo)
+                    randomizeSkin();
+                else
+                    configBindable.Value = v.ID;
+            });
+        }
+
+        private void randomizeSkin()
+        {
+            int n = usableSkins.Count();
+            if (n > 1)
+                configBindable.Value = (configBindable.Value + random.Next(n - 1) + 1) % n; // make sure it's always a different one
+            else
+                configBindable.Value = 0;
         }
 
         private void itemRemoved(SkinInfo s) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != s.ID).ToArray());
@@ -97,6 +121,17 @@ namespace osu.Game.Overlays.Settings.Sections
             {
                 protected override string GenerateItemText(SkinInfo item) => item.ToString();
             }
+        }
+
+        private class RandomSkinInfo : SkinInfo
+        {
+            public RandomSkinInfo()
+            {
+                Name = "<Random Skin>";
+                ID = -1;
+            }
+
+            public override string ToString() => Name;
         }
     }
 }
