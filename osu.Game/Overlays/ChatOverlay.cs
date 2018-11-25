@@ -209,7 +209,6 @@ namespace osu.Game.Overlays
             {
                 textbox.Current.Disabled = true;
                 currentChannelContainer.Clear(false);
-                channelTabControl.Current.Value = null;
                 return;
             }
 
