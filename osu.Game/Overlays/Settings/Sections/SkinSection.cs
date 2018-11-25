@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -26,12 +25,12 @@ namespace osu.Game.Overlays.Settings.Sections
         private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo>();
         private readonly Bindable<int> configBindable = new Bindable<int>();
 
-        private static readonly SkinInfo randomSkinInfo = new RandomSkinInfo();
+        private static readonly SkinInfo random_skin_info = new RandomSkinInfo();
 
         private SkinManager skins;
         private SkinInfo[] usableSkins;
 
-        private Random random = new Random();
+        private readonly Random random = new Random();
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, SkinManager skins)
@@ -69,7 +68,7 @@ namespace osu.Game.Overlays.Settings.Sections
             usableSkins = skins.GetAllUsableSkins().ToArray();
 
             skinDropdown.Bindable = dropdownBindable;
-            skinDropdown.Items = usableSkins.Concat(new[] { randomSkinInfo });
+            skinDropdown.Items = usableSkins.Concat(new[] { random_skin_info });
 
             // Todo: This should not be necessary when OsuConfigManager is databased
             if (skinDropdown.Items.All(s => s.ID != configBindable.Value))
@@ -78,7 +77,7 @@ namespace osu.Game.Overlays.Settings.Sections
             configBindable.BindValueChanged(v => dropdownBindable.Value = skinDropdown.Items.Single(s => s.ID == v), true);
             dropdownBindable.BindValueChanged(v =>
             {
-                if (v == randomSkinInfo)
+                if (v == random_skin_info)
                     randomizeSkin();
                 else
                     configBindable.Value = v.ID;
@@ -87,7 +86,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void randomizeSkin()
         {
-            int n = usableSkins.Count();
+            int n = usableSkins.Length;
             if (n > 1)
                 configBindable.Value = (configBindable.Value + random.Next(n - 1) + 1) % n; // make sure it's always a different one
             else
