@@ -68,7 +68,10 @@ namespace osu.Game.Overlays.Settings.Sections
             usableSkins = skins.GetAllUsableSkins().ToArray();
 
             skinDropdown.Bindable = dropdownBindable;
-            skinDropdown.Items = usableSkins.Concat(new[] { random_skin_info });
+            if (usableSkins.Length > 1)
+                skinDropdown.Items = usableSkins.Concat(new[] { random_skin_info });
+            else
+                skinDropdown.Items = usableSkins;
 
             // Todo: This should not be necessary when OsuConfigManager is databased
             if (skinDropdown.Items.All(s => s.ID != configBindable.Value))
