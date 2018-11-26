@@ -7,7 +7,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play.HUD;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Visual
 {

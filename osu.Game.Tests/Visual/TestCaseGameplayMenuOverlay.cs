@@ -5,12 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using OpenTK.Input;
+using osuTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Screens.Play;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Visual
 {

@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Visual
 {

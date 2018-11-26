@@ -3,8 +3,8 @@
 
 using System.IO;
 using NUnit.Framework;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Tests.Resources;
 using System.Linq;
 using osu.Game.Audio;

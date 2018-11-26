@@ -13,7 +13,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Multi.Screens.Lounge;
 using osu.Game.Users;
-using OpenTK.Input;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
