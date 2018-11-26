@@ -12,7 +12,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
@@ -35,6 +35,8 @@ namespace osu.Game.Screens.Play
 {
     public class Player : ScreenWithBeatmapBackground, IProvideCursor
     {
+        protected override bool AllowBackButton => false; // handled by HoldForMenuButton
+
         protected override float BackgroundParallaxAmount => 0.1f;
 
         protected override bool HideOverlaysOnEnter => true;
@@ -370,7 +372,7 @@ namespace osu.Game.Screens.Play
             Content.FadeOut(fadeOutDuration);
         }
 
-        protected override bool OnScroll(InputState state) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
+        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
 
         private void initializeStoryboard(bool asyncLoad)
         {

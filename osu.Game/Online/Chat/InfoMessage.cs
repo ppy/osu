@@ -15,11 +15,7 @@ namespace osu.Game.Online.Chat
             Timestamp = DateTimeOffset.Now;
             Content = message;
 
-            Sender = new User
-            {
-                Username = @"system",
-                Colour = @"0000ff",
-            };
+            Sender = User.SYSTEM_USER;
         }
     }
 }

@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -24,7 +25,6 @@ using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -35,6 +35,8 @@ namespace osu.Game.Rulesets.Mania.UI
         public IEnumerable<BarLine> BarLines;
 
         protected new ManiaConfigManager Config => (ManiaConfigManager)base.Config;
+
+        private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
 
         public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -71,18 +73,11 @@ namespace osu.Game.Rulesets.Mania.UI
         private void load()
         {
             BarLines.ForEach(Playfield.Add);
-        }
 
-        private DependencyContainer dependencies;
+            Config.BindWith(ManiaSetting.ScrollDirection, configDirection);
+            configDirection.BindValueChanged(v => Direction.Value = (ScrollingDirection)v, true);
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
-            if (dependencies.Get<ManiaScrollingInfo>() == null)
-                dependencies.CacheAs<IScrollingInfo>(new ManiaScrollingInfo(Config));
-
-            return dependencies;
+            Config.BindWith(ManiaSetting.ScrollTime, TimeRange);
         }
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
@@ -97,7 +92,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
-        protected override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
+        public override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {
             switch (h)
             {
@@ -109,8 +104,6 @@ namespace osu.Game.Rulesets.Mania.UI
                     return null;
             }
         }
-
-        protected override Vector2 PlayfieldArea => new Vector2(1, 0.8f);
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
     }

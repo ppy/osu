@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -132,7 +132,7 @@ namespace osu.Game.Screens.Play
             public override string Header => "paused";
             public override string Description => "you're not going to do what i think you're going to do, are ya?";
 
-            protected override Action BackAction => () => InternalButtons.Children.First().TriggerOnClick();
+            protected override Action BackAction => () => InternalButtons.Children.First().Click();
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)

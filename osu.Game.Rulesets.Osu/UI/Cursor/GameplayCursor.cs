@@ -12,8 +12,8 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Skinning;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {
@@ -72,7 +72,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             return false;
         }
 
-        public override bool HandleMouseInput => true; // OverlayContainer will set this false when we go hidden, but we always want to receive input.
+        public override bool HandlePositionalInput => true; // OverlayContainer will set this false when we go hidden, but we always want to receive input.
 
         protected override void PopIn()
         {

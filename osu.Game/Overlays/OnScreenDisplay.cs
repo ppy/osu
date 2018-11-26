@@ -11,8 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
@@ -24,9 +24,6 @@ namespace osu.Game.Overlays
     public class OnScreenDisplay : Container
     {
         private readonly Container box;
-
-        public override bool HandleKeyboardInput => false;
-        public override bool HandleMouseInput => false;
 
         private readonly SpriteText textLine1;
         private readonly SpriteText textLine2;

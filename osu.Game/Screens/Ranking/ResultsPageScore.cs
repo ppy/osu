@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -13,7 +13,6 @@ using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -24,11 +23,13 @@ using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions;
+using osu.Framework.Localisation;
 
 namespace osu.Game.Screens.Ranking
 {
     public class ResultsPageScore : ResultsPage
     {
+        private Container scoreContainer;
         private ScoreCounter scoreCounter;
 
         public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap) { }
@@ -76,7 +77,7 @@ namespace osu.Game.Screens.Ranking
                             Size = new Vector2(150, 60),
                             Margin = new MarginPadding(20),
                         },
-                        new Container
+                        scoreContainer = new Container
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -92,8 +93,8 @@ namespace osu.Game.Screens.Ranking
                                 },
                                 scoreCounter = new SlowScoreCounter(6)
                                 {
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
                                     Colour = colours.PinkDarker,
                                     Y = 10,
                                     TextSize = 56,
@@ -183,6 +184,13 @@ namespace osu.Game.Screens.Ranking
                      .FadeIn(300 + delay, Easing.Out);
                 }
             });
+        }
+
+        protected override void UpdateAfterChildren()
+        {
+            base.UpdateAfterChildren();
+
+            scoreCounter.Scale = new Vector2(Math.Min(1f, (scoreContainer.DrawWidth - 20) / scoreCounter.DrawWidth));
         }
 
         private class DrawableScoreStatistic : Container
@@ -320,7 +328,7 @@ namespace osu.Game.Screens.Ranking
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuColour colours, LocalisationEngine localisation)
+            private void load(OsuColour colours)
             {
                 title.Colour = artist.Colour = colours.BlueDarker;
                 versionMapper.Colour = colours.Gray8;
@@ -333,8 +341,8 @@ namespace osu.Game.Screens.Ranking
                         versionMapper.Text = $"{beatmap.Version} - " + versionMapper.Text;
                 }
 
-                title.Current = localisation.GetUnicodePreference(beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title);
-                artist.Current = localisation.GetUnicodePreference(beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist);
+                title.Text = new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title));
+                artist.Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist));
             }
         }
 
@@ -368,7 +376,7 @@ namespace osu.Game.Screens.Ranking
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(LargeTextureStore textures)
             {
                 if (!string.IsNullOrEmpty(user.CoverUrl))
                     cover.Texture = textures.Get(user.CoverUrl);

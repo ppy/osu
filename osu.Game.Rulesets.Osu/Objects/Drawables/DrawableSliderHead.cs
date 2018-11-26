@@ -2,21 +2,35 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSliderHead : DrawableHitCircle
     {
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+        private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
+
         private readonly Slider slider;
 
         public DrawableSliderHead(Slider slider, HitCircle h)
             : base(h)
         {
             this.slider = slider;
+        }
 
-            Position = HitObject.Position - slider.Position;
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            positionBindable.BindTo(HitObject.PositionBindable);
+            pathBindable.BindTo(slider.PathBindable);
+
+            positionBindable.BindValueChanged(_ => updatePosition());
+            pathBindable.BindValueChanged(_ => updatePosition(), true);
         }
 
         protected override void Update()
@@ -33,5 +47,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public Action<double> OnShake;
 
         protected override void Shake(double maximumLength) => OnShake?.Invoke(maximumLength);
+
+        private void updatePosition() => Position = HitObject.Position - slider.Position;
     }
 }

@@ -3,12 +3,12 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using System;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
-using OpenTK.Graphics.ES30;
+using osuTK.Graphics.ES30;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Allocation;
@@ -29,10 +29,6 @@ namespace osu.Game.Graphics.Backgrounds
         /// Same behavior as Sprite's EdgeSmoothness.
         /// </summary>
         private const float edge_smoothness = 1;
-
-        public override bool HandleKeyboardInput => false;
-        public override bool HandleMouseInput => false;
-
 
         public Color4 ColourLight = Color4.White;
         public Color4 ColourDark = Color4.Black;

@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Online.Chat
 {
@@ -24,7 +24,7 @@ namespace osu.Game.Online.Chat
         /// </summary>
         public List<SpriteText> Parts;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Parts.Any(d => d.ReceiveMouseInputAt(screenSpacePos));
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
 
         protected override HoverClickSounds CreateHoverClickSounds(HoverSampleSet sampleSet) => new LinkHoverSounds(sampleSet, Parts);
 
@@ -53,7 +53,7 @@ namespace osu.Game.Online.Chat
                 this.parts = parts;
             }
 
-            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => parts.Any(d => d.ReceiveMouseInputAt(screenSpacePos));
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
         }
     }
 }

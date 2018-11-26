@@ -42,6 +42,8 @@ namespace osu.Game.Configuration
                 if (!val) Set(OsuSetting.SavePassword, false);
             };
 
+            Set(OsuSetting.ExternalLinkWarning, true);
+
             // Audio
             Set(OsuSetting.VolumeInactive, 0.25, 0, 1, 0.01);
 
@@ -82,8 +84,6 @@ namespace osu.Game.Configuration
             Set(OsuSetting.FloatingComments, false);
 
             Set(OsuSetting.ScoreDisplayMode, ScoringMode.Standardised);
-
-            Set(OsuSetting.SpeedChangeVisualisation, SpeedChangeVisualisationMethod.Sequential);
 
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
 
@@ -143,7 +143,6 @@ namespace osu.Game.Configuration
         ChatDisplayHeight,
         Version,
         ShowConvertedBeatmaps,
-        SpeedChangeVisualisation,
         Skin,
         ScreenshotFormat,
         ScreenshotCaptureMenuCursor,
@@ -151,6 +150,7 @@ namespace osu.Game.Configuration
         BeatmapSkins,
         BeatmapHitsounds,
         IncreaseFirstObjectVisibility,
-        ScoreDisplayMode
+        ScoreDisplayMode,
+        ExternalLinkWarning
     }
 }

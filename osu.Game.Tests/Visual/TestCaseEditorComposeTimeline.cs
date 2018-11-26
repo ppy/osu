@@ -6,15 +6,15 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Edit.Screens.Compose.Timeline;
-using OpenTK.Graphics;
+using osu.Game.Screens.Edit.Compose.Components.Timeline;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {

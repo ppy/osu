@@ -6,9 +6,9 @@ using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
@@ -35,6 +35,8 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             letterboxing = config.GetBindable<bool>(FrameworkSetting.Letterboxing);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
 
+            Container resolutionSettingsContainer;
+
             Children = new Drawable[]
             {
                 windowModeDropdown = new SettingsEnumDropdown<WindowMode>
@@ -42,12 +44,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Screen mode",
                     Bindable = config.GetBindable<WindowMode>(FrameworkSetting.WindowMode),
                 },
-                resolutionDropdown = new SettingsDropdown<Size>
+                resolutionSettingsContainer = new Container
                 {
-                    LabelText = "Resolution",
-                    ShowsDefaultIndicator = false,
-                    Items = getResolutions(),
-                    Bindable = sizeFullscreen
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y
                 },
                 new SettingsCheckbox
                 {
@@ -81,16 +81,29 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
             };
 
-            windowModeDropdown.Bindable.BindValueChanged(windowMode =>
+            var resolutions = getResolutions();
+
+            if (resolutions.Count > 1)
             {
-                if (windowMode == WindowMode.Fullscreen)
+                resolutionSettingsContainer.Child = resolutionDropdown = new ResolutionSettingsDropdown
                 {
-                    resolutionDropdown.Show();
-                    sizeFullscreen.TriggerChange();
-                }
-                else
-                    resolutionDropdown.Hide();
-            }, true);
+                    LabelText = "Resolution",
+                    ShowsDefaultIndicator = false,
+                    Items = resolutions,
+                    Bindable = sizeFullscreen
+                };
+
+                windowModeDropdown.Bindable.BindValueChanged(windowMode =>
+                {
+                    if (windowMode == WindowMode.Fullscreen)
+                    {
+                        resolutionDropdown.Show();
+                        sizeFullscreen.TriggerChange();
+                    }
+                    else
+                        resolutionDropdown.Hide();
+                }, true);
+            }
 
             letterboxing.BindValueChanged(isVisible =>
             {
@@ -102,18 +115,36 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }, true);
         }
 
-        private IEnumerable<KeyValuePair<string, Size>> getResolutions()
+        private IReadOnlyList<Size> getResolutions()
         {
-            var resolutions = new KeyValuePair<string, Size>("Default", new Size(9999, 9999)).Yield();
+            var resolutions = new List<Size> { new Size(9999, 9999) };
 
             if (game.Window != null)
-                resolutions = resolutions.Concat(game.Window.AvailableResolutions
-                                                     .Where(r => r.Width >= 800 && r.Height >= 600)
-                                                     .OrderByDescending(r => r.Width)
-                                                     .ThenByDescending(r => r.Height)
-                                                     .Select(res => new KeyValuePair<string, Size>($"{res.Width}x{res.Height}", new Size(res.Width, res.Height)))
-                                                     .Distinct()).ToList();
+            {
+                resolutions.AddRange(game.Window.AvailableResolutions
+                                         .Where(r => r.Width >= 800 && r.Height >= 600)
+                                         .OrderByDescending(r => r.Width)
+                                         .ThenByDescending(r => r.Height)
+                                         .Select(res => new Size(res.Width, res.Height))
+                                         .Distinct());
+            }
+
             return resolutions;
+        }
+
+        private class ResolutionSettingsDropdown : SettingsDropdown<Size>
+        {
+            protected override OsuDropdown<Size> CreateDropdown() => new ResolutionDropdownControl { Items = Items };
+
+            private class ResolutionDropdownControl : DropdownControl
+            {
+                protected override string GenerateItemText(Size item)
+                {
+                    if (item == new Size(9999, 9999))
+                        return "Default";
+                    return $"{item.Width}x{item.Height}";
+                }
+            }
         }
     }
 }
