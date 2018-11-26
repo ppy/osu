@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -135,6 +135,13 @@ namespace osu.Game.Rulesets.Mania.UI
             hitObject.OnNewResult += OnNewResult;
 
             HitObjectContainer.Add(hitObject);
+        }
+
+        public override void Remove(DrawableHitObject h)
+        {
+            h.OnNewResult -= OnNewResult;
+
+            HitObjectContainer.Remove(h);
         }
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)

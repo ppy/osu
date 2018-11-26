@@ -4,7 +4,7 @@
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.IO.Serialization.Converters
 {

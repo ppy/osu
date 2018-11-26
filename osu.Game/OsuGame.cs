@@ -14,7 +14,7 @@ using osu.Framework.Allocation;
 using osu.Game.Overlays.Toolbar;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
-using OpenTK;
+using osuTK;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,7 +35,7 @@ using osu.Game.Input.Bindings;
 using osu.Game.Online.Chat;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Game.Overlays.Volume;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
@@ -51,7 +51,9 @@ namespace osu.Game
     {
         public Toolbar Toolbar;
 
-        private ChatOverlay chat;
+        private ChatOverlay chatOverlay;
+
+        private ChannelManager channelManager;
 
         private MusicController musicController;
 
@@ -181,6 +183,9 @@ namespace osu.Game
 
             LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
         }
+
+        private ExternalLinkOpener externalLinkOpener;
+        public void OpenUrlExternally(string url) => externalLinkOpener.OpenUrlExternally(url);
 
         private ScheduledDelegate scoreLoad;
 
@@ -342,12 +347,8 @@ namespace osu.Game
             //overlay elements
             loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
             loadComponentSingleFile(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
-            loadComponentSingleFile(new ChannelManager(), channelManager =>
-            {
-                dependencies.Cache(channelManager);
-                AddInternal(channelManager);
-            });
-            loadComponentSingleFile(chat = new ChatOverlay { Depth = -1 }, mainContent.Add);
+            loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal);
+            loadComponentSingleFile(chatOverlay = new ChatOverlay { Depth = -1 }, mainContent.Add);
             loadComponentSingleFile(settings = new MainSettings
             {
                 GetToolbarHeight = () => ToolbarOffset,
@@ -381,12 +382,15 @@ namespace osu.Game
             dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
             dependencies.Cache(direct);
-            dependencies.Cache(chat);
+            dependencies.Cache(chatOverlay);
+            dependencies.Cache(channelManager);
             dependencies.Cache(userProfile);
             dependencies.Cache(musicController);
             dependencies.Cache(beatmapSetOverlay);
             dependencies.Cache(notifications);
             dependencies.Cache(dialogOverlay);
+
+            Add(externalLinkOpener = new ExternalLinkOpener());
 
             var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications };
             overlays.AddRange(singleDisplaySideOverlays);
@@ -414,7 +418,7 @@ namespace osu.Game
             }
 
             // ensure only one of these overlays are open at once.
-            var singleDisplayOverlays = new OverlayContainer[] { chat, social, direct };
+            var singleDisplayOverlays = new OverlayContainer[] { chatOverlay, social, direct };
             overlays.AddRange(singleDisplayOverlays);
 
             foreach (var overlay in singleDisplayOverlays)
@@ -539,7 +543,7 @@ namespace osu.Game
             switch (action)
             {
                 case GlobalAction.ToggleChat:
-                    chat.ToggleVisibility();
+                    chatOverlay.ToggleVisibility();
                     return true;
                 case GlobalAction.ToggleSocial:
                     social.ToggleVisibility();

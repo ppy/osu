@@ -15,7 +15,7 @@ using osu.Game.Tests.Visual;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public class TestCaseHoldNoteSelectionBlueprint : SelectionBlueprintTestCase
+    public class TestCaseHoldNoteSelectionBlueprint : ManiaSelectionBlueprintTestCase
     {
         private readonly DrawableHoldNote drawableObject;
 
