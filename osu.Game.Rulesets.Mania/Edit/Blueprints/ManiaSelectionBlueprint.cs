@@ -42,7 +42,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             Position = Parent.ToLocalSpace(HitObject.ToScreenSpace(Vector2.Zero));
         }
-        }
 
         public override void Show()
         {
@@ -54,5 +53,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             HitObject.AlwaysAlive = false;
             base.Hide();
+        }
     }
 }

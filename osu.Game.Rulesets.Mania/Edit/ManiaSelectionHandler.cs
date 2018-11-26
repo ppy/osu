@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Screens.Edit.Compose.Components;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
