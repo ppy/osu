@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osuTK;
@@ -14,6 +15,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public class ManiaSelectionBlueprint : SelectionBlueprint
     {
+        protected new DrawableManiaHitObject HitObject => (DrawableManiaHitObject)base.HitObject;
+
         protected IClock EditorClock { get; private set; }
 
         [Resolved]
@@ -59,6 +62,18 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 EditorClock.CurrentTime,
                 scrollingInfo.TimeRange.Value,
                 objectParent.DrawHeight);
+        }
+
+        public override void Show()
+        {
+            HitObject.AlwaysAlive = true;
+            base.Show();
+        }
+
+        public override void Hide()
+        {
+            HitObject.AlwaysAlive = false;
+            base.Hide();
         }
     }
 }
