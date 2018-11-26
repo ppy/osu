@@ -11,8 +11,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Screens.Match.Settings
 {
@@ -26,7 +26,6 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
 
-        private readonly Room room;
         private readonly Container content;
         private readonly OsuSpriteText typeLabel;
 
@@ -37,7 +36,6 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
 
         public RoomSettingsOverlay(Room room)
         {
-            this.room = room;
             Masking = true;
 
             Child = content = new Container

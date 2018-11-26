@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Testing.Input;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Screens.Match.Settings;
-using OpenTK.Input;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
