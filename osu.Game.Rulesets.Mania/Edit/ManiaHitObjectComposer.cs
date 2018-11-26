@@ -12,7 +12,7 @@ using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
