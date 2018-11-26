@@ -13,7 +13,7 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
