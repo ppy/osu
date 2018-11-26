@@ -52,6 +52,8 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override void Add(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Add(h);
 
+        public override void Remove(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Remove(h);
+
         public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
 
         private ManiaStage getStageByColumn(int column)
