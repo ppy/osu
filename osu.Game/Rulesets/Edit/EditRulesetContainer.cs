@@ -91,8 +91,8 @@ namespace osu.Game.Rulesets.Edit
             // Process the beatmap
             var processor = ruleset.CreateBeatmapProcessor(beatmap);
 
-            processor.PreProcess();
-            processor.PostProcess();
+            processor?.PreProcess();
+            processor?.PostProcess();
 
             // Remove visual representation
             var drawableObject = Playfield.AllHitObjects.Single(d => d.HitObject == hitObject);
