@@ -13,6 +13,7 @@ using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Input;
 
@@ -66,8 +67,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Handles the selected <see cref="DrawableHitObject"/>s being dragged.
         /// </summary>
+        /// <param name="blueprint">The <see cref="SelectionBlueprint"/> that received the drag event.</param>
         /// <param name="dragEvent">The drag event.</param>
-        public virtual void HandleDrag(DragEvent dragEvent)
+        public virtual void HandleDrag(SelectionBlueprint blueprint, DragEvent dragEvent)
         {
         }
 

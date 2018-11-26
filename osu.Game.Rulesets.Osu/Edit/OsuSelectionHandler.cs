@@ -3,6 +3,7 @@
 
 using System.Linq;
 using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Screens.Edit.Compose.Components;
 
@@ -10,10 +11,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 {
     public class OsuSelectionHandler : SelectionHandler
     {
-        public override void HandleDrag(DragEvent dragEvent)
+        public override void HandleDrag(SelectionBlueprint blueprint, DragEvent dragEvent)
         {
-            base.HandleDrag(dragEvent);
-
             foreach (var h in SelectedHitObjects.OfType<OsuHitObject>())
             {
                 if (h is Spinner)
@@ -24,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Edit
 
                 h.Position += dragEvent.Delta;
             }
+
+            base.HandleDrag(blueprint, dragEvent);
         }
     }
 }

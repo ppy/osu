@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
@@ -14,6 +15,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public class ManiaSelectionBlueprint : SelectionBlueprint
     {
+        public Vector2 ScreenSpaceMouseDownPosition { get; private set; }
+        public Vector2 MouseDownPosition { get; private set; }
+
         protected new DrawableManiaHitObject HitObject => (DrawableManiaHitObject)base.HitObject;
 
         protected IClock EditorClock { get; private set; }
@@ -41,6 +45,24 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             base.Update();
 
             Position = Parent.ToLocalSpace(HitObject.ToScreenSpace(Vector2.Zero));
+        }
+
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            ScreenSpaceMouseDownPosition = e.ScreenSpaceMousePosition;
+            MouseDownPosition = HitObject.ToLocalSpace(e.ScreenSpaceMousePosition);
+
+            return base.OnMouseDown(e);
+        }
+
+        protected override bool OnDrag(DragEvent e)
+        {
+            var result = base.OnDrag(e);
+
+            ScreenSpaceMouseDownPosition = e.ScreenSpaceMousePosition;
+            MouseDownPosition = HitObject.ToLocalSpace(e.ScreenSpaceMousePosition);
+
+            return result;
         }
 
         public override void Show()
