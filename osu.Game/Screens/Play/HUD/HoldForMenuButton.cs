@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Play.HUD
 
         public Action Action
         {
-            get => button.Action;
             set => button.Action = value;
         }
 

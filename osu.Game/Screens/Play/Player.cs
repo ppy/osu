@@ -221,7 +221,7 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            hudOverlay.HoldToQuit.Action = Exit;
+            pauseContainer.HoldToQuit.Action = Exit;
             hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
