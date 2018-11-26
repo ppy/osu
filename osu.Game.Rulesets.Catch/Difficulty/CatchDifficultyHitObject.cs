@@ -4,7 +4,7 @@
 using System;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {

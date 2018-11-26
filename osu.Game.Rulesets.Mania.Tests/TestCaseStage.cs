@@ -14,7 +14,8 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
+using osu.Game.Tests.Visual;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
@@ -122,7 +123,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         {
             var specialAction = ManiaAction.Special1;
 
-            var stage = new ManiaStage(0, new StageDefinition { Columns = 2 }, ref action, ref specialAction) { VisibleTimeRange = { Value = 2000 } };
+            var stage = new ManiaStage(0, new StageDefinition { Columns = 2 }, ref action, ref specialAction);
             stages.Add(stage);
 
             return new ScrollingTestContainer(direction)
@@ -131,6 +132,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
+                TimeRange = 2000,
                 Child = stage
             };
         }

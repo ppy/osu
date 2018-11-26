@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK.Input;
+using osuTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -16,7 +16,6 @@ using osu.Game.Graphics;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Edit;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
@@ -68,7 +67,7 @@ namespace osu.Game.Screens.Select
             BeatmapOptions.AddButton(@"Edit", @"beatmap", FontAwesome.fa_pencil, colours.Yellow, () =>
             {
                 ValidForResume = false;
-                Push(new Editor());
+                Edit();
             }, Key.Number3);
 
             if (dialogOverlay != null)

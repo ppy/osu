@@ -7,7 +7,7 @@ using System.IO;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected string StripComments(string line)
         {
-            var index = line.IndexOf("//", StringComparison.Ordinal);
+            var index = line.AsSpan().IndexOf("//".AsSpan());
             if (index > 0)
                 return line.Substring(0, index);
             return line;
