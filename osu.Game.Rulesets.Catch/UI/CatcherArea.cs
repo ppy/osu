@@ -18,16 +18,16 @@ using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatcherArea : Container
     {
-        public const float CATCHER_SIZE = 84;
+        public const float CATCHER_SIZE = 100;
 
-        protected readonly Catcher MovableCatcher;
+        protected internal readonly Catcher MovableCatcher;
 
         public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> GetVisualRepresentation;
 
@@ -106,6 +106,11 @@ namespace osu.Game.Rulesets.Catch.UI
         public bool OnReleased(CatchAction action) => false;
 
         public bool AttemptCatch(CatchHitObject obj) => MovableCatcher.AttemptCatch(obj);
+
+        public static float GetCatcherSize(BeatmapDifficulty difficulty)
+        {
+            return CATCHER_SIZE / CatchPlayfield.BASE_WIDTH * (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
+        }
 
         public class Catcher : Container, IKeyBindingHandler<CatchAction>
         {

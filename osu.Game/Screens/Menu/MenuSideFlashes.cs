@@ -1,7 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
@@ -19,9 +19,6 @@ namespace osu.Game.Screens.Menu
 {
     public class MenuSideFlashes : BeatSyncedContainer
     {
-        public override bool HandleKeyboardInput => false;
-        public override bool HandleMouseInput => false;
-
         private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         private Box leftBox;

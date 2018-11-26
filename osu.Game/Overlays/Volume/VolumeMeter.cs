@@ -11,12 +11,12 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Volume
 {
@@ -228,32 +228,36 @@ namespace osu.Game.Overlays.Volume
         public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
 
         // because volume precision is set to 0.01, this local is required to keep track of more precise adjustments and only apply when possible.
-        private double adjustAccumulator;
+        private double scrollAccumulation;
 
         private void adjust(double delta, bool isPrecise)
         {
-            adjustAccumulator += delta * adjust_step * (isPrecise ? 0.1 : 1);
-            if (Math.Abs(adjustAccumulator) < Bindable.Precision)
-                return;
-            Volume += adjustAccumulator;
-            adjustAccumulator = 0;
+            scrollAccumulation += delta * adjust_step * (isPrecise ? 0.1 : 1);
+
+            var precision = Bindable.Precision;
+
+            while (Math.Abs(scrollAccumulation) > precision)
+            {
+                Volume += Math.Sign(scrollAccumulation) * precision;
+                scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
+            }
         }
 
-        protected override bool OnScroll(InputState state)
+        protected override bool OnScroll(ScrollEvent e)
         {
-            adjust(state.Mouse.ScrollDelta.Y, state.Mouse.HasPreciseScroll);
+            adjust(e.ScrollDelta.Y, e.IsPrecise);
             return true;
         }
 
         private const float transition_length = 500;
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             this.ScaleTo(1.04f, transition_length, Easing.OutExpo);
             return false;
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             this.ScaleTo(1f, transition_length, Easing.OutExpo);
         }

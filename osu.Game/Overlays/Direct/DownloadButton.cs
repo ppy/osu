@@ -8,7 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Direct
 {

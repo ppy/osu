@@ -59,7 +59,7 @@ namespace osu.Game.Database
         // ReSharper disable once NotAccessedField.Local (we should keep a reference to this so it is not finalised)
         private ArchiveImportIPCChannel ipc;
 
-        private readonly List<Action> cachedEvents = new List<Action>();
+        private readonly List<Action> queuedEvents = new List<Action>();
 
         /// <summary>
         /// Allows delaying of outwards events until an operation is confirmed (at a database level).
@@ -77,20 +77,27 @@ namespace osu.Game.Database
         /// <param name="perform">Whether the flushed events should be performed.</param>
         private void flushEvents(bool perform)
         {
+            Action[] events;
+            lock (queuedEvents)
+            {
+                events = queuedEvents.ToArray();
+                queuedEvents.Clear();
+            }
+
             if (perform)
             {
-                foreach (var a in cachedEvents)
+                foreach (var a in events)
                     a.Invoke();
             }
 
-            cachedEvents.Clear();
             delayingEvents = false;
         }
 
         private void handleEvent(Action a)
         {
             if (delayingEvents)
-                cachedEvents.Add(a);
+                lock (queuedEvents)
+                    queuedEvents.Add(a);
             else
                 a.Invoke();
         }
@@ -275,17 +282,19 @@ namespace osu.Game.Database
         /// Is a no-op for already deleted items.
         /// </summary>
         /// <param name="item">The item to delete.</param>
-        public void Delete(TModel item)
+        /// <returns>false if no operation was performed</returns>
+        public bool Delete(TModel item)
         {
             using (ContextFactory.GetForWrite())
             {
                 // re-fetch the model on the import context.
-                var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).First(s => s.ID == item.ID);
+                var foundModel = queryModel().Include(s => s.Files).ThenInclude(f => f.FileInfo).FirstOrDefault(s => s.ID == item.ID);
 
-                if (foundModel.DeletePending) return;
+                if (foundModel == null || foundModel.DeletePending) return false;
 
                 if (ModelStore.Delete(foundModel))
                     Files.Dereference(foundModel.Files.Select(f => f.FileInfo).ToArray());
+                return true;
             }
         }
 
@@ -395,7 +404,7 @@ namespace osu.Game.Database
                 using (Stream s = reader.GetStream(file))
                     fileInfos.Add(new TFileModel
                     {
-                        Filename = FileSafety.PathSanitise(file),
+                        Filename = FileSafety.PathStandardise(file),
                         FileInfo = files.Add(s)
                     });
 
@@ -429,6 +438,13 @@ namespace osu.Game.Database
             if (stable == null)
             {
                 Logger.Log("No osu!stable installation available!", LoggingTarget.Information, LogLevel.Error);
+                return Task.CompletedTask;
+            }
+
+            if (!stable.ExistsDirectory(ImportFromStablePath))
+            {
+                // This handles situations like when the user does not have a Skins folder
+                Logger.Log($"No {ImportFromStablePath} folder available in osu!stable installation", LoggingTarget.Information, LogLevel.Error);
                 return Task.CompletedTask;
             }
 

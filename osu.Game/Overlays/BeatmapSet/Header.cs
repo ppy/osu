@@ -13,8 +13,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.BeatmapSet.Buttons;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -230,10 +230,12 @@ namespace osu.Game.Overlays.BeatmapSet
                             Spacing = new Vector2(10),
                             Children = new Drawable[]
                             {
-                                onlineStatusPill = new BeatmapSetOnlineStatusPill(14, new MarginPadding { Horizontal = 25, Vertical = 8 })
+                                onlineStatusPill = new BeatmapSetOnlineStatusPill
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
+                                    TextSize = 14,
+                                    TextPadding = new MarginPadding { Horizontal = 25, Vertical = 8 }
                                 },
                                 Details = new Details(),
                             },

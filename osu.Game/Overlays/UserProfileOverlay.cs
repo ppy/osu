@@ -16,8 +16,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -77,9 +77,11 @@ namespace osu.Game.Overlays
 
         public void ShowUser(User user, bool fetchOnline = true)
         {
+            if (user == User.SYSTEM_USER) return;
+
             Show();
 
-            if (user.Id == Header?.User.Id)
+            if (user.Id == Header?.User?.Id)
                 return;
 
             userReq?.Cancel();

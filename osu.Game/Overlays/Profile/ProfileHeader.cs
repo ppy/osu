@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -386,10 +386,13 @@ namespace osu.Game.Overlays.Profile
                 infoTextLeft.AddText(new DrawableJoinDate(user.JoinDate), boldItalic);
             }
 
-            infoTextLeft.NewLine();
-            infoTextLeft.AddText("Last seen ", lightText);
-            infoTextLeft.AddText(new DrawableDate(user.LastVisit), boldItalic);
-            infoTextLeft.NewParagraph();
+            if (user.LastVisit.HasValue)
+            {
+                infoTextLeft.NewLine();
+                infoTextLeft.AddText("Last seen ", lightText);
+                infoTextLeft.AddText(new DrawableDate(user.LastVisit.Value), boldItalic);
+                infoTextLeft.NewParagraph();
+            }
 
             if (user.PlayStyle?.Length > 0)
             {

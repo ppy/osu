@@ -5,7 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {

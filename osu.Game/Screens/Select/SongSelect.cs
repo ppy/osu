@@ -3,8 +3,8 @@
 
 using System;
 using System.Linq;
-using OpenTK;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -13,8 +13,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -205,7 +204,7 @@ namespace osu.Game.Screens.Select
                 Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
                 Footer.AddButton(@"options", colours.Blue, BeatmapOptions, Key.F3);
 
-                BeatmapOptions.AddButton(@"Delete", @"Beatmap", FontAwesome.fa_trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
+                BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.fa_trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
             }
 
             if (this.beatmaps == null)
@@ -224,9 +223,9 @@ namespace osu.Game.Screens.Select
             Carousel.LoadBeatmapSetsFromManager(this.beatmaps);
         }
 
-        public void Edit(BeatmapInfo beatmap)
+        public void Edit(BeatmapInfo beatmap = null)
         {
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
             Push(new Editor());
         }
 
@@ -351,7 +350,7 @@ namespace osu.Game.Screens.Select
                     }
                 }
 
-                ensurePlayingSelected(preview);
+                if (IsCurrentScreen) ensurePlayingSelected(preview);
                 UpdateBeatmap(Beatmap.Value);
             }
 
@@ -536,7 +535,7 @@ namespace osu.Game.Screens.Select
 
         private void delete(BeatmapSetInfo beatmap)
         {
-            if (beatmap == null) return;
+            if (beatmap == null || beatmap.ID <= 0) return;
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
@@ -554,14 +553,14 @@ namespace osu.Game.Screens.Select
             return base.OnPressed(action);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (args.Repeat) return false;
+            if (e.Repeat) return false;
 
-            switch (args.Key)
+            switch (e.Key)
             {
                 case Key.Delete:
-                    if (state.Keyboard.ShiftPressed)
+                    if (e.ShiftPressed)
                     {
                         if (!Beatmap.IsDefault)
                             delete(Beatmap.Value.BeatmapSetInfo);
@@ -571,7 +570,7 @@ namespace osu.Game.Screens.Select
                     break;
             }
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
         private class ResetScrollContainer : Container
@@ -583,10 +582,10 @@ namespace osu.Game.Screens.Select
                 this.onHoverAction = onHoverAction;
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 onHoverAction?.Invoke();
-                return base.OnHover(state);
+                return base.OnHover(e);
             }
         }
     }

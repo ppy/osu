@@ -9,10 +9,10 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using OpenTK;
+using osuTK;
 using osu.Game.Graphics.Containers;
 using System.Linq;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -93,16 +93,16 @@ namespace osu.Game.Screens.Play.HUD
 
         private void contract() => iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             expand();
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             contract();
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
     }
 }

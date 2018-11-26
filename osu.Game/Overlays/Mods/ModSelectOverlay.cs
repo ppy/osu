@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Mods
         protected readonly OsuSpriteText MultiplierLabel, UnrankedLabel;
         private readonly FillFlowContainer footerContainer;
 
-        protected override bool BlockPassThroughKeyboard => false;
+        protected override bool BlockNonPositionalInput => false;
 
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
