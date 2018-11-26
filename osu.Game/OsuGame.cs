@@ -319,7 +319,7 @@ namespace osu.Game
                 },
                 mainContent = new Container { RelativeSizeAxes = Axes.Both },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
-                idleTracker = new IdleTracker(6000) { RelativeSizeAxes = Axes.Both }
+                idleTracker = new IdleTracker(6000)
             });
 
             loadComponentSingleFile(screenStack = new Loader(), d =>
