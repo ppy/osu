@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
-    public class TestCaseNoteSelectionBlueprint : SelectionBlueprintTestCase
+    public class TestCaseNoteSelectionBlueprint : ManiaSelectionBlueprintTestCase
     {
         private readonly DrawableNote drawableObject;
 
