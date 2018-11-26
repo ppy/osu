@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -181,28 +180,6 @@ namespace osu.Game.Overlays
             channelSelection.OnRequestLeave = channel => channelManager.LeaveChannel(channel);
         }
 
-        private void joinedChannelsChanged(object sender, NotifyCollectionChangedEventArgs args)
-        {
-            switch (args.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    foreach (Channel newChannel in args.NewItems)
-                    {
-                        channelTabControl.AddChannel(newChannel);
-                    }
-
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                    foreach (Channel removedChannel in args.OldItems)
-                    {
-                        channelTabControl.RemoveChannel(removedChannel);
-                        loadedChannels.Remove(loadedChannels.Find(c => c.Channel == removedChannel));
-                    }
-
-                    break;
-            }
-        }
-
         private void currentChannelChanged(Channel channel)
         {
             if (channel == null)
@@ -322,18 +299,34 @@ namespace osu.Game.Overlays
 
             this.channelManager = channelManager;
             channelManager.CurrentChannel.ValueChanged += currentChannelChanged;
-            channelManager.JoinedChannels.CollectionChanged += joinedChannelsChanged;
-            channelManager.AvailableChannels.CollectionChanged += availableChannelsChanged;
+            channelManager.JoinedChannels.ItemsAdded += onChannelAddedToJoinedChannels;
+            channelManager.JoinedChannels.ItemsRemoved += onChannelRemovedFromJoinedChannels;
+            channelManager.AvailableChannels.ItemsAdded += availableChannelsChanged;
+            channelManager.AvailableChannels.ItemsRemoved += availableChannelsChanged;
 
             //for the case that channelmanager was faster at fetching the channels than our attachment to CollectionChanged.
             channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
-            joinedChannelsChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, channelManager.JoinedChannels));
+            foreach (Channel channel in channelManager.JoinedChannels)
+                channelTabControl.AddChannel(channel);
         }
 
-        private void availableChannelsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void onChannelAddedToJoinedChannels(IEnumerable<Channel> channels)
         {
-            channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
+            foreach (Channel channel in channels)
+                channelTabControl.AddChannel(channel);
         }
+
+        private void onChannelRemovedFromJoinedChannels(IEnumerable<Channel> channels)
+        {
+            foreach (Channel channel in channels)
+            {
+                channelTabControl.RemoveChannel(channel);
+                loadedChannels.Remove(loadedChannels.Find(c => c.Channel == channel));
+            }
+        }
+
+        private void availableChannelsChanged(IEnumerable<Channel> channels)
+            => channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
 
         protected override void Dispose(bool isDisposing)
         {
@@ -342,8 +335,10 @@ namespace osu.Game.Overlays
             if (channelManager != null)
             {
                 channelManager.CurrentChannel.ValueChanged -= currentChannelChanged;
-                channelManager.JoinedChannels.CollectionChanged -= joinedChannelsChanged;
-                channelManager.AvailableChannels.CollectionChanged -= availableChannelsChanged;
+                channelManager.JoinedChannels.ItemsAdded -= onChannelAddedToJoinedChannels;
+                channelManager.JoinedChannels.ItemsRemoved -= onChannelRemovedFromJoinedChannels;
+                channelManager.AvailableChannels.ItemsAdded -= availableChannelsChanged;
+                channelManager.AvailableChannels.ItemsRemoved -= availableChannelsChanged;
             }
         }
 
