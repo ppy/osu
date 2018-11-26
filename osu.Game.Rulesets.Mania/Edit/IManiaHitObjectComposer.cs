@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Rulesets.Mania.UI;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
 {
