@@ -6,12 +6,12 @@ using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Screens.Match.Settings
 {
@@ -79,16 +79,16 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                 selection.Colour = colours.GreenLight;
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 hover.FadeTo(0.05f, transition_duration, Easing.OutQuint);
-                return base.OnHover(state);
+                return base.OnHover(e);
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 hover.FadeOut(transition_duration, Easing.OutQuint);
-                base.OnHoverLost(state);
+                base.OnHoverLost(e);
             }
 
             protected override void OnActivated()
