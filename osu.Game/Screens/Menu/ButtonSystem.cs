@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Menu
     {
         public event Action<ButtonSystemState> StateChanged;
 
-        private readonly BindableBool isIdle = new BindableBool();
+        private readonly IBindable<bool> isIdle = new BindableBool();
 
         public Action OnEdit;
         public Action OnExit;
