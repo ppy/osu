@@ -181,6 +181,9 @@ namespace osu.Game
             LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
         }
 
+        private ExternalLinkOpener externalLinkOpener;
+        public void OpenUrlExternally(string url) => externalLinkOpener.OpenUrlExternally(url);
+
         private ScheduledDelegate scoreLoad;
 
         /// <summary>
@@ -381,6 +384,8 @@ namespace osu.Game
             dependencies.Cache(beatmapSetOverlay);
             dependencies.Cache(notifications);
             dependencies.Cache(dialogOverlay);
+
+            Add(externalLinkOpener = new ExternalLinkOpener());
 
             var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications };
             overlays.AddRange(singleDisplaySideOverlays);
