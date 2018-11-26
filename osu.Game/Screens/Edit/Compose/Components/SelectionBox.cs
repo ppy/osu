@@ -12,8 +12,8 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
-using OpenTK;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {

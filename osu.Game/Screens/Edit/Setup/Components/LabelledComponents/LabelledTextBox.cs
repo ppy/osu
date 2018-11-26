@@ -9,7 +9,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
 {

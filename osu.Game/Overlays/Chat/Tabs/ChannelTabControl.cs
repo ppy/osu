@@ -6,7 +6,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
-using OpenTK;
+using osuTK;
 using osu.Framework.Configuration;
 using System;
 using System.Linq;
@@ -56,12 +56,10 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             switch (value.Type)
             {
-                case ChannelType.Public:
+                default:
                     return new ChannelTabItem(value) { OnRequestClose = tabCloseRequested };
                 case ChannelType.PM:
                     return new PrivateChannelTabItem(value) { OnRequestClose = tabCloseRequested };
-                default:
-                    throw new InvalidOperationException("Only TargetType User and Channel are supported.");
             }
         }
 

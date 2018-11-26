@@ -15,8 +15,8 @@ using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -155,6 +155,15 @@ namespace osu.Game.Rulesets.Mania.UI
             int columnIndex = maniaObject.Column - firstColumnIndex;
             Columns.ElementAt(columnIndex).Add(h);
             h.OnNewResult += OnNewResult;
+        }
+
+        public override void Remove(DrawableHitObject h)
+        {
+            var maniaObject = (ManiaHitObject)h.HitObject;
+            int columnIndex = maniaObject.Column - firstColumnIndex;
+            Columns.ElementAt(columnIndex).Remove(h);
+
+            h.OnNewResult -= OnNewResult;
         }
 
         public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));

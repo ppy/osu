@@ -9,8 +9,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Catch.Objects.Drawable.Pieces;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
@@ -40,7 +40,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         private void load()
         {
             // todo: this should come from the skin.
-            AccentColour = colourForRrepesentation(HitObject.VisualRepresentation);
+            AccentColour = colourForRepresentation(HitObject.VisualRepresentation);
 
             InternalChildren = new[]
             {
@@ -275,7 +275,7 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             border.Alpha = (float)MathHelper.Clamp((HitObject.StartTime - Time.Current) / 500, 0, 1);
         }
 
-        private Color4 colourForRrepesentation(FruitVisualRepresentation representation)
+        private Color4 colourForRepresentation(FruitVisualRepresentation representation)
         {
             switch (representation)
             {

@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Volume;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
