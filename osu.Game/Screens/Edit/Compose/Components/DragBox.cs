@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {

@@ -11,7 +11,7 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Tests.Visual;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {

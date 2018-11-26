@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Scoring;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens.Play.Break
 {

@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
