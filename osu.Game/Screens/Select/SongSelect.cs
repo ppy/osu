@@ -3,8 +3,8 @@
 
 using System;
 using System.Linq;
-using OpenTK;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -223,9 +223,9 @@ namespace osu.Game.Screens.Select
             Carousel.LoadBeatmapSetsFromManager(this.beatmaps);
         }
 
-        public void Edit(BeatmapInfo beatmap)
+        public void Edit(BeatmapInfo beatmap = null)
         {
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
             Push(new Editor());
         }
 
@@ -350,7 +350,7 @@ namespace osu.Game.Screens.Select
                     }
                 }
 
-                ensurePlayingSelected(preview);
+                if (IsCurrentScreen) ensurePlayingSelected(preview);
                 UpdateBeatmap(Beatmap.Value);
             }
 

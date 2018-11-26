@@ -19,7 +19,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual;
-using OpenTK;
+using osuTK;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Tests

@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
 using osu.Game.Screens.Backgrounds;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens.Play
 {

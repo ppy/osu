@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -310,9 +310,9 @@ namespace osu.Game.Screens.Select.Leaderboards
             currentPlaceholder = placeholder;
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             var fadeStart = scrollContainer.Current + scrollContainer.DrawHeight;
 

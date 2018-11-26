@@ -15,7 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Users;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
@@ -74,7 +74,7 @@ namespace osu.Game.Overlays.Profile.Header
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.X,
-                    Height = 75,
+                    Height = 60,
                     Y = -secondary_textsize,
                     Alpha = 0,
                 }

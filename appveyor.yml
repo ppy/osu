@@ -1,22 +1,8 @@
 clone_depth: 1
 version: '{branch}-{build}'
 image: Visual Studio 2017
-configuration: Debug
-cache:
-  - C:\ProgramData\chocolatey\bin -> appveyor.yml
-  - C:\ProgramData\chocolatey\lib -> appveyor.yml
+test: off
 install:
   - cmd: git submodule update --init --recursive --depth=5
-  - cmd: choco install resharper-clt -y
-  - cmd: choco install nvika -y
-  - cmd: dotnet tool install CodeFileSanity --version 0.0.16 --global
-before_build:
-  - cmd: CodeFileSanity
-  - cmd: nuget restore -verbosity quiet
-build:
-  project: osu.sln
-  parallel: true
-  verbosity: minimal
-after_build:
-  - cmd: inspectcode --o="inspectcodereport.xml" --projects:osu.Game* --caches-home="inspectcode" osu.sln > NUL
-  - cmd: NVika parsereport "inspectcodereport.xml" --treatwarningsaserrors
+build_script:
+  - cmd: PowerShell -Version 2.0 .\build.ps1

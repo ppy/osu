@@ -4,7 +4,7 @@
 using System;
 using System.Linq;
 using osu.Game.Rulesets.Osu.Objects;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
 {
@@ -75,15 +75,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             {
                 computeSliderCursorPosition(lastSlider);
                 lastCursorPosition = lastSlider.LazyEndPosition ?? lastCursorPosition;
+
+                TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
             }
 
             // Don't need to jump to reach spinners
             if (!(BaseObject is Spinner))
                 JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
-
-            // Todo: BUG!!! Last slider's travel distance is considered ONLY IF we ourselves are also a slider!
-            if (BaseObject is Slider)
-                TravelDistance = (lastSlider?.LazyTravelDistance ?? 0) * scalingFactor;
         }
 
         private void setTimingValues()
@@ -110,7 +108,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                     progress = progress % 1;
 
                 // ReSharper disable once PossibleInvalidOperationException (bugged in current r# version)
-                var diff = slider.StackedPosition + slider.Curve.PositionAt(progress) - slider.LazyEndPosition.Value;
+                var diff = slider.StackedPosition + slider.Path.PositionAt(progress) - slider.LazyEndPosition.Value;
                 float dist = diff.Length;
 
                 if (dist > approxFollowCircleRadius)

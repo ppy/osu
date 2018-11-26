@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Caching;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;

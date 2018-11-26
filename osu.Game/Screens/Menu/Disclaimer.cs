@@ -6,8 +6,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Menu
