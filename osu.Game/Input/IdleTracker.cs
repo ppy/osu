@@ -32,6 +32,7 @@ namespace osu.Game.Input
         public IdleTracker(double timeToIdle)
         {
             this.timeToIdle = timeToIdle;
+            RelativeSizeAxes = Axes.Both;
         }
 
         protected override void Update()
