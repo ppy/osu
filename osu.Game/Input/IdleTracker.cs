@@ -34,12 +34,6 @@ namespace osu.Game.Input
             this.timeToIdle = timeToIdle;
         }
 
-        private bool updateLastInteractionTime()
-        {
-            lastInteractionTime = Clock.CurrentTime;
-            return false;
-        }
-
         protected override void Update()
         {
             base.Update();
@@ -63,6 +57,12 @@ namespace osu.Game.Input
                 default:
                     return base.Handle(e);
             }
+        }
+
+        private bool updateLastInteractionTime()
+        {
+            lastInteractionTime = Clock.CurrentTime;
+            return false;
         }
     }
 }
