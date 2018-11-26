@@ -228,15 +228,19 @@ namespace osu.Game.Overlays.Volume
         public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
 
         // because volume precision is set to 0.01, this local is required to keep track of more precise adjustments and only apply when possible.
-        private double adjustAccumulator;
+        private double scrollAccumulation;
 
         private void adjust(double delta, bool isPrecise)
         {
-            adjustAccumulator += delta * adjust_step * (isPrecise ? 0.1 : 1);
-            if (Math.Abs(adjustAccumulator) < Bindable.Precision)
-                return;
-            Volume += adjustAccumulator;
-            adjustAccumulator = 0;
+            scrollAccumulation += delta * adjust_step * (isPrecise ? 0.1 : 1);
+
+            var precision = Bindable.Precision;
+
+            while (Math.Abs(scrollAccumulation) > precision)
+            {
+                Volume += Math.Sign(scrollAccumulation) * precision;
+                scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
+            }
         }
 
         protected override bool OnScroll(ScrollEvent e)
