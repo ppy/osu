@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Menu
             this.game = game;
 
             isIdle.ValueChanged += updateIdleState;
-            isIdle.BindTo(idleTracker.IsIdle);
+            if (idleTracker != null) isIdle.BindTo(idleTracker.IsIdle);
 
             sampleBack = audio.Sample.Get(@"Menu/button-back-select");
         }
