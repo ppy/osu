@@ -4,7 +4,7 @@
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
 {

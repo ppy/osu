@@ -6,11 +6,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
 
@@ -35,6 +36,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly Color4 baseColour = OsuColour.FromHex(@"002c3c");
         private readonly Color4 fillColour = OsuColour.FromHex(@"005b7c");
+
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
 
         private Color4 normalColour;
         private Color4 completeColour;
@@ -112,8 +115,23 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Alpha = 0
                 }
             };
+        }
 
-            s.PositionChanged += _ => Position = s.Position;
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            normalColour = baseColour;
+
+            Background.AccentColour = normalColour;
+
+            completeColour = colours.YellowLight.Opacity(0.75f);
+
+            Disc.AccentColour = fillColour;
+            circle.Colour = colours.BlueDark;
+            glow.Colour = colours.BlueDark;
+
+            positionBindable.BindValueChanged(v => Position = v);
+            positionBindable.BindTo(HitObject.PositionBindable);
         }
 
         public float Progress => MathHelper.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
@@ -151,20 +169,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 else if (Time.Current >= Spinner.EndTime)
                     r.Type = HitResult.Miss;
             });
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            normalColour = baseColour;
-
-            Background.AccentColour = normalColour;
-
-            completeColour = colours.YellowLight.Opacity(0.75f);
-
-            Disc.AccentColour = fillColour;
-            circle.Colour = colours.BlueDark;
-            glow.Colour = colours.BlueDark;
         }
 
         protected override void Update()

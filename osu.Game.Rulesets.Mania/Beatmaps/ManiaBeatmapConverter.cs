@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
-using OpenTK;
+using osuTK;
 using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps

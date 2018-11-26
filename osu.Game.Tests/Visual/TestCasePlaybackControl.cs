@@ -8,7 +8,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit.Components;
 using osu.Game.Tests.Beatmaps;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Visual
 {

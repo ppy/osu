@@ -15,8 +15,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input;
-using OpenTK.Graphics;
-using OpenTK.Input;
+using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Overlays.KeyBinding
 {
