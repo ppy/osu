@@ -7,7 +7,7 @@ using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens.Edit
 {

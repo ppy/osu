@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using OpenTK;
+using osuTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI;

@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Game.Graphics.UserInterface;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Visual
 {

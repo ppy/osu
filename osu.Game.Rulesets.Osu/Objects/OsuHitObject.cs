@@ -4,7 +4,7 @@
 using osu.Framework.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
-using OpenTK;
+using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.ControlPoints;
 

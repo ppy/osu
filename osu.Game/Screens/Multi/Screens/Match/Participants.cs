@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Users;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens.Multi.Screens.Match
 {
