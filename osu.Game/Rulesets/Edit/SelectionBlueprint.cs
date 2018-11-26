@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Invoked when this <see cref="SelectionBlueprint"/> has requested drag.
         /// </summary>
-        public event Action<DragEvent> DragRequested;
+        public event Action<SelectionBlueprint, DragEvent> DragRequested;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="SelectionBlueprint"/> applies to.
@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnDrag(DragEvent e)
         {
-            DragRequested?.Invoke(e);
+            DragRequested?.Invoke(this, e);
             return true;
         }
 

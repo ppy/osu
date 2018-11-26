@@ -5,6 +5,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
+using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
@@ -29,11 +31,42 @@ namespace osu.Game.Rulesets.Mania.Edit
             editorClock = clock;
         }
 
-        public override void HandleDrag(DragEvent dragEvent)
+        public override void HandleDrag(SelectionBlueprint blueprint, DragEvent dragEvent)
         {
-            foreach (var blueprint in SelectedBlueprints)
+            adjustOrigins((ManiaSelectionBlueprint)blueprint);
+            performDragMovement(dragEvent);
+            performColumnMovement(dragEvent);
+
+            base.HandleDrag(blueprint, dragEvent);
+        }
+
+        /// <summary>
+        /// Ensures that the position of hitobjects remains centred to the mouse position.
+        /// E.g. The hitobject position will change if the editor scrolls while a hitobject is dragged.
+        /// </summary>
+        /// <param name="reference">The <see cref="ManiaSelectionBlueprint"/> that received the drag event.</param>
+        private void adjustOrigins(ManiaSelectionBlueprint reference)
+        {
+            var referenceParent = (HitObjectContainer)reference.HitObject.Parent;
+
+            float offsetFromReferenceOrigin = reference.MouseDownPosition.Y - reference.HitObject.OriginPosition.Y;
+            float targetPosition = referenceParent.ToLocalSpace(reference.ScreenSpaceMouseDownPosition).Y - offsetFromReferenceOrigin;
+
+            // Flip the vertical coordinate space when scrolling downwards
+            if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
+                targetPosition = targetPosition - referenceParent.DrawHeight;
+
+            float movementDelta = targetPosition - reference.HitObject.Position.Y;
+
+            foreach (var b in SelectedBlueprints.OfType<ManiaSelectionBlueprint>())
+                b.HitObject.Y += movementDelta;
+        }
+
+        private void performDragMovement(DragEvent dragEvent)
+        {
+            foreach (var b in SelectedBlueprints)
             {
-                var hitObject = blueprint.HitObject;
+                var hitObject = b.HitObject;
 
                 var objectParent = (HitObjectContainer)hitObject.Parent;
 
@@ -59,11 +92,9 @@ namespace osu.Game.Rulesets.Mania.Edit
 
                 objectParent.Add(hitObject);
             }
-
-            adjustColumn(dragEvent);
         }
 
-        private void adjustColumn(DragEvent dragEvent)
+        private void performColumnMovement(DragEvent dragEvent)
         {
             var lastColumn = composer.ColumnAt(dragEvent.ScreenSpaceLastMousePosition);
             var currentColumn = composer.ColumnAt(dragEvent.ScreenSpaceMousePosition);

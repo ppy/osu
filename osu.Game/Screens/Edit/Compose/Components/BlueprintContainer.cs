@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionHandler.HandleSelectionRequested(blueprint, state);
 
-        private void onDragRequested(DragEvent dragEvent) => selectionHandler.HandleDrag(dragEvent);
+        private void onDragRequested(SelectionBlueprint blueprint, DragEvent dragEvent) => selectionHandler.HandleDrag(blueprint, dragEvent);
 
         private class SelectionBlueprintContainer : Container<SelectionBlueprint>
         {
