@@ -16,6 +16,9 @@ namespace osu.Game.Scoring
         }
 
         protected override IQueryable<ScoreInfo> AddIncludesForConsumption(IQueryable<ScoreInfo> query)
-            => base.AddIncludesForConsumption(query).Include(s => s.Files).ThenInclude(f => f.FileInfo);
+            => base.AddIncludesForConsumption(query)
+                   .Include(s => s.Files).ThenInclude(f => f.FileInfo)
+                   .Include(s => s.BeatmapInfo)
+                   .Include(s => s.Ruleset);
     }
 }

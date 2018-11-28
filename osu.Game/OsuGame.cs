@@ -267,7 +267,9 @@ namespace osu.Game
                 return;
             }
 
-            if (scoreInfo.BeatmapInfo == null)
+            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == scoreInfo.BeatmapInfo.ID);
+
+            if (databasedBeatmap == null)
             {
                 notifications.Post(new SimpleNotification
                 {
@@ -279,7 +281,7 @@ namespace osu.Game
 
             ruleset.Value = scoreInfo.Ruleset;
 
-            Beatmap.Value = BeatmapManager.GetWorkingBeatmap(scoreInfo.BeatmapInfo);
+            Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
             Beatmap.Value.Mods.Value = scoreInfo.Mods;
 
             menu.Push(new PlayerLoader(new ReplayPlayer(ScoreManager.GetScore(scoreInfo).Replay)));
