@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
-using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -39,22 +38,27 @@ namespace osu.Game.Scoring
 
         public RulesetInfo Ruleset { get; set; }
 
-        [NotMapped]
-        [JsonIgnore]
-        public Mod[] Mods { get; set; } = { };
+        [NotMapped, JsonIgnore]
+        public Mod[] Mods
+        {
+            get
+            {
+                var deserialized = JsonConvert.DeserializeObject<string[]>(modsString);
+                return Ruleset.CreateInstance().GetAllMods().Where(mod => deserialized.Any(d => d == mod.ShortenedName)).ToArray();
+            }
+            set => modsString = JsonConvert.SerializeObject(value.Select(m => m.ShortenedName).ToArray());
+        }
+
+        [NotMapped, JsonIgnore]
+        private string modsString;
 
         public string ModsString
         {
-            get => JsonConvert.SerializeObject(Mods);
-            set
-            {
-                var deserialized = JsonConvert.DeserializeObject<SerializableMod[]>(value);
-                Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => deserialized.Any(d => d.ShortenedName == mod.ShortenedName)).ToArray();
-            }
+            get => modsString;
+            set => modsString = value;
         }
 
-        [NotMapped]
-        [JsonIgnore]
+        [NotMapped, JsonIgnore]
         public User User;
 
         public string UserString
@@ -82,15 +86,5 @@ namespace osu.Game.Scoring
         public List<ScoreFileInfo> Files { get; set; }
 
         public bool DeletePending { get; set; }
-
-        [UsedImplicitly]
-        private class SerializableMod : Mod
-        {
-            public override string Name => ShortenedName;
-
-            public override string ShortenedName { get; } = string.Empty;
-
-            public override double ScoreMultiplier => 0;
-        }
     }
 }
