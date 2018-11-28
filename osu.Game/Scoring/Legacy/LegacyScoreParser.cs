@@ -34,7 +34,7 @@ namespace osu.Game.Scoring.Legacy
                 var version = sr.ReadInt32();
 
                 currentBeatmap = GetBeatmap(sr.ReadString()).Beatmap;
-                score.Beatmap = currentBeatmap.BeatmapInfo;
+                score.BeatmapInfo = currentBeatmap.BeatmapInfo;
 
                 score.User = new User { Username = sr.ReadString() };
                 score.MD5Hash = sr.ReadString();

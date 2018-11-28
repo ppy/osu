@@ -275,7 +275,7 @@ namespace osu.Game.Screens.Play
 
                     var score = new Score
                     {
-                        Beatmap = Beatmap.Value.BeatmapInfo,
+                        BeatmapInfo = Beatmap.Value.BeatmapInfo,
                         Ruleset = ruleset
                     };
                     ScoreProcessor.PopulateScore(score);

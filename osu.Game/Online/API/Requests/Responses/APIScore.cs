@@ -58,7 +58,7 @@ namespace osu.Game.Online.API.Requests.Responses
         [JsonProperty(@"beatmap")]
         private BeatmapInfo beatmap
         {
-            set => Beatmap = value;
+            set => BeatmapInfo = value;
         }
 
         [JsonProperty(@"beatmapset")]
@@ -67,10 +67,10 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 // extract the set ID to its correct place.
-                Beatmap.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = value.ID };
+                BeatmapInfo.BeatmapSet = new BeatmapSetInfo { OnlineBeatmapSetID = value.ID };
                 value.ID = 0;
 
-                Beatmap.Metadata = value;
+                BeatmapInfo.Metadata = value;
             }
         }
 
@@ -110,7 +110,7 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public void ApplyBeatmap(BeatmapInfo beatmap)
         {
-            Beatmap = beatmap;
+            BeatmapInfo = beatmap;
             ApplyRuleset(beatmap.Ruleset);
         }
 
