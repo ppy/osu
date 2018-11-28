@@ -28,7 +28,7 @@ namespace osu.Game.Database
         public DbSet<FileInfo> FileInfo { get; set; }
         public DbSet<RulesetInfo> RulesetInfo { get; set; }
         public DbSet<SkinInfo> SkinInfo { get; set; }
-        public DbSet<Score> ScoreInfo { get; set; }
+        public DbSet<ScoreInfo> ScoreInfo { get; set; }
 
         private readonly string connectionString;
 

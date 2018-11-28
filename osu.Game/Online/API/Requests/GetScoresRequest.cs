@@ -33,7 +33,7 @@ namespace osu.Game.Online.API.Requests
 
         private void onSuccess(APIScores r)
         {
-            foreach (APIScore score in r.Scores)
+            foreach (APIScoreInfo score in r.Scores)
                 score.ApplyBeatmap(beatmap);
         }
 

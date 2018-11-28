@@ -14,7 +14,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIScore : Score
+    public class APIScoreInfo : ScoreInfo
     {
         [JsonProperty(@"score")]
         private double totalScore

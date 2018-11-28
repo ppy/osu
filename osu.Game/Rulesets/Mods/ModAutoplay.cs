@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModAutoplay<T> : ModAutoplay, IApplicableToRulesetContainer<T>
         where T : HitObject
     {
-        protected virtual Score CreateReplayScore(Beatmap<T> beatmap) => new Score { Replay = new Replay() };
+        protected virtual ScoreInfo CreateReplayScore(Beatmap<T> beatmap) => new ScoreInfo { Replay = new Replay() };
 
         public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
 

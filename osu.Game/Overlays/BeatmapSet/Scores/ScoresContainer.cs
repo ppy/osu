@@ -29,10 +29,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             set => loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
         }
 
-        private IEnumerable<APIScore> scores;
+        private IEnumerable<APIScoreInfo> scores;
         private BeatmapInfo beatmap;
 
-        public IEnumerable<APIScore> Scores
+        public IEnumerable<APIScoreInfo> Scores
         {
             get { return scores; }
             set
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 return;
             }
 
-            topScore.Score = scores.FirstOrDefault();
+            topScore.ScoreInfo = scores.FirstOrDefault();
             topScore.Show();
 
             flow.Clear();

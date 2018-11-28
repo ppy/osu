@@ -13,8 +13,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     {
         private readonly double? weight;
 
-        public DrawablePerformanceScore(Score score, double? weight = null)
-            : base(score)
+        public DrawablePerformanceScore(ScoreInfo scoreInfo, double? weight = null)
+            : base(scoreInfo)
         {
             this.weight = weight;
         }
@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         [BackgroundDependencyLoader]
         private void load(OsuColour colour)
         {
-            double pp = Score.PP ?? 0;
+            double pp = ScoreInfo.PP ?? 0;
             RightFlowContainer.Add(new OsuSpriteText
             {
                 Text = $"{pp:0}pp",

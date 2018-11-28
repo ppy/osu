@@ -23,18 +23,18 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public TaikoPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
-            : base(ruleset, beatmap, score)
+        public TaikoPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo scoreInfo)
+            : base(ruleset, beatmap, scoreInfo)
         {
         }
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
-            mods = Score.Mods;
-            countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
-            countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
-            countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
-            countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
+            mods = ScoreInfo.Mods;
+            countGreat = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Great]);
+            countGood = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Good]);
+            countMeh = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Meh]);
+            countMiss = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Miss]);
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))
@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             // Combo scaling
             if (Attributes.MaxCombo > 0)
-                strainValue *= Math.Min(Math.Pow(Score.MaxCombo, 0.5) / Math.Pow(Attributes.MaxCombo, 0.5), 1.0);
+                strainValue *= Math.Min(Math.Pow(ScoreInfo.MaxCombo, 0.5) / Math.Pow(Attributes.MaxCombo, 0.5), 1.0);
 
             if (mods.Any(m => m is ModHidden))
                 strainValue *= 1.025;
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 strainValue *= 1.05 * lengthBonus;
 
             // Scale the speed value with accuracy _slightly_
-            return strainValue * Score.Accuracy;
+            return strainValue * ScoreInfo.Accuracy;
         }
 
         private double computeAccuracyValue()
@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accValue = Math.Pow(150.0 / Attributes.GreatHitWindow, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
+            double accValue = Math.Pow(150.0 / Attributes.GreatHitWindow, 1.1) * Math.Pow(ScoreInfo.Accuracy, 15) * 22.0;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             return accValue * Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));

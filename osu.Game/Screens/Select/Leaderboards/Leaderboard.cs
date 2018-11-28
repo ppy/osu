@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
-        public Action<Score> ScoreSelected;
+        public Action<ScoreInfo> ScoreSelected;
 
         private readonly LoadingAnimation loading;
 
@@ -42,9 +42,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private bool scoresLoadedOnce;
 
-        private IEnumerable<Score> scores;
+        private IEnumerable<ScoreInfo> scores;
 
-        public IEnumerable<Score> Scores
+        public IEnumerable<ScoreInfo> Scores
         {
             get { return scores; }
             set

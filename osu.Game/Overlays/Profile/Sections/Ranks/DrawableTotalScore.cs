@@ -10,8 +10,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
     public class DrawableTotalScore : DrawableProfileScore
     {
-        public DrawableTotalScore(Score score)
-            : base(score)
+        public DrawableTotalScore(ScoreInfo scoreInfo)
+            : base(scoreInfo)
         {
         }
 
@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         {
             RightFlowContainer.Add(new OsuSpriteText
             {
-                Text = Score.TotalScore.ToString("#,###"),
+                Text = ScoreInfo.TotalScore.ToString("#,###"),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 TextSize = 18,

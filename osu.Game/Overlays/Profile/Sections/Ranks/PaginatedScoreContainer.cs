@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
                 MissingText.Hide();
 
-                foreach (APIScore score in scores)
+                foreach (APIScoreInfo score in scores)
                 {
                     DrawableProfileScore drawableScore;
 

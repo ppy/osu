@@ -273,7 +273,7 @@ namespace osu.Game.Screens.Play
                 {
                     if (!IsCurrentScreen) return;
 
-                    var score = new Score
+                    var score = new ScoreInfo
                     {
                         BeatmapInfo = Beatmap.Value.BeatmapInfo,
                         Ruleset = ruleset
