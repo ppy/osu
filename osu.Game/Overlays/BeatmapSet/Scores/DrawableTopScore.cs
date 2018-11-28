@@ -16,6 +16,7 @@ using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 

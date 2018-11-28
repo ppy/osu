@@ -20,6 +20,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Rulesets.Osu.Difficulty;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Osu
 {

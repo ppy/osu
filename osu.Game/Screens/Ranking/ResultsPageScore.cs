@@ -24,6 +24,7 @@ using osu.Game.Users;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions;
 using osu.Framework.Localisation;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking
 {

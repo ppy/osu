@@ -37,6 +37,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 using osu.Game.Overlays.Volume;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;

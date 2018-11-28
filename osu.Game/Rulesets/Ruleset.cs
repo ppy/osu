@@ -18,6 +18,7 @@ using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets
 {

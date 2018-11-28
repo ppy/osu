@@ -13,6 +13,7 @@ using osuTK;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual
 {

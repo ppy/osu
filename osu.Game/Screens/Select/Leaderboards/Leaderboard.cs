@@ -14,12 +14,12 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using System.Linq;
 using osu.Framework.Configuration;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {

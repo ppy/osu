@@ -9,7 +9,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 using osu.Game.Rulesets.Replays;
 
-namespace osu.Game.Rulesets.Scoring
+namespace osu.Game.Scoring
 {
     public class Score
     {

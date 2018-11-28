@@ -6,6 +6,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
+using osu.Game.Scoring;
 using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Taiko.Mods

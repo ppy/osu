@@ -3,16 +3,18 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Beatmaps.Legacy;
 using osu.Game.IO.Legacy;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Replays.Legacy;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 using SharpCompress.Compressors.LZMA;
-using osu.Game.Beatmaps.Legacy;
-using System.Linq;
 
-namespace osu.Game.Rulesets.Scoring.Legacy
+namespace osu.Game.Scoring.Legacy
 {
     public abstract class LegacyScoreParser
     {
