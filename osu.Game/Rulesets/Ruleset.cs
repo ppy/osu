@@ -12,7 +12,6 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;

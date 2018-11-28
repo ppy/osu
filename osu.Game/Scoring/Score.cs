@@ -5,9 +5,11 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 using osu.Game.Rulesets.Replays;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
 {

@@ -7,7 +7,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Difficulty
