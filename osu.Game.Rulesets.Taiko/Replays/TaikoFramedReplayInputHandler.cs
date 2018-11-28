@@ -5,6 +5,7 @@ using osu.Game.Rulesets.Replays;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input.StateChanges;
+using osu.Game.Replays;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {

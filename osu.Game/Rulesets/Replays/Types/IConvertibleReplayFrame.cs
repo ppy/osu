@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Replays.Legacy;
+using osu.Game.Replays.Legacy;
 
 namespace osu.Game.Rulesets.Replays.Types
 {
