@@ -37,7 +37,11 @@ namespace osu.Game.Scoring.Legacy
 
                 var version = sr.ReadInt32();
 
-                currentBeatmap = GetBeatmap(sr.ReadString()).Beatmap;
+                var workingBeatmap = GetBeatmap(sr.ReadString());
+                if (workingBeatmap is DummyWorkingBeatmap)
+                    throw new BeatmapNotFoundException();
+
+                currentBeatmap = workingBeatmap.Beatmap;
                 score.ScoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;
 
                 score.ScoreInfo.User = score.Replay.User = new User { Username = sr.ReadString() };
@@ -185,5 +189,13 @@ namespace osu.Game.Scoring.Legacy
         /// <param name="md5Hash">The MD5 hash.</param>
         /// <returns>The <see cref="WorkingBeatmap"/>.</returns>
         protected abstract WorkingBeatmap GetBeatmap(string md5Hash);
+
+        public class BeatmapNotFoundException : Exception
+        {
+            public BeatmapNotFoundException()
+                : base("No corresponding beatmap for the score could be found.")
+            {
+            }
+        }
     }
 }

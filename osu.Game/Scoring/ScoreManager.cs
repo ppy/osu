@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
@@ -41,7 +42,17 @@ namespace osu.Game.Scoring
                 return null;
 
             using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr"))))
-                return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream).ScoreInfo;
+            {
+                try
+                {
+                    return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream).ScoreInfo;
+                }
+                catch (LegacyScoreParser.BeatmapNotFoundException e)
+                {
+                    Logger.Log(e.Message, LoggingTarget.Information, LogLevel.Error);
+                    return null;
+                }
+            }
         }
 
         protected override ScoreInfo CheckForExisting(ScoreInfo model)
