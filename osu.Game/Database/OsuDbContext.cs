@@ -10,6 +10,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 using DatabasedKeyBinding = osu.Game.Input.Bindings.DatabasedKeyBinding;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 using osu.Game.Skinning;
@@ -27,6 +28,7 @@ namespace osu.Game.Database
         public DbSet<FileInfo> FileInfo { get; set; }
         public DbSet<RulesetInfo> RulesetInfo { get; set; }
         public DbSet<SkinInfo> SkinInfo { get; set; }
+        public DbSet<Score> ScoreInfo { get; set; }
 
         private readonly string connectionString;
 
