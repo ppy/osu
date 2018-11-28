@@ -36,6 +36,8 @@ namespace osu.Game.Scoring
 
         public int Combo { get; set; }
 
+        public int RulesetID { get; set; }
+
         public RulesetInfo Ruleset { get; set; }
 
         [NotMapped]
