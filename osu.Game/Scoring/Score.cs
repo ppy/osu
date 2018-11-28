@@ -73,6 +73,12 @@ namespace osu.Game.Scoring
 
         public Dictionary<HitResult, object> Statistics = new Dictionary<HitResult, object>();
 
+        /// <summary>
+        /// MD5 is kept for legacy support.
+        /// </summary>
+        [JsonProperty("file_md5")]
+        public string MD5Hash { get; set; }
+
         public List<ScoreFileInfo> Files { get; set; }
 
         public bool DeletePending { get; set; }
