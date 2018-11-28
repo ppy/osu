@@ -69,11 +69,11 @@ namespace osu.Game.Scoring
 
         public int BeatmapInfoID { get; set; }
 
-        public BeatmapInfo BeatmapInfo;
+        public BeatmapInfo BeatmapInfo { get; set; }
 
         public long? OnlineScoreID { get; set; }
 
-        public DateTimeOffset Date;
+        public DateTimeOffset Date { get; set; }
 
         public Dictionary<HitResult, object> Statistics = new Dictionary<HitResult, object>();
 
