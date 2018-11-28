@@ -65,7 +65,9 @@ namespace osu.Game.Scoring
         [JsonIgnore]
         public Replay Replay;
 
-        public BeatmapInfo Beatmap;
+        public int BeatmapInfoID { get; set; }
+
+        public BeatmapInfo BeatmapInfo;
 
         public long OnlineScoreID;
 
