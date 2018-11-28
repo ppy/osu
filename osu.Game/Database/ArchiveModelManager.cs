@@ -485,7 +485,7 @@ namespace osu.Game.Database
             if (ZipUtils.IsZipArchive(path))
                 return new ZipArchiveReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read), Path.GetFileName(path));
             if (Directory.Exists(path))
-                return new LegacyFilesystemReader(path);
+                return new LegacyDirectoryArchiveReader(path);
             throw new InvalidFormatException($"{path} is not a valid archive");
         }
     }
