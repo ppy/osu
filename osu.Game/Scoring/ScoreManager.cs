@@ -41,7 +41,7 @@ namespace osu.Game.Scoring
                 return null;
 
             using (var stream = archive.GetStream(archive.Filenames.First(f => f.EndsWith(".osr"))))
-                return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream);
+                return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream).ScoreInfo;
         }
 
         protected override ScoreInfo CheckForExisting(ScoreInfo model)
@@ -56,7 +56,9 @@ namespace osu.Game.Scoring
             return null;
         }
 
-        public List<ScoreInfo> GetAllScores() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
+        public Score GetScore(ScoreInfo scoreInfo) => new LegacyDatabasedScore(scoreInfo, rulesets, beatmaps, Files.Store);
+
+        public List<ScoreInfo> GetAllUsableScores() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
 
         public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().FirstOrDefault(query);
     }

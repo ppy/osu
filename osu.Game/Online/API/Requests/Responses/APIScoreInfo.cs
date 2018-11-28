@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
-using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
@@ -32,12 +31,6 @@ namespace osu.Game.Online.API.Requests.Responses
         private User user
         {
             set => User = value;
-        }
-
-        [JsonProperty(@"replay_data")]
-        private Replay replay
-        {
-            set => Replay = value;
         }
 
         [JsonProperty(@"mode_int")]
