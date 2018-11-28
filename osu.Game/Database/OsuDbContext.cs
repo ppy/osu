@@ -119,6 +119,8 @@ namespace osu.Game.Database
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.ShortName).IsUnique();
 
             modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
+
+            modelBuilder.Entity<ScoreInfo>().HasIndex(b => b.OnlineScoreID).IsUnique();
         }
 
         private class OsuDbLoggerFactory : ILoggerFactory
