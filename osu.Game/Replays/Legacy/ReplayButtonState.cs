@@ -3,7 +3,7 @@
 
 using System;
 
-namespace osu.Game.Rulesets.Replays.Legacy
+namespace osu.Game.Replays.Legacy
 {
     [Flags]
     public enum ReplayButtonState
