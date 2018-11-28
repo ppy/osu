@@ -67,7 +67,7 @@ namespace osu.Game.Scoring
 
         public BeatmapInfo BeatmapInfo;
 
-        public long OnlineScoreID;
+        public long? OnlineScoreID { get; set; }
 
         public DateTimeOffset Date;
 
