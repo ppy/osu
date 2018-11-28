@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -86,7 +85,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void randomizeSkin()
         {
-            int n = usableSkins.Count();
+            int n = usableSkins.Count;
             if (n > 1)
                 configBindable.Value = (configBindable.Value + RNG.Next(n - 1) + 1) % n; // make sure it's always a different one
             else
@@ -107,7 +106,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void resetSkinButtons()
         {
-            skinDropdown.Items = usableSkins.Count() > 1 ? usableSkins.Concat(new[] { random_skin_info }) : usableSkins;
+            skinDropdown.Items = usableSkins.Count > 1 ? usableSkins.Concat(new[] { random_skin_info }) : usableSkins;
         }
 
         protected override void Dispose(bool isDisposing)
