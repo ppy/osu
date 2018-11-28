@@ -148,7 +148,7 @@ namespace osu.Game
         {
             this.frameworkConfig = frameworkConfig;
 
-            ScoreStore.ScoreImported += score => Schedule(() => LoadScore(score));
+            ScoreManager.ItemAdded += score => Schedule(() => LoadScore(score));
 
             if (!Host.IsPrimaryInstance)
             {
