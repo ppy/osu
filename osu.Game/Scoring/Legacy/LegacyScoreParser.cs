@@ -30,17 +30,13 @@ namespace osu.Game.Scoring.Legacy
                 currentRuleset = GetRuleset(sr.ReadByte());
                 score = new Score { Ruleset = currentRuleset.RulesetInfo };
 
-                /* score.Pass = true;*/
                 var version = sr.ReadInt32();
 
-                /* score.FileChecksum = */
                 currentBeatmap = GetBeatmap(sr.ReadString()).Beatmap;
                 score.Beatmap = currentBeatmap.BeatmapInfo;
 
-                /* score.PlayerName = */
                 score.User = new User { Username = sr.ReadString() };
-                /* var localScoreChecksum = */
-                sr.ReadString();
+                score.MD5Hash = sr.ReadString();
 
                 var count300 = sr.ReadUInt16();
                 var count100 = sr.ReadUInt16();
@@ -58,23 +54,23 @@ namespace osu.Game.Scoring.Legacy
 
                 score.TotalScore = sr.ReadInt32();
                 score.MaxCombo = sr.ReadUInt16();
+
                 /* score.Perfect = */
                 sr.ReadBoolean();
-                /* score.EnabledMods = (Mods)*/
+
                 score.Mods = currentRuleset.ConvertLegacyMods((LegacyMods)sr.ReadInt32()).ToArray();
+
                 /* score.HpGraphString = */
                 sr.ReadString();
-                /* score.Date = */
-                sr.ReadDateTime();
+
+                score.Date = sr.ReadDateTime();
 
                 var compressedReplay = sr.ReadByteArray();
 
                 if (version >= 20140721)
-                    /*OnlineId =*/
-                    sr.ReadInt64();
+                    score.OnlineScoreID = sr.ReadInt64();
                 else if (version >= 20121008)
-                    /*OnlineId =*/
-                    sr.ReadInt32();
+                    score.OnlineScoreID = sr.ReadInt32();
 
                 switch (score.Ruleset.ID)
                 {
