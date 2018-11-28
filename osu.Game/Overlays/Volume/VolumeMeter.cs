@@ -25,7 +25,7 @@ namespace osu.Game.Overlays.Volume
         private CircularProgress volumeCircle;
         private CircularProgress volumeCircleGlow;
 
-        public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1 };
+        public BindableDouble Bindable { get; } = new BindableDouble { MinValue = 0, MaxValue = 1, Precision = 0.01 };
         private readonly float circleSize;
         private readonly Color4 meterColour;
         private readonly string name;
@@ -222,7 +222,7 @@ namespace osu.Game.Overlays.Volume
             private set => Bindable.Value = value;
         }
 
-        private const float adjust_step = 0.05f;
+        private const double adjust_step = 0.05;
 
         public void Increase(double amount = 1, bool isPrecise = false) => adjust(amount, isPrecise);
         public void Decrease(double amount = 1, bool isPrecise = false) => adjust(-amount, isPrecise);
@@ -236,7 +236,7 @@ namespace osu.Game.Overlays.Volume
 
             var precision = Bindable.Precision;
 
-            while (Math.Abs(scrollAccumulation) > precision)
+            while (Precision.AlmostBigger(Math.Abs(scrollAccumulation), precision))
             {
                 Volume += Math.Sign(scrollAccumulation) * precision;
                 scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
