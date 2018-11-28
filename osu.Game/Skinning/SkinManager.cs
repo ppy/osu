@@ -31,7 +31,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Returns a list of all usable <see cref="SkinInfo"/>s. Includes the special default skin plus all skins from <see cref="GetAllUserSkins"/>.
         /// </summary>
-        /// <returns>A list of available <see cref="SkinInfo"/>.</returns>
+        /// <returns>A newly allocated list of available <see cref="SkinInfo"/>.</returns>
         public List<SkinInfo> GetAllUsableSkins()
         {
             var userSkins = GetAllUserSkins();
@@ -42,7 +42,7 @@ namespace osu.Game.Skinning
         /// <summary>
         /// Returns a list of all usable <see cref="SkinInfo"/>s that have been loaded by the user.
         /// </summary>
-        /// <returns>A list of available <see cref="SkinInfo"/>.</returns>
+        /// <returns>A newly allocated list of available <see cref="SkinInfo"/>.</returns>
         public List<SkinInfo> GetAllUserSkins() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo

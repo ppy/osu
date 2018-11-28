@@ -2,10 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.MathUtils;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -28,9 +30,7 @@ namespace osu.Game.Overlays.Settings.Sections
         private static readonly SkinInfo random_skin_info = new RandomSkinInfo();
 
         private SkinManager skins;
-        private SkinInfo[] usableSkins;
-
-        private readonly Random random = new Random();
+        private List<SkinInfo> usableSkins;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config, SkinManager skins)
@@ -65,10 +65,10 @@ namespace osu.Game.Overlays.Settings.Sections
 
             config.BindWith(OsuSetting.Skin, configBindable);
 
-            usableSkins = skins.GetAllUsableSkins().ToArray();
+            usableSkins = skins.GetAllUsableSkins();
 
             skinDropdown.Bindable = dropdownBindable;
-            skinDropdown.Items = usableSkins.Length > 1 ? usableSkins.Concat(new[] { random_skin_info }) : usableSkins;
+            resetSkinButtons();
 
             // Todo: This should not be necessary when OsuConfigManager is databased
             if (skinDropdown.Items.All(s => s.ID != configBindable.Value))
@@ -86,15 +86,29 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void randomizeSkin()
         {
-            int n = usableSkins.Length;
+            int n = usableSkins.Count();
             if (n > 1)
-                configBindable.Value = (configBindable.Value + random.Next(n - 1) + 1) % n; // make sure it's always a different one
+                configBindable.Value = (configBindable.Value + RNG.Next(n - 1) + 1) % n; // make sure it's always a different one
             else
                 configBindable.Value = 0;
         }
 
-        private void itemRemoved(SkinInfo s) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != s.ID).ToArray());
-        private void itemAdded(SkinInfo s) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Append(s).ToArray());
+        private void itemRemoved(SkinInfo s) => Schedule(() =>
+        {
+            usableSkins.RemoveAll(i => i.ID == s.ID);
+            resetSkinButtons();
+        });
+
+        private void itemAdded(SkinInfo s) => Schedule(() =>
+        {
+            usableSkins.Add(s);
+            resetSkinButtons();
+        });
+
+        private void resetSkinButtons()
+        {
+            skinDropdown.Items = usableSkins.Count() > 1 ? usableSkins.Concat(new[] { random_skin_info }) : usableSkins;
+        }
 
         protected override void Dispose(bool isDisposing)
         {
