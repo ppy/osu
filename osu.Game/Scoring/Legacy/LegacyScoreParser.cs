@@ -22,22 +22,22 @@ namespace osu.Game.Scoring.Legacy
         private IBeatmap currentBeatmap;
         private Ruleset currentRuleset;
 
-        public Score Parse(Stream stream)
+        public ScoreInfo Parse(Stream stream)
         {
-            Score score;
+            ScoreInfo scoreInfo;
 
             using (SerializationReader sr = new SerializationReader(stream))
             {
                 currentRuleset = GetRuleset(sr.ReadByte());
-                score = new Score { Ruleset = currentRuleset.RulesetInfo };
+                scoreInfo = new ScoreInfo { Ruleset = currentRuleset.RulesetInfo };
 
                 var version = sr.ReadInt32();
 
                 currentBeatmap = GetBeatmap(sr.ReadString()).Beatmap;
-                score.BeatmapInfo = currentBeatmap.BeatmapInfo;
+                scoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;
 
-                score.User = new User { Username = sr.ReadString() };
-                score.MD5Hash = sr.ReadString();
+                scoreInfo.User = new User { Username = sr.ReadString() };
+                scoreInfo.MD5Hash = sr.ReadString();
 
                 var count300 = sr.ReadUInt16();
                 var count100 = sr.ReadUInt16();
@@ -46,57 +46,57 @@ namespace osu.Game.Scoring.Legacy
                 var countKatu = sr.ReadUInt16();
                 var countMiss = sr.ReadUInt16();
 
-                score.Statistics[HitResult.Great] = count300;
-                score.Statistics[HitResult.Good] = count100;
-                score.Statistics[HitResult.Meh] = count50;
-                score.Statistics[HitResult.Perfect] = countGeki;
-                score.Statistics[HitResult.Ok] = countKatu;
-                score.Statistics[HitResult.Miss] = countMiss;
+                scoreInfo.Statistics[HitResult.Great] = count300;
+                scoreInfo.Statistics[HitResult.Good] = count100;
+                scoreInfo.Statistics[HitResult.Meh] = count50;
+                scoreInfo.Statistics[HitResult.Perfect] = countGeki;
+                scoreInfo.Statistics[HitResult.Ok] = countKatu;
+                scoreInfo.Statistics[HitResult.Miss] = countMiss;
 
-                score.TotalScore = sr.ReadInt32();
-                score.MaxCombo = sr.ReadUInt16();
+                scoreInfo.TotalScore = sr.ReadInt32();
+                scoreInfo.MaxCombo = sr.ReadUInt16();
 
                 /* score.Perfect = */
                 sr.ReadBoolean();
 
-                score.Mods = currentRuleset.ConvertLegacyMods((LegacyMods)sr.ReadInt32()).ToArray();
+                scoreInfo.Mods = currentRuleset.ConvertLegacyMods((LegacyMods)sr.ReadInt32()).ToArray();
 
                 /* score.HpGraphString = */
                 sr.ReadString();
 
-                score.Date = sr.ReadDateTime();
+                scoreInfo.Date = sr.ReadDateTime();
 
                 var compressedReplay = sr.ReadByteArray();
 
                 if (version >= 20140721)
-                    score.OnlineScoreID = sr.ReadInt64();
+                    scoreInfo.OnlineScoreID = sr.ReadInt64();
                 else if (version >= 20121008)
-                    score.OnlineScoreID = sr.ReadInt32();
+                    scoreInfo.OnlineScoreID = sr.ReadInt32();
 
-                switch (score.Ruleset.ID)
+                switch (scoreInfo.Ruleset.ID)
                 {
                     case 0:
                     {
                         int totalHits = count50 + count100 + count300 + countMiss;
-                        score.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + count300 * 300) / (totalHits * 300) : 1;
+                        scoreInfo.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + count300 * 300) / (totalHits * 300) : 1;
                         break;
                     }
                     case 1:
                     {
                         int totalHits = count50 + count100 + count300 + countMiss;
-                        score.Accuracy = totalHits > 0 ? (double)(count100 * 150 + count300 * 300) / (totalHits * 300) : 1;
+                        scoreInfo.Accuracy = totalHits > 0 ? (double)(count100 * 150 + count300 * 300) / (totalHits * 300) : 1;
                         break;
                     }
                     case 2:
                     {
                         int totalHits = count50 + count100 + count300 + countMiss + countKatu;
-                        score.Accuracy = totalHits > 0 ? (double)(count50 + count100 + count300 ) / totalHits : 1;
+                        scoreInfo.Accuracy = totalHits > 0 ? (double)(count50 + count100 + count300 ) / totalHits : 1;
                         break;
                     }
                     case 3:
                     {
                         int totalHits = count50 + count100 + count300 + countMiss + countGeki + countKatu;
-                        score.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + countKatu * 200 + (count300 + countGeki) * 300) / (totalHits * 300) : 1;
+                        scoreInfo.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + countKatu * 200 + (count300 + countGeki) * 300) / (totalHits * 300) : 1;
                         break;
                     }
                 }
@@ -120,13 +120,13 @@ namespace osu.Game.Scoring.Legacy
                     using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
                     using (var reader = new StreamReader(lzma))
                     {
-                        score.Replay = new Replay { User = score.User };
-                        readLegacyReplay(score.Replay, reader);
+                        scoreInfo.Replay = new Replay { User = scoreInfo.User };
+                        readLegacyReplay(scoreInfo.Replay, reader);
                     }
                 }
             }
 
-            return score;
+            return scoreInfo;
         }
 
         private void readLegacyReplay(Replay replay, StreamReader reader)

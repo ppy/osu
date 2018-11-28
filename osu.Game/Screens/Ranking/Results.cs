@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Ranking
 {
     public class Results : OsuScreen
     {
-        private readonly Score score;
+        private readonly ScoreInfo scoreInfo;
         private Container circleOuterBackground;
         private Container circleOuter;
         private Container circleInner;
@@ -44,9 +44,9 @@ namespace osu.Game.Screens.Ranking
 
         private const float circle_outer_scale = 0.96f;
 
-        public Results(Score score)
+        public Results(ScoreInfo scoreInfo)
         {
-            this.score = score;
+            this.scoreInfo = scoreInfo;
         }
 
         private const float transition_time = 800;
@@ -188,7 +188,7 @@ namespace osu.Game.Screens.Ranking
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = $"{score.MaxCombo}x",
+                                    Text = $"{scoreInfo.MaxCombo}x",
                                     TextSize = 40,
                                     RelativePositionAxes = Axes.X,
                                     Font = @"Exo2.0-Bold",
@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Ranking
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = $"{score.Accuracy:P2}",
+                                    Text = $"{scoreInfo.Accuracy:P2}",
                                     TextSize = 40,
                                     RelativePositionAxes = Axes.X,
                                     Font = @"Exo2.0-Bold",
@@ -274,10 +274,10 @@ namespace osu.Game.Screens.Ranking
                 switch (mode)
                 {
                     case ResultMode.Summary:
-                        currentPage = new ResultsPageScore(score, Beatmap.Value);
+                        currentPage = new ResultsPageScore(scoreInfo, Beatmap.Value);
                         break;
                     case ResultMode.Ranking:
-                        currentPage = new ResultsPageRanking(score, Beatmap.Value);
+                        currentPage = new ResultsPageRanking(scoreInfo, Beatmap.Value);
                         break;
                 }
 

@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private readonly Box background;
 
-        public DrawableScore(int index, APIScore score)
+        public DrawableScore(int index, APIScoreInfo scoreInfo)
         {
             ScoreModsContainer modsContainer;
 
@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Font = @"Exo2.0-RegularItalic",
                     Margin = new MarginPadding { Left = side_margin }
                 },
-                new DrawableFlag(score.User.Country)
+                new DrawableFlag(scoreInfo.User.Country)
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -60,7 +60,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
-                    User = score.User,
+                    User = scoreInfo.User,
                     Margin = new MarginPadding { Left = 100 }
                 },
                 modsContainer = new ScoreModsContainer
@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     RelativePositionAxes = Axes.X,
                     X = 0.42f
                 },
-                new DrawableRank(score.Rank)
+                new DrawableRank(scoreInfo.Rank)
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -86,7 +86,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
-                    Text = $@"{score.TotalScore:N0}",
+                    Text = $@"{scoreInfo.TotalScore:N0}",
                     Font = @"Venera",
                     RelativePositionAxes = Axes.X,
                     X = 0.75f,
@@ -96,7 +96,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
-                    Text = $@"{score.Accuracy:P2}",
+                    Text = $@"{scoreInfo.Accuracy:P2}",
                     Font = @"Exo2.0-RegularItalic",
                     RelativePositionAxes = Axes.X,
                     X = 0.85f
@@ -105,13 +105,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Text = $"{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Meh]}",
+                    Text = $"{scoreInfo.Statistics[HitResult.Great]}/{scoreInfo.Statistics[HitResult.Good]}/{scoreInfo.Statistics[HitResult.Meh]}",
                     Font = @"Exo2.0-RegularItalic",
                     Margin = new MarginPadding { Right = side_margin }
                 },
             };
 
-            foreach (Mod mod in score.Mods)
+            foreach (Mod mod in scoreInfo.Mods)
                 modsContainer.Add(new ModIcon(mod)
                 {
                     AutoSizeAxes = Axes.Both,

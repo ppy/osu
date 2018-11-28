@@ -28,21 +28,21 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public ManiaPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
-            : base(ruleset, beatmap, score)
+        public ManiaPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo scoreInfo)
+            : base(ruleset, beatmap, scoreInfo)
         {
         }
 
         public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
-            mods = Score.Mods;
-            scaledScore = Score.TotalScore;
-            countPerfect = Convert.ToInt32(Score.Statistics[HitResult.Perfect]);
-            countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
-            countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
-            countOk = Convert.ToInt32(Score.Statistics[HitResult.Ok]);
-            countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
-            countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
+            mods = ScoreInfo.Mods;
+            scaledScore = ScoreInfo.TotalScore;
+            countPerfect = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Perfect]);
+            countGreat = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Great]);
+            countGood = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Good]);
+            countOk = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Ok]);
+            countMeh = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Meh]);
+            countMiss = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Miss]);
 
             if (mods.Any(m => !m.Ranked))
                 return 0;

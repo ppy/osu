@@ -15,7 +15,7 @@ using osu.Game.Scoring.Legacy;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreManager : ArchiveModelManager<Score, ScoreFileInfo>
+    public class ScoreManager : ArchiveModelManager<ScoreInfo, ScoreFileInfo>
     {
         public override string[] HandledExtensions => new[] { ".osr" };
 
@@ -35,7 +35,7 @@ namespace osu.Game.Scoring
             scores = (ScoreStore)ModelStore;
         }
 
-        protected override Score CreateModel(ArchiveReader archive)
+        protected override ScoreInfo CreateModel(ArchiveReader archive)
         {
             if (archive == null)
                 return null;
@@ -44,7 +44,7 @@ namespace osu.Game.Scoring
                 return new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream);
         }
 
-        protected override Score CheckForExisting(Score model)
+        protected override ScoreInfo CheckForExisting(ScoreInfo model)
         {
             var existingHashMatch = scores.ConsumableItems.FirstOrDefault(s => s.MD5Hash == model.MD5Hash);
             if (existingHashMatch != null)
@@ -56,8 +56,8 @@ namespace osu.Game.Scoring
             return null;
         }
 
-        public List<Score> GetAllScores() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
+        public List<ScoreInfo> GetAllScores() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
 
-        public Score Query(Expression<Func<Score, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().FirstOrDefault(query);
+        public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().FirstOrDefault(query);
     }
 }

@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Ranking
         private Container scoreContainer;
         private ScoreCounter scoreCounter;
 
-        public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap) { }
+        public ResultsPageScore(ScoreInfo scoreInfo, WorkingBeatmap beatmap) : base(scoreInfo, beatmap) { }
 
         private FillFlowContainer<DrawableScoreStatistic> statisticsContainer;
 
@@ -64,14 +64,14 @@ namespace osu.Game.Screens.Ranking
                     Direction = FillDirection.Vertical,
                     Children = new Drawable[]
                     {
-                        new UserHeader(Score.User)
+                        new UserHeader(ScoreInfo.User)
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             Height = user_header_height,
                         },
-                        new DrawableRank(Score.Rank)
+                        new DrawableRank(ScoreInfo.Rank)
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -119,7 +119,7 @@ namespace osu.Game.Screens.Ranking
                             Origin = Anchor.TopCentre,
                             Margin = new MarginPadding { Bottom = 10 },
                         },
-                        new DateTimeDisplay(Score.Date.LocalDateTime)
+                        new DateTimeDisplay(ScoreInfo.Date.LocalDateTime)
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Ranking
                 }
             };
 
-            statisticsContainer.ChildrenEnumerable = Score.Statistics.OrderByDescending(p => p.Key).Select(s => new DrawableScoreStatistic(s));
+            statisticsContainer.ChildrenEnumerable = ScoreInfo.Statistics.OrderByDescending(p => p.Key).Select(s => new DrawableScoreStatistic(s));
         }
 
         protected override void LoadComplete()
@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Ranking
 
             Schedule(() =>
             {
-                scoreCounter.Increment(Score.TotalScore);
+                scoreCounter.Increment(ScoreInfo.TotalScore);
 
                 int delay = 0;
                 foreach (var s in statisticsContainer.Children)

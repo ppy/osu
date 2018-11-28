@@ -8,14 +8,14 @@ using osu.Game.Database;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreStore : MutableDatabaseBackedStore<Score>
+    public class ScoreStore : MutableDatabaseBackedStore<ScoreInfo>
     {
         public ScoreStore(IDatabaseContextFactory factory, Storage storage)
             : base(factory, storage)
         {
         }
 
-        protected override IQueryable<Score> AddIncludesForConsumption(IQueryable<Score> query)
+        protected override IQueryable<ScoreInfo> AddIncludesForConsumption(IQueryable<ScoreInfo> query)
             => base.AddIncludesForConsumption(query).Include(s => s.Files).ThenInclude(f => f.FileInfo);
     }
 }

@@ -16,11 +16,11 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
     public abstract class DrawableProfileScore : DrawableProfileRow
     {
         private readonly ScoreModsContainer modsContainer;
-        protected readonly Score Score;
+        protected readonly ScoreInfo ScoreInfo;
 
-        protected DrawableProfileScore(Score score)
+        protected DrawableProfileScore(ScoreInfo scoreInfo)
         {
-            Score = score;
+            ScoreInfo = scoreInfo;
 
             RelativeSizeAxes = Axes.X;
             Height = 60;
@@ -42,7 +42,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         {
             var text = new OsuSpriteText
             {
-                Text = $"accuracy: {Score.Accuracy:P2}",
+                Text = $"accuracy: {ScoreInfo.Accuracy:P2}",
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Colour = colour.GrayA,
@@ -53,14 +53,14 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             RightFlowContainer.Add(text);
             RightFlowContainer.SetLayoutPosition(text, 1);
 
-            LeftFlowContainer.Add(new BeatmapMetadataContainer(Score.BeatmapInfo));
-            LeftFlowContainer.Add(new DrawableDate(Score.Date));
+            LeftFlowContainer.Add(new BeatmapMetadataContainer(ScoreInfo.BeatmapInfo));
+            LeftFlowContainer.Add(new DrawableDate(ScoreInfo.Date));
 
-            foreach (Mod mod in Score.Mods)
+            foreach (Mod mod in ScoreInfo.Mods)
                 modsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.5f) });
         }
 
-        protected override Drawable CreateLeftVisual() => new DrawableRank(Score.Rank)
+        protected override Drawable CreateLeftVisual() => new DrawableRank(ScoreInfo.Rank)
         {
             RelativeSizeAxes = Axes.Y,
             Width = 60,

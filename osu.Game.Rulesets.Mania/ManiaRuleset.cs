@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Mania
     {
         public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap) => new ManiaRulesetContainer(this, beatmap);
         public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new ManiaBeatmapConverter(beatmap);
-        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, Score score) => new ManiaPerformanceCalculator(this, beatmap, score);
+        public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo scoreInfo) => new ManiaPerformanceCalculator(this, beatmap, scoreInfo);
 
         public override HitObjectComposer CreateHitObjectComposer() => new ManiaHitObjectComposer(this);
 

@@ -17,21 +17,21 @@ namespace osu.Game.Rulesets.Difficulty
 
         protected readonly Ruleset Ruleset;
         protected readonly IBeatmap Beatmap;
-        protected readonly Score Score;
+        protected readonly ScoreInfo ScoreInfo;
 
         protected double TimeRate { get; private set; } = 1;
 
-        protected PerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
+        protected PerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo scoreInfo)
         {
             Ruleset = ruleset;
-            Score = score;
+            ScoreInfo = scoreInfo;
 
-            beatmap.Mods.Value = score.Mods;
+            beatmap.Mods.Value = scoreInfo.Mods;
             Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
 
-            Attributes = ruleset.CreateDifficultyCalculator(beatmap).Calculate(score.Mods);
+            Attributes = ruleset.CreateDifficultyCalculator(beatmap).Calculate(scoreInfo.Mods);
 
-            ApplyMods(score.Mods);
+            ApplyMods(scoreInfo.Mods);
         }
 
         protected virtual void ApplyMods(Mod[] mods)

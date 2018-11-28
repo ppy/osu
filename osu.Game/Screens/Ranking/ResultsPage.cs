@@ -16,16 +16,16 @@ namespace osu.Game.Screens.Ranking
 {
     public class ResultsPage : Container
     {
-        protected readonly Score Score;
+        protected readonly ScoreInfo ScoreInfo;
         protected readonly WorkingBeatmap Beatmap;
         private CircularContainer content;
         private Box fill;
 
         protected override Container<Drawable> Content => content;
 
-        public ResultsPage(Score score, WorkingBeatmap beatmap)
+        public ResultsPage(ScoreInfo scoreInfo, WorkingBeatmap beatmap)
         {
-            Score = score;
+            ScoreInfo = scoreInfo;
             Beatmap = beatmap;
             RelativeSizeAxes = Axes.Both;
         }

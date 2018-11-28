@@ -9,6 +9,6 @@ namespace osu.Game.Online.API.Requests.Responses
     public class APIScores
     {
         [JsonProperty(@"scores")]
-        public IEnumerable<APIScore> Scores;
+        public IEnumerable<APIScoreInfo> Scores;
     }
 }

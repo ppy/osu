@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Ranking
 {
     public class ResultsPageRanking : ResultsPage
     {
-        public ResultsPageRanking(Score score, WorkingBeatmap beatmap = null) : base(score, beatmap)
+        public ResultsPageRanking(ScoreInfo scoreInfo, WorkingBeatmap beatmap = null) : base(scoreInfo, beatmap)
         {
         }
 
@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Ranking
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Beatmap = Beatmap.BeatmapInfo ?? Score.BeatmapInfo,
+                    Beatmap = Beatmap.BeatmapInfo ?? ScoreInfo.BeatmapInfo,
                     Scale = new Vector2(0.7f)
                 }
             };

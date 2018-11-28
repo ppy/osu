@@ -15,9 +15,9 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).Append(typeof(OsuModSpunOut)).ToArray();
 
-        protected override Score CreateReplayScore(Beatmap<OsuHitObject> beatmap)
+        protected override ScoreInfo CreateReplayScore(Beatmap<OsuHitObject> beatmap)
         {
-            return new Score
+            return new ScoreInfo
             {
                 Replay = new OsuAutoGenerator(beatmap).Generate()
             };
