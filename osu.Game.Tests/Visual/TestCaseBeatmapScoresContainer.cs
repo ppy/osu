@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual
 {

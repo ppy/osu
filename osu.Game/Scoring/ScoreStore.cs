@@ -10,7 +10,7 @@ using osu.Game.Database;
 using osu.Game.IPC;
 using osu.Game.Rulesets.Scoring.Legacy;
 
-namespace osu.Game.Rulesets.Scoring
+namespace osu.Game.Scoring
 {
     public class ScoreStore : DatabaseBackedStore, ICanAcceptFiles
     {
