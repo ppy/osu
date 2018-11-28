@@ -129,18 +129,8 @@ namespace osu.Game.Beatmaps
                 beatmaps.ForEach(b => b.OnlineBeatmapID = null);
         }
 
-        protected override BeatmapSetInfo CheckForExisting(BeatmapSetInfo model)
-        {
-            // check if this beatmap has already been imported and exit early if so
-            var existingHashMatch = beatmaps.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
-            if (existingHashMatch != null)
-            {
-                Undelete(existingHashMatch);
-                return existingHashMatch;
-            }
-
-            return null;
-        }
+        protected override BeatmapSetInfo CheckForExisting(BeatmapSetInfo model) =>
+            beatmaps.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
         /// <summary>
         /// Downloads a beatmap.

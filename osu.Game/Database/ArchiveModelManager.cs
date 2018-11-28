@@ -235,6 +235,7 @@ namespace osu.Game.Database
 
                         if (existing != null)
                         {
+                            Undelete(existing);
                             Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
                             return existing;
                         }
@@ -471,6 +472,11 @@ namespace osu.Game.Database
         {
         }
 
+        /// <summary>
+        /// Check whether an existing model already exists for a new import item.
+        /// </summary>
+        /// <param name="model">The new model proposed for import. Note that <see cref="Populate"/> has not yet been run on this model.</param>
+        /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
         protected virtual TModel CheckForExisting(TModel model) => null;
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
