@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Game.Overlays.Settings;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Osu.Edit;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Osu.Replays;
