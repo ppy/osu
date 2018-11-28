@@ -9,7 +9,6 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
-using osu.Game.Replays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
@@ -63,9 +62,6 @@ namespace osu.Game.Scoring
             get => User?.Username;
             set => User = new User { Username = value };
         }
-
-        [JsonIgnore]
-        public Replay Replay;
 
         public int BeatmapInfoID { get; set; }
 
