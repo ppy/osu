@@ -26,6 +26,8 @@ namespace osu.Game.Skinning
 
         public override string[] HandledExtensions => new[] { ".osk" };
 
+        protected override string[] HashableFileTypes => new[] { ".ini" };
+
         protected override string ImportFromStablePath => "Skins";
 
         public SkinManager(Storage storage, DatabaseContextFactory contextFactory, IIpcHost importHost, AudioManager audio)
@@ -66,9 +68,6 @@ namespace osu.Game.Skinning
         /// </summary>
         /// <returns>A list of available <see cref="SkinInfo"/>.</returns>
         public List<SkinInfo> GetAllUserSkins() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
-
-        protected override SkinInfo CheckForExisting(SkinInfo model)
-            => ModelStore.ConsumableItems.FirstOrDefault(s => s.Name == model.Name && s.Creator == model.Creator);
 
         protected override SkinInfo CreateModel(ArchiveReader archive) => new SkinInfo { Name = archive.Name };
 

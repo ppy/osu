@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.Extensions;
 using osu.Framework.IO.File;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -203,13 +204,39 @@ namespace osu.Game.Database
             try
             {
                 var model = CreateModel(archive);
-                return model == null ? null : Import(model, archive);
+
+                if (model == null) return null;
+
+                model.Hash = computeBeatmapSetHash(archive);
+
+                return Import(model, archive);
             }
             catch (Exception e)
             {
                 Logger.Error(e, $"Model creation of {archive.Name} failed.", LoggingTarget.Database);
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Any file extensions which should be included in hash creation.
+        /// Generally should include all file types which determine the file's uniqueness.
+        /// Large files should be avoided if possible.
+        /// </summary>
+        protected abstract string[] HashableFileTypes { get; }
+
+        /// <summary>
+        /// Create a SHA-2 hash from the provided archive based on contained beatmap (.osu) file content.
+        /// </summary>
+        private string computeBeatmapSetHash(ArchiveReader reader)
+        {
+            // for now, concatenate all .osu files in the set to create a unique hash.
+            MemoryStream hashable = new MemoryStream();
+            foreach (string file in reader.Filenames.Where(f => f.EndsWith(".osu")))
+                using (Stream s = reader.GetStream(file))
+                    s.CopyTo(hashable);
+
+            return hashable.ComputeSHA2Hash();
         }
 
         /// <summary>
@@ -477,7 +504,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The new model proposed for import. Note that <see cref="Populate"/> has not yet been run on this model.</param>
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
-        protected virtual TModel CheckForExisting(TModel model) => null;
+        protected virtual TModel CheckForExisting(TModel model) => ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
