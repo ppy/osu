@@ -148,7 +148,7 @@ namespace osu.Game
         {
             this.frameworkConfig = frameworkConfig;
 
-            ScoreManager.ItemAdded += (score, _) => Schedule(() => LoadScore(score));
+            ScoreManager.ItemAdded += (score, _, silent) => Schedule(() => LoadScore(score, silent));
 
             if (!Host.IsPrimaryInstance)
             {
@@ -248,15 +248,18 @@ namespace osu.Game
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId);
 
-        protected void LoadScore(ScoreInfo score)
+        protected void LoadScore(ScoreInfo score, bool silent)
         {
+            if (silent)
+                return;
+
             scoreLoad?.Cancel();
 
             var menu = intro.ChildScreen;
 
             if (menu == null)
             {
-                scoreLoad = Schedule(() => LoadScore(score));
+                scoreLoad = Schedule(() => LoadScore(score, false));
                 return;
             }
 
