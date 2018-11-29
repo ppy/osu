@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -16,6 +17,8 @@ namespace osu.Game.Rulesets.Mania.UI
     public class ManiaPlayfield : ScrollingPlayfield
     {
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => stages.Any(s => s.ReceivePositionalInputAt(screenSpacePos));
 
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
         {
