@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mania.Objects;
@@ -13,10 +14,13 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
-    public abstract class ManiaPlacementBlueprint<T> : PlacementBlueprint
+    public abstract class ManiaPlacementBlueprint<T> : PlacementBlueprint,
+                                                       IRequireHighFrequencyMousePosition // the playfield could be moving behind us
         where T : ManiaHitObject
     {
         protected new T HitObject => (T)base.HitObject;
+
+        protected Column Column;
 
         /// <summary>
         /// The current mouse position, snapped to the closest column.
@@ -40,31 +44,49 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             RelativeSizeAxes = Axes.None;
         }
 
+        protected override bool OnMouseDown(MouseDownEvent e)
+        {
+            if (Column == null)
+                return base.OnMouseDown(e);
+
+            HitObject.StartTime = TimeAt(e.ScreenSpaceMousePosition);
+            HitObject.Column = Column.Index;
+
+            BeginPlacement();
+            return true;
+        }
+
+        protected override bool OnMouseUp(MouseUpEvent e)
+        {
+            EndPlacement();
+            return base.OnMouseUp(e);
+        }
+
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            Column column = ColumnAt(e.ScreenSpaceMousePosition);
+            if (!PlacementBegun)
+                Column = ColumnAt(e.ScreenSpaceMousePosition);
 
-            if (column == null) return false;
+            if (Column == null) return false;
 
-            SnappedWidth = column.DrawWidth;
+            SnappedWidth = Column.DrawWidth;
 
             // Snap to the column
-            var parentPos = Parent.ToLocalSpace(column.ToScreenSpace(new Vector2(column.DrawWidth / 2, 0)));
+            var parentPos = Parent.ToLocalSpace(Column.ToScreenSpace(new Vector2(Column.DrawWidth / 2, 0)));
             SnappedMousePosition = new Vector2(parentPos.X, e.MousePosition.Y);
             return true;
         }
 
         protected double TimeAt(Vector2 screenSpacePosition)
         {
-            var column = ColumnAt(screenSpacePosition);
-            if (column == null)
+            if (Column == null)
                 return 0;
 
-            var hitObjectContainer = column.HitObjectContainer;
+            var hitObjectContainer = Column.HitObjectContainer;
 
             // If we're scrolling downwards, a position of 0 is actually further away from the hit target
             // so we need to flip the vertical coordinate in the hitobject container's space
-            var hitObjectPos = column.HitObjectContainer.ToLocalSpace(applyPositionOffset(screenSpacePosition)).Y;
+            var hitObjectPos = Column.HitObjectContainer.ToLocalSpace(applyPositionOffset(screenSpacePosition, false)).Y;
             if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
                 hitObjectPos = hitObjectContainer.DrawHeight - hitObjectPos;
 
@@ -74,21 +96,22 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
                 hitObjectContainer.DrawHeight);
         }
 
-        protected Column ColumnAt(Vector2 screenSpacePosition)
-            => composer.ColumnAt(applyPositionOffset(screenSpacePosition));
-
-        private Vector2 applyPositionOffset(Vector2 position)
+        protected float PositionAt(double time)
         {
-            switch (scrollingInfo.Direction.Value)
-            {
-                case ScrollingDirection.Up:
-                    position.Y -= NotePiece.NOTE_HEIGHT / 2;
-                    break;
-                case ScrollingDirection.Down:
-                    position.Y += NotePiece.NOTE_HEIGHT / 2;
-                    break;
-            }
+            var pos = scrollingInfo.Algorithm.PositionAt(time,
+                EditorClock.CurrentTime,
+                scrollingInfo.TimeRange.Value,
+                Column.HitObjectContainer.DrawHeight);
 
+            return applyPositionOffset(Column.HitObjectContainer.ToSpaceOfOtherDrawable(new Vector2(0, pos), Parent), true).Y;
+        }
+
+        protected Column ColumnAt(Vector2 screenSpacePosition)
+            => composer.ColumnAt(applyPositionOffset(screenSpacePosition, false));
+
+        private Vector2 applyPositionOffset(Vector2 position, bool reverse)
+        {
+            position.Y += (scrollingInfo.Direction.Value == ScrollingDirection.Up && !reverse ? -1 : 1) * NotePiece.NOTE_HEIGHT / 2;
             return position;
         }
     }
