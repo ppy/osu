@@ -179,6 +179,9 @@ namespace osu.Game.Screens.Select.Leaderboards
         private APIAccess api;
         private BeatmapInfo beatmap;
 
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+
         private ScheduledDelegate pendingUpdateScores;
 
         public BeatmapInfo Beatmap
@@ -216,6 +219,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                 api.OnStateChange -= handleApiStateChange;
         }
 
+        public void RefreshScores() => updateScores();
+
         private GetScoresRequest getScoresRequest;
 
         private void handleApiStateChange(APIState oldState, APIState newState)
@@ -242,8 +247,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 if (Scope == LeaderboardScope.Local)
                 {
-                    // TODO: get local scores from wherever here.
-                    PlaceholderState = PlaceholderState.NoScores;
+                    Scores = scoreManager.QueryScores(s => s.BeatmapInfo.ID == Beatmap.ID).ToArray();
+                    PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
                     return;
                 }
 
