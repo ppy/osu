@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     ApplyResult(r => r.Type = HitResult.Miss);
                     return;
                 }
-                 
+
                 if (!userTriggered)
                 {
                     if (timeOffset > second_hit_window)
