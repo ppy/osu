@@ -267,15 +267,17 @@ namespace osu.Game
                 return;
             }
 
-            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == score.Beatmap.ID);
+            var score = ScoreManager.GetScore(scoreInfo);
+            if (score.Replay == null)
+            {
+                Logger.Log("The loaded score has no replay data.", LoggingTarget.Information);
+                return;
+            }
 
+            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == scoreInfo.BeatmapInfo.ID);
             if (databasedBeatmap == null)
             {
-                notifications.Post(new SimpleNotification
-                {
-                    Text = @"Tried to load a score for a beatmap we don't have!",
-                    Icon = FontAwesome.fa_life_saver,
-                });
+                Logger.Log("Tried to load a score for a beatmap we don't have!", LoggingTarget.Information);
                 return;
             }
 
@@ -284,7 +286,7 @@ namespace osu.Game
             Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
             Beatmap.Value.Mods.Value = score.Mods;
 
-            menu.Push(new PlayerLoader(new ReplayPlayer(ScoreManager.GetScore(score).Replay)));
+            menu.Push(new PlayerLoader(new ReplayPlayer(score.Replay)));
         }
 
         protected override void Dispose(bool isDisposing)
