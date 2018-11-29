@@ -7,7 +7,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
@@ -20,7 +19,7 @@ namespace osu.Game.Rulesets.Edit
     /// <summary>
     /// A blueprint which governs the creation of a new <see cref="HitObject"/> to actualisation.
     /// </summary>
-    public abstract class PlacementBlueprint : CompositeDrawable, IStateful<PlacementState>, IRequireHighFrequencyMousePosition
+    public abstract class PlacementBlueprint : CompositeDrawable, IStateful<PlacementState>
     {
         /// <summary>
         /// Invoked when <see cref="State"/> has changed.
