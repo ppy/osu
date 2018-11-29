@@ -15,7 +15,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
-using OpenTK;
+using osuTK;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Containers;
 

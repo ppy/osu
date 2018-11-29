@@ -3,8 +3,8 @@
 
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;

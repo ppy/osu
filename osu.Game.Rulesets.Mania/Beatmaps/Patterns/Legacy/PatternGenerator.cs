@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
 {
