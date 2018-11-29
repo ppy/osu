@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
@@ -16,8 +15,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         private readonly EditBodyPiece bodyPiece;
         private readonly EditNotePiece headPiece;
         private readonly EditNotePiece tailPiece;
-
-        private PlacementState state;
 
         public HoldNotePlacementBlueprint()
             : base(new HoldNote())
@@ -36,15 +33,10 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             base.Update();
 
-            switch (state)
+            if (Column != null)
             {
-                case PlacementState.Start:
-                    headPiece.Position = tailPiece.Position = SnappedMousePosition;
-                    headPiece.Width = tailPiece.Width = SnappedWidth;
-                    break;
-                case PlacementState.End:
-                    tailPiece.Position = new Vector2(headPiece.Position.X, SnappedMousePosition.Y);
-                    break;
+                headPiece.Y = PositionAt(HitObject.StartTime);
+                tailPiece.Y = PositionAt(HitObject.EndTime);
             }
 
             var topPosition = new Vector2(headPiece.DrawPosition.X, Math.Min(headPiece.DrawPosition.Y, tailPiece.DrawPosition.Y));
@@ -55,42 +47,28 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             bodyPiece.Height = (bottomPosition - topPosition).Y;
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
+        private double originalStartTime;
+
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            Column column;
-            if ((column = ColumnAt(e.ScreenSpaceMousePosition)) == null)
-                return base.OnMouseDown(e);
+            base.OnMouseMove(e);
 
-            HitObject.StartTime = TimeAt(e.ScreenSpaceMousePosition);
-            HitObject.Column = column.Index;
-
-            BeginPlacement();
-
-            state = PlacementState.End;
-
-            return true;
-        }
-
-        protected override bool OnMouseUp(MouseUpEvent e)
-        {
-            var endTime = TimeAt(e.ScreenSpaceMousePosition);
-            if (endTime < HitObject.StartTime)
+            if (PlacementBegun)
             {
-                var tmp = endTime;
-                endTime = HitObject.StartTime;
-                HitObject.StartTime = tmp;
+                var endTime = TimeAt(e.ScreenSpaceMousePosition);
+
+                HitObject.StartTime = endTime < originalStartTime ? endTime : originalStartTime;
+                HitObject.Duration = Math.Abs(endTime - originalStartTime);
+            }
+            else
+            {
+                headPiece.Width = tailPiece.Width = SnappedWidth;
+                headPiece.X = tailPiece.X = SnappedMousePosition.X;
+
+                originalStartTime = HitObject.StartTime = TimeAt(e.ScreenSpaceMousePosition);
             }
 
-            HitObject.Duration = endTime - HitObject.StartTime;
-
-            EndPlacement();
             return true;
-        }
-
-        private enum PlacementState
-        {
-            Start,
-            End
         }
     }
 }
