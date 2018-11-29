@@ -49,6 +49,10 @@ namespace osu.Game.Rulesets.Edit
 
             RelativeSizeAxes = Axes.Both;
 
+            // This is required to allow the blueprint's position to be updated via OnMouseMove/Handle
+            // on the same frame it is made visible via a PlacementState change.
+            AlwaysPresent = true;
+
             Alpha = 0;
         }
 
