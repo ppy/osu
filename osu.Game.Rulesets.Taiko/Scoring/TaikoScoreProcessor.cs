@@ -40,6 +40,25 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         /// </summary>
         private const double hp_miss_max = -0.012;
 
+
+        /// <summary>
+        /// The minimum HP deducted for a swell <see cref="HitResult.Miss"/>.
+        /// This occurs when HP Drain = 0.
+        /// </summary>
+        private const double swell_hp_miss_min = -0.0012;
+
+        /// <summary>
+        /// The median HP deducted for a swell <see cref="HitResult.Miss"/>.
+        /// This occurs when HP Drain = 5.
+        /// </summary>
+        private const double swell_hp_miss_mid = -0.0045;
+
+        /// <summary>
+        /// The maximum HP deducted for a swell <see cref="HitResult.Miss"/>.
+        /// This occurs when HP Drain = 10.
+        /// </summary>
+        private const double swell_hp_miss_max = -0.0084;
+
         /// <summary>
         /// The HP awarded for a <see cref="DrumRollTick"/> hit.
         /// <para>
@@ -58,6 +77,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         private double hpIncreaseGreat;
         private double hpIncreaseGood;
         private double hpIncreaseMiss;
+        private double hpIncreaseMissSwell;
 
         public TaikoScoreProcessor(RulesetContainer<TaikoHitObject> rulesetContainer)
             : base(rulesetContainer)
@@ -74,6 +94,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             hpIncreaseGreat = hpMultiplierNormal * hp_hit_great;
             hpIncreaseGood = hpMultiplierNormal * hp_hit_good;
             hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
+            hpIncreaseMissSwell = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, swell_hp_miss_min, swell_hp_miss_mid, swell_hp_miss_max);
         }
 
         protected override void ApplyResult(JudgementResult result)
@@ -94,7 +115,9 @@ namespace osu.Game.Rulesets.Taiko.Scoring
             {
                 case HitResult.Miss:
                     // Missing ticks shouldn't drop HP
-                    if (!isTick)
+                    if (isSwell)
+                        Health.Value += hpIncreaseMissSwell;
+                    else if (!isTick)
                         Health.Value += hpIncreaseMiss;
                     break;
                 case HitResult.Good:
