@@ -6,7 +6,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
     public class TaikoStrongJudgement : TaikoJudgement
     {
         // MainObject already changes the HP
-        public override bool AffectsHp => false;
+        public override bool AffectsHP => false;
 
         public override bool AffectsCombo => false;
     }
