@@ -1,8 +1,11 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -17,6 +20,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         public bool Tracking { get; set; }
 
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+        private readonly IBindable<SliderPath> pathBindable = new Bindable<SliderPath>();
+
         public DrawableSliderTail(Slider slider, SliderTailCircle hitCircle)
             : base(hitCircle)
         {
@@ -29,10 +35,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             AlwaysPresent = true;
 
-            hitCircle.PositionChanged += _ => updatePosition();
-            slider.PathChanged += _ => updatePosition();
+            positionBindable.BindTo(hitCircle.PositionBindable);
+            pathBindable.BindTo(slider.PathBindable);
 
-            updatePosition();
+            positionBindable.BindValueChanged(_ => updatePosition());
+            pathBindable.BindValueChanged(_ => updatePosition(), true);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

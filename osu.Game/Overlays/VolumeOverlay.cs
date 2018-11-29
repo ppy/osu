@@ -14,8 +14,8 @@ using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Volume;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {

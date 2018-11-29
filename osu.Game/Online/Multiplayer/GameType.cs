@@ -1,8 +1,8 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -14,6 +14,9 @@ namespace osu.Game.Online.Multiplayer
     {
         public abstract string Name { get; }
         public abstract Drawable GetIcon(OsuColour colours, float size);
+
+        public override int GetHashCode() => GetType().GetHashCode();
+        public override bool Equals(object obj) => GetType() == obj?.GetType();
     }
 
     public class GameTypeTag : GameType

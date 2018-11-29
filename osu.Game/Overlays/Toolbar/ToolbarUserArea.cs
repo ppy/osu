@@ -4,7 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using OpenTK;
+using osuTK;
 using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 
 namespace osu.Game.Overlays.Toolbar

@@ -7,20 +7,19 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Screens.Edit.Compose;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
     /// <summary>
     /// A blueprint which governs the creation of a new <see cref="HitObject"/> to actualisation.
     /// </summary>
-    public abstract class PlacementBlueprint : CompositeDrawable, IStateful<PlacementState>, IRequireHighFrequencyMousePosition
+    public abstract class PlacementBlueprint : CompositeDrawable, IStateful<PlacementState>
     {
         /// <summary>
         /// Invoked when <see cref="State"/> has changed.
@@ -49,6 +48,10 @@ namespace osu.Game.Rulesets.Edit
             HitObject = hitObject;
 
             RelativeSizeAxes = Axes.Both;
+
+            // This is required to allow the blueprint's position to be updated via OnMouseMove/Handle
+            // on the same frame it is made visible via a PlacementState change.
+            AlwaysPresent = true;
 
             Alpha = 0;
         }
