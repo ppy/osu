@@ -5,17 +5,20 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     public class ManiaPlayfield : ScrollingPlayfield
     {
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => stages.Any(s => s.ReceivePositionalInputAt(screenSpacePos));
 
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
         {
@@ -52,7 +55,36 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override void Add(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Add(h);
 
+        public override void Remove(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Remove(h);
+
         public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
+
+        /// <summary>
+        /// Retrieves a column from a screen-space position.
+        /// </summary>
+        /// <param name="screenSpacePosition">The screen-space position.</param>
+        /// <returns>The column which the <paramref name="screenSpacePosition"/> lies in.</returns>
+        public Column GetColumnByPosition(Vector2 screenSpacePosition)
+        {
+            Column found = null;
+
+            foreach (var stage in stages)
+            {
+                foreach (var column in stage.Columns)
+                {
+                    if (column.ReceivePositionalInputAt(screenSpacePosition))
+                    {
+                        found = column;
+                        break;
+                    }
+                }
+
+                if (found != null)
+                    break;
+            }
+
+            return found;
+        }
 
         private ManiaStage getStageByColumn(int column)
         {

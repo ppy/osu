@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Linq;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -13,6 +13,7 @@ using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.UI.Components;
 using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -20,6 +21,11 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         private const float column_width = 45;
         private const float special_column_width = 70;
+
+        /// <summary>
+        /// The index of this column as part of the whole playfield.
+        /// </summary>
+        public readonly int Index;
 
         public readonly Bindable<ManiaAction> Action = new Bindable<ManiaAction>();
 
@@ -30,8 +36,10 @@ namespace osu.Game.Rulesets.Mania.UI
         internal readonly Container TopLevelContainer;
         private readonly Container explosionContainer;
 
-        public Column()
+        public Column(int index)
         {
+            Index = index;
+
             RelativeSizeAxes = Axes.Y;
             Width = column_width;
 
@@ -137,6 +145,13 @@ namespace osu.Game.Rulesets.Mania.UI
             HitObjectContainer.Add(hitObject);
         }
 
+        public override void Remove(DrawableHitObject h)
+        {
+            h.OnNewResult -= OnNewResult;
+
+            HitObjectContainer.Remove(h);
+        }
+
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements)
@@ -165,5 +180,9 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public bool OnReleased(ManiaAction action) => false;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos)
+            // This probably shouldn't exist as is, but the columns in the stage are separated by a 1px border
+            => DrawRectangle.Inflate(new Vector2(ManiaStage.COLUMN_SPACING / 2, 0)).Contains(ToLocalSpace(screenSpacePos));
     }
 }

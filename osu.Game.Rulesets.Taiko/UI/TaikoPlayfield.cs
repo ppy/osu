@@ -16,8 +16,8 @@ using osu.Game.Rulesets.UI.Scrolling;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.Judgements;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -41,6 +41,7 @@ namespace osu.Game.Rulesets.Taiko.UI
         private readonly Container<HitExplosion> hitExplosionContainer;
         private readonly Container<KiaiHitExplosion> kiaiExplosionContainer;
         private readonly JudgementContainer<DrawableTaikoJudgement> judgementContainer;
+        internal readonly HitTarget HitTarget;
 
         private readonly Container topLevelHitContainer;
 
@@ -102,7 +103,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                                         FillMode = FillMode.Fit,
                                         Blending = BlendingMode.Additive,
                                     },
-                                    new HitTarget
+                                    HitTarget = new HitTarget
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.Centre,

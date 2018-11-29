@@ -15,18 +15,14 @@ namespace osu.Game.Tests.Visual
     [Cached(Type = typeof(IPlacementHandler))]
     public abstract class PlacementBlueprintTestCase : OsuTestCase, IPlacementHandler
     {
-        private readonly Container hitObjectContainer;
+        protected readonly Container HitObjectContainer;
         private PlacementBlueprint currentBlueprint;
 
         protected PlacementBlueprintTestCase()
         {
             Beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize = 2;
 
-            Add(hitObjectContainer = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Clock = new FramedClock(new StopwatchClock())
-            });
+            Add(HitObjectContainer = CreateHitObjectContainer());
         }
 
         [BackgroundDependencyLoader]
@@ -49,7 +45,7 @@ namespace osu.Game.Tests.Visual
 
         public void EndPlacement(HitObject hitObject)
         {
-            hitObjectContainer.Add(CreateHitObject(hitObject));
+            AddHitObject(CreateHitObject(hitObject));
 
             Remove(currentBlueprint);
             Add(currentBlueprint = CreateBlueprint());
@@ -58,6 +54,10 @@ namespace osu.Game.Tests.Visual
         public void Delete(HitObject hitObject)
         {
         }
+
+        protected virtual Container CreateHitObjectContainer() => new Container { RelativeSizeAxes = Axes.Both };
+
+        protected virtual void AddHitObject(DrawableHitObject hitObject) => HitObjectContainer.Add(hitObject);
 
         protected abstract DrawableHitObject CreateHitObject(HitObject hitObject);
         protected abstract PlacementBlueprint CreateBlueprint();

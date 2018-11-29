@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Input.Events;
-using OpenTK.Input;
-using OpenTK;
+using osuTK.Input;
+using osuTK;
 
 namespace osu.Game.Screens.Play
 {
