@@ -286,7 +286,7 @@ namespace osu.Game
             Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
             Beatmap.Value.Mods.Value = score.Mods;
 
-            menu.Push(new PlayerLoader(new ReplayPlayer(score.Replay)));
+            menu.Push(new PlayerLoader(new ReplayPlayer(score)));
         }
 
         protected override void Dispose(bool isDisposing)
