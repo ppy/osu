@@ -11,6 +11,11 @@ namespace osu.Game.Rulesets.Taiko.Judgements
         public override HitResult MaxResult => HitResult.Great;
 
         /// <summary>
+        /// Whether this <see cref="TaikoJudgement"/> should affect user's hitpoints.
+        /// </summary>
+        public virtual bool AffectsHP => true;
+
+        /// <summary>
         /// Computes the numeric result value for the combo portion of the score.
         /// </summary>
         /// <param name="result">The result to compute the value for.</param>

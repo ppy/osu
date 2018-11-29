@@ -79,27 +79,15 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         protected override void ApplyResult(JudgementResult result)
         {
             base.ApplyResult(result);
+            
+            if (!((TaikoJudgement)result.Judgement).AffectsHP)
+                return;
 
-            bool isRoll = false;
-            bool isStrong = false;
+            bool isSwell = false;
             bool isTick = result.Judgement is TaikoDrumRollTickJudgement;
 
-            if (!isTick)
-            {
-                isRoll = result.Judgement is TaikoDrumRollJudgement;
-                if (!isRoll)
-                {
-                    isStrong = result.Judgement is TaikoStrongJudgement;
-                }
-            }
-
-            //Don't change HP based on drum roll fullness for compatibility
-            if (isRoll)
-                return;
-
-            //If the object is strong, HP change is already handled in MainObject
-            if (isStrong)
-                return;
+            if(!isTick)
+                isSwell = result.Judgement is TaikoSwellJudgement;
 
             // Apply HP changes
             switch (result.Type)
@@ -110,12 +98,14 @@ namespace osu.Game.Rulesets.Taiko.Scoring
                         Health.Value += hpIncreaseMiss;
                     break;
                 case HitResult.Good:
-                    Health.Value += hpIncreaseGood;
+                    // Swells shouldn't increase HP
+                    if (!isSwell)
+                        Health.Value += hpIncreaseGood;
                     break;
                 case HitResult.Great:
                     if (isTick)
                         Health.Value += hpIncreaseTick;
-                    else
+                    else if(!isSwell)
                         Health.Value += hpIncreaseGreat;
                     break;
             }
