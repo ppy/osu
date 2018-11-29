@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         protected override void ApplyResult(JudgementResult result)
         {
             base.ApplyResult(result);
-            
+
             if (!((TaikoJudgement)result.Judgement).AffectsHP)
                 return;
 
