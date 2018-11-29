@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         /// The maximum HP deducted for a <see cref="HitResult.Miss"/>.
         /// This occurs when HP Drain = 10.
         /// </summary>
-        private const double hp_miss_max = -0.12;
+        private const double hp_miss_max = -0.012;
 
         /// <summary>
         /// The HP awarded for a <see cref="DrumRollTick"/> hit.
