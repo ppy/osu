@@ -80,7 +80,27 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         {
             base.ApplyResult(result);
 
-            bool isTick = result.Judgement is TaikoDrumRollTickJudgement;
+            bool isTick = false;
+            bool isRoll = false;
+            bool isStrong = false;
+
+            isTick = result.Judgement is TaikoDrumRollTickJudgement;
+            if (!isTick)
+            {
+                isRoll = result.Judgement is TaikoDrumRollJudgement;
+                if (!isRoll)
+                {
+                    isStrong = result.Judgement is TaikoStrongJudgement;
+                }
+            }
+
+            //Don't change HP based on drum roll fullness for compatibility
+            if (isRoll)
+                return;
+
+            //If the object is strong, HP change is already handled in MainObject
+            if (isStrong)
+                return;
 
             // Apply HP changes
             switch (result.Type)

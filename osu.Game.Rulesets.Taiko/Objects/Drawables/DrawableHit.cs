@@ -170,7 +170,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                     ApplyResult(r => r.Type = HitResult.Miss);
                     return;
                 }
-
+                 
                 if (!userTriggered)
                 {
                     if (timeOffset > second_hit_window)
@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 }
 
                 if (Math.Abs(MainObject.Result.TimeOffset - timeOffset) < second_hit_window)
-                    ApplyResult(r => r.Type = HitResult.Great);
+                    ApplyResult(r => r.Type = MainObject.Result.Type);
             }
 
             public override bool OnPressed(TaikoAction action)
