@@ -505,7 +505,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private void onBeatmapSetAdded(BeatmapSetInfo s, bool existing) => Carousel.UpdateBeatmapSet(s);
+        private void onBeatmapSetAdded(BeatmapSetInfo s, bool existing, bool silent) => Carousel.UpdateBeatmapSet(s);
         private void onBeatmapSetRemoved(BeatmapSetInfo s) => Carousel.RemoveBeatmapSet(s);
         private void onBeatmapRestored(BeatmapInfo b) => Carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
         private void onBeatmapHidden(BeatmapInfo b) => Carousel.UpdateBeatmapSet(beatmaps.QueryBeatmapSet(s => s.ID == b.BeatmapSetInfoID));
