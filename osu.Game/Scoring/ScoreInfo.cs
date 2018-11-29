@@ -43,6 +43,9 @@ namespace osu.Game.Scoring
         {
             get
             {
+                if (modsString == null)
+                    return Array.Empty<Mod>();
+
                 var deserialized = JsonConvert.DeserializeObject<string[]>(modsString);
                 return Ruleset.CreateInstance().GetAllMods().Where(mod => deserialized.Any(d => d == mod.ShortenedName)).ToArray();
             }
