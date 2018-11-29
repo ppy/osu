@@ -3,11 +3,15 @@
 
 using System;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class Swell : TaikoHitObject, IHasEndTime
     {
+        public override Judgement CreateJudgement() => new TaikoSwellJudgement();
+
         public double EndTime => StartTime + Duration;
 
         public double Duration { get; set; }

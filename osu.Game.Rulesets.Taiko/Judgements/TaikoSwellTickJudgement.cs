@@ -5,12 +5,21 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Judgements
 {
-    public class TaikoDrumRollJudgement : TaikoJudgement
+    public class TaikoSwellTickJudgement : TaikoJudgement
     {
         public override bool AffectsCombo => false;
 
         public override bool AffectsHP => false;
 
-        protected override int NumericResultFor(HitResult result) => 0;
+        protected override int NumericResultFor(HitResult result)
+        {
+            switch (result)
+            {
+                default:
+                    return 0;
+                case HitResult.Great:
+                    return 300;
+            }
+        }
     }
 }
