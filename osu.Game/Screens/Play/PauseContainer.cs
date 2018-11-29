@@ -70,7 +70,10 @@ namespace osu.Game.Screens.Play
                 OnResume = () =>
                 {
                     if (resumeOverlay == null)
-                        scheduleResuming();
+                    {
+                        IsResuming = true;
+                        this.Delay(400).Schedule(Resume);
+                    }
 
                     pauseOverlay.Hide();
                     resumeOverlay?.Show();
@@ -83,8 +86,9 @@ namespace osu.Game.Screens.Play
             {
                 resumeOverlay.ResumeAction = () =>
                 {
-                    scheduleResuming();
+                    IsResuming = true;
                     resumeOverlay.Hide();
+                    Resume();
                 };
                 resumeOverlay.PauseAction = () =>
                 {
@@ -93,12 +97,6 @@ namespace osu.Game.Screens.Play
                 };
                 AddInternal(resumeOverlay);
             }
-        }
-
-        private void scheduleResuming()
-        {
-            IsResuming = true;
-            this.Delay(400).Schedule(Resume);
         }
 
         public void Pause(bool force = false) => Schedule(() => // Scheduled to ensure a stable position in execution order, no matter how it was called.
