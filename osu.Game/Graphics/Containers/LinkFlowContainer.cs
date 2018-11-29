@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
 using osu.Framework.Logging;
-using osu.Framework.Platform;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
@@ -24,14 +23,12 @@ namespace osu.Game.Graphics.Containers
         private OsuGame game;
         private ChannelManager channelManager;
         private Action showNotImplementedError;
-        private GameHost host;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, NotificationOverlay notifications, GameHost host, ChannelManager channelManager)
+        private void load(OsuGame game, NotificationOverlay notifications, ChannelManager channelManager)
         {
             // will be null in tests
             this.game = game;
-            this.host = host;
             this.channelManager = channelManager;
 
             showNotImplementedError = () => notifications?.Post(new SimpleNotification
@@ -98,7 +95,7 @@ namespace osu.Game.Graphics.Containers
                             showNotImplementedError?.Invoke();
                             break;
                         case LinkAction.External:
-                            host.OpenUrlExternally(url);
+                            game?.OpenUrlExternally(url);
                             break;
                         case LinkAction.OpenUserProfile:
                             if (long.TryParse(linkArgument, out long userId))

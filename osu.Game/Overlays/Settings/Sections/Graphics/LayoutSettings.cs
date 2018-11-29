@@ -6,9 +6,9 @@ using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             if (resolutions.Count > 1)
             {
-                resolutionSettingsContainer.Child = resolutionDropdown = new SettingsDropdown<Size>
+                resolutionSettingsContainer.Child = resolutionDropdown = new ResolutionSettingsDropdown
                 {
                     LabelText = "Resolution",
                     ShowsDefaultIndicator = false,
@@ -115,18 +115,36 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }, true);
         }
 
-        private IReadOnlyList<KeyValuePair<string, Size>> getResolutions()
+        private IReadOnlyList<Size> getResolutions()
         {
-            var resolutions = new KeyValuePair<string, Size>("Default", new Size(9999, 9999)).Yield();
+            var resolutions = new List<Size> { new Size(9999, 9999) };
 
             if (game.Window != null)
-                resolutions = resolutions.Concat(game.Window.AvailableResolutions
-                                                     .Where(r => r.Width >= 800 && r.Height >= 600)
-                                                     .OrderByDescending(r => r.Width)
-                                                     .ThenByDescending(r => r.Height)
-                                                     .Select(res => new KeyValuePair<string, Size>($"{res.Width}x{res.Height}", new Size(res.Width, res.Height)))
-                                                     .Distinct());
-            return resolutions.ToList();
+            {
+                resolutions.AddRange(game.Window.AvailableResolutions
+                                         .Where(r => r.Width >= 800 && r.Height >= 600)
+                                         .OrderByDescending(r => r.Width)
+                                         .ThenByDescending(r => r.Height)
+                                         .Select(res => new Size(res.Width, res.Height))
+                                         .Distinct());
+            }
+
+            return resolutions;
+        }
+
+        private class ResolutionSettingsDropdown : SettingsDropdown<Size>
+        {
+            protected override OsuDropdown<Size> CreateDropdown() => new ResolutionDropdownControl { Items = Items };
+
+            private class ResolutionDropdownControl : DropdownControl
+            {
+                protected override string GenerateItemText(Size item)
+                {
+                    if (item == new Size(9999, 9999))
+                        return "Default";
+                    return $"{item.Width}x{item.Height}";
+                }
+            }
         }
     }
 }

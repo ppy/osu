@@ -7,7 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shaders;
 using osu.Game.Screens.Menu;
-using OpenTK;
+using osuTK;
 using osu.Framework.Screens;
 using osu.Game.Overlays;
 

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using OpenTK;
+using osuTK;
 using osu.Game.Screens.Tournament.Teams;
 
 namespace osu.Game.Screens.Tournament

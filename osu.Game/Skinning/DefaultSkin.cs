@@ -4,7 +4,7 @@
 using osu.Framework.Audio.Sample;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {

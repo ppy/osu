@@ -7,7 +7,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.UI;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
