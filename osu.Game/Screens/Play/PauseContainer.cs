@@ -9,9 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Play.HUD;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
@@ -32,8 +29,6 @@ namespace osu.Game.Screens.Play
         private readonly PauseOverlay pauseOverlay;
 
         private readonly Container content;
-
-        public readonly HoldForMenuButton HoldToQuit;
 
         protected override Container<Drawable> Content => content;
 
@@ -77,16 +72,7 @@ namespace osu.Game.Screens.Play
                 OnRetry = () => OnRetry(),
                 OnQuit = () => OnQuit(),
             });
-
-            AddInternal(HoldToQuit = createHoldForMenuButton());
         }
-
-        private HoldForMenuButton createHoldForMenuButton() => new HoldForMenuButton
-        {
-            Anchor = Anchor.BottomRight,
-            Origin = Anchor.BottomRight,
-            Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y)
-        };
 
         public void Pause(bool force = false) => Schedule(() => // Scheduled to ensure a stable position in execution order, no matter how it was called.
         {

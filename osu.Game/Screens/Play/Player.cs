@@ -21,15 +21,18 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
+using osuTK;
 
 namespace osu.Game.Screens.Play
 {
@@ -218,10 +221,16 @@ namespace osu.Game.Screens.Play
                         fadeOut(true);
                         Restart();
                     },
+                },
+                new HoldForMenuButton
+                {
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
+                    Action = Exit
                 }
             };
 
-            pauseContainer.HoldToQuit.Action = Exit;
             hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
