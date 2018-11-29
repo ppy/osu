@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
         /// <summary>
         /// Whether this <see cref="TaikoJudgement"/> should affect user's hitpoints.
         /// </summary>
-        public virtual bool AffectsHP => true;
+        public virtual bool AffectsHp => true;
 
         /// <summary>
         /// Computes the numeric result value for the combo portion of the score.
