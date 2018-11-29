@@ -57,7 +57,7 @@ namespace osu.Game.Scoring
 
         protected override ScoreInfo CheckForExisting(ScoreInfo model)
         {
-            var existingHashMatch = scores.ConsumableItems.FirstOrDefault(s => s.MD5Hash == model.MD5Hash);
+            var existingHashMatch = scores.ConsumableItems.FirstOrDefault(s => s.MD5Hash != null && s.MD5Hash == model.MD5Hash);
             if (existingHashMatch != null)
             {
                 Undelete(existingHashMatch);
