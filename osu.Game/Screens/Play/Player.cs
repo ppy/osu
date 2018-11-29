@@ -273,18 +273,25 @@ namespace osu.Game.Screens.Play
                 {
                     if (!IsCurrentScreen) return;
 
-                    var score = new ScoreInfo
-                    {
-                        Beatmap = Beatmap.Value.BeatmapInfo,
-                        Ruleset = ruleset
-                    };
-                    ScoreProcessor.PopulateScore(score);
-                    score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
-                    Push(new Results(score));
+                    Push(new Results(CreateScoreInfo()));
 
                     onCompletionEvent = null;
                 });
             }
+        }
+
+        protected virtual ScoreInfo CreateScoreInfo()
+        {
+            var score = new ScoreInfo
+            {
+                BeatmapInfo = Beatmap.Value.BeatmapInfo,
+                Ruleset = ruleset,
+                User = api.LocalUser.Value
+            };
+
+            ScoreProcessor.PopulateScore(score);
+
+            return score;
         }
 
         private bool onFail()

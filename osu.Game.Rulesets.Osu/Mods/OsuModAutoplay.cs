@@ -8,6 +8,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Scoring;
+using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -17,6 +18,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         protected override Score CreateReplayScore(Beatmap<OsuHitObject> beatmap) => new Score
         {
+            ScoreInfo = new ScoreInfo { User = new User { Username = "Autoplay" } },
             Replay = new OsuAutoGenerator(beatmap).Generate()
         };
     }

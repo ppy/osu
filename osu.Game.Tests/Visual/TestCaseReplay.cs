@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
@@ -19,13 +20,10 @@ namespace osu.Game.Tests.Visual
             Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
             var dummyRulesetContainer = ruleset.CreateRulesetContainerWith(Beatmap.Value);
 
-            // We have the replay
-            var replay = dummyRulesetContainer.Replay;
-
             // Reset the mods
             Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Where(m => !(m is ModAutoplay));
 
-            return new ReplayPlayer(replay);
+            return new ReplayPlayer(new Score { Replay = dummyRulesetContainer.Replay });
         }
     }
 }
