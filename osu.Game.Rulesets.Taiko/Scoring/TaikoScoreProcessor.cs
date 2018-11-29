@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         {
             base.ApplyResult(result);
 
-            if (!((TaikoJudgement)result.Judgement).AffectsHp)
+            if (!((TaikoJudgement)result.Judgement).AffectsHP)
                 return;
 
             bool isSwell = false;
