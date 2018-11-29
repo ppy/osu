@@ -80,11 +80,10 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         {
             base.ApplyResult(result);
 
-            bool isTick = false;
             bool isRoll = false;
             bool isStrong = false;
+            bool isTick = result.Judgement is TaikoDrumRollTickJudgement;
 
-            isTick = result.Judgement is TaikoDrumRollTickJudgement;
             if (!isTick)
             {
                 isRoll = result.Judgement is TaikoDrumRollJudgement;
