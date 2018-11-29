@@ -13,6 +13,9 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints.Components
         private void load(OsuColour colours)
         {
             AccentColour = colours.Yellow;
+
+            Background.Alpha = 0.5f;
+            Foreground.Alpha = 0;
         }
     }
 }
