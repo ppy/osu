@@ -15,8 +15,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public class ManiaSelectionBlueprint : SelectionBlueprint
     {
-        public Vector2 ScreenSpaceMouseDownPosition { get; private set; }
-        public Vector2 MouseDownPosition { get; private set; }
+        public Vector2 ScreenSpaceDragPosition { get; private set; }
+        public Vector2 DragPosition { get; private set; }
 
         protected new DrawableManiaHitObject HitObject => (DrawableManiaHitObject)base.HitObject;
 
@@ -49,8 +49,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
         protected override bool OnMouseDown(MouseDownEvent e)
         {
-            ScreenSpaceMouseDownPosition = e.ScreenSpaceMousePosition;
-            MouseDownPosition = HitObject.ToLocalSpace(e.ScreenSpaceMousePosition);
+            ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
+            DragPosition = HitObject.ToLocalSpace(e.ScreenSpaceMousePosition);
 
             return base.OnMouseDown(e);
         }
@@ -59,8 +59,8 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
         {
             var result = base.OnDrag(e);
 
-            ScreenSpaceMouseDownPosition = e.ScreenSpaceMousePosition;
-            MouseDownPosition = HitObject.ToLocalSpace(e.ScreenSpaceMousePosition);
+            ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
+            DragPosition = HitObject.ToLocalSpace(e.ScreenSpaceMousePosition);
 
             return result;
         }
