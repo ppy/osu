@@ -291,7 +291,7 @@ namespace osu.Game.Screens.Play
         {
             var score = new ScoreInfo
             {
-                BeatmapInfo = Beatmap.Value.BeatmapInfo,
+                Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = ruleset,
                 User = api.LocalUser.Value
             };
