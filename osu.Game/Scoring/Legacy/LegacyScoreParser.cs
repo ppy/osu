@@ -46,7 +46,9 @@ namespace osu.Game.Scoring.Legacy
                 score.ScoreInfo.Beatmap = currentBeatmap.BeatmapInfo;
 
                 score.ScoreInfo.User = score.Replay.User = new User { Username = sr.ReadString() };
-                score.ScoreInfo.MD5Hash = sr.ReadString();
+
+                // MD5Hash
+                sr.ReadString();
 
                 var count300 = (int)sr.ReadUInt16();
                 var count100 = (int)sr.ReadUInt16();

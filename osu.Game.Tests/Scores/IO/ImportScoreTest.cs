@@ -121,10 +121,8 @@ namespace osu.Game.Tests.Scores.IO
             }
         }
 
-        private ScoreInfo loadIntoOsu(OsuGameBase osu, ScoreInfo score, string guidOverride = null)
+        private ScoreInfo loadIntoOsu(OsuGameBase osu, ScoreInfo score)
         {
-            score.MD5Hash = guidOverride ?? Guid.NewGuid().ToString();
-
             var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
 
             score.Beatmap = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
@@ -133,9 +131,7 @@ namespace osu.Game.Tests.Scores.IO
             var scoreManager = osu.Dependencies.Get<ScoreManager>();
             scoreManager.Import(score);
 
-            var imported = scoreManager.Query(s => s.MD5Hash == score.MD5Hash);
-
-            return imported;
+            return scoreManager.GetAllUsableScores().First();
         }
 
         private string createTemporaryBeatmap()

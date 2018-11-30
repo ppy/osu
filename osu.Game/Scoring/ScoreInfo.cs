@@ -110,13 +110,9 @@ namespace osu.Game.Scoring
             }
         }
 
-        /// <summary>
-        /// MD5 is kept for legacy support.
-        /// </summary>
-        [JsonProperty("file_md5")]
-        public string MD5Hash { get; set; }
-
         public List<ScoreFileInfo> Files { get; set; }
+
+        public string Hash { get; set; }
 
         public bool DeletePending { get; set; }
 
