@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo scoreInfo)
-            : base(ruleset, beatmap, scoreInfo)
+        public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
+            : base(ruleset, beatmap, score)
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
 
@@ -42,13 +42,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public override double Calculate(Dictionary<string, double> categoryRatings = null)
         {
-            mods = ScoreInfo.Mods;
-            accuracy = ScoreInfo.Accuracy;
-            scoreMaxCombo = ScoreInfo.MaxCombo;
-            countGreat = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Great]);
-            countGood = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Good]);
-            countMeh = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Meh]);
-            countMiss = Convert.ToInt32(ScoreInfo.Statistics[HitResult.Miss]);
+            mods = Score.Mods;
+            accuracy = Score.Accuracy;
+            scoreMaxCombo = Score.MaxCombo;
+            countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
+            countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
+            countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
+            countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))

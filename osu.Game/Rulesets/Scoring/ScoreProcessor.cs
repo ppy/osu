@@ -158,15 +158,15 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Retrieve a score populated with data for the current play this processor is responsible for.
         /// </summary>
-        public virtual void PopulateScore(ScoreInfo scoreInfo)
+        public virtual void PopulateScore(ScoreInfo score)
         {
-            scoreInfo.TotalScore = TotalScore;
-            scoreInfo.Combo = Combo;
-            scoreInfo.MaxCombo = HighestCombo;
-            scoreInfo.Accuracy = Accuracy;
-            scoreInfo.Rank = Rank;
-            scoreInfo.Date = DateTimeOffset.Now;
-            scoreInfo.Health = Health;
+            score.TotalScore = TotalScore;
+            score.Combo = Combo;
+            score.MaxCombo = HighestCombo;
+            score.Accuracy = Accuracy;
+            score.Rank = Rank;
+            score.Date = DateTimeOffset.Now;
+            score.Health = Health;
         }
     }
 

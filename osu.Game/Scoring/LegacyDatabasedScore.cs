@@ -12,11 +12,11 @@ namespace osu.Game.Scoring
 {
     public class LegacyDatabasedScore : Score
     {
-        public LegacyDatabasedScore(ScoreInfo scoreInfo, RulesetStore rulesets, BeatmapManager beatmaps, IResourceStore<byte[]> store)
+        public LegacyDatabasedScore(ScoreInfo score, RulesetStore rulesets, BeatmapManager beatmaps, IResourceStore<byte[]> store)
         {
-            ScoreInfo = scoreInfo;
+            ScoreInfo = score;
 
-            var replayFilename = scoreInfo.Files.First(f => f.Filename.EndsWith(".osr", StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
+            var replayFilename = score.Files.First(f => f.Filename.EndsWith(".osr", StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
 
             using (var stream = store.GetStream(replayFilename))
                 Replay = new DatabasedLegacyScoreParser(rulesets, beatmaps).Parse(stream).Replay;
