@@ -3,7 +3,7 @@
 
 using System.ComponentModel;
 
-namespace osu.Game.Rulesets.Scoring
+namespace osu.Game.Scoring
 {
     public enum ScoreRank
     {

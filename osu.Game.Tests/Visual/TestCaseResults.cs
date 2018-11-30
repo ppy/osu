@@ -7,6 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 
@@ -19,7 +20,7 @@ namespace osu.Game.Tests.Visual
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(Score),
+            typeof(ScoreInfo),
             typeof(Results),
             typeof(ResultsPage),
             typeof(ResultsPageScore),
@@ -40,7 +41,7 @@ namespace osu.Game.Tests.Visual
             if (beatmapInfo != null)
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
 
-            Add(new Results(new Score
+            Add(new Results(new ScoreInfo
             {
                 TotalScore = 2845370,
                 Accuracy = 0.98,

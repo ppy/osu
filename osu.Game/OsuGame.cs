@@ -27,7 +27,6 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Input;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Play;
@@ -37,6 +36,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Skinning;
 using osuTK.Graphics;
 using osu.Game.Overlays.Volume;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select;
 using osu.Game.Utils;
 using LogLevel = osu.Framework.Logging.LogLevel;
@@ -148,7 +148,7 @@ namespace osu.Game
         {
             this.frameworkConfig = frameworkConfig;
 
-            ScoreStore.ScoreImported += score => Schedule(() => LoadScore(score));
+            ScoreManager.ItemAdded += (score, _) => Schedule(() => LoadScore(score));
 
             if (!Host.IsPrimaryInstance)
             {
@@ -248,7 +248,7 @@ namespace osu.Game
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId);
 
-        protected void LoadScore(Score score)
+        protected void LoadScore(ScoreInfo score)
         {
             scoreLoad?.Cancel();
 
@@ -267,7 +267,9 @@ namespace osu.Game
                 return;
             }
 
-            if (score.Beatmap == null)
+            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == score.Beatmap.ID);
+
+            if (databasedBeatmap == null)
             {
                 notifications.Post(new SimpleNotification
                 {
@@ -279,10 +281,10 @@ namespace osu.Game
 
             ruleset.Value = score.Ruleset;
 
-            Beatmap.Value = BeatmapManager.GetWorkingBeatmap(score.Beatmap);
+            Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
             Beatmap.Value.Mods.Value = score.Mods;
 
-            menu.Push(new PlayerLoader(new ReplayPlayer(score.Replay)));
+            menu.Push(new PlayerLoader(new ReplayPlayer(ScoreManager.GetScore(score).Replay)));
         }
 
         protected override void Dispose(bool isDisposing)

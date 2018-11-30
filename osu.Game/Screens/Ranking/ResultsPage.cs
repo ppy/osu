@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
@@ -16,14 +16,14 @@ namespace osu.Game.Screens.Ranking
 {
     public class ResultsPage : Container
     {
-        protected readonly Score Score;
+        protected readonly ScoreInfo Score;
         protected readonly WorkingBeatmap Beatmap;
         private CircularContainer content;
         private Box fill;
 
         protected override Container<Drawable> Content => content;
 
-        public ResultsPage(Score score, WorkingBeatmap beatmap)
+        public ResultsPage(ScoreInfo score, WorkingBeatmap beatmap)
         {
             Score = score;
             Beatmap = beatmap;

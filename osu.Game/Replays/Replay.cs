@@ -2,9 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Game.Rulesets.Replays;
 using osu.Game.Users;
 
-namespace osu.Game.Rulesets.Replays
+namespace osu.Game.Replays
 {
     public class Replay
     {

@@ -6,14 +6,14 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Game.Database;
 using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
     [Serializable]
-    public class BeatmapMetadata : IEquatable<BeatmapMetadata>
+    public class BeatmapMetadata : IEquatable<BeatmapMetadata>, IHasPrimaryKey
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
 
         public string Title { get; set; }

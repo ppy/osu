@@ -7,7 +7,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
@@ -15,12 +15,9 @@ namespace osu.Game.Rulesets.Osu.Mods
     {
         public override Type[] IncompatibleMods => base.IncompatibleMods.Append(typeof(OsuModAutopilot)).Append(typeof(OsuModSpunOut)).ToArray();
 
-        protected override Score CreateReplayScore(Beatmap<OsuHitObject> beatmap)
+        protected override Score CreateReplayScore(Beatmap<OsuHitObject> beatmap) => new Score
         {
-            return new Score
-            {
-                Replay = new OsuAutoGenerator(beatmap).Generate()
-            };
-        }
+            Replay = new OsuAutoGenerator(beatmap).Generate()
+        };
     }
 }

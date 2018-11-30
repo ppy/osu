@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Scoring
 {
@@ -157,7 +158,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Retrieve a score populated with data for the current play this processor is responsible for.
         /// </summary>
-        public virtual void PopulateScore(Score score)
+        public virtual void PopulateScore(ScoreInfo score)
         {
             score.TotalScore = TotalScore;
             score.Combo = Combo;
