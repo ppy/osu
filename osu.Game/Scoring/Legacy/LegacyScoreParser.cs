@@ -43,7 +43,7 @@ namespace osu.Game.Scoring.Legacy
                     throw new BeatmapNotFoundException();
 
                 currentBeatmap = workingBeatmap.Beatmap;
-                score.ScoreInfo.BeatmapInfo = currentBeatmap.BeatmapInfo;
+                score.ScoreInfo.Beatmap = currentBeatmap.BeatmapInfo;
 
                 score.ScoreInfo.User = score.Replay.User = new User { Username = sr.ReadString() };
                 score.ScoreInfo.MD5Hash = sr.ReadString();

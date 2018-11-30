@@ -36,27 +36,49 @@ namespace osu.Game.Scoring
 
         public int RulesetID { get; set; }
 
-        public RulesetInfo Ruleset { get; set; }
+        public virtual RulesetInfo Ruleset { get; set; }
 
-        [NotMapped, JsonIgnore]
+        private Mod[] mods;
+
+        [NotMapped]
         public Mod[] Mods
         {
             get
             {
-                if (ModsString == null)
+                if (mods != null) return mods;
+
+                if (modsJson == null)
                     return Array.Empty<Mod>();
 
-                var deserialized = JsonConvert.DeserializeObject<string[]>(ModsString);
-                return Ruleset.CreateInstance().GetAllMods().Where(mod => deserialized.Any(d => d == mod.ShortenedName)).ToArray();
+                return getModsFromRuleset(JsonConvert.DeserializeObject<DeserializedMod[]>(modsJson));
             }
-            set => ModsString = JsonConvert.SerializeObject(value.Select(m => m.ShortenedName).ToArray());
+            set
+            {
+                mods = value;
+                ModsJson = null;
+            }
         }
 
-        public string ModsString { get; set; }
+        private Mod[] getModsFromRuleset(DeserializedMod[] mods) => Ruleset.CreateInstance().GetAllMods().Where(mod => mods.Any(d => d.ShortenedName == mod.ShortenedName)).ToArray();
 
-        [NotMapped, JsonIgnore]
+        private string modsJson;
+
+        [Column("Mods")]
+        public string ModsJson
+        {
+            get => modsJson ?? JsonConvert.SerializeObject(Mods);
+            set
+            {
+                modsJson = value;
+
+                // we potentially can't update this yet due to Ruleset being late-bound, so instead update on read as necessary.
+                mods = null;
+            }
+        }
+
         public User User;
 
+        [Column("User")]
         public string UserString
         {
             get => User?.Username;
@@ -65,22 +87,25 @@ namespace osu.Game.Scoring
 
         public int BeatmapInfoID { get; set; }
 
-        public BeatmapInfo BeatmapInfo { get; set; }
+        public virtual BeatmapInfo Beatmap { get; set; }
 
         public long? OnlineScoreID { get; set; }
 
         public DateTimeOffset Date { get; set; }
 
-        [NotMapped, JsonIgnore]
         public Dictionary<HitResult, object> Statistics = new Dictionary<HitResult, object>();
 
-        public string StatisticsString
+        [Column("Statistics")]
+        public string StatisticsJson
         {
             get => JsonConvert.SerializeObject(Statistics);
             set
             {
                 if (value == null)
+                {
+                    Statistics.Clear();
                     return;
+                }
 
                 Statistics = JsonConvert.DeserializeObject<Dictionary<HitResult, object>>(value);
             }
@@ -95,5 +120,13 @@ namespace osu.Game.Scoring
         public List<ScoreFileInfo> Files { get; set; }
 
         public bool DeletePending { get; set; }
+
+        [Serializable]
+        protected class DeserializedMod : Mod
+        {
+            public override string Name { get; } = string.Empty;
+            public override string ShortenedName { get; } = string.Empty;
+            public override double ScoreMultiplier { get; } = 0;
+        }
     }
 }

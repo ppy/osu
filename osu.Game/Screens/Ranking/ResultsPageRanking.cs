@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Ranking
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
-                    Beatmap = Beatmap.BeatmapInfo ?? Score.BeatmapInfo,
+                    Beatmap = Beatmap.BeatmapInfo ?? Score.Beatmap,
                     Scale = new Vector2(0.7f)
                 }
             };
