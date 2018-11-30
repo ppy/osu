@@ -163,10 +163,10 @@ namespace osu.Game.Screens.Edit
             switch (e.Key)
             {
                 case Key.Left:
-                    seek(-1);
+                    seek(e, -1);
                     return true;
                 case Key.Right:
-                    seek(1);
+                    seek(e, 1);
                     return true;
             }
 
@@ -184,9 +184,9 @@ namespace osu.Game.Screens.Edit
             while (Math.Abs(scrollAccumulation) > precision)
             {
                 if (scrollAccumulation > 0)
-                    seek(-1);
+                    seek(e, -1);
                 else
-                    seek(1);
+                    seek(e, 1);
 
                 scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
             }
@@ -241,9 +241,9 @@ namespace osu.Game.Screens.Edit
             LoadComponentAsync(currentScreen, screenContainer.Add);
         }
 
-        private void seek(int direction)
+        private void seek(UIEvent e, int direction)
         {
-            double amount = GetContainingInputManager().CurrentState.Keyboard.ShiftPressed ? 2 : 1;
+            double amount = e.ShiftPressed ? 2 : 1;
 
             if (direction < 1)
                 clock.SeekBackward(!clock.IsRunning, amount);
