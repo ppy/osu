@@ -15,7 +15,6 @@ namespace osu.Game.Beatmaps
     [Serializable]
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IHasPrimaryKey
     {
-        [JsonIgnore]
         public int ID { get; set; }
 
         public int BeatmapVersion;
@@ -29,7 +28,6 @@ namespace osu.Game.Beatmaps
             set => onlineBeatmapID = value > 0 ? value : null;
         }
 
-        [JsonIgnore]
         public int BeatmapSetInfoID { get; set; }
 
         public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using Newtonsoft.Json;
 using osu.Game.Database;
 
 namespace osu.Game.Beatmaps
@@ -13,7 +12,6 @@ namespace osu.Game.Beatmaps
         /// </summary>
         public const float DEFAULT_DIFFICULTY = 5;
 
-        [JsonIgnore]
         public int ID { get; set; }
 
         public float DrainRate { get; set; } = DEFAULT_DIFFICULTY;
