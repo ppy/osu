@@ -9,7 +9,7 @@ namespace osu.Game.Scoring
     {
         [Description(@"F")]
         F,
-        [Description(@"F")]
+        [Description(@"D")]
         D,
         [Description(@"C")]
         C,
