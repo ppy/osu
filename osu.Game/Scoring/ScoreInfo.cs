@@ -17,7 +17,6 @@ namespace osu.Game.Scoring
 {
     public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete
     {
-        [JsonIgnore]
         public int ID { get; set; }
 
         public ScoreRank Rank { get; set; }
