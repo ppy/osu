@@ -14,8 +14,8 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Select.Leaderboards
@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         public static readonly float HEIGHT = 60;
 
         public readonly int RankPosition;
-        public readonly Score Score;
+        public readonly ScoreInfo Score;
 
         private const float corner_radius = 5;
         private const float edge_margin = 5;
@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         private Container flagBadgeContainer;
         private FillFlowContainer<ModIcon> modsContainer;
 
-        public LeaderboardScore(Score score, int rank)
+        public LeaderboardScore(ScoreInfo score, int rank)
         {
             Score = score;
             RankPosition = rank;
