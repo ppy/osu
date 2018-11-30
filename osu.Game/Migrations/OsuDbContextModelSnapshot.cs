@@ -317,9 +317,9 @@ namespace osu.Game.Migrations
 
                     b.Property<bool>("DeletePending");
 
-                    b.Property<double>("Health");
+                    b.Property<string>("Hash");
 
-                    b.Property<string>("MD5Hash");
+                    b.Property<double>("Health");
 
                     b.Property<int>("MaxCombo");
 
