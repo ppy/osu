@@ -49,8 +49,8 @@ namespace osu.Game.Rulesets.Mania.Edit
         {
             var referenceParent = (HitObjectContainer)reference.HitObject.Parent;
 
-            float offsetFromReferenceOrigin = reference.MouseDownPosition.Y - reference.HitObject.OriginPosition.Y;
-            float targetPosition = referenceParent.ToLocalSpace(reference.ScreenSpaceMouseDownPosition).Y - offsetFromReferenceOrigin;
+            float offsetFromReferenceOrigin = reference.DragPosition.Y - reference.HitObject.OriginPosition.Y;
+            float targetPosition = referenceParent.ToLocalSpace(reference.ScreenSpaceDragPosition).Y - offsetFromReferenceOrigin;
 
             // Flip the vertical coordinate space when scrolling downwards
             if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
