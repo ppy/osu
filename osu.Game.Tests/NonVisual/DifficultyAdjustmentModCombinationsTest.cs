@@ -94,7 +94,7 @@ namespace osu.Game.Tests.NonVisual
         private class ModA : Mod
         {
             public override string Name => nameof(ModA);
-            public override string ShortenedName => nameof(ModA);
+            public override string Acronym => nameof(ModA);
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModIncompatibleWithA), typeof(ModIncompatibleWithAAndB) };
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.NonVisual
         private class ModB : Mod
         {
             public override string Name => nameof(ModB);
-            public override string ShortenedName => nameof(ModB);
+            public override string Acronym => nameof(ModB);
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModIncompatibleWithAAndB) };
@@ -112,7 +112,7 @@ namespace osu.Game.Tests.NonVisual
         private class ModIncompatibleWithA : Mod
         {
             public override string Name => $"Incompatible With {nameof(ModA)}";
-            public override string ShortenedName => $"Incompatible With {nameof(ModA)}";
+            public override string Acronym => $"Incompatible With {nameof(ModA)}";
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModA) };
@@ -130,7 +130,7 @@ namespace osu.Game.Tests.NonVisual
         private class ModIncompatibleWithAAndB : Mod
         {
             public override string Name => $"Incompatible With {nameof(ModA)} and {nameof(ModB)}";
-            public override string ShortenedName => $"Incompatible With {nameof(ModA)} and {nameof(ModB)}";
+            public override string Acronym => $"Incompatible With {nameof(ModA)} and {nameof(ModB)}";
             public override double ScoreMultiplier => 1;
 
             public override Type[] IncompatibleMods => new[] { typeof(ModA), typeof(ModB) };

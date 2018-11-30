@@ -53,19 +53,19 @@ namespace osu.Game.Scoring
             }
             set
             {
+                modsJson = null;
                 mods = value;
-                ModsJson = null;
             }
         }
 
-        private Mod[] getModsFromRuleset(DeserializedMod[] mods) => Ruleset.CreateInstance().GetAllMods().Where(mod => mods.Any(d => d.ShortenedName == mod.ShortenedName)).ToArray();
+        private Mod[] getModsFromRuleset(DeserializedMod[] mods) => Ruleset.CreateInstance().GetAllMods().Where(mod => mods.Any(d => d.Acronym == mod.Acronym)).ToArray();
 
         private string modsJson;
 
         [Column("Mods")]
         public string ModsJson
         {
-            get => modsJson ?? JsonConvert.SerializeObject(Mods);
+            get => modsJson ?? (modsJson = JsonConvert.SerializeObject(mods));
             set
             {
                 modsJson = value;
@@ -121,11 +121,9 @@ namespace osu.Game.Scoring
         public bool DeletePending { get; set; }
 
         [Serializable]
-        protected class DeserializedMod : Mod
+        protected class DeserializedMod : IMod
         {
-            public override string Name { get; } = string.Empty;
-            public override string ShortenedName { get; } = string.Empty;
-            public override double ScoreMultiplier { get; } = 0;
+            public string Acronym { get; set; }
         }
     }
 }

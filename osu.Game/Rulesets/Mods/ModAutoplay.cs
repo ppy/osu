@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModAutoplay : Mod, IApplicableFailOverride
     {
         public override string Name => "Autoplay";
-        public override string ShortenedName => "AT";
+        public override string Acronym => "AT";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_auto;
         public override ModType Type => ModType.Automation;
         public override string Description => "Watch a perfect automated play through the song.";
