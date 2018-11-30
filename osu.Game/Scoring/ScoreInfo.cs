@@ -71,7 +71,20 @@ namespace osu.Game.Scoring
 
         public DateTimeOffset Date { get; set; }
 
+        [NotMapped, JsonIgnore]
         public Dictionary<HitResult, object> Statistics = new Dictionary<HitResult, object>();
+
+        public string StatisticsString
+        {
+            get => JsonConvert.SerializeObject(Statistics);
+            set
+            {
+                if (value == null)
+                    return;
+
+                Statistics = JsonConvert.DeserializeObject<Dictionary<HitResult, object>>(value);
+            }
+        }
 
         /// <summary>
         /// MD5 is kept for legacy support.
