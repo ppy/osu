@@ -10,6 +10,7 @@ using osu.Game.IO.Legacy;
 using osu.Game.Replays;
 using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
@@ -47,12 +48,12 @@ namespace osu.Game.Scoring.Legacy
                 score.ScoreInfo.User = score.Replay.User = new User { Username = sr.ReadString() };
                 score.ScoreInfo.MD5Hash = sr.ReadString();
 
-                var count300 = sr.ReadUInt16();
-                var count100 = sr.ReadUInt16();
-                var count50 = sr.ReadUInt16();
-                var countGeki = sr.ReadUInt16();
-                var countKatu = sr.ReadUInt16();
-                var countMiss = sr.ReadUInt16();
+                var count300 = (int)sr.ReadUInt16();
+                var count100 = (int)sr.ReadUInt16();
+                var count50 = (int)sr.ReadUInt16();
+                var countGeki = (int)sr.ReadUInt16();
+                var countKatu = (int)sr.ReadUInt16();
+                var countMiss = (int)sr.ReadUInt16();
 
                 score.ScoreInfo.Statistics[HitResult.Great] = count300;
                 score.ScoreInfo.Statistics[HitResult.Good] = count100;
@@ -81,57 +82,132 @@ namespace osu.Game.Scoring.Legacy
                 else if (version >= 20121008)
                     score.ScoreInfo.OnlineScoreID = sr.ReadInt32();
 
-                switch (score.ScoreInfo.Ruleset.ID)
+                if (compressedReplay?.Length > 0)
                 {
-                    case 0:
+                    using (var replayInStream = new MemoryStream(compressedReplay))
                     {
-                        int totalHits = count50 + count100 + count300 + countMiss;
-                        score.ScoreInfo.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + count300 * 300) / (totalHits * 300) : 1;
-                        break;
-                    }
-                    case 1:
-                    {
-                        int totalHits = count50 + count100 + count300 + countMiss;
-                        score.ScoreInfo.Accuracy = totalHits > 0 ? (double)(count100 * 150 + count300 * 300) / (totalHits * 300) : 1;
-                        break;
-                    }
-                    case 2:
-                    {
-                        int totalHits = count50 + count100 + count300 + countMiss + countKatu;
-                        score.ScoreInfo.Accuracy = totalHits > 0 ? (double)(count50 + count100 + count300 ) / totalHits : 1;
-                        break;
-                    }
-                    case 3:
-                    {
-                        int totalHits = count50 + count100 + count300 + countMiss + countGeki + countKatu;
-                        score.ScoreInfo.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + countKatu * 200 + (count300 + countGeki) * 300) / (totalHits * 300) : 1;
-                        break;
-                    }
-                }
+                        byte[] properties = new byte[5];
+                        if (replayInStream.Read(properties, 0, 5) != 5)
+                            throw new IOException("input .lzma is too short");
+                        long outSize = 0;
+                        for (int i = 0; i < 8; i++)
+                        {
+                            int v = replayInStream.ReadByte();
+                            if (v < 0)
+                                throw new IOException("Can't Read 1");
+                            outSize |= (long)(byte)v << (8 * i);
+                        }
 
-                using (var replayInStream = new MemoryStream(compressedReplay))
-                {
-                    byte[] properties = new byte[5];
-                    if (replayInStream.Read(properties, 0, 5) != 5)
-                        throw new IOException("input .lzma is too short");
-                    long outSize = 0;
-                    for (int i = 0; i < 8; i++)
-                    {
-                        int v = replayInStream.ReadByte();
-                        if (v < 0)
-                            throw new IOException("Can't Read 1");
-                        outSize |= (long)(byte)v << (8 * i);
+                        long compressedSize = replayInStream.Length - replayInStream.Position;
+
+                        using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
+                        using (var reader = new StreamReader(lzma))
+                            readLegacyReplay(score.Replay, reader);
                     }
-
-                    long compressedSize = replayInStream.Length - replayInStream.Position;
-
-                    using (var lzma = new LzmaStream(properties, replayInStream, compressedSize, outSize))
-                    using (var reader = new StreamReader(lzma))
-                        readLegacyReplay(score.Replay, reader);
                 }
             }
 
+            calculateAccuracy(score.ScoreInfo);
+
             return score;
+        }
+
+        private void calculateAccuracy(ScoreInfo score)
+        {
+            int countMiss = (int)score.Statistics[HitResult.Miss];
+            int count50 = (int)score.Statistics[HitResult.Meh];
+            int count100 = (int)score.Statistics[HitResult.Good];
+            int count300 = (int)score.Statistics[HitResult.Great];
+            int countGeki = (int)score.Statistics[HitResult.Perfect];
+            int countKatu = (int)score.Statistics[HitResult.Ok];
+
+            switch (score.Ruleset.ID)
+            {
+                case 0:
+                {
+                    int totalHits = count50 + count100 + count300 + countMiss;
+                    score.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + count300 * 300) / (totalHits * 300) : 1;
+
+                    float ratio300 = (float)count300 / totalHits;
+                    float ratio50 = (float)count50 / totalHits;
+
+                    if (ratio300 == 1)
+                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
+                    else if (ratio300 > 0.9 && ratio50 <= 0.01 && countMiss == 0)
+                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
+                    else if (ratio300 > 0.8 && countMiss == 0 || ratio300 > 0.9)
+                        score.Rank = ScoreRank.A;
+                    else if (ratio300 > 0.7 && countMiss == 0 || ratio300 > 0.8)
+                        score.Rank = ScoreRank.B;
+                    else if (ratio300 > 0.6)
+                        score.Rank = ScoreRank.C;
+                    else
+                        score.Rank = ScoreRank.D;
+
+                    break;
+                }
+                case 1:
+                {
+                    int totalHits = count50 + count100 + count300 + countMiss;
+                    score.Accuracy = totalHits > 0 ? (double)(count100 * 150 + count300 * 300) / (totalHits * 300) : 1;
+
+                    float ratio300 = (float)count300 / totalHits;
+                    float ratio50 = (float)count50 / totalHits;
+
+                    if (ratio300 == 1)
+                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
+                    else if (ratio300 > 0.9 && ratio50 <= 0.01 && countMiss == 0)
+                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
+                    else if (ratio300 > 0.8 && countMiss == 0 || ratio300 > 0.9)
+                        score.Rank = ScoreRank.A;
+                    else if (ratio300 > 0.7 && countMiss == 0 || ratio300 > 0.8)
+                        score.Rank = ScoreRank.B;
+                    else if (ratio300 > 0.6)
+                        score.Rank = ScoreRank.C;
+                    else
+                        score.Rank = ScoreRank.D;
+
+                    break;
+                }
+                case 2:
+                {
+                    int totalHits = count50 + count100 + count300 + countMiss + countKatu;
+                    score.Accuracy = totalHits > 0 ? (double)(count50 + count100 + count300) / totalHits : 1;
+
+                    if (score.Accuracy == 1)
+                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
+                    else if (score.Accuracy > 0.98)
+                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
+                    else if (score.Accuracy > 0.94)
+                        score.Rank = ScoreRank.A;
+                    else if (score.Accuracy > 0.9)
+                        score.Rank = ScoreRank.B;
+                    else if (score.Accuracy > 0.85)
+                        score.Rank = ScoreRank.C;
+                    else
+                        score.Rank = ScoreRank.D;
+                    break;
+                }
+                case 3:
+                {
+                    int totalHits = count50 + count100 + count300 + countMiss + countGeki + countKatu;
+                    score.Accuracy = totalHits > 0 ? (double)(count50 * 50 + count100 * 100 + countKatu * 200 + (count300 + countGeki) * 300) / (totalHits * 300) : 1;
+
+                    if (score.Accuracy == 1)
+                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.XH : ScoreRank.X;
+                    else if (score.Accuracy > 0.95)
+                        score.Rank = score.Mods.Any(m => m is ModHidden || m is ModFlashlight) ? ScoreRank.SH : ScoreRank.S;
+                    else if (score.Accuracy > 0.9)
+                        score.Rank = ScoreRank.A;
+                    else if (score.Accuracy > 0.8)
+                        score.Rank = ScoreRank.B;
+                    else if (score.Accuracy > 0.7)
+                        score.Rank = ScoreRank.C;
+                    else
+                        score.Rank = ScoreRank.D;
+                    break;
+                }
+            }
         }
 
         private void readLegacyReplay(Replay replay, StreamReader reader)
