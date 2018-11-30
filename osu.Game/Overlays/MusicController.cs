@@ -214,7 +214,7 @@ namespace osu.Game.Overlays
             beatmapSets.Insert(index, beatmapSetInfo);
         }
 
-        private void handleBeatmapAdded(BeatmapSetInfo obj, bool existing)
+        private void handleBeatmapAdded(BeatmapSetInfo obj, bool existing, bool silent)
         {
             if (existing)
                 return;

@@ -67,6 +67,9 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private DecoupleableInterpolatingFramedClock adjustableClock;
 
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+
         private PauseContainer pauseContainer;
 
         private RulesetInfo ruleset;
@@ -273,18 +276,29 @@ namespace osu.Game.Screens.Play
                 {
                     if (!IsCurrentScreen) return;
 
-                    var score = new ScoreInfo
-                    {
-                        Beatmap = Beatmap.Value.BeatmapInfo,
-                        Ruleset = ruleset
-                    };
-                    ScoreProcessor.PopulateScore(score);
-                    score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
+                    var score = CreateScore();
+                    if (RulesetContainer.Replay == null)
+                        scoreManager.Import(score, true);
+
                     Push(new Results(score));
 
                     onCompletionEvent = null;
                 });
             }
+        }
+
+        protected virtual ScoreInfo CreateScore()
+        {
+            var score = new ScoreInfo
+            {
+                Beatmap = Beatmap.Value.BeatmapInfo,
+                Ruleset = ruleset,
+                User = api.LocalUser.Value
+            };
+
+            ScoreProcessor.PopulateScore(score);
+
+            return score;
         }
 
         private bool onFail()
