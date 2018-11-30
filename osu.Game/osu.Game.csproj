@@ -24,9 +24,4 @@
     <PackageReference Include="SharpRaven" Version="2.4.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="osu.Game, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\osu.Game.Rulesets.Osu.Tests\bin\Debug\netcoreapp2.1\osu.Game.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 </Project>
