@@ -263,10 +263,18 @@ namespace osu.Game
                 return;
             }
 
-            var score = ScoreManager.GetScore(scoreInfo);
-            if (score.Replay == null)
+            var databasedScore = ScoreManager.GetScore(score);
+            var databasedScoreInfo = databasedScore.ScoreInfo;
+            if (databasedScore.Replay == null)
             {
                 Logger.Log("The loaded score has no replay data.", LoggingTarget.Information);
+                return;
+            }
+
+            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScoreInfo.Beatmap.ID);
+            if (databasedBeatmap == null)
+            {
+                Logger.Log("Tried to load a score for a beatmap we don't have!", LoggingTarget.Information);
                 return;
             }
 
@@ -274,7 +282,7 @@ namespace osu.Game
             {
                 notifications.Post(new SimpleNotification
                 {
-                    Text = $"Click here to watch {scoreInfo.User.Username} on {scoreInfo.BeatmapInfo}",
+                    Text = $"Click here to watch {databasedScoreInfo.User.Username} on {databasedScoreInfo.Beatmap}",
                     Activated = () =>
                     {
                         loadScore();
@@ -296,19 +304,12 @@ namespace osu.Game
                     return;
                 }
 
-                var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == scoreInfo.BeatmapInfo.ID);
-                if (databasedBeatmap == null)
-                {
-                    Logger.Log("Tried to load a score for a beatmap we don't have!", LoggingTarget.Information);
-                    return;
-                }
-
-                ruleset.Value = score.Ruleset;
+                ruleset.Value = databasedScoreInfo.Ruleset;
 
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
-                Beatmap.Value.Mods.Value = score.Mods;
+                Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
 
-                currentScreen.Push(new PlayerLoader(new ReplayPlayer(score)));
+                currentScreen.Push(new PlayerLoader(new ReplayPlayer(databasedScore)));
             }
         }
 
