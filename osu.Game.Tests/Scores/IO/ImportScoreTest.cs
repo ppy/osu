@@ -18,7 +18,7 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Users;
 
-namespace osu.Game.Tests.Beatmaps.IO
+namespace osu.Game.Tests.Scores.IO
 {
     public class ImportScoreTest
     {
