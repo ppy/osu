@@ -25,6 +25,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -79,6 +80,13 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Config.BindWith(ManiaSetting.ScrollTime, TimeRange);
         }
+
+        /// <summary>
+        /// Retrieves the column that intersects a screen-space position.
+        /// </summary>
+        /// <param name="screenSpacePosition">The screen-space position.</param>
+        /// <returns>The column which intersects with <paramref name="screenSpacePosition"/>.</returns>
+        public Column GetColumnByPosition(Vector2 screenSpacePosition) => Playfield.GetColumnByPosition(screenSpacePosition);
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
         {
