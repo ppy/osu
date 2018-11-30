@@ -20,6 +20,7 @@ using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit
 {
@@ -157,29 +158,19 @@ namespace osu.Game.Screens.Edit
             bottomBackground.Colour = colours.Gray2;
         }
 
-        private void exportBeatmap()
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            host.OpenFileExternally(Beatmap.Value.Save());
-        }
-
-        private void onModeChanged(EditorScreenMode mode)
-        {
-            currentScreen?.Exit();
-
-            switch (mode)
+            switch (e.Key)
             {
-                case EditorScreenMode.Compose:
-                    currentScreen = new ComposeScreen();
-                    break;
-                case EditorScreenMode.Design:
-                    currentScreen = new DesignScreen();
-                    break;
-                default:
-                    currentScreen = new EditorScreen();
-                    break;
+                case Key.Left:
+                    seek(-1);
+                    return true;
+                case Key.Right:
+                    seek(1);
+                    return true;
             }
 
-            LoadComponentAsync(currentScreen, screenContainer.Add);
+            return base.OnKeyDown(e);
         }
 
         private double scrollAccumulation;
@@ -193,9 +184,9 @@ namespace osu.Game.Screens.Edit
             while (Math.Abs(scrollAccumulation) > precision)
             {
                 if (scrollAccumulation > 0)
-                    clock.SeekBackward(!clock.IsRunning);
+                    seek(-1);
                 else
-                    clock.SeekForward(!clock.IsRunning);
+                    seek(1);
 
                 scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
             }
@@ -224,7 +215,40 @@ namespace osu.Game.Screens.Edit
                 Beatmap.Value.Track.Tempo.Value = 1;
                 Beatmap.Value.Track.Start();
             }
+
             return base.OnExiting(next);
+        }
+
+        private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());
+
+        private void onModeChanged(EditorScreenMode mode)
+        {
+            currentScreen?.Exit();
+
+            switch (mode)
+            {
+                case EditorScreenMode.Compose:
+                    currentScreen = new ComposeScreen();
+                    break;
+                case EditorScreenMode.Design:
+                    currentScreen = new DesignScreen();
+                    break;
+                default:
+                    currentScreen = new EditorScreen();
+                    break;
+            }
+
+            LoadComponentAsync(currentScreen, screenContainer.Add);
+        }
+
+        private void seek(int direction)
+        {
+            double amount = GetContainingInputManager().CurrentState.Keyboard.ShiftPressed ? 2 : 1;
+
+            if (direction < 1)
+                clock.SeekBackward(!clock.IsRunning, amount);
+            else
+                clock.SeekForward(!clock.IsRunning, amount);
         }
     }
 }
