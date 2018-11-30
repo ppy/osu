@@ -276,7 +276,7 @@ namespace osu.Game.Screens.Play
                 {
                     if (!IsCurrentScreen) return;
 
-                    var score = CreateScoreInfo();
+                    var score = CreateScore();
                     if (RulesetContainer.Replay == null)
                         scoreManager.Import(score, true);
 
@@ -287,7 +287,7 @@ namespace osu.Game.Screens.Play
             }
         }
 
-        protected virtual ScoreInfo CreateScoreInfo()
+        protected virtual ScoreInfo CreateScore()
         {
             var score = new ScoreInfo
             {
