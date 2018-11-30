@@ -14,5 +14,7 @@ namespace osu.Game.Database
 
     {
         List<TFile> Files { get; set; }
+
+        string Hash { get; set; }
     }
 }
