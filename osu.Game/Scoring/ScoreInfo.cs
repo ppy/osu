@@ -43,23 +43,16 @@ namespace osu.Game.Scoring
         {
             get
             {
-                if (modsString == null)
+                if (ModsString == null)
                     return Array.Empty<Mod>();
 
-                var deserialized = JsonConvert.DeserializeObject<string[]>(modsString);
+                var deserialized = JsonConvert.DeserializeObject<string[]>(ModsString);
                 return Ruleset.CreateInstance().GetAllMods().Where(mod => deserialized.Any(d => d == mod.ShortenedName)).ToArray();
             }
-            set => modsString = JsonConvert.SerializeObject(value.Select(m => m.ShortenedName).ToArray());
+            set => ModsString = JsonConvert.SerializeObject(value.Select(m => m.ShortenedName).ToArray());
         }
 
-        [NotMapped, JsonIgnore]
-        private string modsString;
-
-        public string ModsString
-        {
-            get => modsString;
-            set => modsString = value;
-        }
+        public string ModsString { get; set; }
 
         [NotMapped, JsonIgnore]
         public User User;
