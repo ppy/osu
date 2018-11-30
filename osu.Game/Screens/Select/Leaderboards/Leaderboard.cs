@@ -247,7 +247,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 if (Scope == LeaderboardScope.Local)
                 {
-                    Scores = scoreManager.QueryScores(s => s.BeatmapInfo.ID == Beatmap.ID).ToArray();
+                    Scores = scoreManager.QueryScores(s => s.Beatmap.ID == Beatmap.ID).ToArray();
                     PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
                     return;
                 }
