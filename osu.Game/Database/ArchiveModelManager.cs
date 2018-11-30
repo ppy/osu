@@ -207,7 +207,7 @@ namespace osu.Game.Database
 
                 if (model == null) return null;
 
-                model.Hash = computeBeatmapSetHash(archive);
+                model.Hash = computeHash(archive);
 
                 return Import(model, archive);
             }
@@ -226,13 +226,13 @@ namespace osu.Game.Database
         protected abstract string[] HashableFileTypes { get; }
 
         /// <summary>
-        /// Create a SHA-2 hash from the provided archive based on contained beatmap (.osu) file content.
+        /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
         /// </summary>
-        private string computeBeatmapSetHash(ArchiveReader reader)
+        private string computeHash(ArchiveReader reader)
         {
             // for now, concatenate all .osu files in the set to create a unique hash.
             MemoryStream hashable = new MemoryStream();
-            foreach (string file in reader.Filenames.Where(f => f.EndsWith(".osu")))
+            foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(f.EndsWith)))
                 using (Stream s = reader.GetStream(file))
                     s.CopyTo(hashable);
 
