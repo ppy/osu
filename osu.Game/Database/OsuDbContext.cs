@@ -105,6 +105,9 @@ namespace osu.Game.Database
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.Hash).IsUnique();
 
+            modelBuilder.Entity<SkinInfo>().HasIndex(b => b.Hash).IsUnique();
+            modelBuilder.Entity<SkinInfo>().HasIndex(b => b.DeletePending);
+
             modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => new { b.RulesetID, b.Variant });
             modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => b.IntAction);
 
