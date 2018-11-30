@@ -24,6 +24,8 @@ namespace osu.Game.Tests.Visual
 
         public double TimeRange { set => scrollingInfo.TimeRange.Value = value; }
 
+        public IScrollingInfo ScrollingInfo => scrollingInfo;
+
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly TestScrollingInfo scrollingInfo = new TestScrollingInfo();
 

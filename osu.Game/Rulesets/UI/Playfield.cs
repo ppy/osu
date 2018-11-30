@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.UI
         /// Remove a DrawableHitObject from this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
-        public virtual void Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
+        public virtual bool Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.

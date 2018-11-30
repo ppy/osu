@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners.Components;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -20,10 +19,5 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Spinners
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => piece.ReceivePositionalInputAt(screenSpacePos);
-
-        public override void AdjustPosition(DragEvent dragEvent)
-        {
-            // Spinners don't support position adjustments
-        }
     }
 }
