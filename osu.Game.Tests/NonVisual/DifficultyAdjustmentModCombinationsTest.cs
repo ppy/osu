@@ -18,7 +18,7 @@ namespace osu.Game.Tests.NonVisual
             var combinations = new TestDifficultyCalculator().CreateDifficultyAdjustmentModCombinations();
 
             Assert.AreEqual(1, combinations.Length);
-            Assert.IsTrue(combinations[0] is NoModMod);
+            Assert.IsTrue(combinations[0] is ModNoMod);
         }
 
         [Test]
@@ -27,7 +27,7 @@ namespace osu.Game.Tests.NonVisual
             var combinations = new TestDifficultyCalculator(new ModA()).CreateDifficultyAdjustmentModCombinations();
 
             Assert.AreEqual(2, combinations.Length);
-            Assert.IsTrue(combinations[0] is NoModMod);
+            Assert.IsTrue(combinations[0] is ModNoMod);
             Assert.IsTrue(combinations[1] is ModA);
         }
 
@@ -37,7 +37,7 @@ namespace osu.Game.Tests.NonVisual
             var combinations = new TestDifficultyCalculator(new ModA(), new ModB()).CreateDifficultyAdjustmentModCombinations();
 
             Assert.AreEqual(4, combinations.Length);
-            Assert.IsTrue(combinations[0] is NoModMod);
+            Assert.IsTrue(combinations[0] is ModNoMod);
             Assert.IsTrue(combinations[1] is ModA);
             Assert.IsTrue(combinations[2] is MultiMod);
             Assert.IsTrue(combinations[3] is ModB);
@@ -52,7 +52,7 @@ namespace osu.Game.Tests.NonVisual
             var combinations = new TestDifficultyCalculator(new ModA(), new ModIncompatibleWithA()).CreateDifficultyAdjustmentModCombinations();
 
             Assert.AreEqual(3, combinations.Length);
-            Assert.IsTrue(combinations[0] is NoModMod);
+            Assert.IsTrue(combinations[0] is ModNoMod);
             Assert.IsTrue(combinations[1] is ModA);
             Assert.IsTrue(combinations[2] is ModIncompatibleWithA);
         }
@@ -63,7 +63,7 @@ namespace osu.Game.Tests.NonVisual
             var combinations = new TestDifficultyCalculator(new ModA(), new ModB(), new ModIncompatibleWithA(), new ModIncompatibleWithAAndB()).CreateDifficultyAdjustmentModCombinations();
 
             Assert.AreEqual(8, combinations.Length);
-            Assert.IsTrue(combinations[0] is NoModMod);
+            Assert.IsTrue(combinations[0] is ModNoMod);
             Assert.IsTrue(combinations[1] is ModA);
             Assert.IsTrue(combinations[2] is MultiMod);
             Assert.IsTrue(combinations[3] is ModB);
@@ -86,7 +86,7 @@ namespace osu.Game.Tests.NonVisual
             var combinations = new TestDifficultyCalculator(new ModAofA(), new ModIncompatibleWithAofA()).CreateDifficultyAdjustmentModCombinations();
 
             Assert.AreEqual(3, combinations.Length);
-            Assert.IsTrue(combinations[0] is NoModMod);
+            Assert.IsTrue(combinations[0] is ModNoMod);
             Assert.IsTrue(combinations[1] is ModAofA);
             Assert.IsTrue(combinations[2] is ModIncompatibleWithAofA);
         }
