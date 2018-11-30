@@ -16,8 +16,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableOsuHitObject : DrawableHitObject<OsuHitObject>
     {
-        public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Clock?.CurrentTime >= HitObject.StartTime - HitObject.TimePreempt;
-
         private readonly ShakeContainer shakeContainer;
 
         protected DrawableOsuHitObject(OsuHitObject hitObject)
