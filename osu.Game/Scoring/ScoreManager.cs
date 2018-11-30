@@ -20,20 +20,18 @@ namespace osu.Game.Scoring
     {
         public override string[] HandledExtensions => new[] { ".osr" };
 
+        protected override string[] HashableFileTypes => new[] { ".osr" };
+
         protected override string ImportFromStablePath => "Replays";
 
         private readonly RulesetStore rulesets;
         private readonly BeatmapManager beatmaps;
-
-        private readonly ScoreStore scores;
 
         public ScoreManager(RulesetStore rulesets, BeatmapManager beatmaps, Storage storage, IDatabaseContextFactory contextFactory, IIpcHost importHost = null)
             : base(storage, contextFactory, new ScoreStore(contextFactory, storage), importHost)
         {
             this.rulesets = rulesets;
             this.beatmaps = beatmaps;
-
-            scores = (ScoreStore)ModelStore;
         }
 
         protected override ScoreInfo CreateModel(ArchiveReader archive)
@@ -53,18 +51,6 @@ namespace osu.Game.Scoring
                     return null;
                 }
             }
-        }
-
-        protected override ScoreInfo CheckForExisting(ScoreInfo model)
-        {
-            var existingHashMatch = scores.ConsumableItems.FirstOrDefault(s => s.MD5Hash != null && s.MD5Hash == model.MD5Hash);
-            if (existingHashMatch != null)
-            {
-                Undelete(existingHashMatch);
-                return existingHashMatch;
-            }
-
-            return null;
         }
 
         public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps, Files.Store);
