@@ -119,8 +119,11 @@ namespace osu.Game.Online.API.Requests.Responses
             {
                 base.Ruleset = value;
 
-                // Evaluate the mod string
-                Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.Acronym)).ToArray();
+                if (modStrings != null)
+                {
+                    // Evaluate the mod string
+                    Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.Acronym)).ToArray();
+                }
             }
         }
     }
