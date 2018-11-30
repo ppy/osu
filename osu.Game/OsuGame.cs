@@ -148,7 +148,7 @@ namespace osu.Game
         {
             this.frameworkConfig = frameworkConfig;
 
-            ScoreManager.ItemAdded += (score, _) => Schedule(() => LoadScore(score));
+            ScoreManager.ItemAdded += (score, _, silent) => Schedule(() => LoadScore(score, silent));
 
             if (!Host.IsPrimaryInstance)
             {
@@ -248,43 +248,69 @@ namespace osu.Game
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId);
 
-        protected void LoadScore(ScoreInfo score)
+        protected void LoadScore(ScoreInfo score, bool silent)
         {
+            if (silent)
+                return;
+
             scoreLoad?.Cancel();
 
             var menu = intro.ChildScreen;
 
             if (menu == null)
             {
-                scoreLoad = Schedule(() => LoadScore(score));
+                scoreLoad = Schedule(() => LoadScore(score, false));
                 return;
             }
 
-            if (!menu.IsCurrentScreen)
+            var databasedScore = ScoreManager.GetScore(score);
+            var databasedScoreInfo = databasedScore.ScoreInfo;
+            if (databasedScore.Replay == null)
             {
-                menu.MakeCurrent();
-                this.Delay(500).Schedule(() => LoadScore(score), out scoreLoad);
+                Logger.Log("The loaded score has no replay data.", LoggingTarget.Information);
                 return;
             }
 
-            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == score.Beatmap.ID);
-
+            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == databasedScoreInfo.Beatmap.ID);
             if (databasedBeatmap == null)
+            {
+                Logger.Log("Tried to load a score for a beatmap we don't have!", LoggingTarget.Information);
+                return;
+            }
+
+            if (!currentScreen.AllowExternalScreenChange)
             {
                 notifications.Post(new SimpleNotification
                 {
-                    Text = @"Tried to load a score for a beatmap we don't have!",
-                    Icon = FontAwesome.fa_life_saver,
+                    Text = $"Click here to watch {databasedScoreInfo.User.Username} on {databasedScoreInfo.Beatmap}",
+                    Activated = () =>
+                    {
+                        loadScore();
+                        return true;
+                    }
                 });
+
                 return;
             }
 
-            ruleset.Value = score.Ruleset;
+            loadScore();
 
-            Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
-            Beatmap.Value.Mods.Value = score.Mods;
+            void loadScore()
+            {
+                if (!menu.IsCurrentScreen)
+                {
+                    menu.MakeCurrent();
+                    this.Delay(500).Schedule(loadScore, out scoreLoad);
+                    return;
+                }
 
-            menu.Push(new PlayerLoader(new ReplayPlayer(ScoreManager.GetScore(score).Replay)));
+                ruleset.Value = databasedScoreInfo.Ruleset;
+
+                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
+                Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
+
+                currentScreen.Push(new PlayerLoader(new ReplayPlayer(databasedScore)));
+            }
         }
 
         protected override void Dispose(bool isDisposing)

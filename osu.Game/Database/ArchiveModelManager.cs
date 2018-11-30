@@ -32,7 +32,7 @@ namespace osu.Game.Database
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
-        public delegate void ItemAddedDelegate(TModel model, bool existing);
+        public delegate void ItemAddedDelegate(TModel model, bool existing, bool silent);
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
@@ -110,7 +110,7 @@ namespace osu.Game.Database
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += s => handleEvent(() => ItemAdded?.Invoke(s, false));
+            ModelStore.ItemAdded += (item, silent) => handleEvent(() => ItemAdded?.Invoke(item, false, silent));
             ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
 
             Files = new FileStore(contextFactory, storage);
@@ -211,7 +211,7 @@ namespace osu.Game.Database
 
                 model.Hash = computeHash(archive);
 
-                return Import(model, archive);
+                return Import(model, false, archive);
             }
             catch (Exception e)
             {
@@ -245,8 +245,9 @@ namespace osu.Game.Database
         /// Import an item from a <see cref="TModel"/>.
         /// </summary>
         /// <param name="item">The model to be imported.</param>
+        /// <param name="silent">Whether the user should be notified fo the import.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
-        public TModel Import(TModel item, ArchiveReader archive = null)
+        public TModel Import(TModel item, bool silent = false, ArchiveReader archive = null)
         {
             delayEvents();
 
@@ -266,7 +267,7 @@ namespace osu.Game.Database
                         {
                             Undelete(existing);
                             Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
-                            handleEvent(() => ItemAdded?.Invoke(existing, true));
+                            handleEvent(() => ItemAdded?.Invoke(existing, true, silent));
                             return existing;
                         }
 
@@ -276,7 +277,7 @@ namespace osu.Game.Database
                         Populate(item, archive);
 
                         // import to store
-                        ModelStore.Add(item);
+                        ModelStore.Add(item, silent);
                     }
                     catch (Exception e)
                     {
@@ -507,7 +508,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The new model proposed for import. Note that <see cref="Populate"/> has not yet been run on this model.</param>
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
-        protected virtual TModel CheckForExisting(TModel model) => ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
+        protected virtual TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
