@@ -6,6 +6,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using System;
 using System.Collections.Generic;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Users;

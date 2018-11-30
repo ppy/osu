@@ -32,6 +32,8 @@ namespace osu.Game.Database
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
+        public delegate void ItemAddedDelegate(TModel model, bool existing);
+
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
         /// </summary>
@@ -41,7 +43,7 @@ namespace osu.Game.Database
         /// Fired when a new <see cref="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public event Action<TModel> ItemAdded;
+        public event ItemAddedDelegate ItemAdded;
 
         /// <summary>
         /// Fired when a <see cref="TModel"/> is removed from the database.
@@ -108,7 +110,7 @@ namespace osu.Game.Database
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += s => handleEvent(() => ItemAdded?.Invoke(s));
+            ModelStore.ItemAdded += s => handleEvent(() => ItemAdded?.Invoke(s, false));
             ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
 
             Files = new FileStore(contextFactory, storage);
@@ -264,6 +266,7 @@ namespace osu.Game.Database
                         {
                             Undelete(existing);
                             Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
+                            handleEvent(() => ItemAdded?.Invoke(existing, true));
                             return existing;
                         }
 
@@ -518,7 +521,9 @@ namespace osu.Game.Database
             if (ZipUtils.IsZipArchive(path))
                 return new ZipArchiveReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read), Path.GetFileName(path));
             if (Directory.Exists(path))
-                return new LegacyFilesystemReader(path);
+                return new LegacyDirectoryArchiveReader(path);
+            if (File.Exists(path))
+                return new LegacyFileArchiveReader(path);
             throw new InvalidFormatException($"{path} is not a valid archive");
         }
     }

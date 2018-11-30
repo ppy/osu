@@ -16,15 +16,16 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual
 {
     [System.ComponentModel.Description("in BeatmapOverlay")]
     public class TestCaseBeatmapScoresContainer : OsuTestCase
     {
-        private readonly IEnumerable<APIScore> scores;
-        private readonly IEnumerable<APIScore> anotherScores;
-        private readonly APIScore topScore;
+        private readonly IEnumerable<APIScoreInfo> scores;
+        private readonly IEnumerable<APIScoreInfo> anotherScores;
+        private readonly APIScoreInfo topScoreInfo;
         private readonly Box background;
 
         public TestCaseBeatmapScoresContainer()
@@ -48,7 +49,7 @@ namespace osu.Game.Tests.Visual
 
             AddStep("scores pack 1", () => scoresContainer.Scores = scores);
             AddStep("scores pack 2", () => scoresContainer.Scores = anotherScores);
-            AddStep("only top score", () => scoresContainer.Scores = new[] { topScore });
+            AddStep("only top score", () => scoresContainer.Scores = new[] { topScoreInfo });
             AddStep("remove scores", () => scoresContainer.Scores = null);
             AddStep("resize to big", () => container.ResizeWidthTo(1, 300));
             AddStep("resize to normal", () => container.ResizeWidthTo(0.8f, 300));
@@ -57,7 +58,7 @@ namespace osu.Game.Tests.Visual
 
             scores = new[]
             {
-                new APIScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -80,7 +81,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 1234567890,
                     Accuracy = 1,
                 },
-                new APIScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -102,7 +103,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 1234789,
                     Accuracy = 0.9997,
                 },
-                new APIScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -123,7 +124,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 12345678,
                     Accuracy = 0.9854,
                 },
-                new APIScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -143,7 +144,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 1234567,
                     Accuracy = 0.8765,
                 },
-                new APIScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -169,7 +170,7 @@ namespace osu.Game.Tests.Visual
 
             anotherScores = new[]
             {
-                new APIScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -191,7 +192,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 1234789,
                     Accuracy = 0.9997,
                 },
-                new APIScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -214,7 +215,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 1234567890,
                     Accuracy = 1,
                 },
-                new APIScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -230,7 +231,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 123456,
                     Accuracy = 0.6543,
                 },
-                new APIScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -251,7 +252,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 12345678,
                     Accuracy = 0.9854,
                 },
-                new APIScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -279,7 +280,7 @@ namespace osu.Game.Tests.Visual
                 s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
             }
 
-            topScore = new APIScore
+            topScoreInfo = new APIScoreInfo
             {
                 User = new User
                 {
@@ -301,9 +302,9 @@ namespace osu.Game.Tests.Visual
                 TotalScore = 987654321,
                 Accuracy = 0.8487,
             };
-            topScore.Statistics.Add(HitResult.Great, RNG.Next(2000));
-            topScore.Statistics.Add(HitResult.Good, RNG.Next(2000));
-            topScore.Statistics.Add(HitResult.Meh, RNG.Next(2000));
+            topScoreInfo.Statistics.Add(HitResult.Great, RNG.Next(2000));
+            topScoreInfo.Statistics.Add(HitResult.Good, RNG.Next(2000));
+            topScoreInfo.Statistics.Add(HitResult.Meh, RNG.Next(2000));
         }
 
         [BackgroundDependencyLoader]
