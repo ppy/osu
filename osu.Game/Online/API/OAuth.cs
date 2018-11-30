@@ -178,6 +178,7 @@ namespace osu.Game.Online.API
                 AddParameter("grant_type", GrantType);
                 AddParameter("client_id", ClientId);
                 AddParameter("client_secret", ClientSecret);
+                AddParameter("scope", "*");
 
                 base.PrePerform();
             }
