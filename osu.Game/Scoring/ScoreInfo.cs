@@ -44,7 +44,8 @@ namespace osu.Game.Scoring
         {
             get
             {
-                if (mods != null) return mods;
+                if (mods != null)
+                    return mods;
 
                 if (modsJson == null)
                     return Array.Empty<Mod>();
@@ -65,7 +66,16 @@ namespace osu.Game.Scoring
         [Column("Mods")]
         public string ModsJson
         {
-            get => modsJson ?? (modsJson = JsonConvert.SerializeObject(mods));
+            get
+            {
+                if (modsJson != null)
+                    return modsJson;
+
+                if (mods == null)
+                    return null;
+
+                return modsJson = JsonConvert.SerializeObject(mods);
+            }
             set
             {
                 modsJson = value;
