@@ -13,5 +13,7 @@ namespace osu.Game.Database
         where TFile : INamedFileInfo
     {
         List<TFile> Files { get; set; }
+
+        string Hash { get; set; }
     }
 }

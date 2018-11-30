@@ -13,16 +13,20 @@ namespace osu.Game.Skinning
 
         public string Name { get; set; }
 
+        public string Hash { get; set; }
+
         public string Creator { get; set; }
 
         public List<SkinFileInfo> Files { get; set; }
 
         public bool DeletePending { get; set; }
 
+        public string FullName => $"\"{Name}\" by {Creator}";
+
         public static SkinInfo Default { get; } = new SkinInfo { Name = "osu!lazer", Creator = "team osu!" };
 
         public bool Equals(SkinInfo other) => other != null && ID == other.ID;
 
-        public override string ToString() => $"\"{Name}\" by {Creator}";
+        public override string ToString() => FullName;
     }
 }
