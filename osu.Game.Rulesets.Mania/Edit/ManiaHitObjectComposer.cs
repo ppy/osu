@@ -12,6 +12,7 @@ using osu.Framework.Allocation;
 using osu.Game.Rulesets.Mania.Edit.Blueprints;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI;
+using osu.Game.Screens.Edit.Compose.Components;
 using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Edit
@@ -38,6 +39,8 @@ namespace osu.Game.Rulesets.Mania.Edit
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
             => dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
+        public int TotalColumns => ((ManiaPlayfield)RulesetContainer.Playfield).TotalColumns;
+
         protected override RulesetContainer<ManiaHitObject> CreateRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
         {
             RulesetContainer = new ManiaEditRulesetContainer(ruleset, beatmap);
@@ -53,6 +56,8 @@ namespace osu.Game.Rulesets.Mania.Edit
             new NoteCompositionTool(),
             new HoldNoteCompositionTool()
         };
+
+        public override SelectionHandler CreateSelectionHandler() => new ManiaSelectionHandler();
 
         public override SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject)
         {
