@@ -53,7 +53,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             RightFlowContainer.Add(text);
             RightFlowContainer.SetLayoutPosition(text, 1);
 
-            LeftFlowContainer.Add(new BeatmapMetadataContainer(Score.BeatmapInfo));
+            LeftFlowContainer.Add(new BeatmapMetadataContainer(Score.Beatmap));
             LeftFlowContainer.Add(new DrawableDate(Score.Date));
 
             foreach (Mod mod in Score.Mods)

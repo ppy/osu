@@ -34,7 +34,7 @@ namespace osu.Game.Online.API.Requests
         private void onSuccess(APIScores r)
         {
             foreach (APIScoreInfo score in r.Scores)
-                score.ApplyBeatmap(beatmap);
+                score.Beatmap = beatmap;
         }
 
         protected override WebRequest CreateWebRequest()

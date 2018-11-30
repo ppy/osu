@@ -127,7 +127,7 @@ namespace osu.Game.Tests.Beatmaps.IO
 
             var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
 
-            score.BeatmapInfo = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
+            score.Beatmap = beatmapManager.GetAllUsableBeatmapSets().First().Beatmaps.First();
             score.Ruleset = new OsuRuleset().RulesetInfo;
 
             var scoreManager = osu.Dependencies.Get<ScoreManager>();
