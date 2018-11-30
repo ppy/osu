@@ -508,7 +508,7 @@ namespace osu.Game.Database
         /// </summary>
         /// <param name="model">The new model proposed for import. Note that <see cref="Populate"/> has not yet been run on this model.</param>
         /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
-        protected virtual TModel CheckForExisting(TModel model) => ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
+        protected virtual TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
