@@ -67,7 +67,7 @@ namespace osu.Game.Scoring
             return null;
         }
 
-        public Score GetScore(ScoreInfo scoreInfo) => new LegacyDatabasedScore(scoreInfo, rulesets, beatmaps, Files.Store);
+        public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps, Files.Store);
 
         public List<ScoreInfo> GetAllUsableScores() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
 

@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         public static readonly float HEIGHT = 60;
 
         public readonly int RankPosition;
-        public readonly ScoreInfo ScoreInfo;
+        public readonly ScoreInfo Score;
 
         private const float corner_radius = 5;
         private const float edge_margin = 5;
@@ -43,9 +43,9 @@ namespace osu.Game.Screens.Select.Leaderboards
         private Container flagBadgeContainer;
         private FillFlowContainer<ModIcon> modsContainer;
 
-        public LeaderboardScore(ScoreInfo scoreInfo, int rank)
+        public LeaderboardScore(ScoreInfo score, int rank)
         {
-            ScoreInfo = scoreInfo;
+            Score = score;
             RankPosition = rank;
 
             RelativeSizeAxes = Axes.X;
@@ -102,7 +102,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Children = new[]
                             {
                                 avatar = new DelayedLoadWrapper(
-                                    new Avatar(ScoreInfo.User)
+                                    new Avatar(Score.User)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         CornerRadius = corner_radius,
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     {
                                         nameLabel = new OsuSpriteText
                                         {
-                                            Text = ScoreInfo.User.Username,
+                                            Text = Score.User.Username,
                                             Font = @"Exo2.0-BoldItalic",
                                             TextSize = 23,
                                         },
@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
-                                                        new DrawableFlag(ScoreInfo.User?.Country)
+                                                        new DrawableFlag(Score.User?.Country)
                                                         {
                                                             Width = 30,
                                                             RelativeSizeAxes = Axes.Y,
@@ -166,8 +166,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Margin = new MarginPadding { Left = edge_margin },
                                                     Children = new Drawable[]
                                                     {
-                                                        maxCombo = new ScoreComponentLabel(FontAwesome.fa_link, ScoreInfo.MaxCombo.ToString(), "Max Combo"),
-                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_crosshairs, string.Format(ScoreInfo.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", ScoreInfo.Accuracy), "Accuracy"),
+                                                        maxCombo = new ScoreComponentLabel(FontAwesome.fa_link, Score.MaxCombo.ToString(), "Max Combo"),
+                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_crosshairs, string.Format(Score.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", Score.Accuracy), "Accuracy"),
                                                     },
                                                 },
                                             },
@@ -183,13 +183,13 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
-                                        scoreLabel = new GlowingSpriteText(ScoreInfo.TotalScore.ToString(@"N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa")),
+                                        scoreLabel = new GlowingSpriteText(Score.TotalScore.ToString(@"N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa")),
                                         new Container
                                         {
                                             Size = new Vector2(40f, 20f),
                                             Children = new[]
                                             {
-                                                scoreRank = new DrawableRank(ScoreInfo.Rank)
+                                                scoreRank = new DrawableRank(Score.Rank)
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
@@ -205,7 +205,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     Origin = Anchor.BottomRight,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    ChildrenEnumerable = ScoreInfo.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
+                                    ChildrenEnumerable = Score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
                                 },
                             },
                         },

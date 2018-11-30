@@ -80,7 +80,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 return;
             }
 
-            topScore.ScoreInfo = scores.FirstOrDefault();
+            topScore.Score = scores.FirstOrDefault();
             topScore.Show();
 
             flow.Clear();

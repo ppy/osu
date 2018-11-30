@@ -40,14 +40,14 @@ namespace osu.Game.Rulesets.Osu.Scoring
             comboResultCounts.Clear();
         }
 
-        public override void PopulateScore(ScoreInfo scoreInfo)
+        public override void PopulateScore(ScoreInfo score)
         {
-            base.PopulateScore(scoreInfo);
+            base.PopulateScore(score);
 
-            scoreInfo.Statistics[HitResult.Great] = scoreResultCounts.GetOrDefault(HitResult.Great);
-            scoreInfo.Statistics[HitResult.Good] = scoreResultCounts.GetOrDefault(HitResult.Good);
-            scoreInfo.Statistics[HitResult.Meh] = scoreResultCounts.GetOrDefault(HitResult.Meh);
-            scoreInfo.Statistics[HitResult.Miss] = scoreResultCounts.GetOrDefault(HitResult.Miss);
+            score.Statistics[HitResult.Great] = scoreResultCounts.GetOrDefault(HitResult.Great);
+            score.Statistics[HitResult.Good] = scoreResultCounts.GetOrDefault(HitResult.Good);
+            score.Statistics[HitResult.Meh] = scoreResultCounts.GetOrDefault(HitResult.Meh);
+            score.Statistics[HitResult.Miss] = scoreResultCounts.GetOrDefault(HitResult.Miss);
         }
 
         private const double harshness = 0.01;

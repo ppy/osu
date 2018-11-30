@@ -43,26 +43,26 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly InfoColumn statistics;
         private readonly ScoreModsContainer modsContainer;
 
-        private APIScoreInfo scoreInfo;
-        public APIScoreInfo ScoreInfo
+        private APIScoreInfo score;
+        public APIScoreInfo Score
         {
-            get { return scoreInfo; }
+            get { return score; }
             set
             {
-                if (scoreInfo == value) return;
-                scoreInfo = value;
+                if (score == value) return;
+                score = value;
 
-                avatar.User = username.User = scoreInfo.User;
-                flag.Country = scoreInfo.User.Country;
-                date.Text = $@"achieved {scoreInfo.Date:MMM d, yyyy}";
-                rank.UpdateRank(scoreInfo.Rank);
+                avatar.User = username.User = score.User;
+                flag.Country = score.User.Country;
+                date.Text = $@"achieved {score.Date:MMM d, yyyy}";
+                rank.UpdateRank(score.Rank);
 
-                totalScore.Value = $@"{scoreInfo.TotalScore:N0}";
-                accuracy.Value = $@"{scoreInfo.Accuracy:P2}";
-                statistics.Value = $"{scoreInfo.Statistics[HitResult.Great]}/{scoreInfo.Statistics[HitResult.Good]}/{scoreInfo.Statistics[HitResult.Meh]}";
+                totalScore.Value = $@"{score.TotalScore:N0}";
+                accuracy.Value = $@"{score.Accuracy:P2}";
+                statistics.Value = $"{score.Statistics[HitResult.Great]}/{score.Statistics[HitResult.Good]}/{score.Statistics[HitResult.Meh]}";
 
                 modsContainer.Clear();
-                foreach (Mod mod in scoreInfo.Mods)
+                foreach (Mod mod in score.Mods)
                     modsContainer.Add(new ModIcon(mod)
                     {
                         AutoSizeAxes = Axes.Both,

@@ -248,7 +248,7 @@ namespace osu.Game
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId);
 
-        protected void LoadScore(ScoreInfo scoreInfo)
+        protected void LoadScore(ScoreInfo score)
         {
             scoreLoad?.Cancel();
 
@@ -256,18 +256,18 @@ namespace osu.Game
 
             if (menu == null)
             {
-                scoreLoad = Schedule(() => LoadScore(scoreInfo));
+                scoreLoad = Schedule(() => LoadScore(score));
                 return;
             }
 
             if (!menu.IsCurrentScreen)
             {
                 menu.MakeCurrent();
-                this.Delay(500).Schedule(() => LoadScore(scoreInfo), out scoreLoad);
+                this.Delay(500).Schedule(() => LoadScore(score), out scoreLoad);
                 return;
             }
 
-            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == scoreInfo.BeatmapInfo.ID);
+            var databasedBeatmap = BeatmapManager.QueryBeatmap(b => b.ID == score.BeatmapInfo.ID);
 
             if (databasedBeatmap == null)
             {
@@ -279,12 +279,12 @@ namespace osu.Game
                 return;
             }
 
-            ruleset.Value = scoreInfo.Ruleset;
+            ruleset.Value = score.Ruleset;
 
             Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
-            Beatmap.Value.Mods.Value = scoreInfo.Mods;
+            Beatmap.Value.Mods.Value = score.Mods;
 
-            menu.Push(new PlayerLoader(new ReplayPlayer(ScoreManager.GetScore(scoreInfo).Replay)));
+            menu.Push(new PlayerLoader(new ReplayPlayer(ScoreManager.GetScore(score).Replay)));
         }
 
         protected override void Dispose(bool isDisposing)
