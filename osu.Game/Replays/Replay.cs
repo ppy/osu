@@ -3,13 +3,11 @@
 
 using System.Collections.Generic;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Users;
 
 namespace osu.Game.Replays
 {
     public class Replay
     {
-        public User User;
         public List<ReplayFrame> Frames = new List<ReplayFrame>();
     }
 }

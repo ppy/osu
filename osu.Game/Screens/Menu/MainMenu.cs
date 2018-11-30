@@ -29,6 +29,8 @@ namespace osu.Game.Screens.Menu
 
         protected override bool AllowBackButton => buttons.State != ButtonSystemState.Initial;
 
+        public override bool AllowExternalScreenChange => true;
+
         private readonly BackgroundScreenDefault background;
         private Screen songSelect;
 
