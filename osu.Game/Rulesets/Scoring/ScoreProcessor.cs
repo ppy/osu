@@ -166,7 +166,6 @@ namespace osu.Game.Rulesets.Scoring
             score.Accuracy = Math.Round(Accuracy, 4);
             score.Rank = Rank;
             score.Date = DateTimeOffset.Now;
-            score.Health = Health;
         }
     }
 
