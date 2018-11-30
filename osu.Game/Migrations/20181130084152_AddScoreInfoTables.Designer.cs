@@ -9,7 +9,7 @@ using osu.Game.Database;
 namespace osu.Game.Migrations
 {
     [DbContext(typeof(OsuDbContext))]
-    [Migration("20181130071705_AddScoreInfoTables")]
+    [Migration("20181130084152_AddScoreInfoTables")]
     partial class AddScoreInfoTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -319,9 +319,9 @@ namespace osu.Game.Migrations
 
                     b.Property<bool>("DeletePending");
 
-                    b.Property<double>("Health");
+                    b.Property<string>("Hash");
 
-                    b.Property<string>("MD5Hash");
+                    b.Property<double>("Health");
 
                     b.Property<int>("MaxCombo");
 
@@ -386,9 +386,16 @@ namespace osu.Game.Migrations
 
                     b.Property<bool>("DeletePending");
 
+                    b.Property<string>("Hash");
+
                     b.Property<string>("Name");
 
                     b.HasKey("ID");
+
+                    b.HasIndex("DeletePending");
+
+                    b.HasIndex("Hash")
+                        .IsUnique();
 
                     b.ToTable("SkinInfo");
                 });

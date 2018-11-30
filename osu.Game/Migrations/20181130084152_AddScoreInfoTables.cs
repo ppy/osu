@@ -27,7 +27,7 @@ namespace osu.Game.Migrations
                     OnlineScoreID = table.Column<long>(nullable: true),
                     Date = table.Column<DateTimeOffset>(nullable: false),
                     Statistics = table.Column<string>(nullable: true),
-                    MD5Hash = table.Column<string>(nullable: true),
+                    Hash = table.Column<string>(nullable: true),
                     DeletePending = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
