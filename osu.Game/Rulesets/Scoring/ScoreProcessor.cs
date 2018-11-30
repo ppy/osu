@@ -160,10 +160,10 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public virtual void PopulateScore(ScoreInfo score)
         {
-            score.TotalScore = TotalScore;
+            score.TotalScore = (int)Math.Round(TotalScore);
             score.Combo = Combo;
             score.MaxCombo = HighestCombo;
-            score.Accuracy = Accuracy;
+            score.Accuracy = Math.Round(Accuracy, 4);
             score.Rank = Rank;
             score.Date = DateTimeOffset.Now;
             score.Health = Health;
