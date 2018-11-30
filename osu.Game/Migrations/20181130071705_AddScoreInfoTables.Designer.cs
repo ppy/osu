@@ -9,7 +9,7 @@ using osu.Game.Database;
 namespace osu.Game.Migrations
 {
     [DbContext(typeof(OsuDbContext))]
-    [Migration("20181130052804_AddScoreInfoTables")]
+    [Migration("20181130071705_AddScoreInfoTables")]
     partial class AddScoreInfoTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -325,7 +325,8 @@ namespace osu.Game.Migrations
 
                     b.Property<int>("MaxCombo");
 
-                    b.Property<string>("ModsString");
+                    b.Property<string>("ModsJson")
+                        .HasColumnName("Mods");
 
                     b.Property<long?>("OnlineScoreID");
 
@@ -335,11 +336,13 @@ namespace osu.Game.Migrations
 
                     b.Property<int>("RulesetID");
 
-                    b.Property<string>("StatisticsString");
+                    b.Property<string>("StatisticsJson")
+                        .HasColumnName("Statistics");
 
                     b.Property<double>("TotalScore");
 
-                    b.Property<string>("UserString");
+                    b.Property<string>("UserString")
+                        .HasColumnName("User");
 
                     b.HasKey("ID");
 
@@ -446,7 +449,7 @@ namespace osu.Game.Migrations
 
             modelBuilder.Entity("osu.Game.Scoring.ScoreInfo", b =>
                 {
-                    b.HasOne("osu.Game.Beatmaps.BeatmapInfo", "BeatmapInfo")
+                    b.HasOne("osu.Game.Beatmaps.BeatmapInfo", "Beatmap")
                         .WithMany()
                         .HasForeignKey("BeatmapInfoID")
                         .OnDelete(DeleteBehavior.Cascade);
