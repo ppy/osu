@@ -75,6 +75,7 @@ namespace osu.Game.Scoring
             }
         }
 
+        [JsonIgnore]
         public User User;
 
         [Column("User")]
@@ -84,6 +85,7 @@ namespace osu.Game.Scoring
             set => User = new User { Username = value };
         }
 
+        [JsonIgnore]
         public int BeatmapInfoID { get; set; }
 
         public virtual BeatmapInfo Beatmap { get; set; }
@@ -92,6 +94,7 @@ namespace osu.Game.Scoring
 
         public DateTimeOffset Date { get; set; }
 
+        [JsonIgnore]
         public Dictionary<HitResult, object> Statistics = new Dictionary<HitResult, object>();
 
         [Column("Statistics")]
@@ -110,6 +113,7 @@ namespace osu.Game.Scoring
             }
         }
 
+        [JsonIgnore]
         public List<ScoreFileInfo> Files { get; set; }
 
         public string Hash { get; set; }

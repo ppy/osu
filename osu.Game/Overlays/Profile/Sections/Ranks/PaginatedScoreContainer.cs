@@ -9,7 +9,6 @@ using osu.Game.Users;
 using System;
 using System.Linq;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
@@ -29,8 +28,6 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
             ItemsContainer.Direction = FillDirection.Vertical;
         }
-
-        private ScoreManager scoreManager;
 
         protected override void ShowMore()
         {
