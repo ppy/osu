@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Mania.UI
     {
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => stages.Any(s => s.ReceivePositionalInputAt(screenSpacePos));
+
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
         {
             if (stageDefinitions == null)
@@ -52,6 +54,8 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         public override void Add(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Add(h);
+
+        public override bool Remove(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Remove(h);
 
         public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
 
