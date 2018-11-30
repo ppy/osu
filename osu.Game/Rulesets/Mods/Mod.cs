@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// The base class for gameplay modifiers.
     /// </summary>
-    public abstract class Mod : IJsonSerializable
+    public abstract class Mod : IMod, IJsonSerializable
     {
         /// <summary>
         /// The name of this mod.
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// The shortened name of this mod.
         /// </summary>
-        public abstract string ShortenedName { get; }
+        public abstract string Acronym { get; }
 
         /// <summary>
         /// The icon of this mod.

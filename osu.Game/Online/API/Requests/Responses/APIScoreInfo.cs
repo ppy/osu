@@ -120,7 +120,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 base.Ruleset = value;
 
                 // Evaluate the mod string
-                Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.ShortenedName)).ToArray();
+                Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.Acronym)).ToArray();
             }
         }
     }
