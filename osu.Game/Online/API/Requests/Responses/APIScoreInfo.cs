@@ -107,7 +107,8 @@ namespace osu.Game.Online.API.Requests.Responses
             set
             {
                 base.Beatmap = value;
-                Ruleset = value.Ruleset;
+                if (Beatmap.Ruleset != null)
+                    Ruleset = value.Ruleset;
             }
         }
 
