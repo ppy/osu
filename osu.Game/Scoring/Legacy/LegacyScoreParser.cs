@@ -145,7 +145,6 @@ namespace osu.Game.Scoring.Legacy
                         score.Rank = ScoreRank.C;
                     else
                         score.Rank = ScoreRank.D;
-
                     break;
                 }
                 case 1:
@@ -168,7 +167,6 @@ namespace osu.Game.Scoring.Legacy
                         score.Rank = ScoreRank.C;
                     else
                         score.Rank = ScoreRank.D;
-
                     break;
                 }
                 case 2:
