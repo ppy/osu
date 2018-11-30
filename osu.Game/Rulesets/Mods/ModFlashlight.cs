@@ -20,8 +20,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModFlashlight<T> : Mod, IApplicableToRulesetContainer<T>, IApplicableToScoreProcessor
-        where T : HitObject
+    public abstract class ModFlashlight : Mod
     {
         public override string Name => "Flashlight";
         public override string ShortenedName => "FL";
@@ -30,6 +29,14 @@ namespace osu.Game.Rulesets.Mods
         public override string Description => "Restricted view area.";
         public override bool Ranked => true;
 
+        internal ModFlashlight()
+        {
+        }
+    }
+
+    public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToRulesetContainer<T>, IApplicableToScoreProcessor
+        where T : HitObject
+    {
         public const double FLASHLIGHT_FADE_DURATION = 800;
         protected readonly BindableInt Combo = new BindableInt();
 
