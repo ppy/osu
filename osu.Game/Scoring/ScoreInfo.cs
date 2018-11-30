@@ -26,9 +26,6 @@ namespace osu.Game.Scoring
         [Column(TypeName="DECIMAL(1,4)")]
         public double Accuracy { get; set; }
 
-        [NotMapped]
-        public double Health { get; set; } = 1;
-
         public double? PP { get; set; }
 
         public int MaxCombo { get; set; }
