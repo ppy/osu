@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -31,6 +30,9 @@ namespace osu.Game.Online.Chat
             @"#lobby"
         };
 
+        private readonly BindableCollection<Channel> availableChannels = new BindableCollection<Channel>();
+        private readonly BindableCollection<Channel> joinedChannels = new BindableCollection<Channel>();
+
         /// <summary>
         /// The currently opened channel
         /// </summary>
@@ -39,12 +41,12 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// The Channels the player has joined
         /// </summary>
-        public ObservableCollection<Channel> JoinedChannels { get; } = new ObservableCollection<Channel>(); //todo: should be publicly readonly
+        public IBindableCollection<Channel> JoinedChannels => joinedChannels;
 
         /// <summary>
         /// The channels available for the player to join
         /// </summary>
-        public ObservableCollection<Channel> AvailableChannels { get; } = new ObservableCollection<Channel>(); //todo: should be publicly readonly
+        public IBindableCollection<Channel> AvailableChannels => availableChannels;
 
         private IAPIProvider api;
         private ScheduledDelegate fetchMessagesScheduleder;
@@ -293,8 +295,8 @@ namespace osu.Game.Online.Chat
                     found.Users.Remove(foundSelf);
             }
 
-            if (joined == null && addToJoined) JoinedChannels.Add(found);
-            if (available == null && addToAvailable) AvailableChannels.Add(found);
+            if (joined == null && addToJoined) joinedChannels.Add(found);
+            if (available == null && addToAvailable) availableChannels.Add(found);
 
             return found;
         }
@@ -346,9 +348,10 @@ namespace osu.Game.Online.Chat
         {
             if (channel == null) return;
 
-            if (channel == CurrentChannel.Value) CurrentChannel.Value = null;
+            if (channel == CurrentChannel.Value)
+                CurrentChannel.Value = null;
 
-            JoinedChannels.Remove(channel);
+            joinedChannels.Remove(channel);
 
             if (channel.Joined.Value)
             {

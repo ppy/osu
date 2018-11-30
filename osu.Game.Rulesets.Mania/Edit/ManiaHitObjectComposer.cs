@@ -53,7 +53,8 @@ namespace osu.Game.Rulesets.Mania.Edit
 
         protected override IReadOnlyList<HitObjectCompositionTool> CompositionTools => new HitObjectCompositionTool[]
         {
-            new NoteCompositionTool()
+            new NoteCompositionTool(),
+            new HoldNoteCompositionTool()
         };
 
         public override SelectionHandler CreateSelectionHandler() => new ManiaSelectionHandler();

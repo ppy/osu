@@ -8,12 +8,14 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
+using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
 using osuTK;
@@ -25,6 +27,8 @@ namespace osu.Game.Screens.Menu
     public class ButtonSystem : Container, IStateful<ButtonSystemState>, IKeyBindingHandler<GlobalAction>
     {
         public event Action<ButtonSystemState> StateChanged;
+
+        private readonly IBindable<bool> isIdle = new BindableBool();
 
         public Action OnEdit;
         public Action OnExit;
@@ -102,10 +106,20 @@ namespace osu.Game.Screens.Menu
         private OsuGame game;
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, OsuGame game)
+        private void load(AudioManager audio, OsuGame game, IdleTracker idleTracker)
         {
             this.game = game;
+
+            isIdle.ValueChanged += updateIdleState;
+            if (idleTracker != null) isIdle.BindTo(idleTracker.IsIdle);
+
             sampleBack = audio.Sample.Get(@"Menu/button-back-select");
+        }
+
+        private void updateIdleState(bool isIdle)
+        {
+            if (isIdle && State != ButtonSystemState.Exit)
+                State = ButtonSystemState.Initial;
         }
 
         public bool OnPressed(GlobalAction action)
@@ -266,9 +280,6 @@ namespace osu.Game.Screens.Menu
 
         protected override void Update()
         {
-            //if (OsuGame.IdleTime > 6000 && State != MenuState.Exit)
-            //    State = MenuState.Initial;
-
             base.Update();
 
             if (logo != null)
