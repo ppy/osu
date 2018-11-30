@@ -68,16 +68,20 @@ namespace osu.Game.Screens.Edit
         /// Seeks backwards by one beat length.
         /// </summary>
         /// <param name="snapped">Whether to snap to the closest beat after seeking.</param>
-        public void SeekBackward(bool snapped = false) => seek(-1, snapped);
+        /// <param name="amount">The relative amount (magnitude) which should be seeked.</param>
+        public void SeekBackward(bool snapped = false, double amount = 1) => seek(-1, snapped, amount);
 
         /// <summary>
         /// Seeks forwards by one beat length.
         /// </summary>
         /// <param name="snapped">Whether to snap to the closest beat after seeking.</param>
-        public void SeekForward(bool snapped = false) => seek(1, snapped);
+        /// <param name="amount">The relative amount (magnitude) which should be seeked.</param>
+        public void SeekForward(bool snapped = false, double amount = 1) => seek(1, snapped, amount);
 
-        private void seek(int direction, bool snapped)
+        private void seek(int direction, bool snapped, double amount = 1)
         {
+            if (amount <= 0) throw new ArgumentException("Value should be greater than zero", nameof(amount));
+
             var timingPoint = ControlPointInfo.TimingPointAt(CurrentTime);
             if (direction < 0 && timingPoint.Time == CurrentTime)
             {
@@ -87,7 +91,7 @@ namespace osu.Game.Screens.Edit
                     timingPoint = ControlPointInfo.TimingPoints[--activeIndex];
             }
 
-            double seekAmount = timingPoint.BeatLength / beatDivisor;
+            double seekAmount = timingPoint.BeatLength / beatDivisor * amount;
             double seekTime = CurrentTime + seekAmount * direction;
 
             if (!snapped || ControlPointInfo.TimingPoints.Count == 0)
