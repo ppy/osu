@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     public class ManiaModRandom : Mod, IApplicableToRulesetContainer<ManiaHitObject>
     {
         public override string Name => "Random";
-        public override string ShortenedName => "RD";
+        public override string Acronym => "RD";
         public override ModType Type => ModType.Conversion;
         public override FontAwesome Icon => FontAwesome.fa_osu_dice;
         public override string Description => @"Shuffle around the keys!";

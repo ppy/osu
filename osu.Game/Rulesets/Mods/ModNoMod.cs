@@ -6,10 +6,10 @@ namespace osu.Game.Rulesets.Mods
     /// <summary>
     /// Indicates a type of mod that doesn't do anything.
     /// </summary>
-    public sealed class NoModMod : Mod
+    public sealed class ModNoMod : Mod
     {
         public override string Name => "No Mod";
-        public override string ShortenedName => "NM";
+        public override string Acronym => "NM";
         public override double ScoreMultiplier => 1;
     }
 }

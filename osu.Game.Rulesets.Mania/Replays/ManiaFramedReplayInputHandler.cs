@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input.StateChanges;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Mania.Replays

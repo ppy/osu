@@ -8,13 +8,13 @@ using System.Linq;
 namespace osu.Game.IO.Archives
 {
     /// <summary>
-    /// Reads an extracted legacy beatmap from disk.
+    /// Reads an archive from a directory on disk.
     /// </summary>
-    public class LegacyFilesystemReader : ArchiveReader
+    public class LegacyDirectoryArchiveReader : ArchiveReader
     {
         private readonly string path;
 
-        public LegacyFilesystemReader(string path)
+        public LegacyDirectoryArchiveReader(string path)
             : base(Path.GetFileName(path))
         {
             // re-get full path to standardise with Directory.GetFiles return values below.
