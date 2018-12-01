@@ -199,6 +199,18 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             if (Pairing.Team1.Value == null || Pairing.Team2.Value == null)
                 Pairing.CancelMatchStart();
 
+            if (Pairing.ConditionalPairings.Count > 0)
+            {
+                foreach (var conditional in Pairing.ConditionalPairings)
+                {
+                    var team1Match = conditional.Acronyms.Contains(Pairing.Team1Acronym);
+                    var team2Match = conditional.Acronyms.Contains(Pairing.Team2Acronym);
+
+                    if (team1Match && team2Match)
+                        Pairing.Date.Value = conditional.Date;
+                }
+            }
+
             Flow.Children = new[]
             {
                 new DrawableMatchTeam(Pairing.Team1, Pairing, Pairing.Losers),
@@ -226,7 +238,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (editorInfo == null)
+            if (editorInfo == null || Pairing is ConditionalMatchPairing)
                 return false;
 
             Selected = true;
