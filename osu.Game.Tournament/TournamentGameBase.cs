@@ -113,8 +113,8 @@ namespace osu.Game.Tournament
                 if (string.IsNullOrEmpty(p.Username))
                 {
                     var req = new GetUserRequest(p.Id);
-                    req.Success += i => p.Username = i.Username;
                     req.Perform(API);
+                    p.Username = req.Result.Username;
 
                     addedInfo = true;
                 }
@@ -125,8 +125,8 @@ namespace osu.Game.Tournament
                 if (b.BeatmapInfo == null)
                 {
                     var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
-                    req.Success += i => b.BeatmapInfo = i.ToBeatmap(RulesetStore);
                     req.Perform(API);
+                    b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
 
                     addedInfo = true;
                 }
