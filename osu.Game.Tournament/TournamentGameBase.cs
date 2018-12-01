@@ -78,6 +78,13 @@ namespace osu.Game.Tournament
             {
                 pairing.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == pairing.Team1Acronym);
                 pairing.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == pairing.Team2Acronym);
+
+                foreach (var conditional in pairing.ConditionalPairings)
+                {
+                    conditional.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == conditional.Team1Acronym);
+                    conditional.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == conditional.Team2Acronym);
+                    conditional.Grouping.Value = pairing.Grouping.Value;
+                }
             }
 
             // assign progressions

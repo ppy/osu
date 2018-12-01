@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 using osu.Framework.Configuration;
@@ -16,6 +17,17 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     public class MatchPairing
     {
         public int ID;
+
+        public List<string> Acronyms
+        {
+            get
+            {
+                List<string> acronyms = new List<string>();
+                if (Team1Acronym != null) acronyms.Add(Team1Acronym);
+                if (Team2Acronym != null) acronyms.Add(Team2Acronym);
+                return acronyms;
+            }
+        }
 
         [JsonIgnore]
         public readonly Bindable<TournamentTeam> Team1 = new Bindable<TournamentTeam>();
@@ -53,6 +65,8 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
 
         public readonly Bindable<DateTimeOffset> Date = new Bindable<DateTimeOffset>();
 
+        public readonly BindableCollection<ConditionalMatchPairing> ConditionalPairings = new BindableCollection<ConditionalMatchPairing>();
+
         public readonly Bindable<Point> Position = new Bindable<Point>();
 
         public MatchPairing()
@@ -74,7 +88,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [JsonIgnore]
         public TournamentTeam Loser => !Completed.Value ? null : Team1Score.Value > Team2Score.Value ? Team2.Value : Team1.Value;
 
-        public int PointsToWin => Grouping.Value.BestOf / 2 + 1;
+        public int PointsToWin => Grouping.Value == null ? 0 : Grouping.Value.BestOf / 2 + 1;
 
         /// <summary>
         /// Remove scores from the match, in case of a false click or false start.
