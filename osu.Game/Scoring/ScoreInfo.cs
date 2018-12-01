@@ -21,11 +21,10 @@ namespace osu.Game.Scoring
 
         public ScoreRank Rank { get; set; }
 
-        public double TotalScore { get; set; }
+        public int TotalScore { get; set; }
 
+        [Column(TypeName="DECIMAL(1,4)")]
         public double Accuracy { get; set; }
-
-        public double Health { get; set; } = 1;
 
         public double? PP { get; set; }
 

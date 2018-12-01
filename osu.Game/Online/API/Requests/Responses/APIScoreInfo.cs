@@ -16,7 +16,7 @@ namespace osu.Game.Online.API.Requests.Responses
     public class APIScoreInfo : ScoreInfo
     {
         [JsonProperty(@"score")]
-        private double totalScore
+        private int totalScore
         {
             set => TotalScore = value;
         }

@@ -38,7 +38,6 @@ namespace osu.Game.Tests.Scores.IO
                         Rank = ScoreRank.B,
                         TotalScore = 987654,
                         Accuracy = 0.8,
-                        Health = 0.8,
                         MaxCombo = 500,
                         Combo = 250,
                         User = new User { Username = "Test user" },
@@ -51,7 +50,6 @@ namespace osu.Game.Tests.Scores.IO
                     Assert.AreEqual(toImport.Rank, imported.Rank);
                     Assert.AreEqual(toImport.TotalScore, imported.TotalScore);
                     Assert.AreEqual(toImport.Accuracy, imported.Accuracy);
-                    Assert.AreEqual(toImport.Health, imported.Health);
                     Assert.AreEqual(toImport.MaxCombo, imported.MaxCombo);
                     Assert.AreEqual(toImport.Combo, imported.Combo);
                     Assert.AreEqual(toImport.User.Username, imported.User.Username);
