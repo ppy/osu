@@ -147,8 +147,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
 
             foreach (DrawableRoom r in RoomsContainer.Children)
             {
-                r.MatchingFilter = r.MatchingFilter &&
-                                   r.Room.Availability.Value == (RoomAvailability)Filter.Tabs.Current.Value;
+                r.MatchingFilter = r.MatchingFilter && r.Room.Availability.Value == Filter.Availability;
             }
         }
 
