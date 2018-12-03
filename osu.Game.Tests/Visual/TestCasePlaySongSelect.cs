@@ -98,8 +98,11 @@ namespace osu.Game.Tests.Visual
         [SetUp]
         public virtual void SetUp()
         {
-            manager?.Delete(manager.GetAllUsableBeatmapSets());
-            Child = songSelect = new TestSongSelect();
+            Schedule(() =>
+            {
+                manager?.Delete(manager.GetAllUsableBeatmapSets());
+                Child = songSelect = new TestSongSelect();
+            });
         }
 
         [Test]
