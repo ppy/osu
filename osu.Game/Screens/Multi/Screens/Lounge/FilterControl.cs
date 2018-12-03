@@ -17,11 +17,26 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         {
             DisplayStyleControl.Hide();
         }
+
+        public RoomAvailability Availability
+        {
+            get
+            {
+                switch (Tabs.Current.Value)
+                {
+                    default:
+                    case LoungeTab.Public:
+                        return RoomAvailability.Public;
+                    case LoungeTab.Private:
+                        return RoomAvailability.FriendsOnly;
+                }
+            }
+        }
     }
 
     public enum LoungeTab
     {
-        Public = RoomAvailability.Public,
-        Private = RoomAvailability.FriendsOnly,
+        Public,
+        Private,
     }
 }
