@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual
             // Reset the mods
             Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Where(m => !(m is ModAutoplay));
 
-            return new ReplayPlayer(new Score { Replay = dummyRulesetContainer.Replay });
+            return new ReplayPlayer(new Score { Replay = dummyRulesetContainer.ReplayScore.Replay });
         }
     }
 }
