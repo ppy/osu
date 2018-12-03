@@ -15,12 +15,18 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
     public class ManiaSelectionBlueprint : SelectionBlueprint
     {
+        public Vector2 ScreenSpaceDragPosition { get; private set; }
+        public Vector2 DragPosition { get; private set; }
+
         protected new DrawableManiaHitObject HitObject => (DrawableManiaHitObject)base.HitObject;
 
         protected IClock EditorClock { get; private set; }
 
         [Resolved]
         private IScrollingInfo scrollingInfo { get; set; }
+
+        [Resolved]
+        private IManiaHitObjectComposer composer { get; set; }
 
         public ManiaSelectionBlueprint(DrawableHitObject hitObject)
             : base(hitObject)
@@ -41,27 +47,22 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             Position = Parent.ToLocalSpace(HitObject.ToScreenSpace(Vector2.Zero));
         }
 
-        public override void AdjustPosition(DragEvent dragEvent)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            var objectParent = HitObject.Parent;
+            ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
+            DragPosition = HitObject.ToLocalSpace(e.ScreenSpaceMousePosition);
 
-            // Using the hitobject position is required since AdjustPosition can be invoked multiple times per frame
-            // without the position having been updated by the parenting ScrollingHitObjectContainer
-            HitObject.Y += dragEvent.Delta.Y;
+            return base.OnMouseDown(e);
+        }
 
-            float targetPosition;
+        protected override bool OnDrag(DragEvent e)
+        {
+            var result = base.OnDrag(e);
 
-            // If we're scrolling downwards, a position of 0 is actually further away from the hit target
-            // so we need to flip the vertical coordinate in the hitobject container's space
-            if (scrollingInfo.Direction.Value == ScrollingDirection.Down)
-                targetPosition = -HitObject.Position.Y;
-            else
-                targetPosition = HitObject.Position.Y;
+            ScreenSpaceDragPosition = e.ScreenSpaceMousePosition;
+            DragPosition = HitObject.ToLocalSpace(e.ScreenSpaceMousePosition);
 
-            HitObject.HitObject.StartTime = scrollingInfo.Algorithm.TimeAt(targetPosition,
-                EditorClock.CurrentTime,
-                scrollingInfo.TimeRange.Value,
-                objectParent.DrawHeight);
+            return result;
         }
 
         public override void Show()

@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     internal class OsuModWiggle : Mod, IApplicableToDrawableHitObjects
     {
         public override string Name => "Wiggle";
-        public override string ShortenedName => "WG";
+        public override string Acronym => "WG";
         public override FontAwesome Icon => FontAwesome.fa_certificate;
         public override ModType Type => ModType.Fun;
         public override string Description => "They just won't stay still...";

@@ -12,26 +12,31 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
     /// <summary>
-    /// A box which surrounds <see cref="SelectionBlueprint"/>s and provides interactive handles, context menus etc.
+    /// A component which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
     /// </summary>
-    public class SelectionBox : CompositeDrawable
+    public class SelectionHandler : CompositeDrawable
     {
         public const float BORDER_RADIUS = 2;
 
+        protected IEnumerable<SelectionBlueprint> SelectedBlueprints => selectedBlueprints;
         private readonly List<SelectionBlueprint> selectedBlueprints;
+
+        protected IEnumerable<HitObject> SelectedHitObjects => selectedBlueprints.Select(b => b.HitObject.HitObject);
 
         private Drawable outline;
 
         [Resolved]
         private IPlacementHandler placementHandler { get; set; }
 
-        public SelectionBox()
+        public SelectionHandler()
         {
             selectedBlueprints = new List<SelectionBlueprint>();
 
@@ -59,12 +64,13 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         #region User Input Handling
 
-        public void HandleDrag(DragEvent dragEvent)
+        /// <summary>
+        /// Handles the selected <see cref="DrawableHitObject"/>s being dragged.
+        /// </summary>
+        /// <param name="blueprint">The <see cref="SelectionBlueprint"/> that received the drag event.</param>
+        /// <param name="dragEvent">The drag event.</param>
+        public virtual void HandleDrag(SelectionBlueprint blueprint, DragEvent dragEvent)
         {
-            // Todo: Various forms of snapping
-
-            foreach (var blueprint in selectedBlueprints)
-                blueprint.AdjustPosition(dragEvent);
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)
@@ -90,19 +96,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// <summary>
         /// Bind an action to deselect all selected blueprints.
         /// </summary>
-        public Action DeselectAll { private get; set; }
+        internal Action DeselectAll { private get; set; }
 
         /// <summary>
         /// Handle a blueprint becoming selected.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
-        public void HandleSelected(SelectionBlueprint blueprint) => selectedBlueprints.Add(blueprint);
+        internal void HandleSelected(SelectionBlueprint blueprint) => selectedBlueprints.Add(blueprint);
 
         /// <summary>
         /// Handle a blueprint becoming deselected.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
-        public void HandleDeselected(SelectionBlueprint blueprint)
+        internal void HandleDeselected(SelectionBlueprint blueprint)
         {
             selectedBlueprints.Remove(blueprint);
 
@@ -115,7 +121,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         /// Handle a blueprint requesting selection.
         /// </summary>
         /// <param name="blueprint">The blueprint.</param>
-        public void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
+        internal void HandleSelectionRequested(SelectionBlueprint blueprint, InputState state)
         {
             if (state.Keyboard.ControlPressed)
             {
@@ -139,7 +145,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
         #endregion
 
         /// <summary>
-        /// Updates whether this <see cref="SelectionBox"/> is visible.
+        /// Updates whether this <see cref="SelectionHandler"/> is visible.
         /// </summary>
         internal void UpdateVisibility()
         {

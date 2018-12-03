@@ -34,6 +34,8 @@ namespace osu.Game.Screens
 
         protected virtual bool AllowBackButton => true;
 
+        public virtual bool AllowExternalScreenChange => false;
+
         /// <summary>
         /// Override to create a BackgroundMode for the current screen.
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
