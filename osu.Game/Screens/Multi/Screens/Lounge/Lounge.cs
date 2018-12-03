@@ -20,6 +20,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
     {
         private readonly Container content;
         private readonly SearchContainer search;
+        private readonly RoomSettingsOverlay settings;
 
         protected readonly FilterControl Filter;
         protected readonly FillFlowContainer<DrawableRoom> RoomsContainer;
@@ -56,7 +57,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         {
             Children = new Drawable[]
             {
-                Filter = new FilterControl(),
+                Filter = new FilterControl { Depth = -1 },
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -91,8 +92,17 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.45f,
                         },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = settings = new RoomSettingsOverlay(new Room())
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Height = 0.9f,
+                            },
+                        },
                     },
-                },
+                }
             };
 
             Filter.Search.Current.ValueChanged += s => filterRooms();
@@ -143,6 +153,11 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
 
         private void filterRooms()
         {
+            if (Filter.Tabs.Current.Value == LoungeTab.Create)
+                settings.Show();
+            else
+                settings.Hide();
+
             search.SearchTerm = Filter.Search.Current.Value ?? string.Empty;
 
             foreach (DrawableRoom r in RoomsContainer.Children)
