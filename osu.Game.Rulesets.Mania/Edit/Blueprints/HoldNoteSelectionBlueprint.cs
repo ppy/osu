@@ -49,7 +49,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
             base.Update();
 
             Size = HitObject.DrawSize + new Vector2(0, HitObject.Tail.DrawHeight);
-            Position = Parent.ToLocalSpace(HitObject.ScreenSpaceDrawQuad.TopLeft);
 
             // This is a side-effect of not matching the hitobject's anchors/origins, which is kinda hard to do
             // When scrolling upwards our origin is already at the top of the head note (which is the intended location),

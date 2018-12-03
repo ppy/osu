@@ -7,7 +7,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Scoring;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
@@ -18,12 +17,13 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking
 {
     public class Results : OsuScreen
     {
-        private readonly Score score;
+        private readonly ScoreInfo score;
         private Container circleOuterBackground;
         private Container circleOuter;
         private Container circleInner;
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Ranking
 
         private const float circle_outer_scale = 0.96f;
 
-        public Results(Score score)
+        public Results(ScoreInfo score)
         {
             this.score = score;
         }

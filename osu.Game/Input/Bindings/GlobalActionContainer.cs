@@ -43,6 +43,7 @@ namespace osu.Game.Input.Bindings
 
             new KeyBinding(InputKey.Space, GlobalAction.Select),
             new KeyBinding(InputKey.Enter, GlobalAction.Select),
+            new KeyBinding(InputKey.KeypadEnter, GlobalAction.Select),
         };
 
         public IEnumerable<KeyBinding> InGameKeyBindings => new[]

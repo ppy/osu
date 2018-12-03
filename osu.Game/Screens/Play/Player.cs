@@ -28,6 +28,7 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
@@ -68,6 +69,9 @@ namespace osu.Game.Screens.Play
         /// The decoupled clock used for gameplay. Should be used for seeks and clock control.
         /// </summary>
         private DecoupleableInterpolatingFramedClock adjustableClock;
+
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
 
         private PauseContainer pauseContainer;
 
@@ -281,18 +285,29 @@ namespace osu.Game.Screens.Play
                 {
                     if (!IsCurrentScreen) return;
 
-                    var score = new Score
-                    {
-                        Beatmap = Beatmap.Value.BeatmapInfo,
-                        Ruleset = ruleset
-                    };
-                    ScoreProcessor.PopulateScore(score);
-                    score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
+                    var score = CreateScore();
+                    if (RulesetContainer.Replay == null)
+                        scoreManager.Import(score, true);
+
                     Push(new Results(score));
 
                     onCompletionEvent = null;
                 });
             }
+        }
+
+        protected virtual ScoreInfo CreateScore()
+        {
+            var score = new ScoreInfo
+            {
+                Beatmap = Beatmap.Value.BeatmapInfo,
+                Ruleset = ruleset,
+                User = api.LocalUser.Value
+            };
+
+            ScoreProcessor.PopulateScore(score);
+
+            return score;
         }
 
         private bool onFail()

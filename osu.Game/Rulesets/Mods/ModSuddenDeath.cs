@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModSuddenDeath : Mod, IApplicableToScoreProcessor
     {
         public override string Name => "Sudden Death";
-        public override string ShortenedName => "SD";
+        public override string Acronym => "SD";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_suddendeath;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Miss and fail.";
