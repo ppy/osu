@@ -36,6 +36,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
 
     public enum LoungeTab
     {
+        Create,
         Public,
         Private,
     }
