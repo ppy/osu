@@ -57,18 +57,7 @@ namespace osu.Game.Screens.Play
                     Progress = CreateProgress(),
                     ModDisplay = CreateModsContainer(),
                     PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
-                    new FillFlowContainer
-                    {
-                        Anchor = Anchor.BottomRight,
-                        Origin = Anchor.BottomRight,
-                        Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            KeyCounter = CreateKeyCounter(adjustableClock as IFrameBasedClock)
-                        }
-                    }
+                    KeyCounter = CreateKeyCounter(adjustableClock as IFrameBasedClock)
                 }
             });
 
@@ -185,6 +174,8 @@ namespace osu.Game.Screens.Play
             FadeTime = 50,
             Anchor = Anchor.BottomRight,
             Origin = Anchor.BottomRight,
+            Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
+            AutoSizeAxes = Axes.Both,
             Margin = new MarginPadding(10),
             AudioClock = offsetClock
         };

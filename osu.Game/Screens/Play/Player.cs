@@ -230,7 +230,7 @@ namespace osu.Game.Screens.Play
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
-                    Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
+                    Position = -new Vector2(5, 3 * TwoLayerButton.SIZE_RETRACTED.Y),
                     Action = Exit
                 }
             };
