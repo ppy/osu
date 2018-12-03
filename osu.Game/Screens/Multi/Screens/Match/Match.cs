@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Screens.Multi.Screens.Match.Settings;
+using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Users;
 
