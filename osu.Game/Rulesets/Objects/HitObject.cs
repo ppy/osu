@@ -69,6 +69,9 @@ namespace osu.Game.Rulesets.Objects
         {
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
+            // This is done here since ApplyDefaultsToSelf may be used to determine the end time
+            SampleControlPoint = controlPointInfo.SamplePointAt((this as IHasEndTime)?.EndTime ?? StartTime);
+
             nestedHitObjects.Clear();
 
             CreateNestedHitObjects();
@@ -84,11 +87,7 @@ namespace osu.Game.Rulesets.Objects
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            SampleControlPoint samplePoint = controlPointInfo.SamplePointAt(StartTime);
-            EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
-
-            Kiai = effectPoint.KiaiMode;
-            SampleControlPoint = samplePoint;
+            Kiai = controlPointInfo.EffectPointAt(StartTime).KiaiMode;
 
             if (HitWindows == null)
                 HitWindows = CreateHitWindows();
