@@ -34,6 +34,8 @@ namespace osu.Game.Screens.Multi.Components
         private const float side_strip_width = 5;
         private const float cover_width = 145;
 
+        public Action SelectionRequested;
+
         private readonly Box selectionBox;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
@@ -73,17 +75,6 @@ namespace osu.Game.Screens.Multi.Components
             {
                 matchingFilter = value;
                 this.FadeTo(MatchingFilter ? 1 : 0, 200);
-            }
-        }
-
-        private Action<DrawableRoom> action;
-        public new Action<DrawableRoom> Action
-        {
-            get { return action; }
-            set
-            {
-                action = value;
-                Enabled.Value = action != null;
             }
         }
 
@@ -248,12 +239,7 @@ namespace osu.Game.Screens.Multi.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Enabled.Value)
-            {
-                Action?.Invoke(this);
-                State = SelectionState.Selected;
-            }
-
+            State = SelectionState.Selected;
             return true;
         }
     }

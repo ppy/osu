@@ -19,7 +19,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         public IEnumerable<User> Users
         {
-            set {
+            set
+            {
                 usersFlow.Children = value.Select(u => new UserPanel(u)
                 {
                     Anchor = Anchor.TopCentre,
