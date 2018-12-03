@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -29,29 +28,6 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         public override string Title => "Lounge";
 
         protected override Container<Drawable> TransitionContent => content;
-
-        private IEnumerable<Room> rooms;
-        public IEnumerable<Room> Rooms
-        {
-            get { return rooms; }
-            set
-            {
-                if (Equals(value, rooms)) return;
-                rooms = value;
-
-                var enumerable = rooms.ToList();
-
-                RoomsContainer.Children = enumerable.Select(r => new DrawableRoom(r)
-                {
-                    Action = didSelect,
-                }).ToList();
-
-                if (!enumerable.Contains(Inspector.Room))
-                    Inspector.Room = null;
-
-                filterRooms();
-            }
-        }
 
         public Lounge()
         {
@@ -108,6 +84,12 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
             Filter.Search.Current.ValueChanged += s => filterRooms();
             Filter.Tabs.Current.ValueChanged += t => filterRooms();
             Filter.Search.Exit += Exit;
+
+            settings.Applied = () =>
+            {
+                var drawableRoom = addRoom(settings.Room);
+                drawableRoom.State = SelectionState.Selected;
+            };
         }
 
         protected override void UpdateAfterChildren()
@@ -120,6 +102,35 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
                 Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH,
                 Right = SearchableListOverlay.WIDTH_PADDING,
             };
+        }
+
+        public IEnumerable<Room> Rooms
+        {
+            set
+            {
+                RoomsContainer.ForEach(r => r.Action = null);
+                RoomsContainer.Clear();
+
+                foreach (var room in value)
+                    addRoom(room);
+            }
+        }
+
+        private DrawableRoom addRoom(Room room)
+        {
+            var drawableRoom = new DrawableRoom(room);
+
+            drawableRoom.StateChanged += s =>
+            {
+                if (s == SelectionState.Selected)
+                    didSelect(drawableRoom);
+            };
+
+            RoomsContainer.Add(drawableRoom);
+
+            filterRooms();
+
+            return drawableRoom;
         }
 
         protected override void OnFocus(FocusEvent e)

@@ -88,6 +88,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     header.Tabs.Current.Value = MatchHeaderPage.Room;
             };
 
+            settings.Applied = () => settings.Hide();
+
             nameBind.BindTo(room.Name);
             nameBind.BindValueChanged(n => info.Name = n, true);
 

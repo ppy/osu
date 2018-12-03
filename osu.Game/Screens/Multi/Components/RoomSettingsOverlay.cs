@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -21,6 +22,16 @@ namespace osu.Game.Screens.Multi.Components
         private const float transition_duration = 350;
         private const float field_padding = 45;
 
+        /// <summary>
+        /// Invoked when room settings were applied.
+        /// </summary>
+        public Action Applied;
+
+        /// <summary>
+        /// The room which settings are being applied to.
+        /// </summary>
+        public readonly Room Room;
+
         private readonly Bindable<string> nameBind = new Bindable<string>();
         private readonly Bindable<RoomAvailability> availabilityBind = new Bindable<RoomAvailability>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
@@ -36,6 +47,8 @@ namespace osu.Game.Screens.Multi.Components
 
         public RoomSettingsOverlay(Room room)
         {
+            Room = room;
+
             Masking = true;
 
             Child = content = new Container
@@ -185,7 +198,7 @@ namespace osu.Game.Screens.Multi.Components
             else
                 maxParticipantsBind.Value = null;
 
-            Hide();
+            Applied?.Invoke();
         }
 
         private class SettingsTextBox : OsuTextBox
