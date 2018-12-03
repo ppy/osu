@@ -48,10 +48,6 @@ namespace osu.Game.Overlays.Chat
                     },
                 }
             };
-
-            Channel.NewMessagesArrived += newMessagesArrived;
-            Channel.MessageRemoved += messageRemoved;
-            Channel.PendingMessageResolved += pendingMessageResolved;
         }
 
         protected override void LoadComplete()
@@ -59,6 +55,11 @@ namespace osu.Game.Overlays.Chat
             base.LoadComplete();
 
             newMessagesArrived(Channel.Messages);
+
+            Channel.NewMessagesArrived += newMessagesArrived;
+            Channel.MessageRemoved += messageRemoved;
+            Channel.PendingMessageResolved += pendingMessageResolved;
+
             scrollToEnd();
         }
 
@@ -77,8 +78,6 @@ namespace osu.Game.Overlays.Chat
             var displayMessages = newMessages.Skip(Math.Max(0, newMessages.Count() - Channel.MaxHistory));
 
             flow.AddRange(displayMessages.Select(m => new ChatLine(m)));
-
-            if (!IsLoaded) return;
 
             if (scroll.IsScrolledToEnd(10) || !flow.Children.Any() || newMessages.Any(m => m is LocalMessage))
                 scrollToEnd();
