@@ -9,10 +9,9 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Screens.Multi.Components;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Screens.Match.Settings
+namespace osu.Game.Screens.Multi.Components
 {
     public class GameTypePicker : TabControl<GameType>
     {

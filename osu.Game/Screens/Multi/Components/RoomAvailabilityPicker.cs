@@ -13,7 +13,7 @@ using osu.Game.Online.Multiplayer;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Multi.Screens.Match.Settings
+namespace osu.Game.Screens.Multi.Components
 {
     public class RoomAvailabilityPicker : TabControl<RoomAvailability>
     {
