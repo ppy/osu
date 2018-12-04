@@ -23,7 +23,7 @@ Clone the repository including submodules
 
 Build and run
 
-- Using Visual Studio 2017, Rider or Visual Studio Code (configurations are included. No exe file will be generated, simply "dotnet restore" in osu folder then "dotnet run" in osu.desktop folder)
+- Using Visual Studio 2017, Rider or Visual Studio Code (configurations are included). No exe file will be generated, simply "dotnet run" in osu.desktop folder.
 - From command line using `dotnet run --project osu.Desktop`. When building for non-development purposes, add `-c Release` to gain higher performance.
 - To run with code analysis, instead use `powershell ./build.ps1` or `build.sh`. This is currently only supported under windows due to [resharper cli shortcomings](https://youtrack.jetbrains.com/issue/RSRP-410004). Alternative, you can install resharper or use rider to get inline support in your IDE of choice.
 
