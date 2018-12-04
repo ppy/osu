@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Multi.Components
         /// <summary>
         /// The room which settings are being applied to.
         /// </summary>
-        public Room Room
+        public virtual Room Room
         {
             get => room;
             set

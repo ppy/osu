@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Game.Online.API;
+using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Screens.Multi.Components
 {
@@ -15,6 +16,18 @@ namespace osu.Game.Screens.Multi.Components
         private void load()
         {
             Room.Host.Value = api.LocalUser;
+        }
+
+        public override Room Room
+        {
+            get => base.Room;
+            set
+            {
+                base.Room = value;
+
+                if (api != null && value != null)
+                    value.Host.Value = api.LocalUser;
+            }
         }
     }
 }
