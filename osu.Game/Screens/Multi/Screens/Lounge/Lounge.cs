@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
@@ -86,11 +87,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
             Filter.Tabs.Current.ValueChanged += t => filterRooms();
             Filter.Search.Exit += Exit;
 
-            settings.Applied = () =>
-            {
-                var drawableRoom = addRoom(settings.Room);
-                drawableRoom.State = SelectionState.Selected;
-            };
+            settings.Applied = () => createRoom(settings.Room);
         }
 
         protected override void UpdateAfterChildren()
@@ -121,11 +118,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         {
             var drawableRoom = new DrawableRoom(room);
 
-            drawableRoom.StateChanged += s =>
-            {
-                if (s == SelectionState.Selected)
-                    didSelect(drawableRoom);
-            };
+            drawableRoom.SelectionRequested = () => selectionRequested(drawableRoom);
 
             RoomsContainer.Add(drawableRoom);
 
@@ -163,6 +156,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         protected override void OnSuspending(Screen next)
         {
             base.OnSuspending(next);
+
             Filter.Search.HoldFocus = false;
         }
 
@@ -181,19 +175,38 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
             }
         }
 
-        private void didSelect(DrawableRoom room)
+        private void selectionRequested(DrawableRoom room)
         {
-            RoomsContainer.Children.ForEach(c =>
+            if (room.State == SelectionState.Selected)
+                openRoom(room);
+            else
             {
-                if (c != room)
-                    c.State = SelectionState.NotSelected;
-            });
+                RoomsContainer.ForEach(c => c.State = c == room ? SelectionState.Selected : SelectionState.NotSelected);
+                Inspector.Room = room.Room;
+            }
+        }
 
+        private void openRoom(DrawableRoom room)
+        {
+            if (!IsCurrentScreen)
+                return;
+
+            RoomsContainer.ForEach(c => c.State = c == room ? SelectionState.Selected : SelectionState.NotSelected);
             Inspector.Room = room.Room;
 
-            // open the room if its selected and is clicked again
-            if (room.State == SelectionState.Selected)
-                Push(new Match.Match(room.Room));
+            Push(new Match.Match(room.Room));
+        }
+
+        private void createRoom(Room room)
+        {
+            openRoom(addRoom(room));
+
+            this.Delay(WaveContainer.APPEAR_DURATION).Schedule(() =>
+            {
+                Filter.Tabs.Current.Value = LoungeTab.Public;
+                settings.Hide();
+                settings.FinishTransforms(true);
+            });
         }
 
         private class RoomsFilterContainer : FillFlowContainer<DrawableRoom>, IHasFilterableChildren

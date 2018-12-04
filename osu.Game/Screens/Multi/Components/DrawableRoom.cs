@@ -34,6 +34,8 @@ namespace osu.Game.Screens.Multi.Components
         private const float side_strip_width = 5;
         private const float cover_width = 145;
 
+        public event Action<SelectionState> StateChanged;
+
         public Action SelectionRequested;
 
         private readonly Box selectionBox;
@@ -77,8 +79,6 @@ namespace osu.Game.Screens.Multi.Components
                 this.FadeTo(MatchingFilter ? 1 : 0, 200);
             }
         }
-
-        public event Action<SelectionState> StateChanged;
 
         public DrawableRoom(Room room)
         {
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Multi.Components
 
         protected override bool OnClick(ClickEvent e)
         {
-            State = SelectionState.Selected;
+            SelectionRequested?.Invoke();
             return true;
         }
     }
