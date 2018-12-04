@@ -189,6 +189,11 @@ namespace osu.Game.Online.API
             this.password = password;
         }
 
+        public void CreateAccount(string email, string username, string password)
+        {
+            Debug.Assert(State == APIState.Offline);
+        }
+
         /// <summary>
         /// Handle a single API request.
         /// </summary>
