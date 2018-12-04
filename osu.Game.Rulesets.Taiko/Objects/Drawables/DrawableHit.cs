@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
 
             var result = HitObject.HitWindows.ResultFor(timeOffset);
-            if (result == HitResult.None)
+            if (result <= HitResult.Miss)
                 return;
 
             if (!validActionPressed)

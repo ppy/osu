@@ -73,11 +73,8 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         /// </summary>
         protected override bool DefaultFailCondition => JudgedHits == MaxHits && Health.Value <= 0.5;
 
-        private double hpIncreaseTick;
-        private double hpIncreaseGreat;
-        private double hpIncreaseGood;
-        private double hpIncreaseMiss;
-        private double hpIncreaseMissSwell;
+        private double hpMultiplier;
+        private double hpMissMultiplier;
 
         public TaikoScoreProcessor(RulesetContainer<TaikoHitObject> rulesetContainer)
             : base(rulesetContainer)
@@ -88,49 +85,25 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         {
             base.ApplyBeatmap(beatmap);
 
-            double hpMultiplierNormal = 1 / (hp_hit_great * beatmap.HitObjects.FindAll(o => o is Hit).Count * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98));
+            hpMultiplier = 0.01 / (hp_hit_great * beatmap.HitObjects.FindAll(o => o is Hit).Count * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98));
 
-            hpIncreaseTick = hp_hit_tick;
-            hpIncreaseGreat = hpMultiplierNormal * hp_hit_great;
-            hpIncreaseGood = hpMultiplierNormal * hp_hit_good;
-            hpIncreaseMiss = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, hp_miss_min, hp_miss_mid, hp_miss_max);
-            hpIncreaseMissSwell = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, swell_hp_miss_min, swell_hp_miss_mid, swell_hp_miss_max);
+            hpMissMultiplier = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.0018, 0.0075, 0.0120);
         }
 
         protected override void ApplyResult(JudgementResult result)
         {
             base.ApplyResult(result);
 
-            if (!((TaikoJudgement)result.Judgement).AffectsHP)
-                return;
-
-            bool isSwell = false;
-            bool isTick = result.Judgement is TaikoDrumRollTickJudgement;
-
-            if(!isTick)
-                isSwell = result.Judgement is TaikoSwellJudgement;
-
-            // Apply HP changes
-            switch (result.Type)
+            if (result.Judgement is TaikoJudgement taikoJudgement)
             {
-                case HitResult.Miss:
-                    // Missing ticks shouldn't drop HP
-                    if (isSwell)
-                        Health.Value += hpIncreaseMissSwell;
-                    else if (!isTick)
-                        Health.Value += hpIncreaseMiss;
-                    break;
-                case HitResult.Good:
-                    // Swells shouldn't increase HP
-                    if (!isSwell)
-                        Health.Value += hpIncreaseGood;
-                    break;
-                case HitResult.Great:
-                    if (isTick)
-                        Health.Value += hpIncreaseTick;
-                    else if(!isSwell)
-                        Health.Value += hpIncreaseGreat;
-                    break;
+                double hpIncrease = taikoJudgement.HealthIncreaseFor(result);
+
+                if (result.Type == HitResult.Miss)
+                    hpIncrease *= hpMissMultiplier;
+                else
+                    hpIncrease *= hpMultiplier;
+
+                Health.Value += hpIncrease;
             }
         }
 
