@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = settings = new RoomSettingsOverlay
+                            Child = settings = new CreateRoomOverlay
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.9f,

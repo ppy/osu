@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual
                 MaxParticipants = { Value = 10 },
             };
 
-            Add(overlay = new TestRoomSettingsOverlay(room)
+            Add(overlay = new TestRoomSettingsOverlay
             {
                 RelativeSizeAxes = Axes.Both,
                 Height = 0.75f,
