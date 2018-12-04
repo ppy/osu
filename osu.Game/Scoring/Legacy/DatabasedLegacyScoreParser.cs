@@ -2,8 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets;
 
-namespace osu.Game.Rulesets.Scoring.Legacy
+namespace osu.Game.Scoring.Legacy
 {
     /// <summary>
     /// A <see cref="LegacyScoreParser"/> which retrieves the applicable <see cref="Beatmap"/> and <see cref="Ruleset"/>

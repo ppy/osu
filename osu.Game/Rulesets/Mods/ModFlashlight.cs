@@ -20,16 +20,23 @@ using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModFlashlight<T> : Mod, IApplicableToRulesetContainer<T>, IApplicableToScoreProcessor
-        where T : HitObject
+    public abstract class ModFlashlight : Mod
     {
         public override string Name => "Flashlight";
-        public override string ShortenedName => "FL";
+        public override string Acronym => "FL";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_flashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
         public override bool Ranked => true;
 
+        internal ModFlashlight()
+        {
+        }
+    }
+
+    public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToRulesetContainer<T>, IApplicableToScoreProcessor
+        where T : HitObject
+    {
         public const double FLASHLIGHT_FADE_DURATION = 800;
         protected readonly BindableInt Combo = new BindableInt();
 

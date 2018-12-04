@@ -2,15 +2,12 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
 namespace osu.Game.Rulesets
 {
     public class RulesetInfo : IEquatable<RulesetInfo>
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [JsonIgnore]
         public int? ID { get; set; }
 
         public string Name { get; set; }
