@@ -7,7 +7,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
@@ -156,7 +155,6 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         protected override void OnSuspending(Screen next)
         {
             base.OnSuspending(next);
-
             Filter.Search.HoldFocus = false;
         }
 
@@ -200,13 +198,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         private void createRoom(Room room)
         {
             openRoom(addRoom(room));
-
-            this.Delay(WaveContainer.APPEAR_DURATION).Schedule(() =>
-            {
-                Filter.Tabs.Current.Value = LoungeTab.Public;
-                settings.Hide();
-                settings.FinishTransforms(true);
-            });
+            Filter.Tabs.Current.Value = LoungeTab.Public;
         }
 
         private class RoomsFilterContainer : FillFlowContainer<DrawableRoom>, IHasFilterableChildren
