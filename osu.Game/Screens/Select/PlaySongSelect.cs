@@ -85,6 +85,14 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        protected override void ExitFromBack()
+        {
+            if (modSelect.State == Visibility.Visible)
+                modSelect.Hide();
+
+            base.ExitFromBack();
+        }
+
         protected override void UpdateBeatmap(WorkingBeatmap beatmap)
         {
             beatmap.Mods.BindTo(selectedMods);
@@ -124,12 +132,6 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnExiting(Screen next)
         {
-            if (modSelect.State == Visibility.Visible)
-            {
-                modSelect.Hide();
-                return true;
-            }
-
             if (base.OnExiting(next))
                 return true;
 
