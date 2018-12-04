@@ -27,11 +27,6 @@ namespace osu.Game.Screens.Multi.Components
         /// </summary>
         public Action Applied;
 
-        /// <summary>
-        /// The room which settings are being applied to.
-        /// </summary>
-        public readonly Room Room;
-
         private readonly Bindable<string> nameBind = new Bindable<string>();
         private readonly Bindable<RoomAvailability> availabilityBind = new Bindable<RoomAvailability>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
@@ -45,10 +40,8 @@ namespace osu.Game.Screens.Multi.Components
         protected readonly GameTypePicker TypePicker;
         protected readonly TriangleButton ApplyButton;
 
-        public RoomSettingsOverlay(Room room)
+        public RoomSettingsOverlay()
         {
-            Room = room;
-
             Masking = true;
 
             Child = content = new Container
@@ -156,16 +149,43 @@ namespace osu.Game.Screens.Multi.Components
             typeBind.ValueChanged += t => TypePicker.Current.Value = t;
             maxParticipantsBind.ValueChanged += m => MaxParticipantsField.Text = m?.ToString();
 
-            nameBind.BindTo(room.Name);
-            availabilityBind.BindTo(room.Availability);
-            typeBind.BindTo(room.Type);
-            maxParticipantsBind.BindTo(room.MaxParticipants);
+            Room = new Room();
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             typeLabel.Colour = colours.Yellow;
+        }
+
+        private Room room;
+
+        /// <summary>
+        /// The room which settings are being applied to.
+        /// </summary>
+        public Room Room
+        {
+            get => room;
+            set
+            {
+                if (room == value)
+                    return;
+
+                room = value;
+
+                nameBind.UnbindBindings();
+                availabilityBind.UnbindBindings();
+                typeBind.UnbindBindings();
+                maxParticipantsBind.UnbindBindings();
+
+                if (room != null)
+                {
+                    nameBind.BindTo(room.Name);
+                    availabilityBind.BindTo(room.Availability);
+                    typeBind.BindTo(room.Type);
+                    maxParticipantsBind.BindTo(room.MaxParticipants);
+                }
+            }
         }
 
         protected override void PopIn()

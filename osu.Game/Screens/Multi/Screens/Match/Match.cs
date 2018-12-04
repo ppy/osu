@@ -57,10 +57,11 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = Header.HEIGHT },
-                    Child = settings = new RoomSettingsOverlay(room)
+                    Child = settings = new RoomSettingsOverlay
                     {
                         RelativeSizeAxes = Axes.Both,
                         Height = 0.9f,
+                        Room = room
                     },
                 },
             };
