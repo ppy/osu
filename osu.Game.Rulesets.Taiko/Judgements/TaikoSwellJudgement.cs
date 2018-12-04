@@ -13,10 +13,10 @@ namespace osu.Game.Rulesets.Taiko.Judgements
         {
             switch(result)
             {
-                default:
-                    return 0;
                 case HitResult.Miss:
                     return -0.65;
+                default:
+                    return 0;
             }
         }
     }

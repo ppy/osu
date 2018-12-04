@@ -24,10 +24,10 @@ namespace osu.Game.Rulesets.Taiko.Judgements
         {
             switch(result)
             {
-                default:
-                    return 0;
                 case HitResult.Great:
                     return 0.0000003;
+                default:
+                    return 0;
             }
         }
     }
