@@ -19,6 +19,7 @@ namespace osu.Game.Screens.Multi.Components
         private const float selection_width = 3;
 
         protected override TabItem<GameType> CreateTabItem(GameType value) => new GameTypePickerItem(value);
+
         protected override Dropdown<GameType> CreateDropdown() => null;
 
         public GameTypePicker()
@@ -30,6 +31,7 @@ namespace osu.Game.Screens.Multi.Components
             AddItem(new GameTypeVersus());
             AddItem(new GameTypeTagTeam());
             AddItem(new GameTypeTeamVersus());
+            AddItem(new GameTypeTimeshift());
         }
 
         private class GameTypePickerItem : TabItem<GameType>
@@ -38,7 +40,8 @@ namespace osu.Game.Screens.Multi.Components
 
             private readonly CircularContainer hover, selection;
 
-            public GameTypePickerItem(GameType value) : base(value)
+            public GameTypePickerItem(GameType value)
+                : base(value)
             {
                 AutoSizeAxes = Axes.Both;
 
@@ -81,6 +84,9 @@ namespace osu.Game.Screens.Multi.Components
             private void load(OsuColour colours)
             {
                 selection.Colour = colours.Yellow;
+
+                if (!Value.IsAvailable)
+                    Colour = colours.Gray5;
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -93,6 +99,13 @@ namespace osu.Game.Screens.Multi.Components
             {
                 hover.FadeOut(transition_duration, Easing.OutQuint);
                 base.OnHoverLost(e);
+            }
+
+            protected override bool OnClick(ClickEvent e)
+            {
+                if (!Value.IsAvailable)
+                    return true;
+                return base.OnClick(e);
             }
 
             protected override void OnActivated()
