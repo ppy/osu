@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public abstract class ManiaKeyMod : Mod, IApplicableToBeatmapConverter
     {
-        public override string ShortenedName => Name;
+        public override string Acronym => Name;
         public abstract int KeyCount { get; }
         public override ModType Type => ModType.Conversion;
         public override double ScoreMultiplier => 1; // TODO: Implement the mania key mod score multiplier

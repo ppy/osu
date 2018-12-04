@@ -98,11 +98,17 @@ namespace osu.Game.Overlays.Settings.Sections
             resetSkinButtons();
         });
 
-        private void itemAdded(SkinInfo s) => Schedule(() =>
+        private void itemAdded(SkinInfo s, bool existing, bool silent)
         {
-            usableSkins.Add(s);
-            resetSkinButtons();
-        });
+            if (existing)
+                return;
+
+            Schedule(() =>
+            {
+                usableSkins.Add(s);
+                resetSkinButtons();
+            });
+        }
 
         private void resetSkinButtons()
         {
