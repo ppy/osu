@@ -12,7 +12,9 @@ namespace osu.Game.Overlays.Chat
         public ExternalLinkDialog(string url, Action openExternalLinkAction)
         {
             HeaderText = "Just checking...";
-            BodyText = $"You are about to leave osu! and open the following link in a web browser:\n\n{url}";
+
+            if (isOsuWebSite(url)) BodyText = $"You are about to open an osu! link in a web browser:\n\n{url}";
+            else BodyText = $"Warning! You are about to leave osu! and open the following link in a web browser:\n\n{url}";
 
             Icon = FontAwesome.fa_warning;
 
@@ -28,6 +30,18 @@ namespace osu.Game.Overlays.Chat
                     Text = @"No! Abort mission!"
                 },
             };
+        }
+
+        public Boolean isOsuWebSite(string url)
+        {
+            if (url.StartsWith("http://osu.ppy.sh") ||
+            url.StartsWith("https://osu.ppy.sh") ||
+            url.StartsWith("osu.ppy.sh"))
+                return true;
+            else
+            {
+                return false;
+            }
         }
     }
 }
