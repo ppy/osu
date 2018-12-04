@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Play
             Add(content = new Container
             {
                 RelativeSizeAxes = Axes.Both,
-
+                AlwaysPresent = true, // The hud may be hidden but certain elements may need to still be updated
                 Children = new Drawable[]
                 {
                     ComboCounter = CreateComboCounter(),
