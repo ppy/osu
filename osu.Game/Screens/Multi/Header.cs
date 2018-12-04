@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Multi
                 },
             };
 
-            breadcrumbs.Current.ValueChanged += s => screenType.Text = ((MultiplayerScreen)s).Type.ToLowerInvariant();
+            breadcrumbs.Current.ValueChanged += s => screenType.Text = ((IMultiplayerScreen)s).ShortTitle.ToLowerInvariant();
             breadcrumbs.Current.TriggerChange();
         }
 

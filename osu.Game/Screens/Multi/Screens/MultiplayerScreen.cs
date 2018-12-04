@@ -8,14 +8,11 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Multi.Screens
 {
-    public abstract class MultiplayerScreen : OsuScreen
+    public abstract class MultiplayerScreen : OsuScreen, IMultiplayerScreen
     {
         protected virtual Container<Drawable> TransitionContent => Content;
 
-        /// <summary>
-        /// The type to display in the title of the <see cref="Header"/>.
-        /// </summary>
-        public virtual string Type => Title;
+        public virtual string ShortTitle => Title;
 
         protected override void OnEntering(Screen last)
         {
