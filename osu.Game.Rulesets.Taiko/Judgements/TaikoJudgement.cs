@@ -9,12 +9,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
     public class TaikoJudgement : Judgement
     {
         public override HitResult MaxResult => HitResult.Great;
-
-        /// <summary>
-        /// Whether this <see cref="TaikoJudgement"/> should affect user's hitpoints.
-        /// </summary>
-        public virtual bool AffectsHP => true;
-
+        
         /// <summary>
         /// Computes the numeric result value for the combo portion of the score.
         /// </summary>
@@ -32,5 +27,32 @@ namespace osu.Game.Rulesets.Taiko.Judgements
                     return 300;
             }
         }
+
+        /// <summary>
+        /// Retrieves the numeric health increase of a <see cref="HitResult"/>.
+        /// </summary>
+        /// <param name="result">The <see cref="HitResult"/> to find the numeric health increase for.</param>
+        /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
+        protected virtual double HealthIncreaseFor(HitResult result)
+        {
+            switch (result)
+            {
+                default:
+                    return 0;
+                case HitResult.Miss:
+                    return -1.0;
+                case HitResult.Good:
+                    return 1.1;
+                case HitResult.Great:
+                    return 3.0;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the numeric health increase of a <see cref="JudgementResult"/>.
+        /// </summary>
+        /// <param name="result">The <see cref="JudgementResult"/> to find the numeric health increase for.</param>
+        /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
+        public double HealthIncreaseFor(JudgementResult result) => HealthIncreaseFor(result.Type);
     }
 }

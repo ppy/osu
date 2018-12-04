@@ -19,5 +19,16 @@ namespace osu.Game.Rulesets.Taiko.Judgements
                     return 200;
             }
         }
+
+        protected override double HealthIncreaseFor(HitResult result)
+        {
+            switch(result)
+            {
+                default:
+                    return 0;
+                case HitResult.Great:
+                    return 0.0000003;
+            }
+        }
     }
 }

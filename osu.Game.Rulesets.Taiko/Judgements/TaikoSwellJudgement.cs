@@ -9,6 +9,15 @@ namespace osu.Game.Rulesets.Taiko.Judgements
     {
         public override bool AffectsCombo => false;
 
-        protected override int NumericResultFor(HitResult result) => 0;
+        protected override double HealthIncreaseFor(HitResult result)
+        {
+            switch(result)
+            {
+                default:
+                    return 0;
+                case HitResult.Miss:
+                    return -0.65;
+            }
+        }
     }
 }
