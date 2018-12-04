@@ -71,10 +71,11 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
                         new Container
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Child = settings = new RoomSettingsOverlay(new Room())
+                            Child = settings = new RoomSettingsOverlay
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 0.9f,
+                                Room = new Room()
                             },
                         },
                     },
@@ -153,6 +154,9 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
+
+            settings.Room = new Room();
+
             Filter.Search.HoldFocus = true;
         }
 

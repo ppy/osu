@@ -105,7 +105,7 @@ namespace osu.Game.Tests.Visual
                 set => TypePicker.Current.Value = value;
             }
 
-            public TestRoomSettingsOverlay(Room room) : base(room)
+            public TestRoomSettingsOverlay(Room room) : base()
             {
             }
 
