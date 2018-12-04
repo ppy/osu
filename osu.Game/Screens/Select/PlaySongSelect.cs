@@ -88,7 +88,10 @@ namespace osu.Game.Screens.Select
         protected override void ExitFromBack()
         {
             if (modSelect.State == Visibility.Visible)
+            {
                 modSelect.Hide();
+                return;
+            }
 
             base.ExitFromBack();
         }
