@@ -105,10 +105,6 @@ namespace osu.Game.Tests.Visual
                 set => TypePicker.Current.Value = value;
             }
 
-            public TestRoomSettingsOverlay(Room room) : base()
-            {
-            }
-
             public void ClickApplyButton(ManualInputManager inputManager)
             {
                 inputManager.MoveMouseTo(ApplyButton);
