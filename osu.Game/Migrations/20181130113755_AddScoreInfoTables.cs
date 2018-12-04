@@ -14,9 +14,8 @@ namespace osu.Game.Migrations
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Rank = table.Column<int>(nullable: false),
-                    TotalScore = table.Column<double>(nullable: false),
-                    Accuracy = table.Column<double>(nullable: false),
-                    Health = table.Column<double>(nullable: false),
+                    TotalScore = table.Column<int>(nullable: false),
+                    Accuracy = table.Column<double>(type: "DECIMAL(1,4)", nullable: false),
                     PP = table.Column<double>(nullable: true),
                     MaxCombo = table.Column<int>(nullable: false),
                     Combo = table.Column<int>(nullable: false),

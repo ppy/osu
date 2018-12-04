@@ -9,7 +9,7 @@ using osu.Game.Database;
 namespace osu.Game.Migrations
 {
     [DbContext(typeof(OsuDbContext))]
-    [Migration("20181130084152_AddScoreInfoTables")]
+    [Migration("20181130113755_AddScoreInfoTables")]
     partial class AddScoreInfoTables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -309,7 +309,8 @@ namespace osu.Game.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<double>("Accuracy");
+                    b.Property<double>("Accuracy")
+                        .HasColumnType("DECIMAL(1,4)");
 
                     b.Property<int>("BeatmapInfoID");
 
@@ -320,8 +321,6 @@ namespace osu.Game.Migrations
                     b.Property<bool>("DeletePending");
 
                     b.Property<string>("Hash");
-
-                    b.Property<double>("Health");
 
                     b.Property<int>("MaxCombo");
 
@@ -339,7 +338,7 @@ namespace osu.Game.Migrations
                     b.Property<string>("StatisticsJson")
                         .HasColumnName("Statistics");
 
-                    b.Property<double>("TotalScore");
+                    b.Property<int>("TotalScore");
 
                     b.Property<string>("UserString")
                         .HasColumnName("User");
