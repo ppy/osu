@@ -191,12 +191,14 @@ namespace osu.Game.Screens.Select
                 });
                 Add(Footer = new Footer
                 {
-                    OnBack = Exit,
+                    OnBack = ExitFromBack,
                 });
 
                 FooterPanels.Add(BeatmapOptions = new BeatmapOptionsOverlay());
             }
         }
+
+        protected virtual void ExitFromBack() => Exit();
 
         [BackgroundDependencyLoader(true)]
         private void load(BeatmapManager beatmaps, AudioManager audio, DialogOverlay dialog, OsuColour colours)
