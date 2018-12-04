@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
     public class TaikoJudgement : Judgement
     {
         public override HitResult MaxResult => HitResult.Great;
-        
+
         /// <summary>
         /// Computes the numeric result value for the combo portion of the score.
         /// </summary>
