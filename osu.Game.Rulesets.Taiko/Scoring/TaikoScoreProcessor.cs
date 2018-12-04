@@ -42,24 +42,6 @@ namespace osu.Game.Rulesets.Taiko.Scoring
 
 
         /// <summary>
-        /// The minimum HP deducted for a swell <see cref="HitResult.Miss"/>.
-        /// This occurs when HP Drain = 0.
-        /// </summary>
-        private const double swell_hp_miss_min = -0.0012;
-
-        /// <summary>
-        /// The median HP deducted for a swell <see cref="HitResult.Miss"/>.
-        /// This occurs when HP Drain = 5.
-        /// </summary>
-        private const double swell_hp_miss_mid = -0.0045;
-
-        /// <summary>
-        /// The maximum HP deducted for a swell <see cref="HitResult.Miss"/>.
-        /// This occurs when HP Drain = 10.
-        /// </summary>
-        private const double swell_hp_miss_max = -0.0084;
-
-        /// <summary>
         /// The HP awarded for a <see cref="DrumRollTick"/> hit.
         /// <para>
         /// <see cref="DrumRollTick"/> hits award less HP as they're more spammable, although in hindsight
