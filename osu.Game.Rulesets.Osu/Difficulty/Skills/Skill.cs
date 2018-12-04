@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public abstract class Skill
     {
-        private const double difficulty_spike_factor = 1.12;
+        private const double difficulty_spike_factor = 1.2;
         /// <summary>
         /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
         /// </summary>

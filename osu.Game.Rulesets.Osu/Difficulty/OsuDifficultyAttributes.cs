@@ -10,7 +10,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         public double AimStrain;
         public double SpeedStrain;
-        public double LengthBonus;
+        public double AimLengthBonus;
+        public double SpeedLengthBonus;
         public double ApproachRate;
         public double OverallDifficulty;
         public int MaxCombo;
