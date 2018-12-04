@@ -24,4 +24,7 @@
     <PackageReference Include="SharpRaven" Version="2.4.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Overlays\Settings\AccountCreation" />
+  </ItemGroup>
 </Project>

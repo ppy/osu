@@ -61,6 +61,8 @@ namespace osu.Game
 
         private DialogOverlay dialogOverlay;
 
+        private AccountCreationOverlay accountCreation;
+
         private DirectOverlay direct;
 
         private SocialOverlay social;
@@ -405,6 +407,11 @@ namespace osu.Game
                 Depth = -6,
             }, overlayContent.Add);
 
+            loadComponentSingleFile(accountCreation = new AccountCreationOverlay
+            {
+                Depth = -7,
+            }, overlayContent.Add);
+
             dependencies.Cache(idleTracker);
             dependencies.Cache(settings);
             dependencies.Cache(onscreenDisplay);
@@ -417,6 +424,7 @@ namespace osu.Game
             dependencies.Cache(beatmapSetOverlay);
             dependencies.Cache(notifications);
             dependencies.Cache(dialogOverlay);
+            dependencies.Cache(accountCreation);
 
             Add(externalLinkOpener = new ExternalLinkOpener());
 
