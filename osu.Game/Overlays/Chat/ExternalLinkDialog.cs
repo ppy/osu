@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.Chat
                 },
             };
         }
-        public Boolean isOsuWebSite(string url)
+        protected Boolean isOsuWebSite(string url)
         {
             if (url.StartsWith("http://osu.ppy.sh") ||
             url.StartsWith("https://osu.ppy.sh") ||
