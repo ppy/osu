@@ -1,7 +1,9 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -24,9 +26,9 @@ namespace osu.Game.Overlays
 {
     public class AccountCreationOverlay : OsuFocusedOverlayContainer, IOnlineComponent
     {
-        private OsuTextFlowContainer usernameDescription;
-        private OsuTextFlowContainer emailAddressDescription;
-        private OsuTextFlowContainer passwordDescription;
+        private ErrorTextFlowContainer usernameDescription;
+        private ErrorTextFlowContainer emailAddressDescription;
+        private ErrorTextFlowContainer passwordDescription;
 
         private OsuTextBox usernameTextBox;
         private OsuTextBox emailTextBox;
@@ -43,8 +45,6 @@ namespace osu.Game.Overlays
             Size = new Vector2(620, 450);
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-
-            State = Visibility.Visible;
         }
 
         [BackgroundDependencyLoader]
@@ -114,9 +114,10 @@ namespace osu.Game.Overlays
                                             RelativeSizeAxes = Axes.X,
                                             TabbableContentContainer = this
                                         },
-                                        usernameDescription = new OsuTextFlowContainer(cp => { cp.TextSize = 12; })
+                                        usernameDescription = new ErrorTextFlowContainer
                                         {
-                                            RelativeSizeAxes = Axes.X, AutoSizeAxes = Axes.Y
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y
                                         },
                                         emailTextBox = new OsuTextBox
                                         {
@@ -125,9 +126,10 @@ namespace osu.Game.Overlays
                                             Text = api.ProvidedUsername ?? string.Empty,
                                             TabbableContentContainer = this
                                         },
-                                        emailAddressDescription = new OsuTextFlowContainer(cp => { cp.TextSize = 12; })
+                                        emailAddressDescription = new ErrorTextFlowContainer
                                         {
-                                            RelativeSizeAxes = Axes.X, AutoSizeAxes = Axes.Y
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y
                                         },
                                         passwordTextBox = new OsuPasswordTextBox
                                         {
@@ -135,9 +137,10 @@ namespace osu.Game.Overlays
                                             RelativeSizeAxes = Axes.X,
                                             TabbableContentContainer = this,
                                         },
-                                        passwordDescription = new OsuTextFlowContainer(cp => { cp.TextSize = 12; })
+                                        passwordDescription = new ErrorTextFlowContainer
                                         {
-                                            RelativeSizeAxes = Axes.X, AutoSizeAxes = Axes.Y
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y
                                         },
                                         new Container
                                         {
@@ -175,9 +178,7 @@ namespace osu.Game.Overlays
             characterCheckText = passwordDescription.AddText("8 characters long");
             passwordDescription.AddText(". Choose something long but also something you will remember, like a line from your favourite song.");
 
-            passwordTextBox.Current.ValueChanged += text => {
-                characterCheckText.ForEach(s => s.Colour = text.Length == 0 ? Color4.White : Interpolation.ValueAt(text.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In));
-            };
+            passwordTextBox.Current.ValueChanged += text => { characterCheckText.ForEach(s => s.Colour = text.Length == 0 ? Color4.White : Interpolation.ValueAt(text.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
         }
 
         private void performRegistration()
@@ -191,7 +192,47 @@ namespace osu.Game.Overlays
                 return;
             }
 
-            api.CreateAccount(emailTextBox.Text, usernameTextBox.Text, passwordTextBox.Text);
+            usernameDescription.ClearErrors();
+            emailAddressDescription.ClearErrors();
+            passwordDescription.ClearErrors();
+
+            Task.Run(() =>
+            {
+                bool success;
+                RegistrationRequest.RegistrationRequestErrors errors = null;
+
+                try
+                {
+                    errors = api.CreateAccount(emailTextBox.Text, usernameTextBox.Text, passwordTextBox.Text);
+                    success = errors == null;
+                }
+                catch (Exception)
+                {
+                    success = false;
+                }
+
+                Schedule(() =>
+                {
+                    if (!success)
+                    {
+                        if (errors != null)
+                        {
+                            usernameDescription.AddErrors(errors.User.Username);
+                            emailAddressDescription.AddErrors(errors.User.Email);
+                            passwordDescription.AddErrors(errors.User.Password);
+                        }
+                        else
+                        {
+                            passwordDescription.AddErrors(new[] { "Something happened... but we're not sure what." });
+                        }
+
+                        registerShake.Shake();
+                        return;
+                    }
+
+                    api.Login(emailTextBox.Text, passwordTextBox.Text);
+                });
+            });
         }
 
         private OsuTextBox nextUnfilledTextbox()
