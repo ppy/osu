@@ -2,9 +2,9 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Beatmaps;
+using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Rulesets.Replays.Legacy;
 using osu.Game.Rulesets.Replays.Types;
 
 namespace osu.Game.Rulesets.Catch.Replays

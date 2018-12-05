@@ -7,16 +7,16 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Users;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIScore : Score
+    public class APIScoreInfo : ScoreInfo
     {
         [JsonProperty(@"score")]
-        private double totalScore
+        private int totalScore
         {
             set => TotalScore = value;
         }
@@ -32,15 +32,6 @@ namespace osu.Game.Online.API.Requests.Responses
         {
             set => User = value;
         }
-
-        [JsonProperty(@"replay_data")]
-        private Replay replay
-        {
-            set => Replay = value;
-        }
-
-        [JsonProperty(@"mode_int")]
-        public int OnlineRulesetID { get; set; }
 
         [JsonProperty(@"score_id")]
         private long onlineScoreID
@@ -104,21 +95,36 @@ namespace osu.Game.Online.API.Requests.Responses
             }
         }
 
+        [JsonProperty(@"mode_int")]
+        public int OnlineRulesetID { get; set; }
+
         [JsonProperty(@"mods")]
         private string[] modStrings { get; set; }
 
-        public void ApplyBeatmap(BeatmapInfo beatmap)
+        public override BeatmapInfo Beatmap
         {
-            Beatmap = beatmap;
-            ApplyRuleset(beatmap.Ruleset);
+            get => base.Beatmap;
+            set
+            {
+                base.Beatmap = value;
+                if (Beatmap.Ruleset != null)
+                    Ruleset = value.Ruleset;
+            }
         }
 
-        public void ApplyRuleset(RulesetInfo ruleset)
+        public override RulesetInfo Ruleset
         {
-            Ruleset = ruleset;
+            get => base.Ruleset;
+            set
+            {
+                base.Ruleset = value;
 
-            // Evaluate the mod string
-            Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.ShortenedName)).ToArray();
+                if (modStrings != null)
+                {
+                    // Evaluate the mod string
+                    Mods = Ruleset.CreateInstance().GetAllMods().Where(mod => modStrings.Contains(mod.Acronym)).ToArray();
+                }
+            }
         }
     }
 }

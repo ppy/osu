@@ -7,7 +7,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Difficulty
 {
@@ -17,11 +17,11 @@ namespace osu.Game.Rulesets.Difficulty
 
         protected readonly Ruleset Ruleset;
         protected readonly IBeatmap Beatmap;
-        protected readonly Score Score;
+        protected readonly ScoreInfo Score;
 
         protected double TimeRate { get; private set; } = 1;
 
-        protected PerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
+        protected PerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
         {
             Ruleset = ruleset;
             Score = score;

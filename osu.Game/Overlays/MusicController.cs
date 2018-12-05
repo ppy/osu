@@ -214,7 +214,14 @@ namespace osu.Game.Overlays
             beatmapSets.Insert(index, beatmapSetInfo);
         }
 
-        private void handleBeatmapAdded(BeatmapSetInfo obj) => Schedule(() => beatmapSets.Add(obj));
+        private void handleBeatmapAdded(BeatmapSetInfo obj, bool existing, bool silent)
+        {
+            if (existing)
+                return;
+
+            Schedule(() => beatmapSets.Add(obj));
+        }
+
         private void handleBeatmapRemoved(BeatmapSetInfo obj) => Schedule(() => beatmapSets.RemoveAll(s => s.ID == obj.ID));
 
         protected override void LoadComplete()

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Input.StateChanges;
 using osu.Game.Input.Handlers;
+using osu.Game.Replays;
 using osuTK;
 using osuTK.Input;
 

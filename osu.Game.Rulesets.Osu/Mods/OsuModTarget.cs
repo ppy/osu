@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Osu.Mods
     public class OsuModTarget : Mod
     {
         public override string Name => "Target";
-        public override string ShortenedName => "TP";
+        public override string Acronym => "TP";
         public override ModType Type => ModType.Conversion;
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_target;
         public override string Description => @"Practice keeping up with the beat of the song.";

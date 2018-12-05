@@ -139,7 +139,7 @@ namespace osu.Game.Overlays
             var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
             req.Success += res =>
             {
-                ShowBeatmapSet(res.ToBeatmapSet(rulesets));
+                BeatmapSet = res.ToBeatmapSet(rulesets);
                 header.Picker.Beatmap.Value = header.BeatmapSet.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
             };
             api.Queue(req);
@@ -150,7 +150,7 @@ namespace osu.Game.Overlays
         {
             BeatmapSet = null;
             var req = new GetBeatmapSetRequest(beatmapSetId);
-            req.Success += res => ShowBeatmapSet(res.ToBeatmapSet(rulesets));
+            req.Success += res => BeatmapSet = res.ToBeatmapSet(rulesets);
             api.Queue(req);
             Show();
         }

@@ -6,20 +6,17 @@ using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModAutoplay : ModAutoplay<ManiaHitObject>
     {
-        protected override Score CreateReplayScore(Beatmap<ManiaHitObject> beatmap)
+        protected override Score CreateReplayScore(Beatmap<ManiaHitObject> beatmap) => new Score
         {
-            return new Score
-            {
-                User = new User { Username = "osu!topus!" },
-                Replay = new ManiaAutoGenerator((ManiaBeatmap)beatmap).Generate(),
-            };
-        }
+            ScoreInfo = new ScoreInfo { User = new User { Username = "osu!topus!" } },
+            Replay = new ManiaAutoGenerator((ManiaBeatmap)beatmap).Generate(),
+        };
     }
 }

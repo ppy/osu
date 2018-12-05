@@ -68,9 +68,9 @@ namespace osu.Game.Rulesets.Edit
             // Process object
             var processor = ruleset.CreateBeatmapProcessor(beatmap);
 
-            processor.PreProcess();
+            processor?.PreProcess();
             tObject.ApplyDefaults(beatmap.ControlPointInfo, beatmap.BeatmapInfo.BaseDifficulty);
-            processor.PostProcess();
+            processor?.PostProcess();
 
             // Add visual representation
             var drawableObject = rulesetContainer.GetVisualRepresentation(tObject);
@@ -91,8 +91,8 @@ namespace osu.Game.Rulesets.Edit
             // Process the beatmap
             var processor = ruleset.CreateBeatmapProcessor(beatmap);
 
-            processor.PreProcess();
-            processor.PostProcess();
+            processor?.PreProcess();
+            processor?.PostProcess();
 
             // Remove visual representation
             var drawableObject = Playfield.AllHitObjects.Single(d => d.HitObject == hitObject);
