@@ -37,14 +37,14 @@ namespace osu.Game.Rulesets.Taiko.Judgements
         {
             switch (result)
             {
-                default:
-                    return 0;
                 case HitResult.Miss:
                     return -1.0;
                 case HitResult.Good:
                     return 1.1;
                 case HitResult.Great:
                     return 3.0;
+                default:
+                    return 0;
             }
         }
 
