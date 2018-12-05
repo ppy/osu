@@ -125,6 +125,8 @@ namespace osu.Game.Screens.Multi.Components
                                             RelativeSizeAxes = Axes.X,
                                             TabbableContentContainer = this,
                                             OnCommit = (sender, text) => apply(),
+                                            Alpha = 0.2f,
+                                            ReadOnly = true,
                                         },
                                     },
                                 },
@@ -148,6 +150,21 @@ namespace osu.Game.Screens.Multi.Components
             availabilityBind.ValueChanged += a => AvailabilityPicker.Current.Value = a;
             typeBind.ValueChanged += t => TypePicker.Current.Value = t;
             maxParticipantsBind.ValueChanged += m => MaxParticipantsField.Text = m?.ToString();
+
+            AvailabilityPicker.DisabledItems = new[]
+            {
+                RoomAvailability.FriendsOnly,
+                RoomAvailability.InviteOnly
+            };
+
+            TypePicker.DisabledItems = new GameType[]
+            {
+                new GameTypeTag(),
+                new GameTypeVersus(),
+                new GameTypeTagTeam(),
+                new GameTypeTeamVersus(),
+            };
+
 
             Room = new Room();
         }

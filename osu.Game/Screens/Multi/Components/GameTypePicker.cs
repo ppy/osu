@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Multi.Components
 {
-    public class GameTypePicker : TabControl<GameType>
+    public class GameTypePicker : DisableableTabControl<GameType>
     {
         private const float height = 40;
         private const float selection_width = 3;
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Multi.Components
             AddItem(new GameTypeTimeshift());
         }
 
-        private class GameTypePickerItem : TabItem<GameType>
+        private class GameTypePickerItem : DisableableTabItem<GameType>
         {
             private const float transition_duration = 200;
 
@@ -84,9 +84,6 @@ namespace osu.Game.Screens.Multi.Components
             private void load(OsuColour colours)
             {
                 selection.Colour = colours.Yellow;
-
-                if (!Value.IsAvailable)
-                    Colour = colours.Gray5;
             }
 
             protected override bool OnHover(HoverEvent e)
@@ -99,13 +96,6 @@ namespace osu.Game.Screens.Multi.Components
             {
                 hover.FadeOut(transition_duration, Easing.OutQuint);
                 base.OnHoverLost(e);
-            }
-
-            protected override bool OnClick(ClickEvent e)
-            {
-                if (!Value.IsAvailable)
-                    return true;
-                return base.OnClick(e);
             }
 
             protected override void OnActivated()
