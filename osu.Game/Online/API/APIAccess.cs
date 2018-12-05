@@ -192,6 +192,10 @@ namespace osu.Game.Online.API
         public void CreateAccount(string email, string username, string password)
         {
             Debug.Assert(State == APIState.Offline);
+
+            var req = new RegistrationRequest();
+
+            req.Perform();
         }
 
         /// <summary>
