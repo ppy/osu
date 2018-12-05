@@ -108,6 +108,8 @@ namespace osu.Game.Screens.Select
                 removeAutoModOnResume = false;
             }
 
+            BeatmapDetails.Leaderboard.RefreshScores();
+
             Beatmap.Value.Track.Looping = true;
 
             base.OnResuming(last);

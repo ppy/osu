@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -39,6 +40,8 @@ namespace osu.Game.Tournament.Components
 
         public TournamentBeatmapPanel(BeatmapInfo beatmap, string mods = null)
         {
+            if (beatmap == null) throw new ArgumentNullException(nameof(beatmap));
+
             Beatmap = beatmap;
             this.mods = mods;
             Width = 400;

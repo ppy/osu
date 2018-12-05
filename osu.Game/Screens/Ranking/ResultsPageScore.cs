@@ -24,6 +24,7 @@ using osu.Game.Users;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions;
 using osu.Framework.Localisation;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.Ranking
         private Container scoreContainer;
         private ScoreCounter scoreCounter;
 
-        public ResultsPageScore(Score score, WorkingBeatmap beatmap) : base(score, beatmap) { }
+        public ResultsPageScore(ScoreInfo score, WorkingBeatmap beatmap) : base(score, beatmap) { }
 
         private FillFlowContainer<DrawableScoreStatistic> statisticsContainer;
 

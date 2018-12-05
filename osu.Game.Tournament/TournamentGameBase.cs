@@ -78,6 +78,13 @@ namespace osu.Game.Tournament
             {
                 pairing.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == pairing.Team1Acronym);
                 pairing.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == pairing.Team2Acronym);
+
+                foreach (var conditional in pairing.ConditionalPairings)
+                {
+                    conditional.Team1.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == conditional.Team1Acronym);
+                    conditional.Team2.Value = Ladder.Teams.FirstOrDefault(t => t.Acronym == conditional.Team2Acronym);
+                    conditional.Grouping.Value = pairing.Grouping.Value;
+                }
             }
 
             // assign progressions
@@ -113,8 +120,8 @@ namespace osu.Game.Tournament
                 if (string.IsNullOrEmpty(p.Username))
                 {
                     var req = new GetUserRequest(p.Id);
-                    req.Success += i => p.Username = i.Username;
                     req.Perform(API);
+                    p.Username = req.Result.Username;
 
                     addedInfo = true;
                 }
@@ -125,8 +132,8 @@ namespace osu.Game.Tournament
                 if (b.BeatmapInfo == null)
                 {
                     var req = new GetBeatmapRequest(new BeatmapInfo { OnlineBeatmapID = b.ID });
-                    req.Success += i => b.BeatmapInfo = i.ToBeatmap(RulesetStore);
                     req.Perform(API);
+                    b.BeatmapInfo = req.Result?.ToBeatmap(RulesetStore);
 
                     addedInfo = true;
                 }

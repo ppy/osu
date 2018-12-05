@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
             request.Success += scores => Schedule(() =>
             {
                 foreach (var s in scores)
-                    s.ApplyRuleset(Rulesets.GetRuleset(s.OnlineRulesetID));
+                    s.Ruleset = Rulesets.GetRuleset(s.RulesetID);
 
                 ShowMoreButton.FadeTo(scores.Count == ItemsPerPage ? 1 : 0);
                 ShowMoreLoading.Hide();
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
                 MissingText.Hide();
 
-                foreach (APIScore score in scores)
+                foreach (APIScoreInfo score in scores)
                 {
                     DrawableProfileScore drawableScore;
 

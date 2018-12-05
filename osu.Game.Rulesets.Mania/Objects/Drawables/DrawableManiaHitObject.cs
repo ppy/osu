@@ -13,6 +13,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     public abstract class DrawableManiaHitObject : DrawableHitObject<ManiaHitObject>
     {
         /// <summary>
+        /// Whether this <see cref="DrawableManiaHitObject"/> should always remain alive.
+        /// </summary>
+        internal bool AlwaysAlive;
+
+        /// <summary>
         /// The <see cref="ManiaAction"/> which causes this <see cref="DrawableManiaHitObject{TObject}"/> to be hit.
         /// </summary>
         protected readonly IBindable<ManiaAction> Action = new Bindable<ManiaAction>();
@@ -33,6 +38,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Direction.BindTo(scrollingInfo.Direction);
             Direction.BindValueChanged(OnDirectionChanged, true);
         }
+
+        protected override bool ShouldBeAlive => AlwaysAlive || base.ShouldBeAlive;
 
         protected virtual void OnDirectionChanged(ScrollingDirection direction)
         {
