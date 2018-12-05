@@ -68,8 +68,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = Math.Sqrt(speedDifficulty) * difficulty_multiplier;
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
 
-            double aimLengthBonus = Math.Max(m, c + beta * (Math.Log10(aimTotal) - Math.Log10(aimRating) - alpha));
-            double speedLengthBonus = Math.Max(m, c + beta * (Math.Log10(speedTotal) - Math.Log10(speedRating) - alpha));
+            double aimLengthBonus = Math.Max(m, c + beta * (Math.Log10(aimTotal) - Math.Log10(aimDifficulty) - alpha));
+            double speedLengthBonus = Math.Max(m, c + beta * (Math.Log10(speedTotal) - Math.Log10(speedDifficulty) - alpha));
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
             double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
