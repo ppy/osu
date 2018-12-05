@@ -11,11 +11,11 @@ namespace osu.Game.Overlays.Chat
     {
         public ExternalLinkDialog(string url, Action openExternalLinkAction)
         {
-            HeaderText = "Just checking...";
-
+            
             if (isOsuWebSite(url)) BodyText = $"You are about to open an osu! link in a web browser:\n\n{url}";
             else BodyText = $"Warning! You are about to leave osu! and open the following link in a web browser:\n\n{url}";
 
+            HeaderText = "Just checking...";
             Icon = FontAwesome.fa_warning;
 
             Buttons = new PopupDialogButton[]
