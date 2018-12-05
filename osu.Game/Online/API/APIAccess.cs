@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
+using Newtonsoft.Json.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
@@ -189,13 +191,37 @@ namespace osu.Game.Online.API
             this.password = password;
         }
 
-        public void CreateAccount(string email, string username, string password)
+        public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
         {
             Debug.Assert(State == APIState.Offline);
 
-            var req = new RegistrationRequest();
+            var req = new RegistrationRequest
+            {
+                Url = $@"{Endpoint}/users",
+                Method = HttpMethod.Post,
+                Username = username,
+                Email = email,
+                Password = password
+            };
 
-            req.Perform();
+            try
+            {
+                req.Perform();
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    return JObject.Parse(req.ResponseString).SelectToken("form_error", true).ToObject<RegistrationRequest.RegistrationRequestErrors>();
+                }
+                catch
+                {
+                    // if we couldn't deserialize the error message let's throw the original exception outwards.
+                    throw e;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
