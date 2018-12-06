@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             }
 
             var result = HitObject.HitWindows.ResultFor(timeOffset);
-            if (result <= HitResult.Miss)
+            if (result == HitResult.None)
                 return;
 
             if (!validActionPressed)
@@ -173,12 +173,12 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 if (!userTriggered)
                 {
-                    if (timeOffset > second_hit_window)
+                    if (timeOffset - MainObject.Result.TimeOffset > second_hit_window)
                         ApplyResult(r => r.Type = HitResult.Miss);
                     return;
                 }
 
-                if (Math.Abs(MainObject.Result.TimeOffset - timeOffset) < second_hit_window)
+                if (Math.Abs(timeOffset - MainObject.Result.TimeOffset) <= second_hit_window)
                     ApplyResult(r => r.Type = MainObject.Result.Type);
             }
 
