@@ -33,6 +33,7 @@ namespace osu.Game.Screens.Multi.Components
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
 
         private readonly Container content;
+
         private readonly OsuSpriteText typeLabel;
 
         protected readonly OsuTextBox NameField, MaxParticipantsField;
@@ -115,6 +116,8 @@ namespace osu.Game.Screens.Multi.Components
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             TabbableContentContainer = this,
+                                            Alpha = 0.2f,
+                                            ReadOnly = true,
                                             OnCommit = (sender, text) => apply(),
                                         },
                                     },
