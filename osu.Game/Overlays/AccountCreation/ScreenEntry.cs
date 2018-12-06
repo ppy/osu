@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -10,7 +11,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
-using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -36,14 +36,7 @@ namespace osu.Game.Overlays.AccountCreation
         private ShakeContainer registerShake;
         private IEnumerable<SpriteText> characterCheckText;
 
-        protected override void OnEntering(Screen last)
-        {
-            base.OnEntering(last);
-
-            var nextTextbox = nextUnfilledTextbox();
-            if (nextTextbox != null)
-                Schedule(() => GetContainingInputManager().ChangeFocus(nextTextbox));
-        }
+        private OsuTextBox[] textboxes;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, APIAccess api)
@@ -123,6 +116,8 @@ namespace osu.Game.Overlays.AccountCreation
                 }
             };
 
+            textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
+
             usernameDescription.AddText("This will be your public presence. No profanity, no impersonation. Avoid exposing your own personal details, too!");
 
             emailAddressDescription.AddText("Will be used for notifications, account verification and in the case you forget your password. No spam, ever.");
@@ -135,13 +130,18 @@ namespace osu.Game.Overlays.AccountCreation
             passwordTextBox.Current.ValueChanged += text => { characterCheckText.ForEach(s => s.Colour = text.Length == 0 ? Color4.White : Interpolation.ValueAt(text.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (!textboxes.Any(t => t.HasFocus))
+                focusNextTextbox();
+        }
+
         private void performRegistration()
         {
-            var textbox = nextUnfilledTextbox();
-
-            if (textbox != null)
+            if (focusNextTextbox())
             {
-                Schedule(() => GetContainingInputManager().ChangeFocus(textbox));
                 registerShake.Shake();
                 return;
             }
@@ -189,14 +189,18 @@ namespace osu.Game.Overlays.AccountCreation
             });
         }
 
-        private OsuTextBox nextUnfilledTextbox()
+        private bool focusNextTextbox()
         {
-            OsuTextBox textboxIfUsable(OsuTextBox textbox)
+            var nextTextbox = nextUnfilledTextbox();
+            if (nextTextbox != null)
             {
-                return !string.IsNullOrEmpty(textbox.Text) ? null : textbox;
+                Schedule(() => GetContainingInputManager().ChangeFocus(nextTextbox));
+                return true;
             }
 
-            return textboxIfUsable(usernameTextBox) ?? textboxIfUsable(emailTextBox) ?? textboxIfUsable(passwordTextBox);
+            return false;
         }
+
+        private OsuTextBox nextUnfilledTextbox() => textboxes.FirstOrDefault(t => string.IsNullOrEmpty(t.Text));
     }
 }
