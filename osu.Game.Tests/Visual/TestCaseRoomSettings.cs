@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing.Input;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
@@ -38,9 +39,9 @@ namespace osu.Game.Tests.Visual
             {
                 RelativeSizeAxes = Axes.Both,
                 Height = 0.75f,
+                State = Visibility.Visible
             });
 
-            AddStep(@"show", overlay.Show);
             assertAll();
             AddStep(@"set name", () => overlay.CurrentName = @"Two Testing Room");
             AddStep(@"set max", () => overlay.CurrentMaxParticipants = null);
