@@ -11,6 +11,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
+using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -37,83 +38,88 @@ namespace osu.Game.Overlays.AccountCreation
         private IEnumerable<SpriteText> characterCheckText;
 
         private OsuTextBox[] textboxes;
+        private ProcessingOverlay processingOverlay;
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours, APIAccess api)
         {
             this.api = api;
 
-            Child = new FillFlowContainer
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                Padding = new MarginPadding(20),
-                Spacing = new Vector2(0, 10),
-                Children = new Drawable[]
+                new FillFlowContainer
                 {
-                    new OsuSpriteText
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Padding = new MarginPadding(20),
+                    Spacing = new Vector2(0, 10),
+                    Children = new Drawable[]
                     {
-                        TextSize = 20,
-                        Margin = new MarginPadding { Vertical = 10 },
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Text = "Let's create an account!",
-                    },
-                    usernameTextBox = new OsuTextBox
-                    {
-                        PlaceholderText = "username",
-                        RelativeSizeAxes = Axes.X,
-                        TabbableContentContainer = this
-                    },
-                    usernameDescription = new ErrorTextFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y
-                    },
-                    emailTextBox = new OsuTextBox
-                    {
-                        PlaceholderText = "email address",
-                        RelativeSizeAxes = Axes.X,
-                        TabbableContentContainer = this
-                    },
-                    emailAddressDescription = new ErrorTextFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y
-                    },
-                    passwordTextBox = new OsuPasswordTextBox
-                    {
-                        PlaceholderText = "password",
-                        RelativeSizeAxes = Axes.X,
-                        TabbableContentContainer = this,
-                    },
-                    passwordDescription = new ErrorTextFlowContainer
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y
-                    },
-                    new Container
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y,
-                        Children = new Drawable[]
+                        new OsuSpriteText
                         {
-                            registerShake = new ShakeContainer
+                            TextSize = 20,
+                            Margin = new MarginPadding { Vertical = 10 },
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Text = "Let's create an account!",
+                        },
+                        usernameTextBox = new OsuTextBox
+                        {
+                            PlaceholderText = "username",
+                            RelativeSizeAxes = Axes.X,
+                            TabbableContentContainer = this
+                        },
+                        usernameDescription = new ErrorTextFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        },
+                        emailTextBox = new OsuTextBox
+                        {
+                            PlaceholderText = "email address",
+                            RelativeSizeAxes = Axes.X,
+                            TabbableContentContainer = this
+                        },
+                        emailAddressDescription = new ErrorTextFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        },
+                        passwordTextBox = new OsuPasswordTextBox
+                        {
+                            PlaceholderText = "password",
+                            RelativeSizeAxes = Axes.X,
+                            TabbableContentContainer = this,
+                        },
+                        passwordDescription = new ErrorTextFlowContainer
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Child = new SettingsButton
+                                registerShake = new ShakeContainer
                                 {
-                                    Text = "Register",
-                                    Margin = new MarginPadding { Vertical = 20 },
-                                    Action = performRegistration
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Child = new SettingsButton
+                                    {
+                                        Text = "Register",
+                                        Margin = new MarginPadding { Vertical = 20 },
+                                        Action = performRegistration
+                                    }
                                 }
                             }
-                        }
+                        },
                     },
-                }
+                },
+                processingOverlay = new ProcessingOverlay { Alpha = 0 }
             };
 
             textboxes = new[] { usernameTextBox, emailTextBox, passwordTextBox };
@@ -138,6 +144,12 @@ namespace osu.Game.Overlays.AccountCreation
                 focusNextTextbox();
         }
 
+        protected override void OnEntering(Screen last)
+        {
+            base.OnEntering(last);
+            processingOverlay.Hide();
+        }
+
         private void performRegistration()
         {
             if (focusNextTextbox())
@@ -149,6 +161,8 @@ namespace osu.Game.Overlays.AccountCreation
             usernameDescription.ClearErrors();
             emailAddressDescription.ClearErrors();
             passwordDescription.ClearErrors();
+
+            processingOverlay.Show();
 
             Task.Run(() =>
             {
@@ -181,6 +195,7 @@ namespace osu.Game.Overlays.AccountCreation
                         }
 
                         registerShake.Shake();
+                        processingOverlay.Hide();
                         return;
                     }
 
