@@ -27,10 +27,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Sprite panelLeft, panelRight;
         private Sprite bgPanelLeft, bgPanelRight;
 
-        private const float npc_movement_start = 1.5f;
-        private float npcPosition = npc_movement_start;
-        private bool animatingBlinds;
-
         private readonly Beatmap<OsuHitObject> beatmap;
 
         private ISkinSource skin;
@@ -43,7 +39,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private const float black_depth = 10;
         private const float bg_panel_depth = 8;
         private const float fg_panel_depth = 4;
-        private const float npc_depth = 6;
 
         private readonly CompositeDrawable restrictTo;
         private readonly bool modEasy, modHardrock;
@@ -208,6 +203,16 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public void LeaveBreak()
         {
             this.TransformTo(nameof(targetBreakMultiplier), 1f, 2500, Easing.OutBounce);
+        }
+
+        /// <summary>
+        /// Value between 0 and 1 setting a maximum "closedness" for the blinds.
+        /// Useful for animating how far the blinds can be opened while keeping them at the original position if they are wider open than this.
+        /// </summary>
+        public float TargetClamp
+        {
+            get => targetClamp;
+            set => targetClamp = value;
         }
 
         /// <summary>
