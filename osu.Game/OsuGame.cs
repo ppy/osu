@@ -402,14 +402,19 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, overlayContent.Add);
 
-            loadComponentSingleFile(dialogOverlay = new DialogOverlay
+            loadComponentSingleFile(accountCreation = new AccountCreationOverlay
             {
                 Depth = -6,
             }, overlayContent.Add);
 
-            loadComponentSingleFile(accountCreation = new AccountCreationOverlay
+            loadComponentSingleFile(dialogOverlay = new DialogOverlay
             {
                 Depth = -7,
+            }, overlayContent.Add);
+
+            loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener
+            {
+                Depth = -8,
             }, overlayContent.Add);
 
             dependencies.Cache(idleTracker);
@@ -425,8 +430,6 @@ namespace osu.Game
             dependencies.Cache(notifications);
             dependencies.Cache(dialogOverlay);
             dependencies.Cache(accountCreation);
-
-            Add(externalLinkOpener = new ExternalLinkOpener());
 
             var singleDisplaySideOverlays = new OverlayContainer[] { settings, notifications };
             overlays.AddRange(singleDisplaySideOverlays);
