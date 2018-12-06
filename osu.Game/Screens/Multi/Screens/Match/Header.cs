@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
-                    Child = background = new UpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both }
+                    Child = background = new HeaderBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both }
                 },
                 new Box
                 {
@@ -174,6 +174,11 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 bg.FadeTo(bg_opacity, transition_duration);
                 return base.OnMouseUp(e);
             }
+        }
+
+        private class HeaderBeatmapBackgroundSprite : UpdateableBeatmapBackgroundSprite
+        {
+            protected override double FadeDuration => 0;
         }
     }
 

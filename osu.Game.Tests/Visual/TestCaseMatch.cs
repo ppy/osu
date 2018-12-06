@@ -20,7 +20,8 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(TestCaseMatch),
-            typeof(GameTypePicker)
+            typeof(GameTypePicker),
+            typeof(RoomSettingsOverlay)
         };
 
         [BackgroundDependencyLoader]
