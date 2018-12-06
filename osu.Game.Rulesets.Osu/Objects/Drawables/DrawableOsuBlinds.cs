@@ -12,7 +12,6 @@ using osu.Game.Skinning;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osuTK;
 using osuTK.Graphics;
-using System;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -28,14 +27,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Sprite panelLeft, panelRight;
         private Sprite bgPanelLeft, bgPanelRight;
 
-        private Drawable bgRandomNpc;
-        private Drawable randomNpc;
         private const float npc_movement_start = 1.5f;
         private float npcPosition = npc_movement_start;
         private bool animatingBlinds;
 
         private readonly Beatmap<OsuHitObject> beatmap;
-        private Random random;
 
         private ISkinSource skin;
 
@@ -122,36 +118,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 Depth = fg_panel_depth
             });
 
-            // seed with unique seed per map so NPC always comes from the same sides for a same map for reproducible replays.
-            random = new Random(beatmap.Metadata.ToString().GetHashCode());
-            Add(bgRandomNpc = new Box
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Colour = Color4.Black,
-                Width = 512 * 0.4f,
-                Height = 512 * 0.95f,
-                RelativePositionAxes = Axes.Y,
-                X = -512,
-                Y = 0,
-                Depth = black_depth,
-                Alpha = 0
-            });
-            Add(new SkinnableDrawable("Play/Catch/fruit-catcher-idle", name => randomNpc = new Sprite
-            {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Texture = textures.Get(name),
-                Width = 512,
-                Height = 512,
-                RelativePositionAxes = Axes.Y,
-                X = -512,
-                Y = 0,
-                Alpha = 0
-            }) {
-                Depth = npc_depth
-            });
-
             this.skin = skin;
             skin.SourceChanged += skinChanged;
             PanelTexture = textures.Get("Play/osu/blinds-panel");
@@ -205,11 +171,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             panelRight.X = end - width;
             bgPanelLeft.X = start;
             bgPanelRight.X = end;
-
-            float adjustedNpcPosition = npcPosition * rawWidth;
-            if (randomNpc != null)
-                randomNpc.X = adjustedNpcPosition;
-            bgRandomNpc.X = adjustedNpcPosition;
         }
 
         protected override void LoadComplete()
@@ -247,59 +208,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         public void LeaveBreak()
         {
             this.TransformTo(nameof(targetBreakMultiplier), 1f, 2500, Easing.OutBounce);
-        }
-
-        public void TriggerNpc()
-        {
-            if (animatingBlinds)
-                return;
-
-            bool left = (random.Next() & 1) != 0;
-            bool exit = (random.Next() & 1) != 0;
-            float start, end;
-
-            if (left)
-            {
-                start = -npc_movement_start;
-                end = npc_movement_start;
-
-                randomNpc.Scale = new Vector2(1, 1);
-            }
-            else
-            {
-                start = npc_movement_start;
-                end = -npc_movement_start;
-
-                randomNpc.Scale = new Vector2(-1, 1);
-            }
-
-            // depths for exit from the left and entry from the right
-            if (left == exit)
-            {
-                ChangeChildDepth(bgPanelLeft, fg_panel_depth + 1);
-                ChangeChildDepth(panelLeft, fg_panel_depth);
-
-                ChangeChildDepth(bgPanelRight, bg_panel_depth + 1);
-                ChangeChildDepth(panelRight, bg_panel_depth);
-            }
-            else // depths for entry from the left or exit from the right
-            {
-                ChangeChildDepth(bgPanelLeft, bg_panel_depth + 1);
-                ChangeChildDepth(panelLeft, bg_panel_depth);
-
-                ChangeChildDepth(bgPanelRight, fg_panel_depth + 1);
-                ChangeChildDepth(panelRight, fg_panel_depth);
-            }
-
-            animatingBlinds = true;
-            npcPosition = start;
-            this.TransformTo(nameof(npcPosition), end, 3000, Easing.OutSine).Finally(_ => animatingBlinds = false);
-
-            targetClamp = 1;
-            this.Delay(600).TransformTo(nameof(targetClamp), 0.6f, 300).Delay(500).TransformTo(nameof(targetClamp), 1f, 300);
-
-            randomNpc?.FadeIn(250).Delay(2000).FadeOut(500);
-            bgRandomNpc.FadeIn(250).Delay(2000).FadeOut(500);
         }
 
         /// <summary>

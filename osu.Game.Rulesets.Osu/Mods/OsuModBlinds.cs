@@ -33,10 +33,6 @@ namespace osu.Game.Rulesets.Osu.Mods
             scoreProcessor.Health.ValueChanged += val => {
                 flashlight.AnimateTarget((float)val);
             };
-            scoreProcessor.Combo.ValueChanged += val => {
-                if (val > 0 && val % 30 == 0)
-                    flashlight.TriggerNpc();
-            };
         }
     }
 }
