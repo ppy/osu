@@ -19,6 +19,8 @@ namespace osu.Game.Overlays
     {
         private const float transition_time = 400;
 
+        private ScreenWelcome welcomeScreen;
+
         public AccountCreationOverlay()
         {
             Size = new Vector2(620, 450);
@@ -67,7 +69,7 @@ namespace osu.Game.Overlays
                                     Colour = Color4.Black,
                                     Alpha = 0.9f,
                                 },
-                                new ScreenWelcome(),
+                                welcomeScreen = new ScreenWelcome(),
                             }
                         }
                     }
@@ -79,6 +81,9 @@ namespace osu.Game.Overlays
         {
             base.PopIn();
             this.FadeIn(transition_time, Easing.OutQuint);
+
+            if (welcomeScreen.ChildScreen != null)
+                welcomeScreen.MakeCurrent();
         }
 
         protected override void PopOut()
