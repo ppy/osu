@@ -43,17 +43,14 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         {
             base.ApplyResult(result);
 
-            if (result.Judgement is TaikoJudgement taikoJudgement)
-            {
-                double hpIncrease = taikoJudgement.HealthIncreaseFor(result);
+            double hpIncrease = result.Judgement.HealthIncreaseFor(result);
 
-                if (result.Type == HitResult.Miss)
-                    hpIncrease *= hpMissMultiplier;
-                else
-                    hpIncrease *= hpMultiplier;
+            if (result.Type == HitResult.Miss)
+                hpIncrease *= hpMissMultiplier;
+            else
+                hpIncrease *= hpMultiplier;
 
-                Health.Value += hpIncrease;
-            }
+            Health.Value += hpIncrease;
         }
 
         protected override void Reset(bool storeResults)
