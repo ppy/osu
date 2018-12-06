@@ -12,7 +12,7 @@ using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Tests.Resources;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {

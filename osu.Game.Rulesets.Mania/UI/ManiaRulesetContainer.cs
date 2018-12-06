@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -11,6 +12,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Handlers;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Mods;
@@ -20,10 +22,10 @@ using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -34,6 +36,8 @@ namespace osu.Game.Rulesets.Mania.UI
         public IEnumerable<BarLine> BarLines;
 
         protected new ManiaConfigManager Config => (ManiaConfigManager)base.Config;
+
+        private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
 
         public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -70,19 +74,19 @@ namespace osu.Game.Rulesets.Mania.UI
         private void load()
         {
             BarLines.ForEach(Playfield.Add);
+
+            Config.BindWith(ManiaSetting.ScrollDirection, configDirection);
+            configDirection.BindValueChanged(v => Direction.Value = (ScrollingDirection)v, true);
+
+            Config.BindWith(ManiaSetting.ScrollTime, TimeRange);
         }
 
-        private DependencyContainer dependencies;
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-
-            if (dependencies.Get<ManiaScrollingInfo>() == null)
-                dependencies.CacheAs<IScrollingInfo>(new ManiaScrollingInfo(Config));
-
-            return dependencies;
-        }
+        /// <summary>
+        /// Retrieves the column that intersects a screen-space position.
+        /// </summary>
+        /// <param name="screenSpacePosition">The screen-space position.</param>
+        /// <returns>The column which intersects with <paramref name="screenSpacePosition"/>.</returns>
+        public Column GetColumnByPosition(Vector2 screenSpacePosition) => Playfield.GetColumnByPosition(screenSpacePosition);
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
         {
@@ -96,7 +100,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
 
-        protected override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
+        public override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {
             switch (h)
             {

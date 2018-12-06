@@ -1,9 +1,9 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Menu
         protected override bool HideOverlaysOnEnter => buttons.State == ButtonSystemState.Initial;
 
         protected override bool AllowBackButton => buttons.State != ButtonSystemState.Initial;
+
+        public override bool AllowExternalScreenChange => true;
 
         private readonly BackgroundScreenDefault background;
         private Screen songSelect;

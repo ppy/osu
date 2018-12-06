@@ -22,8 +22,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Music;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -214,8 +214,15 @@ namespace osu.Game.Overlays
             beatmapSets.Insert(index, beatmapSetInfo);
         }
 
-        private void handleBeatmapAdded(BeatmapSetInfo obj) => beatmapSets.Add(obj);
-        private void handleBeatmapRemoved(BeatmapSetInfo obj) => beatmapSets.RemoveAll(s => s.ID == obj.ID);
+        private void handleBeatmapAdded(BeatmapSetInfo obj, bool existing, bool silent)
+        {
+            if (existing)
+                return;
+
+            Schedule(() => beatmapSets.Add(obj));
+        }
+
+        private void handleBeatmapRemoved(BeatmapSetInfo obj) => Schedule(() => beatmapSets.RemoveAll(s => s.ID == obj.ID));
 
         protected override void LoadComplete()
         {
@@ -245,10 +252,10 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            if (current?.TrackLoaded ?? false)
-            {
-                var track = current.Track;
+            var track = current?.TrackLoaded ?? false ? current.Track : null;
 
+            if (track?.IsDummyDevice == false)
+            {
                 progressBar.EndTime = track.Length;
                 progressBar.CurrentTime = track.CurrentTime;
 
@@ -258,7 +265,11 @@ namespace osu.Game.Overlays
                     next();
             }
             else
+            {
+                progressBar.CurrentTime = 0;
+                progressBar.EndTime = 1;
                 playButton.Icon = FontAwesome.fa_play_circle_o;
+            }
         }
 
         private void play()
@@ -401,6 +412,10 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
+
+            // This is here mostly as a performance fix.
+            // If the playlist is not hidden it will update children even when the music controller is hidden (due to AlwaysPresent).
+            playlist.State = Visibility.Hidden;
 
             this.FadeOut(transition_length, Easing.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);

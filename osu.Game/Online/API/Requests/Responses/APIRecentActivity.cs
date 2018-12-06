@@ -4,7 +4,7 @@
 using System;
 using Humanizer;
 using Newtonsoft.Json;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Online.API.Requests.Responses
 {

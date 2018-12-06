@@ -9,6 +9,7 @@ using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
@@ -39,7 +40,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             comboResultCounts.Clear();
         }
 
-        public override void PopulateScore(Score score)
+        public override void PopulateScore(ScoreInfo score)
         {
             base.PopulateScore(score);
 

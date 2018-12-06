@@ -1,17 +1,18 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using OpenTK.Graphics;
-using osu.Framework.Allocation;
-using osu.Game.Skinning;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using System;
 using osu.Game.Beatmaps;
+using osu.Game.Skinning;
+using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
+using osuTK;
+using osuTK.Graphics;
+using System;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -178,7 +179,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 // TODO: include OD/CS
             }
 
-            return OpenTK.MathHelper.Clamp(value * multiplier, 0, targetClamp) * targetBreakMultiplier;
+            return MathHelper.Clamp(value * multiplier, 0, targetClamp) * targetBreakMultiplier;
         }
 
         private static float applyAdjustmentCurve(float value)
@@ -262,14 +263,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 start = -npc_movement_start;
                 end = npc_movement_start;
 
-                randomNpc.Scale = new OpenTK.Vector2(1, 1);
+                randomNpc.Scale = new Vector2(1, 1);
             }
             else
             {
                 start = npc_movement_start;
                 end = -npc_movement_start;
 
-                randomNpc.Scale = new OpenTK.Vector2(-1, 1);
+                randomNpc.Scale = new Vector2(-1, 1);
             }
 
             // depths for exit from the left and entry from the right

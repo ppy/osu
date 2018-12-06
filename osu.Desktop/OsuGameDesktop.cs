@@ -10,7 +10,7 @@ using osu.Desktop.Overlays;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game;
-using OpenTK.Input;
+using osuTK.Input;
 using Microsoft.Win32;
 using osu.Desktop.Updater;
 using osu.Framework;

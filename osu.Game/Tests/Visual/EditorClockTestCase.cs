@@ -7,7 +7,6 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Screens.Compose;
 
 namespace osu.Game.Tests.Visual
 {

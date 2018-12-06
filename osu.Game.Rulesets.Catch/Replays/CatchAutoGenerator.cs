@@ -5,10 +5,10 @@ using System;
 using System.Linq;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Catch.Replays
 {
@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Catch.Replays
         public CatchAutoGenerator(Beatmap<CatchHitObject> beatmap)
             : base(beatmap)
         {
-            Replay = new Replay { User = new User { Username = @"Autoplay" } };
+            Replay = new Replay();
         }
 
         protected Replay Replay;
