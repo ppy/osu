@@ -305,17 +305,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         /// <summary>
         /// Health between 0 and 1 for the blinds to base the width on. Will get animated for 200ms using out-quintic easing.
         /// </summary>
-        public float Value
+        public void AnimateTarget(float value)
         {
-            set
-            {
-                target = value;
-                this.TransformTo(nameof(easing), target, 200, Easing.OutQuint);
-            }
-            get
-            {
-                return target;
-            }
+            target = value;
+            this.TransformTo(nameof(easing), target, 200, Easing.OutQuint);
+        }
+
+        public float Target
+        {
+            get => target;
         }
 
         public Texture PanelTexture
