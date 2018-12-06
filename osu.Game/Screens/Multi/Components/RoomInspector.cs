@@ -32,19 +32,24 @@ namespace osu.Game.Screens.Multi.Components
         private readonly Bindable<User> hostBind = new Bindable<User>();
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
-        private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
+        private readonly Bindable<BeatmapInfo> roomBeatmap = new Bindable<BeatmapInfo>();
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
         private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
 
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
         private OsuColour colours;
         private Box statusStrip;
-        private UpdateableBeatmapSetCover cover;
+        private UpdateableBeatmapBackgroundSprite background;
         private ParticipantCount participantCount;
         private FillFlowContainer topFlow, participantsFlow;
         private OsuSpriteText name, status;
         private BeatmapTypeInfo beatmapTypeInfo;
         private ScrollContainer participantsScroll;
         private ParticipantInfo participantInfo;
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         private Room room;
         public Room Room
@@ -59,7 +64,7 @@ namespace osu.Game.Screens.Multi.Components
                 hostBind.UnbindBindings();
                 statusBind.UnbindBindings();
                 typeBind.UnbindBindings();
-                beatmapBind.UnbindBindings();
+                roomBeatmap.UnbindBindings();
                 maxParticipantsBind.UnbindBindings();
                 participantsBind.UnbindBindings();
 
@@ -69,7 +74,7 @@ namespace osu.Game.Screens.Multi.Components
                     hostBind.BindTo(room.Host);
                     statusBind.BindTo(room.Status);
                     typeBind.BindTo(room.Type);
-                    beatmapBind.BindTo(room.Beatmap);
+                    roomBeatmap.BindTo(room.Beatmap);
                     maxParticipantsBind.BindTo(room.MaxParticipants);
                     participantsBind.BindTo(room.Participants);
                 }
@@ -104,10 +109,7 @@ namespace osu.Game.Screens.Multi.Components
                             Masking = true,
                             Children = new Drawable[]
                             {
-                                cover = new UpdateableBeatmapSetCover
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                },
+                                background = new UpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both },
                                 new Box
                                 {
                                     RelativeSizeAxes = Axes.Both,
@@ -207,9 +209,11 @@ namespace osu.Game.Screens.Multi.Components
             maxParticipantsBind.ValueChanged += m => participantCount.Max = m;
             statusBind.ValueChanged += displayStatus;
 
-            beatmapBind.ValueChanged += b =>
+            background.Beatmap.BindTo(beatmap);
+
+            roomBeatmap.ValueChanged += b =>
             {
-                cover.BeatmapSet = b?.BeatmapSet;
+                beatmap.Value = beatmaps.GetWorkingBeatmap(b);
                 beatmapTypeInfo.Beatmap = b;
             };
 
@@ -243,7 +247,7 @@ namespace osu.Game.Screens.Multi.Components
         {
             if (Room == null)
             {
-                cover.BeatmapSet = null;
+                beatmap.Value = null;
                 participantsFlow.FadeOut(transition_duration);
                 participantCount.FadeOut(transition_duration);
                 beatmapTypeInfo.FadeOut(transition_duration);
@@ -261,7 +265,7 @@ namespace osu.Game.Screens.Multi.Components
                 participantInfo.FadeIn(transition_duration);
 
                 statusBind.TriggerChange();
-                beatmapBind.TriggerChange();
+                roomBeatmap.TriggerChange();
             }
         }
 

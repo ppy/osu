@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -24,15 +25,11 @@ namespace osu.Game.Screens.Multi.Screens.Match
     {
         public const float HEIGHT = 200;
 
+        public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+
         private readonly Box tabStrip;
-        private readonly UpdateableBeatmapSetCover cover;
 
         public readonly PageTabControl<MatchHeaderPage> Tabs;
-
-        public BeatmapSetInfo BeatmapSet
-        {
-            set => cover.BeatmapSet = value;
-        }
 
         public Action OnRequestSelectBeatmap;
 
@@ -42,12 +39,14 @@ namespace osu.Game.Screens.Multi.Screens.Match
             Height = HEIGHT;
 
             BeatmapSelectButton beatmapButton;
+            UpdateableBeatmapBackgroundSprite background;
             Children = new Drawable[]
             {
-                cover = new UpdateableBeatmapSetCover
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
+                    Child = background = new UpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both }
                 },
                 new Box
                 {
@@ -90,6 +89,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
             };
 
             beatmapButton.Action = () => OnRequestSelectBeatmap?.Invoke();
+
+            background.Beatmap.BindTo(Beatmap);
         }
 
         [BackgroundDependencyLoader]
