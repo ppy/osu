@@ -1,22 +1,24 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Mania.Beatmaps;
-using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK;
+using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    public class ManiaPlayfield : ManiaScrollingPlayfield
+    public class ManiaPlayfield : ScrollingPlayfield
     {
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => stages.Any(s => s.ReceivePositionalInputAt(screenSpacePos));
 
         public ManiaPlayfield(List<StageDefinition> stageDefinitions)
         {
@@ -41,7 +43,6 @@ namespace osu.Game.Rulesets.Mania.UI
             for (int i = 0; i < stageDefinitions.Count; i++)
             {
                 var newStage = new ManiaStage(firstColumnIndex, stageDefinitions[i], ref normalColumnAction, ref specialColumnAction);
-                newStage.VisibleTimeRange.BindTo(VisibleTimeRange);
 
                 playfieldGrid.Content[0][i] = newStage;
 
@@ -54,7 +55,41 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override void Add(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Add(h);
 
+        public override bool Remove(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Remove(h);
+
         public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
+
+        /// <summary>
+        /// Retrieves a column from a screen-space position.
+        /// </summary>
+        /// <param name="screenSpacePosition">The screen-space position.</param>
+        /// <returns>The column which the <paramref name="screenSpacePosition"/> lies in.</returns>
+        public Column GetColumnByPosition(Vector2 screenSpacePosition)
+        {
+            Column found = null;
+
+            foreach (var stage in stages)
+            {
+                foreach (var column in stage.Columns)
+                {
+                    if (column.ReceivePositionalInputAt(screenSpacePosition))
+                    {
+                        found = column;
+                        break;
+                    }
+                }
+
+                if (found != null)
+                    break;
+            }
+
+            return found;
+        }
+
+        /// <summary>
+        /// Retrieves the total amount of columns across all stages in this playfield.
+        /// </summary>
+        public int TotalColumns => stages.Sum(s => s.Columns.Count);
 
         private ManiaStage getStageByColumn(int column)
         {
@@ -67,12 +102,6 @@ namespace osu.Game.Rulesets.Mania.UI
             }
 
             return null;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(ManiaConfigManager maniaConfig)
-        {
-            maniaConfig.BindWith(ManiaSetting.ScrollTime, VisibleTimeRange);
         }
     }
 }

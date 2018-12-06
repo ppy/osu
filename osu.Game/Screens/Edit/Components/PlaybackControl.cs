@@ -1,8 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -13,6 +13,7 @@ using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit.Components
 {
@@ -61,6 +62,18 @@ namespace osu.Game.Screens.Edit.Components
             };
 
             tabs.Current.ValueChanged += newValue => Beatmap.Value.Track.Tempo.Value = newValue;
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.Space:
+                    togglePause();
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
         }
 
         private void togglePause()

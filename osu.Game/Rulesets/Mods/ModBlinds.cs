@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Mods
             where T : HitObject
     {
         public override string Name => "Blinds";
-        public override string ShortenedName => "BL";
+        public override string Acronym => "BL";
         public override FontAwesome Icon => FontAwesome.fa_adjust;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Play with blinds on your screen.";

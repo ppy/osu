@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK;
+using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Audio;
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
             };
         }
 
-        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples)
+        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, PathType pathType, int repeatCount, List<List<SampleInfo>> nodeSamples)
         {
             newCombo |= forceNewCombo;
             comboOffset += extraComboOffset;
@@ -51,10 +51,8 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
                 Position = position,
                 NewCombo = FirstObject || newCombo,
                 ComboOffset = comboOffset,
-                ControlPoints = controlPoints,
-                Distance = Math.Max(0, length),
-                CurveType = curveType,
-                RepeatSamples = repeatSamples,
+                Path = new SliderPath(pathType, controlPoints, Math.Max(0, length)),
+                NodeSamples = nodeSamples,
                 RepeatCount = repeatCount
             };
         }

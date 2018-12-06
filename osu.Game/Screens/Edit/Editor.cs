@@ -1,14 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK.Graphics;
+using System;
+using osuTK.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
-using osu.Game.Screens.Edit.Menus;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.UserInterface;
@@ -16,10 +16,11 @@ using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Timing;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens.Edit.Screens;
-using osu.Game.Screens.Edit.Screens.Compose;
-using osu.Game.Screens.Edit.Screens.Design;
 using osu.Game.Screens.Edit.Components;
+using osu.Game.Screens.Edit.Components.Menus;
+using osu.Game.Screens.Edit.Compose;
+using osu.Game.Screens.Edit.Design;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit
 {
@@ -157,37 +158,39 @@ namespace osu.Game.Screens.Edit
             bottomBackground.Colour = colours.Gray2;
         }
 
-        private void exportBeatmap()
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            host.OpenFileExternally(Beatmap.Value.Save());
-        }
-
-        private void onModeChanged(EditorScreenMode mode)
-        {
-            currentScreen?.Exit();
-
-            switch (mode)
+            switch (e.Key)
             {
-                case EditorScreenMode.Compose:
-                    currentScreen = new Compose();
-                    break;
-                case EditorScreenMode.Design:
-                    currentScreen = new Design();
-                    break;
-                default:
-                    currentScreen = new EditorScreen();
-                    break;
+                case Key.Left:
+                    seek(e, -1);
+                    return true;
+                case Key.Right:
+                    seek(e, 1);
+                    return true;
             }
 
-            LoadComponentAsync(currentScreen, screenContainer.Add);
+            return base.OnKeyDown(e);
         }
+
+        private double scrollAccumulation;
 
         protected override bool OnScroll(ScrollEvent e)
         {
-            if (e.ScrollDelta.X + e.ScrollDelta.Y > 0)
-                clock.SeekBackward(!clock.IsRunning);
-            else
-                clock.SeekForward(!clock.IsRunning);
+            scrollAccumulation += (e.ScrollDelta.X + e.ScrollDelta.Y) * (e.IsPrecise ? 0.1 : 1);
+
+            const int precision = 1;
+
+            while (Math.Abs(scrollAccumulation) > precision)
+            {
+                if (scrollAccumulation > 0)
+                    seek(e, -1);
+                else
+                    seek(e, 1);
+
+                scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
+            }
+
             return true;
         }
 
@@ -212,7 +215,40 @@ namespace osu.Game.Screens.Edit
                 Beatmap.Value.Track.Tempo.Value = 1;
                 Beatmap.Value.Track.Start();
             }
+
             return base.OnExiting(next);
+        }
+
+        private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());
+
+        private void onModeChanged(EditorScreenMode mode)
+        {
+            currentScreen?.Exit();
+
+            switch (mode)
+            {
+                case EditorScreenMode.Compose:
+                    currentScreen = new ComposeScreen();
+                    break;
+                case EditorScreenMode.Design:
+                    currentScreen = new DesignScreen();
+                    break;
+                default:
+                    currentScreen = new EditorScreen();
+                    break;
+            }
+
+            LoadComponentAsync(currentScreen, screenContainer.Add);
+        }
+
+        private void seek(UIEvent e, int direction)
+        {
+            double amount = e.ShiftPressed ? 2 : 1;
+
+            if (direction < 1)
+                clock.SeekBackward(!clock.IsRunning, amount);
+            else
+                clock.SeekForward(!clock.IsRunning, amount);
         }
     }
 }

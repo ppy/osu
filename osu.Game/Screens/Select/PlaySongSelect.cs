@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK.Input;
+using osuTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -85,6 +85,17 @@ namespace osu.Game.Screens.Select
             }
         }
 
+        protected override void ExitFromBack()
+        {
+            if (modSelect.State == Visibility.Visible)
+            {
+                modSelect.Hide();
+                return;
+            }
+
+            base.ExitFromBack();
+        }
+
         protected override void UpdateBeatmap(WorkingBeatmap beatmap)
         {
             beatmap.Mods.BindTo(selectedMods);
@@ -108,6 +119,8 @@ namespace osu.Game.Screens.Select
                 removeAutoModOnResume = false;
             }
 
+            BeatmapDetails.Leaderboard.RefreshScores();
+
             Beatmap.Value.Track.Looping = true;
 
             base.OnResuming(last);
@@ -122,12 +135,6 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnExiting(Screen next)
         {
-            if (modSelect.State == Visibility.Visible)
-            {
-                modSelect.Hide();
-                return true;
-            }
-
             if (base.OnExiting(next))
                 return true;
 

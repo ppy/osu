@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
@@ -19,13 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
         public TaikoAutoGenerator(Beatmap<TaikoHitObject> beatmap)
             : base(beatmap)
         {
-            Replay = new Replay
-            {
-                User = new User
-                {
-                    Username = @"Autoplay",
-                }
-            };
+            Replay = new Replay();
         }
 
         protected Replay Replay;

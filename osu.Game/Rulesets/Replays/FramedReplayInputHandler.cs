@@ -5,8 +5,9 @@ using System;
 using System.Collections.Generic;
 using osu.Framework.Input.StateChanges;
 using osu.Game.Input.Handlers;
-using OpenTK;
-using OpenTK.Input;
+using osu.Game.Replays;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Replays
 {

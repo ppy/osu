@@ -15,7 +15,7 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
-using OpenTK;
+using osuTK;
 using osu.Game.Overlays;
 using osu.Framework.Graphics.Containers;
 
@@ -33,6 +33,8 @@ namespace osu.Game.Screens
         public string Description => Title;
 
         protected virtual bool AllowBackButton => true;
+
+        public virtual bool AllowExternalScreenChange => false;
 
         /// <summary>
         /// Override to create a BackgroundMode for the current screen.

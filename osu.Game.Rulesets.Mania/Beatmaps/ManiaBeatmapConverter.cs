@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
-using OpenTK;
+using osuTK;
 using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
@@ -247,7 +247,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
                 double segmentTime = (curveData.EndTime - HitObject.StartTime) / curveData.SpanCount();
 
                 int index = (int)(segmentTime == 0 ? 0 : (time - HitObject.StartTime) / segmentTime);
-                return curveData.RepeatSamples[index];
+                return curveData.NodeSamples[index];
             }
         }
     }

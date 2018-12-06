@@ -9,8 +9,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using DebugUtils = osu.Game.Utils.DebugUtils;
 
 namespace osu.Game.Overlays.Settings
