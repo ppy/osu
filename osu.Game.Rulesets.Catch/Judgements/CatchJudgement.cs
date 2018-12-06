@@ -22,11 +22,6 @@ namespace osu.Game.Rulesets.Catch.Judgements
             }
         }
 
-        /// <summary>
-        /// Retrieves the numeric health increase of a <see cref="HitResult"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="HitResult"/> to find the numeric health increase for.</param>
-        /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
         protected override double HealthIncreaseFor(HitResult result)
         {
             switch (result)

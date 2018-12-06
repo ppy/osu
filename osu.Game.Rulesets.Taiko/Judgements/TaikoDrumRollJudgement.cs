@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 
         protected override double HealthIncreaseFor(HitResult result)
         {
-            //Drum rolls can be ignored with no health penalty
+            // Drum rolls can be ignored with no health penalty
             switch (result)
             {
                 case HitResult.Miss:
