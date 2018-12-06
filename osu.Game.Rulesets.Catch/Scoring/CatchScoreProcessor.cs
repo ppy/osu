@@ -3,7 +3,6 @@
 
 using System;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Scoring;
