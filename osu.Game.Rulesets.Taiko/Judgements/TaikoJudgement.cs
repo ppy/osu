@@ -10,11 +10,6 @@ namespace osu.Game.Rulesets.Taiko.Judgements
     {
         public override HitResult MaxResult => HitResult.Great;
 
-        /// <summary>
-        /// Computes the numeric result value for the combo portion of the score.
-        /// </summary>
-        /// <param name="result">The result to compute the value for.</param>
-        /// <returns>The numeric result value.</returns>
         protected override int NumericResultFor(HitResult result)
         {
             switch (result)
@@ -28,12 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
             }
         }
 
-        /// <summary>
-        /// Retrieves the numeric health increase of a <see cref="HitResult"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="HitResult"/> to find the numeric health increase for.</param>
-        /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
-        protected virtual double HealthIncreaseFor(HitResult result)
+        protected override double HealthIncreaseFor(HitResult result)
         {
             switch (result)
             {
@@ -47,12 +37,5 @@ namespace osu.Game.Rulesets.Taiko.Judgements
                     return 0;
             }
         }
-
-        /// <summary>
-        /// Retrieves the numeric health increase of a <see cref="JudgementResult"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="JudgementResult"/> to find the numeric health increase for.</param>
-        /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
-        public double HealthIncreaseFor(JudgementResult result) => HealthIncreaseFor(result.Type);
     }
 }
