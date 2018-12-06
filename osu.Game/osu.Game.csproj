@@ -22,6 +22,6 @@
     <PackageReference Include="NUnit" Version="3.11.0" />
     <PackageReference Include="SharpRaven" Version="2.4.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
-    <PackageReference Include="ppy.osu.Framework" Version="0.0.7620" />
+    <PackageReference Include="ppy.osu.Framework" Version="0.0.7626" />
   </ItemGroup>
 </Project>
