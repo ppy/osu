@@ -116,12 +116,12 @@ namespace osu.Game.Scoring.Legacy
 
         private void calculateAccuracy(ScoreInfo score)
         {
-            int countMiss = (int)score.Statistics[HitResult.Miss];
-            int count50 = (int)score.Statistics[HitResult.Meh];
-            int count100 = (int)score.Statistics[HitResult.Good];
-            int count300 = (int)score.Statistics[HitResult.Great];
-            int countGeki = (int)score.Statistics[HitResult.Perfect];
-            int countKatu = (int)score.Statistics[HitResult.Ok];
+            int countMiss = score.Statistics[HitResult.Miss];
+            int count50 = score.Statistics[HitResult.Meh];
+            int count100 = score.Statistics[HitResult.Good];
+            int count300 = score.Statistics[HitResult.Great];
+            int countGeki = score.Statistics[HitResult.Perfect];
+            int countKatu = score.Statistics[HitResult.Ok];
 
             switch (score.Ruleset.ID)
             {
