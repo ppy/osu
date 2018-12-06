@@ -40,7 +40,6 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         /// </summary>
         private const double hp_miss_max = -0.012;
 
-
         /// <summary>
         /// The HP awarded for a <see cref="DrumRollTick"/> hit.
         /// <para>
