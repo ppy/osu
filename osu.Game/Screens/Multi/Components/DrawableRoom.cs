@@ -44,8 +44,13 @@ namespace osu.Game.Screens.Multi.Components
         private readonly Bindable<User> hostBind = new Bindable<User>();
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
-        private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
+        private readonly Bindable<BeatmapInfo> roomBeatmap = new Bindable<BeatmapInfo>();
         private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
+
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         public readonly Room Room;
 
@@ -101,7 +106,7 @@ namespace osu.Game.Screens.Multi.Components
         private void load(OsuColour colours)
         {
             Box sideStrip;
-            UpdateableBeatmapSetCover cover;
+            UpdateableBeatmapBackgroundSprite background;
             OsuSpriteText name, status;
             ParticipantInfo participantInfo;
             BeatmapTitle beatmapTitle;
@@ -137,12 +142,13 @@ namespace osu.Game.Screens.Multi.Components
                                 RelativeSizeAxes = Axes.Y,
                                 Width = side_strip_width,
                             },
-                            cover = new UpdateableBeatmapSetCover
+                            new Container
                             {
-                                Width = cover_width,
                                 RelativeSizeAxes = Axes.Y,
+                                Width = cover_width,
                                 Masking = true,
                                 Margin = new MarginPadding { Left = side_strip_width },
+                                Child = background = new UpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
                             {
@@ -216,9 +222,11 @@ namespace osu.Game.Screens.Multi.Components
                     d.FadeColour(s.GetAppropriateColour(colours), transition_duration);
             };
 
-            beatmapBind.ValueChanged += b =>
+            background.Beatmap.BindTo(beatmap);
+
+            roomBeatmap.ValueChanged += b =>
             {
-                cover.BeatmapSet = b?.BeatmapSet;
+                beatmap.Value = beatmaps.GetWorkingBeatmap(b);
                 beatmapTitle.Beatmap = b;
                 modeTypeInfo.Beatmap = b;
             };
@@ -227,7 +235,7 @@ namespace osu.Game.Screens.Multi.Components
             hostBind.BindTo(Room.Host);
             statusBind.BindTo(Room.Status);
             typeBind.BindTo(Room.Type);
-            beatmapBind.BindTo(Room.Beatmap);
+            roomBeatmap.BindTo(Room.Beatmap);
             participantsBind.BindTo(Room.Participants);
         }
 
