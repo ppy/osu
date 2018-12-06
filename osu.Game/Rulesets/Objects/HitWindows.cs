@@ -22,7 +22,6 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Hit window for a <see cref="HitResult.Perfect"/> result.
-        /// The user can only achieve receive this result if <see cref="AllowsPerfect"/> is true.
         /// </summary>
         public double Perfect { get; protected set; }
 
@@ -38,7 +37,6 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Hit window for an <see cref="HitResult.Ok"/> result.
-        /// The user can only achieve this result if <see cref="AllowsOk"/> is true.
         /// </summary>
         public double Ok { get; protected set; }
 
@@ -53,14 +51,25 @@ namespace osu.Game.Rulesets.Objects
         public double Miss { get; protected set; }
 
         /// <summary>
-        /// Whether it's possible to achieve a <see cref="HitResult.Perfect"/> result.
+        /// Hit window for a non-<see cref="HitResult.Miss"/> result.
         /// </summary>
-        public bool AllowsPerfect;
+        protected virtual double SuccessfulHitWindow => Meh;
 
         /// <summary>
-        /// Whether it's possible to achieve a <see cref="HitResult.Ok"/> result.
+        /// Whether it's possible to achieve this <see cref="HitResult"/>.
         /// </summary>
-        public bool AllowsOk;
+        /// <param name="result">The result.</param>
+        public virtual bool IsHitResultAllowed(HitResult result)
+        {
+            switch(result)
+            {
+                case HitResult.Perfect:
+                case HitResult.Ok:
+                    return false;
+                default:
+                    return true;
+            }
+        }
 
         /// <summary>
         /// Sets hit windows with values that correspond to a difficulty parameter.
@@ -85,18 +94,11 @@ namespace osu.Game.Rulesets.Objects
         {
             timeOffset = Math.Abs(timeOffset);
 
-            if (AllowsPerfect && timeOffset <= HalfWindowFor(HitResult.Perfect))
-                return HitResult.Perfect;
-            if (timeOffset <= HalfWindowFor(HitResult.Great))
-                return HitResult.Great;
-            if (timeOffset <= HalfWindowFor(HitResult.Good))
-                return HitResult.Good;
-            if (AllowsOk && timeOffset <= HalfWindowFor(HitResult.Ok))
-                return HitResult.Ok;
-            if (timeOffset <= HalfWindowFor(HitResult.Meh))
-                return HitResult.Meh;
-            if (timeOffset <= HalfWindowFor(HitResult.Miss))
-                return HitResult.Miss;
+            for(var result = HitResult.Perfect; result >= HitResult.Miss; --result)
+            {
+                if(IsHitResultAllowed(result) && timeOffset <= HalfWindowFor(result))
+                    return result;
+            }
 
             return HitResult.None;
         }
@@ -130,10 +132,10 @@ namespace osu.Game.Rulesets.Objects
 
         /// <summary>
         /// Given a time offset, whether the <see cref="HitObject"/> can ever be hit in the future with a non-<see cref="HitResult.Miss"/> result.
-        /// This happens if <paramref name="timeOffset"/> is less than what is required for a <see cref="Meh"/> result.
+        /// This happens if <paramref name="timeOffset"/> is less than what is required for a <see cref="SuccessfulHitWindow"/> result.
         /// </summary>
         /// <param name="timeOffset">The time offset.</param>
         /// <returns>Whether the <see cref="HitObject"/> can be hit at any point in the future from this time offset.</returns>
-        public bool CanBeHit(double timeOffset) => timeOffset <= HalfWindowFor(HitResult.Meh);
+        public bool CanBeHit(double timeOffset) => timeOffset <= SuccessfulHitWindow / 2;
     }
 }
