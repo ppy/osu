@@ -9,12 +9,10 @@ using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Overlays;
-using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Ranking;
@@ -25,19 +23,11 @@ namespace osu.Game.Screens.Select
     public class PlaySongSelect : SongSelect
     {
         private OsuScreen player;
-        private readonly ModSelectOverlay modSelect;
         protected readonly BeatmapDetailArea BeatmapDetails;
         private bool removeAutoModOnResume;
 
         public PlaySongSelect()
         {
-            FooterPanels.Add(modSelect = new ModSelectOverlay
-            {
-                RelativeSizeAxes = Axes.X,
-                Origin = Anchor.BottomCentre,
-                Anchor = Anchor.BottomCentre,
-            });
-
             LeftContent.Add(BeatmapDetails = new BeatmapDetailArea
             {
                 RelativeSizeAxes = Axes.Both,
@@ -59,8 +49,6 @@ namespace osu.Game.Screens.Select
             if (selectedMods != null) this.selectedMods.BindTo(selectedMods);
 
             sampleConfirm = audio.Sample.Get(@"SongSelect/confirm-selection");
-
-            Footer.AddButton(@"mods", colours.Yellow, modSelect, Key.F1, float.MaxValue);
 
             BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, colours.Purple, null, Key.Number1);
             BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.fa_eraser, colours.Purple, null, Key.Number2);
@@ -115,7 +103,7 @@ namespace osu.Game.Screens.Select
             if (removeAutoModOnResume)
             {
                 var autoType = Ruleset.Value.CreateInstance().GetAutoplayMod().GetType();
-                modSelect.DeselectTypes(new[] { autoType }, true);
+                ModSelect.DeselectTypes(new[] { autoType }, true);
                 removeAutoModOnResume = false;
             }
 
@@ -124,13 +112,6 @@ namespace osu.Game.Screens.Select
             Beatmap.Value.Track.Looping = true;
 
             base.OnResuming(last);
-        }
-
-        protected override void OnSuspending(Screen next)
-        {
-            modSelect.Hide();
-
-            base.OnSuspending(next);
         }
 
         protected override bool OnExiting(Screen next)

@@ -21,6 +21,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Overlays.Mods;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Backgrounds;
@@ -66,6 +67,8 @@ namespace osu.Game.Screens.Select
         private readonly BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
         private BeatmapManager beatmaps;
+
+        protected readonly ModSelectOverlay ModSelect;
 
         private SampleChannel sampleChangeDifficulty;
         private SampleChannel sampleChangeBeatmap;
@@ -194,7 +197,16 @@ namespace osu.Game.Screens.Select
                     OnBack = ExitFromBack,
                 });
 
-                FooterPanels.Add(BeatmapOptions = new BeatmapOptionsOverlay());
+                FooterPanels.AddRange(new Drawable[]
+                {
+                    BeatmapOptions = new BeatmapOptionsOverlay(),
+                    ModSelect = new ModSelectOverlay
+                    {
+                        RelativeSizeAxes = Axes.X,
+                        Origin = Anchor.BottomCentre,
+                        Anchor = Anchor.BottomCentre,
+                    }
+                });
             }
         }
 
@@ -205,6 +217,7 @@ namespace osu.Game.Screens.Select
         {
             if (Footer != null)
             {
+                Footer.AddButton(@"mods", colours.Yellow, ModSelect, Key.F1);
                 Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
                 Footer.AddButton(@"options", colours.Blue, BeatmapOptions, Key.F3);
 
@@ -438,6 +451,8 @@ namespace osu.Game.Screens.Select
 
         protected override void OnSuspending(Screen next)
         {
+            ModSelect.Hide();
+
             Content.ScaleTo(1.1f, 250, Easing.InSine);
 
             Content.FadeOut(250);
@@ -448,6 +463,12 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnExiting(Screen next)
         {
+            if (ModSelect.State == Visibility.Visible)
+            {
+                ModSelect.Hide();
+                return true;
+            }
+
             FinaliseSelection(performStartAction: false);
 
             beatmapInfoWedge.State = Visibility.Hidden;
