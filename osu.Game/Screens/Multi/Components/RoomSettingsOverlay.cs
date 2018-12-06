@@ -168,7 +168,6 @@ namespace osu.Game.Screens.Multi.Components
                 new GameTypeTeamVersus(),
             };
 
-
             Room = new Room();
         }
 
