@@ -8,15 +8,16 @@ namespace osu.Game.Overlays.AccountCreation
 {
     public abstract class AccountCreationScreen : Screen
     {
-        protected AccountCreationScreen()
-        {
-            ValidForResume = false;
-        }
-
         protected override void OnEntering(Screen last)
         {
             base.OnEntering(last);
             Content.FadeOut().Delay(200).FadeIn(200);
+        }
+
+        protected override void OnResuming(Screen last)
+        {
+            base.OnResuming(last);
+            Content.FadeIn(200);
         }
 
         protected override void OnSuspending(Screen next)
