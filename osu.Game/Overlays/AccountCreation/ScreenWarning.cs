@@ -4,6 +4,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Graphics.Textures;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -23,61 +25,76 @@ namespace osu.Game.Overlays.AccountCreation
         private const string help_centre_url = "/help/wiki/Help_Centre#login";
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuColour colours, APIAccess api, OsuGame game)
+        private void load(OsuColour colours, APIAccess api, OsuGame game, TextureStore textures)
         {
-            Child = new FillFlowContainer
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Anchor = Anchor.TopCentre,
-                Origin = Anchor.TopCentre,
-                Padding = new MarginPadding(20),
-                Spacing = new Vector2(0, 5),
-                Children = new Drawable[]
+                new Sprite
                 {
-                    new Container
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Texture = textures.Get(@"Menu/dev-build-footer"),
+                },
+                new Sprite
+                {
+                    Anchor = Anchor.BottomCentre,
+                    Origin = Anchor.BottomCentre,
+                    Texture = textures.Get(@"Menu/dev-build-footer"),
+                },
+                new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Padding = new MarginPadding(20),
+                    Spacing = new Vector2(0, 5),
+                    Children = new Drawable[]
                     {
-                        RelativeSizeAxes = Axes.X,
-                        Height = 150,
-                        Child = new OsuLogo
+                        new Container
                         {
-                            Scale = new Vector2(0.1f),
-                            Anchor = Anchor.Centre,
-                            Triangles = false,
+                            RelativeSizeAxes = Axes.X,
+                            Height = 150,
+                            Child = new OsuLogo
+                            {
+                                Scale = new Vector2(0.1f),
+                                Anchor = Anchor.Centre,
+                                Triangles = false,
+                            },
                         },
-                    },
-                    new OsuSpriteText
-                    {
-                        TextSize = 28,
-                        Font = "Exo2.0-Light",
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Colour = Color4.Red,
-                        Text = "Warning! 注意！",
-                    },
-                    multiAccountExplanationText = new OsuTextFlowContainer(cp => { cp.TextSize = 12; })
-                    {
-                        RelativeSizeAxes = Axes.X,
-                        AutoSizeAxes = Axes.Y
-                    },
-                    new SettingsButton
-                    {
-                        Text = "Help, I can't access my account!",
-                        Margin = new MarginPadding { Top = 50 },
-                        Action = () => game?.OpenUrlExternally(help_centre_url)
-                    },
-                    new DangerousSettingsButton
-                    {
-                        Text = "I understand. This account isn't for me.",
-                        Action = () => Push(new ScreenEntry())
-                    },
-                    furtherAssistance = new LinkFlowContainer(cp => { cp.TextSize = 12; })
-                    {
-                        Margin = new MarginPadding { Top = 20 },
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        AutoSizeAxes = Axes.Both
-                    },
+                        new OsuSpriteText
+                        {
+                            TextSize = 28,
+                            Font = "Exo2.0-Light",
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Colour = Color4.Red,
+                            Text = "Warning! 注意！",
+                        },
+                        multiAccountExplanationText = new OsuTextFlowContainer(cp => { cp.TextSize = 12; })
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y
+                        },
+                        new SettingsButton
+                        {
+                            Text = "Help, I can't access my account!",
+                            Margin = new MarginPadding { Top = 50 },
+                            Action = () => game?.OpenUrlExternally(help_centre_url)
+                        },
+                        new DangerousSettingsButton
+                        {
+                            Text = "I understand. This account isn't for me.",
+                            Action = () => Push(new ScreenEntry())
+                        },
+                        furtherAssistance = new LinkFlowContainer(cp => { cp.TextSize = 12; })
+                        {
+                            Margin = new MarginPadding { Top = 20 },
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            AutoSizeAxes = Axes.Both
+                        },
+                    }
                 }
             };
 
