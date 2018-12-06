@@ -94,13 +94,12 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             if (tab is ChannelSelectorTabItem)
             {
-                tab.Active.Toggle();
+                tab.Active.Value = true;
                 return;
             }
 
-            selectorTab.Active.Value = false;
-
             base.SelectTab(tab);
+            selectorTab.Active.Value = false;
         }
 
         private void tabCloseRequested(TabItem<Channel> tab)
