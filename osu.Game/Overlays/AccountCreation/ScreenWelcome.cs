@@ -26,14 +26,16 @@ namespace osu.Game.Overlays.AccountCreation
                 Spacing = new Vector2(0, 5),
                 Children = new Drawable[]
                 {
-                    new OsuLogo
+                    new Container
                     {
-                        Scale = new Vector2(0.1f),
-                        Margin = new MarginPadding { Vertical = 500 },
-                        Anchor = Anchor.TopCentre,
-                        Origin = Anchor.TopCentre,
-                        Triangles = false,
-                        BeatMatching = false,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 150,
+                        Child = new OsuLogo
+                        {
+                            Scale = new Vector2(0.1f),
+                            Anchor = Anchor.Centre,
+                            Triangles = false,
+                        },
                     },
                     new OsuSpriteText
                     {
