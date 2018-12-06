@@ -12,8 +12,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class DrumRoll : TaikoHitObject, IHasEndTime
     {
-        public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
-
         /// <summary>
         /// Drum roll distance that results in a duration of 1 speed-adjusted beat length.
         /// </summary>
@@ -85,5 +83,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 first = false;
             }
         }
+
+        public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
     }
 }

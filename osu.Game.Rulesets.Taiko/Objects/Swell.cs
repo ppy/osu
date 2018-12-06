@@ -10,8 +10,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
 {
     public class Swell : TaikoHitObject, IHasEndTime
     {
-        public override Judgement CreateJudgement() => new TaikoSwellJudgement();
-
         public double EndTime => StartTime + Duration;
 
         public double Duration { get; set; }
@@ -30,5 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             for (int i = 0; i < RequiredHits; i++)
                 AddNested(new SwellTick());
         }
+
+        public override Judgement CreateJudgement() => new TaikoSwellJudgement();
     }
 }
