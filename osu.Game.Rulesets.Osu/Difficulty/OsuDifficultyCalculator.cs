@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private const double difficulty_multiplier = 0.0675;
         private const double c = 0.5;
         private const double beta = 0.6;
-        private const double m = 0.8;
+        private const double m = 0.85;
         private const double alpha = 0.6;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
