@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -21,12 +22,26 @@ namespace osu.Game.Overlays.AccountCreation
     {
         private OsuTextFlowContainer multiAccountExplanationText;
         private LinkFlowContainer furtherAssistance;
+        private APIAccess api;
 
         private const string help_centre_url = "/help/wiki/Help_Centre#login";
+
+        protected override void OnEntering(Screen last)
+        {
+            if (string.IsNullOrEmpty(api.ProvidedUsername))
+            {
+                Content.FadeOut();
+                Push(new ScreenEntry());
+                return;
+            }
+
+            base.OnEntering(last);
+        }
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, APIAccess api, OsuGame game, TextureStore textures)
         {
+            this.api = api;
             Children = new Drawable[]
             {
                 new Sprite
