@@ -41,24 +41,32 @@ namespace osu.Desktop.Updater
 
         private async void checkForUpdateAsync()
         {
-            var releases = new JsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
-            await releases.PerformAsync();
-
-            var latest = releases.ResponseObject;
-
-            if (latest.TagName != version)
+            try
             {
-                notificationOverlay.Post(new SimpleNotification
+                var releases = new JsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
+
+                await releases.PerformAsync();
+
+                var latest = releases.ResponseObject;
+
+                if (latest.TagName != version)
                 {
-                    Text = $"A newer release of osu! has been found ({version} → {latest.TagName}).\n\n"
-                           + "Click here to download the new version, which can be installed over the top of your existing installation",
-                    Icon = FontAwesome.fa_upload,
-                    Activated = () =>
+                    notificationOverlay.Post(new SimpleNotification
                     {
-                        host.OpenUrlExternally(getBestUrl(latest));
-                        return true;
-                    }
-                });
+                        Text = $"A newer release of osu! has been found ({version} → {latest.TagName}).\n\n"
+                               + "Click here to download the new version, which can be installed over the top of your existing installation",
+                        Icon = FontAwesome.fa_upload,
+                        Activated = () =>
+                        {
+                            host.OpenUrlExternally(getBestUrl(latest));
+                            return true;
+                        }
+                    });
+                }
+            }
+            catch
+            {
+                // we shouldn't crash on a web failure. or any failure for the matter.
             }
         }
 
