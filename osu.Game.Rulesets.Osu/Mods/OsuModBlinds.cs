@@ -31,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.Mods
         public override void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
             scoreProcessor.Health.ValueChanged += val => {
-                flashlight.Value = (float)val;
+                flashlight.AnimateTarget((float)val);
             };
             scoreProcessor.Combo.ValueChanged += val => {
                 if (val > 0 && val % 30 == 0)
