@@ -187,7 +187,13 @@ namespace osu.Game
         }
 
         private ExternalLinkOpener externalLinkOpener;
-        public void OpenUrlExternally(string url) => externalLinkOpener.OpenUrlExternally(url);
+        public void OpenUrlExternally(string url)
+        {
+            if (url.StartsWith("/"))
+                url = $"{API.Endpoint}{url}";
+
+            externalLinkOpener.OpenUrlExternally(url);
+        }
 
         private ScheduledDelegate scoreLoad;
 

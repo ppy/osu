@@ -20,7 +20,7 @@ namespace osu.Game.Overlays.AccountCreation
         private OsuTextFlowContainer multiAccountExplanationText;
         private LinkFlowContainer furtherAssistance;
 
-        private const string help_centre_url = "https://osu.ppy.sh/help/wiki/Help_Centre#login";
+        private const string help_centre_url = "/help/wiki/Help_Centre#login";
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, APIAccess api, OsuGame game)
