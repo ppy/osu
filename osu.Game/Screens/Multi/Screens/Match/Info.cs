@@ -99,10 +99,11 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 },
             };
 
+            beatmapTypeInfo.Beatmap.BindTo(Beatmap);
+            beatmapTypeInfo.Type.BindTo(Type);
+
             Availability.BindValueChanged(_ => updateAvailabilityStatus());
             Status.BindValueChanged(_ => updateAvailabilityStatus());
-            Beatmap.BindValueChanged(b => beatmapTypeInfo.Beatmap = b);
-            Type.BindValueChanged(t => beatmapTypeInfo.Type = t);
         }
 
         [BackgroundDependencyLoader]

@@ -38,10 +38,10 @@ namespace osu.Game.Screens.Multi.Components
         private readonly Box selectionBox;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
+        private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
         private readonly Bindable<User> hostBind = new Bindable<User>();
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
-        private readonly Bindable<BeatmapInfo> roomBeatmap = new Bindable<BeatmapInfo>();
         private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Multi.Components
         {
             Box sideStrip;
             UpdateableBeatmapBackgroundSprite background;
-            OsuSpriteText name, status;
+            OsuSpriteText status;
             ParticipantInfo participantInfo;
             BeatmapTitle beatmapTitle;
             ModeTypeInfo modeTypeInfo;
@@ -166,9 +166,10 @@ namespace osu.Game.Screens.Multi.Components
                                         Spacing = new Vector2(5f),
                                         Children = new Drawable[]
                                         {
-                                            name = new OsuSpriteText
+                                            new OsuSpriteText
                                             {
                                                 TextSize = 18,
+                                                Current = nameBind
                                             },
                                             participantInfo = new ParticipantInfo(),
                                         },
@@ -206,11 +207,6 @@ namespace osu.Game.Screens.Multi.Components
                 },
             };
 
-            nameBind.ValueChanged += n => name.Text = n;
-            hostBind.ValueChanged += h => participantInfo.Host = h;
-            typeBind.ValueChanged += m => modeTypeInfo.Type = m;
-            participantsBind.ValueChanged += p => participantInfo.Participants = p;
-
             statusBind.ValueChanged += s =>
             {
                 status.Text = s.Message;
@@ -221,19 +217,22 @@ namespace osu.Game.Screens.Multi.Components
 
             background.Beatmap.BindTo(beatmap);
 
-            roomBeatmap.ValueChanged += b =>
-            {
-                beatmap.Value = beatmaps.GetWorkingBeatmap(b);
-                beatmapTitle.Beatmap = b;
-                modeTypeInfo.Beatmap = b;
-            };
+            beatmapBind.ValueChanged += b => beatmap.Value = beatmaps.GetWorkingBeatmap(b);
 
             nameBind.BindTo(Room.Name);
             hostBind.BindTo(Room.Host);
             statusBind.BindTo(Room.Status);
             typeBind.BindTo(Room.Type);
-            roomBeatmap.BindTo(Room.Beatmap);
+            beatmapBind.BindTo(Room.Beatmap);
             participantsBind.BindTo(Room.Participants);
+
+            modeTypeInfo.Beatmap.BindTo(beatmapBind);
+            modeTypeInfo.Type.BindTo(typeBind);
+
+            participantInfo.Host.BindTo(hostBind);
+            participantInfo.Participants.BindTo(participantsBind);
+
+            beatmapTitle.Beatmap.BindTo(beatmapBind);
         }
 
         protected override void LoadComplete()

@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
@@ -12,53 +13,55 @@ using osuTK;
 
 namespace osu.Game.Screens.Multi.Components
 {
-    public class BeatmapTypeInfo : FillFlowContainer
+    public class BeatmapTypeInfo : CompositeDrawable
     {
-        private readonly ModeTypeInfo modeTypeInfo;
-        private readonly BeatmapTitle beatmapTitle;
         private readonly OsuSpriteText beatmapAuthor;
 
-        public BeatmapInfo Beatmap
-        {
-            set
-            {
-                modeTypeInfo.Beatmap = beatmapTitle.Beatmap = value;
-                beatmapAuthor.Text = value == null ? string.Empty : $"mapped by {value.Metadata.Author}";
-            }
-        }
+        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
-        public GameType Type
-        {
-            set { modeTypeInfo.Type = value; }
-        }
+        public readonly Bindable<GameType> Type = new Bindable<GameType>();
 
         public BeatmapTypeInfo()
         {
             AutoSizeAxes = Axes.Both;
-            Direction = FillDirection.Horizontal;
-            LayoutDuration = 100;
-            Spacing = new Vector2(5f, 0f);
 
-            Children = new Drawable[]
+            BeatmapTitle beatmapTitle;
+            ModeTypeInfo modeTypeInfo;
+
+            InternalChild = new FillFlowContainer
             {
-                modeTypeInfo = new ModeTypeInfo(),
-                new Container
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                LayoutDuration = 100,
+                Spacing = new Vector2(5, 0),
+                Children = new Drawable[]
                 {
-                    AutoSizeAxes = Axes.X,
-                    Height = 30,
-                    Margin = new MarginPadding { Left = 5 },
-                    Children = new Drawable[]
+                    modeTypeInfo = new ModeTypeInfo(),
+                    new Container
                     {
-                        beatmapTitle = new BeatmapTitle(),
-                        beatmapAuthor = new OsuSpriteText
+                        AutoSizeAxes = Axes.X,
+                        Height = 30,
+                        Margin = new MarginPadding { Left = 5 },
+                        Children = new Drawable[]
                         {
-                            Anchor = Anchor.BottomLeft,
-                            Origin = Anchor.BottomLeft,
-                            TextSize = 14,
+                            beatmapTitle = new BeatmapTitle(),
+                            beatmapAuthor = new OsuSpriteText
+                            {
+                                Anchor = Anchor.BottomLeft,
+                                Origin = Anchor.BottomLeft,
+                                TextSize = 14,
+                            },
                         },
                     },
-                },
+                }
             };
+
+            modeTypeInfo.Beatmap.BindTo(Beatmap);
+            modeTypeInfo.Type.BindTo(Type);
+
+            beatmapTitle.Beatmap.BindTo(Beatmap);
+
+            Beatmap.BindValueChanged(v => beatmapAuthor.Text = v == null ? string.Empty : $"mapped by {v.Metadata.Author}");
         }
 
         [BackgroundDependencyLoader]

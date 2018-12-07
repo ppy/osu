@@ -60,6 +60,9 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 },
             };
 
+            count.Participants.BindTo(Users);
+            count.MaxParticipants.BindTo(MaxParticipants);
+
             Users.BindValueChanged(v =>
             {
                 usersFlow.Children = v.Select(u => new UserPanel(u)
@@ -69,11 +72,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     Width = 300,
                     OnLoadComplete = d => d.FadeInFromZero(60),
                 }).ToList();
-
-                count.Count = v.Count();
             });
-
-            MaxParticipants.BindValueChanged(v => count.Max = v);
         }
     }
 }
