@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private readonly Box background;
 
-        public DrawableScore(int index, APIScore score)
+        public DrawableScore(int index, APIScoreInfo score)
         {
             ScoreModsContainer modsContainer;
 

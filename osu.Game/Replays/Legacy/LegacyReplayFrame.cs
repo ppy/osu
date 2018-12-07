@@ -1,9 +1,10 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Game.Rulesets.Replays;
 using osuTK;
 
-namespace osu.Game.Rulesets.Replays.Legacy
+namespace osu.Game.Replays.Legacy
 {
     public class LegacyReplayFrame : ReplayFrame
     {

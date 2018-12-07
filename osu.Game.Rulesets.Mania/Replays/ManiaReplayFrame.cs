@@ -3,9 +3,9 @@
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
+using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Rulesets.Replays.Legacy;
 using osu.Game.Rulesets.Replays.Types;
 
 namespace osu.Game.Rulesets.Mania.Replays

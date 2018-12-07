@@ -3,6 +3,7 @@
 
 using osu.Game.Rulesets.Objects;
 using osu.Game.Beatmaps;
+using osu.Game.Replays;
 
 namespace osu.Game.Rulesets.Replays
 {

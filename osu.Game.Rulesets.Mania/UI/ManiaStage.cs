@@ -156,18 +156,29 @@ namespace osu.Game.Rulesets.Mania.UI
         public override void Add(DrawableHitObject h)
         {
             var maniaObject = (ManiaHitObject)h.HitObject;
-            int columnIndex = maniaObject.Column - firstColumnIndex;
-            Columns.ElementAt(columnIndex).Add(h);
+
+            int columnIndex = -1;
+
+            maniaObject.ColumnBindable.BindValueChanged(_ =>
+            {
+                if (columnIndex != -1)
+                    Columns.ElementAt(columnIndex).Remove(h);
+
+                columnIndex = maniaObject.Column - firstColumnIndex;
+                Columns.ElementAt(columnIndex).Add(h);
+            }, true);
+
             h.OnNewResult += OnNewResult;
         }
 
-        public override void Remove(DrawableHitObject h)
+        public override bool Remove(DrawableHitObject h)
         {
             var maniaObject = (ManiaHitObject)h.HitObject;
             int columnIndex = maniaObject.Column - firstColumnIndex;
             Columns.ElementAt(columnIndex).Remove(h);
 
             h.OnNewResult -= OnNewResult;
+            return true;
         }
 
         public void Add(BarLine barline) => base.Add(new DrawableBarLine(barline));

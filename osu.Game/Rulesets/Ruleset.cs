@@ -12,12 +12,12 @@ using osu.Game.Overlays.Settings;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Replays.Types;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Beatmaps.Legacy;
 using osu.Game.Configuration;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets
 {
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets
 
         public abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
 
-        public virtual PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, Score score) => null;
+        public virtual PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => null;
 
         public virtual HitObjectComposer CreateHitObjectComposer() => null;
 

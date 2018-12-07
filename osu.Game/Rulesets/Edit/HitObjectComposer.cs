@@ -171,10 +171,9 @@ namespace osu.Game.Rulesets.Edit
         public virtual SelectionBlueprint CreateBlueprintFor(DrawableHitObject hitObject) => null;
 
         /// <summary>
-        /// Creates a <see cref="SelectionBox"/> which outlines <see cref="DrawableHitObject"/>s
-        /// and handles hitobject pattern adjustments.
+        /// Creates a <see cref="SelectionHandler"/> which outlines <see cref="DrawableHitObject"/>s and handles movement of selections.
         /// </summary>
-        public virtual SelectionBox CreateSelectionBox() => new SelectionBox();
+        public virtual SelectionHandler CreateSelectionHandler() => new SelectionHandler();
 
         /// <summary>
         /// Creates a <see cref="ScalableContainer"/> which provides a layer above or below the <see cref="Playfield"/>.

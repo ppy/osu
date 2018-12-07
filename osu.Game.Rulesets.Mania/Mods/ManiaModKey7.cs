@@ -7,7 +7,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     {
         public override int KeyCount => 7;
         public override string Name => "Seven Keys";
-        public override string ShortenedName => "7K";
+        public override string Acronym => "7K";
         public override string Description => @"Play with seven keys.";
     }
 }
