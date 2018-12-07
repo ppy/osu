@@ -10,7 +10,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -35,8 +34,6 @@ namespace osu.Game.Screens.Multi.Components
         private const float cover_width = 145;
 
         public event Action<SelectionState> StateChanged;
-
-        public Action SelectionRequested;
 
         private readonly Box selectionBox;
 
@@ -243,12 +240,6 @@ namespace osu.Game.Screens.Multi.Components
         {
             base.LoadComplete();
             this.FadeInFromZero(transition_duration);
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            SelectionRequested?.Invoke();
-            return true;
         }
     }
 }

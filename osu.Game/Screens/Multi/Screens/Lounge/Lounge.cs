@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         {
             var drawableRoom = new DrawableRoom(room);
 
-            drawableRoom.SelectionRequested = () => selectionRequested(drawableRoom);
+            drawableRoom.Action = () => selectionRequested(drawableRoom);
 
             RoomsContainer.Add(drawableRoom);
 
