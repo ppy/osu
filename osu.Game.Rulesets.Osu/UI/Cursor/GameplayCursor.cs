@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         [BackgroundDependencyLoader]
         private void load(ISkinSource source)
         {
-            cursorExpand = source.GetValue<SkinConfiguration, string>(s => s.CursorExpand).Equals("1");
+            cursorExpand = source.GetValue<SkinConfiguration, bool>(s => s.CursorExpand) ?? true;
         }
 
         private int downCount;

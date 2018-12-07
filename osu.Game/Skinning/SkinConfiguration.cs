@@ -17,6 +17,6 @@ namespace osu.Game.Skinning
 
         public string HitCircleFont { get; set; } = "default";
 
-        public string CursorExpand { get; set; } = "1";
+        public bool? CursorExpand { get; set; } = true;
     }
 }
