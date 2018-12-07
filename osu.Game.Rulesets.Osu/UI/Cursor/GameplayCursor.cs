@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         protected override Container<Drawable> Content => fadeContainer;
 
+        private bool cursorExpand;
+
         private readonly Container<Drawable> fadeContainer;
 
         public GameplayCursor()
@@ -37,6 +39,12 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(ISkinSource source)
+        {
+            cursorExpand = source.GetValue<SkinConfiguration, string>(s => s.CursorExpand).Equals("1");
+        }
+
         private int downCount;
 
         private const float pressed_scale = 1.2f;
@@ -46,28 +54,30 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         public bool OnPressed(OsuAction action)
         {
-            switch (action)
-            {
-                case OsuAction.LeftButton:
-                case OsuAction.RightButton:
-                    downCount++;
-                    ActiveCursor.ScaleTo(released_scale).ScaleTo(targetScale, 100, Easing.OutQuad);
-                    break;
-            }
+            if (cursorExpand)
+                switch (action)
+                {
+                    case OsuAction.LeftButton:
+                    case OsuAction.RightButton:
+                        downCount++;
+                        ActiveCursor.ScaleTo(released_scale).ScaleTo(targetScale, 100, Easing.OutQuad);
+                        break;
+                }
 
             return false;
         }
 
         public bool OnReleased(OsuAction action)
         {
-            switch (action)
-            {
-                case OsuAction.LeftButton:
-                case OsuAction.RightButton:
-                    if (--downCount == 0)
-                        ActiveCursor.ScaleTo(targetScale, 200, Easing.OutQuad);
-                    break;
-            }
+            if (cursorExpand)
+                switch (action)
+                {
+                    case OsuAction.LeftButton:
+                    case OsuAction.RightButton:
+                        if (--downCount == 0)
+                            ActiveCursor.ScaleTo(targetScale, 200, Easing.OutQuad);
+                        break;
+                }
 
             return false;
         }
