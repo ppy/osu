@@ -30,6 +30,9 @@ namespace osu.Game.Skinning
                         case @"Author":
                             skin.SkinInfo.Creator = pair.Value;
                             break;
+                        case @"CursorExpand":
+                            skin.CursorExpand = pair.Value;
+                            break;
                     }
 
                     break;
