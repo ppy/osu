@@ -45,20 +45,20 @@ namespace osu.Game.Skinning
 
         public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
         {
-            TValue? val = null;
+            TValue? val;
             if ((source as Skin)?.Configuration is TConfiguration conf)
-                val = query?.Invoke(conf);
-
-            return val ?? fallbackSource?.GetValue(query);
+                if (beatmapSkins && (val = query?.Invoke(conf)) != null)
+                    return val;
+            return fallbackSource?.GetValue(query);
         }
 
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
         {
-            TValue val = null;
+            TValue val;
             if ((source as Skin)?.Configuration is TConfiguration conf)
-                val = query?.Invoke(conf);
-
-            return val ?? fallbackSource?.GetValue(query);
+                if (beatmapSkins && (val = query?.Invoke(conf)) != null)
+                    return val;
+            return fallbackSource?.GetValue(query);
         }
 
         private readonly ISkinSource source;
