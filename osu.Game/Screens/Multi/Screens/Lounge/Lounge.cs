@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
 
         public override string Title => "Lounge";
 
-        protected override Container<Drawable> TransitionContent => content;
+        protected override Drawable TransitionContent => content;
 
         public Lounge()
         {

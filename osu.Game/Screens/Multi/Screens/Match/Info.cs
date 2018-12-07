@@ -23,59 +23,25 @@ namespace osu.Game.Screens.Multi.Screens.Match
     {
         public const float HEIGHT = 128;
 
-        private readonly OsuSpriteText name, availabilityStatus;
-        private readonly BeatmapTypeInfo beatmapTypeInfo;
+        private readonly OsuSpriteText availabilityStatus;
         private readonly ReadyButton readyButton;
 
         private OsuColour colours;
 
         public Bindable<bool> Ready => readyButton.Ready;
 
-        public string Name
-        {
-            set { name.Text = value; }
-        }
-
-        private RoomAvailability availability;
-        public RoomAvailability Availability
-        {
-            set
-            {
-                if (value == availability) return;
-                availability = value;
-
-                if (IsLoaded)
-                    updateAvailabilityStatus();
-            }
-        }
-
-        private RoomStatus status;
-        public RoomStatus Status
-        {
-            set
-            {
-                if (value == status) return;
-                status = value;
-
-                if (IsLoaded)
-                    updateAvailabilityStatus();
-            }
-        }
-
-        public BeatmapInfo Beatmap
-        {
-            set { beatmapTypeInfo.Beatmap = value; }
-        }
-
-        public GameType Type
-        {
-            set { beatmapTypeInfo.Type = value; }
-        }
+        public readonly Bindable<string> Name = new Bindable<string>();
+        public readonly Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
+        public readonly Bindable<RoomStatus> Status = new Bindable<RoomStatus>();
+        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly Bindable<GameType> Type = new Bindable<GameType>();
 
         public Info()
         {
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
+
+            BeatmapTypeInfo beatmapTypeInfo;
 
             Children = new Drawable[]
             {
@@ -103,9 +69,10 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        name = new OsuSpriteText
+                                        new OsuSpriteText
                                         {
                                             TextSize = 30,
+                                            Current = Name
                                         },
                                         availabilityStatus = new OsuSpriteText
                                         {
@@ -131,6 +98,11 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     },
                 },
             };
+
+            Availability.BindValueChanged(_ => updateAvailabilityStatus());
+            Status.BindValueChanged(_ => updateAvailabilityStatus());
+            Beatmap.BindValueChanged(b => beatmapTypeInfo.Beatmap = b);
+            Type.BindValueChanged(t => beatmapTypeInfo.Type = t);
         }
 
         [BackgroundDependencyLoader]
@@ -148,10 +120,13 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         private void updateAvailabilityStatus()
         {
-            if (status != null)
+            if (!IsLoaded)
+                return;
+
+            if (Status.Value != null)
             {
-                availabilityStatus.FadeColour(status.GetAppropriateColour(colours), 100);
-                availabilityStatus.Text = $"{availability.GetDescription()}, {status.Message}";
+                availabilityStatus.FadeColour(Status.Value.GetAppropriateColour(colours), 100);
+                availabilityStatus.Text = $"{Availability.Value.GetDescription()}, {Status.Value.Message}";
             }
         }
 
