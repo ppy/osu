@@ -29,10 +29,10 @@ namespace osu.Game.Screens.Multi.Components
 
         private readonly MarginPadding contentPadding = new MarginPadding { Horizontal = 20, Vertical = 10 };
         private readonly Bindable<string> nameBind = new Bindable<string>();
+        private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
         private readonly Bindable<User> hostBind = new Bindable<User>();
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
-        private readonly Bindable<BeatmapInfo> roomBeatmap = new Bindable<BeatmapInfo>();
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
         private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
 
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Multi.Components
                 hostBind.UnbindBindings();
                 statusBind.UnbindBindings();
                 typeBind.UnbindBindings();
-                roomBeatmap.UnbindBindings();
+                beatmapBind.UnbindBindings();
                 maxParticipantsBind.UnbindBindings();
                 participantsBind.UnbindBindings();
 
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Multi.Components
                     hostBind.BindTo(room.Host);
                     statusBind.BindTo(room.Status);
                     typeBind.BindTo(room.Type);
-                    roomBeatmap.BindTo(room.Beatmap);
+                    beatmapBind.BindTo(room.Beatmap);
                     maxParticipantsBind.BindTo(room.MaxParticipants);
                     participantsBind.BindTo(room.Participants);
                 }
@@ -131,6 +131,7 @@ namespace osu.Game.Screens.Multi.Components
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
                                             TextSize = 30,
+                                            Current = nameBind
                                         },
                                     },
                                 },
@@ -203,26 +204,20 @@ namespace osu.Game.Screens.Multi.Components
                 },
             };
 
-            nameBind.ValueChanged += n => name.Text = n;
-            hostBind.ValueChanged += h => participantInfo.Host = h;
-            typeBind.ValueChanged += t => beatmapTypeInfo.Type = t;
-            maxParticipantsBind.ValueChanged += m => participantCount.Max = m;
             statusBind.ValueChanged += displayStatus;
+            beatmapBind.ValueChanged += b => beatmap.Value = beatmaps.GetWorkingBeatmap(b);
+            participantsBind.ValueChanged += p => participantsFlow.ChildrenEnumerable = p.Select(u => new UserTile(u));
 
             background.Beatmap.BindTo(beatmap);
 
-            roomBeatmap.ValueChanged += b =>
-            {
-                beatmap.Value = beatmaps.GetWorkingBeatmap(b);
-                beatmapTypeInfo.Beatmap = b;
-            };
+            participantInfo.Host.BindTo(hostBind);
+            participantInfo.Participants.BindTo(participantsBind);
 
-            participantsBind.ValueChanged += p =>
-            {
-                participantCount.Count = p.Count();
-                participantInfo.Participants = p;
-                participantsFlow.ChildrenEnumerable = p.Select(u => new UserTile(u));
-            };
+            participantCount.Participants.BindTo(participantsBind);
+            participantCount.MaxParticipants.BindTo(maxParticipantsBind);
+
+            beatmapTypeInfo.Type.BindTo(typeBind);
+            beatmapTypeInfo.Beatmap.BindTo(beatmapBind);
 
             updateState();
         }
@@ -265,7 +260,7 @@ namespace osu.Game.Screens.Multi.Components
                 participantInfo.FadeIn(transition_duration);
 
                 statusBind.TriggerChange();
-                roomBeatmap.TriggerChange();
+                beatmapBind.TriggerChange();
             }
         }
 
