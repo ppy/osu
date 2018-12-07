@@ -21,12 +21,14 @@ namespace osu.Game.Beatmaps
         {
             private readonly IResourceStore<byte[]> store;
             private readonly AudioManager audioManager;
+            private readonly TrackManager trackManager;
 
             public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, BeatmapInfo beatmapInfo, AudioManager audioManager)
                 : base(beatmapInfo)
             {
                 this.store = store;
                 this.audioManager = audioManager;
+                this.trackManager = audioManager.Track;
             }
 
             protected override IBeatmap GetBeatmap()
@@ -68,7 +70,7 @@ namespace osu.Game.Beatmaps
                 try
                 {
                     var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
-                    return trackData == null ? null : new TrackBass(trackData);
+                    return trackData == null ? null : trackManager.CreateTrack(trackData, false);
                 }
                 catch
                 {
