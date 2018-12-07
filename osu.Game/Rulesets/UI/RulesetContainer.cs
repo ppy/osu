@@ -310,7 +310,7 @@ namespace osu.Game.Rulesets.UI
             Playfield.PostProcess();
 
             foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
-                mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
+                mod.ApplyToDrawableHitObjects(Playfield.AllHitObjects);
         }
 
         /// <summary>
