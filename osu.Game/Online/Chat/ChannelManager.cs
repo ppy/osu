@@ -79,7 +79,7 @@ namespace osu.Game.Online.Chat
                 throw new ArgumentNullException(nameof(user));
 
             CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Users.Any(u => u.Id == user.Id))
-                                   ?? new Channel { Name = user.Username, Users = { user }, Type = ChannelType.PM };
+                                   ?? new Channel(user);
         }
 
         private void currentChannelChanged(Channel channel) => JoinChannel(channel);
