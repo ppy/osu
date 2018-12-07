@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
+        public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);

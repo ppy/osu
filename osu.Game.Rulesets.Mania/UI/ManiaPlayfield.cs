@@ -55,7 +55,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override void Add(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Add(h);
 
-        public override void Remove(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Remove(h);
+        public override bool Remove(DrawableHitObject h) => getStageByColumn(((ManiaHitObject)h.HitObject).Column).Remove(h);
 
         public void Add(BarLine barline) => stages.ForEach(s => s.Add(barline));
 
@@ -85,6 +85,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
             return found;
         }
+
+        /// <summary>
+        /// Retrieves the total amount of columns across all stages in this playfield.
+        /// </summary>
+        public int TotalColumns => stages.Sum(s => s.Columns.Count);
 
         private ManiaStage getStageByColumn(int column)
         {

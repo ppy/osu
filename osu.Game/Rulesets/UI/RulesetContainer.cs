@@ -19,8 +19,8 @@ using osu.Framework.Input;
 using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Overlays;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Configuration;
-using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.UI

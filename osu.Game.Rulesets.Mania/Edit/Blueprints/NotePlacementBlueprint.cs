@@ -2,10 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Mania.Edit.Blueprints.Components;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 {
@@ -27,20 +25,6 @@ namespace osu.Game.Rulesets.Mania.Edit.Blueprints
 
             Width = SnappedWidth;
             Position = SnappedMousePosition;
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            Column column;
-            if ((column = ColumnAt(e.ScreenSpaceMousePosition)) == null)
-                return base.OnClick(e);
-
-            HitObject.StartTime = TimeAt(e.ScreenSpaceMousePosition);
-            HitObject.Column = column.Index;
-
-            EndPlacement();
-
-            return true;
         }
     }
 }

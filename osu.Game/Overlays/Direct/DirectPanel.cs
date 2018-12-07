@@ -174,7 +174,7 @@ namespace osu.Game.Overlays.Direct
             };
         }
 
-        private void setAdded(BeatmapSetInfo s) => Schedule(() =>
+        private void setAdded(BeatmapSetInfo s, bool existing, bool silent) => Schedule(() =>
         {
             if (s.OnlineBeatmapSetID == SetInfo.OnlineBeatmapSetID)
                 progressBar.FadeOut(500);

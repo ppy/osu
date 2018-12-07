@@ -46,5 +46,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         protected override void AddHitObject(DrawableHitObject hitObject) => column.Add((DrawableManiaHitObject)hitObject);
 
         public Column ColumnAt(Vector2 screenSpacePosition) => column;
+
+        public int TotalColumns => 1;
     }
 }
