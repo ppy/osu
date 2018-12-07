@@ -19,10 +19,10 @@ namespace osu.Game.Tests.Visual
             Info info = new Info();
             Add(info);
 
-            AddStep(@"set name", () => info.Name = @"Room Name?");
-            AddStep(@"set availability", () => info.Availability = RoomAvailability.FriendsOnly);
-            AddStep(@"set status", () => info.Status = new RoomStatusPlaying());
-            AddStep(@"set beatmap", () => info.Beatmap = new BeatmapInfo
+            AddStep(@"set name", () => info.Name.Value = @"Room Name?");
+            AddStep(@"set availability", () => info.Availability.Value = RoomAvailability.FriendsOnly);
+            AddStep(@"set status", () => info.Status.Value = new RoomStatusPlaying());
+            AddStep(@"set beatmap", () => info.Beatmap.Value = new BeatmapInfo
             {
                 StarDifficulty = 2.4,
                 Ruleset = rulesets.GetRuleset(0),
@@ -34,14 +34,14 @@ namespace osu.Game.Tests.Visual
                 },
             });
 
-            AddStep(@"set type", () => info.Type = new GameTypeTagTeam());
+            AddStep(@"set type", () => info.Type.Value = new GameTypeTagTeam());
 
-            AddStep(@"change name", () => info.Name = @"Room Name!");
-            AddStep(@"change availability", () => info.Availability = RoomAvailability.InviteOnly);
-            AddStep(@"change status", () => info.Status = new RoomStatusOpen());
-            AddStep(@"null beatmap", () => info.Beatmap = null);
-            AddStep(@"change type", () => info.Type = new GameTypeTeamVersus());
-            AddStep(@"change beatmap", () => info.Beatmap = new BeatmapInfo
+            AddStep(@"change name", () => info.Name.Value = @"Room Name!");
+            AddStep(@"change availability", () => info.Availability.Value = RoomAvailability.InviteOnly);
+            AddStep(@"change status", () => info.Status.Value = new RoomStatusOpen());
+            AddStep(@"null beatmap", () => info.Beatmap.Value = null);
+            AddStep(@"change type", () => info.Type.Value = new GameTypeTeamVersus());
+            AddStep(@"change beatmap", () => info.Beatmap.Value = new BeatmapInfo
             {
                 StarDifficulty = 4.2,
                 Ruleset = rulesets.GetRuleset(3),

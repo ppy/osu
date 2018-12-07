@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.SearchableList;
@@ -12,35 +13,23 @@ using osuTK;
 
 namespace osu.Game.Screens.Multi.Screens.Match
 {
-    public class Participants : Container
+    public class Participants : CompositeDrawable
     {
-        private readonly ParticipantCount count;
-        private readonly FillFlowContainer<UserPanel> usersFlow;
+        public readonly Bindable<IEnumerable<User>> Users = new Bindable<IEnumerable<User>>();
+        public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
 
-        public IEnumerable<User> Users
+        public new MarginPadding Padding
         {
-            set
-            {
-                usersFlow.Children = value.Select(u => new UserPanel(u)
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Width = 300,
-                    OnLoadComplete = d => d.FadeInFromZero(60),
-                }).ToList();
-
-                count.Count = value.Count();
-            }
-        }
-
-        public int? Max
-        {
-            set => count.Max = value;
+            get => base.Padding;
+            set => base.Padding = value;
         }
 
         public Participants()
         {
-            Child = new Container
+            FillFlowContainer<UserPanel> usersFlow;
+            ParticipantCount count;
+
+            InternalChild = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
@@ -70,6 +59,21 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     },
                 },
             };
+
+            Users.BindValueChanged(v =>
+            {
+                usersFlow.Children = v.Select(u => new UserPanel(u)
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    Width = 300,
+                    OnLoadComplete = d => d.FadeInFromZero(60),
+                }).ToList();
+
+                count.Count = v.Count();
+            });
+
+            MaxParticipants.BindValueChanged(v => count.Max = v);
         }
     }
 }

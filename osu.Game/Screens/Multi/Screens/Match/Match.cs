@@ -20,15 +20,14 @@ namespace osu.Game.Screens.Multi.Screens.Match
         private readonly Participants participants;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
+        private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
         private readonly Bindable<RoomAvailability> availabilityBind = new Bindable<RoomAvailability>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
         private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
 
-        private readonly Bindable<BeatmapInfo> roomBeatmap = new Bindable<BeatmapInfo>();
-
-        protected override Container<Drawable> TransitionContent => participants;
+        protected override Drawable TransitionContent => participants;
 
         public override string Title => room.Name.Value;
 
@@ -40,6 +39,14 @@ namespace osu.Game.Screens.Multi.Screens.Match
         public Match(Room room)
         {
             this.room = room;
+
+            nameBind.BindTo(room.Name);
+            beatmapBind.BindTo(room.Beatmap);
+            statusBind.BindTo(room.Status);
+            availabilityBind.BindTo(room.Availability);
+            typeBind.BindTo(room.Type);
+            participantsBind.BindTo(room.Participants);
+            maxParticipantsBind.BindTo(room.MaxParticipants);
 
             Header header;
             RoomSettingsOverlay settings;
@@ -76,8 +83,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
             header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect());
             header.Beatmap.BindTo(Beatmap);
 
-            roomBeatmap.BindValueChanged(b => info.Beatmap = b, true);
-
             header.Tabs.Current.ValueChanged += t =>
             {
                 if (t == MatchHeaderPage.Settings)
@@ -94,31 +99,22 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
             settings.Applied = () => settings.Hide();
 
-            nameBind.BindTo(room.Name);
-            nameBind.BindValueChanged(n => info.Name = n, true);
+            info.Beatmap.BindTo(beatmapBind);
+            info.Name.BindTo(nameBind);
+            info.Status.BindTo(statusBind);
+            info.Availability.BindTo(availabilityBind);
+            info.Type.BindTo(typeBind);
 
-            statusBind.BindTo(room.Status);
-            statusBind.BindValueChanged(s => info.Status = s, true);
-
-            availabilityBind.BindTo(room.Availability);
-            availabilityBind.BindValueChanged(a => info.Availability = a, true);
-
-            typeBind.BindTo(room.Type);
-            typeBind.BindValueChanged(t => info.Type = t, true);
-
-            maxParticipantsBind.BindTo(room.MaxParticipants);
-            maxParticipantsBind.BindValueChanged(m => { participants.Max = m; }, true);
-
-            participantsBind.BindTo(room.Participants);
-            participantsBind.BindValueChanged(p => participants.Users = p, true);
+            participants.Users.BindTo(participantsBind);
+            participants.MaxParticipants.BindTo(maxParticipantsBind);
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            roomBeatmap.BindTo(room.Beatmap);
-            roomBeatmap.BindValueChanged(b => Beatmap.Value = beatmapManager.GetWorkingBeatmap(room.Beatmap.Value), true);
-            Beatmap.BindValueChanged(b => roomBeatmap.Value = b.BeatmapInfo);
+            beatmapBind.BindTo(room.Beatmap);
+            beatmapBind.BindValueChanged(b => Beatmap.Value = beatmapManager.GetWorkingBeatmap(room.Beatmap.Value), true);
+            Beatmap.BindValueChanged(b => beatmapBind.Value = b.BeatmapInfo);
         }
     }
 }
