@@ -15,6 +15,27 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double StrainDecayBase => 0.15;
 
         protected override double StrainValueOf(OsuDifficultyHitObject current)
-            => (Math.Pow(current.TravelDistance, 0.99) + Math.Pow(current.JumpDistance, 0.99)) / current.StrainTime;
+        {
+            double angleBonus = 1.0;
+
+            if (current.Angle != null)
+            {
+                double angle = current.Angle.Value * 180 / Math.PI;
+
+                if (current.JumpDistance > SINGLE_SPACING_THRESHOLD)
+                {
+                    if (angle > 75)
+                        angleBonus = (angle / 45 - 75) / 2;
+                    else if (angle > 120)
+                        angleBonus = 0.5;
+                }
+            }
+
+            return angleBonus * (
+                       Math.Pow(current.JumpDistance - SINGLE_SPACING_THRESHOLD, 0.99)
+                       + Math.Pow(current.TravelDistance, 0.99)
+                       + Math.Pow(current.JumpDistance, 0.99)
+                   ) / current.StrainTime;
+        }
     }
 }
