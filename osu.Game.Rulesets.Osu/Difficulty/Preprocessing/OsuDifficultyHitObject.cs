@@ -40,15 +40,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double StrainTime { get; private set; }
 
+        public double? Angle { get; private set; }
+
         private readonly OsuHitObject lastObject;
+        private readonly OsuHitObject nextObject;
         private readonly double timeRate;
 
         /// <summary>
         /// Initializes the object calculating extra data required for difficulty calculation.
         /// </summary>
-        public OsuDifficultyHitObject(OsuHitObject currentObject, OsuHitObject lastObject, double timeRate)
+        public OsuDifficultyHitObject(OsuHitObject lastObject, OsuHitObject currentObject, OsuHitObject nextObject, double timeRate)
         {
             this.lastObject = lastObject;
+            this.nextObject = nextObject;
             this.timeRate = timeRate;
 
             BaseObject = currentObject;
@@ -82,6 +86,26 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // Don't need to jump to reach spinners
             if (!(BaseObject is Spinner))
                 JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
+
+            if (nextObject != null)
+            {
+                var endCursorPosition = BaseObject.StackedPosition;
+
+                var currentSlider = BaseObject as Slider;
+                if (currentSlider != null)
+                {
+                    computeSliderCursorPosition(currentSlider);
+                    endCursorPosition = currentSlider.LazyEndPosition ?? endCursorPosition;
+                }
+
+                Vector2 v1 = lastCursorPosition - BaseObject.StackedPosition;
+                Vector2 v2 = nextObject.StackedPosition - endCursorPosition;
+
+                float dot = Vector2.Dot(v1, v2);
+                float det = v1.X * v2.Y - v1.Y * v2.X;
+
+                Angle = Math.Atan2(det, dot);
+            }
         }
 
         private void setTimingValues()

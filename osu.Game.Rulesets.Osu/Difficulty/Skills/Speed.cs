@@ -27,7 +27,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (deltaTime < min_speed_bonus)
                 speedBonus = 1 + Math.Pow((min_speed_bonus - deltaTime) / speed_balancing_factor, 2);
 
-            return speedBonus * (0.95 + Math.Pow(distance / SINGLE_SPACING_THRESHOLD, 4)) / current.StrainTime;
+            double angleBonus = 1.0;
+
+            if (current.Angle != null)
+            {
+                double angle = current.Angle.Value * 180 / Math.PI;
+
+                if (angle < 135)
+                    angleBonus = (135 - angle / 45) * 0.25 + 1.0;
+                else if (angle <= 90)
+                    angleBonus = 1.25;
+            }
+
+            return angleBonus * (0.95 + Math.Pow(distance / SINGLE_SPACING_THRESHOLD, 4)) / current.StrainTime;
         }
     }
 }
