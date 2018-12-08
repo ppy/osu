@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -11,6 +12,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : Skill
     {
+        private const double min_angle_bonus = 1.0;
+        private const double max_angle_bonus = 1.25;
+        private const double angle_bonus_begin = 3 * Math.PI / 4;
+        private const double pi_over_4 = Math.PI / 4;
+
         protected override double SkillMultiplier => 1400;
         protected override double StrainDecayBase => 0.3;
 
@@ -30,14 +36,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double angleBonus = 1.0;
 
             if (current.Angle != null)
-            {
-                double angle = current.Angle.Value * 180 / Math.PI;
-
-                if (angle < 135)
-                    angleBonus = (135 - angle / 45) * 0.25 + 1.0;
-                else if (angle <= 90)
-                    angleBonus = 1.25;
-            }
+                angleBonus = MathHelper.Clamp((angle_bonus_begin - current.Angle.Value) / pi_over_4 * 0.25 + 1.0, min_angle_bonus, max_angle_bonus);
 
             return angleBonus * (0.95 + Math.Pow(distance / SINGLE_SPACING_THRESHOLD, 4)) / current.StrainTime;
         }
