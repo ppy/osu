@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -11,28 +12,22 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : Skill
     {
+        private const double min_angle_bonus = 0;
+        private const double max_angle_bonus = 0.5;
+        private const double angle_bonus_begin = 5 * Math.PI / 12;
+        private const double pi_over_2 = Math.PI / 2;
+
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;
 
         protected override double StrainValueOf(OsuDifficultyHitObject current)
         {
-            double angleBonus = 1.0;
+            double angleBonus = 0;
 
             if (current.Angle != null)
-            {
-                double angle = current.Angle.Value * 180 / Math.PI;
+                angleBonus = MathHelper.Clamp((current.Angle.Value - angle_bonus_begin) / pi_over_2, min_angle_bonus, max_angle_bonus);
 
-                if (current.JumpDistance > SINGLE_SPACING_THRESHOLD)
-                {
-                    if (angle > 75)
-                        angleBonus = (angle / 45 - 75) / 2;
-                    else if (angle > 120)
-                        angleBonus = 0.5;
-                }
-            }
-
-            return angleBonus * (
-                       Math.Pow(current.JumpDistance - SINGLE_SPACING_THRESHOLD, 0.99)
+            return (angleBonus * Math.Pow(Math.Max(0, current.JumpDistance - SINGLE_SPACING_THRESHOLD), 0.99)
                        + Math.Pow(current.TravelDistance, 0.99)
                        + Math.Pow(current.JumpDistance, 0.99)
                    ) / current.StrainTime;
