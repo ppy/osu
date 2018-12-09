@@ -196,19 +196,7 @@ namespace osu.Game.Online.API
         /// <returns>true if we should remove this request from the queue.</returns>
         private bool handleRequest(APIRequest req)
         {
-            try
-            {
-                Logger.Log($@"Performing request {req}", LoggingTarget.Network);
-                req.Perform(this);
-
-                //we could still be in initialisation, at which point we don't want to say we're Online yet.
-                if (IsLoggedIn)
-                    State = APIState.Online;
-
-                failureCount = 0;
-                return true;
-            }
-            catch (WebException we)
+            bool handleWebException(WebException we)
             {
                 HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode
                                             ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
@@ -217,6 +205,7 @@ namespace osu.Game.Online.API
                 switch (we.Message)
                 {
                     case "Unauthorized":
+                    case "Forbidden":
                         statusCode = HttpStatusCode.Unauthorized;
                         break;
                 }
@@ -239,8 +228,39 @@ namespace osu.Game.Online.API
                         return true;
                 }
 
-                req.Fail(we);
                 return true;
+            }
+
+            try
+            {
+                Logger.Log($@"Performing request {req}", LoggingTarget.Network);
+                req.Failure += ex =>
+                {
+                    switch (ex)
+                    {
+                        case WebException we:
+                            handleWebException(we);
+                            break;
+                    }
+                };
+
+                req.Perform(this);
+
+                //we could still be in initialisation, at which point we don't want to say we're Online yet.
+                if (IsLoggedIn)
+                    State = APIState.Online;
+
+                failureCount = 0;
+                return true;
+            }
+            catch (WebException we)
+            {
+                var removeFromQueue = handleWebException(we);
+
+                if (removeFromQueue)
+                    req.Fail(we);
+
+                return removeFromQueue;
             }
             catch (Exception e)
             {
