@@ -200,7 +200,7 @@ namespace osu.Game.Overlays
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                 };
 
             public SettingsSectionsContainer()

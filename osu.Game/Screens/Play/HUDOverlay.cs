@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Play
                         Origin = Anchor.BottomRight,
                         Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
                         AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
+                        Direction = FlowDirection.Vertical,
                         Children = new Drawable[]
                         {
                             KeyCounter = CreateKeyCounter(adjustableClock as IFrameBasedClock),

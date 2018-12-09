@@ -124,7 +124,7 @@ namespace osu.Game.Users
                                         Origin = Anchor.BottomLeft,
                                         AutoSizeAxes = Axes.X,
                                         Height = 20f,
-                                        Direction = FillDirection.Horizontal,
+                                        Direction = FlowDirection.Horizontal,
                                         Spacing = new Vector2(5f, 0f),
                                         Children = new Drawable[]
                                         {

@@ -42,7 +42,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
+                Direction = FlowDirection.Horizontal,
                 Spacing = new Vector2(20),
                 Children = new[]
                 {
@@ -115,7 +115,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 {
                     AutoSizeAxes = Axes.Both,
                     Spacing = new Vector2(0, 10),
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Children = new Drawable[]
                     {
                         new Container

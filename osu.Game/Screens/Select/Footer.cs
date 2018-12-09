@@ -121,13 +121,13 @@ namespace osu.Game.Screens.Select
                     Position = new Vector2(TwoLayerButton.SIZE_EXTENDED.X + padding, 0),
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     Spacing = new Vector2(padding, 0),
                     Children = new Drawable[]
                     {
                         buttons = new FillFlowContainer<FooterButton>
                         {
-                            Direction = FillDirection.Horizontal,
+                            Direction = FlowDirection.Horizontal,
                             Spacing = new Vector2(0.2f, 0),
                             AutoSizeAxes = Axes.Both,
                         }

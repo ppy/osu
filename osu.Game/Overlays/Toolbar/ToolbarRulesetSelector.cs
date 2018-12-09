@@ -38,7 +38,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Padding = new MarginPadding { Left = padding, Right = padding },

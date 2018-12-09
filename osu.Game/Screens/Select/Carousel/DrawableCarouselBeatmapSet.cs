@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Select.Carousel
                 ),
                 new FillFlowContainer
                 {
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Padding = new MarginPadding { Top = 5, Left = 18, Right = 10, Bottom = 10 },
                     AutoSizeAxes = Axes.Both,
                     Children = new Drawable[]
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Select.Carousel
                         },
                         new FillFlowContainer
                         {
-                            Direction = FillDirection.Horizontal,
+                            Direction = FlowDirection.Horizontal,
                             AutoSizeAxes = Axes.Both,
                             Margin = new MarginPadding { Top = 5 },
                             Children = new Drawable[]
@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Select.Carousel
                     new FillFlowContainer
                     {
                         Depth = -1,
-                        Direction = FillDirection.Horizontal,
+                        Direction = FlowDirection.Horizontal,
                         RelativeSizeAxes = Axes.Both,
                         // This makes the gradient not be perfectly horizontal, but diagonal at a ~40° angle
                         Shear = new Vector2(0.8f, 0),

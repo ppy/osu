@@ -11,6 +11,8 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
     public class ScoreModsContainer : FlowContainer<ModIcon>
     {
+        protected override FlowDirection FlowDirection => FlowDirection.Horizontal;
+
         protected override IEnumerable<Vector2> ComputeLayoutPositions()
         {
             int count = FlowingChildren.Count();

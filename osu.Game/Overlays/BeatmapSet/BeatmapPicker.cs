@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Children = new Drawable[]
                     {
                         difficulties = new DifficultiesContainer
@@ -292,7 +292,7 @@ namespace osu.Game.Overlays.BeatmapSet
             public Statistic(FontAwesome icon)
             {
                 AutoSizeAxes = Axes.Both;
-                Direction = FillDirection.Horizontal;
+                Direction = FlowDirection.Horizontal;
                 Spacing = new Vector2(2f);
 
                 Children = new Drawable[]

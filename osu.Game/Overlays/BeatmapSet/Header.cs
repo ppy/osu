@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Child = new FillFlowContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Direction = FillDirection.Vertical,
+                                Direction = FlowDirection.Vertical,
                                 Children = new Drawable[]
                                 {
                                     new Container
@@ -159,7 +159,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                     },
                                     new FillFlowContainer
                                     {
-                                        Direction = FillDirection.Horizontal,
+                                        Direction = FlowDirection.Horizontal,
                                         AutoSizeAxes = Axes.Both,
                                         Children = new Drawable[]
                                         {
@@ -226,7 +226,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             Origin = Anchor.BottomRight,
                             AutoSizeAxes = Axes.Both,
                             Margin = new MarginPadding { Right = BeatmapSetOverlay.X_PADDING },
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                             Spacing = new Vector2(10),
                             Children = new Drawable[]
                             {

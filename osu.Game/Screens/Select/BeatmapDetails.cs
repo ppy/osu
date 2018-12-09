@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Select
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Horizontal,
+                            Direction = FlowDirection.Horizontal,
                             Children = new Drawable[]
                             {
                                 statsFlow = new FillFlowContainer

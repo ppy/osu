@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Children = new Drawable[]
                     {
                         new OsuSpriteText

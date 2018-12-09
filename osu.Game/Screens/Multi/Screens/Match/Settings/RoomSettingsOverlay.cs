@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                         {
                                             AutoSizeAxes = Axes.Y,
                                             RelativeSizeAxes = Axes.X,
-                                            Direction = FillDirection.Vertical,
+                                            Direction = FlowDirection.Vertical,
                                             Spacing = new Vector2(7),
                                             Children = new Drawable[]
                                             {
@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
             {
                 RelativeSizeAxes = Axes.Both;
                 Width = 0.5f;
-                Direction = FillDirection.Vertical;
+                Direction = FlowDirection.Vertical;
                 Spacing = new Vector2(field_padding);
             }
         }
@@ -231,7 +231,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Spacing = new Vector2(5),
                     Children = new Drawable[]
                     {

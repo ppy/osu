@@ -61,7 +61,7 @@ namespace osu.Game.Overlays.Direct
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
+                            Direction = FlowDirection.Horizontal,
                             LayoutEasing = Easing.OutQuint,
                             LayoutDuration = transition_duration,
                             Spacing = new Vector2(10, 0),
@@ -70,13 +70,13 @@ namespace osu.Game.Overlays.Direct
                                 new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Vertical,
+                                    Direction = FlowDirection.Vertical,
                                     Children = new Drawable[]
                                     {
                                         new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
+                                            Direction = FlowDirection.Horizontal,
                                             Children = new Drawable[]
                                             {
                                                 playButton = new PlayButton(SetInfo)
@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.Direct
                                                 new FillFlowContainer
                                                 {
                                                     AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Vertical,
+                                                    Direction = FlowDirection.Vertical,
                                                     Children = new Drawable[]
                                                     {
                                                         new OsuSpriteText
@@ -123,7 +123,7 @@ namespace osu.Game.Overlays.Direct
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
+                            Direction = FlowDirection.Horizontal,
                             Children = new Drawable[]
                             {
                                 new Container
@@ -142,7 +142,7 @@ namespace osu.Game.Overlays.Direct
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Vertical,
+                                    Direction = FlowDirection.Vertical,
                                     Children = new Drawable[]
                                     {
                                         new Statistic(FontAwesome.fa_play_circle, SetInfo.OnlineInfo?.PlayCount ?? 0)
@@ -155,7 +155,7 @@ namespace osu.Game.Overlays.Direct
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
                                             AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
+                                            Direction = FlowDirection.Horizontal,
                                             Children = new[]
                                             {
                                                 new OsuSpriteText

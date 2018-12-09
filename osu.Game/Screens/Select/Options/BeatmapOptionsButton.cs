@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Select.Options
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Children = new Drawable[]
                     {
                         iconText = new SpriteIcon

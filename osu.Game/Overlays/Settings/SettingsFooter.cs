@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.Settings
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
+            Direction = FlowDirection.Vertical;
             Padding = new MarginPadding { Top = 20, Bottom = 30 };
 
             var modes = new List<Drawable>();
@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Direction = FillDirection.Full,
+                    Direction = FlowDirection.Full,
                     AutoSizeAxes = Axes.Both,
                     Children = modes,
                     Spacing = new Vector2(5),

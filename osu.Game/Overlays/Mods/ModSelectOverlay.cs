@@ -266,7 +266,7 @@ namespace osu.Game.Overlays.Mods
                                         Anchor = Anchor.Centre,
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Vertical,
+                                        Direction = FlowDirection.Vertical,
                                         Width = content_width,
                                         Padding = new MarginPadding
                                         {
@@ -358,7 +358,7 @@ namespace osu.Game.Overlays.Mods
                                         AutoSizeAxes = Axes.Y,
                                         RelativeSizeAxes = Axes.X,
                                         Width = content_width,
-                                        Direction = FillDirection.Horizontal,
+                                        Direction = FlowDirection.Horizontal,
                                         Padding = new MarginPadding
                                         {
                                             Vertical = 15,

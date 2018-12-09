@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Play
 
         public KeyCounterCollection()
         {
-            Direction = FillDirection.Horizontal;
+            Direction = FlowDirection.Horizontal;
             AutoSizeAxes = Axes.Both;
         }
 

@@ -168,7 +168,7 @@ namespace osu.Game.Screens.Multi.Components
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Vertical,
+                                        Direction = FlowDirection.Vertical,
                                         Spacing = new Vector2(5f),
                                         Children = new Drawable[]
                                         {
@@ -185,7 +185,7 @@ namespace osu.Game.Screens.Multi.Components
                                         Origin = Anchor.BottomLeft,
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Direction = FillDirection.Vertical,
+                                        Direction = FlowDirection.Vertical,
                                         Children = new Drawable[]
                                         {
                                             status = new OsuSpriteText

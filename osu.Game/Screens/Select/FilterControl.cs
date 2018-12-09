@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Select
                         {
                             Anchor = Anchor.BottomRight,
                             Origin = Anchor.BottomRight,
-                            Direction = FillDirection.Horizontal,
+                            Direction = FlowDirection.Horizontal,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Children = new Drawable[]

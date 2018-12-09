@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
             ItemsPerPage = 5;
 
-            ItemsContainer.Direction = FillDirection.Vertical;
+            ItemsContainer.Direction = FlowDirection.Vertical;
         }
 
         protected override void ShowMore()

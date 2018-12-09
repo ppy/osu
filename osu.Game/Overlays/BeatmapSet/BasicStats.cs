@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Horizontal,
+                Direction = FlowDirection.Horizontal,
                 Children = new[]
                 {
                     length = new Statistic(FontAwesome.fa_clock_o, "Length") { Width = 0.25f },

@@ -37,7 +37,7 @@ namespace osu.Game.Overlays.Profile.Sections
 
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
+            Direction = FlowDirection.Vertical;
 
             Children = new Drawable[]
             {

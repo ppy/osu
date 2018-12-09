@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
                                 AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Vertical,
+                                Direction = FlowDirection.Vertical,
                                 Children = new Drawable[]
                                 {
                                     timingPointCount = new InfoString(@"Timing points amount"),
@@ -195,7 +195,7 @@ namespace osu.Game.Tests.Visual
             public InfoString(string header)
             {
                 AutoSizeAxes = Axes.Both;
-                Direction = FillDirection.Horizontal;
+                Direction = FlowDirection.Horizontal;
                 Add(new OsuSpriteText { Text = header + @": ", TextSize = text_size });
                 Add(valueText = new OsuSpriteText { TextSize = text_size });
                 Margin = new MarginPadding(margin);

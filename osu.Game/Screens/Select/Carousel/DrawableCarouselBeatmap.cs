@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Select.Carousel
                 new FillFlowContainer
                 {
                     Padding = new MarginPadding(5),
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -87,13 +87,13 @@ namespace osu.Game.Screens.Select.Carousel
                         new FillFlowContainer
                         {
                             Padding = new MarginPadding { Left = 5 },
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                             AutoSizeAxes = Axes.Both,
                             Children = new Drawable[]
                             {
                                 new FillFlowContainer
                                 {
-                                    Direction = FillDirection.Horizontal,
+                                    Direction = FlowDirection.Horizontal,
                                     Spacing = new Vector2(4, 0),
                                     AutoSizeAxes = Axes.Both,
                                     Children = new[]

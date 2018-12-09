@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Play
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Spacing = new Vector2(0, 50),
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                             Spacing = new Vector2(0, 20),
                             Children = new Drawable[]
                             {
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Play
                             Anchor = Anchor.TopCentre,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                             Masking = true,
                             EdgeEffect = new EdgeEffectParameters
                             {

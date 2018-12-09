@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Multi
                             Origin = Anchor.BottomLeft,
                             Position = new Vector2(-35f, 5f),
                             AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
+                            Direction = FlowDirection.Horizontal,
                             Spacing = new Vector2(10f, 0f),
                             Children = new Drawable[]
                             {
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Multi
                                 new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
+                                    Direction = FlowDirection.Horizontal,
                                     Children = new[]
                                     {
                                         new OsuSpriteText

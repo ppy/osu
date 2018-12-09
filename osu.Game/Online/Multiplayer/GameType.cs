@@ -59,7 +59,7 @@ namespace osu.Game.Online.Multiplayer
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
+                Direction = FlowDirection.Horizontal,
                 Spacing = new Vector2(2f),
                 Children = new[]
                 {
@@ -92,7 +92,7 @@ namespace osu.Game.Online.Multiplayer
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
+                Direction = FlowDirection.Vertical,
                 Spacing = new Vector2(2f),
                 Children = new[]
                 {

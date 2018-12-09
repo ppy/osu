@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.Break
             AutoSizeAxes = Axes.Both;
             Child = new FillFlowContainer
             {
-                Direction = FillDirection.Vertical,
+                Direction = FlowDirection.Vertical,
                 Spacing = new Vector2(5),
                 Children = new Drawable[]
                 {
@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Play.Break
                         AutoSizeAxes = Axes.Both,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
-                        Direction = FillDirection.Vertical,
+                        Direction = FlowDirection.Vertical,
                         Children = new Drawable[]
                         {
                             AccuracyDisplay = new PercentageBreakInfoLine("Accuracy"),

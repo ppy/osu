@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 direction = value;
-                base.Direction = direction.HasFlag(BarDirection.Horizontal) ? FillDirection.Vertical : FillDirection.Horizontal;
+                base.Direction = direction.HasFlag(BarDirection.Horizontal) ? FlowDirection.Vertical : FlowDirection.Horizontal;
                 foreach (var bar in Children)
                 {
                     bar.Size = direction.HasFlag(BarDirection.Horizontal) ? new Vector2(1, 1.0f / Children.Count) : new Vector2(1.0f / Children.Count, 1);

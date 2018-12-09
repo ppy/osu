@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 },
                 letterboxSettings = new FillFlowContainer
                 {
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     AutoSizeDuration = transition_duration,

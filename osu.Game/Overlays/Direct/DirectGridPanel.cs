@@ -59,7 +59,7 @@ namespace osu.Game.Overlays.Direct
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.TopLeft,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(0f, vertical_padding),
@@ -69,7 +69,7 @@ namespace osu.Game.Overlays.Direct
                         {
                             AutoSizeAxes = Axes.Both,
                             Padding = new MarginPadding { Left = horizontal_padding, Right = horizontal_padding },
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                             Children = new[]
                             {
                                 new OsuSpriteText
@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Direct
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
+                                    Direction = FlowDirection.Vertical,
                                     Padding = new MarginPadding
                                     {
                                         Top = vertical_padding,
@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.Direct
                                         new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
+                                            Direction = FlowDirection.Horizontal,
                                             Children = new[]
                                             {
                                                 new OsuSpriteText
@@ -182,7 +182,7 @@ namespace osu.Game.Overlays.Direct
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Margin = new MarginPadding { Top = vertical_padding, Right = vertical_padding },
                     Children = new[]
                     {

@@ -71,7 +71,7 @@ namespace osu.Game.Graphics.UserInterface
                 stars = new FillFlowContainer<Star>
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     Spacing = new Vector2(star_spacing),
                     ChildrenEnumerable = Enumerable.Range(0, StarCount).Select(i => new Star { Alpha = minStarAlpha })
                 }

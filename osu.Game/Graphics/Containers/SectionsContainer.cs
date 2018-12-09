@@ -95,7 +95,7 @@ namespace osu.Game.Graphics.Containers
         protected virtual FlowContainer<T> CreateScrollContentContainer()
             => new FillFlowContainer<T>
             {
-                Direction = FillDirection.Vertical,
+                Direction = FlowDirection.Vertical,
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,
             };

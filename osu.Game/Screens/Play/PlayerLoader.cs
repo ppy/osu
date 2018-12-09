@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
+                Direction = FlowDirection.Vertical,
                 Spacing = new Vector2(0, 20),
                 Margin = new MarginPadding(25),
                 Children = new PlayerSettingsGroup[]
@@ -302,7 +302,7 @@ namespace osu.Game.Screens.Play
                         AutoSizeAxes = Axes.Both,
                         Origin = Anchor.TopCentre,
                         Anchor = Anchor.TopCentre,
-                        Direction = FillDirection.Vertical,
+                        Direction = FlowDirection.Vertical,
                         Children = new Drawable[]
                         {
                             new OsuSpriteText

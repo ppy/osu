@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
+                                    Direction = FlowDirection.Vertical,
                                     Spacing = new Vector2(10 - DrawableRoom.SELECTION_BORDER_WIDTH * 2),
                                 },
                             },

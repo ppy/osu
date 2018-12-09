@@ -53,7 +53,7 @@ namespace osu.Game.Overlays
                     {
                         sections = new FillFlowContainer<NotificationSection>
                         {
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
                             Children = new[]

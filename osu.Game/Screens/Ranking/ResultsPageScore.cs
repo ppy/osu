@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Children = new Drawable[]
                     {
                         new UserHeader(Score.User)
@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Ranking
                             AutoSizeAxes = Axes.Both,
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Direction = FillDirection.Horizontal,
+                            Direction = FlowDirection.Horizontal,
                             LayoutDuration = 200,
                             LayoutEasing = Easing.OutQuint
                         }
@@ -294,7 +294,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     new FillFlowContainer
                     {
-                        Direction = FillDirection.Vertical,
+                        Direction = FlowDirection.Vertical,
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
                         Children = new Drawable[]

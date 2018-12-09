@@ -91,7 +91,7 @@ namespace osu.Game.Graphics.UserInterface
                     AutoSizeAxes = Axes.Both,
                     Margin = new MarginPadding { Top = 5, Bottom = 5, },
                     Spacing = new Vector2(5f, 0f),
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     Children = new Drawable[]
                     {
                         text = new OsuSpriteText

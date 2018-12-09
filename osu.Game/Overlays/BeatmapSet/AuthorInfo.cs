@@ -94,7 +94,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 fields = new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Padding = new MarginPadding { Left = height + 5 },
                 },
             };
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.BeatmapSet
             public Field(string first, string second, string secondFont)
             {
                 AutoSizeAxes = Axes.Both;
-                Direction = FillDirection.Horizontal;
+                Direction = FlowDirection.Horizontal;
 
                 Children = new[]
                 {

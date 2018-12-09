@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Multi.Components
         public ParticipantCount()
         {
             AutoSizeAxes = Axes.Both;
-            Direction = FillDirection.Horizontal;
+            Direction = FlowDirection.Horizontal;
             LayoutDuration = transition_duration;
 
             Children = new[]

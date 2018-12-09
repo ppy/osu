@@ -30,7 +30,7 @@ namespace osu.Game.Tests.Visual
                 Origin = Anchor.Centre,
                 AutoSizeAxes = Axes.Y,
                 Width = 580f,
-                Direction = FillDirection.Vertical,
+                Direction = FlowDirection.Vertical,
                 Children = new Drawable[]
                 {
                     first = new DrawableRoom(new Room

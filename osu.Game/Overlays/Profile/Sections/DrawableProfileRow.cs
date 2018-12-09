@@ -77,7 +77,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     Children = new[]
                     {
                         CreateLeftVisual(),
@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Profile.Sections
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Margin = new MarginPadding { Left = 10 },
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                         },
                     }
                 },
@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     AutoSizeAxes = Axes.Y,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                 },
             });
 

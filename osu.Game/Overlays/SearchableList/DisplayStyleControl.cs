@@ -27,14 +27,14 @@ namespace osu.Game.Overlays.SearchableList
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     Spacing = new Vector2(10f, 0f),
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
                             Spacing = new Vector2(5f, 0f),
-                            Direction = FillDirection.Horizontal,
+                            Direction = FlowDirection.Horizontal,
                             Children = new[]
                             {
                                 new DisplayStyleToggleButton(FontAwesome.fa_th_large, PanelDisplayStyle.Grid, DisplayStyle),

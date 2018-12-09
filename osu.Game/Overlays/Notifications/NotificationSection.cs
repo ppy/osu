@@ -64,7 +64,7 @@ namespace osu.Game.Overlays.Notifications
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
+            Direction = FlowDirection.Vertical;
 
             Padding = new MarginPadding
             {

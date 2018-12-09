@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Settings
                 {
                     Top = header_size + header_margin
                 },
-                Direction = FillDirection.Vertical,
+                Direction = FlowDirection.Vertical,
                 Spacing = new Vector2(0, 30),
                 AutoSizeAxes = Axes.Y,
                 RelativeSizeAxes = Axes.X,

@@ -87,7 +87,7 @@ namespace osu.Game.Rulesets.Mania.UI
                                     Name = "Columns",
                                     RelativeSizeAxes = Axes.Y,
                                     AutoSizeAxes = Axes.X,
-                                    Direction = FillDirection.Horizontal,
+                                    Direction = FlowDirection.Horizontal,
                                     Padding = new MarginPadding { Left = COLUMN_SPACING, Right = COLUMN_SPACING },
                                     Spacing = new Vector2(COLUMN_SPACING, 0)
                                 },

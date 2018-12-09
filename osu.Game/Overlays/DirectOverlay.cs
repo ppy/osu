@@ -98,7 +98,7 @@ namespace osu.Game.Overlays
                 resultCountsContainer = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     Margin = new MarginPadding { Top = 5 },
                     Children = new Drawable[]
                     {

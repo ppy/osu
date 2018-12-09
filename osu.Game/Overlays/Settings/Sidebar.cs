@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Settings
                             Anchor = Anchor.CentreLeft,
                             AutoSizeAxes = Axes.Y,
                             RelativeSizeAxes = Axes.X,
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                         }
                     }
                 },

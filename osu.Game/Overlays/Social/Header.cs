@@ -26,7 +26,7 @@ namespace osu.Game.Overlays.Social
             return new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
+                Direction = FlowDirection.Horizontal,
                 Children = new[]
                 {
                     new OsuSpriteText

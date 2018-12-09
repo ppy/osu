@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Profile.Header
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Direction = FillDirection.Vertical,
+                        Direction = FlowDirection.Vertical,
                         Padding = outer_padding,
                         Width = DrawableBadge.DRAWABLE_BADGE_SIZE.X + outer_padding.TotalHorizontal,
                         AutoSizeAxes = Axes.Y,
@@ -66,7 +66,7 @@ namespace osu.Game.Overlays.Profile.Header
                                 AutoSizeAxes = Axes.Both,
                                 Child = badgeFlowContainer = new FillFlowContainer
                                 {
-                                    Direction = FillDirection.Horizontal,
+                                    Direction = FlowDirection.Horizontal,
                                     AutoSizeAxes = Axes.Both,
                                 }
                             }
@@ -128,7 +128,7 @@ namespace osu.Game.Overlays.Profile.Header
         {
             badgeFlowContainer.ClearTransforms();
             badgeFlowContainer.X = 0;
-            badgeFlowContainer.Direction = FillDirection.Full;
+            badgeFlowContainer.Direction = FlowDirection.Full;
             outerBadgeContainer.AutoSizeAxes = Axes.Both;
 
             badgeFlowContainer.MaximumSize = new Vector2(ChildSize.X, float.MaxValue);
@@ -137,7 +137,7 @@ namespace osu.Game.Overlays.Profile.Header
         private void onOuterHoverLost()
         {
             badgeFlowContainer.X = -DrawableBadge.DRAWABLE_BADGE_SIZE.X * visibleBadge;
-            badgeFlowContainer.Direction = FillDirection.Horizontal;
+            badgeFlowContainer.Direction = FlowDirection.Horizontal;
             outerBadgeContainer.AutoSizeAxes = Axes.Y;
             outerBadgeContainer.Width = DrawableBadge.DRAWABLE_BADGE_SIZE.X + outer_padding.TotalHorizontal;
         }

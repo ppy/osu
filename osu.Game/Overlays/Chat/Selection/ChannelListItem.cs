@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.Chat.Selection
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     Children = new Drawable[]
                     {
                         new Container
@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.Chat.Selection
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
+                            Direction = FlowDirection.Horizontal,
                             Margin = new MarginPadding { Left = width_padding },
                             Spacing = new Vector2(3f, 0f),
                             Children = new Drawable[]

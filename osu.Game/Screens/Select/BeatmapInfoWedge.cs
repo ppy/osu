@@ -196,7 +196,7 @@ namespace osu.Game.Screens.Select
                         Name = "Topleft-aligned metadata",
                         Anchor = Anchor.TopLeft,
                         Origin = Anchor.TopLeft,
-                        Direction = FillDirection.Vertical,
+                        Direction = FlowDirection.Vertical,
                         Margin = new MarginPadding { Top = 10, Left = 25, Right = 10, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -214,7 +214,7 @@ namespace osu.Game.Screens.Select
                         Name = "Topright-aligned metadata",
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
-                        Direction = FillDirection.Vertical,
+                        Direction = FlowDirection.Vertical,
                         Margin = new MarginPadding { Top = 14, Left = 10, Right = 18, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -233,7 +233,7 @@ namespace osu.Game.Screens.Select
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.TopLeft,
                         Y = -22,
-                        Direction = FillDirection.Vertical,
+                        Direction = FlowDirection.Vertical,
                         Margin = new MarginPadding { Top = 15, Left = 25, Right = 10, Bottom = 20 },
                         AutoSizeAxes = Axes.Both,
                         Children = new Drawable[]
@@ -251,7 +251,7 @@ namespace osu.Game.Screens.Select
                             MapperContainer = new FillFlowContainer
                             {
                                 Margin = new MarginPadding { Top = 10 },
-                                Direction = FillDirection.Horizontal,
+                                Direction = FlowDirection.Horizontal,
                                 AutoSizeAxes = Axes.Both,
                                 Children = getMapper(metadata)
                             },

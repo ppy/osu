@@ -27,7 +27,7 @@ namespace osu.Game.Tests.Visual
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Full,
+                    Direction = FlowDirection.Full,
                 },
             });
 

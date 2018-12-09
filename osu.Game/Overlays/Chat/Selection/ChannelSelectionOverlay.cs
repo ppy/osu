@@ -73,7 +73,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
+                                    Direction = FlowDirection.Vertical,
                                     LayoutDuration = 200,
                                     LayoutEasing = Easing.OutQuint,
                                     Spacing = new Vector2(0f, 20f),
@@ -97,7 +97,7 @@ namespace osu.Game.Overlays.Chat.Selection
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                             Spacing = new Vector2(0f, 10f),
                             Padding = new MarginPadding { Top = 10f, Bottom = 10f, Left = WIDTH_PADDING, Right = WIDTH_PADDING },
                             Children = new Drawable[]

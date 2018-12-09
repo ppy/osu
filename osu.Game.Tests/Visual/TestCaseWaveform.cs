@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual
             Child = flow = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
+                Direction = FlowDirection.Vertical,
                 Spacing = new Vector2(0, 10),
             };
 

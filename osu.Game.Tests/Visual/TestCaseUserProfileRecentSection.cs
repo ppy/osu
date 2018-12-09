@@ -43,7 +43,7 @@ namespace osu.Game.Tests.Visual
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
+                        Direction = FlowDirection.Vertical,
                         ChildrenEnumerable = createDummyActivities().Select(a => new DrawableRecentActivity(a))
                     },
                 }

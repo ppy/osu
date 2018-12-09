@@ -98,7 +98,7 @@ namespace osu.Game.Overlays.BeatmapSet
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Direction = FillDirection.Vertical,
+                                Direction = FlowDirection.Vertical,
                                 LayoutDuration = transition_duration,
                                 Children = new[]
                                 {

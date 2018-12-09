@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Play.HUD
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
+                Direction = FlowDirection.Vertical,
                 Spacing = new Vector2(0, 20),
                 Margin = new MarginPadding { Top = 100, Right = 10 },
                 Children = new PlayerSettingsGroup[]

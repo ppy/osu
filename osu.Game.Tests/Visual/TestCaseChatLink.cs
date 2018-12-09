@@ -45,7 +45,7 @@ namespace osu.Game.Tests.Visual
                 Padding = new MarginPadding { Left = 20, Right = 20 },
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
+                Direction = FlowDirection.Vertical,
             });
         }
 

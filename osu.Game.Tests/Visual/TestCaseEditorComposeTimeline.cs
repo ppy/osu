@@ -39,7 +39,7 @@ namespace osu.Game.Tests.Visual
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {

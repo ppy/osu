@@ -260,7 +260,7 @@ namespace osu.Game.Screens.Play
                                 Y = 0.4f,
                                 AutoSizeAxes = Axes.Both,
                                 Origin = Anchor.Centre,
-                                Direction = FillDirection.Horizontal,
+                                Direction = FlowDirection.Horizontal,
                                 Children = new[]
                                 {
                                     new SpriteIcon { Size = new Vector2(15), Shadow = true, Icon = FontAwesome.fa_chevron_right },

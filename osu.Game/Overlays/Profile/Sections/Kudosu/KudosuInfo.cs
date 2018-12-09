@@ -91,14 +91,14 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 {
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Spacing = new Vector2(0, 5),
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Horizontal,
+                            Direction = FlowDirection.Horizontal,
                             Spacing = new Vector2(5, 0),
                             Children = new Drawable[]
                             {

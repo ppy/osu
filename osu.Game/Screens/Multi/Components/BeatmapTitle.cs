@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Multi.Components
         public BeatmapTitle()
         {
             AutoSizeAxes = Axes.Both;
-            Direction = FillDirection.Horizontal;
+            Direction = FlowDirection.Horizontal;
 
             Children = new[]
             {

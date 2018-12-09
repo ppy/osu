@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.MedalSplash
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Width = 0.6f,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Spacing = new Vector2(0f, 5f),
                     Children = new Drawable[]
                     {

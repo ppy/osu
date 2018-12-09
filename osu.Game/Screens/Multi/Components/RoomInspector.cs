@@ -94,7 +94,7 @@ namespace osu.Game.Screens.Multi.Components
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Children = new Drawable[]
                     {
                         new Container
@@ -154,7 +154,7 @@ namespace osu.Game.Screens.Multi.Components
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
+                                    Direction = FlowDirection.Vertical,
                                     LayoutDuration = transition_duration,
                                     Padding = contentPadding,
                                     Spacing = new Vector2(0f, 5f),

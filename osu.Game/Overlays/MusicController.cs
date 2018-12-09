@@ -134,7 +134,7 @@ namespace osu.Game.Overlays
                                         new FillFlowContainer<IconButton>
                                         {
                                             AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
+                                            Direction = FlowDirection.Horizontal,
                                             Spacing = new Vector2(5),
                                             Origin = Anchor.Centre,
                                             Anchor = Anchor.Centre,

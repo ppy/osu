@@ -226,7 +226,7 @@ namespace osu.Game.Overlays.Direct
                 Anchor = Anchor.TopRight;
                 Origin = Anchor.TopRight;
                 AutoSizeAxes = Axes.Both;
-                Direction = FillDirection.Horizontal;
+                Direction = FlowDirection.Horizontal;
                 Spacing = new Vector2(5f, 0f);
 
                 Children = new Drawable[]

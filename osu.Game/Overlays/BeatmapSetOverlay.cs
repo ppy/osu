@@ -90,7 +90,7 @@ namespace osu.Game.Overlays
                     {
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Direction = FillDirection.Vertical,
+                        Direction = FlowDirection.Vertical,
                         Children = new Drawable[]
                         {
                             header = new Header(),

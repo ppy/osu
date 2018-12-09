@@ -40,7 +40,7 @@ namespace osu.Game.Overlays.Toolbar
                 new ToolbarBackground(),
                 new FillFlowContainer
                 {
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]
@@ -57,7 +57,7 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     RelativeSizeAxes = Axes.Y,
                     AutoSizeAxes = Axes.X,
                     Children = new Drawable[]

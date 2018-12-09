@@ -91,7 +91,7 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 Flow = new FillFlowContainer
                 {
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     Spacing = new Vector2(5),
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
@@ -116,7 +116,7 @@ namespace osu.Game.Overlays.Toolbar
                 },
                 tooltipContainer = new FillFlowContainer
                 {
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     RelativeSizeAxes = Axes.Both, //stops us being considered in parent's autosize
                     Anchor = TooltipAnchor.HasFlag(Anchor.x0) ? Anchor.BottomLeft : Anchor.BottomRight,
                     Origin = TooltipAnchor,

@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                             Origin = Anchor.BottomLeft,
                                             Anchor = Anchor.BottomLeft,
                                             AutoSizeAxes = Axes.Both,
-                                            Direction = FillDirection.Horizontal,
+                                            Direction = FlowDirection.Horizontal,
                                             Spacing = new Vector2(10f, 0f),
                                             Children = new Drawable[]
                                             {
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Origin = Anchor.BottomLeft,
                                                     Anchor = Anchor.BottomLeft,
                                                     AutoSizeAxes = Axes.Both,
-                                                    Direction = FillDirection.Horizontal,
+                                                    Direction = FlowDirection.Horizontal,
                                                     Spacing = new Vector2(10f, 0f),
                                                     Margin = new MarginPadding { Left = edge_margin },
                                                     Children = new Drawable[]
@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     AutoSizeAxes = Axes.Both,
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
-                                    Direction = FillDirection.Horizontal,
+                                    Direction = FlowDirection.Horizontal,
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
@@ -204,7 +204,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     Anchor = Anchor.BottomRight,
                                     Origin = Anchor.BottomRight,
                                     AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Horizontal,
+                                    Direction = FlowDirection.Horizontal,
                                     ChildrenEnumerable = Score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
                                 },
                             },
@@ -330,7 +330,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 Child = content = new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     Children = new Drawable[]
                     {
                         new Container

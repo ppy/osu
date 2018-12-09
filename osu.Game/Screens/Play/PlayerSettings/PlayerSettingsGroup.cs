@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 },
                 new FillFlowContainer
                 {
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Children = new Drawable[]
@@ -114,7 +114,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                             Name = @"Content",
                             Origin = Anchor.TopCentre,
                             Anchor = Anchor.TopCentre,
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeDuration = transition_duration,
                             AutoSizeEasing = Easing.OutQuint,

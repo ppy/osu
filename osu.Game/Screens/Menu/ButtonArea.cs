@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Menu
                     buttonAreaBackground = new ButtonAreaBackground(),
                     Flow = new FlowContainerWithOrigin
                     {
-                        Direction = FillDirection.Horizontal,
+                        Direction = FlowDirection.Horizontal,
                         Spacing = new Vector2(-ButtonSystem.WEDGE_WIDTH, 0),
                         Anchor = Anchor.Centre,
                         AutoSizeAxes = Axes.Both,

@@ -80,7 +80,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override TabFillFlowContainer CreateTabFlow() => new OsuTabFillFlowContainer
         {
-            Direction = FillDirection.Full,
+            Direction = FlowDirection.Full,
             RelativeSizeAxes = Axes.Both,
             Depth = -1,
             Masking = true

@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            Direction = FillDirection.Vertical;
+            Direction = FlowDirection.Vertical;
             Spacing = new Vector2(0f, 5f);
         }
 
@@ -111,7 +111,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
                             Padding = new MarginPadding { Left = 20, Right = 20 },
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                             Spacing = new Vector2(0f, 10f),
                             Children = new Drawable[]
                             {
@@ -199,7 +199,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             private void load(APIAccess api, OsuConfigManager config)
             {
                 this.api = api;
-                Direction = FillDirection.Vertical;
+                Direction = FlowDirection.Vertical;
                 Spacing = new Vector2(0, 5);
                 AutoSizeAxes = Axes.Y;
                 RelativeSizeAxes = Axes.X;

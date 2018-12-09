@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.SearchableList
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
                                     Padding = new MarginPadding { Horizontal = WIDTH_PADDING, Bottom = 50 },
-                                    Direction = FillDirection.Vertical,
+                                    Direction = FlowDirection.Vertical,
                                 },
                             },
                         },
@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.SearchableList
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Children = new Drawable[]
                     {
                         Header = CreateHeader(),

@@ -107,7 +107,7 @@ namespace osu.Game.Screens
                             AutoSizeAxes = Axes.Both,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                             Children = new Drawable[]
                             {
                                 new SpriteIcon
@@ -152,7 +152,7 @@ namespace osu.Game.Screens
                 },
                 childModeButtons = new FillFlowContainer
                 {
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Anchor = Anchor.TopRight,
                     Origin = Anchor.TopRight,
                     RelativeSizeAxes = Axes.Y,

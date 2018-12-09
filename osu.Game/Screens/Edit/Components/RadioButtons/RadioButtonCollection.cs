@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Vertical,
+                Direction = FlowDirection.Vertical,
                 Spacing = new Vector2(0, 5)
             };
         }

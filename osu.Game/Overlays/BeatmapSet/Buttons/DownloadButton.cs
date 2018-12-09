@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         Anchor = Anchor.CentreLeft,
                         Origin = Anchor.CentreLeft,
                         AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
+                        Direction = FlowDirection.Vertical,
                         Children = new[]
                         {
                             new OsuSpriteText

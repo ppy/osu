@@ -156,7 +156,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             Origin = Anchor.BottomLeft,
                             AutoSizeAxes = Axes.Both,
                             Position = new Vector2(height / 2, height / 4),
-                            Direction = FillDirection.Horizontal,
+                            Direction = FlowDirection.Horizontal,
                             Spacing = new Vector2(15, 0),
                             Children = new[]
                             {
@@ -216,7 +216,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             public InfoColumn(string header)
             {
                 AutoSizeAxes = Axes.Both;
-                Direction = FillDirection.Vertical;
+                Direction = FlowDirection.Vertical;
                 Spacing = new Vector2(0, 3);
                 Children = new Drawable[]
                 {

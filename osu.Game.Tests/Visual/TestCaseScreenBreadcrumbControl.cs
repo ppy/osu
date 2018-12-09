@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {
@@ -103,7 +103,7 @@ namespace osu.Game.Tests.Visual
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {

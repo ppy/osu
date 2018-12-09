@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
         {
             ItemsPerPage = 5;
 
-            ItemsContainer.Direction = FillDirection.Vertical;
+            ItemsContainer.Direction = FlowDirection.Vertical;
         }
 
         protected override void ShowMore()

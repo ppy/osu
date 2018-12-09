@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             {
                 RelativeSizeAxes = Axes.X,
                 AutoSizeAxes = Axes.Y,
-                Direction = FillDirection.Horizontal,
+                Direction = FlowDirection.Horizontal,
                 Children = new Drawable[]
                 {
                     new OsuSpriteText
@@ -70,7 +70,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Horizontal,
+                Direction = FlowDirection.Horizontal,
                 Children = new[]
                 {
                     new OsuSpriteText

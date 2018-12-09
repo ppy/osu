@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Children = new Drawable[]
                     {
                         successRateLabel = new OsuSpriteText

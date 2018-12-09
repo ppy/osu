@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                 new FillFlowContainer
                                 {
                                     AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Vertical,
+                                    Direction = FlowDirection.Vertical,
                                     Children = new Drawable[]
                                     {
                                         name = new OsuSpriteText

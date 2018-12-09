@@ -88,14 +88,14 @@ namespace osu.Game.Overlays
                             Anchor = Anchor.BottomCentre,
                             Origin = Anchor.BottomCentre,
                             AutoSizeAxes = Axes.Both,
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                             Children = new Drawable[]
                             {
                                 optionLights = new FillFlowContainer<OptionLight>
                                 {
                                     Padding = new MarginPadding { Top = 20, Bottom = 5 },
                                     Spacing = new Vector2(5, 0),
-                                    Direction = FillDirection.Horizontal,
+                                    Direction = FlowDirection.Horizontal,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
                                     AutoSizeAxes = Axes.Both

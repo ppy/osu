@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
                                         AutoSizeAxes = Axes.Y,
                                         Width = 160,
                                         Padding = new MarginPadding { Horizontal = 15 },
-                                        Direction = FillDirection.Vertical,
+                                        Direction = FlowDirection.Vertical,
                                         Spacing = new Vector2(0, 4),
                                         Children = new[]
                                         {

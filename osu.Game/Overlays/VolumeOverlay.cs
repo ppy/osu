@@ -48,7 +48,7 @@ namespace osu.Game.Overlays
                 },
                 new FillFlowContainer
                 {
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     AutoSizeAxes = Axes.Both,
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,

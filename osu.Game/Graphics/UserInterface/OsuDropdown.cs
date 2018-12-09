@@ -170,7 +170,7 @@ namespace osu.Game.Graphics.UserInterface
                     {
                         RelativeSizeAxes = Axes.X;
                         AutoSizeAxes = Axes.Y;
-                        Direction = FillDirection.Horizontal;
+                        Direction = FlowDirection.Horizontal;
 
                         Children = new Drawable[]
                         {

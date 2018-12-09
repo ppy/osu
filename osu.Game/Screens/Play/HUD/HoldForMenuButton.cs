@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play.HUD
 
         public HoldForMenuButton()
         {
-            Direction = FillDirection.Horizontal;
+            Direction = FlowDirection.Horizontal;
             Spacing = new Vector2(20, 0);
             Margin = new MarginPadding(10);
             Children = new Drawable[]

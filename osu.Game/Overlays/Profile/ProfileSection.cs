@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Profile
 
         protected ProfileSection()
         {
-            Direction = FillDirection.Vertical;
+            Direction = FlowDirection.Vertical;
             AutoSizeAxes = Axes.Y;
             RelativeSizeAxes = Axes.X;
             InternalChildren = new Drawable[]
@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Profile
                 },
                 content = new FillFlowContainer
                 {
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     AutoSizeAxes = Axes.Y,
                     RelativeSizeAxes = Axes.X,
                     Padding = new MarginPadding

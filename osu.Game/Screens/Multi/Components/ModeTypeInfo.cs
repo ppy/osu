@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Multi.Components
                 new FillFlowContainer
                 {
                     AutoSizeAxes = Axes.Both,
-                    Direction = FillDirection.Horizontal,
+                    Direction = FlowDirection.Horizontal,
                     Spacing = new Vector2(5f, 0f),
                     LayoutDuration = 100,
                     Children = new[]

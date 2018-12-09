@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Multi.Components
         public BeatmapTypeInfo()
         {
             AutoSizeAxes = Axes.Both;
-            Direction = FillDirection.Horizontal;
+            Direction = FlowDirection.Horizontal;
             LayoutDuration = 100;
             Spacing = new Vector2(5f, 0f);
 

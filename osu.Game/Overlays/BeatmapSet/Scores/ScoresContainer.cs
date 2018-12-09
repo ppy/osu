@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Width = 0.95f,
-                    Direction = FillDirection.Vertical,
+                    Direction = FlowDirection.Vertical,
                     Spacing = new Vector2(0, spacing),
                     Margin = new MarginPadding { Vertical = spacing },
                     Children = new Drawable[]
@@ -115,7 +115,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
+                            Direction = FlowDirection.Vertical,
                             Spacing = new Vector2(0, 1),
                         },
                     }
