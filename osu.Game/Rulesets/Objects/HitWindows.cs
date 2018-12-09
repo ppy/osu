@@ -94,7 +94,7 @@ namespace osu.Game.Rulesets.Objects
         {
             timeOffset = Math.Abs(timeOffset);
 
-            for(var result = HitResult.Perfect; result >= HitResult.Miss; --result)
+            for (var result = HitResult.Perfect; result >= HitResult.Miss; --result)
             {
                 if(IsHitResultAllowed(result) && timeOffset <= HalfWindowFor(result))
                     return result;
