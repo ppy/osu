@@ -17,10 +17,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private const int section_length = 400;
         private const double difficulty_multiplier = 0.0675;
-        private const double c = 0.5;
-        private const double beta = 0.6;
-        private const double m = 0.85;
-        private const double alpha = 0.6;
+        private const double c = 0.38;
+        private const double beta = 0.45;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
@@ -68,8 +66,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double speedRating = Math.Sqrt(speedDifficulty) * difficulty_multiplier;
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
 
-            double aimLengthBonus = Math.Max(m, c + beta * (Math.Log10(aimTotal) - Math.Log10(aimDifficulty) - alpha));
-            double speedLengthBonus = Math.Max(m, c + beta * (Math.Log10(speedTotal) - Math.Log10(speedDifficulty) - alpha));
+            double aimLengthBonus = c + beta * (Math.Log10(aimTotal + aimDifficulty) - Math.Log10(aimDifficulty));
+            double speedLengthBonus = c + beta * (Math.Log10(speedTotal + speedDifficulty) - Math.Log10(speedDifficulty));
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
             double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
