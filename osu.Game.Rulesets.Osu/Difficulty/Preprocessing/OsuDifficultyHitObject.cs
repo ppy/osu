@@ -40,19 +40,23 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         /// </summary>
         public double StrainTime { get; private set; }
 
+        /// <summary>
+        /// Angle the player has to take to hit this <see cref="OsuDifficultyHitObject"/>.
+        /// Calculated as the angle between the circles (current-2, current-1, current).
+        /// </summary>
         public double? Angle { get; private set; }
 
+        private readonly OsuHitObject lastLastObject;
         private readonly OsuHitObject lastObject;
-        private readonly OsuHitObject nextObject;
         private readonly double timeRate;
 
         /// <summary>
         /// Initializes the object calculating extra data required for difficulty calculation.
         /// </summary>
-        public OsuDifficultyHitObject(OsuHitObject lastObject, OsuHitObject currentObject, OsuHitObject nextObject, double timeRate)
+        public OsuDifficultyHitObject(OsuHitObject lastLastObject, OsuHitObject lastObject, OsuHitObject currentObject, double timeRate)
         {
+            this.lastLastObject = lastLastObject;
             this.lastObject = lastObject;
-            this.nextObject = nextObject;
             this.timeRate = timeRate;
 
             BaseObject = currentObject;
@@ -72,34 +76,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
                 scalingFactor *= 1 + smallCircleBonus;
             }
 
-            Vector2 lastCursorPosition = lastObject.StackedPosition;
-
-            var lastSlider = lastObject as Slider;
-            if (lastSlider != null)
-            {
-                computeSliderCursorPosition(lastSlider);
-                lastCursorPosition = lastSlider.LazyEndPosition ?? lastCursorPosition;
-
+            if (lastObject is Slider lastSlider)
                 TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
-            }
+
+            Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
             // Don't need to jump to reach spinners
             if (!(BaseObject is Spinner))
                 JumpDistance = (BaseObject.StackedPosition * scalingFactor - lastCursorPosition * scalingFactor).Length;
 
-            if (nextObject != null)
+            if (lastLastObject != null)
             {
-                var endCursorPosition = BaseObject.StackedPosition;
+                Vector2 lastLastCursorPosition = getEndCursorPosition(lastLastObject);
 
-                var currentSlider = BaseObject as Slider;
-                if (currentSlider != null)
-                {
-                    computeSliderCursorPosition(currentSlider);
-                    endCursorPosition = currentSlider.LazyEndPosition ?? endCursorPosition;
-                }
-
-                Vector2 v1 = lastCursorPosition - BaseObject.StackedPosition;
-                Vector2 v2 = nextObject.StackedPosition - endCursorPosition;
+                Vector2 v1 = lastLastCursorPosition - lastObject.StackedPosition;
+                Vector2 v2 = BaseObject.StackedPosition - lastCursorPosition;
 
                 float dot = Vector2.Dot(v1, v2);
                 float det = v1.X * v2.Y - v1.Y * v2.X;
@@ -150,6 +141,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             foreach (var time in scoringTimes)
                 computeVertex(time);
             computeVertex(slider.EndTime);
+        }
+
+        private Vector2 getEndCursorPosition(OsuHitObject hitObject)
+        {
+            Vector2 pos = hitObject.StackedPosition;
+
+            var slider = hitObject as Slider;
+            if (slider != null)
+            {
+                computeSliderCursorPosition(slider);
+                pos = slider.LazyEndPosition ?? pos;
+            }
+
+            return pos;
         }
     }
 }
