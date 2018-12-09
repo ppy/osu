@@ -31,7 +31,7 @@ namespace osu.Game.Skinning
                             skin.SkinInfo.Creator = pair.Value;
                             break;
                         case @"CursorExpand":
-                            skin.CursorExpand = !pair.Value.Equals("0");
+                            skin.CursorExpand = pair.Value != "0";
                             break;
                     }
 
