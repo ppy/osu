@@ -39,11 +39,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // If the map has less than two OsuHitObjects, the enumerator will not return anything.
             for (int i = 1; i < objects.Count; i++)
             {
-                var prev = objects[i - 1];
+                var lastLast = i > 1 ? objects[i - 2] : null;
+                var last = objects[i - 1];
                 var current = objects[i];
-                var next = i < objects.Count - 1 ? objects[i + 1] : null;
 
-                yield return new OsuDifficultyHitObject(prev, current, next, timeRate);
+                yield return new OsuDifficultyHitObject(lastLast, last, current, timeRate);
             }
         }
     }
