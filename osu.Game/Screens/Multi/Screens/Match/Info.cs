@@ -42,6 +42,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
             Height = HEIGHT;
 
             BeatmapTypeInfo beatmapTypeInfo;
+            OsuSpriteText name;
 
             Children = new Drawable[]
             {
@@ -69,15 +70,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        new OsuSpriteText
-                                        {
-                                            TextSize = 30,
-                                            Current = Name
-                                        },
-                                        availabilityStatus = new OsuSpriteText
-                                        {
-                                            TextSize = 14,
-                                        },
+                                        name = new OsuSpriteText { TextSize = 30 },
+                                        availabilityStatus = new OsuSpriteText { TextSize = 14 },
                                     },
                                 },
                                 beatmapTypeInfo = new BeatmapTypeInfo
@@ -104,6 +98,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
             Availability.BindValueChanged(_ => updateAvailabilityStatus());
             Status.BindValueChanged(_ => updateAvailabilityStatus());
+            Name.BindValueChanged(n => name.Text = n);
         }
 
         [BackgroundDependencyLoader]

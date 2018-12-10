@@ -131,7 +131,6 @@ namespace osu.Game.Screens.Multi.Components
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft,
                                             TextSize = 30,
-                                            Current = nameBind
                                         },
                                     },
                                 },
@@ -204,9 +203,11 @@ namespace osu.Game.Screens.Multi.Components
                 },
             };
 
-            statusBind.ValueChanged += displayStatus;
-            beatmapBind.ValueChanged += b => beatmap.Value = beatmaps.GetWorkingBeatmap(b);
-            participantsBind.ValueChanged += p => participantsFlow.ChildrenEnumerable = p.Select(u => new UserTile(u));
+            statusBind.BindValueChanged(displayStatus);
+            beatmapBind.BindValueChanged(b => beatmap.Value = beatmaps.GetWorkingBeatmap(b));
+            participantsBind.BindValueChanged(p => participantsFlow.ChildrenEnumerable = p.Select(u => new UserTile(u)));
+
+            nameBind.BindValueChanged(n => name.Text = n);
 
             background.Beatmap.BindTo(beatmap);
 
