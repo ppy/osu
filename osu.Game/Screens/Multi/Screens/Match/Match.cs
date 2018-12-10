@@ -75,7 +75,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     {
                         RelativeSizeAxes = Axes.Both,
                         Height = 0.9f,
-                        Room = room
+                        Room = room,
+                        ReadOnly = true
                     },
                 },
             };
