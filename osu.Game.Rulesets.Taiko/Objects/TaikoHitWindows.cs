@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             { HitResult.Miss, (270, 190, 140) },
         };
 
-        protected override double SuccessfulHitWindow => Good;
+        protected override HitResult SuccessfulHitResult => HitResult.Good;
 
         public override bool IsHitResultAllowed(HitResult result)
         {

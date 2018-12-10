@@ -12,16 +12,23 @@ namespace osu.Game.Rulesets.Taiko.Scoring
     internal class TaikoScoreProcessor : ScoreProcessor<TaikoHitObject>
     {
         /// <summary>
-        /// The HP awarded by a <see cref="HitResult.Great"/> hit.
+        /// A value used in calculating <see cref="hpMultiplier"/>.
         /// </summary>
-        private const double hp_hit_great = 0.03;
+        private const double object_count_factor = 3;
 
         /// <summary>
         /// Taiko fails at the end of the map if the player has not half-filled their HP bar.
         /// </summary>
         protected override bool DefaultFailCondition => JudgedHits == MaxHits && Health.Value <= 0.5;
 
+        /// <summary>
+        /// HP multiplier for a successful <see cref="HitResult"/>.
+        /// </summary>
         private double hpMultiplier;
+
+        /// <summary>
+        /// HP multiplier for a <see cref="HitResult.Miss"/>.
+        /// </summary>
         private double hpMissMultiplier;
 
         public TaikoScoreProcessor(RulesetContainer<TaikoHitObject> rulesetContainer)
@@ -33,7 +40,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
         {
             base.ApplyBeatmap(beatmap);
 
-            hpMultiplier = 0.01 / (hp_hit_great * beatmap.HitObjects.FindAll(o => o is Hit).Count * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98));
+            hpMultiplier = 1 / (object_count_factor * beatmap.HitObjects.FindAll(o => o is Hit).Count * BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.5, 0.75, 0.98));
 
             hpMissMultiplier = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.DrainRate, 0.0018, 0.0075, 0.0120);
         }
