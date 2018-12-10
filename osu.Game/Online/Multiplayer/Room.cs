@@ -19,5 +19,7 @@ namespace osu.Game.Online.Multiplayer
         public Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
         public Bindable<int?> MaxParticipants = new Bindable<int?>();
         public Bindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>(Enumerable.Empty<User>());
+
+        public Bindable<bool> Created = new Bindable<bool>();
     }
 }
