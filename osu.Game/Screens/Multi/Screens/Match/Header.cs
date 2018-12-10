@@ -9,12 +9,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;
 
@@ -75,6 +73,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
                             Child = beatmapButton = new BeatmapSelectButton
                             {
                                 RelativeSizeAxes = Axes.Both,
+                                Height = 1
                             },
                         },
                         Tabs = new MatchTabControl
@@ -98,80 +97,11 @@ namespace osu.Game.Screens.Multi.Screens.Match
             tabStrip.Colour = colours.Yellow;
         }
 
-        private class BeatmapSelectButton : OsuClickableContainer
+        private class BeatmapSelectButton : TriangleButton
         {
-            private const float corner_radius = 5;
-            private const float bg_opacity = 0.5f;
-            private const float transition_duration = 100;
-
-            private readonly Box bg;
-            private readonly Container border;
-
             public BeatmapSelectButton()
             {
-                Masking = true;
-                CornerRadius = corner_radius;
-
-                Children = new Drawable[]
-                {
-                    bg = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                        Alpha = bg_opacity,
-                    },
-                    new OsuSpriteText
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        Font = @"Exo2.0-Bold",
-                        Text = "Select Beatmap",
-                    },
-                    border = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Masking = true,
-                        CornerRadius = corner_radius,
-                        BorderThickness = 4,
-                        Alpha = 0,
-                        Child = new Box // needs a child to show the border
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            AlwaysPresent = true
-                        },
-                    },
-                };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                border.BorderColour = colours.Yellow;
-            }
-
-            protected override bool OnHover(HoverEvent e)
-            {
-                border.FadeIn(transition_duration);
-                return base.OnHover(e);
-            }
-
-            protected override void OnHoverLost(HoverLostEvent e)
-            {
-                base.OnHoverLost(e);
-                border.FadeOut(transition_duration);
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                bg.FadeTo(0.75f, 1000, Easing.Out);
-                return base.OnMouseDown(e);
-            }
-
-            protected override bool OnMouseUp(MouseUpEvent e)
-            {
-                bg.FadeTo(bg_opacity, transition_duration);
-                return base.OnMouseUp(e);
+                Text = "Select beatmap";
             }
         }
 
