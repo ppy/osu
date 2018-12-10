@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -25,6 +26,9 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         protected readonly RoomInspector Inspector;
 
         public override string Title => "Lounge";
+
+        private Room roomBeingCreated;
+        private readonly IBindable<bool> roomCreated = new Bindable<bool>();
 
         protected override Drawable TransitionContent => content;
 
@@ -74,6 +78,12 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
             Filter.Search.Current.ValueChanged += s => filterRooms();
             Filter.Tabs.Current.ValueChanged += t => filterRooms();
             Filter.Search.Exit += Exit;
+
+            roomCreated.BindValueChanged(v =>
+            {
+                if (v)
+                    addRoom(roomBeingCreated);
+            });
         }
 
         protected override void UpdateAfterChildren()
@@ -147,8 +157,14 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         {
             if (Filter.Tabs.Current.Value == LoungeTab.Create)
             {
+                roomBeingCreated = new Room();
+
+                roomCreated.UnbindBindings();
+                roomCreated.BindTo(roomBeingCreated.Created);
+
                 Filter.Tabs.Current.Value = LoungeTab.Public;
-                createRoom(new Room());
+
+                Push(new Match.Match(roomBeingCreated));
             }
 
             search.SearchTerm = Filter.Search.Current.Value ?? string.Empty;
@@ -179,12 +195,6 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
             Inspector.Room = room.Room;
 
             Push(new Match.Match(room.Room));
-        }
-
-        private void createRoom(Room room)
-        {
-            openRoom(addRoom(room));
-            Filter.Tabs.Current.Value = LoungeTab.Public;
         }
 
         private class RoomsFilterContainer : FillFlowContainer<DrawableRoom>, IHasFilterableChildren
