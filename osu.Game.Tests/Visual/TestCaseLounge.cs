@@ -10,8 +10,8 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Multi.Components;
-using osu.Game.Screens.Multi.Screens.Lounge;
+using osu.Game.Screens.Multi.Lounge;
+using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Users;
 using osuTK.Input;
 
@@ -20,12 +20,12 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseLounge : ManualInputManagerTestCase
     {
-        private TestLounge lounge;
+        private TestLoungeScreen loungeScreen;
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            lounge = new TestLounge();
+            loungeScreen = new TestLoungeScreen();
 
             Room[] rooms =
             {
@@ -159,47 +159,47 @@ namespace osu.Game.Tests.Visual
                 },
             };
 
-            AddStep(@"show", () => Add(lounge));
-            AddStep(@"set rooms", () => lounge.Rooms = rooms);
+            AddStep(@"show", () => Add(loungeScreen));
+            AddStep(@"set rooms", () => loungeScreen.Rooms = rooms);
             selectAssert(0);
-            AddStep(@"clear rooms", () => lounge.Rooms = new Room[] {});
-            AddAssert(@"no room selected", () => lounge.SelectedRoom == null);
-            AddStep(@"set rooms", () => lounge.Rooms = rooms);
+            AddStep(@"clear rooms", () => loungeScreen.Rooms = new Room[] {});
+            AddAssert(@"no room selected", () => loungeScreen.SelectedRoom == null);
+            AddStep(@"set rooms", () => loungeScreen.Rooms = rooms);
             selectAssert(1);
             AddStep(@"open room 1", () => clickRoom(1));
-            AddUntilStep(() => lounge.ChildScreen?.IsCurrentScreen == true, "wait until room current");
-            AddStep(@"make lounge current", lounge.MakeCurrent);
+            AddUntilStep(() => loungeScreen.ChildScreen?.IsCurrentScreen == true, "wait until room current");
+            AddStep(@"make lounge current", loungeScreen.MakeCurrent);
             filterAssert(@"THE FINAL", LoungeTab.Public, 1);
             filterAssert(string.Empty, LoungeTab.Public, 2);
             filterAssert(string.Empty, LoungeTab.Private, 1);
             filterAssert(string.Empty, LoungeTab.Public, 2);
             filterAssert(@"no matches", LoungeTab.Public, 0);
-            AddStep(@"clear rooms", () => lounge.Rooms = new Room[] {});
-            AddStep(@"set rooms", () => lounge.Rooms = rooms);
-            AddAssert(@"no matches after clear", () => !lounge.ChildRooms.Any());
+            AddStep(@"clear rooms", () => loungeScreen.Rooms = new Room[] {});
+            AddStep(@"set rooms", () => loungeScreen.Rooms = rooms);
+            AddAssert(@"no matches after clear", () => !loungeScreen.ChildRooms.Any());
             filterAssert(string.Empty, LoungeTab.Public, 2);
-            AddStep(@"exit", lounge.Exit);
+            AddStep(@"exit", loungeScreen.Exit);
         }
 
         private void clickRoom(int n)
         {
-            InputManager.MoveMouseTo(lounge.ChildRooms.ElementAt(n));
+            InputManager.MoveMouseTo(loungeScreen.ChildRooms.ElementAt(n));
             InputManager.Click(MouseButton.Left);
         }
 
         private void selectAssert(int n)
         {
             AddStep($@"select room {n}", () => clickRoom(n));
-            AddAssert($@"room {n} selected", () => lounge.SelectedRoom == lounge.ChildRooms.ElementAt(n).Room);
+            AddAssert($@"room {n} selected", () => loungeScreen.SelectedRoom == loungeScreen.ChildRooms.ElementAt(n).Room);
         }
 
         private void filterAssert(string filter, LoungeTab tab, int endCount)
         {
-            AddStep($@"filter '{filter}', {tab}", () => lounge.SetFilter(filter, tab));
-            AddAssert(@"filtered correctly", () => lounge.ChildRooms.Count() == endCount);
+            AddStep($@"filter '{filter}', {tab}", () => loungeScreen.SetFilter(filter, tab));
+            AddAssert(@"filtered correctly", () => loungeScreen.ChildRooms.Count() == endCount);
         }
 
-        private class TestLounge : Lounge
+        private class TestLoungeScreen : LoungeScreen
         {
             protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 

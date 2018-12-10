@@ -11,7 +11,7 @@ using osu.Game.Screens.Multi.Components;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Screens.Match
+namespace osu.Game.Screens.Multi.Match.Components
 {
     public class Participants : CompositeDrawable
     {

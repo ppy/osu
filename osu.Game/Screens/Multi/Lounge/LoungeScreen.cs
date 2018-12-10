@@ -11,12 +11,13 @@ using osu.Framework.Screens;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.Multi.Lounge.Components;
+using osu.Game.Screens.Multi.Match;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Screens.Lounge
+namespace osu.Game.Screens.Multi.Lounge
 {
-    public class Lounge : MultiplayerScreen
+    public class LoungeScreen : MultiplayerScreen
     {
         private readonly Container content;
         private readonly SearchContainer search;
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
 
         protected override Drawable TransitionContent => content;
 
-        public Lounge()
+        public LoungeScreen()
         {
             Children = new Drawable[]
             {
@@ -164,7 +165,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
 
                 Filter.Tabs.Current.Value = LoungeTab.Public;
 
-                Push(new Match.Match(roomBeingCreated));
+                Push(new MatchScreen(roomBeingCreated));
             }
 
             search.SearchTerm = Filter.Search.Current.Value ?? string.Empty;
@@ -194,7 +195,7 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
             RoomsContainer.ForEach(c => c.State = c == room ? SelectionState.Selected : SelectionState.NotSelected);
             Inspector.Room = room.Room;
 
-            Push(new Match.Match(room.Room));
+            Push(new MatchScreen(room.Room));
         }
 
         private class RoomsFilterContainer : FillFlowContainer<DrawableRoom>, IHasFilterableChildren

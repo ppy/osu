@@ -6,7 +6,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Multi.Screens.Lounge
+namespace osu.Game.Screens.Multi.Lounge.Components
 {
     public class FilterControl : SearchableListFilterControl<LoungeTab, LoungeTab>
     {

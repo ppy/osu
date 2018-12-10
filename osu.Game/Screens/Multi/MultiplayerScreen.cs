@@ -5,7 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 
-namespace osu.Game.Screens.Multi.Screens
+namespace osu.Game.Screens.Multi
 {
     public abstract class MultiplayerScreen : OsuScreen, IMultiplayerScreen
     {
