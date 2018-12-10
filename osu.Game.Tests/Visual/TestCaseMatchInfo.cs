@@ -6,7 +6,7 @@ using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Multi.Screens.Match;
+using osu.Game.Screens.Multi.Match.Components;
 
 namespace osu.Game.Tests.Visual
 {

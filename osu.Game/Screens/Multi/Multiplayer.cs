@@ -9,7 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Multi.Screens.Lounge;
+using osu.Game.Screens.Multi.Lounge;
 
 namespace osu.Game.Screens.Multi
 {
@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Multi
                 RelativeSizeAxes = Axes.Both,
             };
 
-            Lounge lounge;
+            LoungeScreen loungeScreen;
             Children = new Drawable[]
             {
                 new Container
@@ -53,12 +53,12 @@ namespace osu.Game.Screens.Multi
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = Header.HEIGHT },
-                    Child = lounge = new Lounge(),
+                    Child = loungeScreen = new LoungeScreen(),
                 },
-                new Header(lounge),
+                new Header(loungeScreen),
             };
 
-            lounge.Exited += s => Exit();
+            loungeScreen.Exited += s => Exit();
         }
 
         protected override void OnEntering(Screen last)

@@ -17,7 +17,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Multi.Screens.Match
+namespace osu.Game.Screens.Multi.Match.Components
 {
     public class Header : Container
     {

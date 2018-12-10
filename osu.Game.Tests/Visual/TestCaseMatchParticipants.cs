@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Screens.Multi.Screens.Match;
+using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual

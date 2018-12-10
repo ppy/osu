@@ -4,7 +4,7 @@
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Screens.Lounge;
+using osu.Game.Screens.Multi.Lounge;
 
 namespace osu.Game.Tests.Visual
 {
@@ -13,14 +13,14 @@ namespace osu.Game.Tests.Visual
     {
         public TestCaseMultiHeader()
         {
-            Lounge lounge;
+            LoungeScreen loungeScreen;
             Children = new Drawable[]
             {
-                lounge = new Lounge
+                loungeScreen = new LoungeScreen
                 {
                     Padding = new MarginPadding { Top = Header.HEIGHT },
                 },
-                new Header(lounge),
+                new Header(loungeScreen),
             };
         }
     }

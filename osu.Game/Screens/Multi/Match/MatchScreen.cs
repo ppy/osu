@@ -9,12 +9,13 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Users;
 
-namespace osu.Game.Screens.Multi.Screens.Match
+namespace osu.Game.Screens.Multi.Match
 {
-    public class Match : MultiplayerScreen
+    public class MatchScreen : MultiplayerScreen
     {
         private readonly Participants participants;
 
@@ -41,7 +42,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
         [Resolved]
         private APIAccess api { get; set; }
 
-        public Match(Room room)
+        public MatchScreen(Room room)
         {
             this.room = room;
 
@@ -53,29 +54,29 @@ namespace osu.Game.Screens.Multi.Screens.Match
             participantsBind.BindTo(room.Participants);
             maxParticipantsBind.BindTo(room.MaxParticipants);
 
-            Header header;
+            Components.Header header;
             RoomSettingsOverlay settings;
             Info info;
 
             Children = new Drawable[]
             {
-                header = new Header
+                header = new Components.Header
                 {
                     Depth = -1,
                 },
                 info = new Info
                 {
-                    Margin = new MarginPadding { Top = Header.HEIGHT },
+                    Margin = new MarginPadding { Top = Components.Header.HEIGHT },
                 },
                 participants = new Participants
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = Header.HEIGHT + Info.HEIGHT },
+                    Padding = new MarginPadding { Top = Components.Header.HEIGHT + Info.HEIGHT },
                 },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = Header.HEIGHT },
+                    Padding = new MarginPadding { Top = Components.Header.HEIGHT },
                     Child = settings = new RoomSettingsOverlay
                     {
                         RelativeSizeAxes = Axes.Both,

@@ -10,7 +10,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.SearchableList;
-using osu.Game.Screens.Multi.Screens;
 using osuTK;
 using osuTK.Graphics;
 

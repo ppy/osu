@@ -17,7 +17,7 @@ using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Multi.Components;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Screens.Match
+namespace osu.Game.Screens.Multi.Match.Components
 {
     public class Info : Container
     {

@@ -5,7 +5,8 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Screens.Lounge;
+using osu.Game.Screens.Multi.Lounge;
+using osu.Game.Screens.Multi.Lounge.Components;
 
 namespace osu.Game.Tests.Visual
 {
@@ -15,7 +16,7 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(Multiplayer),
-            typeof(Lounge),
+            typeof(LoungeScreen),
             typeof(FilterControl)
         };
 

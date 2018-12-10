@@ -3,7 +3,7 @@
 
 using osu.Framework.Configuration;
 
-namespace osu.Game.Screens.Multi.Screens.Match
+namespace osu.Game.Screens.Multi.Match.Components
 {
     public abstract class MatchPage
     {

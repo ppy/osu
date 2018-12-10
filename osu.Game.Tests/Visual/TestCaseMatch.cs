@@ -8,8 +8,8 @@ using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Multi.Components;
-using osu.Game.Screens.Multi.Screens.Match;
+using osu.Game.Screens.Multi.Match;
+using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
@@ -96,9 +96,9 @@ namespace osu.Game.Tests.Visual
                 },
             };
 
-            Match match = new Match(room);
+            MatchScreen matchScreen = new MatchScreen(room);
 
-            AddStep(@"show", () => Add(match));
+            AddStep(@"show", () => Add(matchScreen));
             AddStep(@"null beatmap", () => room.Beatmap.Value = null);
             AddStep(@"change name", () => room.Name.Value = @"Two Awesome Rooms");
             AddStep(@"change status", () => room.Status.Value = new RoomStatusPlaying());
@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Visual
                 },
             });
 
-            AddStep(@"exit", match.Exit);
+            AddStep(@"exit", matchScreen.Exit);
         }
     }
 }

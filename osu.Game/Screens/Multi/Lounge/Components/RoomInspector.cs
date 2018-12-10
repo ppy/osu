@@ -17,11 +17,12 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Screens.Multi.Components;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.Multi.Lounge.Components
 {
     public class RoomInspector : Container
     {
