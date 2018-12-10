@@ -190,12 +190,15 @@ namespace osu.Game.Screens.Multi.Components
                 if (room == value)
                     return;
 
-                room = value;
+                if (room != null)
+                {
+                    nameBind.UnbindFrom(room.Name);
+                    availabilityBind.UnbindFrom(room.Availability);
+                    typeBind.UnbindFrom(room.Type);
+                    maxParticipantsBind.UnbindFrom(room.MaxParticipants);
+                }
 
-                nameBind.UnbindBindings();
-                availabilityBind.UnbindBindings();
-                typeBind.UnbindBindings();
-                maxParticipantsBind.UnbindBindings();
+                room = value;
 
                 if (room != null)
                 {
