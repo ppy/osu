@@ -54,19 +54,24 @@ namespace osu.Game.Screens.Multi.Components
         private Room room;
         public Room Room
         {
-            get { return room; }
+            get => room;
             set
             {
-                if (value == room) return;
-                room = value;
+                if (value == room)
+                    return;
 
-                nameBind.UnbindBindings();
-                hostBind.UnbindBindings();
-                statusBind.UnbindBindings();
-                typeBind.UnbindBindings();
-                beatmapBind.UnbindBindings();
-                maxParticipantsBind.UnbindBindings();
-                participantsBind.UnbindBindings();
+                if (room != null)
+                {
+                    nameBind.UnbindFrom(room.Name);
+                    hostBind.UnbindFrom(room.Host);
+                    statusBind.UnbindFrom(room.Status);
+                    typeBind.UnbindFrom(room.Type);
+                    beatmapBind.UnbindFrom(room.Beatmap);
+                    maxParticipantsBind.UnbindFrom(room.MaxParticipants);
+                    participantsBind.UnbindFrom(room.Participants);
+                }
+
+                room = value;
 
                 if (room != null)
                 {
