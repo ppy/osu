@@ -61,7 +61,7 @@ namespace osu.Game.Rulesets.Objects
         /// <param name="result">The result.</param>
         public virtual bool IsHitResultAllowed(HitResult result)
         {
-            switch(result)
+            switch (result)
             {
                 case HitResult.Perfect:
                 case HitResult.Ok:
