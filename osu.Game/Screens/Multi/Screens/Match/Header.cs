@@ -13,6 +13,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;
 
@@ -99,9 +100,21 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         private class BeatmapSelectButton : TriangleButton
         {
+            private readonly IBindable<bool> createdBind = new Bindable<bool>();
+
+            [Resolved]
+            private Room room { get; set; }
+
             public BeatmapSelectButton()
             {
                 Text = "Select beatmap";
+            }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                createdBind.BindTo(room.Created);
+                createdBind.BindValueChanged(v => Enabled.Value = !v, true);
             }
         }
 
@@ -109,11 +122,5 @@ namespace osu.Game.Screens.Multi.Screens.Match
         {
             protected override double FadeDuration => 0;
         }
-    }
-
-    public enum MatchHeaderPage
-    {
-        Settings,
-        Room,
     }
 }
