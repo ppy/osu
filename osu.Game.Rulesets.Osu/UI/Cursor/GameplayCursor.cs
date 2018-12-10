@@ -54,8 +54,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         public bool OnPressed(OsuAction action)
         {
-            if (cursorExpand)
-                switch (action)
+            if (!cursorExpand)
+                return false;
+
+            switch (action)
                 {
                     case OsuAction.LeftButton:
                     case OsuAction.RightButton:
@@ -69,15 +71,17 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         public bool OnReleased(OsuAction action)
         {
-            if (cursorExpand)
-                switch (action)
-                {
-                    case OsuAction.LeftButton:
-                    case OsuAction.RightButton:
-                        if (--downCount == 0)
-                            ActiveCursor.ScaleTo(targetScale, 200, Easing.OutQuad);
-                        break;
-                }
+            if (!cursorExpand)
+                return false;
+
+            switch (action)
+            {
+                case OsuAction.LeftButton:
+                case OsuAction.RightButton:
+                    if (--downCount == 0)
+                        ActiveCursor.ScaleTo(targetScale, 200, Easing.OutQuad);
+                    break;
+            }
 
             return false;
         }
