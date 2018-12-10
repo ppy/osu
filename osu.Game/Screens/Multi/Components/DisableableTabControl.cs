@@ -4,6 +4,7 @@
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Components
 {
@@ -30,7 +31,7 @@ namespace osu.Game.Screens.Multi.Components
 
             private void updateReadOnly(bool readOnly)
             {
-                Alpha = readOnly ? 0.2f : 1;
+                Colour = readOnly ? Color4.Gray : Color4.White;
             }
 
             protected override bool OnClick(ClickEvent e)
