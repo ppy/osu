@@ -12,7 +12,7 @@ namespace osu.Game.Rulesets.Taiko.Scoring
     internal class TaikoScoreProcessor : ScoreProcessor<TaikoHitObject>
     {
         /// <summary>
-        /// A value used in calculating <see cref="hpMultiplier"/>.
+        /// A value used for calculating <see cref="hpMultiplier"/>.
         /// </summary>
         private const double object_count_factor = 3;
 
