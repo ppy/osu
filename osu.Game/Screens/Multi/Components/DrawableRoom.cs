@@ -108,6 +108,7 @@ namespace osu.Game.Screens.Multi.Components
             ParticipantInfo participantInfo;
             BeatmapTitle beatmapTitle;
             ModeTypeInfo modeTypeInfo;
+            OsuSpriteText name;
 
             Children = new Drawable[]
             {
@@ -166,11 +167,7 @@ namespace osu.Game.Screens.Multi.Components
                                         Spacing = new Vector2(5f),
                                         Children = new Drawable[]
                                         {
-                                            new OsuSpriteText
-                                            {
-                                                TextSize = 18,
-                                                Current = nameBind
-                                            },
+                                            name = new OsuSpriteText { TextSize = 18 },
                                             participantInfo = new ParticipantInfo(),
                                         },
                                     },
@@ -217,7 +214,8 @@ namespace osu.Game.Screens.Multi.Components
 
             background.Beatmap.BindTo(beatmap);
 
-            beatmapBind.ValueChanged += b => beatmap.Value = beatmaps.GetWorkingBeatmap(b);
+            beatmapBind.BindValueChanged(b => beatmap.Value = beatmaps.GetWorkingBeatmap(b));
+            nameBind.BindValueChanged(n => name.Text = n);
 
             nameBind.BindTo(Room.Name);
             hostBind.BindTo(Room.Host);
