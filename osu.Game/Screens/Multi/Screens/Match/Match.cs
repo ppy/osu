@@ -32,8 +32,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         public override string ShortTitle => "room";
 
-        private readonly Header header;
-
         [Cached]
         private readonly Room room;
 
@@ -55,6 +53,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
             participantsBind.BindTo(room.Participants);
             maxParticipantsBind.BindTo(room.MaxParticipants);
 
+            Header header;
             RoomSettingsOverlay settings;
             Info info;
 
@@ -81,8 +80,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     {
                         RelativeSizeAxes = Axes.Both,
                         Height = 0.9f,
-                        Room = room,
-                        ReadOnly = true
                     },
                 },
             };
@@ -97,14 +94,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
                 else
                     settings.Hide();
             };
-
-            settings.StateChanged += s =>
-            {
-                if (s == Visibility.Hidden)
-                    header.Tabs.Current.Value = new RoomMatchPage();
-            };
-
-            settings.Applied = () => settings.Hide();
 
             info.Beatmap.BindTo(beatmapBind);
             info.Name.BindTo(nameBind);
