@@ -19,7 +19,6 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
     {
         private readonly Container content;
         private readonly SearchContainer search;
-        private readonly CreateRoomOverlay createRoomOverlay;
 
         protected readonly FilterControl Filter;
         protected readonly FillFlowContainer<DrawableRoom> RoomsContainer;
@@ -68,16 +67,6 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.45f,
                         },
-                        new Container
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = createRoomOverlay = new CreateRoomOverlay
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                                Height = 0.9f,
-                                Room = new Room()
-                            },
-                        },
                     },
                 }
             };
@@ -85,8 +74,6 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
             Filter.Search.Current.ValueChanged += s => filterRooms();
             Filter.Tabs.Current.ValueChanged += t => filterRooms();
             Filter.Search.Exit += Exit;
-
-            createRoomOverlay.Applied = () => createRoom(createRoomOverlay.Room);
         }
 
         protected override void UpdateAfterChildren()
@@ -147,8 +134,6 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         {
             base.OnResuming(last);
 
-            createRoomOverlay.Room = new Room();
-
             Filter.Search.HoldFocus = true;
         }
 
@@ -161,9 +146,10 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         private void filterRooms()
         {
             if (Filter.Tabs.Current.Value == LoungeTab.Create)
-                createRoomOverlay.Show();
-            else
-                createRoomOverlay.Hide();
+            {
+                Filter.Tabs.Current.Value = LoungeTab.Public;
+                createRoom(new Room());
+            }
 
             search.SearchTerm = Filter.Search.Current.Value ?? string.Empty;
 

@@ -9,6 +9,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing.Input;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.Multi.Screens.Match;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual

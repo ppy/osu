@@ -15,7 +15,6 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;
 
@@ -29,7 +28,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         private readonly Box tabStrip;
 
-        public readonly PageTabControl<MatchHeaderPage> Tabs;
+        public readonly MatchTabControl Tabs;
 
         public Action OnRequestSelectBeatmap;
 
@@ -78,11 +77,11 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                 RelativeSizeAxes = Axes.Both,
                             },
                         },
-                        Tabs = new PageTabControl<MatchHeaderPage>
+                        Tabs = new MatchTabControl
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
-                            RelativeSizeAxes = Axes.X,
+                            RelativeSizeAxes = Axes.X
                         },
                     },
                 },

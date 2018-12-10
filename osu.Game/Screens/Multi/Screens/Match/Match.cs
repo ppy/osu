@@ -7,8 +7,8 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Users;
 
@@ -16,7 +16,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
 {
     public class Match : MultiplayerScreen
     {
-        private readonly Room room;
         private readonly Participants participants;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
@@ -33,8 +32,16 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         public override string ShortTitle => "room";
 
+        private readonly Header header;
+
+        [Cached]
+        private readonly Room room;
+
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
+
+        [Resolved]
+        private APIAccess api { get; set; }
 
         public Match(Room room)
         {
@@ -48,7 +55,6 @@ namespace osu.Game.Screens.Multi.Screens.Match
             participantsBind.BindTo(room.Participants);
             maxParticipantsBind.BindTo(room.MaxParticipants);
 
-            Header header;
             RoomSettingsOverlay settings;
             Info info;
 
@@ -86,7 +92,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
             header.Tabs.Current.ValueChanged += t =>
             {
-                if (t == MatchHeaderPage.Settings)
+                if (t is SettingsMatchPage)
                     settings.Show();
                 else
                     settings.Hide();
@@ -95,7 +101,7 @@ namespace osu.Game.Screens.Multi.Screens.Match
             settings.StateChanged += s =>
             {
                 if (s == Visibility.Hidden)
-                    header.Tabs.Current.Value = MatchHeaderPage.Room;
+                    header.Tabs.Current.Value = new RoomMatchPage();
             };
 
             settings.Applied = () => settings.Hide();

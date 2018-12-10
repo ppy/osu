@@ -12,10 +12,11 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Screens.Multi.Components;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.Multi.Screens.Match
 {
     public class RoomSettingsOverlay : FocusedOverlayContainer
     {
