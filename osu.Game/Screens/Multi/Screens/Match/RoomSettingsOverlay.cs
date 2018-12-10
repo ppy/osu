@@ -1,12 +1,12 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -23,15 +23,12 @@ namespace osu.Game.Screens.Multi.Screens.Match
         private const float transition_duration = 350;
         private const float field_padding = 45;
 
-        /// <summary>
-        /// Invoked when room settings were applied.
-        /// </summary>
-        public Action Applied;
-
         private readonly Bindable<string> nameBind = new Bindable<string>();
+        private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
         private readonly Bindable<RoomAvailability> availabilityBind = new Bindable<RoomAvailability>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
+        private readonly Bindable<bool> createdBind = new Bindable<bool>();
 
         private readonly Container content;
 
@@ -42,6 +39,9 @@ namespace osu.Game.Screens.Multi.Screens.Match
         protected readonly GameTypePicker TypePicker;
         protected readonly TriangleButton ApplyButton;
         protected readonly OsuPasswordTextBox PasswordField;
+
+        [Resolved]
+        private Room room { get; set; }
 
         public RoomSettingsOverlay()
         {
@@ -151,69 +151,35 @@ namespace osu.Game.Screens.Multi.Screens.Match
             availabilityBind.ValueChanged += a => AvailabilityPicker.Current.Value = a;
             typeBind.ValueChanged += t => TypePicker.Current.Value = t;
             maxParticipantsBind.ValueChanged += m => MaxParticipantsField.Text = m?.ToString();
-
-            Room = new Room();
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             typeLabel.Colour = colours.Yellow;
+
+            nameBind.BindTo(room.Name);
+            beatmapBind.BindTo(room.Beatmap);
+            availabilityBind.BindTo(room.Availability);
+            typeBind.BindTo(room.Type);
+            maxParticipantsBind.BindTo(room.MaxParticipants);
+            createdBind.BindTo(room.Created);
+
+            MaxParticipantsField.ReadOnly = true;
+            PasswordField.ReadOnly = true;
+            AvailabilityPicker.ReadOnly.Value = true;
+            TypePicker.ReadOnly.Value = true;
+            ApplyButton.Enabled.Value = false;
         }
 
-        private bool readOnly;
-
-        public bool ReadOnly
+        protected override void Update()
         {
-            get => readOnly;
-            set
-            {
-                if (readOnly == value)
-                    return;
-                readOnly = value;
+            base.Update();
 
-                NameField.ReadOnly = value;
-                MaxParticipantsField.ReadOnly = value;
-                PasswordField.ReadOnly = value;
-                AvailabilityPicker.ReadOnly.Value = value;
-                TypePicker.ReadOnly.Value = value;
-                ApplyButton.Enabled.Value = !value;
-            }
+            ApplyButton.Enabled.Value = hasValidSettings;
         }
 
-
-        private Room room;
-
-        /// <summary>
-        /// The room which settings are being applied to.
-        /// </summary>
-        public virtual Room Room
-        {
-            get => room;
-            set
-            {
-                if (room == value)
-                    return;
-
-                if (room != null)
-                {
-                    nameBind.UnbindFrom(room.Name);
-                    availabilityBind.UnbindFrom(room.Availability);
-                    typeBind.UnbindFrom(room.Type);
-                    maxParticipantsBind.UnbindFrom(room.MaxParticipants);
-                }
-
-                room = value;
-
-                if (room != null)
-                {
-                    nameBind.BindTo(room.Name);
-                    availabilityBind.BindTo(room.Availability);
-                    typeBind.BindTo(room.Type);
-                    maxParticipantsBind.BindTo(room.MaxParticipants);
-                }
-            }
-        }
+        private bool hasValidSettings => NameField.Text.Length > 0 && beatmapBind.Value != null;
 
         protected override void PopIn()
         {
@@ -245,7 +211,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
             else
                 maxParticipantsBind.Value = null;
 
-            Applied?.Invoke();
+            // Todo: This should only be set after the room has been created server-side
+            createdBind.Value = true;
         }
 
         private class SettingsTextBox : OsuTextBox
