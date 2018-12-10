@@ -40,6 +40,7 @@ namespace osu.Game.Screens.Multi.Components
         protected readonly RoomAvailabilityPicker AvailabilityPicker;
         protected readonly GameTypePicker TypePicker;
         protected readonly TriangleButton ApplyButton;
+        protected readonly OsuPasswordTextBox PasswordField;
 
         public RoomSettingsOverlay()
         {
@@ -116,20 +117,16 @@ namespace osu.Game.Screens.Multi.Components
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             TabbableContentContainer = this,
-                                            Alpha = 0.2f,
-                                            ReadOnly = true,
                                             OnCommit = (sender, text) => apply(),
                                         },
                                     },
                                     new Section("PASSWORD (OPTIONAL)")
                                     {
-                                        Child = new SettingsPasswordTextBox
+                                        Child = PasswordField = new SettingsPasswordTextBox
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             TabbableContentContainer = this,
-                                            OnCommit = (sender, text) => apply(),
-                                            Alpha = 0.2f,
-                                            ReadOnly = true,
+                                            OnCommit = (sender, text) => apply()
                                         },
                                     },
                                 },
@@ -154,20 +151,6 @@ namespace osu.Game.Screens.Multi.Components
             typeBind.ValueChanged += t => TypePicker.Current.Value = t;
             maxParticipantsBind.ValueChanged += m => MaxParticipantsField.Text = m?.ToString();
 
-            AvailabilityPicker.DisabledItems = new[]
-            {
-                RoomAvailability.FriendsOnly,
-                RoomAvailability.InviteOnly
-            };
-
-            TypePicker.DisabledItems = new GameType[]
-            {
-                new GameTypeTag(),
-                new GameTypeVersus(),
-                new GameTypeTagTeam(),
-                new GameTypeTeamVersus(),
-            };
-
             Room = new Room();
         }
 
@@ -176,6 +159,27 @@ namespace osu.Game.Screens.Multi.Components
         {
             typeLabel.Colour = colours.Yellow;
         }
+
+        private bool readOnly;
+
+        public bool ReadOnly
+        {
+            get => readOnly;
+            set
+            {
+                if (readOnly == value)
+                    return;
+                readOnly = value;
+
+                NameField.ReadOnly = value;
+                MaxParticipantsField.ReadOnly = value;
+                PasswordField.ReadOnly = value;
+                AvailabilityPicker.ReadOnly.Value = value;
+                TypePicker.ReadOnly.Value = value;
+                ApplyButton.Enabled.Value = !value;
+            }
+        }
+
 
         private Room room;
 

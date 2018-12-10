@@ -4,13 +4,22 @@
 using osu.Framework.Allocation;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Screens.Multi.Components;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.Multi.Screens.Lounge
 {
     public class CreateRoomOverlay : RoomSettingsOverlay
     {
         [Resolved]
         private APIAccess api { get; set; }
+
+        public CreateRoomOverlay()
+        {
+            MaxParticipantsField.ReadOnly = true;
+            AvailabilityPicker.ReadOnly.Value = true;
+            TypePicker.ReadOnly.Value = true;
+            PasswordField.ReadOnly = true;
+        }
 
         [BackgroundDependencyLoader]
         private void load()
