@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Multi
                     Padding = new MarginPadding { Top = Header.HEIGHT },
                     Child = loungeScreen = new LoungeScreen(),
                 },
-                new Header(loungeScreen),
+                new Header(loungeScreen)
             };
 
             loungeScreen.Exited += s => Exit();

@@ -28,6 +28,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     {
         private const float transition_duration = 100;
 
+        public readonly Bindable<Room> Room = new Bindable<Room>();
+
         private readonly MarginPadding contentPadding = new MarginPadding { Horizontal = 20, Vertical = 10 };
         private readonly Bindable<string> nameBind = new Bindable<string>();
         private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
@@ -51,43 +53,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
-
-        private Room room;
-        public Room Room
-        {
-            get => room;
-            set
-            {
-                if (value == room)
-                    return;
-
-                if (room != null)
-                {
-                    nameBind.UnbindFrom(room.Name);
-                    hostBind.UnbindFrom(room.Host);
-                    statusBind.UnbindFrom(room.Status);
-                    typeBind.UnbindFrom(room.Type);
-                    beatmapBind.UnbindFrom(room.Beatmap);
-                    maxParticipantsBind.UnbindFrom(room.MaxParticipants);
-                    participantsBind.UnbindFrom(room.Participants);
-                }
-
-                room = value;
-
-                if (room != null)
-                {
-                    nameBind.BindTo(room.Name);
-                    hostBind.BindTo(room.Host);
-                    statusBind.BindTo(room.Status);
-                    typeBind.BindTo(room.Type);
-                    beatmapBind.BindTo(room.Beatmap);
-                    maxParticipantsBind.BindTo(room.MaxParticipants);
-                    participantsBind.BindTo(room.Participants);
-                }
-
-                updateState();
-            }
-        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -226,7 +191,52 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             beatmapTypeInfo.Type.BindTo(typeBind);
             beatmapTypeInfo.Beatmap.BindTo(beatmapBind);
 
-            updateState();
+            Room.BindValueChanged(updateRoom, true);
+        }
+
+        private Room lastRoom;
+
+        private void updateRoom(Room newRoom)
+        {
+            if (lastRoom != null)
+            {
+                nameBind.UnbindFrom(lastRoom.Name);
+                hostBind.UnbindFrom(lastRoom.Host);
+                statusBind.UnbindFrom(lastRoom.Status);
+                typeBind.UnbindFrom(lastRoom.Type);
+                beatmapBind.UnbindFrom(lastRoom.Beatmap);
+                maxParticipantsBind.UnbindFrom(lastRoom.MaxParticipants);
+                participantsBind.UnbindFrom(lastRoom.Participants);
+            }
+
+            if (newRoom != null)
+            {
+                nameBind.BindTo(newRoom.Name);
+                hostBind.BindTo(newRoom.Host);
+                statusBind.BindTo(newRoom.Status);
+                typeBind.BindTo(newRoom.Type);
+                beatmapBind.BindTo(newRoom.Beatmap);
+                maxParticipantsBind.BindTo(newRoom.MaxParticipants);
+                participantsBind.BindTo(newRoom.Participants);
+
+                participantsFlow.FadeIn(transition_duration);
+                participantCount.FadeIn(transition_duration);
+                beatmapTypeInfo.FadeIn(transition_duration);
+                name.FadeIn(transition_duration);
+                participantInfo.FadeIn(transition_duration);
+            }
+            else
+            {
+                participantsFlow.FadeOut(transition_duration);
+                participantCount.FadeOut(transition_duration);
+                beatmapTypeInfo.FadeOut(transition_duration);
+                name.FadeOut(transition_duration);
+                participantInfo.FadeOut(transition_duration);
+
+                displayStatus(new RoomStatusNoneSelected());
+            }
+
+            lastRoom = newRoom;
         }
 
         protected override void UpdateAfterChildren()
@@ -243,32 +253,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             Color4 c = s.GetAppropriateColour(colours);
             statusStrip.FadeColour(c, transition_duration);
             status.FadeColour(c, transition_duration);
-        }
-
-        private void updateState()
-        {
-            if (Room == null)
-            {
-                beatmap.Value = null;
-                participantsFlow.FadeOut(transition_duration);
-                participantCount.FadeOut(transition_duration);
-                beatmapTypeInfo.FadeOut(transition_duration);
-                name.FadeOut(transition_duration);
-                participantInfo.FadeOut(transition_duration);
-
-                displayStatus(new RoomStatusNoneSelected());
-            }
-            else
-            {
-                participantsFlow.FadeIn(transition_duration);
-                participantCount.FadeIn(transition_duration);
-                beatmapTypeInfo.FadeIn(transition_duration);
-                name.FadeIn(transition_duration);
-                participantInfo.FadeIn(transition_duration);
-
-                statusBind.TriggerChange();
-                beatmapBind.TriggerChange();
-            }
         }
 
         private class UserTile : Container, IHasTooltip
