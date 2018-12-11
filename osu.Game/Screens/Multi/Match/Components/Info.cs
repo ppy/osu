@@ -1,17 +1,16 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Multi.Components;
@@ -23,12 +22,11 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         public const float HEIGHT = 128;
 
+        public Action OnStart;
+
         private readonly OsuSpriteText availabilityStatus;
-        private readonly ReadyButton readyButton;
 
         private OsuColour colours;
-
-        public Bindable<bool> Ready => readyButton.Ready;
 
         public readonly Bindable<string> Name = new Bindable<string>();
         public readonly Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
@@ -81,13 +79,14 @@ namespace osu.Game.Screens.Multi.Match.Components
                                 },
                             },
                         },
-                        readyButton = new ReadyButton
+                        new ReadyButton
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
                             RelativeSizeAxes = Axes.Y,
                             Size = new Vector2(200, 1),
                             Padding = new MarginPadding { Vertical = 10 },
+                            Action = () => OnStart?.Invoke()
                         },
                     },
                 },
@@ -123,58 +122,6 @@ namespace osu.Game.Screens.Multi.Match.Components
             {
                 availabilityStatus.FadeColour(Status.Value.GetAppropriateColour(colours), 100);
                 availabilityStatus.Text = $"{Availability.Value.GetDescription()}, {Status.Value.Message}";
-            }
-        }
-
-        private class ReadyButton : TriangleButton
-        {
-            public readonly Bindable<bool> Ready = new Bindable<bool>();
-
-            protected override SpriteText CreateText() => new OsuSpriteText
-            {
-                Depth = -1,
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Font = @"Exo2.0-Light",
-                TextSize = 30,
-            };
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                BackgroundColour = OsuColour.FromHex(@"1187aa");
-                Triangles.ColourLight = OsuColour.FromHex(@"277b9c");
-                Triangles.ColourDark = OsuColour.FromHex(@"1f6682");
-                Triangles.TriangleScale = 1.5f;
-
-                Container active;
-                Add(active = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0f,
-                    Child = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Alpha = 0.15f,
-                        Blending = BlendingMode.Additive,
-                    },
-                });
-
-                Action = () => Ready.Value = !Ready.Value;
-
-                Ready.BindValueChanged(value =>
-                {
-                    if (value)
-                    {
-                        Text = "Not Ready";
-                        active.FadeIn(200);
-                    }
-                    else
-                    {
-                        Text = "Ready";
-                        active.FadeOut(200);
-                    }
-                }, true);
             }
         }
     }
