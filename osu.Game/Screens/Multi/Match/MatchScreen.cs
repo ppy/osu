@@ -10,6 +10,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.Multi.Play;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using osu.Game.Users;
 
@@ -35,6 +37,9 @@ namespace osu.Game.Screens.Multi.Match
 
         [Cached]
         private readonly Room room;
+
+        [Resolved]
+        private Multiplayer multiplayer { get; set; }
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -67,6 +72,7 @@ namespace osu.Game.Screens.Multi.Match
                 info = new Info
                 {
                     Margin = new MarginPadding { Top = Components.Header.HEIGHT },
+                    OnStart = onStart
                 },
                 participants = new Participants
                 {
@@ -112,6 +118,17 @@ namespace osu.Game.Screens.Multi.Match
             beatmapBind.BindTo(room.Beatmap);
             beatmapBind.BindValueChanged(b => Beatmap.Value = beatmapManager.GetWorkingBeatmap(room.Beatmap.Value), true);
             Beatmap.BindValueChanged(b => beatmapBind.Value = b.BeatmapInfo);
+        }
+
+        private void onStart()
+        {
+            switch (typeBind.Value)
+            {
+                default:
+                case GameTypeTimeshift _:
+                    multiplayer.Push(new PlayerLoader(new TimeshiftPlayer()));
+                    break;
+            }
         }
     }
 }
