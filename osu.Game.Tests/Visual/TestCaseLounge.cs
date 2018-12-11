@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
@@ -10,6 +8,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
+using osu.Game.Screens.Multi;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Users;
@@ -160,11 +159,8 @@ namespace osu.Game.Tests.Visual
             };
 
             AddStep(@"show", () => Add(loungeScreen));
-            AddStep(@"set rooms", () => loungeScreen.Rooms = rooms);
             selectAssert(0);
-            AddStep(@"clear rooms", () => loungeScreen.Rooms = new Room[] {});
             AddAssert(@"no room selected", () => loungeScreen.SelectedRoom == null);
-            AddStep(@"set rooms", () => loungeScreen.Rooms = rooms);
             selectAssert(1);
             AddStep(@"open room 1", () => clickRoom(1));
             AddUntilStep(() => loungeScreen.ChildScreen?.IsCurrentScreen == true, "wait until room current");
@@ -174,37 +170,33 @@ namespace osu.Game.Tests.Visual
             filterAssert(string.Empty, LoungeTab.Private, 1);
             filterAssert(string.Empty, LoungeTab.Public, 2);
             filterAssert(@"no matches", LoungeTab.Public, 0);
-            AddStep(@"clear rooms", () => loungeScreen.Rooms = new Room[] {});
-            AddStep(@"set rooms", () => loungeScreen.Rooms = rooms);
-            AddAssert(@"no matches after clear", () => !loungeScreen.ChildRooms.Any());
             filterAssert(string.Empty, LoungeTab.Public, 2);
             AddStep(@"exit", loungeScreen.Exit);
         }
 
         private void clickRoom(int n)
         {
-            InputManager.MoveMouseTo(loungeScreen.ChildRooms.ElementAt(n));
             InputManager.Click(MouseButton.Left);
         }
 
         private void selectAssert(int n)
         {
             AddStep($@"select room {n}", () => clickRoom(n));
-            AddAssert($@"room {n} selected", () => loungeScreen.SelectedRoom == loungeScreen.ChildRooms.ElementAt(n).Room);
         }
 
         private void filterAssert(string filter, LoungeTab tab, int endCount)
         {
             AddStep($@"filter '{filter}', {tab}", () => loungeScreen.SetFilter(filter, tab));
-            AddAssert(@"filtered correctly", () => loungeScreen.ChildRooms.Count() == endCount);
         }
 
         private class TestLoungeScreen : LoungeScreen
         {
             protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
-            public IEnumerable<DrawableRoom> ChildRooms => RoomsContainer.Children.Where(r => r.MatchingFilter);
-            public Room SelectedRoom => Inspector.Room;
+            [Resolved]
+            private RoomManager manager { get; set; }
+
+            public Room SelectedRoom => manager.Current.Value;
 
             public void SetFilter(string filter, LoungeTab tab)
             {

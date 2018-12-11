@@ -1,40 +1,37 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using osu.Framework.Configuration;
-using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
-using osuTK;
 
 namespace osu.Game.Screens.Multi.Lounge
 {
     public class LoungeScreen : MultiplayerScreen
     {
+        protected readonly FilterControl Filter;
+
         private readonly Container content;
         private readonly SearchContainer search;
+        private readonly RoomsContainer rooms;
 
-        protected readonly FilterControl Filter;
-        protected readonly FillFlowContainer<DrawableRoom> RoomsContainer;
-        protected readonly RoomInspector Inspector;
+        [Cached]
+        private readonly RoomManager manager;
 
         public override string Title => "Lounge";
-
-        private Room roomBeingCreated;
-        private readonly IBindable<bool> roomCreated = new Bindable<bool>();
 
         protected override Drawable TransitionContent => content;
 
         public LoungeScreen()
         {
+            RoomInspector inspector;
+
             Children = new Drawable[]
             {
                 Filter = new FilterControl { Depth = -1 },
@@ -56,16 +53,10 @@ namespace osu.Game.Screens.Multi.Lounge
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Child = RoomsContainer = new RoomsFilterContainer
-                                {
-                                    RelativeSizeAxes = Axes.X,
-                                    AutoSizeAxes = Axes.Y,
-                                    Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(10 - DrawableRoom.SELECTION_BORDER_WIDTH * 2),
-                                },
+                                Child = rooms = new RoomsContainer { OpenRequested = openRoom }
                             },
                         },
-                        Inspector = new RoomInspector
+                        inspector = new RoomInspector
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
@@ -73,18 +64,15 @@ namespace osu.Game.Screens.Multi.Lounge
                             Width = 0.45f,
                         },
                     },
-                }
+                },
+                manager = new RoomManager()
             };
+
+            inspector.Room.BindTo(manager.Current);
 
             Filter.Search.Current.ValueChanged += s => filterRooms();
             Filter.Tabs.Current.ValueChanged += t => filterRooms();
             Filter.Search.Exit += Exit;
-
-            roomCreated.BindValueChanged(v =>
-            {
-                if (v)
-                    addRoom(roomBeingCreated);
-            });
         }
 
         protected override void UpdateAfterChildren()
@@ -97,31 +85,6 @@ namespace osu.Game.Screens.Multi.Lounge
                 Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH,
                 Right = SearchableListOverlay.WIDTH_PADDING,
             };
-        }
-
-        public IEnumerable<Room> Rooms
-        {
-            set
-            {
-                RoomsContainer.ForEach(r => r.Action = null);
-                RoomsContainer.Clear();
-
-                foreach (var room in value)
-                    addRoom(room);
-            }
-        }
-
-        private DrawableRoom addRoom(Room room)
-        {
-            var drawableRoom = new DrawableRoom(room);
-
-            drawableRoom.Action = () => selectionRequested(drawableRoom);
-
-            RoomsContainer.Add(drawableRoom);
-
-            filterRooms();
-
-            return drawableRoom;
         }
 
         protected override void OnFocus(FocusEvent e)
@@ -158,65 +121,22 @@ namespace osu.Game.Screens.Multi.Lounge
         {
             if (Filter.Tabs.Current.Value == LoungeTab.Create)
             {
-                roomBeingCreated = new Room();
-
-                roomCreated.UnbindBindings();
-                roomCreated.BindTo(roomBeingCreated.Created);
-
                 Filter.Tabs.Current.Value = LoungeTab.Public;
-
-                Push(new MatchScreen(roomBeingCreated));
+                Push(new MatchScreen(new Room()));
             }
 
             search.SearchTerm = Filter.Search.Current.Value ?? string.Empty;
 
-            foreach (DrawableRoom r in RoomsContainer.Children)
-            {
-                r.MatchingFilter = r.MatchingFilter && r.Room.Availability.Value == Filter.Availability;
-            }
+            rooms.Filter(Filter.CreateCriteria());
         }
 
-        private void selectionRequested(DrawableRoom room)
+        private void openRoom(Room room)
         {
-            if (room.State == SelectionState.Selected)
-                openRoom(room);
-            else
-            {
-                RoomsContainer.ForEach(c => c.State = c == room ? SelectionState.Selected : SelectionState.NotSelected);
-                Inspector.Room = room.Room;
-            }
-        }
-
-        private void openRoom(DrawableRoom room)
-        {
+            // Handles the case where a room is clicked 3 times in quick succession
             if (!IsCurrentScreen)
                 return;
 
-            RoomsContainer.ForEach(c => c.State = c == room ? SelectionState.Selected : SelectionState.NotSelected);
-            Inspector.Room = room.Room;
-
-            Push(new MatchScreen(room.Room));
-        }
-
-        private class RoomsFilterContainer : FillFlowContainer<DrawableRoom>, IHasFilterableChildren
-        {
-            public IEnumerable<string> FilterTerms => new string[] { };
-            public IEnumerable<IFilterable> FilterableChildren => Children;
-
-            public bool MatchingFilter
-            {
-                set
-                {
-                    if (value)
-                        InvalidateLayout();
-                }
-            }
-
-            public RoomsFilterContainer()
-            {
-                LayoutDuration = 200;
-                LayoutEasing = Easing.OutQuint;
-            }
+            Push(new MatchScreen(room));
         }
     }
 }

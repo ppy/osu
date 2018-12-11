@@ -18,7 +18,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             DisplayStyleControl.Hide();
         }
 
-        public RoomAvailability Availability
+        public FilterCriteria CreateCriteria() => new FilterCriteria { Availability = availability };
+
+        private RoomAvailability availability
         {
             get
             {

@@ -27,7 +27,6 @@ namespace osu.Game.Screens.Multi.Match.Components
         private readonly Bindable<RoomAvailability> availabilityBind = new Bindable<RoomAvailability>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
-        private readonly Bindable<bool> createdBind = new Bindable<bool>();
 
         private readonly Container content;
 
@@ -38,6 +37,9 @@ namespace osu.Game.Screens.Multi.Match.Components
         protected readonly GameTypePicker TypePicker;
         protected readonly TriangleButton ApplyButton;
         protected readonly OsuPasswordTextBox PasswordField;
+
+        [Resolved]
+        private RoomManager manager { get; set; }
 
         [Resolved]
         private Room room { get; set; }
@@ -162,7 +164,6 @@ namespace osu.Game.Screens.Multi.Match.Components
             availabilityBind.BindTo(room.Availability);
             typeBind.BindTo(room.Type);
             maxParticipantsBind.BindTo(room.MaxParticipants);
-            createdBind.BindTo(room.Created);
 
             MaxParticipantsField.ReadOnly = true;
             PasswordField.ReadOnly = true;
@@ -210,8 +211,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             else
                 maxParticipantsBind.Value = null;
 
-            // Todo: This should only be set after the room has been created server-side
-            createdBind.Value = true;
+            manager.CreateRoom(room);
         }
 
         private class SettingsTextBox : OsuTextBox
