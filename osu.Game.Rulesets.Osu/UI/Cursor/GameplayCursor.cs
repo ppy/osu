@@ -27,22 +27,22 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         private readonly Container<Drawable> fadeContainer;
 
+        private SkinnableCursor skinnableCursor;
+
         public GameplayCursor()
         {
-            InternalChild = fadeContainer = new Container
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Children = new Drawable[]
+                fadeContainer = new Container
                 {
-                    new CursorTrail { Depth = 1 }
-                }
+                    RelativeSizeAxes = Axes.Both,
+                    Children = new Drawable[]
+                    {
+                        new CursorTrail { Depth = 1 }
+                    }
+                },
+                skinnableCursor = new SkinnableCursor()
             };
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(ISkinSource source)
-        {
-            cursorExpand = source.GetValue<SkinConfiguration, bool>(s => s.CursorExpand) ?? true;
         }
 
         private int downCount;
@@ -54,6 +54,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         public bool OnPressed(OsuAction action)
         {
+            cursorExpand = skinnableCursor.CursorExpand;
+
             if (!cursorExpand)
                 return false;
 
@@ -203,6 +205,16 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
                 cursorContainer.Scale = new Vector2(scale);
             }
+        }
+    }
+
+    public class SkinnableCursor : SkinReloadableDrawable
+    {
+        public bool CursorExpand { get; set; } = true;
+
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            CursorExpand = skin.GetValue<SkinConfiguration, bool>(s => s.CursorExpand) ?? true;
         }
     }
 }
