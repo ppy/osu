@@ -60,13 +60,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 return false;
 
             switch (action)
-                {
-                    case OsuAction.LeftButton:
-                    case OsuAction.RightButton:
-                        downCount++;
-                        ActiveCursor.ScaleTo(released_scale).ScaleTo(targetScale, 100, Easing.OutQuad);
-                        break;
-                }
+            {
+                case OsuAction.LeftButton:
+                case OsuAction.RightButton:
+                    downCount++;
+                    ActiveCursor.ScaleTo(released_scale).ScaleTo(targetScale, 100, Easing.OutQuad);
+                    break;
+            }
 
             return false;
         }
