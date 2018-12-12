@@ -58,7 +58,8 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// Whether it's possible to achieve this <see cref="HitResult"/>.
         /// </summary>
-        /// <param name="result">The result.</param>
+        /// <param name="result">The result type to check.</param>
+        /// <returns>Whether the <see cref="HitResult"/> can be achieved.</returns>
         public virtual bool IsHitResultAllowed(HitResult result)
         {
             switch (result)
