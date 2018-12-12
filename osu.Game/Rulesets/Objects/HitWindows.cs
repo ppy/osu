@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Objects
         protected virtual HitResult SuccessfulHitResult => HitResult.Meh;
 
         /// <summary>
-        /// Whether it's possible to achieve this <see cref="HitResult"/>.
+        /// Check whether it is possible to achieve the provided <see cref="HitResult"/>.
         /// </summary>
         /// <param name="result">The result type to check.</param>
         /// <returns>Whether the <see cref="HitResult"/> can be achieved.</returns>
