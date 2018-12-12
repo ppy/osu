@@ -17,8 +17,6 @@ namespace osu.Game.Rulesets.Taiko.Objects
             { HitResult.Miss, (270, 190, 140) },
         };
 
-        protected override HitResult LowestSuccessfulHitResult => HitResult.Good;
-
         public override bool IsHitResultAllowed(HitResult result)
         {
             switch (result)
