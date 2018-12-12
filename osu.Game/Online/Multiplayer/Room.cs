@@ -14,7 +14,7 @@ namespace osu.Game.Online.Multiplayer
 {
     public class Room
     {
-        public Bindable<int> RoomID { get; } = new Bindable<int>();
+        public Bindable<int?> RoomID { get; } = new Bindable<int?>();
 
         [JsonProperty("name")]
         public readonly Bindable<string> Name = new Bindable<string>("My awesome room!");
@@ -34,6 +34,7 @@ namespace osu.Game.Online.Multiplayer
 
         public void CopyFrom(Room other)
         {
+            RoomID.Value = other.RoomID;
             Name.Value = other.Name;
             Host.Value = other.Host;
             Status.Value = other.Status;
@@ -43,8 +44,6 @@ namespace osu.Game.Online.Multiplayer
             MaxParticipants.Value = other.MaxParticipants;
             Participants.Value = other.Participants.Value.ToArray();
         }
-
-        public Bindable<bool> Created = new Bindable<bool>();
     }
 
     public class PlaylistItem
