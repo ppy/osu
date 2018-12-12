@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Taiko.Judgements
 
         protected override double HealthIncreaseFor(HitResult result)
         {
-            switch(result)
+            switch (result)
             {
                 case HitResult.Great:
                     return 0.15;
