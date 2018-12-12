@@ -100,7 +100,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private class BeatmapSelectButton : TriangleButton
         {
-            private readonly IBindable<bool> createdBind = new Bindable<bool>();
+            private readonly IBindable<int?> roomIDBind = new Bindable<int?>();
 
             [Resolved]
             private Room room { get; set; }
@@ -113,8 +113,8 @@ namespace osu.Game.Screens.Multi.Match.Components
             [BackgroundDependencyLoader]
             private void load()
             {
-                createdBind.BindTo(room.Created);
-                createdBind.BindValueChanged(v => Enabled.Value = !v, true);
+                roomIDBind.BindTo(room.RoomID);
+                roomIDBind.BindValueChanged(v => Enabled.Value = !v.HasValue, true);
             }
         }
 

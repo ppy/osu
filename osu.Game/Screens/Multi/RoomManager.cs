@@ -25,7 +25,6 @@ namespace osu.Game.Screens.Multi
 
             // Todo: Perform API request
 
-            room.Created.Value = true;
             rooms.Add(room);
         }
     }
