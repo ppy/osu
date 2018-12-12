@@ -6,6 +6,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Configuration;
 using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
@@ -14,7 +15,11 @@ namespace osu.Game.Online.Multiplayer
 {
     public class Room
     {
+        [JsonProperty("id")]
         public Bindable<int?> RoomID { get; } = new Bindable<int?>();
+
+        [JsonIgnore]
+        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         [JsonProperty("name")]
         public readonly Bindable<string> Name = new Bindable<string>("My awesome room!");
@@ -22,15 +27,31 @@ namespace osu.Game.Online.Multiplayer
         [JsonProperty("host")]
         public readonly Bindable<User> Host = new Bindable<User>();
 
+        public bool ShouldSerializeHost() => false;
+
         [JsonProperty("playlist")]
         public readonly BindableCollection<PlaylistItem> Playlist = new BindableCollection<PlaylistItem>();
+
+        [JsonProperty("duration")]
+        public readonly Bindable<int> Duration = new Bindable<int>(100);
+
+        [JsonProperty("max_attempts")]
+        public readonly Bindable<int?> MaxAttempts = new Bindable<int?>(null);
 
         public Bindable<RoomStatus> Status = new Bindable<RoomStatus>(new RoomStatusOpen());
         public Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
         public Bindable<GameType> Type = new Bindable<GameType>(new GameTypeTimeshift());
-        public Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
         public Bindable<int?> MaxParticipants = new Bindable<int?>();
         public Bindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>(Enumerable.Empty<User>());
+
+        public Room()
+        {
+            Beatmap.BindValueChanged(b =>
+            {
+                Playlist.Clear();
+                Playlist.Add(new PlaylistItem { Beatmap = b });
+            });
+        }
 
         public void CopyFrom(Room other)
         {
@@ -40,22 +61,34 @@ namespace osu.Game.Online.Multiplayer
             Status.Value = other.Status;
             Availability.Value = other.Availability;
             Type.Value = other.Type;
-            Beatmap.Value = other.Beatmap;
             MaxParticipants.Value = other.MaxParticipants;
             Participants.Value = other.Participants.Value.ToArray();
+
+            // Temp:
+            Beatmap.Value = Playlist.FirstOrDefault()?.Beatmap;
         }
     }
 
     public class PlaylistItem
     {
         [JsonProperty("beatmap")]
-        public BeatmapInfo Beatmap;
+        private APIBeatmap beatmap { get; set; }
+
+        public bool ShouldSerializebeatmap() => false;
+
+        [JsonIgnore]
+        public BeatmapInfo Beatmap { get; set; }
+
+        [JsonProperty("beatmap_id")]
+        public int BeatmapID => 847296; //Beatmap.OnlineBeatmapID ?? 0;
 
         [JsonProperty("ruleset_id")]
         public int RulesetID { get; set; }
 
+        [JsonIgnore]
         public readonly BindableCollection<Mod> AllowedMods = new BindableCollection<Mod>();
 
+        [JsonIgnore]
         public readonly BindableCollection<Mod> RequiredMods = new BindableCollection<Mod>();
 
         private APIMod[] _allowedMods;
@@ -78,6 +111,7 @@ namespace osu.Game.Online.Multiplayer
 
         private RulesetInfo ruleset;
 
+        [JsonIgnore]
         public RulesetInfo Ruleset
         {
             get => ruleset;
@@ -101,6 +135,11 @@ namespace osu.Game.Online.Multiplayer
                     _requiredMods = null;
                 }
             }
+        }
+
+        public void SetRulesets(RulesetStore rulesets)
+        {
+            Beatmap = beatmap.ToBeatmap(rulesets);
         }
 
         // Todo: Move this elsewhere for reusability
