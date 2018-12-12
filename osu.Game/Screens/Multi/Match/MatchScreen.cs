@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Multi.Match
             };
 
             header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect());
-            header.Beatmap.BindTo(Beatmap);
+            header.Beatmap.BindTo(beatmapBind);
 
             header.Tabs.Current.ValueChanged += t =>
             {

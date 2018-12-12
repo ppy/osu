@@ -69,6 +69,9 @@ namespace osu.Game.Screens.Multi
                         pi.SetRulesets(rulesets);
                     }
 
+                    // Temporarily
+                    r.Beatmap.Value = r.Playlist.FirstOrDefault()?.Beatmap;
+
                     var existing = rooms.FirstOrDefault(e => e.RoomID.Value == r.RoomID.Value);
                     if (existing == null)
                         rooms.Add(r);
