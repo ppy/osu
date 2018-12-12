@@ -104,7 +104,7 @@ namespace osu.Game.Scoring
         public DateTimeOffset Date { get; set; }
 
         [JsonIgnore]
-        public Dictionary<HitResult, object> Statistics = new Dictionary<HitResult, object>();
+        public Dictionary<HitResult, int> Statistics = new Dictionary<HitResult, int>();
 
         [Column("Statistics")]
         public string StatisticsJson
@@ -118,7 +118,7 @@ namespace osu.Game.Scoring
                     return;
                 }
 
-                Statistics = JsonConvert.DeserializeObject<Dictionary<HitResult, object>>(value);
+                Statistics = JsonConvert.DeserializeObject<Dictionary<HitResult, int>>(value);
             }
         }
 

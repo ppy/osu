@@ -89,6 +89,17 @@ namespace osu.Game.Online.Chat
         }
 
         /// <summary>
+        /// Create a private messaging channel with the specified user.
+        /// </summary>
+        /// <param name="user">The user to create the private conversation with.</param>
+        public Channel(User user)
+        {
+            Type = ChannelType.PM;
+            Users.Add(user);
+            Name = user.Username;
+        }
+
+        /// <summary>
         /// Adds the argument message as a local echo. When this local echo is resolved <see cref="PendingMessageResolved"/> will get called.
         /// </summary>
         /// <param name="message"></param>
