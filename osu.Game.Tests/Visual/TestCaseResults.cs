@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual
                 MaxCombo = 123,
                 Rank = ScoreRank.A,
                 Date = DateTimeOffset.Now,
-                Statistics = new Dictionary<HitResult, dynamic>
+                Statistics = new Dictionary<HitResult, int>
                 {
                     { HitResult.Great, 50 },
                     { HitResult.Good, 20 },
