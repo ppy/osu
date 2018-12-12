@@ -8,7 +8,6 @@ using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
@@ -27,7 +26,7 @@ namespace osu.Game.Overlays.Music
 
         private SpriteIcon handle;
         private TextFlowContainer text;
-        private IEnumerable<SpriteText> titleSprites;
+        private IEnumerable<Drawable> titleSprites;
         private ILocalisedBindableString titleBind;
         private ILocalisedBindableString artistBind;
 
@@ -59,7 +58,7 @@ namespace osu.Game.Overlays.Music
                 selected = value;
 
                 FinishTransforms(true);
-                foreach (SpriteText s in titleSprites)
+                foreach (Drawable s in titleSprites)
                     s.FadeColour(Selected ? hoverColour : Color4.White, fade_duration);
             }
         }

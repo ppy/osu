@@ -100,7 +100,7 @@ namespace osu.Game.Tests.Scores.IO
 
                     var toImport = new ScoreInfo
                     {
-                        Statistics = new Dictionary<HitResult, object>
+                        Statistics = new Dictionary<HitResult, int>
                         {
                             { HitResult.Perfect, 100 },
                             { HitResult.Miss, 50 }
