@@ -206,15 +206,15 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 cursorContainer.Scale = new Vector2(scale);
             }
         }
-    }
 
-    public class SkinnableCursor : SkinReloadableDrawable
-    {
-        public bool CursorExpand { get; set; } = true;
-
-        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        private class SkinnableCursor : SkinReloadableDrawable
         {
-            CursorExpand = skin.GetValue<SkinConfiguration, bool>(s => s.CursorExpand) ?? true;
+            public bool CursorExpand { get; set; } = true;
+
+            protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+            {
+                CursorExpand = skin.GetValue<SkinConfiguration, bool>(s => s.CursorExpand) ?? true;
+            }
         }
     }
 }
