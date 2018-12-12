@@ -9,21 +9,28 @@ using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Beatmaps.Drawables
 {
-    public class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<WorkingBeatmap>
+    public class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<BeatmapInfo>
     {
-        public readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         [Resolved]
-        private OsuGameBase game { get; set; }
+        private BeatmapManager beatmaps { get; set; }
 
         public UpdateableBeatmapBackgroundSprite()
         {
             Beatmap.BindValueChanged(b => Schedule(() => Model = b));
         }
 
-        protected override Drawable CreateDrawable(WorkingBeatmap model)
+        protected override Drawable CreateDrawable(BeatmapInfo model)
         {
-            Drawable drawable = model == null ? (Drawable)new DefaultSprite() : new BeatmapBackgroundSprite(model);
+            Drawable drawable;
+
+            if (model == null)
+                drawable = new DefaultSprite();
+            else if (model.BeatmapSet?.OnlineInfo != null)
+                drawable = new BeatmapSetCover(model.BeatmapSet);
+            else
+                drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(model));
 
             drawable.RelativeSizeAxes = Axes.Both;
             drawable.Anchor = Anchor.Centre;

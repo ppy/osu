@@ -63,9 +63,6 @@ namespace osu.Game.Online.Multiplayer
             Type.Value = other.Type;
             MaxParticipants.Value = other.MaxParticipants;
             Participants.Value = other.Participants.Value.ToArray();
-
-            // Temp:
-            Beatmap.Value = Playlist.FirstOrDefault()?.Beatmap;
         }
     }
 
