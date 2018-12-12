@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Select;
 using osu.Game.Users;
@@ -32,6 +34,9 @@ namespace osu.Game.Screens.Multi.Match
         public override string Title => room.Name.Value;
 
         public override string ShortTitle => "room";
+
+        [Cached]
+        private readonly Bindable<IEnumerable<Mod>> mods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>());
 
         [Cached]
         private readonly Room room;
@@ -101,6 +106,7 @@ namespace osu.Game.Screens.Multi.Match
             info.Status.BindTo(statusBind);
             info.Availability.BindTo(availabilityBind);
             info.Type.BindTo(typeBind);
+            info.Mods.BindTo(mods);
 
             participants.Users.BindTo(participantsBind);
             participants.MaxParticipants.BindTo(maxParticipantsBind);
