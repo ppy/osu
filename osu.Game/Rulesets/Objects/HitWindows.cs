@@ -53,7 +53,7 @@ namespace osu.Game.Rulesets.Objects
         /// <summary>
         /// The <see cref="HitResult"/> with the largest hit window that produces a successful hit.
         /// </summary>
-        protected virtual HitResult SuccessfulHitResult => HitResult.Meh;
+        protected virtual HitResult LowestSuccessfulHitResult => HitResult.Meh;
 
         /// <summary>
         /// Check whether it is possible to achieve the provided <see cref="HitResult"/>.
@@ -137,6 +137,6 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         /// <param name="timeOffset">The time offset.</param>
         /// <returns>Whether the <see cref="HitObject"/> can be hit at any point in the future from this time offset.</returns>
-        public bool CanBeHit(double timeOffset) => timeOffset <= HalfWindowFor(SuccessfulHitResult);
+        public bool CanBeHit(double timeOffset) => timeOffset <= HalfWindowFor(LowestSuccessfulHitResult);
     }
 }
