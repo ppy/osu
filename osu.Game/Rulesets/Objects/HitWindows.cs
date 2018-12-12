@@ -51,9 +51,19 @@ namespace osu.Game.Rulesets.Objects
         public double Miss { get; protected set; }
 
         /// <summary>
-        /// The <see cref="HitResult"/> with the largest hit window that produces a successful hit.
+        /// Retrieves the <see cref="HitResult"/> with the largest hit window that produces a successful hit.
         /// </summary>
-        protected virtual HitResult LowestSuccessfulHitResult => HitResult.Meh;
+        /// <returns>The lowest allowed successful <see cref="HitResult"/>.</returns>
+        protected HitResult LowestSuccessfulHitResult()
+        {
+            for (var result = HitResult.Meh; result <= HitResult.Perfect; ++result)
+            {
+                if (IsHitResultAllowed(result))
+                    return result;
+            }
+
+            return HitResult.None;
+        }
 
         /// <summary>
         /// Check whether it is possible to achieve the provided <see cref="HitResult"/>.
@@ -137,6 +147,6 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         /// <param name="timeOffset">The time offset.</param>
         /// <returns>Whether the <see cref="HitObject"/> can be hit at any point in the future from this time offset.</returns>
-        public bool CanBeHit(double timeOffset) => timeOffset <= HalfWindowFor(LowestSuccessfulHitResult);
+        public bool CanBeHit(double timeOffset) => timeOffset <= HalfWindowFor(LowestSuccessfulHitResult());
     }
 }
