@@ -7,7 +7,7 @@ using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
@@ -66,8 +66,7 @@ namespace osu.Game.Tests.Visual
                 }
             };
 
-            RoomInspector inspector;
-            Add(inspector = new RoomInspector
+            Add(new RoomInspector
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -75,9 +74,6 @@ namespace osu.Game.Tests.Visual
                 Width = 0.5f,
             });
 
-            AddStep(@"set room", () => inspector.Room = room);
-            AddStep(@"null room", () => inspector.Room = null);
-            AddStep(@"set room", () => inspector.Room = room);
             AddStep(@"change title", () => room.Name.Value = @"A Better Room Than The Above");
             AddStep(@"change host", () => room.Host.Value = new User { Username = @"DrabWeb", Id = 6946022, Country = new Country { FlagName = @"CA" } });
             AddStep(@"change status", () => room.Status.Value = new RoomStatusPlaying());
@@ -133,8 +129,6 @@ namespace osu.Game.Tests.Visual
                         }
                     }
                 };
-
-                inspector.Room = newRoom;
             });
         }
 

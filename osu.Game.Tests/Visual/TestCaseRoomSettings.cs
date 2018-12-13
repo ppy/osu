@@ -1,11 +1,14 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Testing.Input;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Screens.Multi.Screens.Match.Settings;
+using osu.Game.Screens.Multi.Match.Components;
 using osuTK.Input;
 
 namespace osu.Game.Tests.Visual
@@ -13,6 +16,12 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseRoomSettings : ManualInputManagerTestCase
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(RoomSettingsOverlay),
+            typeof(GameTypePicker)
+        };
+
         private readonly Room room;
         private readonly TestRoomSettingsOverlay overlay;
 
@@ -26,13 +35,13 @@ namespace osu.Game.Tests.Visual
                 MaxParticipants = { Value = 10 },
             };
 
-            Add(overlay = new TestRoomSettingsOverlay(room)
+            Add(overlay = new TestRoomSettingsOverlay
             {
                 RelativeSizeAxes = Axes.Both,
                 Height = 0.75f,
+                State = Visibility.Visible
             });
 
-            AddStep(@"show", overlay.Show);
             assertAll();
             AddStep(@"set name", () => overlay.CurrentName = @"Two Testing Room");
             AddStep(@"set max", () => overlay.CurrentMaxParticipants = null);
@@ -103,10 +112,6 @@ namespace osu.Game.Tests.Visual
             {
                 get => TypePicker.Current.Value;
                 set => TypePicker.Current.Value = value;
-            }
-
-            public TestRoomSettingsOverlay(Room room) : base(room)
-            {
             }
 
             public void ClickApplyButton(ManualInputManager inputManager)

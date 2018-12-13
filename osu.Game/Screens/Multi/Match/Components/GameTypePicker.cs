@@ -12,14 +12,15 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Screens.Match.Settings
+namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class GameTypePicker : TabControl<GameType>
+    public class GameTypePicker : DisableableTabControl<GameType>
     {
         private const float height = 40;
         private const float selection_width = 3;
 
         protected override TabItem<GameType> CreateTabItem(GameType value) => new GameTypePickerItem(value);
+
         protected override Dropdown<GameType> CreateDropdown() => null;
 
         public GameTypePicker()
@@ -31,15 +32,17 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
             AddItem(new GameTypeVersus());
             AddItem(new GameTypeTagTeam());
             AddItem(new GameTypeTeamVersus());
+            AddItem(new GameTypeTimeshift());
         }
 
-        private class GameTypePickerItem : TabItem<GameType>
+        private class GameTypePickerItem : DisableableTabItem<GameType>
         {
             private const float transition_duration = 200;
 
             private readonly CircularContainer hover, selection;
 
-            public GameTypePickerItem(GameType value) : base(value)
+            public GameTypePickerItem(GameType value)
+                : base(value)
             {
                 AutoSizeAxes = Axes.Both;
 

@@ -2,20 +2,16 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 
-namespace osu.Game.Screens.Multi.Screens
+namespace osu.Game.Screens.Multi
 {
-    public abstract class MultiplayerScreen : OsuScreen
+    public abstract class MultiplayerScreen : OsuScreen, IMultiplayerScreen
     {
-        protected virtual Container<Drawable> TransitionContent => Content;
+        protected virtual Drawable TransitionContent => Content;
 
-        /// <summary>
-        /// The type to display in the title of the <see cref="Header"/>.
-        /// </summary>
-        public virtual string Type => Title;
+        public virtual string ShortTitle => Title;
 
         protected override void OnEntering(Screen last)
         {

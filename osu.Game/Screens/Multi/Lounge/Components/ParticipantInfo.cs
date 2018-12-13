@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,39 +13,24 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.Multi.Lounge.Components
 {
     public class ParticipantInfo : Container
     {
-        private readonly Container flagContainer;
         private readonly OsuSpriteText host;
         private readonly FillFlowContainer levelRangeContainer;
-        private readonly OsuSpriteText levelRangeLower;
-        private readonly OsuSpriteText levelRangeHigher;
 
-        public User Host
-        {
-            set
-            {
-                host.Text = value.Username;
-                flagContainer.Children = new[] { new DrawableFlag(value.Country) { RelativeSizeAxes = Axes.Both } };
-            }
-        }
-
-        public IEnumerable<User> Participants
-        {
-            set
-            {
-                var ranks = value.Select(u => u.Statistics.Ranks.Global);
-                levelRangeLower.Text = ranks.Min().ToString();
-                levelRangeHigher.Text = ranks.Max().ToString();
-            }
-        }
+        public readonly Bindable<User> Host = new Bindable<User>();
+        public readonly Bindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>();
 
         public ParticipantInfo(string rankPrefix = null)
         {
             RelativeSizeAxes = Axes.X;
             Height = 15f;
+
+            OsuSpriteText levelRangeHigher;
+            OsuSpriteText levelRangeLower;
+            Container flagContainer;
 
             Children = new Drawable[]
             {
@@ -133,6 +119,19 @@ namespace osu.Game.Screens.Multi.Components
                     },
                 },
             };
+
+            Host.BindValueChanged(v =>
+            {
+                host.Text = v.Username;
+                flagContainer.Child = new DrawableFlag(v.Country) { RelativeSizeAxes = Axes.Both };
+            });
+
+            Participants.BindValueChanged(v =>
+            {
+                var ranks = v.Select(u => u.Statistics.Ranks.Global);
+                levelRangeLower.Text = ranks.Min().ToString();
+                levelRangeHigher.Text = ranks.Max().ToString();
+            });
         }
 
         [BackgroundDependencyLoader]

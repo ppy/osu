@@ -10,7 +10,6 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
@@ -18,11 +17,12 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Screens.Multi.Components;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Multi.Components
+namespace osu.Game.Screens.Multi.Lounge.Components
 {
     public class DrawableRoom : OsuClickableContainer, IStateful<SelectionState>, IFilterable
     {
@@ -34,14 +34,21 @@ namespace osu.Game.Screens.Multi.Components
         private const float side_strip_width = 5;
         private const float cover_width = 145;
 
+        public event Action<SelectionState> StateChanged;
+
         private readonly Box selectionBox;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
+        private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
         private readonly Bindable<User> hostBind = new Bindable<User>();
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
-        private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
         private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
+
+        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         public readonly Room Room;
 
@@ -76,19 +83,6 @@ namespace osu.Game.Screens.Multi.Components
             }
         }
 
-        private Action<DrawableRoom> action;
-        public new Action<DrawableRoom> Action
-        {
-            get { return action; }
-            set
-            {
-                action = value;
-                Enabled.Value = action != null;
-            }
-        }
-
-        public event Action<SelectionState> StateChanged;
-
         public DrawableRoom(Room room)
         {
             Room = room;
@@ -110,11 +104,12 @@ namespace osu.Game.Screens.Multi.Components
         private void load(OsuColour colours)
         {
             Box sideStrip;
-            UpdateableBeatmapSetCover cover;
-            OsuSpriteText name, status;
+            UpdateableBeatmapBackgroundSprite background;
+            OsuSpriteText status;
             ParticipantInfo participantInfo;
             BeatmapTitle beatmapTitle;
             ModeTypeInfo modeTypeInfo;
+            OsuSpriteText name;
 
             Children = new Drawable[]
             {
@@ -146,12 +141,13 @@ namespace osu.Game.Screens.Multi.Components
                                 RelativeSizeAxes = Axes.Y,
                                 Width = side_strip_width,
                             },
-                            cover = new UpdateableBeatmapSetCover
+                            new Container
                             {
-                                Width = cover_width,
                                 RelativeSizeAxes = Axes.Y,
+                                Width = cover_width,
                                 Masking = true,
                                 Margin = new MarginPadding { Left = side_strip_width },
+                                Child = background = new UpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
                             {
@@ -172,10 +168,7 @@ namespace osu.Game.Screens.Multi.Components
                                         Spacing = new Vector2(5f),
                                         Children = new Drawable[]
                                         {
-                                            name = new OsuSpriteText
-                                            {
-                                                TextSize = 18,
-                                            },
+                                            name = new OsuSpriteText { TextSize = 18 },
                                             participantInfo = new ParticipantInfo(),
                                         },
                                     },
@@ -212,11 +205,6 @@ namespace osu.Game.Screens.Multi.Components
                 },
             };
 
-            nameBind.ValueChanged += n => name.Text = n;
-            hostBind.ValueChanged += h => participantInfo.Host = h;
-            typeBind.ValueChanged += m => modeTypeInfo.Type = m;
-            participantsBind.ValueChanged += p => participantInfo.Participants = p;
-
             statusBind.ValueChanged += s =>
             {
                 status.Text = s.Message;
@@ -225,12 +213,10 @@ namespace osu.Game.Screens.Multi.Components
                     d.FadeColour(s.GetAppropriateColour(colours), transition_duration);
             };
 
-            beatmapBind.ValueChanged += b =>
-            {
-                cover.BeatmapSet = b?.BeatmapSet;
-                beatmapTitle.Beatmap = b;
-                modeTypeInfo.Beatmap = b;
-            };
+            background.Beatmap.BindTo(beatmap);
+
+            beatmapBind.BindValueChanged(b => beatmap.Value = beatmaps.GetWorkingBeatmap(b));
+            nameBind.BindValueChanged(n => name.Text = n);
 
             nameBind.BindTo(Room.Name);
             hostBind.BindTo(Room.Host);
@@ -238,23 +224,20 @@ namespace osu.Game.Screens.Multi.Components
             typeBind.BindTo(Room.Type);
             beatmapBind.BindTo(Room.Beatmap);
             participantsBind.BindTo(Room.Participants);
+
+            modeTypeInfo.Beatmap.BindTo(beatmapBind);
+            modeTypeInfo.Type.BindTo(typeBind);
+
+            participantInfo.Host.BindTo(hostBind);
+            participantInfo.Participants.BindTo(participantsBind);
+
+            beatmapTitle.Beatmap.BindTo(beatmapBind);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             this.FadeInFromZero(transition_duration);
-        }
-
-        protected override bool OnClick(ClickEvent e)
-        {
-            if (Enabled.Value)
-            {
-                Action?.Invoke(this);
-                State = SelectionState.Selected;
-            }
-
-            return true;
         }
     }
 }

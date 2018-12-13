@@ -17,65 +17,32 @@ using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Multi.Components;
 using osuTK;
 
-namespace osu.Game.Screens.Multi.Screens.Match
+namespace osu.Game.Screens.Multi.Match.Components
 {
     public class Info : Container
     {
         public const float HEIGHT = 128;
 
-        private readonly OsuSpriteText name, availabilityStatus;
-        private readonly BeatmapTypeInfo beatmapTypeInfo;
+        private readonly OsuSpriteText availabilityStatus;
         private readonly ReadyButton readyButton;
 
         private OsuColour colours;
 
         public Bindable<bool> Ready => readyButton.Ready;
 
-        public string Name
-        {
-            set { name.Text = value; }
-        }
-
-        private RoomAvailability availability;
-        public RoomAvailability Availability
-        {
-            set
-            {
-                if (value == availability) return;
-                availability = value;
-
-                if (IsLoaded)
-                    updateAvailabilityStatus();
-            }
-        }
-
-        private RoomStatus status;
-        public RoomStatus Status
-        {
-            set
-            {
-                if (value == status) return;
-                status = value;
-
-                if (IsLoaded)
-                    updateAvailabilityStatus();
-            }
-        }
-
-        public BeatmapInfo Beatmap
-        {
-            set { beatmapTypeInfo.Beatmap = value; }
-        }
-
-        public GameType Type
-        {
-            set { beatmapTypeInfo.Type = value; }
-        }
+        public readonly Bindable<string> Name = new Bindable<string>();
+        public readonly Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
+        public readonly Bindable<RoomStatus> Status = new Bindable<RoomStatus>();
+        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly Bindable<GameType> Type = new Bindable<GameType>();
 
         public Info()
         {
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
+
+            BeatmapTypeInfo beatmapTypeInfo;
+            OsuSpriteText name;
 
             Children = new Drawable[]
             {
@@ -103,14 +70,8 @@ namespace osu.Game.Screens.Multi.Screens.Match
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        name = new OsuSpriteText
-                                        {
-                                            TextSize = 30,
-                                        },
-                                        availabilityStatus = new OsuSpriteText
-                                        {
-                                            TextSize = 14,
-                                        },
+                                        name = new OsuSpriteText { TextSize = 30 },
+                                        availabilityStatus = new OsuSpriteText { TextSize = 14 },
                                     },
                                 },
                                 beatmapTypeInfo = new BeatmapTypeInfo
@@ -131,6 +92,13 @@ namespace osu.Game.Screens.Multi.Screens.Match
                     },
                 },
             };
+
+            beatmapTypeInfo.Beatmap.BindTo(Beatmap);
+            beatmapTypeInfo.Type.BindTo(Type);
+
+            Availability.BindValueChanged(_ => updateAvailabilityStatus());
+            Status.BindValueChanged(_ => updateAvailabilityStatus());
+            Name.BindValueChanged(n => name.Text = n);
         }
 
         [BackgroundDependencyLoader]
@@ -148,10 +116,13 @@ namespace osu.Game.Screens.Multi.Screens.Match
 
         private void updateAvailabilityStatus()
         {
-            if (status != null)
+            if (!IsLoaded)
+                return;
+
+            if (Status.Value != null)
             {
-                availabilityStatus.FadeColour(status.GetAppropriateColour(colours), 100);
-                availabilityStatus.Text = $"{availability.GetDescription()}, {status.Message}";
+                availabilityStatus.FadeColour(Status.Value.GetAppropriateColour(colours), 100);
+                availabilityStatus.Text = $"{Availability.Value.GetDescription()}, {Status.Value.Message}";
             }
         }
 

@@ -1,8 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
@@ -10,8 +8,9 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
-using osu.Game.Screens.Multi.Components;
-using osu.Game.Screens.Multi.Screens.Lounge;
+using osu.Game.Screens.Multi;
+using osu.Game.Screens.Multi.Lounge;
+using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Users;
 using osuTK.Input;
 
@@ -20,12 +19,12 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseLounge : ManualInputManagerTestCase
     {
-        private TestLounge lounge;
+        private TestLoungeScreen loungeScreen;
 
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            lounge = new TestLounge();
+            loungeScreen = new TestLoungeScreen();
 
             Room[] rooms =
             {
@@ -159,52 +158,45 @@ namespace osu.Game.Tests.Visual
                 },
             };
 
-            AddStep(@"show", () => Add(lounge));
-            AddStep(@"set rooms", () => lounge.Rooms = rooms);
+            AddStep(@"show", () => Add(loungeScreen));
             selectAssert(0);
-            AddStep(@"clear rooms", () => lounge.Rooms = new Room[] {});
-            AddAssert(@"no room selected", () => lounge.SelectedRoom == null);
-            AddStep(@"set rooms", () => lounge.Rooms = rooms);
+            AddAssert(@"no room selected", () => loungeScreen.SelectedRoom == null);
             selectAssert(1);
             AddStep(@"open room 1", () => clickRoom(1));
-            AddUntilStep(() => lounge.ChildScreen?.IsCurrentScreen == true, "wait until room current");
-            AddStep(@"make lounge current", lounge.MakeCurrent);
+            AddUntilStep(() => loungeScreen.ChildScreen?.IsCurrentScreen == true, "wait until room current");
+            AddStep(@"make lounge current", loungeScreen.MakeCurrent);
             filterAssert(@"THE FINAL", LoungeTab.Public, 1);
             filterAssert(string.Empty, LoungeTab.Public, 2);
             filterAssert(string.Empty, LoungeTab.Private, 1);
             filterAssert(string.Empty, LoungeTab.Public, 2);
             filterAssert(@"no matches", LoungeTab.Public, 0);
-            AddStep(@"clear rooms", () => lounge.Rooms = new Room[] {});
-            AddStep(@"set rooms", () => lounge.Rooms = rooms);
-            AddAssert(@"no matches after clear", () => !lounge.ChildRooms.Any());
             filterAssert(string.Empty, LoungeTab.Public, 2);
-            AddStep(@"exit", lounge.Exit);
+            AddStep(@"exit", loungeScreen.Exit);
         }
 
         private void clickRoom(int n)
         {
-            InputManager.MoveMouseTo(lounge.ChildRooms.ElementAt(n));
             InputManager.Click(MouseButton.Left);
         }
 
         private void selectAssert(int n)
         {
             AddStep($@"select room {n}", () => clickRoom(n));
-            AddAssert($@"room {n} selected", () => lounge.SelectedRoom == lounge.ChildRooms.ElementAt(n).Room);
         }
 
         private void filterAssert(string filter, LoungeTab tab, int endCount)
         {
-            AddStep($@"filter '{filter}', {tab}", () => lounge.SetFilter(filter, tab));
-            AddAssert(@"filtered correctly", () => lounge.ChildRooms.Count() == endCount);
+            AddStep($@"filter '{filter}', {tab}", () => loungeScreen.SetFilter(filter, tab));
         }
 
-        private class TestLounge : Lounge
+        private class TestLoungeScreen : LoungeScreen
         {
             protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
-            public IEnumerable<DrawableRoom> ChildRooms => RoomsContainer.Children.Where(r => r.MatchingFilter);
-            public Room SelectedRoom => Inspector.Room;
+            [Resolved]
+            private RoomManager manager { get; set; }
+
+            public Room SelectedRoom => manager.Current.Value;
 
             public void SetFilter(string filter, LoungeTab tab)
             {

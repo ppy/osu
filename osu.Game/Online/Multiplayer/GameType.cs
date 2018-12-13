@@ -13,6 +13,7 @@ namespace osu.Game.Online.Multiplayer
     public abstract class GameType
     {
         public abstract string Name { get; }
+
         public abstract Drawable GetIcon(OsuColour colours, float size);
 
         public override int GetHashCode() => GetType().GetHashCode();
@@ -22,6 +23,7 @@ namespace osu.Game.Online.Multiplayer
     public class GameTypeTag : GameType
     {
         public override string Name => "Tag";
+
         public override Drawable GetIcon(OsuColour colours, float size)
         {
             return new SpriteIcon
@@ -39,6 +41,7 @@ namespace osu.Game.Online.Multiplayer
     public class GameTypeVersus : GameType
     {
         public override string Name => "Versus";
+
         public override Drawable GetIcon(OsuColour colours, float size)
         {
             return new VersusRow(colours.Blue, colours.Blue, size * 0.6f)
@@ -52,6 +55,7 @@ namespace osu.Game.Online.Multiplayer
     public class GameTypeTagTeam : GameType
     {
         public override string Name => "Tag Team";
+
         public override Drawable GetIcon(OsuColour colours, float size)
         {
             return new FillFlowContainer
@@ -85,6 +89,7 @@ namespace osu.Game.Online.Multiplayer
     public class GameTypeTeamVersus : GameType
     {
         public override string Name => "Team Versus";
+
         public override Drawable GetIcon(OsuColour colours, float size)
         {
             return new FillFlowContainer
@@ -145,5 +150,21 @@ namespace osu.Game.Online.Multiplayer
                 },
             };
         }
+    }
+
+    public class GameTypeTimeshift : GameType
+    {
+        public override string Name => "Timeshift";
+
+        public override Drawable GetIcon(OsuColour colours, float size) => new SpriteIcon
+        {
+            Anchor = Anchor.Centre,
+            Origin = Anchor.Centre,
+            Icon = FontAwesome.fa_osu_charts,
+            X = -2, // The icon is off-centre
+            Size = new Vector2(size),
+            Colour = colours.Blue,
+            Shadow = false
+        };
     }
 }

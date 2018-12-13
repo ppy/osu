@@ -10,12 +10,13 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Screens.Multi.Components;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Multi.Screens.Match.Settings
+namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class RoomAvailabilityPicker : TabControl<RoomAvailability>
+    public class RoomAvailabilityPicker : DisableableTabControl<RoomAvailability>
     {
         protected override TabItem<RoomAvailability> CreateTabItem(RoomAvailability value) => new RoomAvailabilityPickerItem(value);
         protected override Dropdown<RoomAvailability> CreateDropdown() => null;
@@ -32,7 +33,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
             AddItem(RoomAvailability.InviteOnly);
         }
 
-        private class RoomAvailabilityPickerItem : TabItem<RoomAvailability>
+        private class RoomAvailabilityPickerItem : DisableableTabItem<RoomAvailability>
         {
             private const float transition_duration = 200;
 
@@ -41,7 +42,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
             public RoomAvailabilityPickerItem(RoomAvailability value) : base(value)
             {
                 RelativeSizeAxes = Axes.Y;
-                Width = 120;
+                Width = 102;
                 Masking = true;
                 CornerRadius = 5;
 
