@@ -6,6 +6,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -14,7 +15,7 @@ using osu.Game.Overlays.SearchableList;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Multi.Screens.Match.Settings
+namespace osu.Game.Screens.Multi.Match.Components
 {
     public class RoomSettingsOverlay : FocusedOverlayContainer
     {
@@ -22,19 +23,28 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
         private const float field_padding = 45;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
+        private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
         private readonly Bindable<RoomAvailability> availabilityBind = new Bindable<RoomAvailability>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
 
         private readonly Container content;
+
         private readonly OsuSpriteText typeLabel;
 
         protected readonly OsuTextBox NameField, MaxParticipantsField;
         protected readonly RoomAvailabilityPicker AvailabilityPicker;
         protected readonly GameTypePicker TypePicker;
         protected readonly TriangleButton ApplyButton;
+        protected readonly OsuPasswordTextBox PasswordField;
 
-        public RoomSettingsOverlay(Room room)
+        [Resolved]
+        private RoomManager manager { get; set; }
+
+        [Resolved]
+        private Room room { get; set; }
+
+        public RoomSettingsOverlay()
         {
             Masking = true;
 
@@ -114,11 +124,11 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
                                     },
                                     new Section("PASSWORD (OPTIONAL)")
                                     {
-                                        Child = new SettingsPasswordTextBox
+                                        Child = PasswordField = new SettingsPasswordTextBox
                                         {
                                             RelativeSizeAxes = Axes.X,
                                             TabbableContentContainer = this,
-                                            OnCommit = (sender, text) => apply(),
+                                            OnCommit = (sender, text) => apply()
                                         },
                                     },
                                 },
@@ -142,18 +152,34 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
             availabilityBind.ValueChanged += a => AvailabilityPicker.Current.Value = a;
             typeBind.ValueChanged += t => TypePicker.Current.Value = t;
             maxParticipantsBind.ValueChanged += m => MaxParticipantsField.Text = m?.ToString();
-
-            nameBind.BindTo(room.Name);
-            availabilityBind.BindTo(room.Availability);
-            typeBind.BindTo(room.Type);
-            maxParticipantsBind.BindTo(room.MaxParticipants);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             typeLabel.Colour = colours.Yellow;
+
+            nameBind.BindTo(room.Name);
+            beatmapBind.BindTo(room.Beatmap);
+            availabilityBind.BindTo(room.Availability);
+            typeBind.BindTo(room.Type);
+            maxParticipantsBind.BindTo(room.MaxParticipants);
+
+            MaxParticipantsField.ReadOnly = true;
+            PasswordField.ReadOnly = true;
+            AvailabilityPicker.ReadOnly.Value = true;
+            TypePicker.ReadOnly.Value = true;
+            ApplyButton.Enabled.Value = false;
         }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            ApplyButton.Enabled.Value = hasValidSettings;
+        }
+
+        private bool hasValidSettings => NameField.Text.Length > 0 && beatmapBind.Value != null;
 
         protected override void PopIn()
         {
@@ -185,7 +211,7 @@ namespace osu.Game.Screens.Multi.Screens.Match.Settings
             else
                 maxParticipantsBind.Value = null;
 
-            Hide();
+            manager.CreateRoom(room);
         }
 
         private class SettingsTextBox : OsuTextBox

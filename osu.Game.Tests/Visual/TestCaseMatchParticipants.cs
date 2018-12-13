@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
-using osu.Game.Screens.Multi.Screens.Match;
+using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
@@ -19,8 +19,8 @@ namespace osu.Game.Tests.Visual
                 RelativeSizeAxes = Axes.Both,
             });
 
-            AddStep(@"set max to null", () => participants.Max = null);
-            AddStep(@"set users", () => participants.Users = new[]
+            AddStep(@"set max to null", () => participants.MaxParticipants.Value = null);
+            AddStep(@"set users", () => participants.Users.Value = new[]
             {
                 new User
                 {
@@ -48,9 +48,9 @@ namespace osu.Game.Tests.Visual
                 },
             });
 
-            AddStep(@"set max", () => participants.Max = 10);
-            AddStep(@"clear users", () => participants.Users = new User[] { });
-            AddStep(@"set max to null", () => participants.Max = null);
+            AddStep(@"set max", () => participants.MaxParticipants.Value = 10);
+            AddStep(@"clear users", () => participants.Users.Value = new User[] { });
+            AddStep(@"set max to null", () => participants.MaxParticipants.Value = null);
         }
     }
 }

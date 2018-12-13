@@ -6,7 +6,7 @@ using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Multi.Screens.Lounge
+namespace osu.Game.Screens.Multi.Lounge.Components
 {
     public class FilterControl : SearchableListFilterControl<LoungeTab, LoungeTab>
     {
@@ -17,11 +17,29 @@ namespace osu.Game.Screens.Multi.Screens.Lounge
         {
             DisplayStyleControl.Hide();
         }
+
+        public FilterCriteria CreateCriteria() => new FilterCriteria { Availability = availability };
+
+        private RoomAvailability availability
+        {
+            get
+            {
+                switch (Tabs.Current.Value)
+                {
+                    default:
+                    case LoungeTab.Public:
+                        return RoomAvailability.Public;
+                    case LoungeTab.Private:
+                        return RoomAvailability.FriendsOnly;
+                }
+            }
+        }
     }
 
     public enum LoungeTab
     {
-        Public = RoomAvailability.Public,
-        Private = RoomAvailability.FriendsOnly,
+        Create,
+        Public,
+        Private,
     }
 }

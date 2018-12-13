@@ -1,69 +1,65 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
+using System.Linq;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Multi.Components
 {
-    public class ParticipantCount : FillFlowContainer
+    public class ParticipantCount : CompositeDrawable
     {
         private const float text_size = 30;
         private const float transition_duration = 100;
 
-        private readonly OsuSpriteText count, slash, maxText;
+        private readonly OsuSpriteText slash, maxText;
 
-        public int Count
-        {
-            set => count.Text = value.ToString();
-        }
-
-        private int? max;
-        public int? Max
-        {
-            get => max;
-            set
-            {
-                if (value == max) return;
-                max = value;
-
-                updateMax();
-            }
-        }
+        public readonly Bindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>();
+        public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
 
         public ParticipantCount()
         {
             AutoSizeAxes = Axes.Both;
-            Direction = FillDirection.Horizontal;
-            LayoutDuration = transition_duration;
 
-            Children = new[]
+            OsuSpriteText count;
+
+            InternalChild = new FillFlowContainer
             {
-                count = new OsuSpriteText
+                AutoSizeAxes = Axes.Both,
+                Direction = FillDirection.Horizontal,
+                LayoutDuration = transition_duration,
+                Children = new[]
                 {
-                    TextSize = text_size,
-                    Font = @"Exo2.0-Bold"
-                },
-                slash = new OsuSpriteText
-                {
-                    Text = @"/",
-                    TextSize = text_size,
-                    Font = @"Exo2.0-Light"
-                },
-                maxText = new OsuSpriteText
-                {
-                    TextSize = text_size,
-                    Font = @"Exo2.0-Light"
-                },
+                    count = new OsuSpriteText
+                    {
+                        TextSize = text_size,
+                        Font = @"Exo2.0-Bold"
+                    },
+                    slash = new OsuSpriteText
+                    {
+                        Text = @"/",
+                        TextSize = text_size,
+                        Font = @"Exo2.0-Light"
+                    },
+                    maxText = new OsuSpriteText
+                    {
+                        TextSize = text_size,
+                        Font = @"Exo2.0-Light"
+                    },
+                }
             };
 
-            updateMax();
+            Participants.BindValueChanged(v => count.Text = v.Count().ToString());
+            MaxParticipants.BindValueChanged(_ => updateMax(), true);
         }
 
         private void updateMax()
         {
-            if (Max == null)
+            if (MaxParticipants.Value == null)
             {
                 slash.FadeOut(transition_duration);
                 maxText.FadeOut(transition_duration);
@@ -71,7 +67,7 @@ namespace osu.Game.Screens.Multi.Components
             else
             {
                 slash.FadeIn(transition_duration);
-                maxText.Text = Max.ToString();
+                maxText.Text = MaxParticipants.Value.ToString();
                 maxText.FadeIn(transition_duration);
             }
         }
