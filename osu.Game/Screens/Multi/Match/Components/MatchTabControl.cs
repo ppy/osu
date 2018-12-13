@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 {
     public class MatchTabControl : PageTabControl<MatchPage>
     {
-        private readonly IBindable<bool> created = new Bindable<bool>();
+        private readonly IBindable<int?> roomIdBind = new Bindable<int?>();
 
         [Resolved]
         private Room room { get; set; }
@@ -28,10 +28,10 @@ namespace osu.Game.Screens.Multi.Match.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            created.BindTo(room.Created);
-            created.BindValueChanged(v =>
+            roomIdBind.BindTo(room.RoomID);
+            roomIdBind.BindValueChanged(v =>
             {
-                if (v)
+                if (v.HasValue)
                 {
                     Items.ForEach(t => t.Enabled.Value = !(t is SettingsMatchPage));
                     Current.Value = new RoomMatchPage();

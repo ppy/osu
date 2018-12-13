@@ -180,7 +180,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             nameBind.BindValueChanged(n => name.Text = n);
 
-            background.Beatmap.BindTo(beatmap);
+            background.Beatmap.BindTo(beatmapBind);
 
             participantInfo.Host.BindTo(hostBind);
             participantInfo.Participants.BindTo(participantsBind);
