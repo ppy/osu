@@ -24,18 +24,21 @@ namespace osu.Game.Screens.Multi.Match
         private readonly Participants participants;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
-        private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
         private readonly Bindable<RoomAvailability> availabilityBind = new Bindable<RoomAvailability>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
         private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
+        private readonly BindableCollection<PlaylistItem> playlistBind = new BindableCollection<PlaylistItem>();
 
         protected override Drawable TransitionContent => participants;
 
         public override string Title => room.Name.Value;
 
         public override string ShortTitle => "room";
+
+        private readonly Components.Header header;
+        private readonly Info info;
 
         [Cached]
         private readonly Bindable<IEnumerable<Mod>> mods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>());
@@ -57,16 +60,13 @@ namespace osu.Game.Screens.Multi.Match
             this.room = room;
 
             nameBind.BindTo(room.Name);
-            beatmapBind.BindTo(room.Beatmap);
             statusBind.BindTo(room.Status);
             availabilityBind.BindTo(room.Availability);
             typeBind.BindTo(room.Type);
             participantsBind.BindTo(room.Participants);
             maxParticipantsBind.BindTo(room.MaxParticipants);
 
-            Components.Header header;
             RoomSettingsOverlay settings;
-            Info info;
 
             Children = new Drawable[]
             {
@@ -97,7 +97,6 @@ namespace osu.Game.Screens.Multi.Match
             };
 
             header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect());
-            header.Beatmap.BindTo(beatmapBind);
 
             header.Tabs.Current.ValueChanged += t =>
             {
@@ -107,7 +106,6 @@ namespace osu.Game.Screens.Multi.Match
                     settings.Hide();
             };
 
-            info.Beatmap.BindTo(beatmapBind);
             info.Name.BindTo(nameBind);
             info.Status.BindTo(statusBind);
             info.Availability.BindTo(availabilityBind);
@@ -116,14 +114,49 @@ namespace osu.Game.Screens.Multi.Match
 
             participants.Users.BindTo(participantsBind);
             participants.MaxParticipants.BindTo(maxParticipantsBind);
+
+            playlistBind.ItemsAdded += _ => updatePlaylist();
+            playlistBind.ItemsRemoved += _ => updatePlaylist();
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            beatmapBind.BindTo(room.Beatmap);
-            beatmapBind.BindValueChanged(b => Beatmap.Value = beatmapManager.GetWorkingBeatmap(room.Beatmap.Value), true);
-            Beatmap.BindValueChanged(b => beatmapBind.Value = b.BeatmapInfo);
+            Beatmap.BindValueChanged(b =>
+            {
+                playlistBind.Clear();
+
+                var newItem = new PlaylistItem
+                {
+                    Beatmap = b.BeatmapInfo,
+                    Ruleset = Ruleset.Value
+                };
+
+                newItem.RequiredMods.Clear();
+                newItem.RequiredMods.AddRange(b.Mods.Value);
+
+                playlistBind.Add(newItem);
+            });
+
+            playlistBind.BindTo(room.Playlist);
+        }
+
+        private void updatePlaylist()
+        {
+            if (playlistBind.Count == 0)
+                return;
+
+            // For now, only the first playlist item is supported
+            var item = playlistBind.First();
+
+            header.Beatmap.Value = item.Beatmap;
+            info.Beatmap.Value = item.Beatmap;
+
+            if (Beatmap.Value?.BeatmapInfo != item.Beatmap)
+            {
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(item.Beatmap);
+                Beatmap.Value.Mods.Value = item.RequiredMods.ToArray();
+            }
         }
 
         private void onStart()
