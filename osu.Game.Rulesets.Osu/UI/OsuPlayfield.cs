@@ -16,7 +16,7 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuPlayfield : Playfield
     {
-        private readonly Container approachCircles;
+        private readonly ApproachCircleProxyContainer approachCircles;
         private readonly JudgementContainer<DrawableOsuJudgement> judgementLayer;
         private readonly ConnectionRenderer<OsuHitObject> connectionLayer;
 
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.UI
                         Depth = 1,
                     },
                     HitObjectContainer,
-                    approachCircles = new Container
+                    approachCircles = new ApproachCircleProxyContainer
                     {
                         RelativeSizeAxes = Axes.Both,
                         Depth = -1,
@@ -60,9 +60,21 @@ namespace osu.Game.Rulesets.Osu.UI
 
             var c = h as IDrawableHitObjectWithProxiedApproach;
             if (c != null)
-                approachCircles.Add(c.ProxiedLayer.CreateProxy());
+            {
+                var original = c.ProxiedLayer;
+                // lifetime is set on LoadComplete so wait until it.
+                original.OnLoadComplete += addApproachCircleProxy;
+            }
 
             base.Add(h);
+        }
+
+        private void addApproachCircleProxy(Drawable d)
+        {
+            var proxy = d.CreateProxy();
+            proxy.LifetimeStart = d.LifetimeStart;
+            proxy.LifetimeEnd = d.LifetimeEnd;
+            approachCircles.Add(proxy);
         }
 
         public override void PostProcess()
@@ -86,5 +98,10 @@ namespace osu.Game.Rulesets.Osu.UI
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => HitObjectContainer.ReceivePositionalInputAt(screenSpacePos);
+
+        private class ApproachCircleProxyContainer : LifetimeManagementContainer
+        {
+            public void Add(Drawable approachCircleProxy) => AddInternal(approachCircleProxy);
+        }
     }
 }
