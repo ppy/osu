@@ -35,8 +35,16 @@ namespace osu.Game.Online.Multiplayer
         [JsonProperty("duration")]
         public readonly Bindable<int> Duration = new Bindable<int>(100);
 
-        [JsonProperty("max_attempts")]
-        public readonly Bindable<int?> MaxAttempts = new Bindable<int?>(null);
+        [JsonIgnore]
+        public readonly Bindable<int?> MaxAttempts = new Bindable<int?>();
+
+        // Todo: Find a better way to do this (https://github.com/ppy/osu-framework/issues/1930)
+        [JsonProperty("max_attempts", DefaultValueHandling = DefaultValueHandling.Ignore)]
+        private int? maxAttempts
+        {
+            get => MaxAttempts;
+            set => MaxAttempts.Value = value;
+        }
 
         public Bindable<RoomStatus> Status = new Bindable<RoomStatus>(new RoomStatusOpen());
         public Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
