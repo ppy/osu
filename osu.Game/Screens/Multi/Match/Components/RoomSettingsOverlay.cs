@@ -6,7 +6,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -23,10 +22,10 @@ namespace osu.Game.Screens.Multi.Match.Components
         private const float field_padding = 45;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
-        private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
         private readonly Bindable<RoomAvailability> availabilityBind = new Bindable<RoomAvailability>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
+        private readonly IBindableCollection<PlaylistItem> playlistBind = new BindableCollection<PlaylistItem>();
 
         private readonly Container content;
 
@@ -160,7 +159,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             typeLabel.Colour = colours.Yellow;
 
             nameBind.BindTo(room.Name);
-            beatmapBind.BindTo(room.Beatmap);
+            playlistBind.BindTo(room.Playlist);
             availabilityBind.BindTo(room.Availability);
             typeBind.BindTo(room.Type);
             maxParticipantsBind.BindTo(room.MaxParticipants);
@@ -179,7 +178,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             ApplyButton.Enabled.Value = hasValidSettings;
         }
 
-        private bool hasValidSettings => NameField.Text.Length > 0 && beatmapBind.Value != null;
+        private bool hasValidSettings => NameField.Text.Length > 0 && playlistBind.Count > 0;
 
         protected override void PopIn()
         {

@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         public const float HEIGHT = 200;
 
-        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         private readonly Box tabStrip;
 
