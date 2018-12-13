@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
@@ -13,14 +14,16 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
     public class Info : Container
     {
-        public const float HEIGHT = 128;
+        public const float HEIGHT = 156;
 
         public Action OnStart;
 
@@ -33,6 +36,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         public readonly Bindable<RoomStatus> Status = new Bindable<RoomStatus>();
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
         public readonly Bindable<GameType> Type = new Bindable<GameType>();
+        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
 
         public Info()
         {
@@ -41,6 +45,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             BeatmapTypeInfo beatmapTypeInfo;
             OsuSpriteText name;
+            ModDisplay modDisplay;
 
             Children = new Drawable[]
             {
@@ -72,11 +77,23 @@ namespace osu.Game.Screens.Multi.Match.Components
                                         availabilityStatus = new OsuSpriteText { TextSize = 14 },
                                     },
                                 },
-                                beatmapTypeInfo = new BeatmapTypeInfo
+                                new FillFlowContainer
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
-                                },
+                                    AutoSizeAxes = Axes.Both,
+                                    Direction = FillDirection.Vertical,
+                                    Children = new Drawable[]
+                                    {
+                                        beatmapTypeInfo = new BeatmapTypeInfo(),
+                                        modDisplay = new ModDisplay
+                                        {
+                                            Scale = new Vector2(0.75f),
+                                            DisplayUnrankedText = false
+                                        },
+                                    }
+                                }
+
                             },
                         },
                         new ReadyButton
@@ -94,6 +111,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             beatmapTypeInfo.Beatmap.BindTo(Beatmap);
             beatmapTypeInfo.Type.BindTo(Type);
+            modDisplay.Current.BindTo(Mods);
 
             Availability.BindValueChanged(_ => updateAvailabilityStatus());
             Status.BindValueChanged(_ => updateAvailabilityStatus());
