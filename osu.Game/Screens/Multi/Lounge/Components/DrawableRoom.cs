@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -39,13 +40,17 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private readonly Box selectionBox;
 
         private readonly Bindable<string> nameBind = new Bindable<string>();
-        private readonly Bindable<BeatmapInfo> beatmapBind = new Bindable<BeatmapInfo>();
         private readonly Bindable<User> hostBind = new Bindable<User>();
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
+        private readonly IBindableCollection<PlaylistItem> playlistBind = new BindableCollection<PlaylistItem>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
+        private UpdateableBeatmapBackgroundSprite background;
+        private BeatmapTitle beatmapTitle;
+        private ModeTypeInfo modeTypeInfo;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -104,11 +109,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private void load(OsuColour colours)
         {
             Box sideStrip;
-            UpdateableBeatmapBackgroundSprite background;
             OsuSpriteText status;
             ParticipantInfo participantInfo;
-            BeatmapTitle beatmapTitle;
-            ModeTypeInfo modeTypeInfo;
+
             OsuSpriteText name;
 
             Children = new Drawable[]
@@ -213,30 +216,41 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     d.FadeColour(s.GetAppropriateColour(colours), transition_duration);
             };
 
-            beatmapBind.BindValueChanged(b => beatmap.Value = beatmaps.GetWorkingBeatmap(b));
             nameBind.BindValueChanged(n => name.Text = n);
 
             nameBind.BindTo(Room.Name);
             hostBind.BindTo(Room.Host);
             statusBind.BindTo(Room.Status);
             typeBind.BindTo(Room.Type);
-            beatmapBind.BindTo(Room.Beatmap);
+            playlistBind.BindTo(Room.Playlist);
             participantsBind.BindTo(Room.Participants);
-            background.Beatmap.BindTo(beatmapBind);
 
-            modeTypeInfo.Beatmap.BindTo(beatmapBind);
             modeTypeInfo.Type.BindTo(typeBind);
 
             participantInfo.Host.BindTo(hostBind);
             participantInfo.Participants.BindTo(participantsBind);
 
-            beatmapTitle.Beatmap.BindTo(beatmapBind);
+            playlistBind.ItemsAdded += _ => updatePlaylist();
+            playlistBind.ItemsRemoved += _ => updatePlaylist();
+
+            updatePlaylist();
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             this.FadeInFromZero(transition_duration);
+        }
+
+        private void updatePlaylist()
+        {
+            // For now, only the first playlist item is supported
+            var item = playlistBind.First();
+
+            beatmap.Value = beatmaps.GetWorkingBeatmap(item.Beatmap);
+            background.Beatmap.Value = item.Beatmap;
+            modeTypeInfo.Beatmap.Value = item.Beatmap;
+            beatmapTitle.Beatmap.Value = item.Beatmap;
         }
     }
 }
