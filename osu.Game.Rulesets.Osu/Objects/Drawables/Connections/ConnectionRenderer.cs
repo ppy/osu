@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     /// <summary>
     /// Connects hit objects visually, for example with follow points.
     /// </summary>
-    public abstract class ConnectionRenderer<T> : Container
+    public abstract class ConnectionRenderer<T> : LifetimeManagementContainer
         where T : HitObject
     {
         /// <summary>
