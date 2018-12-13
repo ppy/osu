@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -13,21 +14,20 @@ using osu.Game.Screens.Multi.Lounge;
 
 namespace osu.Game.Screens.Multi
 {
+    [Cached]
     public class Multiplayer : OsuScreen
     {
         private readonly MultiplayerWaveContainer waves;
 
-        protected override Container<Drawable> Content => waves;
-
         public Multiplayer()
         {
-            InternalChild = waves = new MultiplayerWaveContainer
+            Child = waves = new MultiplayerWaveContainer
             {
                 RelativeSizeAxes = Axes.Both,
             };
 
             LoungeScreen loungeScreen;
-            Children = new Drawable[]
+            waves.AddRange(new Drawable[]
             {
                 new Container
                 {
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Multi
                     Child = loungeScreen = new LoungeScreen(),
                 },
                 new Header(loungeScreen)
-            };
+            });
 
             loungeScreen.Exited += s => Exit();
         }
@@ -76,13 +76,17 @@ namespace osu.Game.Screens.Multi
         protected override void OnResuming(Screen last)
         {
             base.OnResuming(last);
-            waves.Show();
+
+            Content.FadeIn(250);
+            Content.ScaleTo(1, 250, Easing.OutSine);
         }
 
         protected override void OnSuspending(Screen next)
         {
+            Content.ScaleTo(1.1f, 250, Easing.InSine);
+            Content.FadeOut(250);
+
             base.OnSuspending(next);
-            waves.Hide();
         }
 
         protected override void LogoExiting(OsuLogo logo)
