@@ -213,8 +213,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     d.FadeColour(s.GetAppropriateColour(colours), transition_duration);
             };
 
-            background.Beatmap.BindTo(beatmap);
-
             beatmapBind.BindValueChanged(b => beatmap.Value = beatmaps.GetWorkingBeatmap(b));
             nameBind.BindValueChanged(n => name.Text = n);
 
@@ -224,6 +222,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             typeBind.BindTo(Room.Type);
             beatmapBind.BindTo(Room.Beatmap);
             participantsBind.BindTo(Room.Participants);
+            background.Beatmap.BindTo(beatmapBind);
 
             modeTypeInfo.Beatmap.BindTo(beatmapBind);
             modeTypeInfo.Type.BindTo(typeBind);

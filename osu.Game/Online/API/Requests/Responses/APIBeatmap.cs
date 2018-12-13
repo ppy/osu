@@ -67,11 +67,7 @@ namespace osu.Game.Online.API.Requests.Responses
                 OnlineBeatmapID = OnlineBeatmapID,
                 Version = version,
                 Status = Status,
-                BeatmapSet = new BeatmapSetInfo
-                {
-                    OnlineBeatmapSetID = OnlineBeatmapSetID,
-                    Status = BeatmapSet?.Status ?? BeatmapSetOnlineStatus.None
-                },
+                BeatmapSet = BeatmapSet.ToBeatmapSet(rulesets),
                 BaseDifficulty = new BeatmapDifficulty
                 {
                     DrainRate = drainRate,

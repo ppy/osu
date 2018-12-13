@@ -40,7 +40,7 @@ namespace osu.Game.Online.API
         /// </summary>
         public int Timeout = WebRequest.DEFAULT_TIMEOUT;
 
-        protected virtual string Target => string.Empty;
+        protected abstract string Target { get; }
 
         protected virtual WebRequest CreateWebRequest() => new WebRequest(Uri);
 
