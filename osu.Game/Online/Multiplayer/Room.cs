@@ -18,9 +18,6 @@ namespace osu.Game.Online.Multiplayer
         [JsonProperty("id")]
         public Bindable<int?> RoomID { get; } = new Bindable<int?>();
 
-        [JsonIgnore]
-        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
-
         [JsonProperty("name")]
         public readonly Bindable<string> Name = new Bindable<string>("My awesome room!");
 
@@ -51,15 +48,6 @@ namespace osu.Game.Online.Multiplayer
         public Bindable<GameType> Type = new Bindable<GameType>(new GameTypeTimeshift());
         public Bindable<int?> MaxParticipants = new Bindable<int?>();
         public Bindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>(Enumerable.Empty<User>());
-
-        public Room()
-        {
-            Beatmap.BindValueChanged(b =>
-            {
-                Playlist.Clear();
-                Playlist.Add(new PlaylistItem { Beatmap = b });
-            });
-        }
 
         public void CopyFrom(Room other)
         {
