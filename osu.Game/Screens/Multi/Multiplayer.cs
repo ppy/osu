@@ -19,6 +19,10 @@ namespace osu.Game.Screens.Multi
     {
         private readonly MultiplayerWaveContainer waves;
 
+        public override bool AllowBeatmapRulesetChange => currentScreen?.AllowBeatmapRulesetChange ?? base.AllowBeatmapRulesetChange;
+
+        private OsuScreen currentScreen;
+
         public Multiplayer()
         {
             Child = waves = new MultiplayerWaveContainer
@@ -58,6 +62,8 @@ namespace osu.Game.Screens.Multi
                 new Header(loungeScreen)
             });
 
+            screenAdded(loungeScreen);
+
             loungeScreen.Exited += s => Exit();
         }
 
@@ -94,6 +100,19 @@ namespace osu.Game.Screens.Multi
             // the wave overlay transition takes longer than expected to run.
             logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut();
             base.LogoExiting(logo);
+        }
+
+        private void screenAdded(Screen newScreen)
+        {
+            currentScreen = (OsuScreen)newScreen;
+
+            newScreen.ModePushed += screenAdded;
+            newScreen.Exited += screenRemoved;
+        }
+
+        private void screenRemoved(Screen newScreen)
+        {
+            currentScreen = (OsuScreen)newScreen;
         }
 
         private class MultiplayerWaveContainer : WaveContainer
