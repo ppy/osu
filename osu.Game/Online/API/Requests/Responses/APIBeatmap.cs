@@ -59,11 +59,11 @@ namespace osu.Game.Online.API.Requests.Responses
 
         public BeatmapInfo ToBeatmap(RulesetStore rulesets)
         {
-            var set = BeatmapSet.ToBeatmapSet(rulesets);
+            var set = BeatmapSet?.ToBeatmapSet(rulesets);
 
             return new BeatmapInfo
             {
-                Metadata = set.Metadata,
+                Metadata = set?.Metadata ?? this,
                 Ruleset = rulesets.GetRuleset(ruleset),
                 StarDifficulty = starDifficulty,
                 OnlineBeatmapID = OnlineBeatmapID,
