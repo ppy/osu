@@ -244,6 +244,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private void updatePlaylist()
         {
+            if (playlistBind.Count == 0)
+                return;
+
             // For now, only the first playlist item is supported
             var item = playlistBind.First();
 
