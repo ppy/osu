@@ -22,7 +22,8 @@ namespace osu.Game.Online
         private double timeBetweenPolls;
 
         /// <summary>
-        /// The time that should be waited between polls.
+        /// The time in milliseconds to wait between polls.
+        /// Setting to zero stops all polling.
         /// </summary>
         public double TimeBetweenPolls
         {
@@ -33,6 +34,15 @@ namespace osu.Game.Online
                 scheduledPoll?.Cancel();
                 pollIfNecessary();
             }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="timeBetweenPolls">The initial time in milliseconds to wait between polls. Setting to zero stops al polling.</param>
+        protected PollingComponent(double timeBetweenPolls = 0)
+        {
+            TimeBetweenPolls = timeBetweenPolls;
         }
 
         protected override void LoadComplete()
