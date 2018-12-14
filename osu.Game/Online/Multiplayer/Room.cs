@@ -64,6 +64,9 @@ namespace osu.Game.Online.Multiplayer
 
     public class PlaylistItem
     {
+        [JsonProperty("id")]
+        public int ID { get; set; }
+
         [JsonProperty("beatmap")]
         private APIBeatmap beatmap { get; set; }
 
@@ -73,7 +76,7 @@ namespace osu.Game.Online.Multiplayer
         public BeatmapInfo Beatmap { get; set; }
 
         [JsonProperty("beatmap_id")]
-        public int BeatmapID => 847296; //Beatmap.OnlineBeatmapID ?? 0;
+        public int BeatmapID => Beatmap.OnlineBeatmapID ?? 0;
 
         [JsonProperty("ruleset_id")]
         public int RulesetID { get; set; }

@@ -183,7 +183,7 @@ namespace osu.Game.Screens.Multi.Match
             {
                 default:
                 case GameTypeTimeshift _:
-                    multiplayer.Push(new PlayerLoader(new TimeshiftPlayer()));
+                    multiplayer.Push(new PlayerLoader(new TimeshiftPlayer(room.RoomID.Value ?? 0, room.Playlist.First().ID)));
                     break;
             }
         }
