@@ -4,11 +4,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics;
 using osu.Framework.Logging;
-using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Users;
@@ -18,7 +17,7 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// Manages everything channel related
     /// </summary>
-    public class ChannelManager : Component, IOnlineComponent
+    public class ChannelManager : PollingComponent
     {
         /// <summary>
         /// The channels the player joins on startup
@@ -49,11 +48,14 @@ namespace osu.Game.Online.Chat
         public IBindableCollection<Channel> AvailableChannels => availableChannels;
 
         private IAPIProvider api;
-        private ScheduledDelegate fetchMessagesScheduleder;
+
+        public readonly BindableBool HighPollRate = new BindableBool();
 
         public ChannelManager()
         {
             CurrentChannel.ValueChanged += currentChannelChanged;
+
+            HighPollRate.BindValueChanged(high => TimeBetweenPolls = high ? 1000 : 6000, true);
         }
 
         /// <summary>
@@ -79,7 +81,7 @@ namespace osu.Game.Online.Chat
                 throw new ArgumentNullException(nameof(user));
 
             CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Users.Any(u => u.Id == user.Id))
-                                   ?? new Channel { Name = user.Username, Users = { user }, Type = ChannelType.PM };
+                                   ?? new Channel(user);
         }
 
         private void currentChannelChanged(Channel channel) => JoinChannel(channel);
@@ -360,73 +362,60 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
-        {
-            switch (state)
-            {
-                case APIState.Online:
-                    fetchUpdates();
-                    break;
-                default:
-                    fetchMessagesScheduleder?.Cancel();
-                    fetchMessagesScheduleder = null;
-                    break;
-            }
-        }
-
         private long lastMessageId;
-        private const int update_poll_interval = 1000;
 
         private bool channelsInitialised;
 
-        private void fetchUpdates()
+        protected override Task Poll()
         {
-            fetchMessagesScheduleder?.Cancel();
-            fetchMessagesScheduleder = Scheduler.AddDelayed(() =>
+            if (!api.IsLoggedIn)
+                return base.Poll();
+
+            var fetchReq = new GetUpdatesRequest(lastMessageId);
+
+            var tcs = new TaskCompletionSource<bool>();
+
+            fetchReq.Success += updates =>
             {
-                var fetchReq = new GetUpdatesRequest(lastMessageId);
-
-                fetchReq.Success += updates =>
+                if (updates?.Presence != null)
                 {
-                    if (updates?.Presence != null)
+                    foreach (var channel in updates.Presence)
                     {
-                        foreach (var channel in updates.Presence)
-                        {
-                            // we received this from the server so should mark the channel already joined.
-                            JoinChannel(channel, true);
-                        }
-
-                        //todo: handle left channels
-
-                        handleChannelMessages(updates.Messages);
-
-                        foreach (var group in updates.Messages.GroupBy(m => m.ChannelId))
-                            JoinedChannels.FirstOrDefault(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
-
-                        lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
+                        // we received this from the server so should mark the channel already joined.
+                        JoinChannel(channel, true);
                     }
 
-                    if (!channelsInitialised)
-                    {
-                        channelsInitialised = true;
-                        // we want this to run after the first presence so we can see if the user is in any channels already.
-                        initializeChannels();
-                    }
+                    //todo: handle left channels
 
-                    fetchUpdates();
-                };
+                    handleChannelMessages(updates.Messages);
 
-                fetchReq.Failure += delegate { fetchUpdates(); };
+                    foreach (var group in updates.Messages.GroupBy(m => m.ChannelId))
+                        JoinedChannels.FirstOrDefault(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
 
-                api.Queue(fetchReq);
-            }, update_poll_interval);
+                    lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
+                }
+
+                if (!channelsInitialised)
+                {
+                    channelsInitialised = true;
+                    // we want this to run after the first presence so we can see if the user is in any channels already.
+                    initializeChannels();
+                }
+
+                tcs.SetResult(true);
+            };
+
+            fetchReq.Failure += _ => tcs.SetResult(false);
+
+            api.Queue(fetchReq);
+
+            return tcs.Task;
         }
 
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {
             this.api = api;
-            api.Register(this);
         }
     }
 
