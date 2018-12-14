@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens.Multi.Components
 {

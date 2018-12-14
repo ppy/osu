@@ -3,6 +3,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
@@ -23,8 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             // Sort OsuHitObjects by StartTime - they are not correctly ordered in some cases.
             // This should probably happen before the objects reach the difficulty calculator.
-            objects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
-            difficultyObjects = createDifficultyObjectEnumerator(objects, timeRate);
+            difficultyObjects = createDifficultyObjectEnumerator(objects.OrderBy(h => h.StartTime).ToList(), timeRate);
         }
 
         /// <summary>

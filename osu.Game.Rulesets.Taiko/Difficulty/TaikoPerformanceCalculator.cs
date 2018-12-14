@@ -8,6 +8,8 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.Taiko.Objects;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Difficulty
 {
@@ -21,7 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public TaikoPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
+        public TaikoPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
         {
         }
@@ -82,7 +84,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (mods.Any(m => m is ModHidden))
                 strainValue *= 1.025;
 
-            if (mods.Any(m => m is ModFlashlight))
+            if (mods.Any(m => m is ModFlashlight<TaikoHitObject>))
                 // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
                 strainValue *= 1.05 * lengthBonus;
 

@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -14,12 +14,12 @@ using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using System.Linq;
 using osu.Framework.Configuration;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
-        public Action<Score> ScoreSelected;
+        public Action<ScoreInfo> ScoreSelected;
 
         private readonly LoadingAnimation loading;
 
@@ -42,9 +42,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private bool scoresLoadedOnce;
 
-        private IEnumerable<Score> scores;
+        private IEnumerable<ScoreInfo> scores;
 
-        public IEnumerable<Score> Scores
+        public IEnumerable<ScoreInfo> Scores
         {
             get { return scores; }
             set
@@ -179,6 +179,9 @@ namespace osu.Game.Screens.Select.Leaderboards
         private APIAccess api;
         private BeatmapInfo beatmap;
 
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+
         private ScheduledDelegate pendingUpdateScores;
 
         public BeatmapInfo Beatmap
@@ -216,6 +219,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                 api.OnStateChange -= handleApiStateChange;
         }
 
+        public void RefreshScores() => updateScores();
+
         private GetScoresRequest getScoresRequest;
 
         private void handleApiStateChange(APIState oldState, APIState newState)
@@ -242,8 +247,8 @@ namespace osu.Game.Screens.Select.Leaderboards
             {
                 if (Scope == LeaderboardScope.Local)
                 {
-                    // TODO: get local scores from wherever here.
-                    PlaceholderState = PlaceholderState.NoScores;
+                    Scores = scoreManager.QueryScores(s => s.Beatmap.ID == Beatmap.ID).ToArray();
+                    PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
                     return;
                 }
 
@@ -310,9 +315,9 @@ namespace osu.Game.Screens.Select.Leaderboards
             currentPlaceholder = placeholder;
         }
 
-        protected override void Update()
+        protected override void UpdateAfterChildren()
         {
-            base.Update();
+            base.UpdateAfterChildren();
 
             var fadeStart = scrollContainer.Current + scrollContainer.DrawHeight;
 

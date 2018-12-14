@@ -4,8 +4,8 @@
 using System.ComponentModel;
 using osu.Game.Graphics;
 using osu.Game.Screens.Select.Options;
-using OpenTK.Graphics;
-using OpenTK.Input;
+using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual
 {

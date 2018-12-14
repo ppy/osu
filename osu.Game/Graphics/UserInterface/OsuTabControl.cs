@@ -3,8 +3,8 @@
 
 using System;
 using System.Linq;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
@@ -53,7 +53,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (accentColour == default(Color4))
+            if (accentColour == default)
                 AccentColour = colours.Blue;
         }
 
@@ -142,7 +142,7 @@ namespace osu.Game.Graphics.UserInterface
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                if (accentColour == default(Color4))
+                if (accentColour == default)
                     AccentColour = colours.Blue;
             }
 

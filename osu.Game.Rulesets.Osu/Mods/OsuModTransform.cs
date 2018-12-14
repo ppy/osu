@@ -8,14 +8,14 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
     internal class OsuModTransform : Mod, IApplicableToDrawableHitObjects
     {
         public override string Name => "Transform";
-        public override string ShortenedName => "TR";
+        public override string Acronym => "TR";
         public override FontAwesome Icon => FontAwesome.fa_arrows;
         public override ModType Type => ModType.Fun;
         public override string Description => "Everything rotates. EVERYTHING.";

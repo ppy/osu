@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Music
 {
@@ -75,7 +75,7 @@ namespace osu.Game.Overlays.Music
             [BackgroundDependencyLoader]
             private void load(BeatmapManager beatmaps, IBindableBeatmap beatmap)
             {
-                beatmaps.GetAllUsableBeatmapSets().ForEach(addBeatmapSet);
+                beatmaps.GetAllUsableBeatmapSets().ForEach(b => addBeatmapSet(b, false, false));
                 beatmaps.ItemAdded += addBeatmapSet;
                 beatmaps.ItemRemoved += removeBeatmapSet;
 
@@ -83,20 +83,23 @@ namespace osu.Game.Overlays.Music
                 beatmapBacking.ValueChanged += _ => updateSelectedSet();
             }
 
-            private void addBeatmapSet(BeatmapSetInfo obj)
+            private void addBeatmapSet(BeatmapSetInfo obj, bool existing, bool silent) => Schedule(() =>
             {
+                if (existing)
+                    return;
+
                 var newItem = new PlaylistItem(obj) { OnSelect = set => Selected?.Invoke(set) };
 
                 items.Add(newItem);
                 items.SetLayoutPosition(newItem, items.Count - 1);
-            }
+            });
 
-            private void removeBeatmapSet(BeatmapSetInfo obj)
+            private void removeBeatmapSet(BeatmapSetInfo obj) => Schedule(() =>
             {
                 var itemToRemove = items.FirstOrDefault(i => i.BeatmapSetInfo.ID == obj.ID);
                 if (itemToRemove != null)
                     items.Remove(itemToRemove);
-            }
+            });
 
             private void updateSelectedSet()
             {

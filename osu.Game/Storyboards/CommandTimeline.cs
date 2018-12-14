@@ -21,8 +21,8 @@ namespace osu.Game.Storyboards
         private Cached<double> endTimeBacking;
         public double EndTime => endTimeBacking.IsValid ? endTimeBacking : endTimeBacking.Value = HasCommands ? commands.Max(c => c.EndTime) : double.MaxValue;
 
-        public T StartValue => HasCommands ? commands.OrderBy(c => c.StartTime).First().StartValue : default(T);
-        public T EndValue => HasCommands ? commands.OrderByDescending(c => c.EndTime).First().EndValue : default(T);
+        public T StartValue => HasCommands ? commands.OrderBy(c => c.StartTime).First().StartValue : default;
+        public T EndValue => HasCommands ? commands.OrderByDescending(c => c.EndTime).First().EndValue : default;
 
         public void Add(Easing easing, double startTime, double endTime, T startValue, T endValue)
         {

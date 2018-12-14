@@ -18,16 +18,16 @@ using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatcherArea : Container
     {
-        public const float CATCHER_SIZE = 84;
+        public const float CATCHER_SIZE = 100;
 
-        protected readonly Catcher MovableCatcher;
+        protected internal readonly Catcher MovableCatcher;
 
         public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> GetVisualRepresentation;
 

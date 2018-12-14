@@ -1,8 +1,8 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,7 +16,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio;
 using osu.Framework.Graphics.Textures;
-using OpenTK.Input;
+using osuTK.Input;
 using osu.Framework.Graphics.Shapes;
 using System;
 using osu.Framework.Input.Events;

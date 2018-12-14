@@ -15,11 +15,8 @@ namespace osu.Game.Beatmaps
     [Serializable]
     public class BeatmapInfo : IEquatable<BeatmapInfo>, IJsonSerializable, IHasPrimaryKey
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [JsonIgnore]
         public int ID { get; set; }
 
-        //TODO: should be in database
         public int BeatmapVersion;
 
         private int? onlineBeatmapID;

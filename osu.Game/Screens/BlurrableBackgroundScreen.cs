@@ -4,7 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Transforms;
 using osu.Game.Graphics.Backgrounds;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens
 {

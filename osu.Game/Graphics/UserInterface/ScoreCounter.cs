@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -30,6 +31,9 @@ namespace osu.Game.Graphics.UserInterface
             DisplayedCountSpriteText.FixedWidth = true;
             LeadingZeroes = leading;
         }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
 
         protected override double GetProportionalDuration(double currentValue, double newValue)
         {

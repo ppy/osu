@@ -9,7 +9,6 @@ namespace osu.Game.Configuration
     [Table("Settings")]
     public class DatabasedSetting : IHasPrimaryKey
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
 
         public int? RulesetID { get; set; }

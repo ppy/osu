@@ -5,14 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 using osu.Framework.Allocation;
-using OpenTK;
+using osuTK;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual
 {
@@ -58,7 +58,7 @@ namespace osu.Game.Tests.Visual
         {
             var scores = new[]
             {
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.XH,
                     Accuracy = 1,
@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.X,
                     Accuracy = 1,
@@ -94,7 +94,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.SH,
                     Accuracy = 1,
@@ -112,7 +112,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.S,
                     Accuracy = 1,
@@ -130,7 +130,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.A,
                     Accuracy = 1,
@@ -148,7 +148,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.B,
                     Accuracy = 0.9826,
@@ -166,7 +166,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.C,
                     Accuracy = 0.9654,
@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.F,
                     Accuracy = 0.6025,
@@ -202,7 +202,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.F,
                     Accuracy = 0.5140,
@@ -220,7 +220,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.F,
                     Accuracy = 0.4222,

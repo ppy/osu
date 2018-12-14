@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.IO.File;
 using osu.Game.Storyboards;
@@ -298,6 +298,6 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private string cleanFilename(string path) => FileSafety.PathStandardise(FileSafety.PathSanitise(path.Trim('\"')));
+        private string cleanFilename(string path) => FileSafety.PathStandardise(path.Trim('"'));
     }
 }

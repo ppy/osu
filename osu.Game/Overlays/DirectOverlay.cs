@@ -18,8 +18,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Rulesets;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -288,7 +288,7 @@ namespace osu.Game.Overlays
             {
                 Task.Run(() =>
                 {
-                    var sets = response.Select(r => r.ToBeatmapSet(rulesets)).ToList();
+                    var sets = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
 
                     // may not need scheduling; loads async internally.
                     Schedule(() =>

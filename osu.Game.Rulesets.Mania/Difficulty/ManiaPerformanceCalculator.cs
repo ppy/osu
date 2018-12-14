@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mania.Difficulty
 {
@@ -27,7 +28,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public ManiaPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
+        public ManiaPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
         {
         }
