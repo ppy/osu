@@ -23,8 +23,6 @@ namespace osu.Game.Screens.Multi.Match.Components
 {
     public class Info : Container
     {
-        public const float HEIGHT = 156;
-
         public Action OnStart;
 
         private readonly OsuSpriteText availabilityStatus;
@@ -41,7 +39,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         public Info()
         {
             RelativeSizeAxes = Axes.X;
-            Height = HEIGHT;
+            AutoSizeAxes = Axes.Y;
 
             BeatmapTypeInfo beatmapTypeInfo;
             OsuSpriteText name;
@@ -56,14 +54,16 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
                 new Container
                 {
-                    RelativeSizeAxes = Axes.Both,
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
                     Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
                     Children = new Drawable[]
                     {
-                        new Container
+                        new FillFlowContainer
                         {
-                            RelativeSizeAxes = Axes.Y,
-                            AutoSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
+                            Spacing = new Vector2(0, 10),
                             Padding = new MarginPadding { Vertical = 20 },
                             Children = new Drawable[]
                             {
@@ -75,12 +75,10 @@ namespace osu.Game.Screens.Multi.Match.Components
                                     {
                                         name = new OsuSpriteText { TextSize = 30 },
                                         availabilityStatus = new OsuSpriteText { TextSize = 14 },
-                                    },
+                                    }
                                 },
                                 new FillFlowContainer
                                 {
-                                    Anchor = Anchor.BottomLeft,
-                                    Origin = Anchor.BottomLeft,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
@@ -93,18 +91,25 @@ namespace osu.Game.Screens.Multi.Match.Components
                                         },
                                     }
                                 }
-
                             },
                         },
-                        new ReadyButton
+                        new FillFlowContainer
                         {
-                            Anchor = Anchor.TopRight,
-                            Origin = Anchor.TopRight,
-                            RelativeSizeAxes = Axes.Y,
-                            Size = new Vector2(200, 1),
-                            Padding = new MarginPadding { Vertical = 10 },
-                            Action = () => OnStart?.Invoke()
-                        },
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            AutoSizeAxes = Axes.X,
+                            Height = 70,
+                            Spacing = new Vector2(10, 0),
+                            Direction = FillDirection.Horizontal,
+                            Children = new Drawable[]
+                            {
+                                new ViewBeatmapButton(),
+                                new ReadyButton
+                                {
+                                    Action = () => OnStart?.Invoke()
+                                }
+                            }
+                        }
                     },
                 },
             };

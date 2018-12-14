@@ -6,14 +6,14 @@ using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class ReadyButton : HeaderButton
+    public class ViewBeatmapButton : HeaderButton
     {
-        public ReadyButton()
+        public ViewBeatmapButton()
         {
             RelativeSizeAxes = Axes.Y;
             Size = new Vector2(200, 1);
 
-            Text = "Start";
+            Text = "View beatmap";
         }
     }
 }

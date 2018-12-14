@@ -66,19 +66,21 @@ namespace osu.Game.Screens.Multi.Match
 
             Children = new Drawable[]
             {
-                header = new Components.Header
-                {
-                    Depth = -1,
-                },
-                info = new Info
-                {
-                    Margin = new MarginPadding { Top = Components.Header.HEIGHT },
-                    OnStart = onStart
-                },
-                participants = new Participants
+                new GridContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = Components.Header.HEIGHT + Info.HEIGHT },
+                    Content = new[]
+                    {
+                        new Drawable[] { header = new Components.Header { Depth = -1 } },
+                        new Drawable[] { info = new Info { OnStart = onStart } },
+                        new Drawable[] { participants = new Participants { RelativeSizeAxes = Axes.Both } },
+                    },
+                    RowDimensions = new[]
+                    {
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.AutoSize),
+                        new Dimension(GridSizeMode.Distributed),
+                    }
                 },
                 new Container
                 {
