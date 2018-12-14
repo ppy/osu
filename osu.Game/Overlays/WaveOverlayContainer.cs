@@ -25,20 +25,13 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             base.PopIn();
-
             Waves.Show();
-
-            this.FadeIn();
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-
             Waves.Hide();
-
-            // this is required or we will remain present even though our waves are hidden.
-            this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
         }
     }
 }
