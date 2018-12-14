@@ -199,6 +199,12 @@ namespace osu.Game.Online.API
             try
             {
                 Logger.Log($@"Performing request {req}", LoggingTarget.Network);
+                req.Failure += ex =>
+                {
+                    if (ex is WebException we)
+                        handleWebException(we);
+                };
+
                 req.Perform(this);
 
                 //we could still be in initialisation, at which point we don't want to say we're Online yet.
@@ -210,37 +216,12 @@ namespace osu.Game.Online.API
             }
             catch (WebException we)
             {
-                HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode
-                                            ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
+                var removeFromQueue = handleWebException(we);
 
-                // special cases for un-typed but useful message responses.
-                switch (we.Message)
-                {
-                    case "Unauthorized":
-                        statusCode = HttpStatusCode.Unauthorized;
-                        break;
-                }
+                if (removeFromQueue)
+                    req.Fail(we);
 
-                switch (statusCode)
-                {
-                    case HttpStatusCode.Unauthorized:
-                        Logout(false);
-                        return true;
-                    case HttpStatusCode.RequestTimeout:
-                        failureCount++;
-                        log.Add($@"API failure count is now {failureCount}");
-
-                        if (failureCount < 3)
-                            //we might try again at an api level.
-                            return false;
-
-                        State = APIState.Failing;
-                        flushQueue();
-                        return true;
-                }
-
-                req.Fail(we);
-                return true;
+                return removeFromQueue;
             }
             catch (Exception e)
             {
@@ -274,6 +255,41 @@ namespace osu.Game.Online.API
                     });
                 }
             }
+        }
+
+        private bool handleWebException(WebException we)
+        {
+            HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode
+                                        ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
+
+            // special cases for un-typed but useful message responses.
+            switch (we.Message)
+            {
+                case "Unauthorized":
+                case "Forbidden":
+                    statusCode = HttpStatusCode.Unauthorized;
+                    break;
+            }
+
+            switch (statusCode)
+            {
+                case HttpStatusCode.Unauthorized:
+                    Logout(false);
+                    return true;
+                case HttpStatusCode.RequestTimeout:
+                    failureCount++;
+                    log.Add($@"API failure count is now {failureCount}");
+
+                    if (failureCount < 3)
+                        //we might try again at an api level.
+                        return false;
+
+                    State = APIState.Failing;
+                    flushQueue();
+                    return true;
+            }
+
+            return true;
         }
 
         public bool IsLoggedIn => LocalUser.Value.Id > 1;
