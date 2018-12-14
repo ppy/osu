@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mods
         /// <summary>
         /// The shortened name of this mod.
         /// </summary>
-        [JsonProperty]
+        [JsonProperty("acronym")]
         string Acronym { get; }
     }
 }
