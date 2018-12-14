@@ -32,6 +32,9 @@ namespace osu.Game.Screens.Multi.Match
 
         protected override Drawable TransitionContent => participants;
 
+        public override bool AllowBeatmapRulesetChange => allowBeatmapRulesetChange;
+        private bool allowBeatmapRulesetChange;
+
         public override string Title => room.Name.Value;
 
         public override string ShortTitle => "room";
@@ -140,10 +143,19 @@ namespace osu.Game.Screens.Multi.Match
             info.Beatmap.Value = item.Beatmap;
             info.Mods.Value = item.RequiredMods;
 
+            allowBeatmapRulesetChange = true;
+
             // Todo: item.Beatmap can be null here...
             var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == item.BeatmapID) ?? item.Beatmap;
-            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            Beatmap.Value.Mods.Value = item.RequiredMods.ToArray();
+
+            Schedule(() =>
+            {
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+                Beatmap.Value.Mods.Value = item.RequiredMods.ToArray();
+                Ruleset.Value = item.Ruleset;
+
+                allowBeatmapRulesetChange = false;
+            });
         }
 
         private void onStart()
