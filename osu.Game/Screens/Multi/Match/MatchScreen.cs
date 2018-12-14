@@ -141,7 +141,9 @@ namespace osu.Game.Screens.Multi.Match
             info.Mods.Value = item.RequiredMods;
 
             // Todo: item.Beatmap can be null here...
-            Beatmap.Value = beatmapManager.GetWorkingBeatmap(item.Beatmap);
+            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == item.BeatmapID) ?? item.Beatmap;
+
+            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
 
         private void onStart()
