@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;
@@ -114,7 +113,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             private void load()
             {
                 roomIDBind.BindTo(room.RoomID);
-                roomIDBind.BindValueChanged(v => Enabled.Value = !v.HasValue, true);
+                roomIDBind.BindValueChanged(v => this.FadeTo(v.HasValue ? 0 : 1), true);
             }
         }
 
