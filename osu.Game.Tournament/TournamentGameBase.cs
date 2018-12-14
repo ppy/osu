@@ -109,7 +109,12 @@ namespace osu.Game.Tournament
             foreach (var id in group.Pairings)
             {
                 var found = Ladder.Pairings.FirstOrDefault(p => p.ID == id);
-                if (found != null) found.Grouping.Value = group;
+                if (found != null)
+                {
+                    found.Grouping.Value = group;
+                    if (group.StartDate.Value > found.Date.Value)
+                        found.Date.Value = group.StartDate.Value;
+                }
             }
 
             Ladder.CurrentMatch.Value = Ladder.Pairings.FirstOrDefault(p => p.Current.Value);
