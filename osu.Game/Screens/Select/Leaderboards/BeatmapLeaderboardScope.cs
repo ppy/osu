@@ -3,14 +3,11 @@
 
 namespace osu.Game.Screens.Select.Leaderboards
 {
-    public enum PlaceholderState
+    public enum BeatmapLeaderboardScope
     {
-        Successful,
-        Retrieving,
-        NetworkFailure,
-        Unavailable,
-        NoScores,
-        NotLoggedIn,
-        NotSupporter,
+        Local,
+        Country,
+        Global,
+        Friend,
     }
 }

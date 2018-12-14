@@ -1,9 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using System.Linq;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -14,47 +13,60 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Users;
+using osuTK;
+using osuTK.Graphics;
 
-namespace osu.Game.Screens.Select.Leaderboards
+namespace osu.Game.Online.Leaderboards
 {
-    public class LeaderboardScore : OsuClickableContainer
+    public static class LeaderboardScore
     {
-        public static readonly float HEIGHT = 60;
+        public const float HEIGHT = 60;
+    }
 
+    public abstract class LeaderboardScore<TScoreModel> : OsuClickableContainer
+    {
         public readonly int RankPosition;
-        public readonly ScoreInfo Score;
 
         private const float corner_radius = 5;
         private const float edge_margin = 5;
         private const float background_alpha = 0.25f;
         private const float rank_width = 30;
 
+        protected Container RankContainer { get; private set; }
+
+        private readonly TScoreModel score;
+
         private Box background;
         private Container content;
         private Drawable avatar;
-        private DrawableRank scoreRank;
+        private Drawable scoreRank;
         private OsuSpriteText nameLabel;
         private GlowingSpriteText scoreLabel;
-        private ScoreComponentLabel maxCombo;
-        private ScoreComponentLabel accuracy;
         private Container flagBadgeContainer;
         private FillFlowContainer<ModIcon> modsContainer;
 
-        public LeaderboardScore(ScoreInfo score, int rank)
+        private List<ScoreComponentLabel> statisticsLabels;
+
+        protected LeaderboardScore(TScoreModel score, int rank)
         {
-            Score = score;
+            this.score = score;
             RankPosition = rank;
 
             RelativeSizeAxes = Axes.X;
-            Height = HEIGHT;
+            Height = LeaderboardScore.HEIGHT;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
+            var user = GetUser(score);
+
+            statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s.icon, s.value, s.name)).ToList();
+
             Children = new Drawable[]
             {
                 new Container
@@ -102,7 +114,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                             Children = new[]
                             {
                                 avatar = new DelayedLoadWrapper(
-                                    new Avatar(Score.User)
+                                    new Avatar(user)
                                     {
                                         RelativeSizeAxes = Axes.Both,
                                         CornerRadius = corner_radius,
@@ -117,18 +129,18 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     })
                                 {
                                     RelativeSizeAxes = Axes.None,
-                                    Size = new Vector2(HEIGHT - edge_margin * 2, HEIGHT - edge_margin * 2),
+                                    Size = new Vector2(LeaderboardScore.HEIGHT - edge_margin * 2, LeaderboardScore.HEIGHT - edge_margin * 2),
                                 },
                                 new Container
                                 {
                                     RelativeSizeAxes = Axes.Y,
                                     AutoSizeAxes = Axes.X,
-                                    Position = new Vector2(HEIGHT - edge_margin, 0f),
+                                    Position = new Vector2(LeaderboardScore.HEIGHT - edge_margin, 0f),
                                     Children = new Drawable[]
                                     {
                                         nameLabel = new OsuSpriteText
                                         {
-                                            Text = Score.User.Username,
+                                            Text = user.Username,
                                             Font = @"Exo2.0-BoldItalic",
                                             TextSize = 23,
                                         },
@@ -149,7 +161,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Masking = true,
                                                     Children = new Drawable[]
                                                     {
-                                                        new DrawableFlag(Score.User?.Country)
+                                                        new DrawableFlag(user.Country)
                                                         {
                                                             Width = 30,
                                                             RelativeSizeAxes = Axes.Y,
@@ -164,11 +176,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                                     Direction = FillDirection.Horizontal,
                                                     Spacing = new Vector2(10f, 0f),
                                                     Margin = new MarginPadding { Left = edge_margin },
-                                                    Children = new Drawable[]
-                                                    {
-                                                        maxCombo = new ScoreComponentLabel(FontAwesome.fa_link, Score.MaxCombo.ToString(), "Max Combo"),
-                                                        accuracy = new ScoreComponentLabel(FontAwesome.fa_crosshairs, string.Format(Score.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", Score.Accuracy), "Accuracy"),
-                                                    },
+                                                    Children = statisticsLabels
                                                 },
                                             },
                                         },
@@ -183,17 +191,17 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
-                                        scoreLabel = new GlowingSpriteText(Score.TotalScore.ToString(@"N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa")),
-                                        new Container
+                                        scoreLabel = new GlowingSpriteText(GetTotalScore(score).ToString(@"N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa")),
+                                        RankContainer = new Container
                                         {
                                             Size = new Vector2(40f, 20f),
                                             Children = new[]
                                             {
-                                                scoreRank = new DrawableRank(Score.Rank)
+                                                scoreRank = new DrawableRank(GetRank(score))
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
-                                                    Size = new Vector2(40f),
+                                                    Size = new Vector2(40f)
                                                 },
                                             },
                                         },
@@ -205,7 +213,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                                     Origin = Anchor.BottomRight,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    ChildrenEnumerable = Score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
+                                    ChildrenEnumerable = GetMods(score).Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
                                 },
                             },
                         },
@@ -216,7 +224,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         public override void Show()
         {
-            foreach (var d in new[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, maxCombo, accuracy, modsContainer })
+            foreach (var d in new[] { avatar, nameLabel, scoreLabel, scoreRank, flagBadgeContainer, modsContainer }.Concat(statisticsLabels))
                 d.FadeOut();
 
             Alpha = 0;
@@ -243,7 +251,7 @@ namespace osu.Game.Screens.Select.Leaderboards
 
                     using (BeginDelayedSequence(50, true))
                     {
-                        var drawables = new Drawable[] { flagBadgeContainer, maxCombo, accuracy, modsContainer, };
+                        var drawables = new Drawable[] { flagBadgeContainer, modsContainer }.Concat(statisticsLabels).ToArray();
                         for (int i = 0; i < drawables.Length; i++)
                             drawables[i].FadeIn(100 + i * 50);
                     }
@@ -262,6 +270,16 @@ namespace osu.Game.Screens.Select.Leaderboards
             background.FadeTo(background_alpha, 200, Easing.OutQuint);
             base.OnHoverLost(e);
         }
+
+        protected abstract User GetUser(TScoreModel model);
+
+        protected abstract IEnumerable<Mod> GetMods(TScoreModel model);
+
+        protected abstract IEnumerable<(FontAwesome icon, string value, string name)> GetStatistics(TScoreModel model);
+
+        protected abstract int GetTotalScore(TScoreModel model);
+
+        protected abstract ScoreRank GetRank(TScoreModel model);
 
         private class GlowingSpriteText : Container
         {
@@ -324,8 +342,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             public ScoreComponentLabel(FontAwesome icon, string value, string name)
             {
                 this.name = name;
-                AutoSizeAxes = Axes.Y;
-                Width = 60;
+                AutoSizeAxes = Axes.Both;
 
                 Child = content = new FillFlowContainer
                 {

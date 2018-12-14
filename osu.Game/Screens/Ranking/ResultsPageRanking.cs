@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Ranking
                     Colour = colours.GrayE,
                     RelativeSizeAxes = Axes.Both,
                 },
-                new Leaderboard
+                new BeatmapLeaderboard
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,

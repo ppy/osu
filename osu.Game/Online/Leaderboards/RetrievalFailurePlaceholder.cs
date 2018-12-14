@@ -8,7 +8,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK;
 
-namespace osu.Game.Screens.Select.Leaderboards
+namespace osu.Game.Online.Leaderboards
 {
     public class RetrievalFailurePlaceholder : Placeholder
     {
