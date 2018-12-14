@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         public int TotalScore { get; set; }
 
         [JsonProperty("pp")]
-        public double PP { get; set; }
+        public double? PP { get; set; }
 
         [JsonProperty("attempts")]
         public int TotalAttempts { get; set; }
