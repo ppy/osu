@@ -9,7 +9,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
@@ -35,7 +34,7 @@ namespace osu.Game.Overlays.AccountCreation
 
         private APIAccess api;
         private ShakeContainer registerShake;
-        private IEnumerable<SpriteText> characterCheckText;
+        private IEnumerable<Drawable> characterCheckText;
 
         private OsuTextBox[] textboxes;
         private ProcessingOverlay processingOverlay;
