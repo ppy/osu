@@ -76,7 +76,26 @@ namespace osu.Game.Screens.Multi.Match
                     {
                         new Drawable[] { header = new Components.Header { Depth = -1 } },
                         new Drawable[] { info = new Info { OnStart = onStart } },
-                        new Drawable[] { participants = new Participants { RelativeSizeAxes = Axes.Both } },
+                        new Drawable[]
+                        {
+                            new GridContainer
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Content = new[]
+                                {
+                                    new Drawable[]
+                                    {
+                                        participants = new Participants { RelativeSizeAxes = Axes.Both },
+                                        new MatchLeaderboard(room) { RelativeSizeAxes = Axes.Both }
+                                    },
+                                },
+                                ColumnDimensions = new[]
+                                {
+                                    new Dimension(GridSizeMode.Distributed),
+                                    new Dimension(GridSizeMode.Relative, 0.5f),
+                                }
+                            }
+                        },
                     },
                     RowDimensions = new[]
                     {
