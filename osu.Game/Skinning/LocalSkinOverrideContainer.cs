@@ -16,8 +16,8 @@ namespace osu.Game.Skinning
     {
         public event Action SourceChanged;
 
-        private Bindable<bool> beatmapSkins = new Bindable<bool>();
-        private Bindable<bool> beatmapHitsounds = new Bindable<bool>();
+        private readonly Bindable<bool> beatmapSkins = new Bindable<bool>();
+        private readonly Bindable<bool> beatmapHitsounds = new Bindable<bool>();
 
         public Drawable GetDrawableComponent(string componentName)
         {
@@ -84,11 +84,8 @@ namespace osu.Game.Skinning
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            beatmapSkins = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
-            beatmapSkins.BindValueChanged(_ => onSourceChanged());
-
-            beatmapHitsounds = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
-            beatmapHitsounds.BindValueChanged(_ => onSourceChanged(), true);
+            config.BindWith(OsuSetting.BeatmapSkins, beatmapSkins);
+            config.BindWith(OsuSetting.BeatmapHitsounds, beatmapHitsounds);
         }
 
         protected override void LoadComplete()
@@ -97,6 +94,9 @@ namespace osu.Game.Skinning
 
             if (fallbackSource != null)
                 fallbackSource.SourceChanged += onSourceChanged;
+
+            beatmapSkins.BindValueChanged(_ => onSourceChanged());
+            beatmapHitsounds.BindValueChanged(_ => onSourceChanged(), true);
         }
 
         protected override void Dispose(bool isDisposing)
