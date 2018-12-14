@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             tabStrip.Colour = colours.Yellow;
         }
 
-        private class BeatmapSelectButton : TriangleButton
+        private class BeatmapSelectButton : HeaderButton
         {
             private readonly IBindable<int?> roomIDBind = new Bindable<int?>();
 
