@@ -19,25 +19,38 @@ namespace osu.Game.Scoring
     {
         public int ID { get; set; }
 
+        [JsonProperty("rank")]
         public ScoreRank Rank { get; set; }
 
+        [JsonProperty("total_score")]
         public int TotalScore { get; set; }
 
+        [JsonProperty("accuracy")]
         [Column(TypeName="DECIMAL(1,4)")]
         public double Accuracy { get; set; }
 
+        [JsonIgnore]
         public double? PP { get; set; }
 
+        [JsonProperty("max_combo")]
         public int MaxCombo { get; set; }
 
-        public int Combo { get; set; }
+        [JsonIgnore]
+        public int Combo { get; set; } // Todo: Shouldn't exist in here
 
+        [JsonIgnore]
         public int RulesetID { get; set; }
 
+        [JsonProperty("passed")]
+        [NotMapped]
+        public bool Passed { get; set; } = true;
+
+        [JsonIgnore]
         public virtual RulesetInfo Ruleset { get; set; }
 
         private Mod[] mods;
 
+        [JsonProperty("mods")]
         [NotMapped]
         public Mod[] Mods
         {
@@ -62,6 +75,7 @@ namespace osu.Game.Scoring
 
         private string modsJson;
 
+        [JsonIgnore]
         [Column("Mods")]
         public string ModsJson
         {
@@ -87,6 +101,7 @@ namespace osu.Game.Scoring
         [JsonIgnore]
         public User User;
 
+        [JsonIgnore]
         [Column("User")]
         public string UserString
         {
@@ -97,15 +112,19 @@ namespace osu.Game.Scoring
         [JsonIgnore]
         public int BeatmapInfoID { get; set; }
 
+        [JsonIgnore]
         public virtual BeatmapInfo Beatmap { get; set; }
 
+        [JsonIgnore]
         public long? OnlineScoreID { get; set; }
 
+        [JsonIgnore]
         public DateTimeOffset Date { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics = new Dictionary<HitResult, int>();
 
+        [JsonIgnore]
         [Column("Statistics")]
         public string StatisticsJson
         {
@@ -125,8 +144,10 @@ namespace osu.Game.Scoring
         [JsonIgnore]
         public List<ScoreFileInfo> Files { get; set; }
 
+        [JsonIgnore]
         public string Hash { get; set; }
 
+        [JsonIgnore]
         public bool DeletePending { get; set; }
 
         [Serializable]
