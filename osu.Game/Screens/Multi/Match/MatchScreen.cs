@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
 using osu.Game.Screens.Play;
@@ -39,9 +38,6 @@ namespace osu.Game.Screens.Multi.Match
 
         private readonly Components.Header header;
         private readonly Info info;
-
-        [Cached]
-        private readonly Bindable<IEnumerable<Mod>> mods = new Bindable<IEnumerable<Mod>>(Enumerable.Empty<Mod>());
 
         [Cached]
         private readonly Room room;
@@ -96,7 +92,7 @@ namespace osu.Game.Screens.Multi.Match
                 },
             };
 
-            header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect());
+            header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect { Selected = addPlaylistItem });
 
             header.Tabs.Current.ValueChanged += t =>
             {
@@ -110,38 +106,27 @@ namespace osu.Game.Screens.Multi.Match
             info.Status.BindTo(statusBind);
             info.Availability.BindTo(availabilityBind);
             info.Type.BindTo(typeBind);
-            info.Mods.BindTo(mods);
 
             participants.Users.BindTo(participantsBind);
             participants.MaxParticipants.BindTo(maxParticipantsBind);
 
-            playlistBind.ItemsAdded += _ => updatePlaylist();
-            playlistBind.ItemsRemoved += _ => updatePlaylist();
+            playlistBind.ItemsAdded += _ => setFromPlaylist();
+            playlistBind.ItemsRemoved += _ => setFromPlaylist();
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.BindValueChanged(b =>
-            {
-                playlistBind.Clear();
-
-                var newItem = new PlaylistItem
-                {
-                    Beatmap = b.BeatmapInfo,
-                    Ruleset = Ruleset.Value
-                };
-
-                newItem.RequiredMods.Clear();
-                newItem.RequiredMods.AddRange(b.Mods.Value);
-
-                playlistBind.Add(newItem);
-            });
-
             playlistBind.BindTo(room.Playlist);
         }
 
-        private void updatePlaylist()
+        private void addPlaylistItem(PlaylistItem item)
+        {
+            playlistBind.Clear();
+            playlistBind.Add(item);
+        }
+
+        private void setFromPlaylist()
         {
             if (playlistBind.Count == 0)
                 return;
@@ -151,12 +136,9 @@ namespace osu.Game.Screens.Multi.Match
 
             header.Beatmap.Value = item.Beatmap;
             info.Beatmap.Value = item.Beatmap;
+            info.Mods.Value = item.RequiredMods;
 
-            if (Beatmap.Value?.BeatmapInfo != item.Beatmap)
-            {
-                Beatmap.Value = beatmapManager.GetWorkingBeatmap(item.Beatmap);
-                Beatmap.Value.Mods.Value = item.RequiredMods.ToArray();
-            }
+            Beatmap.Value = beatmapManager.GetWorkingBeatmap(item.Beatmap);
         }
 
         private void onStart()
