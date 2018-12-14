@@ -10,21 +10,31 @@ namespace osu.Game.Rulesets.Taiko.Judgements
     {
         public override HitResult MaxResult => HitResult.Great;
 
-        /// <summary>
-        /// Computes the numeric result value for the combo portion of the score.
-        /// </summary>
-        /// <param name="result">The result to compute the value for.</param>
-        /// <returns>The numeric result value.</returns>
         protected override int NumericResultFor(HitResult result)
         {
             switch (result)
             {
-                default:
-                    return 0;
                 case HitResult.Good:
                     return 100;
                 case HitResult.Great:
                     return 300;
+                default:
+                    return 0;
+            }
+        }
+
+        protected override double HealthIncreaseFor(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Miss:
+                    return -1.0;
+                case HitResult.Good:
+                    return 1.1;
+                case HitResult.Great:
+                    return 3.0;
+                default:
+                    return 0;
             }
         }
     }

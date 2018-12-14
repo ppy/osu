@@ -20,11 +20,10 @@ namespace osu.Game.Rulesets.Mania.Objects
             { HitResult.Miss, (376, 346, 316) },
         };
 
+        public override bool IsHitResultAllowed(HitResult result) => true;
+
         public override void SetDifficulty(double difficulty)
         {
-            AllowsPerfect = true;
-            AllowsOk = true;
-
             Perfect = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Perfect]);
             Great = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Great]);
             Good = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Good]);
