@@ -71,22 +71,24 @@ namespace osu.Game.Beatmaps.Drawables
             if (DownloadState.Value > DownloadStatus.NotDownloaded)
                 return;
 
-            beatmaps.Download(set, noVideo);
-
-            DownloadState.Value = DownloadStatus.Downloading;
+            if (beatmaps.Download(set, noVideo))
+            {
+                // Only change state if download can happen
+                DownloadState.Value = DownloadStatus.Downloading;
+            }
         }
 
-        private void setAdded(BeatmapSetInfo s)
+        private void setAdded(BeatmapSetInfo s, bool existing, bool silent) => Schedule(() =>
         {
             if (s.OnlineBeatmapSetID == set.OnlineBeatmapSetID)
                 DownloadState.Value = DownloadStatus.Downloaded;
-        }
+        });
 
-        private void setRemoved(BeatmapSetInfo s)
+        private void setRemoved(BeatmapSetInfo s) => Schedule(() =>
         {
             if (s.OnlineBeatmapSetID == set.OnlineBeatmapSetID)
                 DownloadState.Value = DownloadStatus.NotDownloaded;
-        }
+        });
 
         private void downloadBegan(DownloadBeatmapSetRequest d)
         {

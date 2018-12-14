@@ -9,7 +9,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModPerfect : ModSuddenDeath
     {
         public override string Name => "Perfect";
-        public override string ShortenedName => "PF";
+        public override string Acronym => "PF";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_perfect;
         public override string Description => "SS or quit.";
 

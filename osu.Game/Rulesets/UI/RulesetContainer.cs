@@ -19,10 +19,9 @@ using osu.Framework.Input;
 using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Overlays;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Configuration;
-using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
-using OpenTK;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -74,7 +73,7 @@ namespace osu.Game.Rulesets.UI
         /// </summary>
         public readonly CursorContainer Cursor;
 
-        protected readonly Ruleset Ruleset;
+        public readonly Ruleset Ruleset;
 
         protected IRulesetConfigManager Config { get; private set; }
 
@@ -239,6 +238,8 @@ namespace osu.Game.Rulesets.UI
 
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
+
+            applyBeatmapMods(Mods);
         }
 
         [BackgroundDependencyLoader]
@@ -256,16 +257,29 @@ namespace osu.Game.Rulesets.UI
                 KeyBindingInputManager.Add(Cursor);
 
             // Apply mods
-            applyMods(Mods, config);
+            applyRulesetMods(Mods, config);
 
             loadObjects();
+        }
+
+        /// <summary>
+        /// Applies the active mods to the Beatmap.
+        /// </summary>
+        /// <param name="mods"></param>
+        private void applyBeatmapMods(IEnumerable<Mod> mods)
+        {
+            if (mods == null)
+                return;
+
+            foreach (var mod in mods.OfType<IApplicableToBeatmap<TObject>>())
+                mod.ApplyToBeatmap(Beatmap);
         }
 
         /// <summary>
         /// Applies the active mods to this RulesetContainer.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyMods(IEnumerable<Mod> mods, OsuConfigManager config)
+        private void applyRulesetMods(IEnumerable<Mod> mods, OsuConfigManager config)
         {
             if (mods == null)
                 return;
@@ -291,17 +305,7 @@ namespace osu.Game.Rulesets.UI
         private void loadObjects()
         {
             foreach (TObject h in Beatmap.HitObjects)
-            {
-                var drawableObject = GetVisualRepresentation(h);
-
-                if (drawableObject == null)
-                    continue;
-
-                drawableObject.OnNewResult += (_, r) => OnNewResult?.Invoke(r);
-                drawableObject.OnRevertResult += (_, r) => OnRevertResult?.Invoke(r);
-
-                Playfield.Add(drawableObject);
-            }
+                AddRepresentation(h);
 
             Playfield.PostProcess();
 
@@ -309,32 +313,30 @@ namespace osu.Game.Rulesets.UI
                 mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
         }
 
-        protected override void Update()
+        /// <summary>
+        /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="RulesetContainer{TObject}"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="TObject"/> to add the visual representation for.</param>
+        internal void AddRepresentation(TObject hitObject)
         {
-            base.Update();
+            var drawableObject = GetVisualRepresentation(hitObject);
 
-            Playfield.Size = GetAspectAdjustedSize() * PlayfieldArea;
+            if (drawableObject == null)
+                return;
+
+            drawableObject.OnNewResult += (_, r) => OnNewResult?.Invoke(r);
+            drawableObject.OnRevertResult += (_, r) => OnRevertResult?.Invoke(r);
+
+            Playfield.Add(drawableObject);
         }
 
-        /// <summary>
-        /// Computes the size of the <see cref="Playfield"/> in relative coordinate space after aspect adjustments.
-        /// </summary>
-        /// <returns>The aspect-adjusted size.</returns>
-        protected virtual Vector2 GetAspectAdjustedSize() => Vector2.One;
-
-        /// <summary>
-        /// The area of this <see cref="RulesetContainer"/> that is available for the <see cref="Playfield"/> to use.
-        /// Must be specified in relative coordinate space to this <see cref="RulesetContainer"/>.
-        /// This affects the final size of the <see cref="Playfield"/> but does not affect the <see cref="Playfield"/>'s scale.
-        /// </summary>
-        protected virtual Vector2 PlayfieldArea => new Vector2(0.75f); // A sane default
 
         /// <summary>
         /// Creates a DrawableHitObject from a HitObject.
         /// </summary>
         /// <param name="h">The HitObject to make drawable.</param>
         /// <returns>The DrawableHitObject.</returns>
-        protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
+        public abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
     }
 
     /// <summary>

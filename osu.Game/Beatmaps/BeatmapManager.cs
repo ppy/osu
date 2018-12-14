@@ -63,6 +63,8 @@ namespace osu.Game.Beatmaps
 
         public override string[] HandledExtensions => new[] { ".osz" };
 
+        protected override string[] HashableFileTypes => new[] { ".osu" };
+
         protected override string ImportFromStablePath => "Songs";
 
         private readonly RulesetStore rulesets;
@@ -129,30 +131,18 @@ namespace osu.Game.Beatmaps
                 beatmaps.ForEach(b => b.OnlineBeatmapID = null);
         }
 
-        protected override BeatmapSetInfo CheckForExisting(BeatmapSetInfo model)
-        {
-            // check if this beatmap has already been imported and exit early if so
-            var existingHashMatch = beatmaps.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
-            if (existingHashMatch != null)
-            {
-                Undelete(existingHashMatch);
-                return existingHashMatch;
-            }
-
-            return null;
-        }
-
         /// <summary>
         /// Downloads a beatmap.
         /// This will post notifications tracking progress.
         /// </summary>
         /// <param name="beatmapSetInfo">The <see cref="BeatmapSetInfo"/> to be downloaded.</param>
         /// <param name="noVideo">Whether the beatmap should be downloaded without video. Defaults to false.</param>
-        public void Download(BeatmapSetInfo beatmapSetInfo, bool noVideo = false)
+        /// <returns>Downloading can happen</returns>
+        public bool Download(BeatmapSetInfo beatmapSetInfo, bool noVideo = false)
         {
             var existing = GetExistingDownload(beatmapSetInfo);
 
-            if (existing != null || api == null) return;
+            if (existing != null || api == null) return false;
 
             if (!api.LocalUser.Value.IsSupporter)
             {
@@ -161,7 +151,7 @@ namespace osu.Game.Beatmaps
                     Icon = FontAwesome.fa_superpowers,
                     Text = "You gotta be an osu!supporter to download for now 'yo"
                 });
-                return;
+                return false;
             }
 
             var downloadNotification = new DownloadNotification
@@ -227,6 +217,7 @@ namespace osu.Game.Beatmaps
             // don't run in the main api queue as this is a long-running task.
             Task.Factory.StartNew(() => request.Perform(api), TaskCreationOptions.LongRunning);
             BeatmapDownloadBegan?.Invoke(request);
+            return true;
         }
 
         protected override void PresentCompletedImport(IEnumerable<BeatmapSetInfo> imported)
@@ -258,10 +249,13 @@ namespace osu.Game.Beatmaps
         /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
         /// </summary>
         /// <param name="beatmapInfo">The beatmap to lookup.</param>
-        /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap.</param>
+        /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap. May be returned if beatmapInfo requested matches</param>
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
         {
+            if (beatmapInfo?.ID > 0 && previous != null && previous.BeatmapInfo?.ID == beatmapInfo.ID)
+                return previous;
+
             if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 
@@ -315,20 +309,6 @@ namespace osu.Game.Beatmaps
         /// <returns>Results from the provided query.</returns>
         public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
 
-        /// <summary>
-        /// Create a SHA-2 hash from the provided archive based on contained beatmap (.osu) file content.
-        /// </summary>
-        private string computeBeatmapSetHash(ArchiveReader reader)
-        {
-            // for now, concatenate all .osu files in the set to create a unique hash.
-            MemoryStream hashable = new MemoryStream();
-            foreach (string file in reader.Filenames.Where(f => f.EndsWith(".osu")))
-                using (Stream s = reader.GetStream(file))
-                    s.CopyTo(hashable);
-
-            return hashable.ComputeSHA2Hash();
-        }
-
         protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
         {
             // let's make sure there are actually .osu files to import.
@@ -347,8 +327,7 @@ namespace osu.Game.Beatmaps
             {
                 OnlineBeatmapSetID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
-                Hash = computeBeatmapSetHash(reader),
-                Metadata = beatmap.Metadata
+                Metadata = beatmap.Metadata,
             };
         }
 

@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {

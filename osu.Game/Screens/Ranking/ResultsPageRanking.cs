@@ -5,16 +5,16 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking
 {
     public class ResultsPageRanking : ResultsPage
     {
-        public ResultsPageRanking(Score score, WorkingBeatmap beatmap = null) : base(score, beatmap)
+        public ResultsPageRanking(ScoreInfo score, WorkingBeatmap beatmap = null) : base(score, beatmap)
         {
         }
 

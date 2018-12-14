@@ -6,29 +6,28 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Online.Chat
 {
     /// <summary>
-    /// An invisible drawable that brings multiple <see cref="SpriteText"/> pieces together to form a consumable clickable link.
+    /// An invisible drawable that brings multiple <see cref="Drawable"/> pieces together to form a consumable clickable link.
     /// </summary>
     public class DrawableLinkCompiler : OsuHoverContainer, IHasTooltip
     {
         /// <summary>
         /// Each word part of a chat link (split for word-wrap support).
         /// </summary>
-        public List<SpriteText> Parts;
+        public List<Drawable> Parts;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Parts.Any(d => d.ReceivePositionalInputAt(screenSpacePos));
 
         protected override HoverClickSounds CreateHoverClickSounds(HoverSampleSet sampleSet) => new LinkHoverSounds(sampleSet, Parts);
 
-        public DrawableLinkCompiler(IEnumerable<SpriteText> parts)
+        public DrawableLinkCompiler(IEnumerable<Drawable> parts)
         {
             Parts = parts.ToList();
         }
@@ -45,9 +44,9 @@ namespace osu.Game.Online.Chat
 
         private class LinkHoverSounds : HoverClickSounds
         {
-            private readonly List<SpriteText> parts;
+            private readonly List<Drawable> parts;
 
-            public LinkHoverSounds(HoverSampleSet sampleSet, List<SpriteText> parts)
+            public LinkHoverSounds(HoverSampleSet sampleSet, List<Drawable> parts)
                 : base(sampleSet)
             {
                 this.parts = parts;

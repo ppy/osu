@@ -18,8 +18,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API.Requests;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -174,11 +174,11 @@ namespace osu.Game.Overlays.Direct
             };
         }
 
-        private void setAdded(BeatmapSetInfo s)
+        private void setAdded(BeatmapSetInfo s, bool existing, bool silent) => Schedule(() =>
         {
             if (s.OnlineBeatmapSetID == SetInfo.OnlineBeatmapSetID)
                 progressBar.FadeOut(500);
-        }
+        });
 
         protected override void LoadComplete()
         {

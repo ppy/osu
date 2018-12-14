@@ -3,22 +3,19 @@
 
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Taiko.Replays;
+using osu.Game.Scoring;
 using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModAutoplay : ModAutoplay<TaikoHitObject>
     {
-        protected override Score CreateReplayScore(Beatmap<TaikoHitObject> beatmap)
+        protected override Score CreateReplayScore(Beatmap<TaikoHitObject> beatmap) => new Score
         {
-            return new Score
-            {
-                User = new User { Username = "mekkadosu!" },
-                Replay = new TaikoAutoGenerator(beatmap).Generate(),
-            };
-        }
+            ScoreInfo = new ScoreInfo { User = new User { Username = "mekkadosu!" } },
+            Replay = new TaikoAutoGenerator(beatmap).Generate(),
+        };
     }
 }
