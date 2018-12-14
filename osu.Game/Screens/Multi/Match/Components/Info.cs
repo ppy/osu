@@ -41,6 +41,8 @@ namespace osu.Game.Screens.Multi.Match.Components
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
+            ReadyButton readyButton;
+            ViewBeatmapButton viewBeatmapButton;
             BeatmapTypeInfo beatmapTypeInfo;
             OsuSpriteText name;
             ModDisplay modDisplay;
@@ -103,8 +105,8 @@ namespace osu.Game.Screens.Multi.Match.Components
                             Direction = FillDirection.Horizontal,
                             Children = new Drawable[]
                             {
-                                new ViewBeatmapButton(),
-                                new ReadyButton
+                                viewBeatmapButton = new ViewBeatmapButton(),
+                                readyButton = new ReadyButton
                                 {
                                     Action = () => OnStart?.Invoke()
                                 }
@@ -117,6 +119,9 @@ namespace osu.Game.Screens.Multi.Match.Components
             beatmapTypeInfo.Beatmap.BindTo(Beatmap);
             beatmapTypeInfo.Type.BindTo(Type);
             modDisplay.Current.BindTo(Mods);
+
+            viewBeatmapButton.Beatmap.BindTo(Beatmap);
+            readyButton.Beatmap.BindTo(Beatmap);
 
             Availability.BindValueChanged(_ => updateAvailabilityStatus());
             Status.BindValueChanged(_ => updateAvailabilityStatus());

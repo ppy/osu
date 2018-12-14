@@ -140,6 +140,7 @@ namespace osu.Game.Screens.Multi.Match
             info.Beatmap.Value = item.Beatmap;
             info.Mods.Value = item.RequiredMods;
 
+            // Todo: item.Beatmap can be null here...
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(item.Beatmap);
         }
 
