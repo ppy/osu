@@ -3,38 +3,30 @@
 
 using System;
 using System.Collections.Generic;
-using osuTK;
-using osuTK.Graphics;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
-using osu.Game.Online.API.Requests;
-using System.Linq;
-using osu.Framework.Configuration;
-using osu.Game.Rulesets;
-using osu.Game.Scoring;
+using osu.Game.Screens.Select.Leaderboards;
+using osuTK;
+using osuTK.Graphics;
 
-namespace osu.Game.Screens.Select.Leaderboards
+namespace osu.Game.Online.Leaderboards
 {
-    public class Leaderboard : Container
+    public abstract class Leaderboard<TScope, TScoreModel> : Container
     {
         private const double fade_duration = 300;
 
         private readonly ScrollContainer scrollContainer;
         private readonly Container placeholderContainer;
 
-        private FillFlowContainer<LeaderboardScore> scrollFlow;
-
-        private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
-
-        public Action<ScoreInfo> ScoreSelected;
+        private FillFlowContainer<LeaderboardScore<TScoreModel>> scrollFlow;
 
         private readonly LoadingAnimation loading;
 
@@ -42,9 +34,9 @@ namespace osu.Game.Screens.Select.Leaderboards
 
         private bool scoresLoadedOnce;
 
-        private IEnumerable<ScoreInfo> scores;
+        private IEnumerable<TScoreModel> scores;
 
-        public IEnumerable<ScoreInfo> Scores
+        public IEnumerable<TScoreModel> Scores
         {
             get { return scores; }
             set
@@ -64,13 +56,13 @@ namespace osu.Game.Screens.Select.Leaderboards
                 // ensure placeholder is hidden when displaying scores
                 PlaceholderState = PlaceholderState.Successful;
 
-                var flow = scrollFlow = new FillFlowContainer<LeaderboardScore>
+                var flow = scrollFlow = new FillFlowContainer<LeaderboardScore<TScoreModel>>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(0f, 5f),
                     Padding = new MarginPadding { Top = 10, Bottom = 5 },
-                    ChildrenEnumerable = scores.Select((s, index) => new LeaderboardScore(s, index + 1) { Action = () => ScoreSelected?.Invoke(s) })
+                    ChildrenEnumerable = scores.Select((s, index) => CreateScoreVisualiser(s, index + 1))
                 };
 
                 // schedule because we may not be loaded yet (LoadComponentAsync complains).
@@ -96,18 +88,18 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        private LeaderboardScope scope;
+        private TScope scope;
 
-        public LeaderboardScope Scope
+        public TScope Scope
         {
             get { return scope; }
             set
             {
-                if (value == scope)
+                if (value.Equals(scope))
                     return;
 
                 scope = value;
-                updateScores();
+                UpdateScores();
             }
         }
 
@@ -137,7 +129,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                     case PlaceholderState.NetworkFailure:
                         replacePlaceholder(new RetrievalFailurePlaceholder
                         {
-                            OnRetry = updateScores,
+                            OnRetry = UpdateScores,
                         });
                         break;
                     case PlaceholderState.Unavailable:
@@ -159,7 +151,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        public Leaderboard()
+        protected Leaderboard()
         {
             Children = new Drawable[]
             {
@@ -177,35 +169,13 @@ namespace osu.Game.Screens.Select.Leaderboards
         }
 
         private APIAccess api;
-        private BeatmapInfo beatmap;
-
-        [Resolved]
-        private ScoreManager scoreManager { get; set; }
 
         private ScheduledDelegate pendingUpdateScores;
 
-        public BeatmapInfo Beatmap
-        {
-            get { return beatmap; }
-            set
-            {
-                if (beatmap == value)
-                    return;
-
-                beatmap = value;
-                Scores = null;
-
-                updateScores();
-            }
-        }
-
-        [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(APIAccess api, IBindable<RulesetInfo> parentRuleset)
+        [BackgroundDependencyLoader(true)]
+        private void load(APIAccess api)
         {
             this.api = api;
-
-            ruleset.BindTo(parentRuleset);
-            ruleset.ValueChanged += _ => updateScores();
 
             if (api != null)
                 api.OnStateChange += handleApiStateChange;
@@ -219,21 +189,17 @@ namespace osu.Game.Screens.Select.Leaderboards
                 api.OnStateChange -= handleApiStateChange;
         }
 
-        public void RefreshScores() => updateScores();
+        public void RefreshScores() => UpdateScores();
 
-        private GetScoresRequest getScoresRequest;
+        private APIRequest getScoresRequest;
 
         private void handleApiStateChange(APIState oldState, APIState newState)
         {
-            if (Scope == LeaderboardScope.Local)
-                // No need to respond to API state change while current scope is local
-                return;
-
             if (newState == APIState.Online)
-                updateScores();
+                UpdateScores();
         }
 
-        private void updateScores()
+        protected void UpdateScores()
         {
             // don't display any scores or placeholder until the first Scores_Set has been called.
             // this avoids scope changes flickering a "no scores" placeholder before initialisation of song select is finished.
@@ -245,40 +211,23 @@ namespace osu.Game.Screens.Select.Leaderboards
             pendingUpdateScores?.Cancel();
             pendingUpdateScores = Schedule(() =>
             {
-                if (Scope == LeaderboardScope.Local)
-                {
-                    Scores = scoreManager.QueryScores(s => s.Beatmap.ID == Beatmap.ID).ToArray();
-                    PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
-                    return;
-                }
-
-                if (Beatmap?.OnlineBeatmapID == null)
-                {
-                    PlaceholderState = PlaceholderState.Unavailable;
-                    return;
-                }
-
                 if (api?.IsLoggedIn != true)
                 {
                     PlaceholderState = PlaceholderState.NotLoggedIn;
                     return;
                 }
 
-                if (Scope != LeaderboardScope.Global && !api.LocalUser.Value.IsSupporter)
-                {
-                    PlaceholderState = PlaceholderState.NotSupporter;
-                    return;
-                }
-
                 PlaceholderState = PlaceholderState.Retrieving;
                 loading.Show();
 
-                getScoresRequest = new GetScoresRequest(Beatmap, ruleset.Value ?? Beatmap.Ruleset, Scope);
-                getScoresRequest.Success += r => Schedule(() =>
+                getScoresRequest = FetchScores(scores => Schedule(() =>
                 {
-                    Scores = r.Scores;
+                    Scores = scores;
                     PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
-                });
+                }));
+
+                if (getScoresRequest == null)
+                    return;
 
                 getScoresRequest.Failure += e => Schedule(() =>
                 {
@@ -291,6 +240,8 @@ namespace osu.Game.Screens.Select.Leaderboards
                 api.Queue(getScoresRequest);
             });
         }
+
+        protected abstract APIRequest FetchScores(Action<IEnumerable<TScoreModel>> scoresCallback);
 
         private Placeholder currentPlaceholder;
 
@@ -344,5 +295,7 @@ namespace osu.Game.Screens.Select.Leaderboards
                 }
             }
         }
+
+        protected abstract LeaderboardScore<TScoreModel> CreateScoreVisualiser(TScoreModel model, int index);
     }
 }
