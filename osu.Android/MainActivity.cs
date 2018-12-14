@@ -5,6 +5,7 @@ using Android.App;
 using Android.OS;
 using Android.Runtime;
 using Android.Widget;
+using Android.Views;
 using Android.Content.PM;
 
 namespace osu.Android
@@ -17,6 +18,7 @@ namespace osu.Android
             base.OnCreate(savedInstanceState);
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
+            Window.AddFlags(WindowManagerFlags.KeepScreenOn);
         }
         public override void OnBackPressed()
         {

@@ -3,7 +3,6 @@
 
 using Android.Content;
 using Android.Util;
-using osu.Framework;
 using osu.Framework.Android;
 using osu.Game;
 
@@ -21,6 +20,6 @@ namespace osu.Android
         {
             CreateGame();
         }
-        public override Framework.Game CreateGame() => new OsuGame();
+        public override Framework.Game CreateGame() => new OsuGameAndroid();
     }
 }
