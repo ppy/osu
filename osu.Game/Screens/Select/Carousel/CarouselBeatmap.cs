@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Select.Carousel
         {
             base.Filter(criteria);
 
-            bool match = criteria.Ruleset == null || Beatmap.RulesetID == criteria.Ruleset.ID || Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps;
+            bool match = criteria.Ruleset == null || Beatmap.RulesetID == criteria.Ruleset.ID || (Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps);
 
             foreach (var criteriaTerm in criteria.SearchTerms)
                 match &=
