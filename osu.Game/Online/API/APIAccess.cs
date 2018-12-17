@@ -141,7 +141,7 @@ namespace osu.Game.Online.API
                             State = APIState.Online;
                         };
 
-                        if (!handleRequest(userReq))
+                        if (!handleRequest(userReq, out _))
                         {
                             Thread.Sleep(500);
                             continue;
@@ -170,11 +170,15 @@ namespace osu.Game.Online.API
                     lock (queue)
                     {
                         if (queue.Count == 0) break;
-                        req = queue.Dequeue();
+                        req = queue.Peek();
                     }
 
                     // TODO: handle failures better
-                    handleRequest(req);
+                    handleRequest(req, out var removeFromQueue);
+
+                    if (removeFromQueue)
+                        lock (queue)
+                            queue.Dequeue();
                 }
 
                 Thread.Sleep(50);
@@ -193,9 +197,11 @@ namespace osu.Game.Online.API
         /// Handle a single API request.
         /// </summary>
         /// <param name="req">The request.</param>
-        /// <returns>true if we should remove this request from the queue.</returns>
-        private bool handleRequest(APIRequest req)
+        /// <returns>true if the request succeeded.</returns>
+        private bool handleRequest(APIRequest req, out bool removeFromQueue)
         {
+            removeFromQueue = true;
+
             try
             {
                 Logger.Log($@"Performing request {req}", LoggingTarget.Network);
@@ -216,12 +222,12 @@ namespace osu.Game.Online.API
             }
             catch (WebException we)
             {
-                var removeFromQueue = handleWebException(we);
+                removeFromQueue = handleWebException(we);
 
                 if (removeFromQueue)
                     req.Fail(we);
 
-                return removeFromQueue;
+                return false;
             }
             catch (Exception e)
             {
@@ -229,7 +235,7 @@ namespace osu.Game.Online.API
                     log.Add(@"API level timeout exception was hit");
 
                 req.Fail(e);
-                return true;
+                return false;
             }
         }
 
