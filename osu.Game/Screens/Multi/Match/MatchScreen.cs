@@ -7,6 +7,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
@@ -41,6 +42,7 @@ namespace osu.Game.Screens.Multi.Match
 
         private readonly Components.Header header;
         private readonly Info info;
+        private readonly MatchLeaderboard leaderboard;
 
         [Cached]
         private readonly Room room;
@@ -86,7 +88,7 @@ namespace osu.Game.Screens.Multi.Match
                                     new Drawable[]
                                     {
                                         participants = new Participants { RelativeSizeAxes = Axes.Both },
-                                        new MatchLeaderboard(room) { RelativeSizeAxes = Axes.Both }
+                                        leaderboard = new MatchLeaderboard(room) { RelativeSizeAxes = Axes.Both }
                                     },
                                 },
                                 ColumnDimensions = new[]
@@ -142,6 +144,13 @@ namespace osu.Game.Screens.Multi.Match
         private void load()
         {
             playlistBind.BindTo(room.Playlist);
+        }
+
+        protected override void OnResuming(Screen last)
+        {
+            base.OnResuming(last);
+
+            leaderboard.RefreshScores();
         }
 
         private void addPlaylistItem(PlaylistItem item)
