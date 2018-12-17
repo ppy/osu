@@ -35,7 +35,7 @@ namespace osu.Game.Tests.Visual
                 MaxParticipants = { Value = 10 },
             };
 
-            Add(overlay = new TestRoomSettingsOverlay
+            Add(overlay = new TestRoomSettingsOverlay(new Room())
             {
                 RelativeSizeAxes = Axes.Both,
                 Height = 0.75f,
@@ -84,6 +84,11 @@ namespace osu.Game.Tests.Visual
 
         private class TestRoomSettingsOverlay : RoomSettingsOverlay
         {
+            public TestRoomSettingsOverlay(Room room)
+                : base(room)
+            {
+            }
+
             public string CurrentName
             {
                 get => NameField.Text;
