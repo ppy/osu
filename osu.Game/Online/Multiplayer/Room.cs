@@ -29,12 +29,18 @@ namespace osu.Game.Online.Multiplayer
         [JsonProperty("playlist")]
         public readonly BindableCollection<PlaylistItem> Playlist = new BindableCollection<PlaylistItem>();
 
-        [JsonProperty("duration")]
-        public readonly Bindable<int> Duration = new Bindable<int>(100);
+        [JsonIgnore]
+        public readonly Bindable<TimeSpan> Duration = new Bindable<TimeSpan>(TimeSpan.FromMinutes(30));
 
         [JsonIgnore]
         public readonly Bindable<int?> MaxAttempts = new Bindable<int?>();
 
+        [JsonProperty("duration")]
+        private int duration
+        {
+            get => (int)Duration.Value.TotalMinutes;
+            set => Duration.Value = TimeSpan.FromMinutes(value);
+        }
         // Todo: Find a better way to do this (https://github.com/ppy/osu-framework/issues/1930)
         [JsonProperty("max_attempts", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private int? maxAttempts

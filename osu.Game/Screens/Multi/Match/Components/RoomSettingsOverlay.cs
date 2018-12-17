@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -26,25 +28,28 @@ namespace osu.Game.Screens.Multi.Match.Components
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
         private readonly IBindableCollection<PlaylistItem> playlistBind = new BindableCollection<PlaylistItem>();
+        private readonly Bindable<TimeSpan> durationBind = new Bindable<TimeSpan>();
 
         private readonly Container content;
 
         private readonly OsuSpriteText typeLabel;
 
         protected readonly OsuTextBox NameField, MaxParticipantsField;
+        protected readonly OsuDropdown<TimeSpan> DurationField;
         protected readonly RoomAvailabilityPicker AvailabilityPicker;
         protected readonly GameTypePicker TypePicker;
         protected readonly TriangleButton ApplyButton;
         protected readonly OsuPasswordTextBox PasswordField;
 
-        [Resolved]
+        private readonly Room room;
+
+        [Resolved(CanBeNull = true)]
         private RoomManager manager { get; set; }
 
-        [Resolved]
-        private Room room { get; set; }
-
-        public RoomSettingsOverlay()
+        public RoomSettingsOverlay(Room room)
         {
+            this.room = room;
+
             Masking = true;
 
             Child = content = new Container
@@ -121,6 +126,26 @@ namespace osu.Game.Screens.Multi.Match.Components
                                             OnCommit = (sender, text) => apply(),
                                         },
                                     },
+                                    new Section("DURATION")
+                                    {
+                                        Child = DurationField = new DurationDropdown
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            Items = new[]
+                                            {
+                                                TimeSpan.FromMinutes(30),
+                                                TimeSpan.FromHours(1),
+                                                TimeSpan.FromHours(2),
+                                                TimeSpan.FromHours(4),
+                                                TimeSpan.FromHours(8),
+                                                TimeSpan.FromHours(12),
+                                                TimeSpan.FromHours(16),
+                                                TimeSpan.FromHours(24),
+                                                TimeSpan.FromDays(3),
+                                                TimeSpan.FromDays(7)
+                                            }
+                                        }
+                                    },
                                     new Section("PASSWORD (OPTIONAL)")
                                     {
                                         Child = PasswordField = new SettingsPasswordTextBox
@@ -151,6 +176,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             availabilityBind.ValueChanged += a => AvailabilityPicker.Current.Value = a;
             typeBind.ValueChanged += t => TypePicker.Current.Value = t;
             maxParticipantsBind.ValueChanged += m => MaxParticipantsField.Text = m?.ToString();
+            durationBind.ValueChanged += d => DurationField.Current.Value = d;
         }
 
         [BackgroundDependencyLoader]
@@ -163,6 +189,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             availabilityBind.BindTo(room.Availability);
             typeBind.BindTo(room.Type);
             maxParticipantsBind.BindTo(room.MaxParticipants);
+            durationBind.BindTo(room.Duration);
 
             MaxParticipantsField.ReadOnly = true;
             PasswordField.ReadOnly = true;
@@ -210,7 +237,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             else
                 maxParticipantsBind.Value = null;
 
-            manager.CreateRoom(room);
+            manager?.CreateRoom(room);
         }
 
         private class SettingsTextBox : OsuTextBox
@@ -289,6 +316,19 @@ namespace osu.Game.Screens.Multi.Match.Components
                 BackgroundColour = colours.Yellow;
                 Triangles.ColourLight = colours.YellowLight;
                 Triangles.ColourDark = colours.YellowDark;
+            }
+        }
+
+        private class DurationDropdown : OsuDropdown<TimeSpan>
+        {
+            public DurationDropdown()
+            {
+                Menu.MaxHeight = 100;
+            }
+
+            protected override string GenerateItemText(TimeSpan item)
+            {
+                return item.Humanize();
             }
         }
     }
