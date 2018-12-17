@@ -59,6 +59,9 @@ namespace osu.Game.Online.Multiplayer
             Type.Value = other.Type;
             MaxParticipants.Value = other.MaxParticipants;
             Participants.Value = other.Participants.Value.ToArray();
+
+            Playlist.Clear();
+            Playlist.AddRange(other.Playlist);
         }
     }
 
@@ -68,15 +71,25 @@ namespace osu.Game.Online.Multiplayer
         public int ID { get; set; }
 
         [JsonProperty("beatmap")]
-        private APIBeatmap beatmap { get; set; }
+        private APIBeatmap apiBeatmap { get; set; }
 
-        public bool ShouldSerializebeatmap() => false;
+        public bool ShouldSerializeapiBeatmap() => false;
+
+        private BeatmapInfo beatmap;
 
         [JsonIgnore]
-        public BeatmapInfo Beatmap { get; set; }
+        public BeatmapInfo Beatmap
+        {
+            get => beatmap;
+            set
+            {
+                beatmap = value;
+                BeatmapID = value?.OnlineBeatmapID ?? 0;
+            }
+        }
 
         [JsonProperty("beatmap_id")]
-        public int BeatmapID => Beatmap.OnlineBeatmapID ?? 0;
+        public int BeatmapID { get; set; }
 
         [JsonProperty("ruleset_id")]
         public int RulesetID { get; set; }
@@ -105,37 +118,31 @@ namespace osu.Game.Online.Multiplayer
             set => _requiredMods = value;
         }
 
-        private RulesetInfo ruleset;
-
         [JsonIgnore]
-        public RulesetInfo Ruleset
+        public RulesetInfo Ruleset { get; set; }
+
+        public void MapObjects(BeatmapManager beatmaps, RulesetStore rulesets)
         {
-            get => ruleset;
-            set
+            // If we don't have an api beatmap, the request occurred as a result of room creation, so we can query the local beatmap instead
+            // Todo: Is this a bug?
+            Beatmap = apiBeatmap == null ? beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == BeatmapID) : apiBeatmap.ToBeatmap(rulesets);
+            Ruleset = rulesets.GetRuleset(RulesetID);
+
+            if (_allowedMods != null)
             {
-                ruleset = value;
+                AllowedMods.Clear();
+                AllowedMods.AddRange(Ruleset.CreateInstance().GetAllMods().Where(mod => _allowedMods.Any(m => m.Acronym == mod.Acronym)));
 
-                if (_allowedMods != null)
-                {
-                    AllowedMods.Clear();
-                    AllowedMods.AddRange(value.CreateInstance().GetAllMods().Where(mod => _allowedMods.Any(m => m.Acronym == mod.Acronym)));
-
-                    _allowedMods = null;
-                }
-
-                if (_requiredMods != null)
-                {
-                    RequiredMods.Clear();
-                    RequiredMods.AddRange(value.CreateInstance().GetAllMods().Where(mod => _requiredMods.Any(m => m.Acronym == mod.Acronym)));
-
-                    _requiredMods = null;
-                }
+                _allowedMods = null;
             }
-        }
 
-        public void SetRulesets(RulesetStore rulesets)
-        {
-            Beatmap = beatmap.ToBeatmap(rulesets);
+            if (_requiredMods != null)
+            {
+                RequiredMods.Clear();
+                RequiredMods.AddRange(Ruleset.CreateInstance().GetAllMods().Where(mod => _requiredMods.Any(m => m.Acronym == mod.Acronym)));
+
+                _requiredMods = null;
+            }
         }
 
         // Todo: Move this elsewhere for reusability

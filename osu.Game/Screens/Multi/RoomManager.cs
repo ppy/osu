@@ -63,11 +63,7 @@ namespace osu.Game.Screens.Multi
             {
                 foreach (var r in result)
                 {
-                    foreach (var pi in r.Playlist)
-                    {
-                        pi.Ruleset = rulesets.GetRuleset(pi.RulesetID);
-                        pi.SetRulesets(rulesets);
-                    }
+                    processPlaylist(r);
 
                     var existing = rooms.FirstOrDefault(e => e.RoomID.Value == r.RoomID.Value);
                     if (existing == null)
@@ -88,12 +84,20 @@ namespace osu.Game.Screens.Multi
 
         private void addRoom(Room local, Room remote)
         {
+            processPlaylist(remote);
+
             local.CopyFrom(remote);
 
             var existing = rooms.FirstOrDefault(e => e.RoomID.Value == local.RoomID.Value);
             if (existing != null)
                 rooms.Remove(existing);
             rooms.Add(local);
+        }
+
+        private void processPlaylist(Room room)
+        {
+            foreach (var pi in room.Playlist)
+                pi.MapObjects(beatmaps, rulesets);
         }
 
         private class CreateRoomRequest : APIRequest<Room>
