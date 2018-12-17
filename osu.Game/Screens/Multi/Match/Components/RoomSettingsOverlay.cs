@@ -134,7 +134,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                             },
                         },
                     },
-                    ApplyButton = new ApplySettingsButton
+                    ApplyButton = new CreateRoomButton
                     {
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
@@ -276,11 +276,11 @@ namespace osu.Game.Screens.Multi.Match.Components
             }
         }
 
-        private class ApplySettingsButton : TriangleButton
+        private class CreateRoomButton : TriangleButton
         {
-            public ApplySettingsButton()
+            public CreateRoomButton()
             {
-                Text = "Apply";
+                Text = "Create";
             }
 
             [BackgroundDependencyLoader]
