@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -43,12 +44,10 @@ namespace osu.Game.Screens.Multi.Match
         private readonly Components.Header header;
         private readonly Info info;
         private readonly MatchLeaderboard leaderboard;
+        private readonly Action<Screen> pushGameplayScreen;
 
         [Cached]
         private readonly Room room;
-
-        [Resolved]
-        private Multiplayer multiplayer { get; set; }
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -56,9 +55,10 @@ namespace osu.Game.Screens.Multi.Match
         [Resolved]
         private APIAccess api { get; set; }
 
-        public MatchScreen(Room room)
+        public MatchScreen(Room room, Action<Screen> pushGameplayScreen)
         {
             this.room = room;
+            this.pushGameplayScreen = pushGameplayScreen;
 
             nameBind.BindTo(room.Name);
             statusBind.BindTo(room.Status);
@@ -146,13 +146,6 @@ namespace osu.Game.Screens.Multi.Match
             playlistBind.BindTo(room.Playlist);
         }
 
-        protected override void OnResuming(Screen last)
-        {
-            base.OnResuming(last);
-
-            leaderboard.RefreshScores();
-        }
-
         private void addPlaylistItem(PlaylistItem item)
         {
             playlistBind.Clear();
@@ -192,7 +185,10 @@ namespace osu.Game.Screens.Multi.Match
             {
                 default:
                 case GameTypeTimeshift _:
-                    multiplayer.Push(new PlayerLoader(new TimeshiftPlayer(room.RoomID.Value ?? 0, room.Playlist.First().ID)));
+                    var player = new TimeshiftPlayer(room.RoomID.Value ?? 0, room.Playlist.First().ID);
+                    player.Exited += _ => leaderboard.RefreshScores();
+
+                    pushGameplayScreen?.Invoke(new PlayerLoader(player));
                     break;
             }
         }
