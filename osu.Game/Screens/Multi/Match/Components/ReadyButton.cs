@@ -54,7 +54,8 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             base.Dispose(isDisposing);
 
-            beatmaps.ItemAdded -= beatmapAdded;
+            if (beatmaps != null)
+                beatmaps.ItemAdded -= beatmapAdded;
         }
     }
 }
