@@ -14,12 +14,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double SkillMultiplier => 1400;
         protected override double StrainDecayBase => 0.3;
 
-        private const double single_spacing_threshold = 125;
-
         protected override double StrainValueOf(OsuDifficultyHitObject current)
         {
             double distance = current.TravelDistance + current.JumpDistance;
-            return (1 + Math.Pow(distance / single_spacing_threshold, 4)) / current.StrainTime;
+            return (0.95 + Math.Pow(distance / SINGLE_SPACING_THRESHOLD, 4)) / current.StrainTime;
         }
     }
 }
