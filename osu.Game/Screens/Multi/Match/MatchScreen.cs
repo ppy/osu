@@ -54,6 +54,9 @@ namespace osu.Game.Screens.Multi.Match
         [Resolved]
         private APIAccess api { get; set; }
 
+        [Resolved]
+        private OsuGame game { get; set; }
+
         public MatchScreen(Room room, Action<Screen> pushGameplayScreen)
         {
             this.room = room;
@@ -167,18 +170,11 @@ namespace osu.Game.Screens.Multi.Match
             // Todo: item.Beatmap can be null here...
             var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == item.BeatmapID) ?? item.Beatmap;
 
-            // Bypass any beatmap and ruleset restrictions
-            var beatmapDisabled = Beatmap.Disabled;
-            var rulesetDisabled = Ruleset.Disabled;
-            Beatmap.Disabled = false;
-            Ruleset.Disabled = false;
+            var newBeatmap = beatmapManager.GetWorkingBeatmap(localBeatmap);
+            newBeatmap.Mods.Value = item.RequiredMods.ToArray();
 
-            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            Beatmap.Value.Mods.Value = item.RequiredMods.ToArray();
-            Ruleset.Value = item.Ruleset;
-
-            Beatmap.Disabled = beatmapDisabled;
-            Ruleset.Disabled = rulesetDisabled;
+            game.ForcefullySetBeatmap(newBeatmap);
+            game.ForcefullySetRuleset(item.Ruleset);
         }
 
         private void onStart()
