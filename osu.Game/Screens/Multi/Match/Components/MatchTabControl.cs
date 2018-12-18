@@ -21,8 +21,8 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         public MatchTabControl()
         {
-            AddItem(new SettingsMatchPage());
             AddItem(new RoomMatchPage());
+            AddItem(new SettingsMatchPage());
         }
 
         [BackgroundDependencyLoader]
