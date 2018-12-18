@@ -139,9 +139,10 @@ namespace osu.Game.Screens.Multi.Match
             playlistBind.ItemsRemoved += _ => setFromPlaylist();
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
+
             playlistBind.BindTo(room.Playlist);
         }
 
