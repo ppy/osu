@@ -216,8 +216,11 @@ namespace osu.Game.Overlays.KeyBinding
                 }
             }
 
-            bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
-            if (!isModifier(e.Key)) finalise();
+            if (!isModifier(e.Key))
+            {
+                bindTarget.UpdateKeyCombination(KeyCombination.FromInputState(e.CurrentState));
+                finalise();
+            }
 
             return true;
         }
@@ -226,7 +229,9 @@ namespace osu.Game.Overlays.KeyBinding
         {
             if (!HasFocus) return base.OnKeyUp(e);
 
-            finalise();
+            if (!isModifier(e.Key))
+                finalise();
+
             return true;
         }
 
