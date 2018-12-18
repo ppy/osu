@@ -671,6 +671,32 @@ namespace osu.Game
             MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
 
+        /// <summary>
+        /// Sets <see cref="Beatmap"/> while ignoring any beatmap.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to set.</param>
+        public void ForcefullySetBeatmap(WorkingBeatmap beatmap)
+        {
+            var beatmapDisabled = Beatmap.Disabled;
+
+            Beatmap.Disabled = false;
+            Beatmap.Value = beatmap;
+            Beatmap.Disabled = beatmapDisabled;
+        }
+
+        /// <summary>
+        /// Sets <see cref="Ruleset"/> while ignoring any ruleset restrictions.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to set.</param>
+        public void ForcefullySetRuleset(RulesetInfo ruleset)
+        {
+            var rulesetDisabled = this.ruleset.Disabled;
+
+            this.ruleset.Disabled = false;
+            this.ruleset.Value = ruleset;
+            this.ruleset.Disabled = rulesetDisabled;
+        }
+
         private void screenAdded(Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
