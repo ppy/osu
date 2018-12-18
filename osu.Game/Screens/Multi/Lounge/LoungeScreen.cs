@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -20,6 +21,7 @@ namespace osu.Game.Screens.Multi.Lounge
         private readonly Container content;
         private readonly SearchContainer search;
         private readonly RoomsContainer rooms;
+        private readonly Action<Screen> pushGameplayScreen;
 
         [Cached]
         private readonly RoomManager manager;
@@ -28,8 +30,10 @@ namespace osu.Game.Screens.Multi.Lounge
 
         protected override Drawable TransitionContent => content;
 
-        public LoungeScreen()
+        public LoungeScreen(Action<Screen> pushGameplayScreen)
         {
+            this.pushGameplayScreen = pushGameplayScreen;
+
             RoomInspector inspector;
 
             Children = new Drawable[]
@@ -122,7 +126,7 @@ namespace osu.Game.Screens.Multi.Lounge
             if (Filter.Tabs.Current.Value == LoungeTab.Create)
             {
                 Filter.Tabs.Current.Value = LoungeTab.Public;
-                Push(new MatchScreen(new Room()));
+                openRoom(new Room());
             }
 
             search.SearchTerm = Filter.Search.Current.Value ?? string.Empty;
@@ -136,7 +140,7 @@ namespace osu.Game.Screens.Multi.Lounge
             if (!IsCurrentScreen)
                 return;
 
-            Push(new MatchScreen(room));
+            Push(new MatchScreen(room, s  => pushGameplayScreen?.Invoke(s)));
         }
     }
 }

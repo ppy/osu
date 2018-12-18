@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual
             LoungeScreen loungeScreen;
             Children = new Drawable[]
             {
-                loungeScreen = new LoungeScreen
+                loungeScreen = new LoungeScreen(null)
                 {
                     Padding = new MarginPadding { Top = Header.HEIGHT },
                 },

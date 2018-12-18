@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Multi
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = Header.HEIGHT },
-                    Child = loungeScreen = new LoungeScreen(),
+                    Child = loungeScreen = new LoungeScreen(Push),
                 },
                 new Header(loungeScreen)
             });
