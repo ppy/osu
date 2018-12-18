@@ -11,6 +11,7 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Multi.Lounge;
+using osu.Game.Screens.Multi.Match;
 
 namespace osu.Game.Screens.Multi
 {
@@ -76,6 +77,11 @@ namespace osu.Game.Screens.Multi
         protected override bool OnExiting(Screen next)
         {
             waves.Hide();
+
+            var track = Beatmap.Value.Track;
+            if (track != null)
+                track.Looping = false;
+
             return base.OnExiting(next);
         }
 
@@ -102,6 +108,27 @@ namespace osu.Game.Screens.Multi
             base.LogoExiting(logo);
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (currentScreen is MatchScreen)
+            {
+                var track = Beatmap.Value.Track;
+                if (track != null)
+                {
+                    track.Looping = true;
+
+                    if (!track.IsRunning)
+                    {
+                        Game.Audio.AddItemToList(track);
+                        track.Seek(Beatmap.Value.Metadata.PreviewTime);
+                        track.Start();
+                    }
+                }
+            }
+        }
+
         private void screenAdded(Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
@@ -112,6 +139,13 @@ namespace osu.Game.Screens.Multi
 
         private void screenRemoved(Screen newScreen)
         {
+            if (currentScreen is MatchScreen)
+            {
+                var track = Beatmap.Value.Track;
+                if (track != null)
+                    track.Looping = false;
+            }
+
             currentScreen = (OsuScreen)newScreen;
         }
 

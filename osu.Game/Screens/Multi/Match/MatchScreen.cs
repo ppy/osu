@@ -178,10 +178,6 @@ namespace osu.Game.Screens.Multi.Match
 
             Beatmap.Disabled = beatmapDisabled;
             Ruleset.Disabled = rulesetDisabled;
-
-            Beatmap.Value.Track.Looping = true;
-            Beatmap.Value.Track.Seek(Beatmap.Value.Metadata.PreviewTime);
-            Beatmap.Value.Track.Start();
         }
 
         private void onStart()
