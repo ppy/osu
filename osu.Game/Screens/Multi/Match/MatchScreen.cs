@@ -32,10 +32,9 @@ namespace osu.Game.Screens.Multi.Match
         private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
         private readonly BindableCollection<PlaylistItem> playlistBind = new BindableCollection<PlaylistItem>();
 
-        protected override Drawable TransitionContent => participants;
+        public override bool AllowBeatmapRulesetChange => false;
 
-        public override bool AllowBeatmapRulesetChange => allowBeatmapRulesetChange;
-        private bool allowBeatmapRulesetChange;
+        protected override Drawable TransitionContent => participants;
 
         public override string Title => room.Name.Value;
 
@@ -164,19 +163,21 @@ namespace osu.Game.Screens.Multi.Match
             info.Beatmap.Value = item.Beatmap;
             info.Mods.Value = item.RequiredMods;
 
-            allowBeatmapRulesetChange = true;
-
             // Todo: item.Beatmap can be null here...
             var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == item.BeatmapID) ?? item.Beatmap;
 
-            Schedule(() =>
-            {
-                Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-                Beatmap.Value.Mods.Value = item.RequiredMods.ToArray();
-                Ruleset.Value = item.Ruleset;
+            // Bypass any beatmap and ruleset restrictions
+            var beatmapDisabled = Beatmap.Disabled;
+            var rulesetDisabled = Ruleset.Disabled;
+            Beatmap.Disabled = false;
+            Ruleset.Disabled = false;
 
-                allowBeatmapRulesetChange = false;
-            });
+            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+            Beatmap.Value.Mods.Value = item.RequiredMods.ToArray();
+            Ruleset.Value = item.Ruleset;
+
+            Beatmap.Disabled = beatmapDisabled;
+            Ruleset.Disabled = rulesetDisabled;
         }
 
         private void onStart()
