@@ -237,6 +237,8 @@ namespace osu.Game.Screens.Multi.Match.Components
             else
                 maxParticipantsBind.Value = null;
 
+            durationBind.Value = DurationField.Current.Value;
+
             manager?.CreateRoom(room);
         }
 
