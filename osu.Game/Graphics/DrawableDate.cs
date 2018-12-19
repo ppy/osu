@@ -4,6 +4,7 @@
 using System;
 using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
 
@@ -11,13 +12,27 @@ namespace osu.Game.Graphics
 {
     public class DrawableDate : OsuSpriteText, IHasTooltip
     {
-        protected readonly DateTimeOffset Date;
+        private DateTimeOffset date;
+
+        public DateTimeOffset Date
+        {
+            get => date;
+            set
+            {
+                if (date == value)
+                    return;
+                date = value.ToLocalTime();
+
+                if (LoadState >= LoadState.Ready)
+                    updateTime();
+            }
+        }
 
         public DrawableDate(DateTimeOffset date)
         {
             Font = "Exo2.0-RegularItalic";
 
-            Date = date.ToLocalTime();
+            Date = date;
         }
 
         [BackgroundDependencyLoader]
