@@ -35,6 +35,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
         public readonly Bindable<GameType> Type = new Bindable<GameType>();
         public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
+        public readonly Bindable<DateTimeOffset> EndDate = new Bindable<DateTimeOffset>();
 
         public Info(Room room)
         {
@@ -46,6 +47,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             BeatmapTypeInfo beatmapTypeInfo;
             OsuSpriteText name;
             ModDisplay modDisplay;
+            DrawableDate date;
 
             Children = new Drawable[]
             {
@@ -77,6 +79,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                     {
                                         name = new OsuSpriteText { TextSize = 30 },
                                         availabilityStatus = new OsuSpriteText { TextSize = 14 },
+                                        date = new MatchDate { TextSize = 14 }
                                     }
                                 },
                                 new FillFlowContainer
@@ -126,6 +129,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             Availability.BindValueChanged(_ => updateAvailabilityStatus());
             Status.BindValueChanged(_ => updateAvailabilityStatus());
             Name.BindValueChanged(n => name.Text = n);
+            EndDate.BindValueChanged(d => date.Date = d);
         }
 
         [BackgroundDependencyLoader]
@@ -150,6 +154,30 @@ namespace osu.Game.Screens.Multi.Match.Components
             {
                 availabilityStatus.FadeColour(Status.Value.GetAppropriateColour(colours), 100);
                 availabilityStatus.Text = $"{Availability.Value.GetDescription()}, {Status.Value.Message}";
+            }
+        }
+
+        private class MatchDate : DrawableDate
+        {
+            public MatchDate()
+                : base(DateTimeOffset.UtcNow)
+            {
+            }
+
+            protected override string Format()
+            {
+                var diffToNow = Date.Subtract(DateTimeOffset.Now);
+
+                if (diffToNow.TotalSeconds < -5)
+                    return $"Closed {base.Format()}";
+
+                if (diffToNow.TotalSeconds < 0)
+                    return "Closed";
+
+                if (diffToNow.TotalSeconds < 5)
+                    return "Closing soon";
+
+                return $"Closing {base.Format()}";
             }
         }
     }
