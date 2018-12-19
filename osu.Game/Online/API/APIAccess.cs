@@ -102,7 +102,7 @@ namespace osu.Game.Online.API
                         if (queue.Count == 0)
                         {
                             log.Add(@"Queueing a ping request");
-                            Queue(new ListChannelsRequest { Timeout = 5000 });
+                            Queue(new GetUserRequest());
                         }
 
                         break;
@@ -141,7 +141,7 @@ namespace osu.Game.Online.API
                             State = APIState.Online;
                         };
 
-                        if (!handleRequest(userReq, out _))
+                        if (!handleRequest(userReq))
                         {
                             Thread.Sleep(500);
                             continue;
@@ -170,15 +170,10 @@ namespace osu.Game.Online.API
                     lock (queue)
                     {
                         if (queue.Count == 0) break;
-                        req = queue.Peek();
+                        req = queue.Dequeue();
                     }
 
-                    // TODO: handle failures better
-                    handleRequest(req, out var removeFromQueue);
-
-                    if (removeFromQueue)
-                        lock (queue)
-                            queue.Dequeue();
+                    handleRequest(req);
                 }
 
                 Thread.Sleep(50);
@@ -195,46 +190,29 @@ namespace osu.Game.Online.API
 
         /// <summary>
         /// Handle a single API request.
+        /// Ensures all exceptions are caught and dealt with correctly.
         /// </summary>
         /// <param name="req">The request.</param>
         /// <returns>true if the request succeeded.</returns>
-        private bool handleRequest(APIRequest req, out bool removeFromQueue)
+        private bool handleRequest(APIRequest req)
         {
-            removeFromQueue = true;
-
             try
             {
-                Logger.Log($@"Performing request {req}", LoggingTarget.Network);
-                req.Failure += ex =>
-                {
-                    if (ex is WebException we)
-                        handleWebException(we);
-                };
-
                 req.Perform(this);
 
                 //we could still be in initialisation, at which point we don't want to say we're Online yet.
-                if (IsLoggedIn)
-                    State = APIState.Online;
+                if (IsLoggedIn) State = APIState.Online;
 
                 failureCount = 0;
                 return true;
             }
             catch (WebException we)
             {
-                removeFromQueue = handleWebException(we);
-
-                if (removeFromQueue)
-                    req.Fail(we);
-
+                handleWebException(we);
                 return false;
             }
             catch (Exception e)
             {
-                if (e is TimeoutException)
-                    log.Add(@"API level timeout exception was hit");
-
-                req.Fail(e);
                 return false;
             }
         }
@@ -290,8 +268,12 @@ namespace osu.Game.Online.API
                         //we might try again at an api level.
                         return false;
 
-                    State = APIState.Failing;
-                    flushQueue();
+                    if (State == APIState.Online)
+                    {
+                        State = APIState.Failing;
+                        flushQueue();
+                    }
+
                     return true;
             }
 
