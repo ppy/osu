@@ -9,9 +9,13 @@ using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Match;
+using osuTK;
 
 namespace osu.Game.Screens.Multi
 {
@@ -21,6 +25,8 @@ namespace osu.Game.Screens.Multi
         private readonly MultiplayerWaveContainer waves;
 
         public override bool AllowBeatmapRulesetChange => currentScreen?.AllowBeatmapRulesetChange ?? base.AllowBeatmapRulesetChange;
+
+        private readonly OsuButton createButton;
 
         private OsuScreen currentScreen;
 
@@ -60,7 +66,21 @@ namespace osu.Game.Screens.Multi
                     Padding = new MarginPadding { Top = Header.HEIGHT },
                     Child = loungeScreen = new LoungeScreen(Push),
                 },
-                new Header(loungeScreen)
+                new Header(loungeScreen),
+                createButton = new HeaderButton
+                {
+                    Anchor = Anchor.TopRight,
+                    Origin = Anchor.TopRight,
+                    RelativeSizeAxes = Axes.None,
+                    Size = new Vector2(150, Header.HEIGHT - 20),
+                    Margin = new MarginPadding
+                    {
+                        Top = 10,
+                        Right = 10,
+                    },
+                    Text = "Create room",
+                    Action = () => loungeScreen.Open(new Room())
+                }
             });
 
             screenAdded(loungeScreen);
@@ -126,7 +146,11 @@ namespace osu.Game.Screens.Multi
                         track.Start();
                     }
                 }
+
+                createButton.Hide();
             }
+            else
+                createButton.Show();
         }
 
         private void screenAdded(Screen newScreen)

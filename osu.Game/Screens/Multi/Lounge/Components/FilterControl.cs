@@ -1,45 +1,42 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.ComponentModel;
 using osu.Game.Graphics;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
-    public class FilterControl : SearchableListFilterControl<LoungeTab, LoungeTab>
+    public class FilterControl : SearchableListFilterControl<PrimaryFilter, SecondaryFilter>
     {
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"362e42");
-        protected override LoungeTab DefaultTab => LoungeTab.Public;
+        protected override PrimaryFilter DefaultTab => PrimaryFilter.Current;
 
         public FilterControl()
         {
             DisplayStyleControl.Hide();
         }
 
-        public FilterCriteria CreateCriteria() => new FilterCriteria { Availability = availability };
-
-        private RoomAvailability availability
+        public FilterCriteria CreateCriteria() => new FilterCriteria
         {
-            get
-            {
-                switch (Tabs.Current.Value)
-                {
-                    default:
-                    case LoungeTab.Public:
-                        return RoomAvailability.Public;
-                    case LoungeTab.Private:
-                        return RoomAvailability.FriendsOnly;
-                }
-            }
-        }
+            SearchString = Search.Current.Value ?? string.Empty,
+            PrimaryFilter = Tabs.Current,
+            SecondaryFilter = DisplayStyleControl.Dropdown.Current
+        };
     }
 
-    public enum LoungeTab
+    public enum PrimaryFilter
     {
-        Create,
+        Current,
+        [Description("Recently Ended")]
+        RecentlyEnded,
+        Participated,
+    }
+
+    public enum SecondaryFilter
+    {
         Public,
-        Private,
+        //Private,
     }
 }

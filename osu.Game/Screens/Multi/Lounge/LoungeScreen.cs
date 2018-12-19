@@ -19,7 +19,6 @@ namespace osu.Game.Screens.Multi.Lounge
         protected readonly FilterControl Filter;
 
         private readonly Container content;
-        private readonly SearchContainer search;
         private readonly RoomsContainer rooms;
         private readonly Action<Screen> pushGameplayScreen;
 
@@ -53,11 +52,11 @@ namespace osu.Game.Screens.Multi.Lounge
                                 Vertical = 35 - DrawableRoom.SELECTION_BORDER_WIDTH,
                                 Right = 20 - DrawableRoom.SELECTION_BORDER_WIDTH
                             },
-                            Child = search = new SearchContainer
+                            Child = new SearchContainer
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Child = rooms = new RoomsContainer { OpenRequested = openRoom }
+                                Child = rooms = new RoomsContainer { OpenRequested = Open }
                             },
                         },
                         inspector = new RoomInspector
@@ -121,20 +120,9 @@ namespace osu.Game.Screens.Multi.Lounge
             Filter.Search.HoldFocus = false;
         }
 
-        private void filterRooms()
-        {
-            if (Filter.Tabs.Current.Value == LoungeTab.Create)
-            {
-                Filter.Tabs.Current.Value = LoungeTab.Public;
-                openRoom(new Room());
-            }
+        private void filterRooms() => rooms.Filter(Filter.CreateCriteria());
 
-            search.SearchTerm = Filter.Search.Current.Value ?? string.Empty;
-
-            rooms.Filter(Filter.CreateCriteria());
-        }
-
-        private void openRoom(Room room)
+        public void Open(Room room)
         {
             // Handles the case where a room is clicked 3 times in quick succession
             if (!IsCurrentScreen)

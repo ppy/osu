@@ -59,7 +59,26 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         public void Filter(FilterCriteria criteria)
         {
-            roomFlow.Children.ForEach(r => r.MatchingFilter = criteria == null || r.Room.Availability == criteria.Availability);
+            roomFlow.Children.ForEach(r =>
+            {
+                if (criteria == null)
+                    r.MatchingFilter = true;
+                else
+                {
+                    bool matchingFilter = true;
+                    matchingFilter &= r.FilterTerms.Any(term => term.IndexOf(criteria.SearchString, StringComparison.InvariantCultureIgnoreCase) >= 0);
+
+                    switch (criteria.SecondaryFilter)
+                    {
+                        default:
+                        case SecondaryFilter.Public:
+                            r.MatchingFilter = r.Room.Availability.Value == RoomAvailability.Public;
+                            break;
+                    }
+
+                    r.MatchingFilter = matchingFilter;
+                }
+            });
             currentFilter = criteria;
         }
 
