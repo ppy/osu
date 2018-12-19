@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            Info info = new Info();
+            Info info = new Info(new Room());
             Add(info);
 
             AddStep(@"set name", () => info.Name.Value = @"Room Name?");

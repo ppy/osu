@@ -52,6 +52,10 @@ namespace osu.Game.Online.Multiplayer
             set => Duration.Value = TimeSpan.FromMinutes(value);
         }
 
+        // Only supports retrieval for now
+        [JsonProperty("ends_at")]
+        public Bindable<DateTimeOffset> EndDate = new Bindable<DateTimeOffset>();
+
         // Todo: Find a better way to do this (https://github.com/ppy/osu-framework/issues/1930)
         [JsonProperty("max_attempts", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private int? maxAttempts
@@ -70,6 +74,7 @@ namespace osu.Game.Online.Multiplayer
             Type.Value = other.Type;
             MaxParticipants.Value = other.MaxParticipants;
             Participants.Value = other.Participants.Value.ToArray();
+            EndDate = other.EndDate;
 
             Playlist.Clear();
             Playlist.AddRange(other.Playlist);
@@ -77,5 +82,6 @@ namespace osu.Game.Online.Multiplayer
 
         public bool ShouldSerializeRoomID() => false;
         public bool ShouldSerializeHost() => false;
+        public bool ShouldSerializeEndDate() => false;
     }
 }

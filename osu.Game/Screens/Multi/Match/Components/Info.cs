@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         public readonly Bindable<GameType> Type = new Bindable<GameType>();
         public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
 
-        public Info()
+        public Info(Room room)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -106,7 +106,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                             Children = new Drawable[]
                             {
                                 viewBeatmapButton = new ViewBeatmapButton(),
-                                readyButton = new ReadyButton
+                                readyButton = new ReadyButton(room)
                                 {
                                     Action = () => OnStart?.Invoke()
                                 }
