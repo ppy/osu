@@ -15,6 +15,7 @@ using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Multi.Lounge.Components;
 
 namespace osu.Game.Screens.Multi
 {
@@ -24,6 +25,8 @@ namespace osu.Game.Screens.Multi
         private readonly BindableCollection<Room> rooms = new BindableCollection<Room>();
 
         public readonly Bindable<Room> Current = new Bindable<Room>();
+
+        private FilterCriteria currentFilter = new FilterCriteria();
 
         [Resolved]
         private APIAccess api { get; set; }
@@ -50,6 +53,12 @@ namespace osu.Game.Screens.Multi
             api.Queue(req);
         }
 
+        public void Filter(FilterCriteria criteria)
+        {
+            currentFilter = criteria;
+            PollImmediately();
+        }
+
         protected override Task Poll()
         {
             if (!api.IsLoggedIn)
@@ -57,10 +66,18 @@ namespace osu.Game.Screens.Multi
 
             var tcs = new TaskCompletionSource<bool>();
 
-            var pollReq = new GetRoomsRequest();
+            var pollReq = new GetRoomsRequest(currentFilter.PrimaryFilter);
 
             pollReq.Success += result =>
             {
+                // Remove past matches
+                foreach (var r in rooms.ToList())
+                {
+                    if (result.All(e => e.RoomID.Value != r.RoomID.Value))
+                        rooms.Remove(r);
+                }
+
+                // Add new matches, or update existing
                 foreach (var r in result)
                 {
                     processPlaylist(r);
@@ -126,6 +143,23 @@ namespace osu.Game.Screens.Multi
 
         private class GetRoomsRequest : APIRequest<List<Room>>
         {
+            private readonly PrimaryFilter primaryFilter;
+
+            public GetRoomsRequest(PrimaryFilter primaryFilter)
+            {
+                this.primaryFilter = primaryFilter;
+            }
+
+            protected override WebRequest CreateWebRequest()
+            {
+                var req = base.CreateWebRequest();
+
+                if (primaryFilter == PrimaryFilter.Participated)
+                    req.AddParameter("participated", "1");
+
+                return req;
+            }
+
             protected override string Target => "rooms";
         }
     }
