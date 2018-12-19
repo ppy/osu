@@ -74,7 +74,7 @@ namespace osu.Game.Online.Multiplayer
             Type.Value = other.Type;
             MaxParticipants.Value = other.MaxParticipants;
             Participants.Value = other.Participants.Value.ToArray();
-            EndDate = other.EndDate;
+            EndDate.Value = other.EndDate;
 
             Playlist.Clear();
             Playlist.AddRange(other.Playlist);

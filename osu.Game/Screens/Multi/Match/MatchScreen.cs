@@ -31,6 +31,7 @@ namespace osu.Game.Screens.Multi.Match
         private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
         private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
         private readonly BindableCollection<PlaylistItem> playlistBind = new BindableCollection<PlaylistItem>();
+        private readonly Bindable<DateTimeOffset> endDateBind = new Bindable<DateTimeOffset>();
 
         public override bool AllowBeatmapRulesetChange => false;
 
@@ -68,6 +69,7 @@ namespace osu.Game.Screens.Multi.Match
             typeBind.BindTo(room.Type);
             participantsBind.BindTo(room.Participants);
             maxParticipantsBind.BindTo(room.MaxParticipants);
+            endDateBind.BindTo(room.EndDate);
 
             RoomSettingsOverlay settings;
 
@@ -134,6 +136,7 @@ namespace osu.Game.Screens.Multi.Match
             info.Status.BindTo(statusBind);
             info.Availability.BindTo(availabilityBind);
             info.Type.BindTo(typeBind);
+            info.EndDate.BindTo(endDateBind);
 
             participants.Users.BindTo(participantsBind);
             participants.MaxParticipants.BindTo(maxParticipantsBind);
