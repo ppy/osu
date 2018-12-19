@@ -79,6 +79,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     r.MatchingFilter = matchingFilter;
                 }
             });
+
             currentFilter = criteria;
         }
 

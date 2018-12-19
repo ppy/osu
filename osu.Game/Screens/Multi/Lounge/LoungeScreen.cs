@@ -120,7 +120,11 @@ namespace osu.Game.Screens.Multi.Lounge
             Filter.Search.HoldFocus = false;
         }
 
-        private void filterRooms() => rooms.Filter(Filter.CreateCriteria());
+        private void filterRooms()
+        {
+            rooms.Filter(Filter.CreateCriteria());
+            manager.Filter(Filter.CreateCriteria());
+        }
 
         public void Open(Room room)
         {
