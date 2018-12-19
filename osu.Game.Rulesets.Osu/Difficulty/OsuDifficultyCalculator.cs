@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
     {
         private const int section_length = 400;
         private const double difficulty_multiplier = 0.0675;
-        private const double c = 0.38;
-        private const double beta = 0.45;
+        private const double c = 0.32;
+        private const double beta = 0.5;
 
         public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
