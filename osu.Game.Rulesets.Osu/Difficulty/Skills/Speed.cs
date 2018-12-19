@@ -34,11 +34,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 speedBonus = 1 + Math.Pow((min_speed_bonus - deltaTime) / speed_balancing_factor, 2);
 
             double angleBonus = 1.0;
-
             if (current.Angle != null)
                 angleBonus = MathHelper.Clamp((angle_bonus_begin - current.Angle.Value) / pi_over_4 * 0.5 + 1.0, min_angle_bonus, max_angle_bonus);
 
-            return angleBonus * (0.95 + Math.Pow(distance / SINGLE_SPACING_THRESHOLD, 4)) / current.StrainTime;
+            return speedBonus * angleBonus * (0.95 + Math.Pow(distance / SINGLE_SPACING_THRESHOLD, 4)) / current.StrainTime;
         }
     }
 }
