@@ -1,11 +1,13 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Multiplayer;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components
@@ -14,11 +16,19 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
+        private readonly Room room;
+
+        [Resolved]
+        private IBindableBeatmap gameBeatmap { get; set; }
+
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public ReadyButton()
+        private bool hasBeatmap;
+
+        public ReadyButton(Room room)
         {
+            this.room = room;
             RelativeSizeAxes = Axes.Y;
             Size = new Vector2(200, 1);
 
@@ -30,24 +40,43 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             beatmaps.ItemAdded += beatmapAdded;
 
-            Beatmap.BindValueChanged(updateEnabledState, true);
+            Beatmap.BindValueChanged(updateBeatmap, true);
         }
 
-        private void updateEnabledState(BeatmapInfo beatmap)
+        private void updateBeatmap(BeatmapInfo beatmap)
         {
-            if (beatmap?.OnlineBeatmapID == null)
-            {
-                Enabled.Value = false;
-                return;
-            }
+            hasBeatmap = false;
 
-            Enabled.Value = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID) != null;
+            if (beatmap?.OnlineBeatmapID == null)
+                return;
+
+            hasBeatmap = beatmaps.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID) != null;
         }
 
         private void beatmapAdded(BeatmapSetInfo model, bool existing, bool silent)
         {
             if (model.Beatmaps.Any(b => b.OnlineBeatmapID == Beatmap.Value.OnlineBeatmapID))
-                Schedule(() => Enabled.Value = true);
+                Schedule(() => hasBeatmap = true);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            updateEnabledState();
+        }
+
+        private void updateEnabledState()
+        {
+            if (gameBeatmap.Value == null)
+            {
+                Enabled.Value = false;
+                return;
+            }
+
+            bool hasEnoughTime = DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(gameBeatmap.Value.Track.Length) < room.EndDate;
+
+            Enabled.Value = hasBeatmap && hasEnoughTime;
         }
 
         protected override void Dispose(bool isDisposing)

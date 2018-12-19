@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Multi.Match
                     Content = new[]
                     {
                         new Drawable[] { header = new Components.Header { Depth = -1 } },
-                        new Drawable[] { info = new Info { OnStart = onStart } },
+                        new Drawable[] { info = new Info(room) { OnStart = onStart } },
                         new Drawable[]
                         {
                             new GridContainer
