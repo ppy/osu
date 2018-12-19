@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private const float corner_radius = 5;
         private const float transition_duration = 60;
         private const float content_padding = 10;
-        private const float height = 100;
+        private const float height = 110;
         private const float side_strip_width = 5;
         private const float cover_width = 145;
 
@@ -45,6 +45,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
         private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
         private readonly IBindableCollection<PlaylistItem> playlistBind = new BindableCollection<PlaylistItem>();
+        private readonly IBindable<DateTimeOffset> endDateBind = new Bindable<DateTimeOffset>();
 
         private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
@@ -111,8 +112,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             Box sideStrip;
             OsuSpriteText status;
             ParticipantInfo participantInfo;
-
             OsuSpriteText name;
+            EndDateInfo endDate;
 
             Children = new Drawable[]
             {
@@ -189,11 +190,25 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                                 TextSize = 14,
                                                 Font = @"Exo2.0-Bold",
                                             },
-                                            beatmapTitle = new BeatmapTitle
+                                            new FillFlowContainer
                                             {
-                                                TextSize = 14,
-                                                Colour = colours.Gray9
-                                            },
+                                                RelativeSizeAxes = Axes.X,
+                                                AutoSizeAxes = Axes.Y,
+                                                Direction = FillDirection.Vertical,
+                                                Spacing = new Vector2(0, 5),
+                                                Children = new Drawable[]
+                                                {
+                                                    endDate = new EndDateInfo
+                                                    {
+                                                        TextSize = 14,
+                                                    },
+                                                    beatmapTitle = new BeatmapTitle
+                                                    {
+                                                        TextSize = 14,
+                                                        Colour = colours.Gray9
+                                                    },
+                                                }
+                                            }
                                         },
                                     },
                                     modeTypeInfo = new ModeTypeInfo
@@ -224,6 +239,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             typeBind.BindTo(Room.Type);
             playlistBind.BindTo(Room.Playlist);
             participantsBind.BindTo(Room.Participants);
+            endDateBind.BindTo(Room.EndDate);
+
+            endDateBind.BindValueChanged(d => endDate.Date = d, true);
 
             modeTypeInfo.Type.BindTo(typeBind);
 
