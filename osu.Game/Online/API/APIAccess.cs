@@ -268,8 +268,12 @@ namespace osu.Game.Online.API
                         //we might try again at an api level.
                         return false;
 
-                    State = APIState.Failing;
-                    flushQueue();
+                    if (State == APIState.Online)
+                    {
+                        State = APIState.Failing;
+                        flushQueue();
+                    }
+
                     return true;
             }
 
