@@ -205,7 +205,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                                     beatmapTitle = new BeatmapTitle
                                                     {
                                                         TextSize = 14,
-                                                        Colour = colours.Gray9
                                                     },
                                                 }
                                             }
