@@ -149,7 +149,7 @@ namespace osu.Game.Screens.Multi
 
                 createButton.Hide();
             }
-            else
+            else if (currentScreen is LoungeScreen)
                 createButton.Show();
         }
 
