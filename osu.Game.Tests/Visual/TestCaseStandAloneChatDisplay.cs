@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Online.Chat;
 using osu.Game.Users;
@@ -31,23 +32,41 @@ namespace osu.Game.Tests.Visual
             Id = 4,
         };
 
+        [Cached]
+        private ChannelManager channelManager = new ChannelManager();
+
+        private readonly StandAloneChatDisplay chatDisplay;
+        private readonly StandAloneChatDisplay chatDisplay2;
+
         public TestCaseStandAloneChatDisplay()
         {
-            StandAloneChatDisplay chatDisplay;
+            Add(channelManager);
 
             Add(chatDisplay = new StandAloneChatDisplay
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
+                Anchor = Anchor.CentreLeft,
+                Origin = Anchor.CentreLeft,
+                Margin = new MarginPadding(20),
                 Size = new Vector2(400, 80)
             });
 
-            chatDisplay.Channel.Value = testChannel;
+            Add(chatDisplay2 = new StandAloneChatDisplay(true)
+            {
+                Anchor = Anchor.CentreRight,
+                Origin = Anchor.CentreRight,
+                Margin = new MarginPadding(20),
+                Size = new Vector2(400, 150)
+            });
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            channelManager.CurrentChannel.Value = testChannel;
+
+            chatDisplay.Channel.Value = testChannel;
+            chatDisplay2.Channel.Value = testChannel;
 
             AddStep("message from admin", () => testChannel.AddLocalEcho(new LocalEchoMessage
             {
