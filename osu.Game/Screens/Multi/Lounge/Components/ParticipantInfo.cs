@@ -9,7 +9,9 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Chat;
 using osu.Game.Users;
 using osuTK;
 
@@ -17,7 +19,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 {
     public class ParticipantInfo : Container
     {
-        private readonly OsuSpriteText host;
         private readonly FillFlowContainer levelRangeContainer;
 
         public readonly Bindable<User> Host = new Bindable<User>();
@@ -31,6 +32,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             OsuSpriteText levelRangeHigher;
             OsuSpriteText levelRangeLower;
             Container flagContainer;
+            LinkFlowContainer hostText;
 
             Children = new Drawable[]
             {
@@ -62,20 +64,12 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                 },
                             },
                         },
-                        new OsuSpriteText
-                        {
-                            Text = "hosted by",
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            TextSize = 14,
-                        },
-                        host = new OsuSpriteText
+                        hostText = new LinkFlowContainer
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
-                            TextSize = 14,
-                            Font = @"Exo2.0-BoldItalic",
-                        },
+                            AutoSizeAxes = Axes.Both
+                        }
                     },
                 },
                 levelRangeContainer = new FillFlowContainer
@@ -122,7 +116,10 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             Host.BindValueChanged(v =>
             {
-                host.Text = v.Username;
+                hostText.Clear();
+                hostText.AddText("hosted by ");
+                hostText.AddLink(v.Username, null, LinkAction.OpenUserProfile, v.Id.ToString(), "Open profile", s => s.Font = "Exo2.0-BoldItalic");
+
                 flagContainer.Child = new DrawableFlag(v.Country) { RelativeSizeAxes = Axes.Both };
             });
 
@@ -138,7 +135,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private void load(OsuColour colours)
         {
             levelRangeContainer.Colour = colours.Gray9;
-            host.Colour = colours.Blue;
         }
     }
 }
