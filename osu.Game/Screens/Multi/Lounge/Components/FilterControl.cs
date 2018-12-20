@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     public class FilterControl : SearchableListFilterControl<PrimaryFilter, SecondaryFilter>
     {
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"362e42");
-        protected override PrimaryFilter DefaultTab => PrimaryFilter.Current;
+        protected override PrimaryFilter DefaultTab => PrimaryFilter.Open;
 
         public FilterControl()
         {
@@ -28,10 +28,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
     public enum PrimaryFilter
     {
-        Current,
+        Open,
         [Description("Recently Ended")]
         RecentlyEnded,
         Participated,
+        Owned,
     }
 
     public enum SecondaryFilter

@@ -150,17 +150,30 @@ namespace osu.Game.Screens.Multi
                 this.primaryFilter = primaryFilter;
             }
 
-            protected override WebRequest CreateWebRequest()
+            protected override string Target
             {
-                var req = base.CreateWebRequest();
+                get
+                {
+                    string target = "rooms";
 
-                if (primaryFilter == PrimaryFilter.Participated)
-                    req.AddParameter("participated", "1");
+                    switch (primaryFilter)
+                    {
+                        case PrimaryFilter.Open:
+                            break;
+                        case PrimaryFilter.Owned:
+                            target += "/owned";
+                            break;
+                        case PrimaryFilter.Participated:
+                            target += "/participated";
+                            break;
+                        case PrimaryFilter.RecentlyEnded:
+                            target += "/ended";
+                            break;
+                    }
 
-                return req;
+                    return target;
+                }
             }
-
-            protected override string Target => "rooms";
         }
     }
 }
