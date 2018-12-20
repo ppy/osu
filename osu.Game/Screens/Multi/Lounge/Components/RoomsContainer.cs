@@ -99,6 +99,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 toRemove.Action = null;
 
                 roomFlow.Remove(toRemove);
+
+                if (currentRoom.Value == r)
+                    currentRoom.Value = null;
             }
         }
 
