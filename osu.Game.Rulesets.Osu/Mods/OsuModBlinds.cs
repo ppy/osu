@@ -14,7 +14,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -235,15 +234,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// </summary>
             public void AnimateClosedness(float value) => this.TransformTo(nameof(easing), value, 200, Easing.OutQuint);
 
-            public class ModBlindsPanel : CompositeDrawable
+            public class ModBlindsPanel : Sprite
             {
                 [BackgroundDependencyLoader]
                 private void load(TextureStore textures)
                 {
-                    InternalChild = new SkinnableDrawable("Play/osu/blinds-panel", s => new Sprite { Texture = textures.Get("Play/osu/blinds-panel") })
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    };
+                    Texture = textures.Get("Play/osu/blinds-panel");
                 }
             }
         }
