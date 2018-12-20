@@ -38,10 +38,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                         Origin = Anchor.CentreLeft,
                         AutoSizeAxes = Axes.Both,
                         Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            linkContainer = new LinkFlowContainer { AutoSizeAxes = Axes.Both }
-                        }
+                        Child = linkContainer = new LinkFlowContainer { AutoSizeAxes = Axes.Both }
                     }
                 }
             };
