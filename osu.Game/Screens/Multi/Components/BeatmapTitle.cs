@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Multi.Components
             set { beatmapTitle.TextSize = beatmapDash.TextSize = beatmapArtist.TextSize = value; }
         }
 
-        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         public BeatmapTitle()
         {

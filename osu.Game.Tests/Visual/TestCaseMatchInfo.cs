@@ -44,13 +44,10 @@ namespace osu.Game.Tests.Visual
                 },
             });
 
-            AddStep(@"set type", () => info.Type.Value = new GameTypeTagTeam());
-
             AddStep(@"change name", () => info.Name.Value = @"Room Name!");
             AddStep(@"change availability", () => info.Availability.Value = RoomAvailability.InviteOnly);
             AddStep(@"change status", () => info.Status.Value = new RoomStatusOpen());
             AddStep(@"null beatmap", () => info.Beatmap.Value = null);
-            AddStep(@"change type", () => info.Type.Value = new GameTypeTeamVersus());
             AddStep(@"change beatmap", () => info.Beatmap.Value = new BeatmapInfo
             {
                 StarDifficulty = 4.2,

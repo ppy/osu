@@ -5,6 +5,7 @@ using System;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -133,6 +134,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                             RelativeSizeAxes = Axes.X,
                                             Items = new[]
                                             {
+                                                TimeSpan.FromMinutes(1),
                                                 TimeSpan.FromMinutes(30),
                                                 TimeSpan.FromHours(1),
                                                 TimeSpan.FromHours(2),
@@ -159,14 +161,29 @@ namespace osu.Game.Screens.Multi.Match.Components
                             },
                         },
                     },
-                    ApplyButton = new CreateRoomButton
+                    new Container
                     {
-                        Anchor = Anchor.BottomCentre,
-                        Origin = Anchor.BottomCentre,
-                        Size = new Vector2(230, 35),
-                        Margin = new MarginPadding { Bottom = 20 },
-                        Action = apply,
-                    },
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.BottomLeft,
+                        Y = 2,
+                        RelativeSizeAxes = Axes.X,
+                        Height = 60,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = OsuColour.FromHex(@"28242d").Darken(0.5f).Opacity(1f),
+                            },
+                            ApplyButton = new CreateRoomButton
+                            {
+                                Anchor = Anchor.Centre,
+                                Origin = Anchor.Centre,
+                                Size = new Vector2(230, 35),
+                                Action = apply,
+                            },
+                        }
+                    }
                 },
             };
 

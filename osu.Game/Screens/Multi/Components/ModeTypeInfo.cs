@@ -18,8 +18,8 @@ namespace osu.Game.Screens.Multi.Components
 
         private readonly Container rulesetContainer;
 
-        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
-        public readonly Bindable<GameType> Type = new Bindable<GameType>();
+        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly IBindable<GameType> Type = new Bindable<GameType>();
 
         public ModeTypeInfo()
         {

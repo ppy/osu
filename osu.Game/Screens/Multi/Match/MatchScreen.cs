@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Multi.Match
                     RelativeSizeAxes = Axes.Both,
                     Content = new[]
                     {
-                        new Drawable[] { header = new Components.Header { Depth = -1 } },
+                        new Drawable[] { header = new Components.Header(room) { Depth = -1 } },
                         new Drawable[] { info = new Info(room) { OnStart = onStart } },
                         new Drawable[]
                         {
@@ -135,8 +135,9 @@ namespace osu.Game.Screens.Multi.Match
             info.Name.BindTo(nameBind);
             info.Status.BindTo(statusBind);
             info.Availability.BindTo(availabilityBind);
-            info.Type.BindTo(typeBind);
             info.EndDate.BindTo(endDateBind);
+
+            header.Type.BindTo(typeBind);
 
             participants.Users.BindTo(participantsBind);
             participants.MaxParticipants.BindTo(maxParticipantsBind);
@@ -167,8 +168,8 @@ namespace osu.Game.Screens.Multi.Match
             var item = playlistBind.First();
 
             header.Beatmap.Value = item.Beatmap;
+            header.Mods.Value = item.RequiredMods;
             info.Beatmap.Value = item.Beatmap;
-            info.Mods.Value = item.RequiredMods;
 
             // Todo: item.Beatmap can be null here...
             var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == item.BeatmapID) ?? item.Beatmap;

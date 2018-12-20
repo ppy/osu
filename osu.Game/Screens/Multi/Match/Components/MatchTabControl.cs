@@ -16,11 +16,10 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         private readonly IBindable<int?> roomIdBind = new Bindable<int?>();
 
-        [Resolved]
-        private Room room { get; set; }
-
-        public MatchTabControl()
+        public MatchTabControl(Room room)
         {
+            roomIdBind.BindTo(room.RoomID);
+
             AddItem(new RoomMatchPage());
             AddItem(new SettingsMatchPage());
         }
@@ -28,7 +27,6 @@ namespace osu.Game.Screens.Multi.Match.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            roomIdBind.BindTo(room.RoomID);
             roomIdBind.BindValueChanged(v =>
             {
                 if (v.HasValue)
