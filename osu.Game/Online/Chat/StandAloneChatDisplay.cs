@@ -8,9 +8,11 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
@@ -22,10 +24,20 @@ namespace osu.Game.Online.Chat
     public class StandAloneChatDisplay : CompositeDrawable
     {
         public readonly Bindable<Channel> Channel = new Bindable<Channel>();
+
         private readonly FillFlowContainer messagesFlow;
+
         private Channel lastChannel;
 
-        public StandAloneChatDisplay()
+        private readonly FocusedTextBox textbox;
+
+        protected ChannelManager ChannelManager;
+
+        /// <summary>
+        /// Construct a new instance.
+        /// </summary>
+        /// <param name="postingTextbox">Whether a textbox for posting new messages should be displayed.</param>
+        public StandAloneChatDisplay(bool postingTextbox = false)
         {
             CornerRadius = 10;
             Masking = true;
@@ -50,7 +62,47 @@ namespace osu.Game.Online.Chat
                 }
             };
 
+            const float textbox_height = 30;
+
+            if (postingTextbox)
+            {
+                messagesFlow.Y -= textbox_height;
+                AddInternal(textbox = new FocusedTextBox
+                {
+                    RelativeSizeAxes = Axes.X,
+                    Height = textbox_height,
+                    PlaceholderText = "type your message",
+                    OnCommit = postMessage,
+                    ReleaseFocusOnCommit = false,
+                    HoldFocus = true,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
+                });
+            }
+
             Channel.BindValueChanged(channelChanged);
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(ChannelManager manager)
+        {
+            if (ChannelManager == null)
+                ChannelManager = manager;
+        }
+
+        private void postMessage(TextBox sender, bool newtext)
+        {
+            var text = textbox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
+            if (text[0] == '/')
+                ChannelManager?.PostCommand(text.Substring(1));
+            else
+                ChannelManager?.PostMessage(text);
+
+            textbox.Text = string.Empty;
         }
 
         public void Contract()
