@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     {
         private const float transition_duration = 100;
 
-        public readonly Bindable<Room> Room = new Bindable<Room>();
+        public readonly IBindable<Room> Room = new Bindable<Room>();
 
         private readonly MarginPadding contentPadding = new MarginPadding { Horizontal = 20, Vertical = 10 };
         private readonly Bindable<string> nameBind = new Bindable<string>();

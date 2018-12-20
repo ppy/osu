@@ -10,7 +10,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
@@ -53,10 +52,10 @@ namespace osu.Game.Screens.Multi.Match
         private BeatmapManager beatmapManager { get; set; }
 
         [Resolved]
-        private APIAccess api { get; set; }
-
-        [Resolved]
         private OsuGame game { get; set; }
+
+        [Resolved(CanBeNull = true)]
+        private RoomManager manager { get; set; }
 
         public MatchScreen(Room room, Action<Screen> pushGameplayScreen)
         {
