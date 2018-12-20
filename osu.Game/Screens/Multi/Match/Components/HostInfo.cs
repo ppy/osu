@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             linkContainer.AddText("hosted by");
             linkContainer.NewLine();
-            linkContainer.AddLink(room.Host.Value.Username,null, LinkAction.OpenUserProfile, room.Host.Value.Id.ToString(), "Open profile", s => s.Font = "Exo2.0-BoldItalic");
+            linkContainer.AddLink(room.Host.Value.Username, null, LinkAction.OpenUserProfile, room.Host.Value.Id.ToString(), "View Profile", s => s.Font = "Exo2.0-BoldItalic");
         }
     }
 }

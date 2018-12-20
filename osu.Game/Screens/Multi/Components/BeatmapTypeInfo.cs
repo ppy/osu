@@ -1,13 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.Containers;
+using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 using osuTK;
 
@@ -15,8 +15,6 @@ namespace osu.Game.Screens.Multi.Components
 {
     public class BeatmapTypeInfo : CompositeDrawable
     {
-        private readonly OsuSpriteText beatmapAuthor;
-
         public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         public readonly IBindable<GameType> Type = new Bindable<GameType>();
@@ -27,6 +25,7 @@ namespace osu.Game.Screens.Multi.Components
 
             BeatmapTitle beatmapTitle;
             ModeTypeInfo modeTypeInfo;
+            LinkFlowContainer beatmapAuthor;
 
             InternalChild = new FillFlowContainer
             {
@@ -45,11 +44,11 @@ namespace osu.Game.Screens.Multi.Components
                         Children = new Drawable[]
                         {
                             beatmapTitle = new BeatmapTitle(),
-                            beatmapAuthor = new OsuSpriteText
+                            beatmapAuthor = new LinkFlowContainer(s => s.TextSize = 14)
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
-                                TextSize = 14,
+                                AutoSizeAxes = Axes.Both
                             },
                         },
                     },
@@ -61,13 +60,16 @@ namespace osu.Game.Screens.Multi.Components
 
             beatmapTitle.Beatmap.BindTo(Beatmap);
 
-            Beatmap.BindValueChanged(v => beatmapAuthor.Text = v == null ? string.Empty : $"mapped by {v.Metadata.Author}");
-        }
+            Beatmap.BindValueChanged(v =>
+            {
+                beatmapAuthor.Clear();
 
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            beatmapAuthor.Colour = colours.GrayC;
+                if (v != null)
+                {
+                    beatmapAuthor.AddText("mapped by ", s => s.Colour = OsuColour.Gray(0.8f));
+                    beatmapAuthor.AddLink(v.Metadata.Author.Username, null, LinkAction.OpenUserProfile, v.Metadata.Author.Id.ToString(), "View Profile");
+                }
+            });
         }
     }
 }
