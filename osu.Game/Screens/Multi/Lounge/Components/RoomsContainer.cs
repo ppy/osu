@@ -17,10 +17,12 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 {
     public class RoomsContainer : CompositeDrawable, IHasFilterableChildren
     {
-        public Action<Room> OpenRequested;
+        public Action<Room> JoinRequested;
+
+        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
+        public IBindable<Room> SelectedRoom => selectedRoom;
 
         private readonly IBindableCollection<Room> rooms = new BindableCollection<Room>();
-        private readonly Bindable<Room> currentRoom = new Bindable<Room>();
 
         private readonly FillFlowContainer<DrawableRoom> roomFlow;
 
@@ -44,15 +46,12 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            currentRoom.BindTo(manager.Current);
             rooms.BindTo(manager.Rooms);
 
             rooms.ItemsAdded += addRooms;
             rooms.ItemsRemoved += removeRooms;
 
             addRooms(rooms);
-
-            currentRoom.BindValueChanged(selectRoom, true);
         }
 
         private FilterCriteria currentFilter;
@@ -100,8 +99,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
                 roomFlow.Remove(toRemove);
 
-                if (currentRoom.Value == r)
-                    currentRoom.Value = null;
+                selectRoom(null);
             }
         }
 
@@ -110,12 +108,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             var drawable = roomFlow.FirstOrDefault(r => r.Room == room);
 
             if (drawable != null && drawable.State == SelectionState.Selected)
-                OpenRequested?.Invoke(room);
+                JoinRequested?.Invoke(room);
             else
-            {
-                currentRoom.Value = room;
                 roomFlow.Children.ForEach(r => r.State = r.Room == room ? SelectionState.Selected : SelectionState.NotSelected);
-            }
+
+            selectedRoom.Value = room;
         }
 
         public IEnumerable<string> FilterTerms => Enumerable.Empty<string>();

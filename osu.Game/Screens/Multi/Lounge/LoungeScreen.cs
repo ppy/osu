@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Multi.Lounge
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Child = rooms = new RoomsContainer { OpenRequested = Open }
+                                Child = rooms = new RoomsContainer { JoinRequested = r => manager?.JoinRoom(r) }
                             },
                         },
                         inspector = new RoomInspector
@@ -68,10 +68,10 @@ namespace osu.Game.Screens.Multi.Lounge
                         },
                     },
                 },
-                manager = new RoomManager()
+                manager = new RoomManager { OpenRequested = Open }
             };
 
-            inspector.Room.BindTo(manager.Current);
+            inspector.Room.BindTo(rooms.SelectedRoom);
 
             Filter.Search.Current.ValueChanged += s => filterRooms();
             Filter.Tabs.Current.ValueChanged += t => filterRooms();
@@ -103,15 +103,17 @@ namespace osu.Game.Screens.Multi.Lounge
 
         protected override bool OnExiting(Screen next)
         {
+            manager?.PartRoom();
+
             Filter.Search.HoldFocus = false;
             return base.OnExiting(next);
         }
 
         protected override void OnResuming(Screen last)
         {
-            base.OnResuming(last);
+            manager?.PartRoom();
 
-            Filter.Search.HoldFocus = true;
+            base.OnResuming(last);
         }
 
         protected override void OnSuspending(Screen next)

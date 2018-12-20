@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -16,15 +17,18 @@ using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Multi.Lounge.Components;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Multi
 {
     public class RoomManager : PollingComponent
     {
+        public Action<Room> OpenRequested;
+
         public IBindableCollection<Room> Rooms => rooms;
         private readonly BindableCollection<Room> rooms = new BindableCollection<Room>();
 
-        public readonly Bindable<Room> Current = new Bindable<Room>();
+        private Room currentRoom;
 
         private FilterCriteria currentFilter = new FilterCriteria();
 
@@ -47,10 +51,38 @@ namespace osu.Game.Screens.Multi
             room.Host.Value = api.LocalUser;
 
             var req = new CreateRoomRequest(room);
-
             req.Success += result => addRoom(room, result);
             req.Failure += exception => Logger.Log($"Failed to create room: {exception}");
+
             api.Queue(req);
+        }
+
+        private JoinRoomRequest currentJoinRoomRequest;
+
+        public void JoinRoom(Room room)
+        {
+            currentJoinRoomRequest?.Cancel();
+            currentJoinRoomRequest = null;
+
+            currentJoinRoomRequest = new JoinRoomRequest(room, api.LocalUser.Value);
+            currentJoinRoomRequest.Success += () =>
+            {
+                currentRoom = room;
+                OpenRequested?.Invoke(room);
+            };
+
+            currentJoinRoomRequest.Failure += exception => Logger.Log($"Failed to join room: {exception}");
+
+            api.Queue(currentJoinRoomRequest);
+        }
+
+        public void PartRoom()
+        {
+            if (currentRoom == null)
+                return;
+
+            api.Queue(new PartRoomRequest(currentRoom, api.LocalUser.Value));
+            currentRoom = null;
         }
 
         public void Filter(FilterCriteria criteria)
@@ -139,6 +171,48 @@ namespace osu.Game.Screens.Multi
             }
 
             protected override string Target => "rooms";
+        }
+
+        private class JoinRoomRequest : APIRequest
+        {
+            private readonly Room room;
+            private readonly User user;
+
+            public JoinRoomRequest(Room room, User user)
+            {
+                this.room = room;
+                this.user = user;
+            }
+
+            protected override WebRequest CreateWebRequest()
+            {
+                var req = base.CreateWebRequest();
+                req.Method = HttpMethod.Put;
+                return req;
+            }
+
+            protected override string Target => $"rooms/{room.RoomID.Value}/users/{user.Id}";
+        }
+
+        private class PartRoomRequest : APIRequest
+        {
+            private readonly Room room;
+            private readonly User user;
+
+            public PartRoomRequest(Room room, User user)
+            {
+                this.room = room;
+                this.user = user;
+            }
+
+            protected override WebRequest CreateWebRequest()
+            {
+                var req = base.CreateWebRequest();
+                req.Method = HttpMethod.Delete;
+                return req;
+            }
+
+            protected override string Target => $"rooms/{room.RoomID.Value}/users/{user.Id}";
         }
 
         private class GetRoomsRequest : APIRequest<List<Room>>

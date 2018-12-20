@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Multi
         public override bool AllowBeatmapRulesetChange => currentScreen?.AllowBeatmapRulesetChange ?? base.AllowBeatmapRulesetChange;
 
         private readonly OsuButton createButton;
+        private readonly LoungeScreen loungeScreen;
 
         private OsuScreen currentScreen;
 
@@ -37,7 +38,6 @@ namespace osu.Game.Screens.Multi
                 RelativeSizeAxes = Axes.Both,
             };
 
-            LoungeScreen loungeScreen;
             waves.AddRange(new Drawable[]
             {
                 new Container
@@ -101,6 +101,9 @@ namespace osu.Game.Screens.Multi
             var track = Beatmap.Value.Track;
             if (track != null)
                 track.Looping = false;
+
+            loungeScreen.MakeCurrent();
+            loungeScreen.Exit();
 
             return base.OnExiting(next);
         }
