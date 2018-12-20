@@ -82,6 +82,7 @@ namespace osu.Game.Overlays.Profile
                                     Origin = Anchor.BottomLeft,
                                     Masking = true,
                                     CornerRadius = 5,
+                                    OpenOnClick = { Value = false },
                                     EdgeEffect = new EdgeEffectParameters
                                     {
                                         Type = EdgeEffectType.Shadow,
