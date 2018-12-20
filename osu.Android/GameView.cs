@@ -20,6 +20,6 @@ namespace osu.Android
         {
             CreateGame();
         }
-        public override Framework.Game CreateGame() => new OsuGameAndroid();
+        public override Framework.Game CreateGame() => new OsuGame();
     }
 }
