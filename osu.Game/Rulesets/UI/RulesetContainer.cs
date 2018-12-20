@@ -71,7 +71,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Place to put drawables above hit objects but below UI.
         /// </summary>
-        public readonly Container Overlays;
+        public Container Overlays { get; protected set; }
 
         /// <summary>
         /// The cursor provided by this <see cref="RulesetContainer"/>. May be null if no cursor is provided.
@@ -92,12 +92,6 @@ namespace osu.Game.Rulesets.UI
         {
             Ruleset = ruleset;
             playfield = new Lazy<Playfield>(CreatePlayfield);
-            Overlays = new Container
-            {
-                RelativeSizeAxes = Axes.Both,
-                Width = 1,
-                Height = 1
-            };
 
             IsPaused.ValueChanged += paused =>
             {
@@ -215,7 +209,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The mods which are to be applied.
         /// </summary>
-        protected IEnumerable<Mod> Mods;
+        public IEnumerable<Mod> Mods { get; protected set; }
 
         /// <summary>
         /// The <see cref="WorkingBeatmap"/> this <see cref="RulesetContainer{TObject}"/> was created with.
@@ -226,7 +220,6 @@ namespace osu.Game.Rulesets.UI
 
         protected override Container<Drawable> Content => content;
         private Container content;
-        private IEnumerable<Mod> mods;
 
         /// <summary>
         /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
@@ -256,16 +249,23 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            KeyBindingInputManager.Add(content = new Container
+            KeyBindingInputManager.Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-            });
-
-            AddInternal(KeyBindingInputManager);
-            KeyBindingInputManager.Add(Playfield);
+                content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                Playfield
+            };
 
             if (Cursor != null)
                 KeyBindingInputManager.Add(Cursor);
+
+            InternalChildren = new Drawable[]
+            {
+                KeyBindingInputManager,
+                Overlays = new Container { RelativeSizeAxes = Axes.Both }
+            };
 
             // Apply mods
             applyRulesetMods(Mods, config);
@@ -323,11 +323,6 @@ namespace osu.Game.Rulesets.UI
             foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
                 mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
         }
-
-        /// <summary>
-        /// Returns the currently selected mods for this ruleset container.
-        /// </summary>
-        public IEnumerable<Mod> ActiveMods { get => Mods; }
 
         /// <summary>
         /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="RulesetContainer{TObject}"/>.

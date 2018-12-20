@@ -35,8 +35,8 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToRulesetContainer(RulesetContainer<OsuHitObject> rulesetContainer)
         {
-            bool hasEasy = rulesetContainer.ActiveMods.Any(m => m is ModEasy);
-            bool hasHardrock = rulesetContainer.ActiveMods.Any(m => m is ModHardRock);
+            bool hasEasy = rulesetContainer.Mods.Any(m => m is ModEasy);
+            bool hasHardrock = rulesetContainer.Mods.Any(m => m is ModHardRock);
 
             rulesetContainer.Overlays.Add(blinds = new DrawableOsuBlinds(rulesetContainer.Playfield.HitObjectContainer, hasEasy, hasHardrock, rulesetContainer.Beatmap));
         }
