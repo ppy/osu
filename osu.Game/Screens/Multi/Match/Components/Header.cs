@@ -73,16 +73,13 @@ namespace osu.Game.Screens.Multi.Match.Components
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding
-                    {
-                        Left = SearchableListOverlay.WIDTH_PADDING,
-                        Top = 20
-                    },
+                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
                         {
                             AutoSizeAxes = Axes.Both,
+                            Padding = new MarginPadding { Top = 20 },
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {

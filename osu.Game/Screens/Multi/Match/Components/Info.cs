@@ -75,6 +75,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                         endDate = new EndDateInfo { TextSize = 14 }
                                     }
                                 },
+                                new HostInfo(room),
                             },
                         },
                         new FillFlowContainer
