@@ -5,29 +5,19 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Judgements
 {
-    public class TaikoDrumRollTickJudgement : TaikoJudgement
+    public class TaikoDrumRollJudgement : TaikoJudgement
     {
         public override bool AffectsCombo => false;
 
-        protected override int NumericResultFor(HitResult result)
-        {
-            switch (result)
-            {
-                case HitResult.Great:
-                    return 200;
-                default:
-                    return 0;
-            }
-        }
-
         protected override double HealthIncreaseFor(HitResult result)
         {
+            // Drum rolls can be ignored with no health penalty
             switch (result)
             {
-                case HitResult.Great:
-                    return 0.15;
-                default:
+                case HitResult.Miss:
                     return 0;
+                default:
+                    return base.HealthIncreaseFor(result);
             }
         }
     }
