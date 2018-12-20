@@ -17,9 +17,9 @@ namespace osu.Game.Screens.Multi.Components
     {
         private readonly OsuSpriteText beatmapAuthor;
 
-        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
-        public readonly Bindable<GameType> Type = new Bindable<GameType>();
+        public readonly IBindable<GameType> Type = new Bindable<GameType>();
 
         public BeatmapTypeInfo()
         {
@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Multi.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            beatmapAuthor.Colour = colours.Gray9;
+            beatmapAuthor.Colour = colours.GrayC;
         }
     }
 }

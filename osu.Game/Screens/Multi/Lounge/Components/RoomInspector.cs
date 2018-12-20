@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
         private readonly IBindableCollection<PlaylistItem> playlistBind = new BindableCollection<PlaylistItem>();
 
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly Bindable<BeatmapInfo> beatmap = new Bindable<BeatmapInfo>();
 
         private OsuColour colours;
         private Box statusStrip;
@@ -190,6 +190,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             beatmapTypeInfo.Type.BindTo(typeBind);
 
+            background.Beatmap.BindTo(beatmap);
+            beatmapTypeInfo.Beatmap.BindTo(beatmap);
+
             Room.BindValueChanged(updateRoom, true);
         }
 
@@ -244,11 +247,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 return;
 
             // For now, only the first playlist item is supported
-            var item = playlistBind.First();
-
-            beatmap.Value = beatmaps.GetWorkingBeatmap(item.Beatmap);
-            background.Beatmap.Value = item.Beatmap;
-            beatmapTypeInfo.Beatmap.Value = item.Beatmap;
+            beatmap.Value = playlistBind.First().Beatmap;
         }
 
         protected override void UpdateAfterChildren()

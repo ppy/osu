@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -14,6 +15,10 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
+using osu.Game.Rulesets.Mods;
+using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.Play.HUD;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Match.Components
@@ -23,6 +28,8 @@ namespace osu.Game.Screens.Multi.Match.Components
         public const float HEIGHT = 200;
 
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly IBindable<GameType> Type = new Bindable<GameType>();
+        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
 
         private readonly Box tabStrip;
 
@@ -30,25 +37,31 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         public Action OnRequestSelectBeatmap;
 
-        public Header()
+        public Header(Room room)
         {
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
 
+            BeatmapTypeInfo beatmapTypeInfo;
             BeatmapSelectButton beatmapButton;
             UpdateableBeatmapBackgroundSprite background;
+            ModDisplay modDisplay;
+
             Children = new Drawable[]
             {
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                     Masking = true,
-                    Child = background = new HeaderBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both }
-                },
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0), Color4.Black.Opacity(0.5f)),
+                    Children = new Drawable[]
+                    {
+                        background = new HeaderBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both },
+                        new Box
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Colour = ColourInfo.GradientVertical(Color4.Black.Opacity(0.4f), Color4.Black.Opacity(0.6f)),
+                        },
+                    }
                 },
                 tabStrip = new Box
                 {
@@ -60,9 +73,27 @@ namespace osu.Game.Screens.Multi.Match.Components
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
+                    Padding = new MarginPadding
+                    {
+                        Left = SearchableListOverlay.WIDTH_PADDING,
+                        Top = 20
+                    },
                     Children = new Drawable[]
                     {
+                        new FillFlowContainer
+                        {
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
+                            Children = new Drawable[]
+                            {
+                                beatmapTypeInfo = new BeatmapTypeInfo(),
+                                modDisplay = new ModDisplay
+                                {
+                                    Scale = new Vector2(0.75f),
+                                    DisplayUnrankedText = false
+                                },
+                            }
+                        },
                         new Container
                         {
                             Anchor = Anchor.TopRight,
@@ -70,13 +101,13 @@ namespace osu.Game.Screens.Multi.Match.Components
                             RelativeSizeAxes = Axes.Y,
                             Width = 200,
                             Padding = new MarginPadding { Vertical = 5 },
-                            Child = beatmapButton = new BeatmapSelectButton
+                            Child = beatmapButton = new BeatmapSelectButton(room)
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 1
                             },
                         },
-                        Tabs = new MatchTabControl
+                        Tabs = new MatchTabControl(room)
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
@@ -85,6 +116,10 @@ namespace osu.Game.Screens.Multi.Match.Components
                     },
                 },
             };
+
+            beatmapTypeInfo.Beatmap.BindTo(Beatmap);
+            beatmapTypeInfo.Type.BindTo(Type);
+            modDisplay.Current.BindTo(Mods);
 
             beatmapButton.Action = () => OnRequestSelectBeatmap?.Invoke();
 
@@ -101,17 +136,10 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             private readonly IBindable<int?> roomIDBind = new Bindable<int?>();
 
-            [Resolved]
-            private Room room { get; set; }
-
-            public BeatmapSelectButton()
+            public BeatmapSelectButton(Room room)
             {
                 Text = "Select beatmap";
-            }
 
-            [BackgroundDependencyLoader]
-            private void load()
-            {
                 roomIDBind.BindTo(room.RoomID);
                 roomIDBind.BindValueChanged(v => this.FadeTo(v.HasValue ? 0 : 1), true);
             }

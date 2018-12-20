@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
@@ -14,9 +13,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Components;
-using osu.Game.Screens.Play.HUD;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components
@@ -33,8 +30,6 @@ namespace osu.Game.Screens.Multi.Match.Components
         public readonly Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
         public readonly Bindable<RoomStatus> Status = new Bindable<RoomStatus>();
         public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
-        public readonly Bindable<GameType> Type = new Bindable<GameType>();
-        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
         public readonly Bindable<DateTimeOffset> EndDate = new Bindable<DateTimeOffset>();
 
         public Info(Room room)
@@ -44,9 +39,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             ReadyButton readyButton;
             ViewBeatmapButton viewBeatmapButton;
-            BeatmapTypeInfo beatmapTypeInfo;
             OsuSpriteText name;
-            ModDisplay modDisplay;
             EndDateInfo endDate;
 
             Children = new Drawable[]
@@ -82,20 +75,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                         endDate = new EndDateInfo { TextSize = 14 }
                                     }
                                 },
-                                new FillFlowContainer
-                                {
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Vertical,
-                                    Children = new Drawable[]
-                                    {
-                                        beatmapTypeInfo = new BeatmapTypeInfo(),
-                                        modDisplay = new ModDisplay
-                                        {
-                                            Scale = new Vector2(0.75f),
-                                            DisplayUnrankedText = false
-                                        },
-                                    }
-                                }
                             },
                         },
                         new FillFlowContainer
@@ -118,10 +97,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                     },
                 },
             };
-
-            beatmapTypeInfo.Beatmap.BindTo(Beatmap);
-            beatmapTypeInfo.Type.BindTo(Type);
-            modDisplay.Current.BindTo(Mods);
 
             viewBeatmapButton.Beatmap.BindTo(Beatmap);
             readyButton.Beatmap.BindTo(Beatmap);
