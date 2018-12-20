@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -35,10 +34,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToRulesetContainer(RulesetContainer<OsuHitObject> rulesetContainer)
         {
-            bool hasEasy = rulesetContainer.Mods.Any(m => m is ModEasy);
-            bool hasHardrock = rulesetContainer.Mods.Any(m => m is ModHardRock);
-
-            rulesetContainer.Overlays.Add(blinds = new DrawableOsuBlinds(rulesetContainer.Playfield.HitObjectContainer, hasEasy, hasHardrock, rulesetContainer.Beatmap));
+            rulesetContainer.Overlays.Add(blinds = new DrawableOsuBlinds(rulesetContainer.Playfield.HitObjectContainer, rulesetContainer.Beatmap));
         }
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
@@ -69,12 +65,7 @@ namespace osu.Game.Rulesets.Osu.Mods
             private readonly float targetBreakMultiplier = 0;
             private readonly float easing = 1;
 
-            private const float black_depth = 10;
-            private const float bg_panel_depth = 8;
-            private const float fg_panel_depth = 4;
-
             private readonly CompositeDrawable restrictTo;
-            private readonly bool modEasy, modHardrock;
 
             /// <summary>
             /// <para>
@@ -89,13 +80,10 @@ namespace osu.Game.Rulesets.Osu.Mods
             /// </summary>
             private const float leniency = 0.1f;
 
-            public DrawableOsuBlinds(CompositeDrawable restrictTo, bool hasEasy, bool hasHardrock, Beatmap<OsuHitObject> beatmap)
+            public DrawableOsuBlinds(CompositeDrawable restrictTo, Beatmap<OsuHitObject> beatmap)
             {
                 this.restrictTo = restrictTo;
                 this.beatmap = beatmap;
-
-                modEasy = hasEasy;
-                modHardrock = hasHardrock;
             }
 
             [BackgroundDependencyLoader]
@@ -111,9 +99,6 @@ namespace osu.Game.Rulesets.Osu.Mods
                         Origin = Anchor.TopLeft,
                         Colour = Color4.Black,
                         RelativeSizeAxes = Axes.Y,
-                        Width = 0,
-                        Height = 1,
-                        Depth = black_depth
                     },
                     blackBoxRight = new Box
                     {
@@ -121,60 +106,22 @@ namespace osu.Game.Rulesets.Osu.Mods
                         Origin = Anchor.TopRight,
                         Colour = Color4.Black,
                         RelativeSizeAxes = Axes.Y,
-                        Width = 0,
-                        Height = 1,
-                        Depth = black_depth
                     },
                     bgPanelLeft = new ModBlindsPanel
                     {
                         Origin = Anchor.TopRight,
                         Colour = Color4.Gray,
-                        Depth = bg_panel_depth + 1
                     },
-                    panelLeft = new ModBlindsPanel
-                    {
-                        Origin = Anchor.TopRight,
-                        Depth = bg_panel_depth
-                    },
-                    bgPanelRight = new ModBlindsPanel
-                    {
-                        Origin = Anchor.TopLeft,
-                        Colour = Color4.Gray,
-                        Depth = fg_panel_depth + 1
-                    },
-                    panelRight = new ModBlindsPanel
-                    {
-                        Origin = Anchor.TopLeft,
-                        Depth = fg_panel_depth
-                    },
+                    panelLeft = new ModBlindsPanel { Origin = Anchor.TopRight, },
+                    bgPanelRight = new ModBlindsPanel { Colour = Color4.Gray },
+                    panelRight = new ModBlindsPanel()
                 };
             }
 
-            private float applyGap(float value)
-            {
-                const float easy_multiplier = 0.95f;
-                const float hardrock_multiplier = 1.1f;
+            private float calculateGap(float value) => MathHelper.Clamp(value, 0, target_clamp) * targetBreakMultiplier;
 
-                float multiplier = 1;
-                if (modEasy)
-                {
-                    multiplier = easy_multiplier;
-                    // TODO: include OD/CS
-                }
-                else if (modHardrock)
-                {
-                    multiplier = hardrock_multiplier;
-                    // TODO: include OD/CS
-                }
-
-                return MathHelper.Clamp(value * multiplier, 0, target_clamp) * targetBreakMultiplier;
-            }
-
-            private static float applyAdjustmentCurve(float value)
-            {
-                // lagrange polinominal for (0,0) (0.5,0.35) (1,1) should make a good curve
-                return 0.6f * value * value + 0.4f * value;
-            }
+            // lagrange polinominal for (0,0) (0.6,0.4) (1,1) should make a good curve
+            private static float applyAdjustmentCurve(float value) => 0.6f * value * value + 0.4f * value;
 
             protected override void Update()
             {
@@ -186,7 +133,7 @@ namespace osu.Game.Rulesets.Osu.Mods
                 start -= rawWidth * leniency * 0.5f;
                 end += rawWidth * leniency * 0.5f;
 
-                float width = (end - start) * 0.5f * applyAdjustmentCurve(applyGap(easing));
+                float width = (end - start) * 0.5f * applyAdjustmentCurve(calculateGap(easing));
 
                 // different values in case the playfield ever moves from center to somewhere else.
                 blackBoxLeft.Width = start + width;

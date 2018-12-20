@@ -209,7 +209,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The mods which are to be applied.
         /// </summary>
-        public IEnumerable<Mod> Mods { get; protected set; }
+        protected IEnumerable<Mod> Mods;
 
         /// <summary>
         /// The <see cref="WorkingBeatmap"/> this <see cref="RulesetContainer{TObject}"/> was created with.
