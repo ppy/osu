@@ -10,30 +10,21 @@ using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Screens.Ranking.Types;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ResultModeButton : TabItem<ResultMode>
+    public class ResultModeButton : TabItem<IResultType>
     {
         private readonly FontAwesome icon;
         private Color4 activeColour;
         private Color4 inactiveColour;
         private CircularContainer colouredPart;
 
-        public ResultModeButton(ResultMode mode) : base(mode)
+        public ResultModeButton(IResultType mode)
+            : base(mode)
         {
-            switch (mode)
-            {
-                case ResultMode.Summary:
-                    icon = FontAwesome.fa_asterisk;
-                    break;
-                case ResultMode.Ranking:
-                    icon = FontAwesome.fa_list;
-                    break;
-                case ResultMode.Share:
-                    icon = FontAwesome.fa_camera;
-                    break;
-            }
+            icon = mode.Icon;
         }
 
         [BackgroundDependencyLoader]
