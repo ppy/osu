@@ -102,7 +102,7 @@ namespace osu.Game.Online.API
                         if (queue.Count == 0)
                         {
                             log.Add(@"Queueing a ping request");
-                            Queue(new ListChannelsRequest { Timeout = 5000 });
+                            Queue(new GetUserRequest());
                         }
 
                         break;
@@ -173,7 +173,6 @@ namespace osu.Game.Online.API
                         req = queue.Dequeue();
                     }
 
-                    // TODO: handle failures better
                     handleRequest(req);
                 }
 
@@ -191,64 +190,30 @@ namespace osu.Game.Online.API
 
         /// <summary>
         /// Handle a single API request.
+        /// Ensures all exceptions are caught and dealt with correctly.
         /// </summary>
         /// <param name="req">The request.</param>
-        /// <returns>true if we should remove this request from the queue.</returns>
+        /// <returns>true if the request succeeded.</returns>
         private bool handleRequest(APIRequest req)
         {
             try
             {
-                Logger.Log($@"Performing request {req}", LoggingTarget.Network);
                 req.Perform(this);
 
                 //we could still be in initialisation, at which point we don't want to say we're Online yet.
-                if (IsLoggedIn)
-                    State = APIState.Online;
+                if (IsLoggedIn) State = APIState.Online;
 
                 failureCount = 0;
                 return true;
             }
             catch (WebException we)
             {
-                HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode
-                                            ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
-
-                // special cases for un-typed but useful message responses.
-                switch (we.Message)
-                {
-                    case "Unauthorized":
-                        statusCode = HttpStatusCode.Unauthorized;
-                        break;
-                }
-
-                switch (statusCode)
-                {
-                    case HttpStatusCode.Unauthorized:
-                        Logout(false);
-                        return true;
-                    case HttpStatusCode.RequestTimeout:
-                        failureCount++;
-                        log.Add($@"API failure count is now {failureCount}");
-
-                        if (failureCount < 3)
-                            //we might try again at an api level.
-                            return false;
-
-                        State = APIState.Failing;
-                        flushQueue();
-                        return true;
-                }
-
-                req.Fail(we);
-                return true;
+                handleWebException(we);
+                return false;
             }
             catch (Exception e)
             {
-                if (e is TimeoutException)
-                    log.Add(@"API level timeout exception was hit");
-
-                req.Fail(e);
-                return true;
+                return false;
             }
         }
 
@@ -274,6 +239,45 @@ namespace osu.Game.Online.API
                     });
                 }
             }
+        }
+
+        private bool handleWebException(WebException we)
+        {
+            HttpStatusCode statusCode = (we.Response as HttpWebResponse)?.StatusCode
+                                        ?? (we.Status == WebExceptionStatus.UnknownError ? HttpStatusCode.NotAcceptable : HttpStatusCode.RequestTimeout);
+
+            // special cases for un-typed but useful message responses.
+            switch (we.Message)
+            {
+                case "Unauthorized":
+                case "Forbidden":
+                    statusCode = HttpStatusCode.Unauthorized;
+                    break;
+            }
+
+            switch (statusCode)
+            {
+                case HttpStatusCode.Unauthorized:
+                    Logout(false);
+                    return true;
+                case HttpStatusCode.RequestTimeout:
+                    failureCount++;
+                    log.Add($@"API failure count is now {failureCount}");
+
+                    if (failureCount < 3)
+                        //we might try again at an api level.
+                        return false;
+
+                    if (State == APIState.Online)
+                    {
+                        State = APIState.Failing;
+                        flushQueue();
+                    }
+
+                    return true;
+            }
+
+            return true;
         }
 
         public bool IsLoggedIn => LocalUser.Value.Id > 1;
