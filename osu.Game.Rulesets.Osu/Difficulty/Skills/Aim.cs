@@ -12,10 +12,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Aim : Skill
     {
-        private const double min_angle_bonus = 0;
-        private const double max_angle_bonus = 0.5;
         private const double angle_bonus_begin = 5 * Math.PI / 12;
-        private const double pi_over_2 = Math.PI / 2;
 
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;
@@ -24,13 +21,16 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             double angleBonus = 0;
 
-            if (current.Angle != null)
-                angleBonus = MathHelper.Clamp((current.Angle.Value - angle_bonus_begin) / pi_over_2, min_angle_bonus, max_angle_bonus);
+            double result = 0;
 
-            return (angleBonus * Math.Pow(Math.Max(0, current.JumpDistance - STREAM_SPACING_THRESHOLD), 0.99)
-                       + Math.Pow(current.TravelDistance, 0.99)
-                       + Math.Pow(current.JumpDistance, 0.99)
-                   ) / current.StrainTime;
+            if (Previous.Count > 0)
+            {
+                if (current.Angle != null)
+                    angleBonus = (Previous[0].JumpDistance - STREAM_SPACING_THRESHOLD) * Math.Sin(current.Angle.Value - angle_bonus_begin);
+                result = Math.Pow(Math.Max(0, angleBonus), 0.99) / Previous[0].StrainTime;
+            }
+
+            return result + (Math.Pow(current.TravelDistance, 0.99) + Math.Pow(current.JumpDistance, 0.99)) / current.StrainTime;
         }
     }
 }
