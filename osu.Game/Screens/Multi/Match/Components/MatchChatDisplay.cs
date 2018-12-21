@@ -24,7 +24,13 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             base.LoadComplete();
 
-            Channel.Value = channelManager.JoinChannel(new Channel { Id = room.ChannelId, Type = ChannelType.Multiplayer, Name = $"#mp_{room.RoomID}" });
+            room.RoomID.BindValueChanged(v => updateChannel(), true);
+        }
+
+        private void updateChannel()
+        {
+            if (room.RoomID.Value != null)
+                Channel.Value = channelManager.JoinChannel(new Channel { Id = room.ChannelId, Type = ChannelType.Multiplayer, Name = $"#mp_{room.RoomID}" });
         }
     }
 }
