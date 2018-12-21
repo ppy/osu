@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Play
                 {
                     Retries = RestartCount,
                     OnRetry = Restart,
-                    OnQuit = Exit,
+                    OnQuit = performUserRequestedExit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
                     Children = new[]
                     {
@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Play
                 failOverlay = new FailOverlay
                 {
                     OnRetry = Restart,
-                    OnQuit = Exit,
+                    OnQuit = performUserRequestedExit,
                 },
                 new HotkeyRetryOverlay
                 {
@@ -225,7 +225,7 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            hudOverlay.HoldToQuit.Action = Exit;
+            hudOverlay.HoldToQuit.Action = performUserRequestedExit;
             hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
@@ -250,8 +250,16 @@ namespace osu.Game.Screens.Play
                 mod.ApplyToClock(sourceClock);
         }
 
+        private void performUserRequestedExit()
+        {
+            if (!IsCurrentScreen) return;
+            Exit();
+        }
+
         public void Restart()
         {
+            if (!IsCurrentScreen) return;
+
             sampleRestart?.Play();
             ValidForResume = false;
             RestartRequested?.Invoke();
