@@ -21,8 +21,6 @@ namespace osu.Game.Screens.Multi.Match
 {
     public class MatchScreen : MultiplayerScreen
     {
-        private readonly Participants participants;
-
         private readonly Bindable<string> nameBind = new Bindable<string>();
         private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
         private readonly Bindable<RoomAvailability> availabilityBind = new Bindable<RoomAvailability>();
@@ -33,8 +31,6 @@ namespace osu.Game.Screens.Multi.Match
         private readonly Bindable<DateTimeOffset> endDateBind = new Bindable<DateTimeOffset>();
 
         public override bool AllowBeatmapRulesetChange => false;
-
-        protected override Drawable TransitionContent => participants;
 
         public override string Title => room.Name.Value;
 
@@ -90,15 +86,10 @@ namespace osu.Game.Screens.Multi.Match
                                 {
                                     new Drawable[]
                                     {
-                                        participants = new Participants { RelativeSizeAxes = Axes.Both },
-                                        leaderboard = new MatchLeaderboard(room) { RelativeSizeAxes = Axes.Both }
+                                        leaderboard = new MatchLeaderboard(room) { RelativeSizeAxes = Axes.Both },
+                                        new MatchChatDisplay(room) { RelativeSizeAxes = Axes.Both }
                                     },
                                 },
-                                ColumnDimensions = new[]
-                                {
-                                    new Dimension(GridSizeMode.Distributed),
-                                    new Dimension(GridSizeMode.Relative, 0.5f),
-                                }
                             }
                         },
                     },
@@ -137,9 +128,6 @@ namespace osu.Game.Screens.Multi.Match
             info.EndDate.BindTo(endDateBind);
 
             header.Type.BindTo(typeBind);
-
-            participants.Users.BindTo(participantsBind);
-            participants.MaxParticipants.BindTo(maxParticipantsBind);
 
             playlistBind.ItemsAdded += _ => setFromPlaylist();
             playlistBind.ItemsRemoved += _ => setFromPlaylist();

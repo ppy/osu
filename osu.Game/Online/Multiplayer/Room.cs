@@ -24,6 +24,9 @@ namespace osu.Game.Online.Multiplayer
         [JsonProperty("playlist")]
         public BindableCollection<PlaylistItem> Playlist { get; set; } = new BindableCollection<PlaylistItem>();
 
+        [JsonProperty("channel_id")]
+        public Bindable<int> ChannelId { get; private set; } = new Bindable<int>();
+
         [JsonIgnore]
         public Bindable<TimeSpan> Duration { get; private set; } = new Bindable<TimeSpan>(TimeSpan.FromMinutes(30));
 
