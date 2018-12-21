@@ -1,0 +1,96 @@
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+
+using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Internal;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
+using osu.Framework.Lists;
+using osu.Game.Beatmaps;
+using osu.Game.Graphics;
+using osu.Game.Online.Leaderboards;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Scoring;
+using osu.Game.Screens.Multi.Match.Components;
+using osu.Game.Screens.Ranking.Pages;
+
+namespace osu.Game.Screens.Multi.Ranking.Pages
+{
+    public class RoomRankingResultsPage : ResultsPage
+    {
+        private readonly Room room;
+
+        private OsuColour colours;
+
+        private TextFlowContainer rankText;
+
+        public RoomRankingResultsPage(ScoreInfo score, WorkingBeatmap beatmap, Room room)
+            : base(score, beatmap)
+        {
+            this.room = room;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            this.colours = colours;
+
+            Children = new Drawable[]
+            {
+                new Box
+                {
+                    Colour = colours.GrayE,
+                    RelativeSizeAxes = Axes.Both,
+                },
+                new BufferedContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    BackgroundColour = colours.GrayE,
+                    Children = new Drawable[]
+                    {
+                        new MatchLeaderboard(room)
+                        {
+                            Origin = Anchor.Centre,
+                            Anchor = Anchor.Centre,
+                            RelativeSizeAxes = Axes.Both,
+                            Height = 0.8f,
+                            Y = 95,
+                            ScoresLoaded = scoresLoaded
+                        }
+                    }
+                },
+                rankText = new TextFlowContainer
+                {
+                    Anchor = Anchor.TopCentre,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.X,
+                    Width = 0.5f,
+                    AutoSizeAxes = Axes.Y,
+                    Y = 75,
+                    TextAnchor = Anchor.TopCentre
+                },
+            };
+        }
+
+        private void scoresLoaded(IEnumerable<RoomScore> scores)
+        {
+            Action<SpriteText> gray = s => s.Colour = colours.Gray8;
+
+            rankText.AddText("You are placed ", gray);
+
+            int index = scores.IndexOf(new RoomScore { User = Score.User }, new FuncEqualityComparer<RoomScore>((s1, s2) => s1.User.Id.Equals(s2.User.Id)));
+
+            rankText.AddText($"#{index + 1} ", s =>
+            {
+                s.Font = "Exo2.0-Bold";
+                s.Colour = colours.YellowDark;
+            });
+
+            rankText.AddText("in the room!", gray);
+        }
+    }
+}

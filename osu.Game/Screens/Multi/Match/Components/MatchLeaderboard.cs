@@ -18,6 +18,8 @@ namespace osu.Game.Screens.Multi.Match.Components
 {
     public class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, RoomScore>
     {
+        public Action<IEnumerable<RoomScore>> ScoresLoaded;
+
         private readonly Room room;
 
         public MatchLeaderboard(Room room)
@@ -42,7 +44,11 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             var req = new GetRoomScoresRequest(room.RoomID.Value ?? 0);
 
-            req.Success += r => scoresCallback?.Invoke(r);
+            req.Success += r =>
+            {
+                scoresCallback?.Invoke(r);
+                ScoresLoaded?.Invoke(r);
+            };
 
             return req;
         }
