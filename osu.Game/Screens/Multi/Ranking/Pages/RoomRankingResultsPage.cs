@@ -12,7 +12,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
-using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Match.Components;
@@ -39,6 +38,8 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
         {
             this.colours = colours;
 
+            MatchLeaderboard leaderboard;
+
             Children = new Drawable[]
             {
                 new Box
@@ -50,18 +51,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
                 {
                     RelativeSizeAxes = Axes.Both,
                     BackgroundColour = colours.GrayE,
-                    Children = new Drawable[]
-                    {
-                        new MatchLeaderboard(room)
-                        {
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Height = 0.8f,
-                            Y = 95,
-                            ScoresLoaded = scoresLoaded
-                        }
-                    }
+                    Child = leaderboard = CreateLeaderboard(room)
                 },
                 rankText = new TextFlowContainer
                 {
@@ -74,6 +64,13 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
                     TextAnchor = Anchor.TopCentre
                 },
             };
+
+            leaderboard.Origin = Anchor.Centre;
+            leaderboard.Anchor = Anchor.Centre;
+            leaderboard.RelativeSizeAxes = Axes.Both;
+            leaderboard.Height = 0.8f;
+            leaderboard.Y = 95;
+            leaderboard.ScoresLoaded = scoresLoaded;
         }
 
         private void scoresLoaded(IEnumerable<RoomScore> scores)
@@ -92,5 +89,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
 
             rankText.AddText("in the room!", gray);
         }
+
+        protected virtual MatchLeaderboard CreateLeaderboard(Room room) => new MatchLeaderboard(room);
     }
 }

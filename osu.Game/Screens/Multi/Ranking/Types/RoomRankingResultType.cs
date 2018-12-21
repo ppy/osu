@@ -26,6 +26,6 @@ namespace osu.Game.Screens.Multi.Ranking.Types
 
         public FontAwesome Icon => FontAwesome.fa_list;
 
-        public ResultsPage CreatePage() => new RoomRankingResultsPage(score, beatmap, room);
+        public virtual ResultsPage CreatePage() => new RoomRankingResultsPage(score, beatmap, room);
     }
 }
