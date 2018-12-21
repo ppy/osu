@@ -98,9 +98,9 @@ namespace osu.Game.Online.Chat
                 return;
 
             if (text[0] == '/')
-                ChannelManager?.PostCommand(text.Substring(1));
+                ChannelManager?.PostCommand(text.Substring(1), Channel);
             else
-                ChannelManager?.PostMessage(text);
+                ChannelManager?.PostMessage(text, target: Channel);
 
             textbox.Text = string.Empty;
         }
