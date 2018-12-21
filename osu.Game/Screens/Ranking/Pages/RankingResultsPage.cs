@@ -3,18 +3,19 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osuTK;
-using osu.Framework.Graphics.Shapes;
-using osu.Game.Scoring;
 
-namespace osu.Game.Screens.Ranking
+namespace osu.Game.Screens.Ranking.Pages
 {
-    public class ResultsPageRanking : ResultsPage
+    public class RankingResultsPage : ResultsPage
     {
-        public ResultsPageRanking(ScoreInfo score, WorkingBeatmap beatmap = null) : base(score, beatmap)
+        public RankingResultsPage(ScoreInfo score, WorkingBeatmap beatmap = null)
+            : base(score, beatmap)
         {
         }
 
