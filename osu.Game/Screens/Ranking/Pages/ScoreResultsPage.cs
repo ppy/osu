@@ -4,36 +4,39 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Users;
-using osu.Framework.Graphics.Shapes;
-using osu.Framework.Extensions;
-using osu.Framework.Localisation;
-using osu.Game.Online.Leaderboards;
-using osu.Game.Scoring;
+using osuTK;
+using osuTK.Graphics;
 
-namespace osu.Game.Screens.Ranking
+namespace osu.Game.Screens.Ranking.Pages
 {
-    public class ResultsPageScore : ResultsPage
+    public class ScoreResultsPage : ResultsPage
     {
         private Container scoreContainer;
         private ScoreCounter scoreCounter;
 
-        public ResultsPageScore(ScoreInfo score, WorkingBeatmap beatmap) : base(score, beatmap) { }
+        public ScoreResultsPage(ScoreInfo score, WorkingBeatmap beatmap)
+            : base(score, beatmap)
+        {
+        }
 
         private FillFlowContainer<DrawableScoreStatistic> statisticsContainer;
 
