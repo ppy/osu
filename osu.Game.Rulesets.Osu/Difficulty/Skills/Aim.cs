@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 if (current.Angle != null)
                     angleBonus = (Previous[0].JumpDistance - STREAM_SPACING_THRESHOLD) * Math.Sin(current.Angle.Value - angle_bonus_begin);
-                result = Math.Pow(Math.Max(0, angleBonus), 0.99) / Previous[0].StrainTime;
+                result = 2 * Math.Pow(Math.Max(0, angleBonus), 0.99) / Previous[0].StrainTime;
             }
 
             return result + (Math.Pow(current.TravelDistance, 0.99) + Math.Pow(current.JumpDistance, 0.99)) / current.StrainTime;
