@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -18,12 +19,12 @@ using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking.Types;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class Results : OsuScreen
+    public abstract class Results : OsuScreen
     {
-        private readonly ScoreInfo score;
         private Container circleOuterBackground;
         private Container circleOuter;
         private Container circleInner;
@@ -33,6 +34,8 @@ namespace osu.Game.Screens.Ranking
         private ResultModeTabControl modeChangeButtons;
 
         public override bool AllowBeatmapRulesetChange => false;
+
+        protected readonly ScoreInfo Score;
 
         private Container currentPage;
 
@@ -44,9 +47,9 @@ namespace osu.Game.Screens.Ranking
 
         private const float circle_outer_scale = 0.96f;
 
-        public Results(ScoreInfo score)
+        protected Results(ScoreInfo score)
         {
-            this.score = score;
+            Score = score;
         }
 
         private const float transition_time = 800;
@@ -67,7 +70,7 @@ namespace osu.Game.Screens.Ranking
 
             backgroundParallax.FadeOut();
             modeChangeButtons.FadeOut();
-            currentPage.FadeOut();
+            currentPage?.FadeOut();
 
             circleOuterBackground
                 .FadeIn(transition_time, Easing.OutQuint)
@@ -90,7 +93,7 @@ namespace osu.Game.Screens.Ranking
                     using (BeginDelayedSequence(transition_time * 0.4f, true))
                     {
                         modeChangeButtons.FadeIn(transition_time, Easing.OutQuint);
-                        currentPage.FadeIn(transition_time, Easing.OutQuint);
+                        currentPage?.FadeIn(transition_time, Easing.OutQuint);
                     }
                 }
             }
@@ -188,7 +191,7 @@ namespace osu.Game.Screens.Ranking
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = $"{score.MaxCombo}x",
+                                    Text = $"{Score.MaxCombo}x",
                                     TextSize = 40,
                                     RelativePositionAxes = Axes.X,
                                     Font = @"Exo2.0-Bold",
@@ -209,7 +212,7 @@ namespace osu.Game.Screens.Ranking
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = $"{score.Accuracy:P2}",
+                                    Text = $"{Score.Accuracy:P2}",
                                     TextSize = 40,
                                     RelativePositionAxes = Axes.X,
                                     Font = @"Exo2.0-Bold",
@@ -262,30 +265,22 @@ namespace osu.Game.Screens.Ranking
                 },
             };
 
-            modeChangeButtons.AddItem(ResultMode.Summary);
-            modeChangeButtons.AddItem(ResultMode.Ranking);
-            //modeChangeButtons.AddItem(ResultMode.Share);
+            foreach (var t in CreateResultTypes())
+                modeChangeButtons.AddItem(t);
+            modeChangeButtons.Current.Value = modeChangeButtons.Items.FirstOrDefault();
 
-            modeChangeButtons.Current.ValueChanged += mode =>
+            modeChangeButtons.Current.BindValueChanged(m =>
             {
                 currentPage?.FadeOut();
                 currentPage?.Expire();
 
-                switch (mode)
-                {
-                    case ResultMode.Summary:
-                        currentPage = new ResultsPageScore(score, Beatmap.Value);
-                        break;
-                    case ResultMode.Ranking:
-                        currentPage = new ResultsPageRanking(score, Beatmap.Value);
-                        break;
-                }
+                currentPage = m?.CreatePage();
 
                 if (currentPage != null)
                     circleInner.Add(currentPage);
-            };
-
-            modeChangeButtons.Current.TriggerChange();
+            }, true);
         }
+
+        protected abstract IEnumerable<IResultType> CreateResultTypes();
     }
 }
