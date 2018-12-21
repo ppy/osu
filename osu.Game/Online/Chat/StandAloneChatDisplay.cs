@@ -133,6 +133,8 @@ namespace osu.Game.Online.Chat
             if (channel == null) return;
 
             channel.NewMessagesArrived += newMessages;
+
+            newMessages(channel.Messages);
         }
 
         private void newMessages(IEnumerable<Message> messages)
