@@ -53,7 +53,6 @@ namespace osu.Game.Online.Chat
                 },
             };
 
-
             if (postingTextbox)
             {
                 AddInternal(textbox = new FocusedTextBox
