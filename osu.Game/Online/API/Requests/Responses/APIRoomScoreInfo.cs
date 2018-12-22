@@ -2,12 +2,16 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using Newtonsoft.Json;
+using osu.Game.Scoring;
 
 namespace osu.Game.Online.API.Requests.Responses
 {
-    public class APIRoomScore
+    public class APIRoomScoreInfo : ScoreInfo
     {
-        [JsonProperty("id")]
-        public int ID { get; set; }
+        [JsonProperty("attempts")]
+        public int TotalAttempts { get; set; }
+
+        [JsonProperty("completed")]
+        public int CompletedAttempts { get; set; }
     }
 }

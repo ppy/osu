@@ -7,7 +7,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class CreateRoomScoreRequest : APIRequest<APIRoomScore>
+    public class CreateRoomScoreRequest : APIRequest<APIScoreToken>
     {
         private readonly int roomId;
         private readonly int playlistItemId;
