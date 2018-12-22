@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select
         protected override Container<Drawable> Content => content;
 
         public readonly BeatmapDetails Details;
-        public readonly Leaderboard Leaderboard;
+        public readonly BeatmapLeaderboard Leaderboard;
 
         private WorkingBeatmap beatmap;
         public WorkingBeatmap Beatmap
@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Select
 
                             default:
                                 Details.Hide();
-                                Leaderboard.Scope = (LeaderboardScope)tab - 1;
+                                Leaderboard.Scope = (BeatmapLeaderboardScope)tab - 1;
                                 Leaderboard.Show();
                                 break;
                         }
@@ -73,7 +73,7 @@ namespace osu.Game.Screens.Select
                     Alpha = 0,
                     Margin = new MarginPadding { Top = details_padding },
                 },
-                Leaderboard = new Leaderboard
+                Leaderboard = new BeatmapLeaderboard
                 {
                     RelativeSizeAxes = Axes.Both,
                 }

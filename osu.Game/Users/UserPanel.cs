@@ -99,6 +99,7 @@ namespace osu.Game.Users
                                 User = user,
                                 Masking = true,
                                 CornerRadius = 5,
+                                OpenOnClick = { Value = false },
                                 EdgeEffect = new EdgeEffectParameters
                                 {
                                     Type = EdgeEffectType.Shadow,
