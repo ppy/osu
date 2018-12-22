@@ -104,10 +104,6 @@ namespace osu.Game.Screens.Multi.Match
                 else
                     settings.Hide();
             };
-
-            header.Type.BindTo(bindings.Type);
-            header.Beatmap.BindTo(bindings.CurrentBeatmap);
-            header.Mods.BindTo(bindings.CurrentMods);
         }
 
         protected override void LoadComplete()
