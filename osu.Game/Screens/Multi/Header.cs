@@ -103,7 +103,8 @@ namespace osu.Game.Screens.Multi
 
         private class HeaderBreadcrumbControl : ScreenBreadcrumbControl
         {
-            public HeaderBreadcrumbControl(Screen initialScreen) : base(initialScreen)
+            public HeaderBreadcrumbControl(Screen initialScreen)
+                : base(initialScreen)
             {
             }
 
