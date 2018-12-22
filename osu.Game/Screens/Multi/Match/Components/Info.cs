@@ -3,12 +3,10 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
@@ -26,11 +24,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private OsuColour colours;
 
-        public readonly IBindable<string> Name = new Bindable<string>();
-        public readonly IBindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
-        public readonly IBindable<RoomStatus> Status = new Bindable<RoomStatus>();
-        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
-        public readonly IBindable<DateTimeOffset> EndDate = new Bindable<DateTimeOffset>();
+        private readonly RoomBindings bindings = new RoomBindings();
 
         public Info(Room room)
         {
@@ -99,13 +93,15 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            viewBeatmapButton.Beatmap.BindTo(Beatmap);
-            readyButton.Beatmap.BindTo(Beatmap);
+            viewBeatmapButton.Beatmap.BindTo(bindings.CurrentBeatmap);
+            readyButton.Beatmap.BindTo(bindings.CurrentBeatmap);
 
-            Availability.BindValueChanged(_ => updateAvailabilityStatus());
-            Status.BindValueChanged(_ => updateAvailabilityStatus());
-            Name.BindValueChanged(n => name.Text = n);
-            EndDate.BindValueChanged(d => endDate.Date = d);
+            bindings.Availability.BindValueChanged(_ => updateAvailabilityStatus());
+            bindings.Status.BindValueChanged(_ => updateAvailabilityStatus());
+            bindings.Name.BindValueChanged(n => name.Text = n);
+            bindings.EndDate.BindValueChanged(d => endDate.Date = d);
+
+            bindings.Room = room;
         }
 
         [BackgroundDependencyLoader]
@@ -126,10 +122,10 @@ namespace osu.Game.Screens.Multi.Match.Components
             if (!IsLoaded)
                 return;
 
-            if (Status.Value != null)
+            if (bindings.Status.Value != null)
             {
-                availabilityStatus.FadeColour(Status.Value.GetAppropriateColour(colours), 100);
-                availabilityStatus.Text = $"{Availability.Value.GetDescription()}, {Status.Value.Message}";
+                availabilityStatus.FadeColour(bindings.Status.Value.GetAppropriateColour(colours), 100);
+                availabilityStatus.Text = $"{bindings.Availability.Value.GetDescription()}, {bindings.Status.Value.Message}";
             }
         }
     }

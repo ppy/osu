@@ -49,7 +49,6 @@ namespace osu.Game.Screens.Multi.Match
 
             bindings.Room = room;
 
-            Info info;
             Components.Header header;
             RoomSettingsOverlay settings;
 
@@ -61,7 +60,7 @@ namespace osu.Game.Screens.Multi.Match
                     Content = new[]
                     {
                         new Drawable[] { header = new Components.Header(room) { Depth = -1 } },
-                        new Drawable[] { info = new Info(room) { OnStart = onStart } },
+                        new Drawable[] { new Info(room) { OnStart = onStart } },
                         new Drawable[]
                         {
                             new GridContainer
@@ -106,11 +105,6 @@ namespace osu.Game.Screens.Multi.Match
                     settings.Hide();
             };
 
-            info.Name.BindTo(bindings.Name);
-            info.Status.BindTo(bindings.Status);
-            info.Availability.BindTo(bindings.Availability);
-            info.EndDate.BindTo(bindings.EndDate);
-            info.Beatmap.BindTo(bindings.CurrentBeatmap);
             header.Type.BindTo(bindings.Type);
             header.Beatmap.BindTo(bindings.CurrentBeatmap);
             header.Mods.BindTo(bindings.CurrentMods);
