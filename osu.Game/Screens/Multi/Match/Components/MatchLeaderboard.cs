@@ -3,16 +3,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Scoring;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
@@ -53,7 +50,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             return req;
         }
 
-        protected override LeaderboardScore<RoomScore> CreateScoreVisualiser(RoomScore model, int index) => new MatchLeaderboardScore(model, index);
+        protected override LeaderboardScore CreateDrawableScore(RoomScore model, int index) => new MatchLeaderboardScore(model, index);
 
         private class GetRoomScoresRequest : APIRequest<List<RoomScore>>
         {
@@ -68,7 +65,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         }
     }
 
-    public class MatchLeaderboardScore : LeaderboardScore<RoomScore>
+    public class MatchLeaderboardScore : LeaderboardScore
     {
         public MatchLeaderboardScore(RoomScore score, int rank)
             : base(score, rank)
@@ -81,20 +78,12 @@ namespace osu.Game.Screens.Multi.Match.Components
             RankContainer.Alpha = 0;
         }
 
-        protected override User GetUser(RoomScore model) => model.User;
-
-        protected override IEnumerable<Mod> GetMods(RoomScore model) => Enumerable.Empty<Mod>(); // Not implemented yet
-
-        protected override IEnumerable<(FontAwesome icon, string value, string name)> GetStatistics(RoomScore model) => new[]
+        protected override IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
-            (FontAwesome.fa_crosshairs, string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy), "Accuracy"),
-            (FontAwesome.fa_refresh, model.TotalAttempts.ToString(), "Total Attempts"),
-            (FontAwesome.fa_check, model.CompletedAttempts.ToString(), "Completed Beatmaps"),
+            new LeaderboardScoreStatistic(FontAwesome.fa_crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy)),
+            new LeaderboardScoreStatistic(FontAwesome.fa_refresh, "Total Attempts", ((RoomScore)model).TotalAttempts.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.fa_check, "Completed Beatmaps", ((RoomScore)model).CompletedAttempts.ToString()),
         };
-
-        protected override int GetTotalScore(RoomScore model) => model.TotalScore;
-
-        protected override ScoreRank GetRank(RoomScore model) => ScoreRank.S;
     }
 
     public enum MatchLeaderboardScope
