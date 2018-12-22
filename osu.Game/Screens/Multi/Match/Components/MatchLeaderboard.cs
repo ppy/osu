@@ -3,19 +3,20 @@
 
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, RoomScore>
+    public class MatchLeaderboard : Leaderboard<MatchLeaderboardScope, APIRoomScoreInfo>
     {
-        public Action<IEnumerable<RoomScore>> ScoresLoaded;
+        public Action<IEnumerable<APIRoomScoreInfo>> ScoresLoaded;
 
         private readonly Room room;
 
@@ -34,7 +35,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             }, true);
         }
 
-        protected override APIRequest FetchScores(Action<IEnumerable<RoomScore>> scoresCallback)
+        protected override APIRequest FetchScores(Action<IEnumerable<APIRoomScoreInfo>> scoresCallback)
         {
             if (room.RoomID == null)
                 return null;
@@ -50,24 +51,12 @@ namespace osu.Game.Screens.Multi.Match.Components
             return req;
         }
 
-        protected override LeaderboardScore CreateDrawableScore(RoomScore model, int index) => new MatchLeaderboardScore(model, index);
-
-        private class GetRoomScoresRequest : APIRequest<List<RoomScore>>
-        {
-            private readonly int roomId;
-
-            public GetRoomScoresRequest(int roomId)
-            {
-                this.roomId = roomId;
-            }
-
-            protected override string Target => $@"rooms/{roomId}/leaderboard";
-        }
+        protected override LeaderboardScore CreateDrawableScore(APIRoomScoreInfo model, int index) => new MatchLeaderboardScore(model, index);
     }
 
     public class MatchLeaderboardScore : LeaderboardScore
     {
-        public MatchLeaderboardScore(RoomScore score, int rank)
+        public MatchLeaderboardScore(APIRoomScoreInfo score, int rank)
             : base(score, rank)
         {
         }
@@ -81,22 +70,13 @@ namespace osu.Game.Screens.Multi.Match.Components
         protected override IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
         {
             new LeaderboardScoreStatistic(FontAwesome.fa_crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy)),
-            new LeaderboardScoreStatistic(FontAwesome.fa_refresh, "Total Attempts", ((RoomScore)model).TotalAttempts.ToString()),
-            new LeaderboardScoreStatistic(FontAwesome.fa_check, "Completed Beatmaps", ((RoomScore)model).CompletedAttempts.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.fa_refresh, "Total Attempts", ((APIRoomScoreInfo)model).TotalAttempts.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.fa_check, "Completed Beatmaps", ((APIRoomScoreInfo)model).CompletedAttempts.ToString()),
         };
     }
 
     public enum MatchLeaderboardScope
     {
         Overall
-    }
-
-    public class RoomScore : ScoreInfo
-    {
-        [JsonProperty("attempts")]
-        public int TotalAttempts { get; set; }
-
-        [JsonProperty("completed")]
-        public int CompletedAttempts { get; set; }
     }
 }

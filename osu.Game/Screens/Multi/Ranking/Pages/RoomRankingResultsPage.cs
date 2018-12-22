@@ -12,6 +12,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Match.Components;
@@ -73,13 +74,13 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
             leaderboard.ScoresLoaded = scoresLoaded;
         }
 
-        private void scoresLoaded(IEnumerable<RoomScore> scores)
+        private void scoresLoaded(IEnumerable<APIRoomScoreInfo> scores)
         {
             Action<SpriteText> gray = s => s.Colour = colours.Gray8;
 
             rankText.AddText("You are placed ", gray);
 
-            int index = scores.IndexOf(new RoomScore { User = Score.User }, new FuncEqualityComparer<RoomScore>((s1, s2) => s1.User.Id.Equals(s2.User.Id)));
+            int index = scores.IndexOf(new APIRoomScoreInfo { User = Score.User }, new FuncEqualityComparer<APIRoomScoreInfo>((s1, s2) => s1.User.Id.Equals(s2.User.Id)));
 
             rankText.AddText($"#{index + 1} ", s =>
             {

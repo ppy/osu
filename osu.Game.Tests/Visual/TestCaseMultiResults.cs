@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Match.Components;
@@ -101,7 +102,7 @@ namespace osu.Game.Tests.Visual
             {
             }
 
-            protected override APIRequest FetchScores(Action<IEnumerable<RoomScore>> scoresCallback)
+            protected override APIRequest FetchScores(Action<IEnumerable<APIRoomScoreInfo>> scoresCallback)
             {
                 var scores = Enumerable.Range(0, 50).Select(createRoomScore).ToArray();
 
@@ -111,7 +112,7 @@ namespace osu.Game.Tests.Visual
                 return null;
             }
 
-            private RoomScore createRoomScore(int id) => new RoomScore
+            private APIRoomScoreInfo createRoomScore(int id) => new APIRoomScoreInfo
             {
                 User = new User { Id = id, Username = $"User {id}" },
                 Accuracy = 0.98,
