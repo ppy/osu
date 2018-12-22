@@ -4,7 +4,7 @@
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 
-namespace osu.Game.Screens.Select.Leaderboards
+namespace osu.Game.Online.Leaderboards
 {
     public class MessagePlaceholder : Placeholder
     {
