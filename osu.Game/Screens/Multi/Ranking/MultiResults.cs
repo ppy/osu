@@ -20,11 +20,11 @@ namespace osu.Game.Screens.Multi.Ranking
             this.room = room;
         }
 
-        protected override IEnumerable<IResultType> CreateResultTypes() => new IResultType[]
+        protected override IEnumerable<IResultPageInfo> CreateResultPages() => new IResultPageInfo[]
         {
-            new ScoreResultType(Score, Beatmap),
-            new RankingResultType(Score, Beatmap),
-            new RoomRankingResultType(Score, Beatmap, room),
+            new ScoreOverviewPageInfo(Score, Beatmap),
+            new BeatmapLeaderboardPageInfo(Score, Beatmap),
+            new RoomLeaderboardPageInfo(Score, Beatmap, room),
         };
     }
 }

@@ -16,7 +16,7 @@ using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Match.Components;
-using osu.Game.Screens.Ranking.Pages;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Multi.Ranking.Pages
 {

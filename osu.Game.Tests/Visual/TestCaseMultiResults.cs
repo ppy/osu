@@ -14,8 +14,7 @@ using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Ranking;
 using osu.Game.Screens.Multi.Ranking.Pages;
 using osu.Game.Screens.Multi.Ranking.Types;
-using osu.Game.Screens.Ranking.Pages;
-using osu.Game.Screens.Ranking.Types;
+using osu.Game.Screens.Ranking;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
@@ -25,7 +24,7 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(MultiResults),
-            typeof(RoomRankingResultType),
+            typeof(RoomLeaderboardPageInfo),
             typeof(RoomRankingResultsPage)
         };
 
@@ -60,21 +59,16 @@ namespace osu.Game.Tests.Visual
                 this.room = room;
             }
 
-            protected override IEnumerable<IResultType> CreateResultTypes() => new IResultType[]
-            {
-                new ScoreResultType(Score, Beatmap),
-                new RankingResultType(Score, Beatmap),
-                new TestRoomRankingResultType(Score, Beatmap, room),
-            };
+            protected override IEnumerable<IResultPageInfo> CreateResultPages() => new[] { new TestRoomLeaderboardPageInfo(Score, Beatmap, room) };
         }
 
-        private class TestRoomRankingResultType : RoomRankingResultType
+        private class TestRoomLeaderboardPageInfo : RoomLeaderboardPageInfo
         {
             private readonly ScoreInfo score;
             private readonly WorkingBeatmap beatmap;
             private readonly Room room;
 
-            public TestRoomRankingResultType(ScoreInfo score, WorkingBeatmap beatmap, Room room)
+            public TestRoomLeaderboardPageInfo(ScoreInfo score, WorkingBeatmap beatmap, Room room)
                 : base(score, beatmap, room)
             {
                 this.score = score;
