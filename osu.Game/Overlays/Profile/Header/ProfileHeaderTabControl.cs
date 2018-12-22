@@ -10,7 +10,7 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Overlays.Profile
+namespace osu.Game.Overlays.Profile.Header
 {
     public class ProfileHeaderTabControl : TabControl<string>
     {
