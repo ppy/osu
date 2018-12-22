@@ -20,7 +20,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat.Selection
 {
-    public class ChannelSelectionOverlay : OsuFocusedOverlayContainer
+    public class ChannelSelectionOverlay : WaveOverlayContainer
     {
         public static readonly float WIDTH_PADDING = 170;
 
@@ -38,6 +38,11 @@ namespace osu.Game.Overlays.Chat.Selection
         public ChannelSelectionOverlay()
         {
             RelativeSizeAxes = Axes.X;
+
+            Waves.FirstWaveColour = OsuColour.FromHex("353535");
+            Waves.SecondWaveColour = OsuColour.FromHex("434343");
+            Waves.ThirdWaveColour = OsuColour.FromHex("515151");
+            Waves.FourthWaveColour = OsuColour.FromHex("595959");
 
             Children = new Drawable[]
             {
