@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Multi
 {
     public class RoomManager : PollingComponent
     {
-        public Action<Room> OpenRequested;
+        public event Action<Room> OpenRequested;
 
         public IBindableCollection<Room> Rooms => rooms;
         private readonly BindableCollection<Room> rooms = new BindableCollection<Room>();
