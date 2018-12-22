@@ -59,6 +59,9 @@ namespace osu.Game.Users
         [JsonProperty(@"is_supporter")]
         public bool IsSupporter;
 
+        [JsonProperty(@"support_level")]
+        public int SupportLevel;
+
         [JsonProperty(@"is_gmt")]
         public bool IsGMT;
 
@@ -70,6 +73,9 @@ namespace osu.Game.Users
 
         [JsonProperty(@"is_active")]
         public bool Active;
+
+        [JsonProperty(@"pm_friends_only")]
+        public bool PMFriendsOnly;
 
         [JsonProperty(@"interests")]
         public string Interests;
@@ -103,6 +109,9 @@ namespace osu.Game.Users
 
         [JsonProperty(@"post_count")]
         public int PostCount;
+
+        [JsonProperty(@"follower_count")]
+        public int[] FollowerCount;
 
         [JsonProperty(@"playstyle")]
         public string[] PlayStyle;
@@ -142,6 +151,18 @@ namespace osu.Game.Users
 
         [JsonProperty("badges")]
         public Badge[] Badges;
+
+        [JsonProperty("user_achievements")]
+        public UserAchievement[] Achievements;
+
+        public class UserAchievement
+        {
+            [JsonProperty("achieved_at")]
+            public DateTimeOffset AchievedAt;
+
+            [JsonProperty("achievement_id")]
+            public int ID;
+        }
 
         public override string ToString() => Username;
 

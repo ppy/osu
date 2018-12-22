@@ -185,8 +185,8 @@ namespace osu.Game.Users
             {
                 infoContainer.Add(new SupporterIcon
                 {
-                    RelativeSizeAxes = Axes.Y,
-                    Width = 20f,
+                    Height = 20f,
+                    SupporterLevel = user.SupportLevel
                 });
             }
 

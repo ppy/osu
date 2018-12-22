@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -27,7 +28,9 @@ namespace osu.Game.Tests.Visual
             typeof(UserProfileOverlay),
             typeof(RankGraph),
             typeof(LineGraph),
-            typeof(BadgeContainer)
+            typeof(BadgeContainer),
+            typeof(SectionsContainer<>),
+            typeof(SupporterIcon)
         };
 
         public TestCaseUserProfile()
@@ -58,6 +61,11 @@ namespace osu.Game.Tests.Visual
                 {
                     Ranks = new UserStatistics.UserRanks { Global = 2148, Country = 1 },
                     PP = 4567.89m,
+                    Level = new UserStatistics.LevelInfo
+                    {
+                        Current = 727,
+                        Progress = 69,
+                    }
                 },
                 RankHistory = new User.RankHistoryData
                 {
@@ -72,7 +80,10 @@ namespace osu.Game.Tests.Visual
                         Description = "Outstanding help by being a voluntary test subject.",
                         ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg"
                     }
-                }
+                },
+                Title = "osu!volunteer",
+                Colour = "ff0000",
+                Achievements = new User.UserAchievement[0],
             }, false));
 
             checkSupporterTag(false);

@@ -1,7 +1,9 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using Newtonsoft.Json;
+using osu.Game.Scoring;
 
 namespace osu.Game.Users
 {
@@ -37,6 +39,9 @@ namespace osu.Game.Users
         [JsonProperty(@"play_count")]
         public int PlayCount;
 
+        [JsonProperty(@"play_time")]
+        public int? PlayTime;
+
         [JsonProperty(@"total_score")]
         public long TotalScore;
 
@@ -68,6 +73,19 @@ namespace osu.Game.Users
 
             [JsonProperty(@"a")]
             public int A;
+
+            public int GetForScoreRank(ScoreRank rank)
+            {
+                switch (rank)
+                {
+                    case ScoreRank.XH: return SSPlus;
+                    case ScoreRank.X: return SS;
+                    case ScoreRank.SH: return SPlus;
+                    case ScoreRank.S: return S;
+                    case ScoreRank.A: return A;
+                    default: throw new ArgumentException($"API does not return {rank.ToString()}");
+                }
+            }
         }
 
         public struct UserRanks
