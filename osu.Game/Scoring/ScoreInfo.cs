@@ -98,8 +98,9 @@ namespace osu.Game.Scoring
             }
         }
 
-        [JsonIgnore]
-        public User User;
+        [NotMapped]
+        [JsonProperty("user")]
+        public User User { get; set; }
 
         [JsonIgnore]
         [Column("User")]
