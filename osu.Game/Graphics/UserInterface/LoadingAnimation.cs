@@ -8,6 +8,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
+    /// <summary>
+    /// A loading spinner.
+    /// </summary>
     public class LoadingAnimation : VisibilityContainer
     {
         private readonly SpriteIcon spinner;
