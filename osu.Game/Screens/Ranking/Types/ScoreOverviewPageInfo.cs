@@ -10,6 +10,9 @@ namespace osu.Game.Screens.Ranking.Types
 {
     public class ScoreOverviewPageInfo : IResultPageInfo
     {
+        public FontAwesome Icon => FontAwesome.fa_asterisk;
+
+        public string Name => "Overview";
         private readonly ScoreInfo score;
         private readonly WorkingBeatmap beatmap;
 
@@ -19,10 +22,9 @@ namespace osu.Game.Screens.Ranking.Types
             this.beatmap = beatmap;
         }
 
-        public FontAwesome Icon => FontAwesome.fa_asterisk;
-        
-        public string Name => "Overview";
-
-        public ResultsPage CreatePage() => new ScoreResultsPage(score, beatmap);
+        public ResultsPage CreatePage()
+        {
+            return new ScoreResultsPage(score, beatmap);
+        }
     }
 }
