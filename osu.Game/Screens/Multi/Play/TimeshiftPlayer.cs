@@ -2,13 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Diagnostics;
-using System.Net.Http;
 using System.Threading;
-using Newtonsoft.Json;
 using osu.Framework.Allocation;
-using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Ranking;
@@ -40,7 +38,7 @@ namespace osu.Game.Screens.Multi.Play
 
             bool failed = false;
 
-            var req = new CreateScoreRequest(room.RoomID.Value ?? 0, playlistItemId);
+            var req = new CreateRoomScoreRequest(room.RoomID.Value ?? 0, playlistItemId);
             req.Success += r => token = r.ID;
             req.Failure += e =>
             {
@@ -67,7 +65,7 @@ namespace osu.Game.Screens.Multi.Play
 
             Debug.Assert(token != null);
 
-            var request = new SubmitScoreRequest(token.Value, room.RoomID.Value ?? 0, playlistItemId, score);
+            var request = new SubmitRoomScoreRequest(token.Value, room.RoomID.Value ?? 0, playlistItemId, score);
             request.Failure += e => Logger.Error(e, "Failed to submit score");
             api.Queue(request);
 
@@ -75,62 +73,5 @@ namespace osu.Game.Screens.Multi.Play
         }
 
         protected override Results CreateResults(ScoreInfo score) => new MultiResults(score, room);
-    }
-
-    public class SubmitScoreRequest : APIRequest
-    {
-        private readonly int scoreId;
-        private readonly int roomId;
-        private readonly int playlistItemId;
-        private readonly ScoreInfo scoreInfo;
-
-        public SubmitScoreRequest(int scoreId, int roomId, int playlistItemId, ScoreInfo scoreInfo)
-        {
-            this.scoreId = scoreId;
-            this.roomId = roomId;
-            this.playlistItemId = playlistItemId;
-            this.scoreInfo = scoreInfo;
-        }
-
-        protected override WebRequest CreateWebRequest()
-        {
-            var req = base.CreateWebRequest();
-
-            req.ContentType = "application/json";
-            req.Method = HttpMethod.Put;
-
-            req.AddRaw(JsonConvert.SerializeObject(scoreInfo));
-
-            return req;
-        }
-
-        protected override string Target => $@"rooms/{roomId}/playlist/{playlistItemId}/scores/{scoreId}";
-    }
-
-    public class CreateScoreRequest : APIRequest<CreateScoreResult>
-    {
-        private readonly int roomId;
-        private readonly int playlistItemId;
-
-        public CreateScoreRequest(int roomId, int playlistItemId)
-        {
-            this.roomId = roomId;
-            this.playlistItemId = playlistItemId;
-        }
-
-        protected override WebRequest CreateWebRequest()
-        {
-            var req = base.CreateWebRequest();
-            req.Method = HttpMethod.Post;
-            return req;
-        }
-
-        protected override string Target => $@"rooms/{roomId}/playlist/{playlistItemId}/scores";
-    }
-
-    public class CreateScoreResult
-    {
-        [JsonProperty("id")]
-        public int ID { get; set; }
     }
 }

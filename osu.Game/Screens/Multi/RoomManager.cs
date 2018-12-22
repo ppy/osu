@@ -2,22 +2,18 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.IO.Network;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Online;
 using osu.Game.Online.API;
+using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Multi.Lounge.Components;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Multi
 {
@@ -147,107 +143,6 @@ namespace osu.Game.Screens.Multi
         {
             foreach (var pi in room.Playlist)
                 pi.MapObjects(beatmaps, rulesets);
-        }
-
-        private class CreateRoomRequest : APIRequest<Room>
-        {
-            private readonly Room room;
-
-            public CreateRoomRequest(Room room)
-            {
-                this.room = room;
-            }
-
-            protected override WebRequest CreateWebRequest()
-            {
-                var req = base.CreateWebRequest();
-
-                req.ContentType = "application/json";
-                req.Method = HttpMethod.Post;
-
-                req.AddRaw(JsonConvert.SerializeObject(room));
-
-                return req;
-            }
-
-            protected override string Target => "rooms";
-        }
-
-        private class JoinRoomRequest : APIRequest
-        {
-            private readonly Room room;
-            private readonly User user;
-
-            public JoinRoomRequest(Room room, User user)
-            {
-                this.room = room;
-                this.user = user;
-            }
-
-            protected override WebRequest CreateWebRequest()
-            {
-                var req = base.CreateWebRequest();
-                req.Method = HttpMethod.Put;
-                return req;
-            }
-
-            protected override string Target => $"rooms/{room.RoomID.Value}/users/{user.Id}";
-        }
-
-        private class PartRoomRequest : APIRequest
-        {
-            private readonly Room room;
-            private readonly User user;
-
-            public PartRoomRequest(Room room, User user)
-            {
-                this.room = room;
-                this.user = user;
-            }
-
-            protected override WebRequest CreateWebRequest()
-            {
-                var req = base.CreateWebRequest();
-                req.Method = HttpMethod.Delete;
-                return req;
-            }
-
-            protected override string Target => $"rooms/{room.RoomID.Value}/users/{user.Id}";
-        }
-
-        private class GetRoomsRequest : APIRequest<List<Room>>
-        {
-            private readonly PrimaryFilter primaryFilter;
-
-            public GetRoomsRequest(PrimaryFilter primaryFilter)
-            {
-                this.primaryFilter = primaryFilter;
-            }
-
-            protected override string Target
-            {
-                get
-                {
-                    string target = "rooms";
-
-                    switch (primaryFilter)
-                    {
-                        case PrimaryFilter.Open:
-                            break;
-                        case PrimaryFilter.Owned:
-                            target += "/owned";
-                            break;
-                        case PrimaryFilter.Participated:
-                            target += "/participated";
-                            break;
-                        case PrimaryFilter.RecentlyEnded:
-                            target += "/ended";
-                            break;
-                    }
-
-                    return target;
-                }
-            }
         }
     }
 }
