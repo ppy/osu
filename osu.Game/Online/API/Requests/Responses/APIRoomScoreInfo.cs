@@ -12,6 +12,6 @@ namespace osu.Game.Online.API.Requests.Responses
         public int TotalAttempts { get; set; }
 
         [JsonProperty("completed")]
-        public int CompletedAttempts { get; set; }
+        public int CompletedBeatmaps { get; set; }
     }
 }

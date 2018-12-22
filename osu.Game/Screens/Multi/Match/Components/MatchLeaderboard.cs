@@ -71,7 +71,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             new LeaderboardScoreStatistic(FontAwesome.fa_crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy)),
             new LeaderboardScoreStatistic(FontAwesome.fa_refresh, "Total Attempts", ((APIRoomScoreInfo)model).TotalAttempts.ToString()),
-            new LeaderboardScoreStatistic(FontAwesome.fa_check, "Completed Beatmaps", ((APIRoomScoreInfo)model).CompletedAttempts.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.fa_check, "Completed Beatmaps", ((APIRoomScoreInfo)model).CompletedBeatmaps.ToString()),
         };
     }
 

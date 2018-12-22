@@ -118,7 +118,7 @@ namespace osu.Game.Tests.Visual
                 Accuracy = 0.98,
                 TotalScore = 987654,
                 TotalAttempts = 13,
-                CompletedAttempts = 5
+                CompletedBeatmaps = 5
             };
         }
     }
