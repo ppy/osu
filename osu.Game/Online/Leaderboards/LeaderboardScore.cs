@@ -56,12 +56,6 @@ namespace osu.Game.Online.Leaderboards
             Height = HEIGHT;
         }
 
-        protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
-        {
-            new LeaderboardScoreStatistic(FontAwesome.fa_link, "Max Combo", model.MaxCombo.ToString()),
-            new LeaderboardScoreStatistic(FontAwesome.fa_crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy))
-        };
-
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -260,6 +254,12 @@ namespace osu.Game.Online.Leaderboards
                 }
             }
         }
+
+        protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
+        {
+            new LeaderboardScoreStatistic(FontAwesome.fa_link, "Max Combo", model.MaxCombo.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.fa_crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy))
+        };
 
         protected override bool OnHover(HoverEvent e)
         {
