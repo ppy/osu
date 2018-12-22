@@ -102,20 +102,8 @@ namespace osu.Game.Screens.Multi.Match.Components
         Overall
     }
 
-    public class RoomScore
+    public class RoomScore : ScoreInfo
     {
-        [JsonProperty("user")]
-        public User User { get; set; }
-
-        [JsonProperty("accuracy")]
-        public double Accuracy { get; set; }
-
-        [JsonProperty("total_score")]
-        public int TotalScore { get; set; }
-
-        [JsonProperty("pp")]
-        public double? PP { get; set; }
-
         [JsonProperty("attempts")]
         public int TotalAttempts { get; set; }
 
