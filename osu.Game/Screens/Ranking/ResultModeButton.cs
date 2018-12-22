@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osuTK;
@@ -13,7 +14,7 @@ using osu.Framework.Graphics.Shapes;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ResultModeButton : TabItem<IResultPageInfo>
+    public class ResultModeButton : TabItem<IResultPageInfo>, IHasTooltip
     {
         private readonly FontAwesome icon;
         private Color4 activeColour;
@@ -24,6 +25,7 @@ namespace osu.Game.Screens.Ranking
             : base(mode)
         {
             icon = mode.Icon;
+            TooltipText = mode.Name;
         }
 
         [BackgroundDependencyLoader]
@@ -85,5 +87,7 @@ namespace osu.Game.Screens.Ranking
         protected override void OnActivated() => colouredPart.FadeColour(activeColour, 200, Easing.OutQuint);
 
         protected override void OnDeactivated() => colouredPart.FadeColour(inactiveColour, 200, Easing.OutQuint);
+
+        public string TooltipText { get; private set; }
     }
 }
