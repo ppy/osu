@@ -18,14 +18,14 @@ using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public abstract class Leaderboard<TScope, TScoreModel> : Container
+    public abstract class Leaderboard<TScope, ScoreInfo> : Container
     {
         private const double fade_duration = 300;
 
         private readonly ScrollContainer scrollContainer;
         private readonly Container placeholderContainer;
 
-        private FillFlowContainer<LeaderboardScore<TScoreModel>> scrollFlow;
+        private FillFlowContainer<LeaderboardScore> scrollFlow;
 
         private readonly LoadingAnimation loading;
 
@@ -33,9 +33,9 @@ namespace osu.Game.Online.Leaderboards
 
         private bool scoresLoadedOnce;
 
-        private IEnumerable<TScoreModel> scores;
+        private IEnumerable<ScoreInfo> scores;
 
-        public IEnumerable<TScoreModel> Scores
+        public IEnumerable<ScoreInfo> Scores
         {
             get { return scores; }
             set
@@ -55,13 +55,13 @@ namespace osu.Game.Online.Leaderboards
                 // ensure placeholder is hidden when displaying scores
                 PlaceholderState = PlaceholderState.Successful;
 
-                var flow = scrollFlow = new FillFlowContainer<LeaderboardScore<TScoreModel>>
+                var flow = scrollFlow = new FillFlowContainer<LeaderboardScore>
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(0f, 5f),
                     Padding = new MarginPadding { Top = 10, Bottom = 5 },
-                    ChildrenEnumerable = scores.Select((s, index) => CreateScoreVisualiser(s, index + 1))
+                    ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1))
                 };
 
                 // schedule because we may not be loaded yet (LoadComponentAsync complains).
@@ -240,7 +240,7 @@ namespace osu.Game.Online.Leaderboards
             });
         }
 
-        protected abstract APIRequest FetchScores(Action<IEnumerable<TScoreModel>> scoresCallback);
+        protected abstract APIRequest FetchScores(Action<IEnumerable<ScoreInfo>> scoresCallback);
 
         private Placeholder currentPlaceholder;
 
@@ -295,6 +295,6 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
-        protected abstract LeaderboardScore<TScoreModel> CreateScoreVisualiser(TScoreModel model, int index);
+        protected abstract LeaderboardScore CreateDrawableScore(ScoreInfo model, int index);
     }
 }
