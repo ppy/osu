@@ -3,10 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Configuration;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Screens.Multi.Match.Components;
@@ -20,37 +18,34 @@ namespace osu.Game.Tests.Visual
             typeof(Header)
         };
 
-        private readonly Bindable<BeatmapInfo> beatmap = new Bindable<BeatmapInfo>();
-        private readonly Bindable<GameType> type = new Bindable<GameType>();
-        private readonly Bindable<IEnumerable<Mod>> mods = new Bindable<IEnumerable<Mod>>();
-
         public TestCaseMatchHeader()
         {
-            var header = new Header(new Room());
+            var room = new Room();
 
-            header.Beatmap.BindTo(beatmap);
-            header.Type.BindTo(type);
-            header.Mods.BindTo(mods);
+            var header = new Header(room);
 
-            beatmap.Value = new BeatmapInfo
+            room.Playlist.Add(new PlaylistItem
             {
-                Metadata = new BeatmapMetadata
+                Beatmap = new BeatmapInfo
                 {
-                    Title = "Title",
-                    Artist = "Artist",
-                    AuthorString = "Author",
+                    Metadata = new BeatmapMetadata
+                    {
+                        Title = "Title",
+                        Artist = "Artist",
+                        AuthorString = "Author",
+                    },
+                    Version = "Version",
+                    Ruleset = new OsuRuleset().RulesetInfo
                 },
-                Version = "Version",
-                Ruleset = new OsuRuleset().RulesetInfo
-            };
+                RequiredMods =
+                {
+                    new OsuModDoubleTime(),
+                    new OsuModNoFail(),
+                    new OsuModRelax(),
+                }
+            });
 
-            type.Value = new GameTypeTimeshift();
-            mods.Value = new Mod[]
-            {
-                new OsuModDoubleTime(),
-                new OsuModNoFail(),
-                new OsuModRelax(),
-            };
+            room.Type.Value = new GameTypeTimeshift();
 
             Child = header;
         }

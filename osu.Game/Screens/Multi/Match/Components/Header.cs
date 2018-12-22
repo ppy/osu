@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -10,12 +9,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Components;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
@@ -27,9 +24,7 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         public const float HEIGHT = 200;
 
-        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
-        public readonly IBindable<GameType> Type = new Bindable<GameType>();
-        public readonly IBindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
+        private readonly RoomBindings bindings = new RoomBindings();
 
         private readonly Box tabStrip;
 
@@ -41,6 +36,8 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
+
+            bindings.Room = room;
 
             BeatmapTypeInfo beatmapTypeInfo;
             BeatmapSelectButton beatmapButton;
@@ -114,13 +111,12 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            beatmapTypeInfo.Beatmap.BindTo(Beatmap);
-            beatmapTypeInfo.Type.BindTo(Type);
-            background.Beatmap.BindTo(Beatmap);
-            Mods.BindValueChanged(m => modDisplay.Current.Value = m, true);
+            beatmapTypeInfo.Beatmap.BindTo(bindings.CurrentBeatmap);
+            beatmapTypeInfo.Type.BindTo(bindings.Type);
+            background.Beatmap.BindTo(bindings.CurrentBeatmap);
+            bindings.CurrentMods.BindValueChanged(m => modDisplay.Current.Value = m, true);
 
             beatmapButton.Action = () => OnRequestSelectBeatmap?.Invoke();
-
         }
 
         [BackgroundDependencyLoader]
