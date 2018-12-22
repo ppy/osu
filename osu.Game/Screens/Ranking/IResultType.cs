@@ -2,13 +2,14 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Game.Graphics;
-using osu.Game.Screens.Ranking.Pages;
 
-namespace osu.Game.Screens.Ranking.Types
+namespace osu.Game.Screens.Ranking
 {
-    public interface IResultType
+    public interface IResultPageInfo
     {
         FontAwesome Icon { get; }
+
+        string Name { get; }
 
         ResultsPage CreatePage();
     }

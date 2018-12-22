@@ -8,18 +8,20 @@ using osu.Game.Screens.Ranking.Pages;
 
 namespace osu.Game.Screens.Ranking.Types
 {
-    public class RankingResultType : IResultType
+    public class BeatmapLeaderboardPageInfo : IResultPageInfo
     {
         private readonly ScoreInfo score;
         private readonly WorkingBeatmap beatmap;
 
-        public RankingResultType(ScoreInfo score, WorkingBeatmap beatmap)
+        public BeatmapLeaderboardPageInfo(ScoreInfo score, WorkingBeatmap beatmap)
         {
             this.score = score;
             this.beatmap = beatmap;
         }
 
         public FontAwesome Icon => FontAwesome.fa_list;
+
+        public string Name => @"Beatmap Leaderboard";
 
         public ResultsPage CreatePage() => new RankingResultsPage(score, beatmap);
     }
