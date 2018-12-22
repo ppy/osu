@@ -264,7 +264,7 @@ namespace osu.Game.Screens.Ranking
                 },
             };
 
-            foreach (var t in CreateResultTypes())
+            foreach (var t in CreateResultPages())
                 modeChangeButtons.AddItem(t);
             modeChangeButtons.Current.Value = modeChangeButtons.Items.FirstOrDefault();
 
@@ -280,6 +280,6 @@ namespace osu.Game.Screens.Ranking
             }, true);
         }
 
-        protected abstract IEnumerable<IResultPageInfo> CreateResultTypes();
+        protected abstract IEnumerable<IResultPageInfo> CreateResultPages();
     }
 }
