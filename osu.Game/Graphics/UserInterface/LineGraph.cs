@@ -9,6 +9,7 @@ using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -63,13 +64,19 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
+        public Color4 LineColour
+        {
+            get => maskingContainer.Colour;
+            set => maskingContainer.Colour = value;
+        }
+
         public LineGraph()
         {
             Add(maskingContainer = new Container<Path>
             {
                 Masking = true,
                 RelativeSizeAxes = Axes.Both,
-                Child = path = new SmoothPath { RelativeSizeAxes = Axes.Both, PathWidth = 1 }
+                Child = path = new SmoothPath { RelativeSizeAxes = Axes.Both, PathWidth = 1.5f }
             });
         }
 
@@ -103,7 +110,7 @@ namespace osu.Game.Graphics.UserInterface
             for (int i = 0; i < values.Length; i++)
             {
                 float x = (i + count - values.Length) / (float)(count - 1) * DrawWidth - 1;
-                float y = GetYPosition(values[i]) * DrawHeight - 1;
+                float y = GetYPosition(values[i]) * DrawHeight - path.PathWidth;
                 // the -1 is for inner offset in path (actually -PathWidth)
                 path.AddVertex(new Vector2(x, y));
             }

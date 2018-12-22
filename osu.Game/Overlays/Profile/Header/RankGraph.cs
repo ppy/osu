@@ -8,8 +8,8 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -19,19 +19,18 @@ using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
-    public class RankGraph : Container
+    public class RankGraph : Container, IHasCustomTooltip
     {
-        private const float primary_textsize = 25;
         private const float secondary_textsize = 13;
         private const float padding = 10;
         private const float fade_duration = 150;
         private const int ranked_days = 88;
 
-        private readonly SpriteText rankText, performanceText, relativeText;
         private readonly RankChartLineGraph graph;
         private readonly OsuSpriteText placeholder;
 
         private KeyValuePair<int, int>[] ranks;
+        private int dayIndex;
         public Bindable<User> User = new Bindable<User>();
 
         public RankGraph()
@@ -44,43 +43,20 @@ namespace osu.Game.Overlays.Profile.Header
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = "No recent plays",
-                    TextSize = 14,
-                    Font = @"Exo2.0-RegularItalic",
-                },
-                rankText = new OsuSpriteText
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Font = @"Exo2.0-RegularItalic",
-                    TextSize = primary_textsize
-                },
-                relativeText = new OsuSpriteText
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
-                    Font = @"Exo2.0-RegularItalic",
-                    Y = 25,
-                    TextSize = secondary_textsize
-                },
-                performanceText = new OsuSpriteText
-                {
-                    Anchor = Anchor.BottomCentre,
-                    Origin = Anchor.BottomCentre,
-                    Font = @"Exo2.0-RegularItalic",
-                    TextSize = secondary_textsize
+                    TextSize = 12,
+                    Font = @"Exo2.0-Regular",
                 },
                 graph = new RankChartLineGraph
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    RelativeSizeAxes = Axes.X,
-                    Height = 60,
+                    RelativeSizeAxes = Axes.Both,
                     Y = -secondary_textsize,
                     Alpha = 0,
                 }
             };
 
-            graph.OnBallMove += showHistoryRankTexts;
+            graph.OnBallMove += i => dayIndex = i;
 
             User.ValueChanged += userChanged;
         }
@@ -88,7 +64,7 @@ namespace osu.Game.Overlays.Profile.Header
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            graph.Colour = colours.Yellow;
+            graph.LineColour = colours.Yellow;
         }
 
         private void userChanged(User user)
@@ -97,9 +73,6 @@ namespace osu.Game.Overlays.Profile.Header
 
             if (user?.Statistics?.Ranks.Global == null)
             {
-                rankText.Text = string.Empty;
-                performanceText.Text = string.Empty;
-                relativeText.Text = string.Empty;
                 graph.FadeOut(fade_duration, Easing.Out);
                 ranks = null;
                 return;
@@ -114,27 +87,9 @@ namespace osu.Game.Overlays.Profile.Header
 
                 graph.DefaultValueCount = ranks.Length;
                 graph.Values = ranks.Select(x => -(float)Math.Log(x.Value));
-                graph.SetStaticBallPosition();
             }
 
             graph.FadeTo(ranks.Length > 1 ? 1 : 0, fade_duration, Easing.Out);
-
-            updateRankTexts();
-        }
-
-        private void updateRankTexts()
-        {
-            var user = User.Value;
-
-            performanceText.Text = user.Statistics.PP != null ? $"{user.Statistics.PP:#,0}pp" : string.Empty;
-            rankText.Text = user.Statistics.Ranks.Global > 0 ? $"#{user.Statistics.Ranks.Global:#,0}" : "no rank";
-            relativeText.Text = user.Country != null && user.Statistics.Ranks.Country > 0 ? $"{user.Country.FullName} #{user.Statistics.Ranks.Country:#,0}" : "no rank";
-        }
-
-        private void showHistoryRankTexts(int dayIndex)
-        {
-            rankText.Text = $"#{ranks[dayIndex].Value:#,0}";
-            relativeText.Text = dayIndex + 1 == ranks.Length ? "Now" : $"{ranked_days - ranks[dayIndex].Key} days ago";
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -160,7 +115,6 @@ namespace osu.Game.Overlays.Profile.Header
             if (ranks?.Length > 1)
             {
                 graph.HideBall();
-                updateRankTexts();
             }
 
             base.OnHoverLost(e);
@@ -168,44 +122,62 @@ namespace osu.Game.Overlays.Profile.Header
 
         private class RankChartLineGraph : LineGraph
         {
-            private readonly CircularContainer staticBall;
             private readonly CircularContainer movingBall;
+            private readonly Box ballBg;
+            private readonly Box movingBar;
 
             public Action<int> OnBallMove;
 
             public RankChartLineGraph()
             {
-                Add(staticBall = new CircularContainer
+                Add(movingBar = new Box
                 {
-                    Origin = Anchor.Centre,
-                    Size = new Vector2(8),
-                    Masking = true,
+                    Origin = Anchor.TopCentre,
+                    RelativeSizeAxes = Axes.Y,
+                    Width = 1.5f,
+                    Alpha = 0,
                     RelativePositionAxes = Axes.Both,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
                 });
+
                 Add(movingBall = new CircularContainer
                 {
                     Origin = Anchor.Centre,
-                    Size = new Vector2(8),
+                    Size = new Vector2(18),
                     Alpha = 0,
                     Masking = true,
+                    BorderThickness = 4,
                     RelativePositionAxes = Axes.Both,
-                    Child = new Box { RelativeSizeAxes = Axes.Both }
+                    Child = ballBg = new Box { RelativeSizeAxes = Axes.Both }
                 });
             }
 
-            public void SetStaticBallPosition() => staticBall.Position = new Vector2(1, GetYPosition(Values.Last()));
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                ballBg.Colour = colours.CommunityUserGrayGreenDarkest;
+                movingBall.BorderColour = colours.Yellow;
+                movingBar.Colour = colours.Yellow;
+            }
 
             public void UpdateBallPosition(float mouseXPosition)
             {
                 int index = calculateIndex(mouseXPosition);
                 movingBall.Position = calculateBallPosition(index);
+                movingBar.X = movingBall.X;
                 OnBallMove.Invoke(index);
             }
 
-            public void ShowBall() => movingBall.FadeIn(fade_duration);
+            public void ShowBall()
+            {
+                movingBall.FadeIn(fade_duration);
+                movingBar.FadeIn(fade_duration);
+            }
 
-            public void HideBall() => movingBall.FadeOut(fade_duration);
+            public void HideBall()
+            {
+                movingBall.FadeOut(fade_duration);
+                movingBar.FadeOut(fade_duration);
+            }
 
             private int calculateIndex(float mouseXPosition) => (int)Math.Round(mouseXPosition / DrawWidth * (DefaultValueCount - 1));
 
@@ -214,6 +186,98 @@ namespace osu.Game.Overlays.Profile.Header
                 float y = GetYPosition(Values.ElementAt(index));
                 return new Vector2(index / (float)(DefaultValueCount - 1), y);
             }
+        }
+
+        public string TooltipText => User.Value?.Statistics?.Ranks.Global == null ? "" : $"{ranks[dayIndex].Value:#,##0}|{ranked_days - ranks[dayIndex].Key + 1}";
+
+        public ITooltip GetCustomTooltip() => new RankGraphTooltip(this);
+
+        public class RankGraphTooltip : VisibilityContainer, ITooltip
+        {
+            private readonly RankGraph graph;
+            private readonly OsuSpriteText globalRankingText, timeText;
+            private readonly Box background;
+
+            public string TooltipText { get; set; }
+
+            public RankGraphTooltip(RankGraph graph)
+            {
+                this.graph = graph;
+                AutoSizeAxes = Axes.Both;
+                Masking = true;
+                CornerRadius = 10;
+
+                Children = new Drawable[]
+                {
+                    background = new Box
+                    {
+                        RelativeSizeAxes = Axes.Both
+                    },
+                    new FillFlowContainer
+                    {
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Padding = new MarginPadding(10),
+                        Children = new Drawable[]
+                        {
+                            new FillFlowContainer
+                            {
+                                AutoSizeAxes = Axes.Both,
+                                Direction = FillDirection.Horizontal,
+                                Children = new Drawable[]
+                                {
+                                    new OsuSpriteText
+                                    {
+                                        Font = "Exo2.0-Bold",
+                                        TextSize = 12,
+                                        Text = "Global Ranking "
+                                    },
+                                    globalRankingText = new OsuSpriteText
+                                    {
+                                        Font = "Exo2.0-Regular",
+                                        TextSize = 12,
+                                    }
+                                }
+                            },
+                            timeText = new OsuSpriteText
+                            {
+                                TextSize = 12,
+                                Font = "Exo2.0-Regular"
+                            }
+                        }
+                    }
+                };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                background.Colour = colours.CommunityUserGrayGreenDarker;
+            }
+
+            public void Refresh()
+            {
+                var info = TooltipText.Split('|');
+                globalRankingText.Text = info[0];
+                timeText.Text = info[1] == "0" ? "now" : $"{info[1]} days ago";
+            }
+
+            private bool instantMove = true;
+
+            public void Move(Vector2 pos)
+            {
+                if (instantMove)
+                {
+                    Position = pos;
+                    instantMove = false;
+                }
+                else
+                    this.MoveTo(pos, 200, Easing.OutQuint);
+            }
+
+            protected override void PopIn() => this.FadeIn(200, Easing.OutQuint);
+
+            protected override void PopOut() => this.FadeOut(200, Easing.OutQuint);
         }
     }
 }

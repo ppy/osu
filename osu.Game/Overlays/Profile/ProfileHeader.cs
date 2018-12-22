@@ -15,8 +15,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -36,7 +34,7 @@ namespace osu.Game.Overlays.Profile
         public readonly SupporterIcon SupporterTag;
         private readonly Container coverContainer;
         private readonly OsuSpriteText coverInfoText;
-        private readonly CoverInfoTabControl infoTabControl;
+        private readonly ProfileHeaderTabControl infoTabControl;
 
         private readonly Box headerTopBox;
         private readonly UpdateableAvatar avatar;
@@ -67,9 +65,16 @@ namespace osu.Game.Overlays.Profile
         private readonly Dictionary<ScoreRank, ScoreRankInfo> scoreRankInfos = new Dictionary<ScoreRank, ScoreRankInfo>();
         private readonly OverlinedInfoContainer detailGlobalRank, detailCountryRank;
 
+        private readonly Box headerBadgeBox;
+        private readonly FillFlowContainer badgeFlowContainer;
+        private readonly Container badgeContainer;
+
+        private readonly Box headerBottomBox;
+        private readonly LinkFlowContainer bottomTopLinkContainer;
+        private readonly LinkFlowContainer bottomLinkContainer;
+
         private const float cover_height = 150;
         private const float cover_info_height = 75;
-        private const float info_height = 500;
         private const float avatar_size = 110;
 
         [Resolved(CanBeNull = true)]
@@ -83,12 +88,12 @@ namespace osu.Game.Overlays.Profile
 
         public ProfileHeader()
         {
-            Container headerDetailContainer, expandedDetailContainer;
-            FillFlowContainer hiddenDetailContainer;
+            Container expandedDetailContainer;
+            FillFlowContainer hiddenDetailContainer, headerDetailContainer;
             SpriteIcon expandButtonIcon;
 
             RelativeSizeAxes = Axes.X;
-            Height = cover_height + info_height;
+            AutoSizeAxes = Axes.Y;
 
             Children = new Drawable[]
             {
@@ -137,7 +142,7 @@ namespace osu.Game.Overlays.Profile
                                 }
                             }
                         },
-                        infoTabControl = new CoverInfoTabControl
+                        infoTabControl = new ProfileHeaderTabControl
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
@@ -181,7 +186,7 @@ namespace osu.Game.Overlays.Profile
                                             Size = new Vector2(avatar_size),
                                             Masking = true,
                                             CornerRadius = avatar_size * 0.25f,
-                                    OpenOnClick = { Value = false },
+                                            OpenOnClick = { Value = false },
                                         },
                                         new Container
                                         {
@@ -437,7 +442,7 @@ namespace osu.Game.Overlays.Profile
                                 }
                             }
                         },
-                        headerDetailContainer = new Container
+                        new Container
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
@@ -447,7 +452,7 @@ namespace osu.Game.Overlays.Profile
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                 },
-                                new FillFlowContainer
+                                headerDetailContainer = new FillFlowContainer
                                 {
                                     RelativeSizeAxes = Axes.X,
                                     AutoSizeAxes = Axes.Y,
@@ -539,11 +544,82 @@ namespace osu.Game.Overlays.Profile
                                                     }
                                                 }
                                             }
-                                        }
+                                        },
                                     }
                                 },
                             }
-                        }
+                        },
+                        badgeContainer = new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Alpha = 0,
+                            Children = new Drawable[]
+                            {
+                                headerBadgeBox = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new Container //artificial shadow
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    Height = 3,
+                                    Child = new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = new ColourInfo
+                                        {
+                                            TopLeft = Color4.Black.Opacity(0.2f),
+                                            TopRight = Color4.Black.Opacity(0.2f),
+                                            BottomLeft = Color4.Black.Opacity(0),
+                                            BottomRight = Color4.Black.Opacity(0)
+                                        }
+                                    },
+                                },
+                                badgeFlowContainer = new FillFlowContainer
+                                {
+                                    Direction = FillDirection.Full,
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Margin = new MarginPadding { Top = 5 },
+                                    Spacing = new Vector2(10, 10),
+                                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
+                                }
+                            }
+                        },
+                        new Container
+                        {
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Children = new Drawable[]
+                            {
+                                headerBottomBox = new Box
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                },
+                                new FillFlowContainer
+                                {
+                                    RelativeSizeAxes = Axes.X,
+                                    AutoSizeAxes = Axes.Y,
+                                    Direction = FillDirection.Vertical,
+                                    Padding = new MarginPadding { Horizontal = UserProfileOverlay.CONTENT_X_MARGIN, Vertical = 10 },
+                                    Spacing = new Vector2(0, 10),
+                                    Children = new Drawable[]
+                                    {
+                                        bottomTopLinkContainer = new LinkFlowContainer(text => text.TextSize = 12)
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                        },
+                                        bottomLinkContainer = new LinkFlowContainer(text => text.TextSize = 12)
+                                        {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                        }
+                                    }
+                                }
+                            }
+                        },
                     }
                 }
             };
@@ -556,6 +632,8 @@ namespace osu.Game.Overlays.Profile
             DetailsVisible.ValueChanged += newValue => expandedDetailContainer.Alpha = newValue ? 0 : 1;
             DetailsVisible.ValueChanged += newValue => headerDetailContainer.Alpha = newValue ? 0 : 1;
         }
+
+        private Color4 communityUserGrayGreenLighter;
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuColour colours, TextureStore textures)
@@ -583,9 +661,12 @@ namespace osu.Game.Overlays.Profile
 
             detailGlobalRank.LineColour = colours.Yellow;
             detailCountryRank.LineColour = colours.Yellow;
-        }
 
-        private readonly OsuSpriteText usernameText;
+            headerBadgeBox.Colour = colours.CommunityUserGrayGreenDarkest;
+            headerBottomBox.Colour = colours.CommunityUserGrayGreenDarker;
+
+            communityUserGrayGreenLighter = colours.CommunityUserGrayGreenLighter;
+        }
 
         private User user;
 
@@ -683,67 +764,68 @@ namespace osu.Game.Overlays.Profile
 
             rankGraph.User.Value = user;
 
-            /*
-            if (!string.IsNullOrEmpty(user.Colour))
+            var badges = User.Badges;
+            if (badges.Length > 0)
             {
-                colourBar.Colour = OsuColour.FromHex(user.Colour);
-                colourBar.Show();
+                badgeContainer.Show();
+                for (var index = 0; index < badges.Length; index++)
+                {
+                    int displayIndex = index;
+                    LoadComponentAsync(new DrawableBadge(badges[index]), asyncBadge =>
+                    {
+                        badgeFlowContainer.Add(asyncBadge);
+
+                        // load in stable order regardless of async load order.
+                        badgeFlowContainer.SetLayoutPosition(asyncBadge, displayIndex);
+                    });
+                }
             }
 
-            void boldItalic(SpriteText t) => t.Font = @"Exo2.0-BoldItalic";
-            void lightText(SpriteText t) => t.Alpha = 0.8f;
-
-            OsuSpriteText createScoreText(string text) => new OsuSpriteText
-            {
-                TextSize = 14,
-                Text = text
-            };
-
-            OsuSpriteText createScoreNumberText(string text) => new OsuSpriteText
-            {
-                TextSize = 14,
-                Font = @"Exo2.0-Bold",
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                Text = text
-            };
-
-            if (user.Country != null)
-            {
-                infoTextLeft.AddText("From ", lightText);
-                infoTextLeft.AddText(user.Country.FullName, boldItalic);
-                countryFlag.Country = user.Country;
-            }
-
-            infoTextLeft.NewParagraph();
+            void bold(SpriteText t) => t.Font = @"Exo2.0-Bold";
+            void addSpacer(OsuTextFlowContainer textFlow) => textFlow.AddArbitraryDrawable(new Container { Width = 15 });
 
             if (user.JoinDate.ToUniversalTime().Year < 2008)
             {
-                infoTextLeft.AddText(new DrawableJoinDate(user.JoinDate), lightText);
+                bottomTopLinkContainer.AddText("Here since the beginning");
             }
             else
             {
-                infoTextLeft.AddText("Joined ", lightText);
-                infoTextLeft.AddText(new DrawableJoinDate(user.JoinDate), boldItalic);
+                bottomTopLinkContainer.AddText("Joined ");
+                bottomTopLinkContainer.AddText(new DrawableDate(user.JoinDate), bold);
             }
+
+            addSpacer(bottomTopLinkContainer);
 
             if (user.LastVisit.HasValue)
             {
-                infoTextLeft.NewLine();
-                infoTextLeft.AddText("Last seen ", lightText);
-                infoTextLeft.AddText(new DrawableDate(user.LastVisit.Value), boldItalic);
-                infoTextLeft.NewParagraph();
+                bottomTopLinkContainer.AddText("Last seen ");
+                bottomTopLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), bold);
             }
 
-            if (user.PlayStyle?.Length > 0)
+            addSpacer(bottomTopLinkContainer);
+
+            bottomTopLinkContainer.AddText("Contributed ");
+            bottomTopLinkContainer.AddLink($@"{user.PostCount} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: bold);
+
+            void tryAddInfo(FontAwesome icon, string content, string link = null)
             {
-                infoTextLeft.AddText("Plays with ", lightText);
-                infoTextLeft.AddText(string.Join(", ", user.PlayStyle), boldItalic);
-            }
+                if (string.IsNullOrEmpty(content)) return;
 
-            infoTextLeft.NewLine();
-            infoTextLeft.AddText("Contributed ", lightText);
-            infoTextLeft.AddLink($@"{user.PostCount} forum posts", url: $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: boldItalic);
+                bottomLinkContainer.AddIcon(icon, text =>
+                {
+                    text.TextSize = 10;
+                    text.Colour = communityUserGrayGreenLighter;
+                });
+                if (link != null)
+                {
+                    bottomLinkContainer.AddLink(" " + content, link, creationParameters: bold);
+                }
+                else
+                {
+                    bottomLinkContainer.AddText(" " + content, bold);
+                }
+                addSpacer(bottomLinkContainer);
+            }
 
             string websiteWithoutProtcol = user.Website;
             if (!string.IsNullOrEmpty(websiteWithoutProtcol))
@@ -753,185 +835,16 @@ namespace osu.Game.Overlays.Profile
                     websiteWithoutProtcol = websiteWithoutProtcol.Substring(protocolIndex + 2);
             }
 
-            tryAddInfoRightLine(FontAwesome.fa_map_marker, user.Location);
-            tryAddInfoRightLine(FontAwesome.fa_heart_o, user.Interests);
-            tryAddInfoRightLine(FontAwesome.fa_suitcase, user.Occupation);
-            infoTextRight.NewParagraph();
+            tryAddInfo(FontAwesome.fa_map_marker, user.Location);
+            tryAddInfo(FontAwesome.fa_heart_o, user.Interests);
+            tryAddInfo(FontAwesome.fa_suitcase, user.Occupation);
+            bottomLinkContainer.NewLine();
             if (!string.IsNullOrEmpty(user.Twitter))
-                tryAddInfoRightLine(FontAwesome.fa_twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
-            tryAddInfoRightLine(FontAwesome.fa_gamepad, user.Discord);
-            tryAddInfoRightLine(FontAwesome.fa_skype, user.Skype, @"skype:" + user.Skype + @"?chat");
-            tryAddInfoRightLine(FontAwesome.fa_lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
-            tryAddInfoRightLine(FontAwesome.fa_globe, websiteWithoutProtcol, user.Website);
-
-            if (user.Statistics != null)
-            {
-                levelBadge.Show();
-                levelText.Text = user.Statistics.Level.Current.ToString();
-
-                scoreText.Add(createScoreText("Ranked Score"));
-                scoreNumberText.Add(createScoreNumberText(user.Statistics.RankedScore.ToString(@"#,0")));
-                scoreText.Add(createScoreText("Accuracy"));
-                scoreNumberText.Add(createScoreNumberText($"{user.Statistics.Accuracy:0.##}%"));
-                scoreText.Add(createScoreText("Play Count"));
-                scoreNumberText.Add(createScoreNumberText(user.Statistics.PlayCount.ToString(@"#,0")));
-                scoreText.Add(createScoreText("Total Score"));
-                scoreNumberText.Add(createScoreNumberText(user.Statistics.TotalScore.ToString(@"#,0")));
-                scoreText.Add(createScoreText("Total Hits"));
-                scoreNumberText.Add(createScoreNumberText(user.Statistics.TotalHits.ToString(@"#,0")));
-                scoreText.Add(createScoreText("Max Combo"));
-                scoreNumberText.Add(createScoreNumberText(user.Statistics.MaxCombo.ToString(@"#,0")));
-                scoreText.Add(createScoreText("Replays Watched by Others"));
-                scoreNumberText.Add(createScoreNumberText(user.Statistics.ReplaysWatched.ToString(@"#,0")));
-
-                gradeSSPlus.DisplayCount = user.Statistics.GradesCount.SSPlus;
-                gradeSSPlus.Show();
-                gradeSS.DisplayCount = user.Statistics.GradesCount.SS;
-                gradeSS.Show();
-                gradeSPlus.DisplayCount = user.Statistics.GradesCount.SPlus;
-                gradeSPlus.Show();
-                gradeS.DisplayCount = user.Statistics.GradesCount.S;
-                gradeS.Show();
-                gradeA.DisplayCount = user.Statistics.GradesCount.A;
-                gradeA.Show();
-
-                rankGraph.User.Value = user;
-            }
-
-            badgeContainer.ShowBadges(user.Badges);*/
-        }
-
-        private class CoverInfoTabControl : TabControl<string>
-        {
-            private readonly Box bar;
-
-            private Color4 accentColour;
-            public Color4 AccentColour
-            {
-                get => accentColour;
-                set
-                {
-                    if (accentColour == value) return;
-
-                    accentColour = value;
-
-                    bar.Colour = value;
-
-                    foreach (TabItem<string> tabItem in TabContainer)
-                    {
-                        ((CoverInfoTabItem)tabItem).AccentColour = value;
-                    }
-                }
-            }
-
-            public MarginPadding Padding
-            {
-                set => TabContainer.Padding = value;
-                get => TabContainer.Padding;
-            }
-
-            public CoverInfoTabControl()
-            {
-                TabContainer.Masking = false;
-                TabContainer.Spacing = new Vector2(20, 0);
-
-                AddInternal(bar = new Box
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Height = 2,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.CentreLeft
-                });
-            }
-
-            protected override Dropdown<string> CreateDropdown() => null;
-
-            protected override TabItem<string> CreateTabItem(string value) => new CoverInfoTabItem(value)
-            {
-                AccentColour = AccentColour
-            };
-
-            private class CoverInfoTabItem : TabItem<string>
-            {
-                private readonly OsuSpriteText text;
-                private readonly Drawable bar;
-
-                private Color4 accentColour;
-                public Color4 AccentColour
-                {
-                    get => accentColour;
-                    set
-                    {
-                        accentColour = value;
-
-                        bar.Colour = value;
-                        if (!Active) text.Colour = value;
-                    }
-                }
-
-                public CoverInfoTabItem(string value)
-                    : base(value)
-                {
-                    AutoSizeAxes = Axes.X;
-                    RelativeSizeAxes = Axes.Y;
-
-                    Children = new[]
-                    {
-                        text = new OsuSpriteText
-                        {
-                            Margin = new MarginPadding { Bottom = 15 },
-                            Origin = Anchor.BottomLeft,
-                            Anchor = Anchor.BottomLeft,
-                            Text = value,
-                            TextSize = 14,
-                            Font = "Exo2.0-Bold",
-                        },
-                        bar = new Circle
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            Height = 0,
-                            Origin = Anchor.CentreLeft,
-                            Anchor = Anchor.BottomLeft,
-                        },
-                        new HoverClickSounds()
-                    };
-                }
-
-                protected override bool OnHover(HoverEvent e)
-                {
-                    if (!Active)
-                        onActivated(true);
-                    return base.OnHover(e);
-                }
-
-                protected override void OnHoverLost(HoverLostEvent e)
-                {
-                    base.OnHoverLost(e);
-
-                    if (!Active)
-                        OnDeactivated();
-                }
-
-                protected override void OnActivated()
-                {
-                    onActivated();
-                }
-
-                protected override void OnDeactivated()
-                {
-                    text.FadeColour(AccentColour, 120, Easing.InQuad);
-                    bar.ResizeHeightTo(0, 120, Easing.InQuad);
-                    text.Font = "Exo2.0-Medium";
-                }
-
-                private void onActivated(bool fake = false)
-                {
-                    text.FadeColour(Color4.White, 120, Easing.InQuad);
-                    bar.ResizeHeightTo(7.5f, 120, Easing.InQuad);
-                    if (!fake)
-                        text.Font = "Exo2.0-Bold";
-                }
-            }
+                tryAddInfo(FontAwesome.fa_twitter, "@" + user.Twitter, $@"https://twitter.com/{user.Twitter}");
+            tryAddInfo(FontAwesome.fa_gamepad, user.Discord); //todo: update fontawesome to include discord logo
+            tryAddInfo(FontAwesome.fa_skype, user.Skype, @"skype:" + user.Skype + @"?chat");
+            tryAddInfo(FontAwesome.fa_lastfm, user.Lastfm, $@"https://last.fm/users/{user.Lastfm}");
+            tryAddInfo(FontAwesome.fa_link, websiteWithoutProtcol, user.Website);
         }
 
         private class UserStatsLine : Container
@@ -1107,6 +1020,38 @@ namespace osu.Game.Overlays.Profile
             {
                 rankSprite.Texture = textures.Get($"Grades/{rank.GetDescription()}");
             }
+        }
+
+        private class DrawableBadge : CompositeDrawable, IHasTooltip
+        {
+            public static readonly Vector2 DRAWABLE_BADGE_SIZE = new Vector2(86, 40);
+
+            private readonly Badge badge;
+
+            public DrawableBadge(Badge badge)
+            {
+                this.badge = badge;
+                Size = DRAWABLE_BADGE_SIZE;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(LargeTextureStore textures)
+            {
+                InternalChild = new Sprite
+                {
+                    FillMode = FillMode.Fit,
+                    RelativeSizeAxes = Axes.Both,
+                    Texture = textures.Get(badge.ImageUrl),
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                InternalChild.FadeInFromZero(200);
+            }
+
+            public string TooltipText => badge.Description;
         }
     }
 }
