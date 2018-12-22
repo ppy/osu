@@ -90,7 +90,7 @@
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
     <Reference Include="FFmpeg.AutoGen">
-      <HintPath>..\packages\FFmpeg.AutoGen.4.0.0.4\lib\netstandard2.0\FFmpeg.AutoGen.dll</HintPath>
+      <HintPath>..\packages\FFmpeg.AutoGen.4.1.0.1\lib\netstandard2.0\FFmpeg.AutoGen.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Annotations">
       <HintPath>..\packages\JetBrains.Annotations.2018.2.1\lib\netstandard2.0\JetBrains.Annotations.dll</HintPath>
@@ -102,19 +102,22 @@
       <HintPath>..\packages\ManagedBass.Fx.2.0.1\lib\Xamarin.iOS\ManagedBass.Fx.dll</HintPath>
     </Reference>
     <Reference Include="Markdig">
-      <HintPath>..\packages\Markdig.0.15.0\lib\netstandard1.1\Markdig.dll</HintPath>
+      <HintPath>..\packages\Markdig.0.15.4\lib\netstandard2.0\Markdig.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\packages\NUnit.3.11.0\lib\netstandard2.0\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Diagnostics.Runtime">
       <HintPath>..\packages\ppy.Microsoft.Diagnostics.Runtime.0.9.180305.1\lib\netstandard2.0\Microsoft.Diagnostics.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="osuTK">
-      <HintPath>..\packages\ppy.osuTK.NS20.1.0.45\lib\netstandard2.0\osuTK.dll</HintPath>
-    </Reference>
-    <Reference Include="osuTK.iOS">
-      <HintPath>..\packages\ppy.osuTK.iOS.1.0.41\lib\xamarinios10\osuTK.iOS.dll</HintPath>
+      <HintPath>..\packages\ppy.osuTK.NS20.1.0.50\lib\netstandard2.0\osuTK.dll</HintPath>
     </Reference>
     <Reference Include="SharpFNT">
-      <HintPath>..\packages\SharpFNT.1.0.0\lib\netstandard1.3\SharpFNT.dll</HintPath>
+      <HintPath>..\packages\SharpFNT.1.0.1\lib\netstandard1.3\SharpFNT.dll</HintPath>
     </Reference>
     <Reference Include="System.Buffers">
       <HintPath>..\packages\System.Buffers.4.5.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
@@ -131,12 +134,6 @@
     <Reference Include="System.Memory">
       <HintPath>..\packages\System.Memory.4.5.1\lib\netstandard2.0\System.Memory.dll</HintPath>
     </Reference>
-    <Reference Include="SixLabors.Core">
-      <HintPath>..\packages\SixLabors.Core.1.0.0-beta0006\lib\netstandard1.1\SixLabors.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="SixLabors.ImageSharp">
-      <HintPath>..\packages\SixLabors.ImageSharp.1.0.0-beta0005\lib\netstandard2.0\SixLabors.ImageSharp.dll</HintPath>
-    </Reference>
     <Reference Include="System.Threading.Tasks.Extensions">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.3.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
@@ -144,37 +141,22 @@
       <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.2.9.0\lib\netstandard1.3\Microsoft.CodeAnalysis.dll</HintPath>
+      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.2.10.0\lib\netstandard1.3\Microsoft.CodeAnalysis.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis.CSharp">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.2.9.0\lib\netstandard1.3\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.2.10.0\lib\netstandard1.3\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
     </Reference>
     <Reference Include="osu.Framework">
-      <HintPath>..\packages\ppy.osu.Framework.0.0.7645\lib\netstandard2.0\osu.Framework.dll</HintPath>
+      <HintPath>..\packages\ppy.osu.Framework.0.0.7742\lib\netstandard2.0\osu.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="osuTK.iOS">
+      <HintPath>..\packages\ppy.osuTK.iOS.1.0.50\lib\xamarinios10\osuTK.iOS.dll</HintPath>
     </Reference>
     <Reference Include="osu.Framework.iOS">
-      <HintPath>..\packages\ppy.osu.Framework.iOS.0.0.7645\lib\xamarinios10\osu.Framework.iOS.dll</HintPath>
+      <HintPath>..\packages\ppy.osu.Framework.iOS.0.0.7742\lib\xamarinios10\osu.Framework.iOS.dll</HintPath>
     </Reference>
     <Reference Include="Humanizer">
       <HintPath>..\packages\Humanizer.Core.2.5.16\lib\netstandard2.0\Humanizer.dll</HintPath>
-    </Reference>
-    <Reference Include="Remotion.Linq">
-      <HintPath>..\packages\Remotion.Linq.2.2.0\lib\portable-net45+win+wpa81+wp80\Remotion.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.core">
-      <HintPath>..\packages\SQLitePCLRaw.core.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.provider.sqlite3">
-      <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_green">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
-    </Reference>
-    <Reference Include="SQLitePCLRaw.batteries_v2">
-      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Diagnostics.DiagnosticSource">
-      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.5.1\lib\netstandard1.3\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.EntityFrameworkCore.Abstractions">
       <HintPath>..\packages\Microsoft.EntityFrameworkCore.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Abstractions.dll</HintPath>
@@ -188,8 +170,26 @@
     <Reference Include="Microsoft.Extensions.Logging.Abstractions">
       <HintPath>..\packages\Microsoft.Extensions.Logging.Abstractions.2.2.0\lib\netstandard2.0\Microsoft.Extensions.Logging.Abstractions.dll</HintPath>
     </Reference>
+    <Reference Include="Remotion.Linq">
+      <HintPath>..\packages\Remotion.Linq.2.2.0\lib\portable-net45+win+wpa81+wp80\Remotion.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.core">
+      <HintPath>..\packages\SQLitePCLRaw.core.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.core.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Data.Sqlite">
       <HintPath>..\packages\Microsoft.Data.Sqlite.Core.2.2.0\lib\netstandard2.0\Microsoft.Data.Sqlite.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.provider.sqlite3">
+      <HintPath>..\packages\SQLitePCLRaw.provider.sqlite3.ios_unified.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.provider.sqlite3.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_green">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_green.dll</HintPath>
+    </Reference>
+    <Reference Include="SQLitePCLRaw.batteries_v2">
+      <HintPath>..\packages\SQLitePCLRaw.bundle_green.1.1.11\lib\Xamarin.iOS10\SQLitePCLRaw.batteries_v2.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Diagnostics.DiagnosticSource">
+      <HintPath>..\packages\System.Diagnostics.DiagnosticSource.4.5.1\lib\netstandard1.3\System.Diagnostics.DiagnosticSource.dll</HintPath>
     </Reference>
     <Reference Include="System.Interactive.Async">
       <HintPath>..\packages\System.Interactive.Async.3.2.0\lib\netstandard2.0\System.Interactive.Async.dll</HintPath>
@@ -224,20 +224,14 @@
     <Reference Include="Microsoft.EntityFrameworkCore.Relational">
       <HintPath>..\packages\Microsoft.EntityFrameworkCore.Relational.2.2.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Relational.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.EntityFrameworkCore.Sqlite">
+      <HintPath>..\packages\Microsoft.EntityFrameworkCore.Sqlite.Core.2.2.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Sqlite.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.DotNet.PlatformAbstractions">
       <HintPath>..\packages\Microsoft.DotNet.PlatformAbstractions.2.1.0\lib\netstandard1.3\Microsoft.DotNet.PlatformAbstractions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Extensions.DependencyModel">
       <HintPath>..\packages\Microsoft.Extensions.DependencyModel.2.1.0\lib\netstandard1.6\Microsoft.Extensions.DependencyModel.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.EntityFrameworkCore.Sqlite">
-      <HintPath>..\packages\Microsoft.EntityFrameworkCore.Sqlite.Core.2.2.0\lib\netstandard2.0\Microsoft.EntityFrameworkCore.Sqlite.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.3.11.0\lib\netstandard2.0\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="SharpCompress">
       <HintPath>..\packages\SharpCompress.0.22.0\lib\netstandard2.0\SharpCompress.dll</HintPath>
@@ -247,6 +241,12 @@
     </Reference>
     <Reference Include="SharpRaven">
       <HintPath>..\packages\SharpRaven.2.4.0\lib\netstandard2.0\SharpRaven.dll</HintPath>
+    </Reference>
+    <Reference Include="SixLabors.Core">
+      <HintPath>..\packages\SixLabors.Core.1.0.0-dev000094\lib\netstandard2.0\SixLabors.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="SixLabors.ImageSharp">
+      <HintPath>..\packages\SixLabors.ImageSharp.1.0.0-dev002298\lib\netstandard2.0\SixLabors.ImageSharp.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -306,6 +306,9 @@
     <Compile Include="AppDelegate.cs" />
   </ItemGroup>
   <ItemGroup>
+    <LinkDescription Include="Linker.xml" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\osu.Game\osu.Game.csproj">
       <Project>{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}</Project>
       <Name>osu.Game</Name>
@@ -330,9 +333,6 @@
       <Project>{F167E17A-7DE6-4AF5-B920-A5112296C695}</Project>
       <Name>osu.Game.Rulesets.Taiko</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <LinkDescription Include="Linker.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets')" />
