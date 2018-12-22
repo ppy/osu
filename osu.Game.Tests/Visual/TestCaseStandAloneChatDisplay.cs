@@ -68,31 +68,33 @@ namespace osu.Game.Tests.Visual
             chatDisplay.Channel.Value = testChannel;
             chatDisplay2.Channel.Value = testChannel;
 
-            AddStep("message from admin", () => testChannel.AddLocalEcho(new LocalEchoMessage
+            int sequence = 0;
+
+            AddStep("message from admin", () => testChannel.AddNewMessages(new Message(sequence++)
             {
                 Sender = admin,
                 Content = "I am a wang!"
             }));
 
-            AddStep("message from team red", () => testChannel.AddLocalEcho(new LocalEchoMessage
+            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(sequence++)
             {
                 Sender = redUser,
                 Content = "I am team red."
             }));
 
-            AddStep("message from team red", () => testChannel.AddLocalEcho(new LocalEchoMessage
+            AddStep("message from team red", () => testChannel.AddNewMessages(new Message(sequence++)
             {
                 Sender = redUser,
                 Content = "I plan to win!"
             }));
 
-            AddStep("message from team blue", () => testChannel.AddLocalEcho(new LocalEchoMessage
+            AddStep("message from team blue", () => testChannel.AddNewMessages(new Message(sequence++)
             {
                 Sender = blueUser,
                 Content = "Not on my watch. Prepare to eat saaaaaaaaaand. Lots and lots of saaaaaaand."
             }));
 
-            AddStep("message from admin", () => testChannel.AddLocalEcho(new LocalEchoMessage
+            AddStep("message from admin", () => testChannel.AddNewMessages(new Message(sequence++)
             {
                 Sender = admin,
                 Content = "Okay okay, calm down guys. Let's do this!"
