@@ -19,11 +19,11 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Play;
-using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions;
 using osu.Framework.Localisation;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking
