@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
@@ -39,6 +40,7 @@ namespace osu.Game.Overlays.Profile
         private readonly Box headerTopBox;
         private readonly UpdateableAvatar avatar;
         private readonly OsuSpriteText usernameText;
+        private readonly ExternalLinkButton openUserExternally;
         private readonly OsuSpriteText titleText;
         private readonly DrawableFlag userFlag;
         private readonly OsuSpriteText userCountryText;
@@ -76,6 +78,13 @@ namespace osu.Game.Overlays.Profile
         private const float cover_height = 150;
         private const float cover_info_height = 75;
         private const float avatar_size = 110;
+        private static readonly Dictionary<string, string> play_styles = new Dictionary<string, string>
+        {
+            {"keyboard", "Keyboard"},
+            {"mouse", "Mouse"},
+            {"tablet", "Tablet"},
+            {"touch", "Touch Screen"},
+        };
 
         [Resolved(CanBeNull = true)]
         private ChannelManager channelManager { get; set; }
@@ -195,10 +204,24 @@ namespace osu.Game.Overlays.Profile
                                             Padding = new MarginPadding { Left = 10 },
                                             Children = new Drawable[]
                                             {
-                                                usernameText = new OsuSpriteText
+                                                new FillFlowContainer
                                                 {
-                                                    Font = "Exo2.0-Regular",
-                                                    TextSize = 24
+                                                    AutoSizeAxes = Axes.Both,
+                                                    Direction = FillDirection.Horizontal,
+                                                    Children = new Drawable[]
+                                                    {
+                                                        usernameText = new OsuSpriteText
+                                                        {
+                                                            Font = "Exo2.0-Regular",
+                                                            TextSize = 24
+                                                        },
+                                                        openUserExternally = new ExternalLinkButton
+                                                        {
+                                                            Margin = new MarginPadding { Left = 5 },
+                                                            Anchor = Anchor.CentreLeft,
+                                                            Origin = Anchor.CentreLeft,
+                                                        },
+                                                    }
                                                 },
                                                 new FillFlowContainer
                                                 {
@@ -694,6 +717,7 @@ namespace osu.Game.Overlays.Profile
 
             avatar.User = User;
             usernameText.Text = user.Username;
+            openUserExternally.Link = $@"https://osu.ppy.sh/users/{user.Id}";
             userFlag.Country = user.Country;
             userCountryText.Text = user.Country?.FullName;
             SupporterTag.SupporterLevel = user.SupportLevel;
@@ -796,16 +820,24 @@ namespace osu.Game.Overlays.Profile
 
             addSpacer(bottomTopLinkContainer);
 
+            if (user.PlayStyle?.Length > 0)
+            {
+                bottomTopLinkContainer.AddText("Plays with ");
+                bottomTopLinkContainer.AddText(string.Join(", ", user.PlayStyle.Select(style => play_styles[style])), bold);
+
+                addSpacer(bottomTopLinkContainer);
+            }
+
             if (user.LastVisit.HasValue)
             {
                 bottomTopLinkContainer.AddText("Last seen ");
                 bottomTopLinkContainer.AddText(new DrawableDate(user.LastVisit.Value), bold);
+
+                addSpacer(bottomTopLinkContainer);
             }
 
-            addSpacer(bottomTopLinkContainer);
-
             bottomTopLinkContainer.AddText("Contributed ");
-            bottomTopLinkContainer.AddLink($@"{user.PostCount} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: bold);
+            bottomTopLinkContainer.AddLink($@"{user.PostCount:#,##0} forum posts", $"https://osu.ppy.sh/users/{user.Id}/posts", creationParameters: bold);
 
             void tryAddInfo(FontAwesome icon, string content, string link = null)
             {
