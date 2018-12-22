@@ -181,6 +181,7 @@ namespace osu.Game.Overlays.Profile
                                             Size = new Vector2(avatar_size),
                                             Masking = true,
                                             CornerRadius = avatar_size * 0.25f,
+                                    OpenOnClick = { Value = false },
                                         },
                                         new Container
                                         {
@@ -583,6 +584,8 @@ namespace osu.Game.Overlays.Profile
             detailGlobalRank.LineColour = colours.Yellow;
             detailCountryRank.LineColour = colours.Yellow;
         }
+
+        private readonly OsuSpriteText usernameText;
 
         private User user;
 
