@@ -28,7 +28,6 @@ namespace osu.Game.Tests.Visual
             typeof(UserProfileOverlay),
             typeof(RankGraph),
             typeof(LineGraph),
-            typeof(BadgeContainer),
             typeof(SectionsContainer<>),
             typeof(SupporterIcon)
         };
