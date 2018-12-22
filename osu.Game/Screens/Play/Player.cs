@@ -28,7 +28,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 
@@ -288,7 +287,7 @@ namespace osu.Game.Screens.Play
                     if (RulesetContainer.Replay == null)
                         scoreManager.Import(score, true);
 
-                    Push(CreateResults(score));
+                    Push(new SoloResults(score));
 
                     onCompletionEvent = null;
                 });
@@ -432,7 +431,5 @@ namespace osu.Game.Screens.Play
             if (storyboardVisible && beatmap.Storyboard.ReplacesBackground)
                 Background?.FadeTo(0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
-
-        protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
     }
 }

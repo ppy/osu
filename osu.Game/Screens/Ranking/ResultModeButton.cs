@@ -10,18 +10,17 @@ using osu.Game.Graphics;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Game.Screens.Ranking.Types;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ResultModeButton : TabItem<IResultType>
+    public class ResultModeButton : TabItem<IResultPageInfo>
     {
         private readonly FontAwesome icon;
         private Color4 activeColour;
         private Color4 inactiveColour;
         private CircularContainer colouredPart;
 
-        public ResultModeButton(IResultType mode)
+        public ResultModeButton(IResultPageInfo mode)
             : base(mode)
         {
             icon = mode.Icon;
