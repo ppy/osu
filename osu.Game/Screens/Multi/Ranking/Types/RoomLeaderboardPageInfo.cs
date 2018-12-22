@@ -6,18 +6,17 @@ using osu.Game.Graphics;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Ranking.Pages;
-using osu.Game.Screens.Ranking.Pages;
-using osu.Game.Screens.Ranking.Types;
+using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Multi.Ranking.Types
 {
-    public class RoomRankingResultType : IResultType
+    public class RoomLeaderboardPageInfo : IResultPageInfo
     {
         private readonly ScoreInfo score;
         private readonly WorkingBeatmap beatmap;
         private readonly Room room;
 
-        public RoomRankingResultType(ScoreInfo score, WorkingBeatmap beatmap, Room room)
+        public RoomLeaderboardPageInfo(ScoreInfo score, WorkingBeatmap beatmap, Room room)
         {
             this.score = score;
             this.beatmap = beatmap;
@@ -25,6 +24,8 @@ namespace osu.Game.Screens.Multi.Ranking.Types
         }
 
         public FontAwesome Icon => FontAwesome.fa_list;
+
+        public string Name => "Room Leaderboard";
 
         public virtual ResultsPage CreatePage() => new RoomRankingResultsPage(score, beatmap, room);
     }

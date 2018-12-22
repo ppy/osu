@@ -12,7 +12,7 @@ using osu.Game.Scoring;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Screens.Ranking.Pages
+namespace osu.Game.Screens.Ranking
 {
     public abstract class ResultsPage : Container
     {
