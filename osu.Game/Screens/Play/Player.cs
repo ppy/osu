@@ -28,7 +28,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
-using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 
@@ -288,7 +287,7 @@ namespace osu.Game.Screens.Play
                     if (RulesetContainer.Replay == null)
                         scoreManager.Import(score, true);
 
-                    Push(new Results(score));
+                    Push(new SoloResults(score));
 
                     onCompletionEvent = null;
                 });

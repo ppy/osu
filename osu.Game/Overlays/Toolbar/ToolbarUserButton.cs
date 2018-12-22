@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.Toolbar
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 CornerRadius = 4,
+                OpenOnClick = { Value = false },
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,
