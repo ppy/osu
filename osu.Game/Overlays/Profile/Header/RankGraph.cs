@@ -190,19 +190,17 @@ namespace osu.Game.Overlays.Profile.Header
 
         public string TooltipText => User.Value?.Statistics?.Ranks.Global == null ? "" : $"{ranks[dayIndex].Value:#,##0}|{ranked_days - ranks[dayIndex].Key + 1}";
 
-        public ITooltip GetCustomTooltip() => new RankGraphTooltip(this);
+        public ITooltip GetCustomTooltip() => new RankGraphTooltip();
 
         public class RankGraphTooltip : VisibilityContainer, ITooltip
         {
-            private readonly RankGraph graph;
             private readonly OsuSpriteText globalRankingText, timeText;
             private readonly Box background;
 
             public string TooltipText { get; set; }
 
-            public RankGraphTooltip(RankGraph graph)
+            public RankGraphTooltip()
             {
-                this.graph = graph;
                 AutoSizeAxes = Axes.Both;
                 Masking = true;
                 CornerRadius = 10;

@@ -353,7 +353,6 @@ namespace osu.Game.Overlays.Profile
                                                 },
                                             }
                                         },
-
                                     }
                                 },
                                 new Container
