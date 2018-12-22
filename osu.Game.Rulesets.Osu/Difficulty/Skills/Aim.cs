@@ -3,7 +3,6 @@
 
 using System;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
-using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
@@ -13,30 +12,39 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     public class Aim : Skill
     {
         private const double angle_bonus_begin = 5 * Math.PI / 12;
+        private const double timing_threshold = 107;
+        private const double min_distance_for_bonus = 90;
+
+        private const double angle_threshold = Math.PI / 4;
 
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;
 
         protected override double StrainValueOf(OsuDifficultyHitObject current)
         {
-            double angleBonus = 0;
-
             double result = 0;
 
             if (Previous.Count > 0)
             {
-                if (current.Angle != null)
+                if (current.Angle != null && current.Angle.Value > angle_bonus_begin)
                 {
-                    angleBonus = Math.Min(
-                        (Previous[0].JumpDistance - STREAM_SPACING_THRESHOLD) * Math.Sin(current.Angle.Value - angle_bonus_begin),
-                        (current.JumpDistance - STREAM_SPACING_THRESHOLD) * Math.Sin(current.Angle.Value - angle_bonus_begin)
-                    );
-                }
+                    var angleBonus = Math.Sqrt(
+                        Math.Max(0, Previous[0].JumpDistance + Previous[0].TravelDistance - min_distance_for_bonus)
+                        * Math.Min(
+                            Math.Sin(current.Angle.Value - angle_bonus_begin),
+                            Math.Sin(angle_threshold))
+                        * (Math.Max(0, current.JumpDistance - min_distance_for_bonus)
+                           * Math.Min(
+                               Math.Sin(current.Angle.Value - angle_bonus_begin),
+                               Math.Sin(angle_threshold))));
 
-                result = 2 * Math.Pow(Math.Max(0, angleBonus), 0.99) / Previous[0].StrainTime;
+                    result = 2 * Math.Pow(Math.Max(0, angleBonus), 0.99) / Math.Max(Previous[0].StrainTime, timing_threshold);
+                }
             }
 
-            return result + (Math.Pow(current.TravelDistance, 0.99) + Math.Pow(current.JumpDistance, 0.99)) / current.StrainTime;
+            return Math.Max(
+                result + (Math.Pow(current.TravelDistance, 0.99) + Math.Pow(current.JumpDistance, 0.99)) / Math.Max(current.StrainTime, timing_threshold),
+                (Math.Pow(current.TravelDistance, 0.99) + Math.Pow(current.JumpDistance, 0.99)) / current.StrainTime);
         }
     }
 }
