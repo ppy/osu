@@ -3,8 +3,8 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Screens;
 using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Lounge;
 
 namespace osu.Game.Tests.Visual
 {
@@ -13,15 +13,31 @@ namespace osu.Game.Tests.Visual
     {
         public TestCaseMultiHeader()
         {
-            LoungeScreen loungeScreen;
+            int index = 0;
+
+            OsuScreen currentScreen = new TestMultiplayerScreen(index);
+
             Children = new Drawable[]
             {
-                loungeScreen = new LoungeScreen(null)
-                {
-                    Padding = new MarginPadding { Top = Header.HEIGHT },
-                },
-                new Header(loungeScreen),
+                currentScreen,
+                new Header(currentScreen)
             };
+
+            AddStep("push multi screen", () => currentScreen.Push(currentScreen = new TestMultiplayerScreen(++index)));
+        }
+
+        private class TestMultiplayerScreen : OsuScreen, IMultiplayerScreen
+        {
+            private readonly int index;
+
+            public string ShortTitle => $"Screen {index}";
+
+            public TestMultiplayerScreen(int index)
+            {
+                this.index = index;
+            }
+
+            public override string ToString() => ShortTitle;
         }
     }
 }
