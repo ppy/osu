@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Multi.Match
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
 
         [Resolved(CanBeNull = true)]
@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Multi.Match
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
 
-            game.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
+            game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
         }
 
         private void setMods(IEnumerable<Mod> mods)
@@ -133,7 +133,7 @@ namespace osu.Game.Screens.Multi.Match
             if (ruleset == null)
                 return;
 
-            game.ForcefullySetRuleset(ruleset);
+            game?.ForcefullySetRuleset(ruleset);
         }
 
         private void addPlaylistItem(PlaylistItem item)

@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         private readonly Room room;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private ChannelManager channelManager { get; set; }
 
         public MatchChatDisplay(Room room)
@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         private void updateChannel()
         {
             if (room.RoomID.Value != null)
-                Channel.Value = channelManager.JoinChannel(new Channel { Id = room.ChannelId, Type = ChannelType.Multiplayer, Name = $"#mp_{room.RoomID}" });
+                Channel.Value = channelManager?.JoinChannel(new Channel { Id = room.ChannelId, Type = ChannelType.Multiplayer, Name = $"#mp_{room.RoomID}" });
         }
     }
 }
