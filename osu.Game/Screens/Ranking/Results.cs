@@ -19,7 +19,6 @@ using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
-using osu.Game.Screens.Ranking.Types;
 
 namespace osu.Game.Screens.Ranking
 {
@@ -265,7 +264,7 @@ namespace osu.Game.Screens.Ranking
                 },
             };
 
-            foreach (var t in CreateResultTypes())
+            foreach (var t in CreateResultPages())
                 modeChangeButtons.AddItem(t);
             modeChangeButtons.Current.Value = modeChangeButtons.Items.FirstOrDefault();
 
@@ -281,6 +280,6 @@ namespace osu.Game.Screens.Ranking
             }, true);
         }
 
-        protected abstract IEnumerable<IResultType> CreateResultTypes();
+        protected abstract IEnumerable<IResultPageInfo> CreateResultPages();
     }
 }

@@ -15,10 +15,10 @@ namespace osu.Game.Screens.Play
         {
         }
 
-        protected override IEnumerable<IResultType> CreateResultTypes() => new IResultType[]
+        protected override IEnumerable<IResultPageInfo> CreateResultPages() => new IResultPageInfo[]
         {
-            new ScoreResultType(Score, Beatmap),
-            new RankingResultType(Score, Beatmap)
+            new ScoreOverviewPageInfo(Score, Beatmap),
+            new BeatmapLeaderboardPageInfo(Score, Beatmap)
         };
     }
 }
