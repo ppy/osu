@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Multi.Lounge
         private readonly RoomsContainer rooms;
         private readonly Action<Screen> pushGameplayScreen;
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private RoomManager roomManager { get; set; }
 
         public override string Title => "Lounge";
@@ -80,7 +80,8 @@ namespace osu.Game.Screens.Multi.Lounge
         [BackgroundDependencyLoader]
         private void load()
         {
-            roomManager.OpenRequested += Open;
+            if (roomManager != null)
+                roomManager.OpenRequested += Open;
         }
 
         protected override void UpdateAfterChildren()
@@ -130,7 +131,7 @@ namespace osu.Game.Screens.Multi.Lounge
         private void filterRooms()
         {
             rooms.Filter(Filter.CreateCriteria());
-            roomManager.Filter(Filter.CreateCriteria());
+            roomManager?.Filter(Filter.CreateCriteria());
         }
 
         public void Open(Room room)
