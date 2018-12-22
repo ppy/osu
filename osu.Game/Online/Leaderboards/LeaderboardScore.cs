@@ -13,7 +13,6 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Users;
@@ -22,14 +21,11 @@ using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public static class LeaderboardScore
-    {
-        public const float HEIGHT = 60;
-    }
-
-    public abstract class LeaderboardScore<TScoreModel> : OsuClickableContainer
+    public class LeaderboardScore : OsuClickableContainer
     {
         public readonly int RankPosition;
+
+        public const float HEIGHT = 60;
 
         private const float corner_radius = 5;
         private const float edge_margin = 5;
@@ -38,7 +34,7 @@ namespace osu.Game.Online.Leaderboards
 
         protected Container RankContainer { get; private set; }
 
-        private readonly TScoreModel score;
+        private readonly ScoreInfo score;
 
         private Box background;
         private Container content;
@@ -51,21 +47,21 @@ namespace osu.Game.Online.Leaderboards
 
         private List<ScoreComponentLabel> statisticsLabels;
 
-        protected LeaderboardScore(TScoreModel score, int rank)
+        public LeaderboardScore(ScoreInfo score, int rank)
         {
             this.score = score;
             RankPosition = rank;
 
             RelativeSizeAxes = Axes.X;
-            Height = LeaderboardScore.HEIGHT;
+            Height = HEIGHT;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            var user = GetUser(score);
+            var user = score.User;
 
-            statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s.icon, s.value, s.name)).ToList();
+            statisticsLabels = GetStatistics(score).Select(s => new ScoreComponentLabel(s)).ToList();
 
             Children = new Drawable[]
             {
@@ -129,13 +125,13 @@ namespace osu.Game.Online.Leaderboards
                                     })
                                 {
                                     RelativeSizeAxes = Axes.None,
-                                    Size = new Vector2(LeaderboardScore.HEIGHT - edge_margin * 2, LeaderboardScore.HEIGHT - edge_margin * 2),
+                                    Size = new Vector2(HEIGHT - edge_margin * 2, HEIGHT - edge_margin * 2),
                                 },
                                 new Container
                                 {
                                     RelativeSizeAxes = Axes.Y,
                                     AutoSizeAxes = Axes.X,
-                                    Position = new Vector2(LeaderboardScore.HEIGHT - edge_margin, 0f),
+                                    Position = new Vector2(HEIGHT - edge_margin, 0f),
                                     Children = new Drawable[]
                                     {
                                         nameLabel = new OsuSpriteText
@@ -191,13 +187,13 @@ namespace osu.Game.Online.Leaderboards
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
-                                        scoreLabel = new GlowingSpriteText(GetTotalScore(score).ToString(@"N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa")),
+                                        scoreLabel = new GlowingSpriteText(score.TotalScore.ToString(@"N0"), @"Venera", 23, Color4.White, OsuColour.FromHex(@"83ccfa")),
                                         RankContainer = new Container
                                         {
                                             Size = new Vector2(40f, 20f),
                                             Children = new[]
                                             {
-                                                scoreRank = new DrawableRank(GetRank(score))
+                                                scoreRank = new DrawableRank(score.Rank)
                                                 {
                                                     Anchor = Anchor.Centre,
                                                     Origin = Anchor.Centre,
@@ -213,7 +209,7 @@ namespace osu.Game.Online.Leaderboards
                                     Origin = Anchor.BottomRight,
                                     AutoSizeAxes = Axes.Both,
                                     Direction = FillDirection.Horizontal,
-                                    ChildrenEnumerable = GetMods(score).Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
+                                    ChildrenEnumerable = score.Mods.Select(mod => new ModIcon(mod) { Scale = new Vector2(0.375f) })
                                 },
                             },
                         },
@@ -259,6 +255,12 @@ namespace osu.Game.Online.Leaderboards
             }
         }
 
+        protected virtual IEnumerable<LeaderboardScoreStatistic> GetStatistics(ScoreInfo model) => new[]
+        {
+            new LeaderboardScoreStatistic(FontAwesome.fa_link, "Max Combo", model.MaxCombo.ToString()),
+            new LeaderboardScoreStatistic(FontAwesome.fa_crosshairs, "Accuracy", string.Format(model.Accuracy % 1 == 0 ? @"{0:P0}" : @"{0:P2}", model.Accuracy))
+        };
+
         protected override bool OnHover(HoverEvent e)
         {
             background.FadeTo(0.5f, 300, Easing.OutQuint);
@@ -270,16 +272,6 @@ namespace osu.Game.Online.Leaderboards
             background.FadeTo(background_alpha, 200, Easing.OutQuint);
             base.OnHoverLost(e);
         }
-
-        protected abstract User GetUser(TScoreModel model);
-
-        protected abstract IEnumerable<Mod> GetMods(TScoreModel model);
-
-        protected abstract IEnumerable<(FontAwesome icon, string value, string name)> GetStatistics(TScoreModel model);
-
-        protected abstract int GetTotalScore(TScoreModel model);
-
-        protected abstract ScoreRank GetRank(TScoreModel model);
 
         private class GlowingSpriteText : Container
         {
@@ -339,9 +331,9 @@ namespace osu.Game.Online.Leaderboards
 
             public string TooltipText => name;
 
-            public ScoreComponentLabel(FontAwesome icon, string value, string name)
+            public ScoreComponentLabel(LeaderboardScoreStatistic statistic)
             {
-                this.name = name;
+                name = statistic.Name;
                 AutoSizeAxes = Axes.Both;
 
                 Child = content = new FillFlowContainer
@@ -373,17 +365,31 @@ namespace osu.Game.Online.Leaderboards
                                     Origin = Anchor.Centre,
                                     Size = new Vector2(icon_size - 6),
                                     Colour = OsuColour.FromHex(@"a4edff"),
-                                    Icon = icon,
+                                    Icon = statistic.Icon,
                                 },
                             },
                         },
-                        new GlowingSpriteText(value, @"Exo2.0-Bold", 17, Color4.White, OsuColour.FromHex(@"83ccfa"))
+                        new GlowingSpriteText(statistic.Value, @"Exo2.0-Bold", 17, Color4.White, OsuColour.FromHex(@"83ccfa"))
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                         },
                     },
                 };
+            }
+        }
+
+        public class LeaderboardScoreStatistic
+        {
+            public FontAwesome Icon;
+            public string Value;
+            public string Name;
+
+            public LeaderboardScoreStatistic(FontAwesome icon, string name, string value)
+            {
+                Icon = icon;
+                Name = name;
+                Value = value;
             }
         }
     }
