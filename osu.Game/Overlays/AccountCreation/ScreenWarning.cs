@@ -42,6 +42,10 @@ namespace osu.Game.Overlays.AccountCreation
         private void load(OsuColour colours, APIAccess api, OsuGame game, TextureStore textures)
         {
             this.api = api;
+
+            if (string.IsNullOrEmpty(api.ProvidedUsername))
+                return;
+
             Children = new Drawable[]
             {
                 new Sprite
