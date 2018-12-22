@@ -79,7 +79,7 @@ namespace osu.Game.Screens.Select.Leaderboards
             return req;
         }
 
-        protected override LeaderboardScore<ScoreInfo> CreateScoreVisualiser(ScoreInfo model, int index) => new BeatmapLeaderboardScore(model, index)
+        protected override LeaderboardScore CreateDrawableScore(ScoreInfo model, int index) => new LeaderboardScore(model, index)
         {
             Action = () => ScoreSelected?.Invoke(model)
         };
