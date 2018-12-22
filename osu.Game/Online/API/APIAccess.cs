@@ -161,7 +161,7 @@ namespace osu.Game.Online.API
                 //hard bail if we can't get a valid access token.
                 if (authentication.RequestAccessToken() == null)
                 {
-                    Logout(false);
+                    Logout();
                     continue;
                 }
 
@@ -293,7 +293,7 @@ namespace osu.Game.Online.API
             switch (statusCode)
             {
                 case HttpStatusCode.Unauthorized:
-                    Logout(false);
+                    Logout();
                     return true;
                 case HttpStatusCode.RequestTimeout:
                     failureCount++;
@@ -342,10 +342,9 @@ namespace osu.Game.Online.API
             }
         }
 
-        public void Logout(bool clearUsername = true)
+        public void Logout()
         {
             flushQueue();
-            if (clearUsername) ProvidedUsername = null;
             password = null;
             authentication.Clear();
             LocalUser.Value = createGuestUser();
