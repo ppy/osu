@@ -31,6 +31,9 @@ namespace osu.Game.Screens.Multi
 
         private OsuScreen currentScreen;
 
+        [Cached]
+        private RoomManager roomManager;
+
         public Multiplayer()
         {
             Child = waves = new MultiplayerWaveContainer
@@ -80,7 +83,8 @@ namespace osu.Game.Screens.Multi
                     },
                     Text = "Create room",
                     Action = () => loungeScreen.Open(new Room())
-                }
+                },
+                roomManager = new RoomManager()
             });
 
             screenAdded(loungeScreen);

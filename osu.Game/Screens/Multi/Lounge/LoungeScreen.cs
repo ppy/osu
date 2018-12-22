@@ -22,8 +22,8 @@ namespace osu.Game.Screens.Multi.Lounge
         private readonly RoomsContainer rooms;
         private readonly Action<Screen> pushGameplayScreen;
 
-        [Cached]
-        private readonly RoomManager manager;
+        [Resolved]
+        private RoomManager roomManager { get; set; }
 
         public override string Title => "Lounge";
 
@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Multi.Lounge
                             {
                                 RelativeSizeAxes = Axes.X,
                                 AutoSizeAxes = Axes.Y,
-                                Child = rooms = new RoomsContainer { JoinRequested = r => manager?.JoinRoom(r) }
+                                Child = rooms = new RoomsContainer { JoinRequested = r => roomManager?.JoinRoom(r) }
                             },
                         },
                         inspector = new RoomInspector
@@ -68,7 +68,6 @@ namespace osu.Game.Screens.Multi.Lounge
                         },
                     },
                 },
-                manager = new RoomManager { OpenRequested = Open }
             };
 
             inspector.Room.BindTo(rooms.SelectedRoom);
@@ -76,6 +75,12 @@ namespace osu.Game.Screens.Multi.Lounge
             Filter.Search.Current.ValueChanged += s => filterRooms();
             Filter.Tabs.Current.ValueChanged += t => filterRooms();
             Filter.Search.Exit += Exit;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            roomManager.OpenRequested += Open;
         }
 
         protected override void UpdateAfterChildren()
@@ -103,7 +108,7 @@ namespace osu.Game.Screens.Multi.Lounge
 
         protected override bool OnExiting(Screen next)
         {
-            manager?.PartRoom();
+            roomManager?.PartRoom();
 
             Filter.Search.HoldFocus = false;
             return base.OnExiting(next);
@@ -111,7 +116,7 @@ namespace osu.Game.Screens.Multi.Lounge
 
         protected override void OnResuming(Screen last)
         {
-            manager?.PartRoom();
+            roomManager?.PartRoom();
 
             base.OnResuming(last);
         }
@@ -125,7 +130,7 @@ namespace osu.Game.Screens.Multi.Lounge
         private void filterRooms()
         {
             rooms.Filter(Filter.CreateCriteria());
-            manager.Filter(Filter.CreateCriteria());
+            roomManager.Filter(Filter.CreateCriteria());
         }
 
         public void Open(Room room)
@@ -135,6 +140,14 @@ namespace osu.Game.Screens.Multi.Lounge
                 return;
 
             Push(new MatchScreen(room, s  => pushGameplayScreen?.Invoke(s)));
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (roomManager != null)
+                roomManager.OpenRequested -= Open;
         }
     }
 }
