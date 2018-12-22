@@ -21,8 +21,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     {
         private readonly FillFlowContainer levelRangeContainer;
 
-        public readonly Bindable<User> Host = new Bindable<User>();
-        public readonly Bindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>();
+        public readonly IBindable<User> Host = new Bindable<User>();
+        public readonly IBindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>();
 
         public ParticipantInfo(string rankPrefix = null)
         {

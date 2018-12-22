@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -31,15 +30,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         public readonly IBindable<Room> Room = new Bindable<Room>();
 
         private readonly MarginPadding contentPadding = new MarginPadding { Horizontal = 20, Vertical = 10 };
-        private readonly Bindable<string> nameBind = new Bindable<string>();
-        private readonly Bindable<User> hostBind = new Bindable<User>();
-        private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
-        private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
-        private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
-        private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
-        private readonly IBindableCollection<PlaylistItem> playlistBind = new BindableCollection<PlaylistItem>();
 
-        private readonly Bindable<BeatmapInfo> beatmap = new Bindable<BeatmapInfo>();
+        private readonly RoomBindings bindings = new RoomBindings();
 
         private OsuColour colours;
         private Box statusStrip;
@@ -174,53 +166,27 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 },
             };
 
-            playlistBind.ItemsAdded += _ => updatePlaylist();
-            playlistBind.ItemsRemoved += _ => updatePlaylist();
+            participantInfo.Host.BindTo(bindings.Host);
+            participantInfo.Participants.BindTo(bindings.Participants);
+            participantCount.Participants.BindTo(bindings.Participants);
+            participantCount.MaxParticipants.BindTo(bindings.MaxParticipants);
+            beatmapTypeInfo.Type.BindTo(bindings.Type);
+            background.Beatmap.BindTo(bindings.CurrentBeatmap);
+            beatmapTypeInfo.Beatmap.BindTo(bindings.CurrentBeatmap);
 
-            statusBind.BindValueChanged(displayStatus);
-            participantsBind.BindValueChanged(p => participantsFlow.ChildrenEnumerable = p.Select(u => new UserTile(u)));
-
-            nameBind.BindValueChanged(n => name.Text = n);
-
-            participantInfo.Host.BindTo(hostBind);
-            participantInfo.Participants.BindTo(participantsBind);
-
-            participantCount.Participants.BindTo(participantsBind);
-            participantCount.MaxParticipants.BindTo(maxParticipantsBind);
-
-            beatmapTypeInfo.Type.BindTo(typeBind);
-
-            background.Beatmap.BindTo(beatmap);
-            beatmapTypeInfo.Beatmap.BindTo(beatmap);
+            bindings.Status.BindValueChanged(displayStatus);
+            bindings.Participants.BindValueChanged(p => participantsFlow.ChildrenEnumerable = p.Select(u => new UserTile(u)));
+            bindings.Name.BindValueChanged(n => name.Text = n);
 
             Room.BindValueChanged(updateRoom, true);
         }
 
-        private Room lastRoom;
-
-        private void updateRoom(Room newRoom)
+        private void updateRoom(Room room)
         {
-            if (lastRoom != null)
-            {
-                nameBind.UnbindFrom(lastRoom.Name);
-                hostBind.UnbindFrom(lastRoom.Host);
-                statusBind.UnbindFrom(lastRoom.Status);
-                typeBind.UnbindFrom(lastRoom.Type);
-                playlistBind.UnbindFrom(lastRoom.Playlist);
-                maxParticipantsBind.UnbindFrom(lastRoom.MaxParticipants);
-                participantsBind.UnbindFrom(lastRoom.Participants);
-            }
+            bindings.Room = room;
 
-            if (newRoom != null)
+            if (room != null)
             {
-                nameBind.BindTo(newRoom.Name);
-                hostBind.BindTo(newRoom.Host);
-                statusBind.BindTo(newRoom.Status);
-                typeBind.BindTo(newRoom.Type);
-                playlistBind.BindTo(newRoom.Playlist);
-                maxParticipantsBind.BindTo(newRoom.MaxParticipants);
-                participantsBind.BindTo(newRoom.Participants);
-
                 participantsFlow.FadeIn(transition_duration);
                 participantCount.FadeIn(transition_duration);
                 beatmapTypeInfo.FadeIn(transition_duration);
@@ -237,17 +203,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
                 displayStatus(new RoomStatusNoneSelected());
             }
-
-            lastRoom = newRoom;
-        }
-
-        private void updatePlaylist()
-        {
-            if (playlistBind.Count == 0)
-                return;
-
-            // For now, only the first playlist item is supported
-            beatmap.Value = playlistBind.First().Beatmap;
         }
 
         protected override void UpdateAfterChildren()

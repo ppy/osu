@@ -5,39 +5,28 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Multi.Match
 {
     public class MatchScreen : MultiplayerScreen
     {
-        private readonly Bindable<string> nameBind = new Bindable<string>();
-        private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
-        private readonly Bindable<RoomAvailability> availabilityBind = new Bindable<RoomAvailability>();
-        private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
-        private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
-        private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
-        private readonly BindableCollection<PlaylistItem> playlistBind = new BindableCollection<PlaylistItem>();
-        private readonly Bindable<DateTimeOffset> endDateBind = new Bindable<DateTimeOffset>();
-
         public override bool AllowBeatmapRulesetChange => false;
-
         public override string Title => room.Name.Value;
-
         public override string ShortTitle => "room";
 
-        private readonly Components.Header header;
-        private readonly Info info;
+        private readonly RoomBindings bindings = new RoomBindings();
+
         private readonly MatchLeaderboard leaderboard;
         private readonly Action<Screen> pushGameplayScreen;
 
@@ -58,14 +47,10 @@ namespace osu.Game.Screens.Multi.Match
             this.room = room;
             this.pushGameplayScreen = pushGameplayScreen;
 
-            nameBind.BindTo(room.Name);
-            statusBind.BindTo(room.Status);
-            availabilityBind.BindTo(room.Availability);
-            typeBind.BindTo(room.Type);
-            participantsBind.BindTo(room.Participants);
-            maxParticipantsBind.BindTo(room.MaxParticipants);
-            endDateBind.BindTo(room.EndDate);
+            bindings.Room = room;
 
+            Info info;
+            Components.Header header;
             RoomSettingsOverlay settings;
 
             Children = new Drawable[]
@@ -113,7 +98,6 @@ namespace osu.Game.Screens.Multi.Match
             };
 
             header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect { Selected = addPlaylistItem });
-
             header.Tabs.Current.ValueChanged += t =>
             {
                 if (t is SettingsMatchPage)
@@ -122,55 +106,55 @@ namespace osu.Game.Screens.Multi.Match
                     settings.Hide();
             };
 
-            info.Name.BindTo(nameBind);
-            info.Status.BindTo(statusBind);
-            info.Availability.BindTo(availabilityBind);
-            info.EndDate.BindTo(endDateBind);
-
-            header.Type.BindTo(typeBind);
-
-            playlistBind.ItemsAdded += _ => setFromPlaylist();
-            playlistBind.ItemsRemoved += _ => setFromPlaylist();
+            info.Name.BindTo(bindings.Name);
+            info.Status.BindTo(bindings.Status);
+            info.Availability.BindTo(bindings.Availability);
+            info.EndDate.BindTo(bindings.EndDate);
+            info.Beatmap.BindTo(bindings.CurrentBeatmap);
+            header.Type.BindTo(bindings.Type);
+            header.Beatmap.BindTo(bindings.CurrentBeatmap);
+            header.Mods.BindTo(bindings.CurrentMods);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            playlistBind.BindTo(room.Playlist);
+            bindings.CurrentBeatmap.BindValueChanged(setBeatmap, true);
+            bindings.CurrentMods.BindValueChanged(setMods, true);
+            bindings.CurrentRuleset.BindValueChanged(setRuleset, true);
+        }
+
+        private void setBeatmap(BeatmapInfo beatmap)
+        {
+            // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
+            var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
+
+            game.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
+        }
+
+        private void setMods(IEnumerable<Mod> mods)
+        {
+            Beatmap.Value.Mods.Value = mods.ToArray();
+        }
+
+        private void setRuleset(RulesetInfo ruleset)
+        {
+            if (ruleset == null)
+                return;
+
+            game.ForcefullySetRuleset(ruleset);
         }
 
         private void addPlaylistItem(PlaylistItem item)
         {
-            playlistBind.Clear();
-            playlistBind.Add(item);
-        }
-
-        private void setFromPlaylist()
-        {
-            if (playlistBind.Count == 0)
-                return;
-
-            // For now, only the first playlist item is supported
-            var item = playlistBind.First();
-
-            header.Beatmap.Value = item.Beatmap;
-            header.Mods.Value = item.RequiredMods;
-            info.Beatmap.Value = item.Beatmap;
-
-            // Todo: item.Beatmap can be null here...
-            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == item.BeatmapID) ?? item.Beatmap;
-
-            var newBeatmap = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            newBeatmap.Mods.Value = item.RequiredMods.ToArray();
-
-            game.ForcefullySetBeatmap(newBeatmap);
-            game.ForcefullySetRuleset(item.Ruleset);
+            bindings.Playlist.Clear();
+            bindings.Playlist.Add(item);
         }
 
         private void onStart()
         {
-            switch (typeBind.Value)
+            switch (bindings.Type.Value)
             {
                 default:
                 case GameTypeTimeshift _:

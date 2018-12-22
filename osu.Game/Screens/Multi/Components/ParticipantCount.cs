@@ -18,8 +18,8 @@ namespace osu.Game.Screens.Multi.Components
 
         private readonly OsuSpriteText slash, maxText;
 
-        public readonly Bindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>();
-        public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
+        public readonly IBindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>();
+        public readonly IBindable<int?> MaxParticipants = new Bindable<int?>();
 
         public ParticipantCount()
         {

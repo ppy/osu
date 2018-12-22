@@ -14,21 +14,6 @@ namespace osu.Game.Screens.Multi.Components
 {
     public class BeatmapTitle : CompositeDrawable
     {
-        private float textSize = OsuSpriteText.FONT_SIZE;
-
-        public float TextSize
-        {
-            get => textSize;
-            set
-            {
-                if (textSize == value)
-                    return;
-                textSize = value;
-
-                updateText();
-            }
-        }
-
         public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         private readonly LinkFlowContainer textFlow;
@@ -46,6 +31,21 @@ namespace osu.Game.Screens.Multi.Components
         {
             base.LoadComplete();
             updateText();
+        }
+
+        private float textSize = OsuSpriteText.FONT_SIZE;
+
+        public float TextSize
+        {
+            get => textSize;
+            set
+            {
+                if (textSize == value)
+                    return;
+                textSize = value;
+
+                updateText();
+            }
         }
 
         private void updateText()

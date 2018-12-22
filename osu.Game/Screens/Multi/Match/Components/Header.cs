@@ -27,9 +27,9 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         public const float HEIGHT = 200;
 
-        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
         public readonly IBindable<GameType> Type = new Bindable<GameType>();
-        public readonly Bindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
+        public readonly IBindable<IEnumerable<Mod>> Mods = new Bindable<IEnumerable<Mod>>();
 
         private readonly Box tabStrip;
 
@@ -116,11 +116,11 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             beatmapTypeInfo.Beatmap.BindTo(Beatmap);
             beatmapTypeInfo.Type.BindTo(Type);
-            modDisplay.Current.BindTo(Mods);
+            background.Beatmap.BindTo(Beatmap);
+            Mods.BindValueChanged(m => modDisplay.Current.Value = m, true);
 
             beatmapButton.Action = () => OnRequestSelectBeatmap?.Invoke();
 
-            background.Beatmap.BindTo(Beatmap);
         }
 
         [BackgroundDependencyLoader]

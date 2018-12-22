@@ -3,10 +3,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,7 +17,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
-using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
 
@@ -37,18 +34,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         public event Action<SelectionState> StateChanged;
 
+        private readonly RoomBindings bindings = new RoomBindings();
+
         private readonly Box selectionBox;
-
-        private readonly Bindable<string> nameBind = new Bindable<string>();
-        private readonly Bindable<User> hostBind = new Bindable<User>();
-        private readonly Bindable<RoomStatus> statusBind = new Bindable<RoomStatus>();
-        private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
-        private readonly Bindable<IEnumerable<User>> participantsBind = new Bindable<IEnumerable<User>>();
-        private readonly IBindableCollection<PlaylistItem> playlistBind = new BindableCollection<PlaylistItem>();
-        private readonly IBindable<DateTimeOffset> endDateBind = new Bindable<DateTimeOffset>();
-
-        private readonly Bindable<BeatmapInfo> beatmap = new Bindable<BeatmapInfo>();
-
         private UpdateableBeatmapBackgroundSprite background;
         private BeatmapTitle beatmapTitle;
         private ModeTypeInfo modeTypeInfo;
@@ -92,6 +80,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         public DrawableRoom(Room room)
         {
             Room = room;
+            bindings.Room = room;
 
             RelativeSizeAxes = Axes.X;
             Height = height + SELECTION_BORDER_WIDTH * 2;
@@ -222,7 +211,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 },
             };
 
-            statusBind.ValueChanged += s =>
+            bindings.Status.ValueChanged += s =>
             {
                 status.Text = s.Message;
 
@@ -230,46 +219,21 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     d.FadeColour(s.GetAppropriateColour(colours), transition_duration);
             };
 
-            nameBind.BindValueChanged(n => name.Text = n);
+            background.Beatmap.BindTo(bindings.CurrentBeatmap);
+            modeTypeInfo.Beatmap.BindTo(bindings.CurrentBeatmap);
+            beatmapTitle.Beatmap.BindTo(bindings.CurrentBeatmap);
+            modeTypeInfo.Type.BindTo(bindings.Type);
+            participantInfo.Host.BindTo(bindings.Host);
+            participantInfo.Participants.BindTo(bindings.Participants);
 
-            nameBind.BindTo(Room.Name);
-            hostBind.BindTo(Room.Host);
-            statusBind.BindTo(Room.Status);
-            typeBind.BindTo(Room.Type);
-            playlistBind.BindTo(Room.Playlist);
-            participantsBind.BindTo(Room.Participants);
-            endDateBind.BindTo(Room.EndDate);
-
-            endDateBind.BindValueChanged(d => endDate.Date = d, true);
-
-            background.Beatmap.BindTo(beatmap);
-            modeTypeInfo.Beatmap.BindTo(beatmap);
-            beatmapTitle.Beatmap.BindTo(beatmap);
-
-            modeTypeInfo.Type.BindTo(typeBind);
-
-            participantInfo.Host.BindTo(hostBind);
-            participantInfo.Participants.BindTo(participantsBind);
-
-            playlistBind.ItemsAdded += _ => updatePlaylist();
-            playlistBind.ItemsRemoved += _ => updatePlaylist();
-
-            updatePlaylist();
+            bindings.Name.BindValueChanged(n => name.Text = n, true);
+            bindings.EndDate.BindValueChanged(d => endDate.Date = d, true);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             this.FadeInFromZero(transition_duration);
-        }
-
-        private void updatePlaylist()
-        {
-            if (playlistBind.Count == 0)
-                return;
-
-            // For now, only the first playlist item is supported
-            beatmap.Value = playlistBind.First().Beatmap;
         }
     }
 }

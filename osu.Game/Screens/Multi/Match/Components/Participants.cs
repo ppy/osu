@@ -15,14 +15,8 @@ namespace osu.Game.Screens.Multi.Match.Components
 {
     public class Participants : CompositeDrawable
     {
-        public readonly Bindable<IEnumerable<User>> Users = new Bindable<IEnumerable<User>>();
-        public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
-
-        public new MarginPadding Padding
-        {
-            get => base.Padding;
-            set => base.Padding = value;
-        }
+        public readonly IBindable<IEnumerable<User>> Users = new Bindable<IEnumerable<User>>();
+        public readonly IBindable<int?> MaxParticipants = new Bindable<int?>();
 
         public Participants()
         {
