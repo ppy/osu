@@ -26,11 +26,11 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private OsuColour colours;
 
-        public readonly Bindable<string> Name = new Bindable<string>();
-        public readonly Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
-        public readonly Bindable<RoomStatus> Status = new Bindable<RoomStatus>();
-        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
-        public readonly Bindable<DateTimeOffset> EndDate = new Bindable<DateTimeOffset>();
+        public readonly IBindable<string> Name = new Bindable<string>();
+        public readonly IBindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();
+        public readonly IBindable<RoomStatus> Status = new Bindable<RoomStatus>();
+        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly IBindable<DateTimeOffset> EndDate = new Bindable<DateTimeOffset>();
 
         public Info(Room room)
         {

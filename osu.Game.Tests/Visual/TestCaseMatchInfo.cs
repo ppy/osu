@@ -26,38 +26,54 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(RulesetStore rulesets)
         {
-            Info info = new Info(new Room());
+            var room = new Room();
+
+            Info info = new Info(room);
             Add(info);
 
-            AddStep(@"set name", () => info.Name.Value = @"Room Name?");
-            AddStep(@"set availability", () => info.Availability.Value = RoomAvailability.FriendsOnly);
-            AddStep(@"set status", () => info.Status.Value = new RoomStatusPlaying());
-            AddStep(@"set beatmap", () => info.Beatmap.Value = new BeatmapInfo
+            AddStep(@"set name", () => room.Name.Value = @"Room Name?");
+            AddStep(@"set availability", () => room.Availability.Value = RoomAvailability.FriendsOnly);
+            AddStep(@"set status", () => room.Status.Value = new RoomStatusPlaying());
+            AddStep(@"set beatmap", () =>
             {
-                StarDifficulty = 2.4,
-                Ruleset = rulesets.GetRuleset(0),
-                Metadata = new BeatmapMetadata
+                room.Playlist.Clear();
+                room.Playlist.Add(new PlaylistItem
                 {
-                    Title = @"My Song",
-                    Artist = @"VisualTests",
-                    AuthorString = @"osu!lazer",
-                },
+                    Beatmap = new BeatmapInfo
+                    {
+                        StarDifficulty = 2.4,
+                        Ruleset = rulesets.GetRuleset(0),
+                        Metadata = new BeatmapMetadata
+                        {
+                            Title = @"My Song",
+                            Artist = @"VisualTests",
+                            AuthorString = @"osu!lazer",
+                        },
+                    }
+                });
             });
 
-            AddStep(@"change name", () => info.Name.Value = @"Room Name!");
-            AddStep(@"change availability", () => info.Availability.Value = RoomAvailability.InviteOnly);
-            AddStep(@"change status", () => info.Status.Value = new RoomStatusOpen());
-            AddStep(@"null beatmap", () => info.Beatmap.Value = null);
-            AddStep(@"change beatmap", () => info.Beatmap.Value = new BeatmapInfo
+            AddStep(@"change name", () => room.Name.Value = @"Room Name!");
+            AddStep(@"change availability", () => room.Availability.Value = RoomAvailability.InviteOnly);
+            AddStep(@"change status", () => room.Status.Value = new RoomStatusOpen());
+            AddStep(@"null beatmap", () => room.Playlist.Clear());
+            AddStep(@"change beatmap", () =>
             {
-                StarDifficulty = 4.2,
-                Ruleset = rulesets.GetRuleset(3),
-                Metadata = new BeatmapMetadata
+                room.Playlist.Clear();
+                room.Playlist.Add(new PlaylistItem
                 {
-                    Title = @"Your Song",
-                    Artist = @"Tester",
-                    AuthorString = @"Someone",
-                },
+                    Beatmap = new BeatmapInfo
+                    {
+                        StarDifficulty = 4.2,
+                        Ruleset = rulesets.GetRuleset(3),
+                        Metadata = new BeatmapMetadata
+                        {
+                            Title = @"Your Song",
+                            Artist = @"Tester",
+                            AuthorString = @"Someone",
+                        },
+                    }
+                });
             });
         }
     }

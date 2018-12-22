@@ -4,7 +4,6 @@
 using System;
 using Humanizer;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -24,12 +23,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         private const float transition_duration = 350;
         private const float field_padding = 45;
 
-        private readonly Bindable<string> nameBind = new Bindable<string>();
-        private readonly Bindable<RoomAvailability> availabilityBind = new Bindable<RoomAvailability>();
-        private readonly Bindable<GameType> typeBind = new Bindable<GameType>();
-        private readonly Bindable<int?> maxParticipantsBind = new Bindable<int?>();
-        private readonly IBindableCollection<PlaylistItem> playlistBind = new BindableCollection<PlaylistItem>();
-        private readonly Bindable<TimeSpan> durationBind = new Bindable<TimeSpan>();
+        private readonly RoomBindings bindings = new RoomBindings();
 
         private readonly Container content;
 
@@ -50,6 +44,8 @@ namespace osu.Game.Screens.Multi.Match.Components
         public RoomSettingsOverlay(Room room)
         {
             this.room = room;
+
+            bindings.Room = room;
 
             Masking = true;
 
@@ -189,24 +185,17 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             TypePicker.Current.ValueChanged += t => typeLabel.Text = t.Name;
 
-            nameBind.ValueChanged += n => NameField.Text = n;
-            availabilityBind.ValueChanged += a => AvailabilityPicker.Current.Value = a;
-            typeBind.ValueChanged += t => TypePicker.Current.Value = t;
-            maxParticipantsBind.ValueChanged += m => MaxParticipantsField.Text = m?.ToString();
-            durationBind.ValueChanged += d => DurationField.Current.Value = d;
+            bindings.Name.BindValueChanged(n => NameField.Text = n, true);
+            bindings.Availability.BindValueChanged(a => AvailabilityPicker.Current.Value = a, true);
+            bindings.Type.BindValueChanged(t => TypePicker.Current.Value = t, true);
+            bindings.MaxParticipants.BindValueChanged(m => MaxParticipantsField.Text = m?.ToString(), true);
+            bindings.Duration.BindValueChanged(d => DurationField.Current.Value = d, true);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             typeLabel.Colour = colours.Yellow;
-
-            nameBind.BindTo(room.Name);
-            playlistBind.BindTo(room.Playlist);
-            availabilityBind.BindTo(room.Availability);
-            typeBind.BindTo(room.Type);
-            maxParticipantsBind.BindTo(room.MaxParticipants);
-            durationBind.BindTo(room.Duration);
 
             MaxParticipantsField.ReadOnly = true;
             PasswordField.ReadOnly = true;
@@ -222,19 +211,10 @@ namespace osu.Game.Screens.Multi.Match.Components
             ApplyButton.Enabled.Value = hasValidSettings;
         }
 
-        private bool hasValidSettings => NameField.Text.Length > 0 && playlistBind.Count > 0;
+        private bool hasValidSettings => NameField.Text.Length > 0 && bindings.Playlist.Count > 0;
 
         protected override void PopIn()
         {
-            // reapply the rooms values if the overlay was completely closed
-            if (content.Y == -1)
-            {
-                nameBind.TriggerChange();
-                availabilityBind.TriggerChange();
-                typeBind.TriggerChange();
-                maxParticipantsBind.TriggerChange();
-            }
-
             content.MoveToY(0, transition_duration, Easing.OutQuint);
         }
 
@@ -245,16 +225,16 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private void apply()
         {
-            nameBind.Value = NameField.Text;
-            availabilityBind.Value = AvailabilityPicker.Current.Value;
-            typeBind.Value = TypePicker.Current.Value;
+            bindings.Name.Value = NameField.Text;
+            bindings.Availability.Value = AvailabilityPicker.Current.Value;
+            bindings.Type.Value = TypePicker.Current.Value;
 
             if (int.TryParse(MaxParticipantsField.Text, out int max))
-                maxParticipantsBind.Value = max;
+                bindings.MaxParticipants.Value = max;
             else
-                maxParticipantsBind.Value = null;
+                bindings.MaxParticipants.Value = null;
 
-            durationBind.Value = DurationField.Current.Value;
+            bindings.Duration.Value = DurationField.Current.Value;
 
             manager?.CreateRoom(room);
         }

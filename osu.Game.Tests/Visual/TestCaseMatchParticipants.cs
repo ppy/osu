@@ -1,7 +1,9 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Users;
@@ -11,16 +13,20 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseMatchParticipants : OsuTestCase
     {
+        private readonly Bindable<int?> maxParticipants = new Bindable<int?>();
+        private readonly Bindable<IEnumerable<User>> users = new Bindable<IEnumerable<User>>();
+
         public TestCaseMatchParticipants()
         {
             Participants participants;
-            Add(participants = new Participants
-            {
-                RelativeSizeAxes = Axes.Both,
-            });
 
-            AddStep(@"set max to null", () => participants.MaxParticipants.Value = null);
-            AddStep(@"set users", () => participants.Users.Value = new[]
+            Add(participants = new Participants { RelativeSizeAxes = Axes.Both });
+
+            participants.MaxParticipants.BindTo(maxParticipants);
+            participants.Users.BindTo(users);
+
+            AddStep(@"set max to null", () => maxParticipants.Value = null);
+            AddStep(@"set users", () => users.Value = new[]
             {
                 new User
                 {
@@ -48,9 +54,9 @@ namespace osu.Game.Tests.Visual
                 },
             });
 
-            AddStep(@"set max", () => participants.MaxParticipants.Value = 10);
-            AddStep(@"clear users", () => participants.Users.Value = new User[] { });
-            AddStep(@"set max to null", () => participants.MaxParticipants.Value = null);
+            AddStep(@"set max", () => maxParticipants.Value = 10);
+            AddStep(@"clear users", () => users.Value = new User[] { });
+            AddStep(@"set max to null", () => maxParticipants.Value = null);
         }
     }
 }
