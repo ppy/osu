@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
+using Newtonsoft.Json.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
@@ -159,7 +161,7 @@ namespace osu.Game.Online.API
                 //hard bail if we can't get a valid access token.
                 if (authentication.RequestAccessToken() == null)
                 {
-                    Logout(false);
+                    Logout();
                     continue;
                 }
 
@@ -186,6 +188,39 @@ namespace osu.Game.Online.API
 
             ProvidedUsername = username;
             this.password = password;
+        }
+
+        public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
+        {
+            Debug.Assert(State == APIState.Offline);
+
+            var req = new RegistrationRequest
+            {
+                Url = $@"{Endpoint}/users",
+                Method = HttpMethod.Post,
+                Username = username,
+                Email = email,
+                Password = password
+            };
+
+            try
+            {
+                req.Perform();
+            }
+            catch (Exception e)
+            {
+                try
+                {
+                    return JObject.Parse(req.ResponseString).SelectToken("form_error", true).ToObject<RegistrationRequest.RegistrationRequestErrors>();
+                }
+                catch
+                {
+                    // if we couldn't deserialize the error message let's throw the original exception outwards.
+                    throw e;
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -258,7 +293,7 @@ namespace osu.Game.Online.API
             switch (statusCode)
             {
                 case HttpStatusCode.Unauthorized:
-                    Logout(false);
+                    Logout();
                     return true;
                 case HttpStatusCode.RequestTimeout:
                     failureCount++;
@@ -307,10 +342,9 @@ namespace osu.Game.Online.API
             }
         }
 
-        public void Logout(bool clearUsername = true)
+        public void Logout()
         {
             flushQueue();
-            if (clearUsername) ProvidedUsername = null;
             password = null;
             authentication.Clear();
             LocalUser.Value = createGuestUser();
