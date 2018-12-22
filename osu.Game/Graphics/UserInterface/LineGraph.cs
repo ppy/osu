@@ -111,7 +111,6 @@ namespace osu.Game.Graphics.UserInterface
             {
                 float x = (i + count - values.Length) / (float)(count - 1) * DrawWidth - 1;
                 float y = GetYPosition(values[i]) * DrawHeight - path.PathWidth;
-                // the -1 is for inner offset in path (actually -PathWidth)
                 path.AddVertex(new Vector2(x, y));
             }
         }
