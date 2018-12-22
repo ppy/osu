@@ -1,7 +1,9 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,7 +13,6 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
 using osuTK;
 using osu.Game.Graphics.Containers;
-using System.Linq;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Play.HUD
@@ -22,9 +23,20 @@ namespace osu.Game.Screens.Play.HUD
 
         public bool DisplayUnrankedText = true;
 
-        private readonly Bindable<IEnumerable<Mod>> mods = new Bindable<IEnumerable<Mod>>();
+        private readonly Bindable<IEnumerable<Mod>> current = new Bindable<IEnumerable<Mod>>();
 
-        public Bindable<IEnumerable<Mod>> Current => mods;
+        public Bindable<IEnumerable<Mod>> Current
+        {
+            get => current;
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+
+                current.UnbindBindings();
+                current.BindTo(value);
+            }
+        }
 
         private readonly FillFlowContainer<ModIcon> iconsContainer;
         private readonly OsuSpriteText unrankedText;
@@ -53,7 +65,7 @@ namespace osu.Game.Screens.Play.HUD
                 }
             };
 
-            mods.ValueChanged += mods =>
+            Current.ValueChanged += mods =>
             {
                 iconsContainer.Clear();
                 foreach (Mod mod in mods)
@@ -69,7 +81,7 @@ namespace osu.Game.Screens.Play.HUD
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-            mods.UnbindAll();
+            Current.UnbindAll();
         }
 
         protected override void LoadComplete()
@@ -80,7 +92,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void appearTransform()
         {
-            if (DisplayUnrankedText && mods.Value.Any(m => !m.Ranked))
+            if (DisplayUnrankedText && Current.Value.Any(m => !m.Ranked))
                 unrankedText.FadeInFromZero(fade_duration, Easing.OutQuint);
             else
                 unrankedText.Hide();

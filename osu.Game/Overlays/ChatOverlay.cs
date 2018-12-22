@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -19,6 +20,7 @@ using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
+using osuTK.Input;
 
 namespace osu.Game.Overlays
 {
@@ -222,7 +224,7 @@ namespace osu.Game.Overlays
             else
             {
                 currentChannelContainer.Clear(false);
-                Scheduler.Add(() => currentChannelContainer.Add(loaded));
+                currentChannelContainer.Add(loaded);
             }
         }
 
@@ -260,6 +262,39 @@ namespace osu.Game.Overlays
         {
             isDragging = false;
             return base.OnDragEnd(e);
+        }
+
+        private void selectTab(int index)
+        {
+            var channel = channelTabControl.Items.Skip(index).FirstOrDefault();
+            if (channel != null && channel.Name != "+")
+                channelTabControl.Current.Value = channel;
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.AltPressed)
+            {
+                switch (e.Key)
+                {
+                    case Key.Number1:
+                    case Key.Number2:
+                    case Key.Number3:
+                    case Key.Number4:
+                    case Key.Number5:
+                    case Key.Number6:
+                    case Key.Number7:
+                    case Key.Number8:
+                    case Key.Number9:
+                        selectTab((int)e.Key - (int)Key.Number1);
+                        return true;
+                    case Key.Number0:
+                        selectTab(9);
+                        return true;
+                }
+            }
+
+            return base.OnKeyDown(e);
         }
 
         public override bool AcceptsFocus => true;
