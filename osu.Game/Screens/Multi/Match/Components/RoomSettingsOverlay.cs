@@ -22,6 +22,7 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         private const float transition_duration = 350;
         private const float field_padding = 45;
+        private const float disabled_alpha = 0.2f;
 
         private readonly RoomBindings bindings = new RoomBindings();
 
@@ -82,10 +83,12 @@ namespace osu.Game.Screens.Multi.Match.Components
                                     },
                                     new Section("ROOM VISIBILITY")
                                     {
+                                        Alpha = disabled_alpha,
                                         Child = AvailabilityPicker = new RoomAvailabilityPicker(),
                                     },
                                     new Section("GAME TYPE")
                                     {
+                                        Alpha = disabled_alpha,
                                         Child = new FillFlowContainer
                                         {
                                             AutoSizeAxes = Axes.Y,
@@ -116,6 +119,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                 {
                                     new Section("MAX PARTICIPANTS")
                                     {
+                                        Alpha = disabled_alpha,
                                         Child = MaxParticipantsField = new SettingsNumberTextBox
                                         {
                                             RelativeSizeAxes = Axes.X,
@@ -146,6 +150,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                     },
                                     new Section("PASSWORD (OPTIONAL)")
                                     {
+                                        Alpha = disabled_alpha,
                                         Child = PasswordField = new SettingsPasswordTextBox
                                         {
                                             RelativeSizeAxes = Axes.X,
@@ -199,8 +204,8 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             MaxParticipantsField.ReadOnly = true;
             PasswordField.ReadOnly = true;
-            AvailabilityPicker.ReadOnly.Value = true;
-            TypePicker.ReadOnly.Value = true;
+            AvailabilityPicker.Enabled.Value = false;
+            TypePicker.Enabled.Value = false;
             ApplyButton.Enabled.Value = false;
         }
 

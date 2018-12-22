@@ -4,39 +4,32 @@
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Components
 {
     public abstract class DisableableTabControl<T> : TabControl<T>
     {
-        public readonly BindableBool ReadOnly = new BindableBool();
+        public readonly BindableBool Enabled = new BindableBool();
 
         protected override void AddTabItem(TabItem<T> tab, bool addToDropdown = true)
         {
             if (tab is DisableableTabItem<T> disableable)
-                disableable.ReadOnly.BindTo(ReadOnly);
+                disableable.Enabled.BindTo(Enabled);
             base.AddTabItem(tab, addToDropdown);
         }
 
         protected abstract class DisableableTabItem<T> : TabItem<T>
         {
-            public readonly BindableBool ReadOnly = new BindableBool();
+            public readonly BindableBool Enabled = new BindableBool();
 
             protected DisableableTabItem(T value)
                 : base(value)
             {
-                ReadOnly.BindValueChanged(updateReadOnly);
-            }
-
-            private void updateReadOnly(bool readOnly)
-            {
-                Colour = readOnly ? Color4.Gray : Color4.White;
             }
 
             protected override bool OnClick(ClickEvent e)
             {
-                if (ReadOnly)
+                if (!Enabled)
                     return true;
                 return base.OnClick(e);
             }
