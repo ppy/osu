@@ -71,6 +71,6 @@ namespace osu.Game.Graphics.UserInterface
             Exit?.Invoke();
         }
 
-        public override bool RequestsFocus => HoldFocus;
+        public override bool RequestsFocus => false;
     }
 }
