@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
                     var angleBonus = Math.Sqrt
                     (
-                        Math.Max(0, Previous[0].JumpDistance + Previous[0].TravelDistance - min_distance_for_bonus)
+                        Math.Max(0, Previous[0].JumpDistance + 8 * Previous[0].TravelDistance - min_distance_for_bonus)
                         * Math.Min
                         (
                             sinDiffAngle,
