@@ -61,80 +61,67 @@ namespace osu.Game.Screens.Select
 
         static readonly Regex query_syntax_regex = new Regex(@"\b(?<key>stars|ar|divisor|length)(?<op>:|>|<)(?<value>\w+)\b");
 
-        enum QueryOperation
+        void updateCriteriaRange(ref FilterCriteria.OptionalRange range, string op, double value, double equalityTolerableDistance = 0)
         {
-            Equals,
-            LargerThan,
-            LessThan
+            switch (op)
+            {
+                default:
+                case ":":
+                    range.IsInclusive = true;
+                    range.Min = value - equalityTolerableDistance;
+                    range.Max = value + equalityTolerableDistance;
+                    break;
+                case ">":
+                    range.IsInclusive = false;
+                    range.Min = value;
+                    break;
+                case "<":
+                    range.IsInclusive = false;
+                    range.Max = value;
+                    break;
+            }
         }
 
         public FilterCriteria CreateCriteria()
         {
-            var text = searchTextBox.Text;
             var criteria = new FilterCriteria
             {
                 Group = group,
                 Sort = sort,
-                SearchText = query_syntax_regex.Replace(text, string.Empty),
+                SearchText = query_syntax_regex.Replace(searchTextBox.Text, string.Empty),
                 AllowConvertedBeatmaps = showConverted,
                 Ruleset = ruleset.Value
             };
 
-            foreach (Match match in query_syntax_regex.Matches(text))
+            foreach (Match match in query_syntax_regex.Matches(searchTextBox.Text))
             {
-                QueryOperation op;
+                var key = match.Groups["key"].Value;
+                var value = match.Groups["value"].Value;
+                var op = match.Groups["op"].Value;
 
-                switch (match.Groups["op"].Value)
-                {
-                    default:
-                    case ":": op = QueryOperation.Equals; break;
-                    case ">": op = QueryOperation.LargerThan; break;
-                    case "<": op = QueryOperation.LessThan; break;
-                }
-
-                switch (match.Groups["key"].Value)
+                switch (key)
                 {
                     case "stars":
-                        var stars = Convert.ToDouble(match.Groups["value"].Value);
-                        switch (op)
-                        {
-                            case QueryOperation.Equals: criteria.StarDifficulty.MinExclusive = stars; criteria.StarDifficulty.MaxExclusive = stars + 1; break;
-                            case QueryOperation.LargerThan: criteria.StarDifficulty.MinExclusive = stars; break;
-                            case QueryOperation.LessThan: criteria.StarDifficulty.MaxExclusive = stars; break;
-                        }
+                        updateCriteriaRange(ref criteria.StarDifficulty, op, Convert.ToDouble(value), 0.5);
                         break;
                     case "ar":
-                        var ar = Convert.ToDouble(match.Groups["value"].Value);
-                        switch (op)
-                        {
-                            case QueryOperation.Equals: criteria.ApproachRate.MinExclusive = ar; criteria.ApproachRate.MaxExclusive = ar + 1; break;
-                            case QueryOperation.LargerThan: criteria.ApproachRate.MinExclusive = ar; break;
-                            case QueryOperation.LessThan: criteria.ApproachRate.MaxExclusive = ar; break;
-                        }
+                        updateCriteriaRange(ref criteria.ApproachRate, op, Convert.ToDouble(value), 0.5);
                         break;
                     case "divisor":
-                        var divisor = Convert.ToDouble(match.Groups["value"].Value);
-                        switch (op)
-                        {
-                            case QueryOperation.Equals: criteria.BeatDivisor = unchecked((int)divisor); break;
-                        }
+                        if (op == ":")
+                            criteria.BeatDivisor = Convert.ToInt32(value);
                         break;
                     case "length":
-                        var lengthStr = match.Groups["value"].Value;
-                        // Length is measured in milliseconds
-                        var length =
-                            lengthStr.EndsWith("ms") ? Convert.ToDouble(lengthStr.TrimEnd('m', 's')) :
-                            lengthStr.EndsWith("s") ? Convert.ToDouble(lengthStr.TrimEnd('s')) * 1000 :
-                            lengthStr.EndsWith("m") ? Convert.ToDouble(lengthStr.TrimEnd('m')) * 60000 :
-                            lengthStr.EndsWith("h") ? Convert.ToDouble(lengthStr.TrimEnd('h')) * 3600000 :
-                            Convert.ToDouble(lengthStr) * 1000;
+                        var lengthScale =
+                            value.EndsWith("ms") ? 1 :
+                            value.EndsWith("s") ? 1000 :
+                            value.EndsWith("m") ? 60000 :
+                            value.EndsWith("h") ? 3600000 :
+                            0;
+                        var length = Convert.ToDouble(value.TrimEnd('m', 's', 'h')) * lengthScale;
 
-                        switch (op)
-                        {
-                            case QueryOperation.Equals: criteria.Length.MinExclusive = length; criteria.Length.MaxExclusive = length + 60000; break;
-                            case QueryOperation.LargerThan: criteria.Length.MinExclusive = length; break;
-                            case QueryOperation.LessThan: criteria.Length.MaxExclusive = length; break;
-                        }
+                        if (length > 0)
+                            updateCriteriaRange(ref criteria.Length, op, length, lengthScale / 2);
                         break;
                 }
             }
