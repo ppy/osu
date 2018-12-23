@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        static readonly Regex querySyntaxRegex = new Regex(@"\b(?<key>stars|ar|divisor)(?<op>:|>|<)(?<value>\w+)\b");
+        static readonly Regex querySyntaxRegex = new Regex(@"\b(?<key>stars|ar|divisor|length)(?<op>:|>|<)(?<value>\w+)\b");
 
         enum QueryOperation
         {
@@ -117,6 +117,23 @@ namespace osu.Game.Screens.Select
                         switch (op)
                         {
                             case QueryOperation.Equals: criteria.BeatDivisor = unchecked((int)divisor); break;
+                        }
+                        break;
+                    case "length":
+                        var lengthStr = match.Groups["value"].Value;
+                        // Length is measured in milliseconds
+                        var length =
+                            lengthStr.EndsWith("ms") ? Convert.ToDouble(lengthStr.TrimEnd('m', 's')) :
+                            lengthStr.EndsWith("s") ? Convert.ToDouble(lengthStr.TrimEnd('s')) * 1000 :
+                            lengthStr.EndsWith("m") ? Convert.ToDouble(lengthStr.TrimEnd('m')) * 60000 :
+                            lengthStr.EndsWith("h") ? Convert.ToDouble(lengthStr.TrimEnd('h')) * 3600000 :
+                            Convert.ToDouble(lengthStr) * 1000;
+
+                        switch (op)
+                        {
+                            case QueryOperation.Equals: criteria.Length.Min = length; criteria.Length.Max = length + 60000; break;
+                            case QueryOperation.LargerThan: criteria.Length.Min = length; break;
+                            case QueryOperation.LessThan: criteria.Length.Max = length; break;
                         }
                         break;
                 }
