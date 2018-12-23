@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        static readonly Regex query_syntax_regex = new Regex(@"\b(?<key>stars|ar|dr|cs|divisor|length|objects)(?<op>:|>|<)(?<value>\w+)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        static readonly Regex query_syntax_regex = new Regex(@"\b(?<key>stars|ar|dr|cs|divisor|length|objects)(?<op>:|>|<)(?<value>\d+([.,]\d+)?)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         static readonly Regex group_syntax_regex = new Regex($@"\bgroup:(?<value>{string.Join("|", Enum.GetNames(typeof(GroupMode)))})\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         static readonly Regex sort_syntax_regex = new Regex($@"\bsort:(?<value>{string.Join("|", Enum.GetNames(typeof(SortMode)))})\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
