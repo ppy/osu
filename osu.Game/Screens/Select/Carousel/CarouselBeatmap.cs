@@ -32,6 +32,7 @@ namespace osu.Game.Screens.Select.Carousel
             match &= criteria.StarDifficulty.IsTrue(Beatmap.StarDifficulty);
             match &= criteria.ApproachRate.IsTrue(Beatmap.BaseDifficulty.ApproachRate);
             match &= criteria.Length.IsTrue(Beatmap.OnlineInfo?.Length ?? 0);
+            match &= criteria.ObjectCount.IsTrue(Beatmap.OnlineInfo?.CircleCount ?? 0);
 
             if (criteria.BeatDivisor.HasValue)
                 match &= criteria.BeatDivisor == Beatmap.BeatDivisor;

@@ -60,6 +60,7 @@ namespace osu.Game.Screens.Select
         public OptionalRange StarDifficulty;
         public OptionalRange ApproachRate;
         public OptionalRange Length;
+        public OptionalRange ObjectCount;
 
         public int? BeatDivisor;
     }
