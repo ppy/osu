@@ -60,6 +60,8 @@ namespace osu.Game.Screens.Select
         }
 
         static readonly Regex query_syntax_regex = new Regex(@"\b(?<key>stars|ar|divisor|length|objects)(?<op>:|>|<)(?<value>\w+)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        static readonly Regex group_syntax_regex = new Regex($@"\bgroup:(?<value>{string.Join("|", Enum.GetNames(typeof(GroupMode)))})\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        static readonly Regex sort_syntax_regex = new Regex($@"\bsort:(?<value>{string.Join("|", Enum.GetNames(typeof(SortMode)))})\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         void updateCriteriaRange(ref FilterCriteria.OptionalRange range, string op, double value, double equalityTolerableDistance = 0)
         {
@@ -84,6 +86,22 @@ namespace osu.Game.Screens.Select
 
         public FilterCriteria CreateCriteria()
         {
+            // update active group mode
+            var groupQuery = group_syntax_regex.Match(searchTextBox.Text);
+            if (Enum.TryParse<GroupMode>(groupQuery?.Groups["value"].Value, out var groupMode))
+            {
+                searchTextBox.Text = searchTextBox.Text.Replace(groupQuery.Value, string.Empty);
+                groupTabs.Current.Value = groupMode;
+            }
+
+            // update active sort mode
+            var sortQuery = sort_syntax_regex.Match(searchTextBox.Text);
+            if (Enum.TryParse<SortMode>(sortQuery?.Groups["value"].Value, out var sortMode))
+            {
+                searchTextBox.Text = searchTextBox.Text.Replace(sortQuery.Value, string.Empty);
+                sortTabs.Current.Value = sortMode;
+            }
+
             var criteria = new FilterCriteria
             {
                 Group = group,
@@ -93,6 +111,13 @@ namespace osu.Game.Screens.Select
                 Ruleset = ruleset.Value
             };
 
+            applyQueries(criteria);
+
+            return criteria;
+        }
+
+        void applyQueries(FilterCriteria criteria)
+        {
             foreach (Match match in query_syntax_regex.Matches(searchTextBox.Text))
             {
                 var key = match.Groups["key"].Value;
@@ -128,8 +153,6 @@ namespace osu.Game.Screens.Select
                         break;
                 }
             }
-
-            return criteria;
         }
 
         public Action Exit;
