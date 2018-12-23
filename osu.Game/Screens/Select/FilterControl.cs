@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        static readonly Regex querySyntaxRegex = new Regex(@"\b(?<key>stars|ar)(?<op>:|>|<)(?<value>\w+)\b");
+        static readonly Regex querySyntaxRegex = new Regex(@"\b(?<key>stars|ar|divisor)(?<op>:|>|<)(?<value>\w+)\b");
 
         enum QueryOperation
         {
@@ -110,6 +110,13 @@ namespace osu.Game.Screens.Select
                             case QueryOperation.Equals: criteria.ApproachRate.Min = ar; criteria.ApproachRate.Max = ar + 1; break;
                             case QueryOperation.LargerThan: criteria.ApproachRate.Min = ar; break;
                             case QueryOperation.LessThan: criteria.ApproachRate.Max = ar; break;
+                        }
+                        break;
+                    case "divisor":
+                        var divisor = Convert.ToDouble(match.Groups["value"].Value);
+                        switch (op)
+                        {
+                            case QueryOperation.Equals: criteria.BeatDivisor = unchecked((int)divisor); break;
                         }
                         break;
                 }

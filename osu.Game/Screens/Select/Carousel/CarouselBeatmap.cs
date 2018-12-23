@@ -32,6 +32,8 @@ namespace osu.Game.Screens.Select.Carousel
             match &= criteria.StarDifficulty.IsTrue(Beatmap.StarDifficulty);
             match &= criteria.ApproachRate.IsTrue(Beatmap.BaseDifficulty.ApproachRate);
 
+            match &= criteria.BeatDivisor == Beatmap.BeatDivisor;
+
             foreach (var criteriaTerm in criteria.SearchTerms)
                 match &=
                     Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0) ||
