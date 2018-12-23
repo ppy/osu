@@ -135,13 +135,13 @@ namespace osu.Game.Screens.Select
                         updateCriteriaRange(ref criteria.StarDifficulty, op, Convert.ToDouble(value), 0.5);
                         break;
                     case "ar":
-                        updateCriteriaRange(ref criteria.ApproachRate, op, Convert.ToDouble(value), 0.5);
+                        updateCriteriaRange(ref criteria.ApproachRate, op, Convert.ToDouble(value), 0.3);
                         break;
                     case "dr":
-                        updateCriteriaRange(ref criteria.DrainRate, op, Convert.ToDouble(value), 0.5);
+                        updateCriteriaRange(ref criteria.DrainRate, op, Convert.ToDouble(value), 0.3);
                         break;
                     case "cs":
-                        updateCriteriaRange(ref criteria.CircleSize, op, Convert.ToDouble(value), 0.5);
+                        updateCriteriaRange(ref criteria.CircleSize, op, Convert.ToDouble(value), 0.3);
                         break;
                     case "divisor":
                         if (op == ":")
