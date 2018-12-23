@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Select
             set
             {
                 searchText = value;
-                SearchTerms = searchText.Split(',', ' ', '!').Where(s => !string.IsNullOrEmpty(s)).ToArray();
+                SearchTerms = searchText.Split(new[] { ',', ' ', '!' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
             }
         }
     }
