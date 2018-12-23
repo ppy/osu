@@ -30,6 +30,7 @@ namespace osu.Game.Screens.Select.Carousel
                 (Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps);
 
             match &= criteria.StarDifficulty.IsTrue(Beatmap.StarDifficulty);
+            match &= criteria.ApproachRate.IsTrue(Beatmap.BaseDifficulty.ApproachRate);
 
             foreach (var criteriaTerm in criteria.SearchTerms)
                 match &=

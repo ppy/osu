@@ -56,5 +56,6 @@ namespace osu.Game.Screens.Select
         }
 
         public OptionalRange StarDifficulty;
+        public OptionalRange ApproachRate;
     }
 }

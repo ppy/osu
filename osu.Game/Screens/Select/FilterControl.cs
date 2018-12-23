@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        static readonly Regex querySyntaxRegex = new Regex(@"\b(?<key>stars)(?<op>:|>|<)(?<value>\w+)\b");
+        static readonly Regex querySyntaxRegex = new Regex(@"\b(?<key>stars|ar)(?<op>:|>|<)(?<value>\w+)\b");
 
         enum QueryOperation
         {
@@ -101,6 +101,15 @@ namespace osu.Game.Screens.Select
                             case QueryOperation.Equals: criteria.StarDifficulty.Min = stars; criteria.StarDifficulty.Max = stars + 1; break;
                             case QueryOperation.LargerThan: criteria.StarDifficulty.Min = stars; break;
                             case QueryOperation.LessThan: criteria.StarDifficulty.Max = stars; break;
+                        }
+                        break;
+                    case "ar":
+                        var ar = Convert.ToDouble(match.Groups["value"].Value);
+                        switch (op)
+                        {
+                            case QueryOperation.Equals: criteria.ApproachRate.Min = ar; criteria.ApproachRate.Max = ar + 1; break;
+                            case QueryOperation.LargerThan: criteria.ApproachRate.Min = ar; break;
+                            case QueryOperation.LessThan: criteria.ApproachRate.Max = ar; break;
                         }
                         break;
                 }
