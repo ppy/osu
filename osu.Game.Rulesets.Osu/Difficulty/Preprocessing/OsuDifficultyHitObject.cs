@@ -77,7 +77,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             }
 
             if (lastObject is Slider lastSlider)
+            {
+                computeSliderCursorPosition(lastSlider);
                 TravelDistance = lastSlider.LazyTravelDistance * scalingFactor;
+            }
 
             Vector2 lastCursorPosition = getEndCursorPosition(lastObject);
 
