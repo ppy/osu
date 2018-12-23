@@ -61,6 +61,8 @@ namespace osu.Game
 
         private DialogOverlay dialogOverlay;
 
+        private AccountCreationOverlay accountCreation;
+
         private DirectOverlay direct;
 
         private SocialOverlay social;
@@ -192,7 +194,13 @@ namespace osu.Game
         }
 
         private ExternalLinkOpener externalLinkOpener;
-        public void OpenUrlExternally(string url) => externalLinkOpener.OpenUrlExternally(url);
+        public void OpenUrlExternally(string url)
+        {
+            if (url.StartsWith("/"))
+                url = $"{API.Endpoint}{url}";
+
+            externalLinkOpener.OpenUrlExternally(url);
+        }
 
         private ScheduledDelegate scoreLoad;
 
@@ -407,9 +415,19 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, overlayContent.Add);
 
-            loadComponentSingleFile(dialogOverlay = new DialogOverlay
+            loadComponentSingleFile(accountCreation = new AccountCreationOverlay
             {
                 Depth = -6,
+            }, overlayContent.Add);
+
+            loadComponentSingleFile(dialogOverlay = new DialogOverlay
+            {
+                Depth = -7,
+            }, overlayContent.Add);
+
+            loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener
+            {
+                Depth = -8,
             }, overlayContent.Add);
 
             dependencies.Cache(idleTracker);
@@ -424,6 +442,7 @@ namespace osu.Game
             dependencies.Cache(beatmapSetOverlay);
             dependencies.Cache(notifications);
             dependencies.Cache(dialogOverlay);
+            dependencies.Cache(accountCreation);
 
             chatOverlay.StateChanged += state => channelManager.HighPollRate.Value = state == Visibility.Visible;
 
