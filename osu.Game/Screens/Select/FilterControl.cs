@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        static readonly Regex query_syntax_regex = new Regex(@"\b(?<key>stars|ar|divisor|length|objects)(?<op>:|>|<)(?<value>\w+)\b");
+        static readonly Regex query_syntax_regex = new Regex(@"\b(?<key>stars|ar|divisor|length|objects)(?<op>:|>|<)(?<value>\w+)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         void updateCriteriaRange(ref FilterCriteria.OptionalRange range, string op, double value, double equalityTolerableDistance = 0)
         {
