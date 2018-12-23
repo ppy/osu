@@ -59,6 +59,6 @@ namespace osu.Game.Screens.Select
         public OptionalRange ApproachRate;
         public OptionalRange Length;
 
-        public int BeatDivisor;
+        public int? BeatDivisor;
     }
 }
