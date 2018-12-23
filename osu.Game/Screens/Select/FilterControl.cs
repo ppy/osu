@@ -17,6 +17,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
+using System.Text.RegularExpressions;
 
 namespace osu.Game.Screens.Select
 {
@@ -58,14 +59,55 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        public FilterCriteria CreateCriteria() => new FilterCriteria
+        static readonly Regex querySyntaxRegex = new Regex(@"\b(?<key>stars)(?<op>:|>|<)(?<value>\w+)\b");
+
+        enum QueryOperation
         {
-            Group = group,
-            Sort = sort,
-            SearchText = searchTextBox.Text,
-            AllowConvertedBeatmaps = showConverted,
-            Ruleset = ruleset.Value
-        };
+            Equals,
+            LargerThan,
+            LessThan
+        }
+
+        public FilterCriteria CreateCriteria()
+        {
+            var text = searchTextBox.Text;
+            var criteria = new FilterCriteria
+            {
+                Group = group,
+                Sort = sort,
+                SearchText = querySyntaxRegex.Replace(text, string.Empty),
+                AllowConvertedBeatmaps = showConverted,
+                Ruleset = ruleset.Value
+            };
+
+            foreach (Match match in querySyntaxRegex.Matches(text))
+            {
+                QueryOperation op;
+
+                switch (match.Groups["op"].Value)
+                {
+                    default:
+                    case ":": op = QueryOperation.Equals; break;
+                    case ">": op = QueryOperation.LargerThan; break;
+                    case "<": op = QueryOperation.LessThan; break;
+                }
+
+                switch (match.Groups["key"].Value)
+                {
+                    case "stars":
+                        var stars = Convert.ToDouble(match.Groups["value"].Value);
+                        switch (op)
+                        {
+                            case QueryOperation.Equals: criteria.StarDifficulty.Max = criteria.StarDifficulty.Min = stars; break;
+                            case QueryOperation.LargerThan: criteria.StarDifficulty.Min = stars; break;
+                            case QueryOperation.LessThan: criteria.StarDifficulty.Max = stars; break;
+                        }
+                        break;
+                }
+            }
+
+            return criteria;
+        }
 
         public Action Exit;
 
