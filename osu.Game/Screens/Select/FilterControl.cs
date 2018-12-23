@@ -86,39 +86,44 @@ namespace osu.Game.Screens.Select
 
         public FilterCriteria CreateCriteria()
         {
+            var query = searchTextBox.Text;
+
             // update active group mode
-            var groupQuery = group_syntax_regex.Match(searchTextBox.Text);
-            if (Enum.TryParse<GroupMode>(groupQuery?.Groups["value"].Value, out var groupMode))
+            var groupQuery = group_syntax_regex.Match(query);
+            if (Enum.TryParse<GroupMode>(groupQuery?.Groups["value"].Value, ignoreCase: true, out var groupMode))
             {
-                searchTextBox.Text = searchTextBox.Text.Replace(groupQuery.Value, string.Empty);
                 groupTabs.Current.Value = groupMode;
+                query = query.Replace(groupQuery.Value, string.Empty);
             }
 
             // update active sort mode
-            var sortQuery = sort_syntax_regex.Match(searchTextBox.Text);
-            if (Enum.TryParse<SortMode>(sortQuery?.Groups["value"].Value, out var sortMode))
+            var sortQuery = sort_syntax_regex.Match(query);
+            if (Enum.TryParse<SortMode>(sortQuery?.Groups["value"].Value, ignoreCase: true, out var sortMode))
             {
-                searchTextBox.Text = searchTextBox.Text.Replace(sortQuery.Value, string.Empty);
                 sortTabs.Current.Value = sortMode;
+                query = query.Replace(sortQuery.Value, string.Empty);
             }
 
             var criteria = new FilterCriteria
             {
                 Group = group,
                 Sort = sort,
-                SearchText = query_syntax_regex.Replace(searchTextBox.Text, string.Empty),
+                SearchText = query_syntax_regex.Replace(query, string.Empty),
                 AllowConvertedBeatmaps = showConverted,
                 Ruleset = ruleset.Value
             };
 
-            applyQueries(criteria);
+            applyQueries(criteria, ref query);
+
+            // query could have been modified by us on the way
+            Schedule(() => searchTextBox.Text = query);
 
             return criteria;
         }
 
-        void applyQueries(FilterCriteria criteria)
+        void applyQueries(FilterCriteria criteria, ref string query)
         {
-            foreach (Match match in query_syntax_regex.Matches(searchTextBox.Text))
+            foreach (Match match in query_syntax_regex.Matches(query))
             {
                 var key = match.Groups["key"].Value;
                 var value = match.Groups["value"].Value;
