@@ -18,6 +18,7 @@ using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 using System.Text.RegularExpressions;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Screens.Select
 {
@@ -59,9 +60,10 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        static readonly Regex query_syntax_regex = new Regex(@"\b(?<key>stars|ar|dr|cs|divisor|length|objects)(?<op>:|>|<)(?<value>\d+([.,]\d+)?)\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        static readonly Regex group_syntax_regex = new Regex($@"\bgroup:(?<value>{string.Join("|", Enum.GetNames(typeof(GroupMode)))})\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        static readonly Regex sort_syntax_regex = new Regex($@"\bsort:(?<value>{string.Join("|", Enum.GetNames(typeof(SortMode)))})\b", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        static readonly Regex query_syntax_regex = new Regex(
+            @"\b((?<key>stars|ar|dr|cs|divisor|length|objects)(?<op>[:><])(?<value>\d*([.,]\d+)?))|" +
+            @"((?<key>group|sort|status)(?<op>:)(?<value>\w*))\b",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         void updateCriteriaRange(ref FilterCriteria.OptionalRange range, string op, double value, double equalityTolerableDistance = 0)
         {
@@ -88,35 +90,17 @@ namespace osu.Game.Screens.Select
         {
             var query = searchTextBox.Text;
 
-            // update active group mode
-            var groupQuery = group_syntax_regex.Match(query);
-            if (Enum.TryParse<GroupMode>(groupQuery?.Groups["value"].Value, ignoreCase: true, out var groupMode))
-            {
-                groupTabs.Current.Value = groupMode;
-                query = query.Replace(groupQuery.Value, string.Empty);
-            }
-
-            // update active sort mode
-            var sortQuery = sort_syntax_regex.Match(query);
-            if (Enum.TryParse<SortMode>(sortQuery?.Groups["value"].Value, ignoreCase: true, out var sortMode))
-            {
-                sortTabs.Current.Value = sortMode;
-                query = query.Replace(sortQuery.Value, string.Empty);
-            }
-
             var criteria = new FilterCriteria
             {
                 Group = group,
                 Sort = sort,
-                SearchText = query_syntax_regex.Replace(query, string.Empty),
                 AllowConvertedBeatmaps = showConverted,
                 Ruleset = ruleset.Value
             };
 
             applyQueries(criteria, ref query);
 
-            // query could have been modified by us on the way
-            Schedule(() => searchTextBox.Text = query);
+            criteria.SearchText = query;
 
             return criteria;
         }
@@ -126,8 +110,14 @@ namespace osu.Game.Screens.Select
             foreach (Match match in query_syntax_regex.Matches(query))
             {
                 var key = match.Groups["key"].Value;
-                var value = match.Groups["value"].Value;
                 var op = match.Groups["op"].Value;
+                var value = match.Groups["value"].Value;
+
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    query = query.Replace(match.Value, string.Empty);
+                    continue;
+                }
 
                 switch (key)
                 {
@@ -162,7 +152,29 @@ namespace osu.Game.Screens.Select
                     case "objects":
                         updateCriteriaRange(ref criteria.ObjectCount, op, Convert.ToInt32(value), 10);
                         break;
+                    case "group":
+                        if (Enum.TryParse<GroupMode>(value, ignoreCase: true, out var groupMode))
+                            Schedule(() =>
+                            {
+                                groupTabs.Current.Value = groupMode;
+                                searchTextBox.Text = searchTextBox.Text.Replace(match.Value, string.Empty);
+                            });
+                        break;
+                    case "sort":
+                        if (Enum.TryParse<SortMode>(value, ignoreCase: true, out var sortMode))
+                            Schedule(() =>
+                            {
+                                sortTabs.Current.Value = sortMode;
+                                searchTextBox.Text = searchTextBox.Text.Replace(match.Value, string.Empty);
+                            });
+                        break;
+                    case "status":
+                        if (Enum.TryParse<BeatmapSetOnlineStatus>(value, ignoreCase: true, out var status))
+                            criteria.OnlineStatus = status;
+                        break;
                 }
+
+                query = query.Replace(match.Value, string.Empty);
             }
         }
 

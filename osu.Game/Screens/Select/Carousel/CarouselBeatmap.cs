@@ -39,6 +39,9 @@ namespace osu.Game.Screens.Select.Carousel
             if (criteria.BeatDivisor.HasValue)
                 match &= criteria.BeatDivisor == Beatmap.BeatDivisor;
 
+            if (criteria.OnlineStatus.HasValue)
+                match &= criteria.OnlineStatus == Beatmap.Status;
+
             foreach (var criteriaTerm in criteria.SearchTerms)
                 match &=
                     Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0) ||
