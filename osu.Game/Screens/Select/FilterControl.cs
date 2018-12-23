@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Select
                         var stars = Convert.ToDouble(match.Groups["value"].Value);
                         switch (op)
                         {
-                            case QueryOperation.Equals: criteria.StarDifficulty.Max = criteria.StarDifficulty.Min = stars; break;
+                            case QueryOperation.Equals: criteria.StarDifficulty.Min = stars; criteria.StarDifficulty.Max = stars + 1; break;
                             case QueryOperation.LargerThan: criteria.StarDifficulty.Min = stars; break;
                             case QueryOperation.LessThan: criteria.StarDifficulty.Max = stars; break;
                         }
