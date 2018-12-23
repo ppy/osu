@@ -31,6 +31,8 @@ namespace osu.Game.Screens.Select.Carousel
 
             match &= criteria.StarDifficulty.IsTrue(Beatmap.StarDifficulty);
             match &= criteria.ApproachRate.IsTrue(Beatmap.BaseDifficulty.ApproachRate);
+            match &= criteria.DrainRate.IsTrue(Beatmap.BaseDifficulty.DrainRate);
+            match &= criteria.CircleSize.IsTrue(Beatmap.BaseDifficulty.CircleSize);
             match &= criteria.Length.IsTrue(Beatmap.OnlineInfo?.Length ?? 0);
             match &= criteria.ObjectCount.IsTrue(Beatmap.OnlineInfo?.CircleCount ?? 0);
 

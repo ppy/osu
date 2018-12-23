@@ -59,6 +59,8 @@ namespace osu.Game.Screens.Select
 
         public OptionalRange StarDifficulty;
         public OptionalRange ApproachRate;
+        public OptionalRange DrainRate;
+        public OptionalRange CircleSize;
         public OptionalRange Length;
         public OptionalRange ObjectCount;
 
