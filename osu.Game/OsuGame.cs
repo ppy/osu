@@ -182,6 +182,13 @@ namespace osu.Game
             configSkin.TriggerChange();
 
             LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
+
+            // schedule loading of game extensions
+            ScheduleAfterChildren(() =>
+            {
+                foreach (var (assembly, extension) in Extensions.GameExtensionLoader.GetExtensions())
+                    dependencies.Inject(extension);
+            });
         }
 
         private ExternalLinkOpener externalLinkOpener;
