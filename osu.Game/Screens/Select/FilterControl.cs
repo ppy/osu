@@ -98,18 +98,18 @@ namespace osu.Game.Screens.Select
                         var stars = Convert.ToDouble(match.Groups["value"].Value);
                         switch (op)
                         {
-                            case QueryOperation.Equals: criteria.StarDifficulty.Min = stars; criteria.StarDifficulty.Max = stars + 1; break;
-                            case QueryOperation.LargerThan: criteria.StarDifficulty.Min = stars; break;
-                            case QueryOperation.LessThan: criteria.StarDifficulty.Max = stars; break;
+                            case QueryOperation.Equals: criteria.StarDifficulty.MinExclusive = stars; criteria.StarDifficulty.MaxExclusive = stars + 1; break;
+                            case QueryOperation.LargerThan: criteria.StarDifficulty.MinExclusive = stars; break;
+                            case QueryOperation.LessThan: criteria.StarDifficulty.MaxExclusive = stars; break;
                         }
                         break;
                     case "ar":
                         var ar = Convert.ToDouble(match.Groups["value"].Value);
                         switch (op)
                         {
-                            case QueryOperation.Equals: criteria.ApproachRate.Min = ar; criteria.ApproachRate.Max = ar + 1; break;
-                            case QueryOperation.LargerThan: criteria.ApproachRate.Min = ar; break;
-                            case QueryOperation.LessThan: criteria.ApproachRate.Max = ar; break;
+                            case QueryOperation.Equals: criteria.ApproachRate.MinExclusive = ar; criteria.ApproachRate.MaxExclusive = ar + 1; break;
+                            case QueryOperation.LargerThan: criteria.ApproachRate.MinExclusive = ar; break;
+                            case QueryOperation.LessThan: criteria.ApproachRate.MaxExclusive = ar; break;
                         }
                         break;
                     case "divisor":
@@ -131,9 +131,9 @@ namespace osu.Game.Screens.Select
 
                         switch (op)
                         {
-                            case QueryOperation.Equals: criteria.Length.Min = length; criteria.Length.Max = length + 60000; break;
-                            case QueryOperation.LargerThan: criteria.Length.Min = length; break;
-                            case QueryOperation.LessThan: criteria.Length.Max = length; break;
+                            case QueryOperation.Equals: criteria.Length.MinExclusive = length; criteria.Length.MaxExclusive = length + 60000; break;
+                            case QueryOperation.LargerThan: criteria.Length.MinExclusive = length; break;
+                            case QueryOperation.LessThan: criteria.Length.MaxExclusive = length; break;
                         }
                         break;
                 }

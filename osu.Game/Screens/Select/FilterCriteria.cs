@@ -34,25 +34,25 @@ namespace osu.Game.Screens.Select
         {
             public bool IsTrue(double value)
             {
-                if (Min.HasValue && value <= Min.Value)
+                if (MinExclusive.HasValue && value < MinExclusive.Value)
                     return false;
-                if (Max.HasValue && value >= Max.Value)
+                if (MaxExclusive.HasValue && value > MaxExclusive.Value)
                     return false;
 
                 return true;
             }
 
-            public double? Min;
-            public double? Max;
+            public double? MinExclusive;
+            public double? MaxExclusive;
 
             public OptionalRange(double minMax) : this(minMax, minMax) { }
             public OptionalRange(double? min, double? max)
             {
-                Min = min;
-                Max = max;
+                MinExclusive = min;
+                MaxExclusive = max;
             }
 
-            public bool Equals(OptionalRange range) => Min == range.Min && Max == range.Max;
+            public bool Equals(OptionalRange range) => MinExclusive == range.MinExclusive && MaxExclusive == range.MaxExclusive;
         }
 
         public OptionalRange StarDifficulty;
