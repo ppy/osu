@@ -29,5 +29,32 @@ namespace osu.Game.Screens.Select
                 SearchTerms = searchText.Split(new[] { ',', ' ', '!' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
             }
         }
+
+        public struct OptionalRange : IEquatable<OptionalRange>
+        {
+            public bool IsTrue(double value)
+            {
+                if (Min.HasValue && value <= Min.Value)
+                    return false;
+                if (Max.HasValue && value >= Max.Value)
+                    return false;
+
+                return true;
+            }
+
+            public double? Min;
+            public double? Max;
+
+            public OptionalRange(double minMax) : this(minMax, minMax) { }
+            public OptionalRange(double? min, double? max)
+            {
+                Min = min;
+                Max = max;
+            }
+
+            public bool Equals(OptionalRange range) => Min == range.Min && Max == range.Max;
+        }
+
+        public OptionalRange StarDifficulty;
     }
 }

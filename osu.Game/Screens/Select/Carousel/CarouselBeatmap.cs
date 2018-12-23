@@ -29,6 +29,8 @@ namespace osu.Game.Screens.Select.Carousel
                 Beatmap.RulesetID == criteria.Ruleset.ID ||
                 (Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps);
 
+            match &= criteria.StarDifficulty.IsTrue(Beatmap.StarDifficulty);
+
             foreach (var criteriaTerm in criteria.SearchTerms)
                 match &=
                     Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0) ||
