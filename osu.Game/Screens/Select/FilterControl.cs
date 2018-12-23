@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        static readonly Regex querySyntaxRegex = new Regex(@"\b(?<key>stars|ar|divisor|length)(?<op>:|>|<)(?<value>\w+)\b");
+        static readonly Regex query_syntax_regex = new Regex(@"\b(?<key>stars|ar|divisor|length)(?<op>:|>|<)(?<value>\w+)\b");
 
         enum QueryOperation
         {
@@ -75,12 +75,12 @@ namespace osu.Game.Screens.Select
             {
                 Group = group,
                 Sort = sort,
-                SearchText = querySyntaxRegex.Replace(text, string.Empty),
+                SearchText = query_syntax_regex.Replace(text, string.Empty),
                 AllowConvertedBeatmaps = showConverted,
                 Ruleset = ruleset.Value
             };
 
-            foreach (Match match in querySyntaxRegex.Matches(text))
+            foreach (Match match in query_syntax_regex.Matches(text))
             {
                 QueryOperation op;
 
