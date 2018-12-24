@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoPerformanceCalculator : PerformanceCalculator
     {
-        protected new TaikoDifficultyAttributes Attributes => (TaikoDifficultyAttributes)base.Attributes;
+        protected TaikoDifficultyAttributes Attributes;
 
         private Mod[] mods;
         private int countGreat;
@@ -28,8 +28,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        public override double Calculate(double upTo, Dictionary<string, double> categoryDifficulty = null)
         {
+            Attributes = (TaikoDifficultyAttributes)Ruleset.CreateDifficultyCalculator((WorkingBeatmap)Beatmap).Calculate(upTo, Score.Mods);
+
             mods = Score.Mods;
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
             countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);

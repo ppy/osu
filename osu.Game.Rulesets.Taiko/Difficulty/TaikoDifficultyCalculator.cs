@@ -33,14 +33,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
+        protected override DifficultyAttributes Calculate(double upTo, IBeatmap beatmap, Mod[] mods, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
                 return new TaikoDifficultyAttributes(mods, 0);
 
             var difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
 
-            foreach (var hitObject in beatmap.HitObjects)
+            foreach (var hitObject in beatmap.HitObjects.Where(b => b.StartTime <= upTo))
                 difficultyHitObjects.Add(new TaikoHitObjectDifficulty((TaikoHitObject)hitObject));
 
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.

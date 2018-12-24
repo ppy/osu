@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
+        protected override DifficultyAttributes Calculate(double upTo, IBeatmap beatmap, Mod[] mods, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
                 return new CatchDifficultyAttributes(mods, 0);
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             var difficultyHitObjects = new List<CatchDifficultyHitObject>();
 
-            foreach (var hitObject in beatmap.HitObjects)
+            foreach (var hitObject in beatmap.HitObjects.Where(b => b.StartTime <= upTo))
             {
                 switch (hitObject)
                 {
