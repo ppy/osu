@@ -79,7 +79,10 @@ namespace osu.Game.Overlays.Settings.Sections.General
                             Margin = new MarginPadding { Bottom = 5 },
                             Font = @"Exo2.0-Black",
                         },
-                        form = new LoginForm()
+                        form = new LoginForm
+                        {
+                            RequestHide = RequestHide
+                        }
                     };
                     break;
                 case APIState.Failing:
@@ -189,6 +192,8 @@ namespace osu.Game.Overlays.Settings.Sections.General
             private TextBox password;
             private APIAccess api;
 
+            public Action RequestHide;
+
             private void performLogin()
             {
                 if (!string.IsNullOrEmpty(username.Text) && !string.IsNullOrEmpty(password.Text))
@@ -196,7 +201,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
-            private void load(APIAccess api, OsuConfigManager config)
+            private void load(APIAccess api, OsuConfigManager config, AccountCreationOverlay accountCreation)
             {
                 this.api = api;
                 Direction = FillDirection.Vertical;
@@ -207,14 +212,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     username = new OsuTextBox
                     {
-                        PlaceholderText = "Email address",
+                        PlaceholderText = "email address",
                         RelativeSizeAxes = Axes.X,
                         Text = api?.ProvidedUsername ?? string.Empty,
                         TabbableContentContainer = this
                     },
                     password = new OsuPasswordTextBox
                     {
-                        PlaceholderText = "Password",
+                        PlaceholderText = "password",
                         RelativeSizeAxes = Axes.X,
                         TabbableContentContainer = this,
                         OnCommit = (sender, newText) => performLogin()
@@ -237,7 +242,11 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     new SettingsButton
                     {
                         Text = "Register",
-                        //Action = registerLink
+                        Action = () =>
+                        {
+                            RequestHide();
+                            accountCreation.Show();
+                        }
                     }
                 };
             }
@@ -322,12 +331,10 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 public const float LABEL_LEFT_MARGIN = 20;
 
                 private readonly SpriteIcon statusIcon;
+
                 public Color4 StatusColour
                 {
-                    set
-                    {
-                        statusIcon.FadeColour(value, 500, Easing.OutQuint);
-                    }
+                    set { statusIcon.FadeColour(value, 500, Easing.OutQuint); }
                 }
 
                 public UserDropdownHeader()
@@ -368,10 +375,13 @@ namespace osu.Game.Overlays.Settings.Sections.General
         private enum UserAction
         {
             Online,
+
             [Description(@"Do not disturb")]
             DoNotDisturb,
+
             [Description(@"Appear offline")]
             AppearOffline,
+
             [Description(@"Sign out")]
             SignOut,
         }
