@@ -28,7 +28,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
 
@@ -210,7 +210,7 @@ namespace osu.Game.Screens.Select
                 });
             }
 
-            BeatmapDetails.Leaderboard.ScoreSelected += s => Push(new Results(s));
+            BeatmapDetails.Leaderboard.ScoreSelected += s => Push(new SoloResults(s));
         }
 
         [BackgroundDependencyLoader(true)]
