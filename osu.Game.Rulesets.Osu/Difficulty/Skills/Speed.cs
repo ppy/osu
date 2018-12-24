@@ -11,12 +11,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : Skill
     {
-        private const double angle_bonus_begin = 3 * Math.PI / 4;
+        private const double angle_bonus_begin = 5 * Math.PI / 6;
         private const double pi_over_4 = Math.PI / 4;
         private const double pi_over_2 = Math.PI / 2;
-        private const double max_distance_for_bonus = 90;
-
-        private static readonly double sin_pi_over_4 = Math.Sin(pi_over_4);
 
         protected override double SkillMultiplier => 1400;
         protected override double StrainDecayBase => 0.3;
@@ -37,23 +34,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double angleBonus = 1.0;
             if (current.Angle != null && current.Angle.Value < angle_bonus_begin)
             {
-                angleBonus = 1 + Math.Min(Math.Sin(angle_bonus_begin - current.Angle.Value), sin_pi_over_4) / 2.5;
-
-                if (distance < max_distance_for_bonus)
+                angleBonus = 1 + Math.Pow(Math.Sin(1.5 * (angle_bonus_begin - current.Angle.Value)), 2) / 3.57;
+                if (current.Angle.Value < pi_over_2)
                 {
-                    if (current.Angle.Value < pi_over_4)
-                    {
-                        angleBonus +=
-                            (1 - angleBonus)
-                            * Math.Min((max_distance_for_bonus - distance) / 10, 1);
-                    }
-                    else if (current.Angle.Value < pi_over_2)
-                    {
-                        angleBonus +=
-                            (1 - angleBonus)
-                            * Math.Min((max_distance_for_bonus - distance) / 10, 1)
-                            * Math.Sin((pi_over_2 - current.Angle.Value) / pi_over_4);
-                    }
+                    angleBonus = 1.28;
+                    if (distance < 90 && current.Angle.Value < pi_over_4)
+                        angleBonus += (1 - angleBonus) * Math.Min((90 - distance) / 10, 1);
+                    else if (distance < 90)
+                        angleBonus += (1 - angleBonus) * Math.Min((90 - distance) / 10, 1) * Math.Sin((pi_over_2 - current.Angle.Value) / pi_over_4);
                 }
             }
 
