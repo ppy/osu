@@ -234,6 +234,8 @@ namespace osu.Game.Overlays.Profile.Header
                                     {
                                         Font = "Exo2.0-Regular",
                                         TextSize = 12,
+                                        Anchor = Anchor.BottomLeft,
+                                        Origin = Anchor.BottomLeft,
                                     }
                                 }
                             },
