@@ -98,32 +98,12 @@ namespace osu.Game.Audio
         }
 
         /// <summary>
-        /// Stops any currently playing <see cref="PreviewTrack"/>.
-        /// </summary>
-        /// <remarks>
-        /// Only the immediate owner (an object that implements <see cref="IPreviewTrackOwner"/>) of the playing <see cref="PreviewTrack"/>
-        /// can globally stop the currently playing <see cref="PreviewTrack"/>. The object holding a reference to the <see cref="PreviewTrack"/>
-        /// can always stop the <see cref="PreviewTrack"/> themselves through <see cref="PreviewTrack.Stop()"/>.
-        /// </remarks>
-        /// <param name="source">The <see cref="IPreviewTrackOwner"/> which may be the owner of the <see cref="PreviewTrack"/>.</param>
-        public void StopAnyPlaying(IPreviewTrackOwner source)
-        {
-            if (current == null || current.Owner != source)
-                return;
-
-            current.Stop();
-            current = null;
-        }
-
-        /// <summary>
         /// Creates the <see cref="TrackManagerPreviewTrack"/>.
         /// </summary>
         protected virtual TrackManagerPreviewTrack CreatePreviewTrack(BeatmapSetInfo beatmapSetInfo, TrackManager trackManager) => new TrackManagerPreviewTrack(beatmapSetInfo, trackManager);
 
         protected class TrackManagerPreviewTrack : PreviewTrack
         {
-            public IPreviewTrackOwner Owner { get; private set; }
-
             private readonly BeatmapSetInfo beatmapSetInfo;
             private readonly TrackManager trackManager;
 
@@ -131,12 +111,6 @@ namespace osu.Game.Audio
             {
                 this.beatmapSetInfo = beatmapSetInfo;
                 this.trackManager = trackManager;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(IPreviewTrackOwner owner)
-            {
-                Owner = owner;
             }
 
             protected override Track GetTrack() => trackManager.Get($"https://b.ppy.sh/preview/{beatmapSetInfo?.OnlineBeatmapSetID}.mp3");

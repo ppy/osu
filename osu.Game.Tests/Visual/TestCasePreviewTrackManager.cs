@@ -4,13 +4,12 @@
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCasePreviewTrackManager : OsuTestCase, IPreviewTrackOwner
+    public class TestCasePreviewTrackManager : OsuTestCase
     {
         private readonly PreviewTrackManager trackManager = new TestPreviewTrackManager();
 
@@ -18,7 +17,6 @@ namespace osu.Game.Tests.Visual
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
             dependencies.CacheAs(trackManager);
-            dependencies.CacheAs<IPreviewTrackOwner>(this);
             return dependencies;
         }
 
@@ -58,31 +56,6 @@ namespace osu.Game.Tests.Visual
             AddAssert("track 2 started", () => track2.IsRunning);
         }
 
-        [Test]
-        public void TestCancelFromOwner()
-        {
-            PreviewTrack track = null;
-
-            AddStep("get track", () => track = getOwnedTrack());
-            AddStep("start", () => track.Start());
-            AddStep("stop by owner", () => trackManager.StopAnyPlaying(this));
-            AddAssert("stopped", () => !track.IsRunning);
-        }
-
-        [Test]
-        public void TestCancelFromNonOwner()
-        {
-            TestTrackOwner owner = null;
-            PreviewTrack track = null;
-
-            AddStep("get track", () => Add(owner = new TestTrackOwner(track = getTrack())));
-            AddStep("start", () => track.Start());
-            AddStep("attempt stop", () => trackManager.StopAnyPlaying(this));
-            AddAssert("not stopped", () => track.IsRunning);
-            AddStep("stop by true owner", () => trackManager.StopAnyPlaying(owner));
-            AddAssert("stopped", () => !track.IsRunning);
-        }
-
         private PreviewTrack getTrack() => trackManager.Get(null);
 
         private PreviewTrack getOwnedTrack()
@@ -92,21 +65,6 @@ namespace osu.Game.Tests.Visual
             Add(track);
 
             return track;
-        }
-
-        private class TestTrackOwner : CompositeDrawable, IPreviewTrackOwner
-        {
-            public TestTrackOwner(PreviewTrack track)
-            {
-                AddInternal(track);
-            }
-
-            protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-            {
-                var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-                dependencies.CacheAs<IPreviewTrackOwner>(this);
-                return dependencies;
-            }
         }
 
         private class TestPreviewTrackManager : PreviewTrackManager

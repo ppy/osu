@@ -15,7 +15,7 @@ using osu.Game.Overlays;
 
 namespace osu.Game.Graphics.Containers
 {
-    public class OsuFocusedOverlayContainer : FocusedOverlayContainer, IPreviewTrackOwner, IKeyBindingHandler<GlobalAction>
+    public class OsuFocusedOverlayContainer : FocusedOverlayContainer, IKeyBindingHandler<GlobalAction>
     {
         private SampleChannel samplePopIn;
         private SampleChannel samplePopOut;
@@ -27,13 +27,6 @@ namespace osu.Game.Graphics.Containers
         private PreviewTrackManager previewTrackManager;
 
         protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs<IPreviewTrackOwner>(this);
-            return dependencies;
-        }
 
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame osuGame, AudioManager audio, PreviewTrackManager previewTrackManager)
@@ -101,12 +94,6 @@ namespace osu.Game.Graphics.Containers
                     if (PlaySamplesOnStateChange) samplePopOut?.Play();
                     break;
             }
-        }
-
-        protected override void PopOut()
-        {
-            base.PopOut();
-            previewTrackManager.StopAnyPlaying(this);
         }
     }
 }
