@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Multi.Match
         private OsuGame game { get; set; }
 
         [Resolved(CanBeNull = true)]
-        private RoomManager manager { get; set; }
+        private IRoomManager manager { get; set; }
 
         public MatchScreen(Room room, Action<Screen> pushGameplayScreen)
         {

@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         private readonly Room room;
 
         [Resolved(CanBeNull = true)]
-        private RoomManager manager { get; set; }
+        private IRoomManager manager { get; set; }
 
         public RoomSettingsOverlay(Room room)
         {
