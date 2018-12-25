@@ -71,16 +71,25 @@ namespace osu.Game.Online.Multiplayer
         {
             RoomID.Value = other.RoomID;
             Name.Value = other.Name;
-            Host.Value = other.Host;
-            Status.Value = other.Status;
+
+            if (other.Host.Value != null && Host.Value?.Id != other.Host.Value.Id)
+                Host.Value = other.Host;
+
+            if (Status.Value.GetType() != other.Status.Value.GetType())
+                Status.Value = other.Status;
+
             Availability.Value = other.Availability;
-            Type.Value = other.Type;
+
+            if (Type.Value.GetType() != other.Type.Value.GetType())
+                Type.Value = other.Type;
+
             MaxParticipants.Value = other.MaxParticipants;
             Participants.Value = other.Participants.Value.ToArray();
             EndDate.Value = other.EndDate;
 
-            Playlist.Clear();
-            Playlist.AddRange(other.Playlist);
+            // Todo: Temporary, should only remove/add new items (requires framework changes)
+            if (Playlist.Count == 0)
+                Playlist.AddRange(other.Playlist);
         }
 
         public bool ShouldSerializeRoomID() => false;
