@@ -14,7 +14,6 @@ namespace osu.iOS
     [Register("AppDelegate")]
     public class AppDelegate : GameAppDelegate
     {
-
         OsuGame iOSOsuGame = new OsuGame();
 
         protected override Framework.Game CreateGame()
