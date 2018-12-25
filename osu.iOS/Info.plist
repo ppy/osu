@@ -72,6 +72,25 @@
 				<string>application/x-osu-lazer-beatmap</string>
 			</dict>
 		</dict>
+		<dict>
+			<key>UTTypeDescription</key>
+			<string>osu! Skin</string>
+			<key>UTTypeIdentifier</key>
+			<string>ppy.osu.lazer.skin</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>osu!lazer</string>
+				<string>public.zip</string>
+				<string>osu!</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>osk</string>
+				<key>public.mime-type</key>
+				<string>application/zip</string>
+			</dict>
+		</dict>
 	</array>
 	<key>CFBundleDocumentTypes</key>
 	<array>
@@ -81,6 +100,14 @@
 			<key>LSItemContentTypes</key>
 			<array>
 				<string>ppy.osu.lazer.beatmap</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>osu! Skin</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>ppy.osu.lazer.skin</string>
 			</array>
 		</dict>
 	</array>
