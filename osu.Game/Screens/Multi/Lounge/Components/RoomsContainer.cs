@@ -15,7 +15,7 @@ using osuTK;
 
 namespace osu.Game.Screens.Multi.Lounge.Components
 {
-    public class RoomsContainer : CompositeDrawable, IHasFilterableChildren
+    public class RoomsContainer : CompositeDrawable
     {
         public Action<Room> JoinRequested;
 
@@ -114,11 +114,5 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             selectedRoom.Value = room;
         }
-
-        public IEnumerable<string> FilterTerms => Enumerable.Empty<string>();
-
-        public IEnumerable<IFilterable> FilterableChildren => InternalChildren.OfType<IFilterable>();
-
-        public bool MatchingFilter { set { } }
     }
 }
