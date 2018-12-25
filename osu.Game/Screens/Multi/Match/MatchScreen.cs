@@ -28,6 +28,7 @@ namespace osu.Game.Screens.Multi.Match
         private readonly RoomBindings bindings = new RoomBindings();
 
         private readonly MatchLeaderboard leaderboard;
+
         private readonly Action<Screen> pushGameplayScreen;
 
         [Cached]
@@ -49,6 +50,7 @@ namespace osu.Game.Screens.Multi.Match
 
             bindings.Room = room;
 
+            MatchChatDisplay chat;
             Components.Header header;
             RoomSettingsOverlay settings;
 
@@ -71,7 +73,7 @@ namespace osu.Game.Screens.Multi.Match
                                     new Drawable[]
                                     {
                                         leaderboard = new MatchLeaderboard(room) { RelativeSizeAxes = Axes.Both },
-                                        new MatchChatDisplay(room) { RelativeSizeAxes = Axes.Both }
+                                        chat = new MatchChatDisplay(room) { RelativeSizeAxes = Axes.Both }
                                     },
                                 },
                             }
@@ -100,6 +102,8 @@ namespace osu.Game.Screens.Multi.Match
                 else
                     settings.Hide();
             };
+
+            chat.Exit += Exit;
         }
 
         protected override void LoadComplete()
