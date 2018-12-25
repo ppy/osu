@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private readonly FillFlowContainer<DrawableRoom> roomFlow;
 
         [Resolved]
-        private RoomManager manager { get; set; }
+        private IRoomManager roomManager { get; set; }
 
         public RoomsContainer()
         {
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            rooms.BindTo(manager.Rooms);
+            rooms.BindTo(roomManager.Rooms);
 
             rooms.ItemsAdded += addRooms;
             rooms.ItemsRemoved += removeRooms;

@@ -31,7 +31,7 @@ namespace osu.Game.Screens.Multi
 
         private OsuScreen currentScreen;
 
-        [Cached]
+        [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
 
         public Multiplayer()

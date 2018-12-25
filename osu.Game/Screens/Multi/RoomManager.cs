@@ -17,12 +17,12 @@ using osu.Game.Screens.Multi.Lounge.Components;
 
 namespace osu.Game.Screens.Multi
 {
-    public class RoomManager : PollingComponent
+    public class RoomManager : PollingComponent, IRoomManager
     {
         public event Action<Room> OpenRequested;
 
-        public IBindableCollection<Room> Rooms => rooms;
         private readonly BindableCollection<Room> rooms = new BindableCollection<Room>();
+        public IBindableCollection<Room> Rooms => rooms;
 
         private Room currentRoom;
 

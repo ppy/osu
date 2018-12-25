@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Multi.Lounge
         private readonly Action<Screen> pushGameplayScreen;
 
         [Resolved(CanBeNull = true)]
-        private RoomManager roomManager { get; set; }
+        private IRoomManager roomManager { get; set; }
 
         public override string Title => "Lounge";
 
