@@ -3,8 +3,8 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Users;
 
@@ -17,13 +17,19 @@ namespace osu.Game.Tests.Visual
             typeof(HostInfo)
         };
 
+        private readonly Bindable<User> host = new Bindable<User>(new User { Username = "SomeHost" });
+
         public TestCaseMatchHostInfo()
         {
-            Child = new HostInfo(new Room { Host = { Value = new User { Username = "ImAHost" }}})
+            HostInfo hostInfo;
+
+            Child = hostInfo = new HostInfo
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
             };
+
+            hostInfo.Host.BindTo(host);
         }
     }
 }

@@ -35,6 +35,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             ViewBeatmapButton viewBeatmapButton;
             OsuSpriteText name;
             EndDateInfo endDate;
+            HostInfo hostInfo;
 
             Children = new Drawable[]
             {
@@ -69,7 +70,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                         endDate = new EndDateInfo { TextSize = 14 }
                                     }
                                 },
-                                new HostInfo(room),
+                                hostInfo = new HostInfo(),
                             },
                         },
                         new FillFlowContainer
@@ -95,6 +96,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             viewBeatmapButton.Beatmap.BindTo(bindings.CurrentBeatmap);
             readyButton.Beatmap.BindTo(bindings.CurrentBeatmap);
+            hostInfo.Host.BindTo(bindings.Host);
 
             bindings.Availability.BindValueChanged(_ => updateAvailabilityStatus());
             bindings.Status.BindValueChanged(_ => updateAvailabilityStatus());

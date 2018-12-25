@@ -1,11 +1,11 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Users;
 using osuTK;
 
@@ -13,12 +13,15 @@ namespace osu.Game.Screens.Multi.Match.Components
 {
     public class HostInfo : CompositeDrawable
     {
-        public HostInfo(Room room)
+        public readonly IBindable<User> Host = new Bindable<User>();
+
+        private readonly LinkFlowContainer linkContainer;
+        private readonly UpdateableAvatar avatar;
+
+        public HostInfo()
         {
             AutoSizeAxes = Axes.X;
             Height = 50;
-
-            LinkFlowContainer linkContainer;
 
             InternalChild = new FillFlowContainer
             {
@@ -27,11 +30,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 Spacing = new Vector2(5, 0),
                 Children = new Drawable[]
                 {
-                    new UpdateableAvatar
-                    {
-                        Size = new Vector2(50),
-                        User = room.Host.Value
-                    },
+                    avatar = new UpdateableAvatar { Size = new Vector2(50) },
                     new FillFlowContainer
                     {
                         Anchor = Anchor.CentreLeft,
@@ -43,11 +42,20 @@ namespace osu.Game.Screens.Multi.Match.Components
                 }
             };
 
-            if (room.Host.Value != null)
+
+
+            Host.BindValueChanged(updateHost);
+        }
+
+        private void updateHost(User host)
+        {
+            avatar.User = host;
+
+            if (host != null)
             {
                 linkContainer.AddText("hosted by");
                 linkContainer.NewLine();
-                linkContainer.AddLink(room.Host.Value.Username, null, LinkAction.OpenUserProfile, room.Host.Value.Id.ToString(), "View Profile", s => s.Font = "Exo2.0-BoldItalic");
+                linkContainer.AddLink(host.Username, null, LinkAction.OpenUserProfile, host.Id.ToString(), "View Profile", s => s.Font = "Exo2.0-BoldItalic");
             }
         }
     }
