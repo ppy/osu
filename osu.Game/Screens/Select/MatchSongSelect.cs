@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using Humanizer;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi;
 
@@ -12,6 +13,7 @@ namespace osu.Game.Screens.Select
         public Action<PlaylistItem> Selected;
 
         public string ShortTitle => "song selection";
+        public override string Title => ShortTitle.Humanize();
 
         protected override bool OnStart()
         {
