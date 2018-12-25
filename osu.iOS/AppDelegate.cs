@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
+// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 using Foundation;
 using osu.Framework.iOS;
 using osu.Game;
@@ -21,30 +22,11 @@ namespace osu.iOS
            return iOSOsuGame;
         }
 
-        private BeatmapManager beatmap;
-
-        [BackgroundDependencyLoader]
-        private void load(BeatmapManager beatmapManager)
-        {
-            beatmap = beatmapManager;
-        }
-
-
-
         [Export("application:openURL:options:")]
         override public bool OpenUrl(UIKit.UIApplication app, NSUrl url, NSDictionary options)
         {
-            Console.WriteLine(url.Path);
-            string path = url.Path;
-            //Stream beatmapToLoad = new FileStream(path, FileMode.Open, FileAccess.Read);
-            //workingGame.Import(path);
-            iOSOsuGame.Import(path);
+            iOSOsuGame.Import(url.Path);
             return true;
         }
-
-
     }
-
-
 }
-
