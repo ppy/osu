@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
+using osu.Framework.Extensions;
 using osu.Framework.IO.File;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
@@ -31,6 +32,8 @@ namespace osu.Game.Database
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
+        public delegate void ItemAddedDelegate(TModel model, bool existing, bool silent);
+
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
         /// </summary>
@@ -40,7 +43,7 @@ namespace osu.Game.Database
         /// Fired when a new <see cref="TModel"/> becomes available in the database.
         /// This is not guaranteed to run on the update thread.
         /// </summary>
-        public event Action<TModel> ItemAdded;
+        public event ItemAddedDelegate ItemAdded;
 
         /// <summary>
         /// Fired when a <see cref="TModel"/> is removed from the database.
@@ -107,7 +110,7 @@ namespace osu.Game.Database
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += s => handleEvent(() => ItemAdded?.Invoke(s));
+            ModelStore.ItemAdded += (item, silent) => handleEvent(() => ItemAdded?.Invoke(item, false, silent));
             ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
 
             Files = new FileStore(contextFactory, storage);
@@ -146,8 +149,10 @@ namespace osu.Game.Database
                 try
                 {
                     notification.Text = $"Importing ({++current} of {paths.Length})\n{Path.GetFileName(path)}";
+
+                    TModel import;
                     using (ArchiveReader reader = getReaderFrom(path))
-                        imported.Add(Import(reader));
+                        imported.Add(import = Import(reader));
 
                     notification.Progress = (float)current / paths.Length;
 
@@ -157,7 +162,7 @@ namespace osu.Game.Database
                     // TODO: Add a check to prevent files from storage to be deleted.
                     try
                     {
-                        if (File.Exists(path))
+                        if (import != null && File.Exists(path))
                             File.Delete(path);
                     }
                     catch (Exception e)
@@ -203,7 +208,12 @@ namespace osu.Game.Database
             try
             {
                 var model = CreateModel(archive);
-                return model == null ? null : Import(model, archive);
+
+                if (model == null) return null;
+
+                model.Hash = computeHash(archive);
+
+                return Import(model, false, archive);
             }
             catch (Exception e)
             {
@@ -213,11 +223,33 @@ namespace osu.Game.Database
         }
 
         /// <summary>
+        /// Any file extensions which should be included in hash creation.
+        /// Generally should include all file types which determine the file's uniqueness.
+        /// Large files should be avoided if possible.
+        /// </summary>
+        protected abstract string[] HashableFileTypes { get; }
+
+        /// <summary>
+        /// Create a SHA-2 hash from the provided archive based on file content of all files matching <see cref="HashableFileTypes"/>.
+        /// </summary>
+        private string computeHash(ArchiveReader reader)
+        {
+            // for now, concatenate all .osu files in the set to create a unique hash.
+            MemoryStream hashable = new MemoryStream();
+            foreach (string file in reader.Filenames.Where(f => HashableFileTypes.Any(f.EndsWith)))
+                using (Stream s = reader.GetStream(file))
+                    s.CopyTo(hashable);
+
+            return hashable.ComputeSHA2Hash();
+        }
+
+        /// <summary>
         /// Import an item from a <see cref="TModel"/>.
         /// </summary>
         /// <param name="item">The model to be imported.</param>
+        /// <param name="silent">Whether the user should be notified fo the import.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
-        public TModel Import(TModel item, ArchiveReader archive = null)
+        public TModel Import(TModel item, bool silent = false, ArchiveReader archive = null)
         {
             delayEvents();
 
@@ -235,7 +267,9 @@ namespace osu.Game.Database
 
                         if (existing != null)
                         {
+                            Undelete(existing);
                             Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
+                            handleEvent(() => ItemAdded?.Invoke(existing, true, silent));
                             return existing;
                         }
 
@@ -245,7 +279,7 @@ namespace osu.Game.Database
                         Populate(item, archive);
 
                         // import to store
-                        ModelStore.Add(item);
+                        ModelStore.Add(item, silent);
                     }
                     catch (Exception e)
                     {
@@ -471,7 +505,12 @@ namespace osu.Game.Database
         {
         }
 
-        protected virtual TModel CheckForExisting(TModel model) => null;
+        /// <summary>
+        /// Check whether an existing model already exists for a new import item.
+        /// </summary>
+        /// <param name="model">The new model proposed for import. Note that <see cref="Populate"/> has not yet been run on this model.</param>
+        /// <returns>An existing model which matches the criteria to skip importing, else null.</returns>
+        protected virtual TModel CheckForExisting(TModel model) => model.Hash == null ? null : ModelStore.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
 
         private DbSet<TModel> queryModel() => ContextFactory.Get().Set<TModel>();
 
@@ -485,7 +524,9 @@ namespace osu.Game.Database
             if (ZipUtils.IsZipArchive(path))
                 return new ZipArchiveReader(File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read), Path.GetFileName(path));
             if (Directory.Exists(path))
-                return new LegacyFilesystemReader(path);
+                return new LegacyDirectoryArchiveReader(path);
+            if (File.Exists(path))
+                return new LegacyFileArchiveReader(path);
             throw new InvalidFormatException($"{path} is not a valid archive");
         }
     }

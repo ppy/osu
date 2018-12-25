@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
@@ -29,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private int countMeh;
         private int countMiss;
 
-        public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, Score score)
+        public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
         {
             countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
@@ -122,8 +123,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             if (mods.Any(h => h is OsuModFlashlight))
             {
-                // Apply length bonus again if flashlight is on simply because it becomes a lot harder on longer maps.
-                aimValue *= 1.45f * lengthBonus;
+                // Apply object-based bonus for flashlight.
+                aimValue *= 1.0f + 0.35f * Math.Min(1.0f, totalHits / 200.0f) +
+                        (totalHits > 200 ? 0.3f * Math.Min(1.0f, (totalHits - 200) / 300.0f) +
+                        (totalHits > 500 ? (totalHits - 500) / 1200.0f : 0.0f) : 0.0f);
             }
 
             // Scale the aim value with accuracy _slightly_

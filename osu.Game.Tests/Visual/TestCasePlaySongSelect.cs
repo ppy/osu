@@ -98,8 +98,11 @@ namespace osu.Game.Tests.Visual
         [SetUp]
         public virtual void SetUp()
         {
-            manager?.Delete(manager.GetAllUsableBeatmapSets());
-            Child = songSelect = new TestSongSelect();
+            Schedule(() =>
+            {
+                manager?.Delete(manager.GetAllUsableBeatmapSets());
+                Child = songSelect = new TestSongSelect();
+            });
         }
 
         [Test]
@@ -187,7 +190,7 @@ namespace osu.Game.Tests.Visual
         private static int importId;
         private int getImportId() => ++importId;
 
-        private void changeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.ShortenedName))}", () => selectedMods.Value = mods);
+        private void changeMods(params Mod[] mods) => AddStep($"change mods to {string.Join(", ", mods.Select(m => m.Acronym))}", () => selectedMods.Value = mods);
 
         private void changeRuleset(int id) => AddStep($"change ruleset to {id}", () => Ruleset.Value = rulesets.AvailableRulesets.First(r => r.ID == id));
 

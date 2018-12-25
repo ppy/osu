@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override FontAwesome Icon => FontAwesome.fa_paint_brush;
 
-        private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo>();
+        private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo> { Default = SkinInfo.Default };
         private readonly Bindable<int> configBindable = new Bindable<int>();
 
         private SkinManager skins;
@@ -71,7 +71,14 @@ namespace osu.Game.Overlays.Settings.Sections
         }
 
         private void itemRemoved(SkinInfo s) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != s.ID).ToArray());
-        private void itemAdded(SkinInfo s) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Append(s).ToArray());
+
+        private void itemAdded(SkinInfo s, bool existing, bool silent)
+        {
+            if (existing)
+                return;
+
+            Schedule(() => skinDropdown.Items = skinDropdown.Items.Append(s).ToArray());
+        }
 
         protected override void Dispose(bool isDisposing)
         {

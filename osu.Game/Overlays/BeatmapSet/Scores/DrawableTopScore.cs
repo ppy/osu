@@ -12,11 +12,12 @@ using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Scoring;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
@@ -42,8 +43,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly InfoColumn statistics;
         private readonly ScoreModsContainer modsContainer;
 
-        private APIScore score;
-        public APIScore Score
+        private APIScoreInfo score;
+        public APIScoreInfo Score
         {
             get { return score; }
             set

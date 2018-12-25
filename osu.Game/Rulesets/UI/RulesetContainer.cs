@@ -19,8 +19,8 @@ using osu.Framework.Input;
 using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Overlays;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Configuration;
-using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.UI
@@ -67,6 +67,11 @@ namespace osu.Game.Rulesets.UI
         /// The playfield.
         /// </summary>
         public Playfield Playfield => playfield.Value;
+
+        /// <summary>
+        /// Place to put drawables above hit objects but below UI.
+        /// </summary>
+        public Container Overlays { get; protected set; }
 
         /// <summary>
         /// The cursor provided by this <see cref="RulesetContainer"/>. May be null if no cursor is provided.
@@ -215,7 +220,6 @@ namespace osu.Game.Rulesets.UI
 
         protected override Container<Drawable> Content => content;
         private Container content;
-        private IEnumerable<Mod> mods;
 
         /// <summary>
         /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
@@ -245,16 +249,23 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            KeyBindingInputManager.Add(content = new Container
+            KeyBindingInputManager.Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-            });
-
-            AddInternal(KeyBindingInputManager);
-            KeyBindingInputManager.Add(Playfield);
+                content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                Playfield
+            };
 
             if (Cursor != null)
                 KeyBindingInputManager.Add(Cursor);
+
+            InternalChildren = new Drawable[]
+            {
+                KeyBindingInputManager,
+                Overlays = new Container { RelativeSizeAxes = Axes.Both }
+            };
 
             // Apply mods
             applyRulesetMods(Mods, config);
@@ -329,7 +340,6 @@ namespace osu.Game.Rulesets.UI
 
             Playfield.Add(drawableObject);
         }
-
 
         /// <summary>
         /// Creates a DrawableHitObject from a HitObject.
