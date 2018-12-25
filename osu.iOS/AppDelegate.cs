@@ -1,12 +1,9 @@
 ﻿using System;
-using System.IO;
 using Foundation;
-using osu.Framework;
 using osu.Framework.iOS;
 using osu.Game;
 using osu.Game.Beatmaps;
-using osu.Game.Database;
-using osu.Game.IO.Archives;
+using osu.Framework.Allocation;
 
 namespace osu.iOS
 {
@@ -16,18 +13,32 @@ namespace osu.iOS
     [Register("AppDelegate")]
     public class AppDelegate : GameAppDelegate
     {
-        protected override Framework.Game CreateGame() => new OsuGame();
-        private BeatmapManager beatmap = null;
+
+        OsuGame iOSOsuGame = new OsuGame();
+
+        protected override Framework.Game CreateGame()
+        {
+           return iOSOsuGame;
+        }
+
+        private BeatmapManager beatmap;
+
+        [BackgroundDependencyLoader]
+        private void load(BeatmapManager beatmapManager)
+        {
+            beatmap = beatmapManager;
+        }
+
+
 
         [Export("application:openURL:options:")]
-
         override public bool OpenUrl(UIKit.UIApplication app, NSUrl url, NSDictionary options)
         {
-
             Console.WriteLine(url.Path);
             string path = url.Path;
             //Stream beatmapToLoad = new FileStream(path, FileMode.Open, FileAccess.Read);
-            beatmap.Import(path);
+            //workingGame.Import(path);
+            iOSOsuGame.Import(path);
             return true;
         }
 
