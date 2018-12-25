@@ -211,14 +211,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 },
             };
 
-            bindings.Status.ValueChanged += s =>
-            {
-                status.Text = s.Message;
-
-                foreach (Drawable d in new Drawable[] { selectionBox, sideStrip, status })
-                    d.FadeColour(s.GetAppropriateColour(colours), transition_duration);
-            };
-
             background.Beatmap.BindTo(bindings.CurrentBeatmap);
             modeTypeInfo.Beatmap.BindTo(bindings.CurrentBeatmap);
             beatmapTitle.Beatmap.BindTo(bindings.CurrentBeatmap);
@@ -228,6 +220,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             bindings.Name.BindValueChanged(n => name.Text = n, true);
             bindings.EndDate.BindValueChanged(d => endDate.Date = d, true);
+            bindings.Status.BindValueChanged(s =>
+            {
+                status.Text = s.Message;
+
+                foreach (Drawable d in new Drawable[] { selectionBox, sideStrip, status })
+                    d.FadeColour(s.GetAppropriateColour(colours), transition_duration);
+            }, true);
         }
 
         protected override void LoadComplete()
