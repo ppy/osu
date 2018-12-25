@@ -59,7 +59,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
-        public WorkingBeatmap DefaultBeatmap { private get; set; }
+        public WorkingBeatmap DefaultBeatmap { get; set; }
 
         public override string[] HandledExtensions => new[] { ".osz" };
 
