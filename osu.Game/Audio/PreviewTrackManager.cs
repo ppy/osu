@@ -1,14 +1,13 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
+using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.IO.Stores;
-using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays.Direct;
 
@@ -26,7 +25,7 @@ namespace osu.Game.Audio
 
         private TrackManagerPreviewTrack current;
 
-        private readonly WeakList<PlayButtonState> playButtonStates = new WeakList<PlayButtonState>();
+        private readonly List<PlayButtonState> playButtonStates = new List<PlayButtonState>();
 
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, FrameworkConfigManager config)
@@ -41,19 +40,11 @@ namespace osu.Game.Audio
 
         public PlayButtonState GetPlayButtonState(BeatmapSetInfo beatmapSet)
         {
-            PlayButtonState result = null;
+            PlayButtonState result = playButtonStates.Find(playButtonState => playButtonState.BeatmapSet == beatmapSet);
 
-            var exists = playButtonStates.FirstOrDefault(weakReference => weakReference.TryGetTarget(out result) && result.BeatmapSet == beatmapSet) != null;
-
-            if (!exists)
+            if (result == null)
             {
-                result = new PlayButtonState(beatmapSet);
-
-                var freeWeakReference = playButtonStates.FirstOrDefault(reference => !reference.TryGetTarget(out _));
-                if (freeWeakReference != null)
-                    freeWeakReference.SetTarget(result);
-                else
-                    playButtonStates.Add(result);
+                playButtonStates.Add(result = new PlayButtonState(beatmapSet));
 
                 result.StateChanged += state =>
                 {
