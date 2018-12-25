@@ -29,7 +29,7 @@ namespace osu.Game.Beatmaps.Drawables
 
             var localBeatmap = beatmaps.GetWorkingBeatmap(model);
 
-            if (localBeatmap == beatmaps.DefaultBeatmap && model?.BeatmapSet?.OnlineInfo != null)
+            if (localBeatmap.BeatmapInfo.ID == 0 && model?.BeatmapSet?.OnlineInfo != null)
                 drawable = new BeatmapSetCover(model.BeatmapSet);
             else
                 drawable = new BeatmapBackgroundSprite(localBeatmap);
