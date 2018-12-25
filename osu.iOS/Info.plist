@@ -2,8 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleIdentifier</key>
-	<string>ppy.osu.lazer</string>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
@@ -36,5 +38,51 @@
 	<true/>
 	<key>UIRequiresFullScreen</key>
 	<true/>
+	<key>CFBundleIdentifier</key>
+	<string>Mirai.SampleGame-iOS</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>osu! URLs</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>osu://</string>
+			</array>
+		</dict>
+	</array>
+	<key>UTExportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeDescription</key>
+			<string>osu! Beatmap</string>
+			<key>UTTypeIdentifier</key>
+			<string>ppy.osu.lazer.beatmap</string>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>osu!lazer</string>
+				<string>public.zip</string>
+				<string>osu!</string>
+			</array>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<string>osz</string>
+				<key>public.mime-type</key>
+				<string>application/x-osu-lazer-beatmap</string>
+			</dict>
+		</dict>
+	</array>
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>osu! Beatmap</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>ppy.osu.lazer.beatmap</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>
