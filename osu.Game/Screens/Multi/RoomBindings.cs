@@ -44,8 +44,9 @@ namespace osu.Game.Screens.Multi
                     Status.UnbindFrom(room.Status);
                     Type.UnbindFrom(room.Type);
                     Playlist.UnbindFrom(room.Playlist);
-                    MaxParticipants.UnbindFrom(room.MaxParticipants);
                     Participants.UnbindFrom(room.Participants);
+                    MaxParticipants.UnbindFrom(room.MaxParticipants);
+                    EndDate.UnbindFrom(room.EndDate);
                     Availability.UnbindFrom(room.Availability);
                     Duration.UnbindFrom(room.Duration);
                 }
@@ -59,8 +60,9 @@ namespace osu.Game.Screens.Multi
                     Status.BindTo(room.Status);
                     Type.BindTo(room.Type);
                     Playlist.BindTo(room.Playlist);
-                    MaxParticipants.BindTo(room.MaxParticipants);
                     Participants.BindTo(room.Participants);
+                    MaxParticipants.BindTo(room.MaxParticipants);
+                    EndDate.BindTo(room.EndDate);
                     Availability.BindTo(room.Availability);
                     Duration.BindTo(room.Duration);
                 }
