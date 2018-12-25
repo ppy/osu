@@ -20,6 +20,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Chat;
 using osu.Game.Overlays.Profile.Header;
 using osu.Game.Scoring;
@@ -94,6 +95,9 @@ namespace osu.Game.Overlays.Profile
 
         [Resolved(CanBeNull = true)]
         private ChatOverlay chatOverlay { get; set; }
+
+        [Resolved]
+        private APIAccess apiAccess { get; set; }
 
         public ProfileHeader()
         {
@@ -340,6 +344,7 @@ namespace osu.Game.Overlays.Profile
                                         },
                                         messageButton = new ProfileHeaderButton
                                         {
+                                            Alpha = 0,
                                             RelativeSizeAxes = Axes.Y,
                                             Children = new Drawable[]
                                             {
@@ -734,13 +739,16 @@ namespace osu.Game.Overlays.Profile
 
             followerText.Text = user.FollowerCount?.Length > 0 ? user.FollowerCount[0].ToString("#,##0") : "0";
 
-            if (!user.PMFriendsOnly)
+            if (!user.PMFriendsOnly && apiAccess.LocalUser.Value.Id != user.Id)
+            {
+                messageButton.Show();
                 messageButton.Action = () =>
                 {
                     channelManager?.OpenPrivateChannel(user);
                     userOverlay?.Hide();
                     chatOverlay?.Show();
                 };
+            }
 
             expandButton.Action = DetailsVisible.Toggle;
 

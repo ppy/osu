@@ -38,8 +38,8 @@ namespace osu.Game.Overlays.Profile.Header
 
         public MarginPadding Padding
         {
-            set => TabContainer.Padding = value;
             get => TabContainer.Padding;
+            set => TabContainer.Padding = value;
         }
 
         public ProfileHeaderTabControl()
