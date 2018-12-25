@@ -25,6 +25,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private readonly IBindableCollection<Room> rooms = new BindableCollection<Room>();
 
         private readonly FillFlowContainer<DrawableRoom> roomFlow;
+        public IReadOnlyList<DrawableRoom> Rooms => roomFlow;
 
         [Resolved]
         private IRoomManager roomManager { get; set; }
