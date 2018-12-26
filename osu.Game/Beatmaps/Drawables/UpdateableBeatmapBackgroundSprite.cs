@@ -5,10 +5,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Beatmaps.Drawables
 {
+    /// <summary>
+    /// Display a baetmap background from a local source, but fallback to online source if not available.
+    /// </summary>
     public class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<BeatmapInfo>
     {
         public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
@@ -25,12 +27,12 @@ namespace osu.Game.Beatmaps.Drawables
         {
             Drawable drawable;
 
-            if (model == null)
-                drawable = new DefaultSprite();
-            else if (model.BeatmapSet?.OnlineInfo != null)
+            var localBeatmap = beatmaps.GetWorkingBeatmap(model);
+
+            if (localBeatmap.BeatmapInfo.ID == 0 && model?.BeatmapSet?.OnlineInfo != null)
                 drawable = new BeatmapSetCover(model.BeatmapSet);
             else
-                drawable = new BeatmapBackgroundSprite(beatmaps.GetWorkingBeatmap(model));
+                drawable = new BeatmapBackgroundSprite(localBeatmap);
 
             drawable.RelativeSizeAxes = Axes.Both;
             drawable.Anchor = Anchor.Centre;
@@ -41,17 +43,5 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         protected override double FadeDuration => 400;
-
-        private class DefaultSprite : Sprite
-        {
-            [Resolved]
-            private IBindableBeatmap gameBeatmap { get; set; }
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                Texture = gameBeatmap.Default.Background;
-            }
-        }
     }
 }
