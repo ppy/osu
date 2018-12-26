@@ -47,11 +47,8 @@ namespace osu.Game.Screens.Multi.Lounge
                         {
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.55f,
-                            Padding = new MarginPadding
-                            {
-                                Vertical = 35 - DrawableRoom.SELECTION_BORDER_WIDTH,
-                                Right = 20 - DrawableRoom.SELECTION_BORDER_WIDTH
-                            },
+                            ScrollbarOverlapsContent = false,
+                            Padding = new MarginPadding(10),
                             Child = new SearchContainer
                             {
                                 RelativeSizeAxes = Axes.X,
@@ -140,7 +137,7 @@ namespace osu.Game.Screens.Multi.Lounge
             if (!IsCurrentScreen)
                 return;
 
-            Push(new MatchScreen(room, s  => pushGameplayScreen?.Invoke(s)));
+            Push(new MatchScreen(room, s => pushGameplayScreen?.Invoke(s)));
         }
 
         protected override void Dispose(bool isDisposing)
