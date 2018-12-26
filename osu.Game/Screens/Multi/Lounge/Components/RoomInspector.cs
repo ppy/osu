@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                             Padding = contentPadding,
                             Children = new Drawable[]
                             {
-                                participantInfo = new ParticipantInfo(@"Rank Range "),
+                                participantInfo = new ParticipantInfo(),
                             },
                         },
                     },
