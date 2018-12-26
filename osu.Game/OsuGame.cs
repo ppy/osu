@@ -187,6 +187,7 @@ namespace osu.Game
         }
 
         private ExternalLinkOpener externalLinkOpener;
+
         public void OpenUrlExternally(string url)
         {
             if (url.StartsWith("/"))
@@ -355,7 +356,7 @@ namespace osu.Game
                 },
                 mainContent = new Container { RelativeSizeAxes = Axes.Both },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
-                idleTracker = new IdleTracker(6000)
+                idleTracker = new GameIdleTracker(6000)
             });
 
             loadComponentSingleFile(screenStack = new Loader(), d =>
@@ -423,7 +424,7 @@ namespace osu.Game
                 Depth = -8,
             }, overlayContent.Add);
 
-            dependencies.Cache(idleTracker);
+            dependencies.CacheAs(idleTracker);
             dependencies.Cache(settings);
             dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
@@ -502,6 +503,16 @@ namespace osu.Game
 
             settings.StateChanged += _ => updateScreenOffset();
             notifications.StateChanged += _ => updateScreenOffset();
+        }
+
+        public class GameIdleTracker : IdleTracker
+        {
+            public GameIdleTracker(int time)
+                : base(time)
+            {
+            }
+
+            protected override bool AllowIdle => GetContainingInputManager().FocusedDrawable == null;
         }
 
         private void forwardLoggedErrorsToNotifications()
