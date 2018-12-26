@@ -106,18 +106,9 @@ namespace osu.Game.Screens.Multi.Lounge
 
         protected override bool OnExiting(Screen next)
         {
-            roomManager?.PartRoom();
-
             Filter.Search.HoldFocus = false;
             // no base call; don't animate
             return false;
-        }
-
-        protected override void OnResuming(Screen last)
-        {
-            roomManager?.PartRoom();
-
-            base.OnResuming(last);
         }
 
         protected override void OnSuspending(Screen next)
