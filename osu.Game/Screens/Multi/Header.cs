@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Multi
 
             breadcrumbs.Current.ValueChanged += s =>
             {
-                if (s is IMultiplayerScreen mpScreen)
+                if (s is IMultiplayerSubScreen mpScreen)
                     screenType.Text = mpScreen.ShortTitle.ToLowerInvariant();
             };
 

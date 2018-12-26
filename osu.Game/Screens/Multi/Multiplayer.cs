@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Multi
         public override bool AllowBeatmapRulesetChange => currentScreen?.AllowBeatmapRulesetChange ?? base.AllowBeatmapRulesetChange;
 
         private readonly OsuButton createButton;
-        private readonly LoungeScreen loungeScreen;
+        private readonly LoungeSubScreen loungeSubScreen;
 
         private OsuScreen currentScreen;
 
@@ -71,9 +71,9 @@ namespace osu.Game.Screens.Multi
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = Header.HEIGHT },
-                    Child = loungeScreen = new LoungeScreen(Push),
+                    Child = loungeSubScreen = new LoungeSubScreen(Push),
                 },
-                new Header(loungeScreen),
+                new Header(loungeSubScreen),
                 createButton = new HeaderButton
                 {
                     Anchor = Anchor.TopRight,
@@ -86,19 +86,22 @@ namespace osu.Game.Screens.Multi
                         Right = 10,
                     },
                     Text = "Create room",
-                    Action = () => loungeScreen.Open(new Room
+                    Action = () => loungeSubScreen.Open(new Room
                     {
                         Name = { Value = $"{api.LocalUser}'s awesome room" }
                     }),
                 },
                 roomManager = new RoomManager()
             });
-            screenAdded(loungeScreen);
-            loungeScreen.Exited += s => Exit();
+
+            screenAdded(loungeSubScreen);
+            loungeSubScreen.Exited += _ => Exit();
         }
 
         protected override void OnEntering(Screen last)
         {
+            Content.FadeIn();
+
             base.OnEntering(last);
             waves.Show();
         }
@@ -107,12 +110,13 @@ namespace osu.Game.Screens.Multi
         {
             waves.Hide();
 
+            Content.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
+
             var track = Beatmap.Value.Track;
             if (track != null)
                 track.Looping = false;
 
-            loungeScreen.MakeCurrent();
-            loungeScreen.Exit();
+            loungeSubScreen.MakeCurrent();
 
             return base.OnExiting(next);
         }
@@ -144,7 +148,7 @@ namespace osu.Game.Screens.Multi
         {
             base.Update();
 
-            if (currentScreen is MatchScreen)
+            if (currentScreen is MatchSubScreen)
             {
                 var track = Beatmap.Value.Track;
                 if (track != null)
@@ -161,7 +165,7 @@ namespace osu.Game.Screens.Multi
 
                 createButton.Hide();
             }
-            else if (currentScreen is LoungeScreen)
+            else if (currentScreen is LoungeSubScreen)
                 createButton.Show();
         }
 
@@ -175,7 +179,7 @@ namespace osu.Game.Screens.Multi
 
         private void screenRemoved(Screen newScreen)
         {
-            if (currentScreen is MatchScreen)
+            if (currentScreen is MatchSubScreen)
             {
                 var track = Beatmap.Value.Track;
                 if (track != null)

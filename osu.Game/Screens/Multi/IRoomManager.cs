@@ -11,9 +11,9 @@ namespace osu.Game.Screens.Multi
     public interface IRoomManager
     {
         /// <summary>
-        /// Invoked when this <see cref="IRoomManager"/> requests a <see cref="Room"/> to be opened.
+        /// Invoked when a room is joined.
         /// </summary>
-        event Action<Room> OpenRequested;
+        event Action<Room> RoomJoined;
 
         /// <summary>
         /// All the active <see cref="Room"/>s.

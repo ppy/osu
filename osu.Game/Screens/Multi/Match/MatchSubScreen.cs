@@ -20,7 +20,7 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.Multi.Match
 {
-    public class MatchScreen : MultiplayerScreen
+    public class MatchSubScreen : MultiplayerSubScreen
     {
         public override bool AllowBeatmapRulesetChange => false;
         public override string Title => room.RoomID.Value == null ? "New room" : room.Name.Value;
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Multi.Match
         [Resolved(CanBeNull = true)]
         private IRoomManager manager { get; set; }
 
-        public MatchScreen(Room room, Action<Screen> pushGameplayScreen)
+        public MatchSubScreen(Room room, Action<Screen> pushGameplayScreen)
         {
             this.room = room;
             this.pushGameplayScreen = pushGameplayScreen;
@@ -117,6 +117,12 @@ namespace osu.Game.Screens.Multi.Match
             };
 
             chat.Exit += Exit;
+        }
+
+        protected override bool OnExiting(Screen next)
+        {
+            manager?.PartRoom();
+            return base.OnExiting(next);
         }
 
         protected override void LoadComplete()

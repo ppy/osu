@@ -14,7 +14,7 @@ using osu.Game.Screens.Multi.Match;
 
 namespace osu.Game.Screens.Multi.Lounge
 {
-    public class LoungeScreen : MultiplayerScreen
+    public class LoungeSubScreen : MultiplayerSubScreen
     {
         protected readonly FilterControl Filter;
 
@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Multi.Lounge
 
         protected override Drawable TransitionContent => content;
 
-        public LoungeScreen(Action<Screen> pushGameplayScreen)
+        public LoungeSubScreen(Action<Screen> pushGameplayScreen)
         {
             this.pushGameplayScreen = pushGameplayScreen;
 
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Multi.Lounge
         private void load()
         {
             if (roomManager != null)
-                roomManager.OpenRequested += Open;
+                roomManager.RoomJoined += Open;
         }
 
         protected override void UpdateAfterChildren()
@@ -109,7 +109,8 @@ namespace osu.Game.Screens.Multi.Lounge
             roomManager?.PartRoom();
 
             Filter.Search.HoldFocus = false;
-            return base.OnExiting(next);
+            // no base call; don't animate
+            return false;
         }
 
         protected override void OnResuming(Screen last)
@@ -137,7 +138,7 @@ namespace osu.Game.Screens.Multi.Lounge
             if (!IsCurrentScreen)
                 return;
 
-            Push(new MatchScreen(room, s => pushGameplayScreen?.Invoke(s)));
+            Push(new MatchSubScreen(room, s => pushGameplayScreen?.Invoke(s)));
         }
 
         protected override void Dispose(bool isDisposing)
@@ -145,7 +146,7 @@ namespace osu.Game.Screens.Multi.Lounge
             base.Dispose(isDisposing);
 
             if (roomManager != null)
-                roomManager.OpenRequested -= Open;
+                roomManager.RoomJoined -= Open;
         }
     }
 }

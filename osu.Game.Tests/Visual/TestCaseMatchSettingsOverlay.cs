@@ -102,7 +102,7 @@ namespace osu.Game.Tests.Visual
         {
             public Action<Room> CreateRequested;
 
-            public event Action<Room> OpenRequested;
+            public event Action<Room> RoomJoined;
 
             public IBindableCollection<Room> Rooms { get; } = null;
 
