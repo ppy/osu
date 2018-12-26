@@ -317,7 +317,7 @@ namespace osu.Game
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
                 Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
 
-                currentScreen.Push(new PlayerLoader(new ReplayPlayer(databasedScore)));
+                currentScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
             }
         }
 

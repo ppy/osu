@@ -167,10 +167,12 @@ namespace osu.Game.Screens.Multi.Match
             {
                 default:
                 case GameTypeTimeshift _:
-                    var player = new TimeshiftPlayer(room, room.Playlist.First().ID);
-                    player.Exited += _ => leaderboard.RefreshScores();
+                    pushGameplayScreen?.Invoke(new PlayerLoader(() => {
+                        var player = new TimeshiftPlayer(room, room.Playlist.First().ID);
+                        player.Exited += _ => leaderboard.RefreshScores();
 
-                    pushGameplayScreen?.Invoke(new PlayerLoader(player));
+                        return player;
+                    }));
                     break;
             }
         }
