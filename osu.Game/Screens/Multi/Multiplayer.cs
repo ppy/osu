@@ -86,7 +86,7 @@ namespace osu.Game.Screens.Multi
                         Right = 10,
                     },
                     Text = "Create room",
-                    Action = () => loungeSubScreen.Open(new Room
+                    Action = () => loungeSubScreen.Push(new Room
                     {
                         Name = { Value = $"{api.LocalUser}'s awesome room" }
                     }),

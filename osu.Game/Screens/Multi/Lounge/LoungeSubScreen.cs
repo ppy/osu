@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Multi.Lounge
         private void load()
         {
             if (roomManager != null)
-                roomManager.RoomJoined += Open;
+                roomManager.RoomJoined += Push;
         }
 
         protected override void UpdateAfterChildren()
@@ -123,7 +123,10 @@ namespace osu.Game.Screens.Multi.Lounge
             roomManager?.Filter(Filter.CreateCriteria());
         }
 
-        public void Open(Room room)
+        /// <summary>
+        /// Push a room as a new subscreen.
+        /// </summary>
+        public void Push(Room room)
         {
             // Handles the case where a room is clicked 3 times in quick succession
             if (!IsCurrentScreen)
@@ -137,7 +140,7 @@ namespace osu.Game.Screens.Multi.Lounge
             base.Dispose(isDisposing);
 
             if (roomManager != null)
-                roomManager.RoomJoined -= Open;
+                roomManager.RoomJoined -= Push;
         }
     }
 }
