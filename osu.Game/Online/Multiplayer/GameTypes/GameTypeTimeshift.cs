@@ -13,7 +13,6 @@ namespace osu.Game.Online.Multiplayer.GameTypes
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
             Icon = FontAwesome.fa_clock_o,
-            X = -2, // The icon is off-centre
             Size = new Vector2(size),
             Colour = colours.Blue,
             Shadow = false
