@@ -131,7 +131,7 @@ namespace osu.Game.Screens.Multi.Lounge
             processingOverlay.Show();
             roomManager?.JoinRoom(room, r =>
             {
-                Open(room);
+                Push(room);
                 processingOverlay.Hide();
             }, _ => processingOverlay.Hide());
         }
