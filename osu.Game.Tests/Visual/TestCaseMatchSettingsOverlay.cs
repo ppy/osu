@@ -115,7 +115,7 @@ namespace osu.Game.Tests.Visual
             AddUntilStep(() => !settings.ErrorText.IsPresent, "error not displayed");
         }
 
-        private class TestRoomSettings : RoomSettingsOverlay
+        private class TestRoomSettings : MatchSettingsOverlay
         {
             public new TriangleButton ApplyButton => base.ApplyButton;
 
