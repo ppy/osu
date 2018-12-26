@@ -11,7 +11,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Screens.Multi.Components
 {
-    public class ParticipantCount : CompositeDrawable
+    public class ParticipantCountDisplay : CompositeDrawable
     {
         private const float text_size = 30;
         private const float transition_duration = 100;
@@ -19,9 +19,10 @@ namespace osu.Game.Screens.Multi.Components
         private readonly OsuSpriteText slash, maxText;
 
         public readonly IBindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>();
+        public readonly IBindable<int> ParticipantCount = new Bindable<int>();
         public readonly IBindable<int?> MaxParticipants = new Bindable<int?>();
 
-        public ParticipantCount()
+        public ParticipantCountDisplay()
         {
             AutoSizeAxes = Axes.Both;
 
@@ -55,6 +56,7 @@ namespace osu.Game.Screens.Multi.Components
 
             Participants.BindValueChanged(v => count.Text = v.Count().ToString());
             MaxParticipants.BindValueChanged(_ => updateMax(), true);
+            ParticipantCount.BindValueChanged(v => count.Text = v.ToString("#,0"));
         }
 
         private void updateMax()

@@ -217,6 +217,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             modeTypeInfo.Type.BindTo(bindings.Type);
             participantInfo.Host.BindTo(bindings.Host);
             participantInfo.Participants.BindTo(bindings.Participants);
+            participantInfo.ParticipantCount.BindTo(bindings.ParticipantCount);
 
             bindings.Name.BindValueChanged(n => name.Text = n, true);
             bindings.EndDate.BindValueChanged(d => endDate.Date = d, true);
