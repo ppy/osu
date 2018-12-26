@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Multi
             PartRoom();
         }
 
-        public void CreateRoom(Room room, Action<string> onError = null)
+        public void CreateRoom(Room room, Action onSuccess = null, Action<string> onError = null)
         {
             room.Host.Value = api.LocalUser;
 
@@ -57,6 +57,8 @@ namespace osu.Game.Screens.Multi
             {
                 update(room, result);
                 addRoom(room);
+
+                onSuccess?.Invoke();
             };
 
             req.Failure += exception =>

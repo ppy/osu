@@ -39,6 +39,8 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         protected readonly OsuSpriteText ErrorText;
 
+        private readonly ProcessingOverlay processingOverlay;
+
         private readonly Room room;
 
         [Resolved(CanBeNull = true)]
@@ -231,7 +233,8 @@ namespace osu.Game.Screens.Multi.Match.Components
                                 }
                             }
                         }
-                    }
+                    },
+                    processingOverlay = new ProcessingOverlay { Alpha = 0 }
                 },
             };
 
@@ -264,7 +267,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             ApplyButton.Enabled.Value = hasValidSettings;
         }
 
-        private bool hasValidSettings => NameField.Text.Length > 0 && bindings.Playlist.Count > 0;
+        private bool hasValidSettings => bindings.Room.RoomID.Value == null && NameField.Text.Length > 0 && bindings.Playlist.Count > 0;
 
         protected override void PopIn()
         {
@@ -291,15 +294,21 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             bindings.Duration.Value = DurationField.Current.Value;
 
-            manager?.CreateRoom(room, showError);
+            manager?.CreateRoom(room, onSuccess, onError);
+
+            processingOverlay.Show();
         }
 
         private void hideError() => ErrorText.FadeOut(50);
 
-        private void showError(string text)
+        private void onSuccess() => processingOverlay.Hide();
+
+        private void onError(string text)
         {
             ErrorText.Text = text;
             ErrorText.FadeIn(50);
+
+            processingOverlay.Hide();
         }
 
         private class SettingsTextBox : OsuTextBox
