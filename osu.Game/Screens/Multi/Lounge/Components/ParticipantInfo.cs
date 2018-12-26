@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -21,9 +22,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         public readonly IBindable<User> Host = new Bindable<User>();
         public readonly IBindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>();
+        public readonly IBindable<int> ParticipantCount = new Bindable<int>();
 
         public ParticipantInfo()
         {
+            OsuSpriteText summary;
             RelativeSizeAxes = Axes.X;
             Height = 15f;
 
@@ -78,7 +81,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     Direction = FillDirection.Horizontal,
                     Children = new[]
                     {
-                        new OsuSpriteText
+                        summary = new OsuSpriteText
                         {
                             Text = "0 participants",
                             TextSize = 14,
@@ -95,6 +98,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
                 flagContainer.Child = new DrawableFlag(v.Country) { RelativeSizeAxes = Axes.Both };
             });
+
+            ParticipantCount.BindValueChanged(v => summary.Text = $"{v:#,0}{" participant".Pluralize(v == 1)}");
 
             /*Participants.BindValueChanged(v =>
             {

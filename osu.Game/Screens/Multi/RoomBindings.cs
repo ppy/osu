@@ -45,6 +45,7 @@ namespace osu.Game.Screens.Multi
                     Type.UnbindFrom(room.Type);
                     Playlist.UnbindFrom(room.Playlist);
                     Participants.UnbindFrom(room.Participants);
+                    ParticipantCount.UnbindFrom(room.ParticipantCount);
                     MaxParticipants.UnbindFrom(room.MaxParticipants);
                     EndDate.UnbindFrom(room.EndDate);
                     Availability.UnbindFrom(room.Availability);
@@ -61,6 +62,7 @@ namespace osu.Game.Screens.Multi
                     Type.BindTo(room.Type);
                     Playlist.BindTo(room.Playlist);
                     Participants.BindTo(room.Participants);
+                    ParticipantCount.BindTo(room.ParticipantCount);
                     MaxParticipants.BindTo(room.MaxParticipants);
                     EndDate.BindTo(room.EndDate);
                     Availability.BindTo(room.Availability);
@@ -86,6 +88,7 @@ namespace osu.Game.Screens.Multi
         public readonly Bindable<GameType> Type = new Bindable<GameType>();
         public readonly BindableCollection<PlaylistItem> Playlist = new BindableCollection<PlaylistItem>();
         public readonly Bindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>();
+        public readonly Bindable<int> ParticipantCount = new Bindable<int>();
         public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();
         public readonly Bindable<DateTimeOffset> EndDate = new Bindable<DateTimeOffset>();
         public readonly Bindable<RoomAvailability> Availability = new Bindable<RoomAvailability>();

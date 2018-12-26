@@ -36,7 +36,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private OsuColour colours;
         private Box statusStrip;
         private UpdateableBeatmapBackgroundSprite background;
-        private ParticipantCount participantCount;
+        private ParticipantCountDisplay participantCount;
         private FillFlowContainer topFlow, participantsFlow;
         private OsuSpriteText name, status;
         private BeatmapTypeInfo beatmapTypeInfo;
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                     Padding = new MarginPadding(20),
                                     Children = new Drawable[]
                                     {
-                                        participantCount = new ParticipantCount
+                                        participantCount = new ParticipantCountDisplay
                                         {
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
@@ -167,9 +167,12 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             };
 
             participantInfo.Host.BindTo(bindings.Host);
+            participantInfo.ParticipantCount.BindTo(bindings.ParticipantCount);
             participantInfo.Participants.BindTo(bindings.Participants);
+
             participantCount.Participants.BindTo(bindings.Participants);
             participantCount.MaxParticipants.BindTo(bindings.MaxParticipants);
+
             beatmapTypeInfo.Type.BindTo(bindings.Type);
             background.Beatmap.BindTo(bindings.CurrentBeatmap);
             beatmapTypeInfo.Beatmap.BindTo(bindings.CurrentBeatmap);

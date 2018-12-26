@@ -49,6 +49,9 @@ namespace osu.Game.Online.Multiplayer
         [JsonIgnore]
         public Bindable<IEnumerable<User>> Participants { get; private set; } = new Bindable<IEnumerable<User>>(Enumerable.Empty<User>());
 
+        [JsonProperty("participant_count")]
+        public Bindable<int> ParticipantCount { get; private set; } = new Bindable<int>();
+
         [JsonProperty("duration")]
         private int duration
         {
@@ -85,6 +88,7 @@ namespace osu.Game.Online.Multiplayer
                 Type.Value = other.Type;
 
             MaxParticipants.Value = other.MaxParticipants;
+            ParticipantCount.Value = other.ParticipantCount.Value;
             Participants.Value = other.Participants.Value.ToArray();
             EndDate.Value = other.EndDate;
 

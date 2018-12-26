@@ -16,12 +16,13 @@ namespace osu.Game.Screens.Multi.Match.Components
     public class Participants : CompositeDrawable
     {
         public readonly IBindable<IEnumerable<User>> Users = new Bindable<IEnumerable<User>>();
+        public readonly IBindable<int> ParticipantCount = new Bindable<int>();
         public readonly IBindable<int?> MaxParticipants = new Bindable<int?>();
 
         public Participants()
         {
             FillFlowContainer<UserPanel> usersFlow;
-            ParticipantCount count;
+            ParticipantCountDisplay count;
 
             InternalChild = new Container
             {
@@ -35,7 +36,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                         Padding = new MarginPadding { Top = 10 },
                         Children = new Drawable[]
                         {
-                            count = new ParticipantCount
+                            count = new ParticipantCountDisplay
                             {
                                 Anchor = Anchor.TopRight,
                                 Origin = Anchor.TopRight,
@@ -55,6 +56,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             };
 
             count.Participants.BindTo(Users);
+            count.ParticipantCount.BindTo(ParticipantCount);
             count.MaxParticipants.BindTo(MaxParticipants);
 
             Users.BindValueChanged(v =>
