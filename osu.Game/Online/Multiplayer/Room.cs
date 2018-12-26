@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Configuration;
+using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Multiplayer
