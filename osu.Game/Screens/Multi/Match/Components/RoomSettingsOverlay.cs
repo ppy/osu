@@ -61,105 +61,113 @@ namespace osu.Game.Screens.Multi.Match.Components
                         RelativeSizeAxes = Axes.Both,
                         Colour = OsuColour.FromHex(@"28242d"),
                     },
-                    new Container
+                    new ScrollContainer
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Padding = new MarginPadding { Top = 35, Bottom = 75, Horizontal = SearchableListOverlay.WIDTH_PADDING },
                         Children = new[]
                         {
-                            new SectionContainer
+                            new Container
                             {
-                                Padding = new MarginPadding { Right = field_padding / 2 },
-                                Children = new[]
+                                Padding = new MarginPadding { Top = 35, Bottom = 75, Horizontal = SearchableListOverlay.WIDTH_PADDING },
+                                RelativeSizeAxes = Axes.X,
+                                AutoSizeAxes = Axes.Y,
+                                Children = new Drawable[]
                                 {
-                                    new Section("Room name")
+                                    new SectionContainer
                                     {
-                                        Child = NameField = new SettingsTextBox
+                                        Padding = new MarginPadding { Right = field_padding / 2 },
+                                        Children = new[]
                                         {
-                                            RelativeSizeAxes = Axes.X,
-                                            TabbableContentContainer = this,
-                                            OnCommit = (sender, text) => apply(),
-                                        },
-                                    },
-                                    new Section("Room visibility")
-                                    {
-                                        Alpha = disabled_alpha,
-                                        Child = AvailabilityPicker = new RoomAvailabilityPicker(),
-                                    },
-                                    new Section("Game type")
-                                    {
-                                        Alpha = disabled_alpha,
-                                        Child = new FillFlowContainer
-                                        {
-                                            AutoSizeAxes = Axes.Y,
-                                            RelativeSizeAxes = Axes.X,
-                                            Direction = FillDirection.Vertical,
-                                            Spacing = new Vector2(7),
-                                            Children = new Drawable[]
+                                            new Section("Room name")
                                             {
-                                                TypePicker = new GameTypePicker
+                                                Child = NameField = new SettingsTextBox
                                                 {
                                                     RelativeSizeAxes = Axes.X,
+                                                    TabbableContentContainer = this,
+                                                    OnCommit = (sender, text) => apply(),
                                                 },
-                                                typeLabel = new OsuSpriteText
+                                            },
+                                            new Section("Room visibility")
+                                            {
+                                                Alpha = disabled_alpha,
+                                                Child = AvailabilityPicker = new RoomAvailabilityPicker(),
+                                            },
+                                            new Section("Game type")
+                                            {
+                                                Alpha = disabled_alpha,
+                                                Child = new FillFlowContainer
                                                 {
-                                                    TextSize = 14,
+                                                    AutoSizeAxes = Axes.Y,
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Direction = FillDirection.Vertical,
+                                                    Spacing = new Vector2(7),
+                                                    Children = new Drawable[]
+                                                    {
+                                                        TypePicker = new GameTypePicker
+                                                        {
+                                                            RelativeSizeAxes = Axes.X,
+                                                        },
+                                                        typeLabel = new OsuSpriteText
+                                                        {
+                                                            TextSize = 14,
+                                                        },
+                                                    },
+                                                },
+                                            },
+                                        },
+                                    },
+                                    new SectionContainer
+                                    {
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
+                                        Padding = new MarginPadding { Left = field_padding / 2 },
+                                        Children = new[]
+                                        {
+                                            new Section("Max participants")
+                                            {
+                                                Alpha = disabled_alpha,
+                                                Child = MaxParticipantsField = new SettingsNumberTextBox
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    TabbableContentContainer = this,
+                                                    OnCommit = (sender, text) => apply(),
+                                                },
+                                            },
+                                            new Section("Duration")
+                                            {
+                                                Child = DurationField = new DurationDropdown
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    Items = new[]
+                                                    {
+                                                        TimeSpan.FromMinutes(1),
+                                                        TimeSpan.FromMinutes(30),
+                                                        TimeSpan.FromHours(1),
+                                                        TimeSpan.FromHours(2),
+                                                        TimeSpan.FromHours(4),
+                                                        TimeSpan.FromHours(8),
+                                                        TimeSpan.FromHours(12),
+                                                        TimeSpan.FromHours(16),
+                                                        TimeSpan.FromHours(24),
+                                                        TimeSpan.FromDays(3),
+                                                        TimeSpan.FromDays(7)
+                                                    }
+                                                }
+                                            },
+                                            new Section("Password (optional)")
+                                            {
+                                                Alpha = disabled_alpha,
+                                                Child = PasswordField = new SettingsPasswordTextBox
+                                                {
+                                                    RelativeSizeAxes = Axes.X,
+                                                    TabbableContentContainer = this,
+                                                    OnCommit = (sender, text) => apply()
                                                 },
                                             },
                                         },
                                     },
                                 },
-                            },
-                            new SectionContainer
-                            {
-                                Anchor = Anchor.TopRight,
-                                Origin = Anchor.TopRight,
-                                Padding = new MarginPadding { Left = field_padding / 2 },
-                                Children = new[]
-                                {
-                                    new Section("Max participants")
-                                    {
-                                        Alpha = disabled_alpha,
-                                        Child = MaxParticipantsField = new SettingsNumberTextBox
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            TabbableContentContainer = this,
-                                            OnCommit = (sender, text) => apply(),
-                                        },
-                                    },
-                                    new Section("Duration")
-                                    {
-                                        Child = DurationField = new DurationDropdown
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            Items = new[]
-                                            {
-                                                TimeSpan.FromMinutes(1),
-                                                TimeSpan.FromMinutes(30),
-                                                TimeSpan.FromHours(1),
-                                                TimeSpan.FromHours(2),
-                                                TimeSpan.FromHours(4),
-                                                TimeSpan.FromHours(8),
-                                                TimeSpan.FromHours(12),
-                                                TimeSpan.FromHours(16),
-                                                TimeSpan.FromHours(24),
-                                                TimeSpan.FromDays(3),
-                                                TimeSpan.FromDays(7)
-                                            }
-                                        }
-                                    },
-                                    new Section("Password (optional)")
-                                    {
-                                        Alpha = disabled_alpha,
-                                        Child = PasswordField = new SettingsPasswordTextBox
-                                        {
-                                            RelativeSizeAxes = Axes.X,
-                                            TabbableContentContainer = this,
-                                            OnCommit = (sender, text) => apply()
-                                        },
-                                    },
-                                },
-                            },
+                            }
                         },
                     },
                     new Container
@@ -265,7 +273,8 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             public SectionContainer()
             {
-                RelativeSizeAxes = Axes.Both;
+                RelativeSizeAxes = Axes.X;
+                AutoSizeAxes = Axes.Y;
                 Width = 0.5f;
                 Direction = FillDirection.Vertical;
                 Spacing = new Vector2(field_padding);
