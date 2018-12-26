@@ -19,8 +19,6 @@ namespace osu.Game.Screens.Multi
 {
     public class RoomManager : PollingComponent, IRoomManager
     {
-        public event Action<Room> RoomJoined;
-
         private readonly BindableCollection<Room> rooms = new BindableCollection<Room>();
         public IBindableCollection<Room> Rooms => rooms;
 
@@ -48,7 +46,7 @@ namespace osu.Game.Screens.Multi
             PartRoom();
         }
 
-        public void CreateRoom(Room room, Action onSuccess = null, Action<string> onError = null)
+        public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             room.Host.Value = api.LocalUser;
 
@@ -58,7 +56,7 @@ namespace osu.Game.Screens.Multi
                 update(room, result);
                 addRoom(room);
 
-                onSuccess?.Invoke();
+                onSuccess?.Invoke(room);
             };
 
             req.Failure += exception =>
@@ -74,7 +72,7 @@ namespace osu.Game.Screens.Multi
 
         private JoinRoomRequest currentJoinRoomRequest;
 
-        public void JoinRoom(Room room)
+        public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             currentJoinRoomRequest?.Cancel();
             currentJoinRoomRequest = null;
@@ -83,10 +81,14 @@ namespace osu.Game.Screens.Multi
             currentJoinRoomRequest.Success += () =>
             {
                 currentRoom = room;
-                RoomJoined?.Invoke(room);
+                onSuccess?.Invoke(room);
             };
 
-            currentJoinRoomRequest.Failure += exception => Logger.Log($"Failed to join room: {exception}", level: LogLevel.Important);
+            currentJoinRoomRequest.Failure += exception =>
+            {
+                Logger.Log($"Failed to join room: {exception}", level: LogLevel.Important);
+                onError?.Invoke(exception.ToString());
+            };
 
             api.Queue(currentJoinRoomRequest);
         }

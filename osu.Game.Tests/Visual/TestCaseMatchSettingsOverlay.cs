@@ -136,11 +136,9 @@ namespace osu.Game.Tests.Visual
 
             public Func<Room, bool> CreateRequested;
 
-            public event Action<Room> RoomJoined;
-
             public IBindableCollection<Room> Rooms { get; } = null;
 
-            public void CreateRoom(Room room, Action onSuccess = null, Action<string> onError = null)
+            public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
             {
                 if (CreateRequested == null)
                     return;
@@ -148,10 +146,10 @@ namespace osu.Game.Tests.Visual
                 if (!CreateRequested.Invoke(room))
                     onError?.Invoke(FAILED_TEXT);
                 else
-                    onSuccess?.Invoke();
+                    onSuccess?.Invoke(room);
             }
 
-            public void JoinRoom(Room room) => throw new NotImplementedException();
+            public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => throw new NotImplementedException();
 
             public void PartRoom() => throw new NotImplementedException();
 

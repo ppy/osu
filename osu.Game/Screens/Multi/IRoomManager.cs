@@ -11,11 +11,6 @@ namespace osu.Game.Screens.Multi
     public interface IRoomManager
     {
         /// <summary>
-        /// Invoked when a room is joined.
-        /// </summary>
-        event Action<Room> RoomJoined;
-
-        /// <summary>
         /// All the active <see cref="Room"/>s.
         /// </summary>
         IBindableCollection<Room> Rooms { get; }
@@ -26,13 +21,15 @@ namespace osu.Game.Screens.Multi
         /// <param name="room">The <see cref="Room"/> to create.</param>
         /// <param name="onSuccess">An action to be invoked if the creation succeeds.</param>
         /// <param name="onError">An action to be invoked if an error occurred.</param>
-        void CreateRoom(Room room, Action onSuccess = null, Action<string> onError = null);
+        void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null);
 
         /// <summary>
         /// Joins a <see cref="Room"/>.
         /// </summary>
         /// <param name="room">The <see cref="Room"/> to join. <see cref="Room.RoomID"/> must be populated.</param>
-        void JoinRoom(Room room);
+        /// <param name="onSuccess"></param>
+        /// <param name="onError"></param>
+        void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null);
 
         /// <summary>
         /// Parts the currently-joined <see cref="Room"/>.

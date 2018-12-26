@@ -301,7 +301,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private void hideError() => ErrorText.FadeOut(50);
 
-        private void onSuccess() => processingOverlay.Hide();
+        private void onSuccess(Room room) => processingOverlay.Hide();
 
         private void onError(string text)
         {
