@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Match.Components;
@@ -22,7 +23,7 @@ namespace osu.Game.Screens.Multi.Match
     public class MatchScreen : MultiplayerScreen
     {
         public override bool AllowBeatmapRulesetChange => false;
-        public override string Title => room.Name.Value;
+        public override string Title => room.RoomID.Value == null ? "New room" : room.Name.Value;
         public override string ShortTitle => "room";
 
         private readonly RoomBindings bindings = new RoomBindings();

@@ -10,6 +10,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Screens.Menu;
@@ -33,6 +34,9 @@ namespace osu.Game.Screens.Multi
 
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
+
+        [Resolved]
+        private APIAccess api { get; set; }
 
         public Multiplayer()
         {
@@ -82,13 +86,14 @@ namespace osu.Game.Screens.Multi
                         Right = 10,
                     },
                     Text = "Create room",
-                    Action = () => loungeScreen.Open(new Room())
+                    Action = () => loungeScreen.Open(new Room
+                    {
+                        Name = { Value = $"{api.LocalUser}'s awesome room" }
+                    }),
                 },
                 roomManager = new RoomManager()
             });
-
             screenAdded(loungeScreen);
-
             loungeScreen.Exited += s => Exit();
         }
 
