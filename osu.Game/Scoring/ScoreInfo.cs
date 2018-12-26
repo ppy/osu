@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
@@ -20,6 +21,7 @@ namespace osu.Game.Scoring
         public int ID { get; set; }
 
         [JsonProperty("rank")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public ScoreRank Rank { get; set; }
 
         [JsonProperty("total_score")]
