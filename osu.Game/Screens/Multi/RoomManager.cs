@@ -47,7 +47,12 @@ namespace osu.Game.Screens.Multi
             room.Host.Value = api.LocalUser;
 
             var req = new CreateRoomRequest(room);
-            req.Success += result => addRoom(room, result);
+            req.Success += result =>
+            {
+                update(room, result);
+                addRoom(room);
+            };
+
             req.Failure += exception =>
             {
                 if (req.Result != null)
@@ -114,13 +119,8 @@ namespace osu.Game.Screens.Multi
                 // Add new matches, or update existing
                 foreach (var r in result)
                 {
-                    processPlaylist(r);
-
-                    var existing = rooms.FirstOrDefault(e => e.RoomID.Value == r.RoomID.Value);
-                    if (existing == null)
-                        rooms.Add(r);
-                    else
-                        existing.CopyFrom(r);
+                    update(r, r);
+                    addRoom(r);
                 }
 
                 tcs.SetResult(true);
@@ -133,22 +133,29 @@ namespace osu.Game.Screens.Multi
             return tcs.Task;
         }
 
-        private void addRoom(Room local, Room remote)
+        /// <summary>
+        /// Updates a local <see cref="Room"/> with a remote copy.
+        /// </summary>
+        /// <param name="local">The local <see cref="Room"/> to update.</param>
+        /// <param name="remote">The remote <see cref="Room"/> to update with.</param>
+        private void update(Room local, Room remote)
         {
-            processPlaylist(remote);
-
+            foreach (var pi in remote.Playlist)
+                pi.MapObjects(beatmaps, rulesets);
             local.CopyFrom(remote);
-
-            var existing = rooms.FirstOrDefault(e => e.RoomID.Value == local.RoomID.Value);
-            if (existing != null)
-                rooms.Remove(existing);
-            rooms.Add(local);
         }
 
-        private void processPlaylist(Room room)
+        /// <summary>
+        /// Adds a <see cref="Room"/> to the list of available rooms.
+        /// </summary>
+        /// <param name="room">The <see cref="Room"/> to add.<</param>
+        private void addRoom(Room room)
         {
-            foreach (var pi in room.Playlist)
-                pi.MapObjects(beatmaps, rulesets);
+            var existing = rooms.FirstOrDefault(e => e.RoomID.Value == room.RoomID.Value);
+            if (existing == null)
+                rooms.Add(room);
+            else
+                existing.CopyFrom(room);
         }
     }
 }
