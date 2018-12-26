@@ -64,6 +64,9 @@ namespace osu.Game.Graphics.Containers
         public void AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(AddText(text, creationParameters), text, url, linkType, linkArgument, tooltipText);
 
+        public void AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
+            => createLink(AddText(text, creationParameters), text, tooltipText: tooltipText, action: action);
+
         public void AddLink(IEnumerable<SpriteText> text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
         {
             foreach (var t in text)
@@ -72,12 +75,12 @@ namespace osu.Game.Graphics.Containers
             createLink(text, null, url, linkType, linkArgument, tooltipText);
         }
 
-        private void createLink(IEnumerable<Drawable> drawables, string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
+        private void createLink(IEnumerable<Drawable> drawables, string text, string url = null, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action action = null)
         {
             AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
             {
                 TooltipText = tooltipText ?? (url != text ? url : string.Empty),
-                Action = () =>
+                Action = action ?? (() =>
                 {
                     switch (linkType)
                     {
@@ -116,7 +119,7 @@ namespace osu.Game.Graphics.Containers
                         default:
                             throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
                     }
-                },
+                }),
             });
         }
     }
