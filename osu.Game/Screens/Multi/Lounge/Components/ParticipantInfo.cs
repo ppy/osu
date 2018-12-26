@@ -2,12 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -19,12 +17,12 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 {
     public class ParticipantInfo : Container
     {
-        private readonly FillFlowContainer levelRangeContainer;
+        private readonly FillFlowContainer summaryContainer;
 
         public readonly IBindable<User> Host = new Bindable<User>();
         public readonly IBindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>();
 
-        public ParticipantInfo(string rankPrefix = null)
+        public ParticipantInfo()
         {
             RelativeSizeAxes = Axes.X;
             Height = 15f;
@@ -49,7 +47,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                             Width = 22f,
                             RelativeSizeAxes = Axes.Y,
                         },
-                        new Container //todo: team banners
+                        /*new Container //todo: team banners
                         {
                             Width = 38f,
                             RelativeSizeAxes = Axes.Y,
@@ -63,7 +61,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                     Colour = OsuColour.FromHex(@"ad387e"),
                                 },
                             },
-                        },
+                        },*/
                         hostText = new LinkFlowContainer
                         {
                             Anchor = Anchor.CentreLeft,
@@ -72,7 +70,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                         }
                     },
                 },
-                levelRangeContainer = new FillFlowContainer
+                summaryContainer = new FillFlowContainer
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
@@ -82,34 +80,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     {
                         new OsuSpriteText
                         {
-                            Text = rankPrefix,
+                            Text = "0 participants",
                             TextSize = 14,
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = "#",
-                            TextSize = 14,
-                        },
-                        levelRangeLower = new OsuSpriteText
-                        {
-                            TextSize = 14,
-                            Font = @"Exo2.0-Bold",
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = " - ",
-                            TextSize = 14,
-                        },
-                        new OsuSpriteText
-                        {
-                            Text = "#",
-                            TextSize = 14,
-                        },
-                        levelRangeHigher = new OsuSpriteText
-                        {
-                            TextSize = 14,
-                            Font = @"Exo2.0-Bold",
-                        },
+                        }
                     },
                 },
             };
@@ -123,18 +96,18 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 flagContainer.Child = new DrawableFlag(v.Country) { RelativeSizeAxes = Axes.Both };
             });
 
-            Participants.BindValueChanged(v =>
+            /*Participants.BindValueChanged(v =>
             {
                 var ranks = v.Select(u => u.Statistics.Ranks.Global);
                 levelRangeLower.Text = ranks.Min().ToString();
                 levelRangeHigher.Text = ranks.Max().ToString();
-            });
+            });*/
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            levelRangeContainer.Colour = colours.Gray9;
+            summaryContainer.Colour = colours.Gray9;
         }
     }
 }
