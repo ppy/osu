@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                 Padding = new MarginPadding { Right = field_padding / 2 },
                                 Children = new[]
                                 {
-                                    new Section("ROOM NAME")
+                                    new Section("Room name")
                                     {
                                         Child = NameField = new SettingsTextBox
                                         {
@@ -81,12 +81,12 @@ namespace osu.Game.Screens.Multi.Match.Components
                                             OnCommit = (sender, text) => apply(),
                                         },
                                     },
-                                    new Section("ROOM VISIBILITY")
+                                    new Section("Room visibility")
                                     {
                                         Alpha = disabled_alpha,
                                         Child = AvailabilityPicker = new RoomAvailabilityPicker(),
                                     },
-                                    new Section("GAME TYPE")
+                                    new Section("Game type")
                                     {
                                         Alpha = disabled_alpha,
                                         Child = new FillFlowContainer
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                 Padding = new MarginPadding { Left = field_padding / 2 },
                                 Children = new[]
                                 {
-                                    new Section("MAX PARTICIPANTS")
+                                    new Section("Max participants")
                                     {
                                         Alpha = disabled_alpha,
                                         Child = MaxParticipantsField = new SettingsNumberTextBox
@@ -127,7 +127,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                             OnCommit = (sender, text) => apply(),
                                         },
                                     },
-                                    new Section("DURATION")
+                                    new Section("Duration")
                                     {
                                         Child = DurationField = new DurationDropdown
                                         {
@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                             }
                                         }
                                     },
-                                    new Section("PASSWORD (OPTIONAL)")
+                                    new Section("Password (optional)")
                                     {
                                         Alpha = disabled_alpha,
                                         Child = PasswordField = new SettingsPasswordTextBox
