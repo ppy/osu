@@ -145,7 +145,8 @@ namespace osu.Game.Online.API
 
                         if (!handleRequest(userReq))
                         {
-                            Thread.Sleep(500);
+                            if (State == APIState.Connecting)
+                                State = APIState.Failing;
                             continue;
                         }
 
