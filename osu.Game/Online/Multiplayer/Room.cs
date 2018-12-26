@@ -16,7 +16,7 @@ namespace osu.Game.Online.Multiplayer
         public Bindable<int?> RoomID { get; private set; } = new Bindable<int?>();
 
         [JsonProperty("name")]
-        public Bindable<string> Name { get; private set; } = new Bindable<string>("My awesome room!");
+        public Bindable<string> Name { get; private set; } = new Bindable<string>();
 
         [JsonProperty("host")]
         public Bindable<User> Host { get; private set; } = new Bindable<User>();

@@ -18,7 +18,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class RoomSettingsOverlay : FocusedOverlayContainer
+    public class MatchSettingsOverlay : FocusedOverlayContainer
     {
         private const float transition_duration = 350;
         private const float field_padding = 45;
@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         [Resolved(CanBeNull = true)]
         private IRoomManager manager { get; set; }
 
-        public RoomSettingsOverlay(Room room)
+        public MatchSettingsOverlay(Room room)
         {
             this.room = room;
 
