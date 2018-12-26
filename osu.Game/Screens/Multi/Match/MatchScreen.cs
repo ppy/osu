@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Multi.Match
 
             MatchChatDisplay chat;
             Components.Header header;
-            RoomSettingsOverlay settings;
+            MatchSettingsOverlay settings;
 
             Children = new Drawable[]
             {
@@ -90,7 +90,7 @@ namespace osu.Game.Screens.Multi.Match
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = Components.Header.HEIGHT },
-                    Child = settings = new RoomSettingsOverlay(room) { RelativeSizeAxes = Axes.Both },
+                    Child = settings = new MatchSettingsOverlay(room) { RelativeSizeAxes = Axes.Both },
                 },
             };
 

@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(RoomSettingsOverlay)
+            typeof(MatchSettingsOverlay)
         };
 
         [Cached(Type = typeof(IRoomManager))]
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("has correct duration", () => createdRoom.Duration.Value == expectedDuration);
         }
 
-        private class TestRoomSettings : RoomSettingsOverlay
+        private class TestRoomSettings : MatchSettingsOverlay
         {
             public new TriangleButton ApplyButton => base.ApplyButton;
 

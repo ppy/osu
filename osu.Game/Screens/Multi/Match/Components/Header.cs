@@ -94,11 +94,11 @@ namespace osu.Game.Screens.Multi.Match.Components
                             Origin = Anchor.TopRight,
                             RelativeSizeAxes = Axes.Y,
                             Width = 200,
-                            Padding = new MarginPadding { Vertical = 5 },
+                            Padding = new MarginPadding { Vertical = 10 },
                             Child = beatmapButton = new BeatmapSelectButton(room)
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Height = 1
+                                Height = 1,
                             },
                         },
                         Tabs = new MatchTabControl(room)
