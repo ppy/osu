@@ -105,13 +105,13 @@ namespace osu.Game.Screens.Menu
             buttonArea.AddRange(buttonsTopLevel);
         }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
 
         [Resolved]
         private APIAccess api { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private NotificationOverlay notifications { get; set; }
 
         [BackgroundDependencyLoader(true)]
@@ -128,7 +128,7 @@ namespace osu.Game.Screens.Menu
         {
             if (!api.IsLoggedIn)
             {
-                notifications.Post(new SimpleNotification
+                notifications?.Post(new SimpleNotification
                 {
                     Text = "You gotta be logged in to multi 'yo!",
                     Icon = FontAwesome.fa_globe
@@ -136,6 +136,7 @@ namespace osu.Game.Screens.Menu
 
                 return;
             }
+
             OnMulti?.Invoke();
         }
 
