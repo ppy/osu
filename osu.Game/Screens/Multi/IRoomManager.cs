@@ -24,8 +24,9 @@ namespace osu.Game.Screens.Multi
         /// Creates a new <see cref="Room"/>.
         /// </summary>
         /// <param name="room">The <see cref="Room"/> to create.</param>
+        /// <param name="onSuccess">An action to be invoked if the creation succeeds.</param>
         /// <param name="onError">An action to be invoked if an error occurred.</param>
-        void CreateRoom(Room room, Action<string> onError = null);
+        void CreateRoom(Room room, Action onSuccess = null, Action<string> onError = null);
 
         /// <summary>
         /// Joins a <see cref="Room"/>.
