@@ -49,8 +49,16 @@ namespace osu.Game.Online.Multiplayer
         [JsonIgnore]
         public Bindable<IEnumerable<User>> Participants { get; private set; } = new Bindable<IEnumerable<User>>(Enumerable.Empty<User>());
 
-        [JsonProperty("participant_count")]
+
         public Bindable<int> ParticipantCount { get; private set; } = new Bindable<int>();
+
+        // todo: TEMPORARY
+        [JsonProperty("participant_count")]
+        private int? participantCount
+        {
+            get => ParticipantCount;
+            set => ParticipantCount.Value = value ?? 0;
+        }
 
         [JsonProperty("duration")]
         private int duration
