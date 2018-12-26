@@ -67,7 +67,7 @@ namespace osu.Game.Screens.Multi
                 RoomJoined?.Invoke(room);
             };
 
-            currentJoinRoomRequest.Failure += exception => Logger.Log($"Failed to join room: {exception}");
+            currentJoinRoomRequest.Failure += exception => Logger.Log($"Failed to join room: {exception}", level: LogLevel.Important);
 
             api.Queue(currentJoinRoomRequest);
         }
