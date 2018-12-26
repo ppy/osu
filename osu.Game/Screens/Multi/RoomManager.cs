@@ -48,13 +48,19 @@ namespace osu.Game.Screens.Multi
             PartRoom();
         }
 
-        public void CreateRoom(Room room)
+        public void CreateRoom(Room room, Action<string> onError = null)
         {
             room.Host.Value = api.LocalUser;
 
             var req = new CreateRoomRequest(room);
             req.Success += result => addRoom(room, result);
-            req.Failure += exception => Logger.Log($"Failed to create room: {exception}");
+            req.Failure += exception =>
+            {
+                if (req.Result != null)
+                    onError?.Invoke(req.Result.Error);
+                else
+                    Logger.Log($"Failed to create the room: {exception}", level: LogLevel.Important);
+            };
 
             api.Queue(req);
         }

@@ -9,6 +9,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi;
@@ -77,7 +78,11 @@ namespace osu.Game.Tests.Visual
                 settings.NameField.Current.Value = expected_name;
                 settings.DurationField.Current.Value = expectedDuration;
 
-                roomManager.CreateRequested = r => createdRoom = r;
+                roomManager.CreateRequested = r =>
+                {
+                    createdRoom = r;
+                    return true;
+                };
             });
 
             AddStep("create room", () => settings.ApplyButton.Action.Invoke());
@@ -85,12 +90,39 @@ namespace osu.Game.Tests.Visual
             AddAssert("has correct duration", () => createdRoom.Duration.Value == expectedDuration);
         }
 
-        private class TestRoomSettings : MatchSettingsOverlay
+        [Test]
+        public void TestCreationFailureDisplaysError()
+        {
+            bool fail;
+
+            AddStep("setup", () =>
+            {
+                fail = true;
+                roomManager.CreateRequested = _ => !fail;
+            });
+            AddAssert("error not displayed", () => !settings.ErrorText.IsPresent);
+
+            AddStep("create room", () => settings.ApplyButton.Action.Invoke());
+            AddAssert("error displayed", () => settings.ErrorText.IsPresent);
+            AddAssert("error has correct text", () => settings.ErrorText.Text == TestRoomManager.FAILED_TEXT);
+
+            AddStep("create room no fail", () =>
+            {
+                fail = false;
+                settings.ApplyButton.Action.Invoke();
+            });
+
+            AddUntilStep(() => !settings.ErrorText.IsPresent, "error not displayed");
+        }
+
+        private class TestRoomSettings : RoomSettingsOverlay
         {
             public new TriangleButton ApplyButton => base.ApplyButton;
 
             public new OsuTextBox NameField => base.NameField;
             public new OsuDropdown<TimeSpan> DurationField => base.DurationField;
+
+            public new OsuSpriteText ErrorText => base.ErrorText;
 
             public TestRoomSettings(Room room)
                 : base(room)
@@ -100,13 +132,22 @@ namespace osu.Game.Tests.Visual
 
         private class TestRoomManager : IRoomManager
         {
-            public Action<Room> CreateRequested;
+            public const string FAILED_TEXT = "failed";
+
+            public Func<Room, bool> CreateRequested;
 
             public event Action<Room> RoomJoined;
 
             public IBindableCollection<Room> Rooms { get; } = null;
 
-            public void CreateRoom(Room room) => CreateRequested?.Invoke(room);
+            public void CreateRoom(Room room, Action<string> onError = null)
+            {
+                if (CreateRequested == null)
+                    return;
+
+                if (!CreateRequested.Invoke(room))
+                    onError?.Invoke(FAILED_TEXT);
+            }
 
             public void JoinRoom(Room room) => throw new NotImplementedException();
 
