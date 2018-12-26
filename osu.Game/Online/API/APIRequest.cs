@@ -92,7 +92,11 @@ namespace osu.Game.Online.API
 
         public void Fail(Exception e)
         {
-            if (cancelled) return;
+            if (WebRequest?.Completed == true)
+                return;
+
+            if (cancelled)
+                return;
 
             cancelled = true;
             WebRequest?.Abort();
