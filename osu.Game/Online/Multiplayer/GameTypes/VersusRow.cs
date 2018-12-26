@@ -4,7 +4,7 @@ using osu.Framework.Graphics.Shapes;
 using osuTK;
 using osuTK.Graphics;
 
-namespace osu.Game.Online.Multiplayer
+namespace osu.Game.Online.Multiplayer.GameTypes
 {
     public class VersusRow : FillFlowContainer
     {
