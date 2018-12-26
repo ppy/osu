@@ -134,7 +134,16 @@ namespace osu.Game.Screens.Multi
             Content.ScaleTo(1.1f, 250, Easing.InSine);
             Content.FadeOut(250);
 
+            cancelLooping();
+
             base.OnSuspending(next);
+        }
+
+        private void cancelLooping()
+        {
+            var track = Beatmap.Value.Track;
+            if (track != null)
+                track.Looping = false;
         }
 
         protected override void LogoExiting(OsuLogo logo)
@@ -147,6 +156,8 @@ namespace osu.Game.Screens.Multi
         protected override void Update()
         {
             base.Update();
+
+            if (!IsCurrentScreen) return;
 
             if (currentScreen is MatchSubScreen)
             {
@@ -180,11 +191,7 @@ namespace osu.Game.Screens.Multi
         private void screenRemoved(Screen newScreen)
         {
             if (currentScreen is MatchSubScreen)
-            {
-                var track = Beatmap.Value.Track;
-                if (track != null)
-                    track.Looping = false;
-            }
+                cancelLooping();
 
             currentScreen = (OsuScreen)newScreen;
         }
