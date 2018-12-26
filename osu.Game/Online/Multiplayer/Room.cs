@@ -95,6 +95,8 @@ namespace osu.Game.Online.Multiplayer
             // Todo: Temporary, should only remove/add new items (requires framework changes)
             if (Playlist.Count == 0)
                 Playlist.AddRange(other.Playlist);
+            else if (other.Playlist.Count > 0)
+                Playlist.First().ID = other.Playlist.First().ID;
         }
 
         public bool ShouldSerializeRoomID() => false;
