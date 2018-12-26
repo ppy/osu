@@ -16,7 +16,7 @@ namespace osu.Game.Tests.Visual
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(Multiplayer),
-            typeof(LoungeScreen),
+            typeof(LoungeSubScreen),
             typeof(FilterControl)
         };
 

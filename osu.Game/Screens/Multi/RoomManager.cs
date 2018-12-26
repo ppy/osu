@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Multi
 {
     public class RoomManager : PollingComponent, IRoomManager
     {
-        public event Action<Room> OpenRequested;
+        public event Action<Room> RoomJoined;
 
         private readonly BindableCollection<Room> rooms = new BindableCollection<Room>();
         public IBindableCollection<Room> Rooms => rooms;
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Multi
             currentJoinRoomRequest.Success += () =>
             {
                 currentRoom = room;
-                OpenRequested?.Invoke(room);
+                RoomJoined?.Invoke(room);
             };
 
             currentJoinRoomRequest.Failure += exception => Logger.Log($"Failed to join room: {exception}");

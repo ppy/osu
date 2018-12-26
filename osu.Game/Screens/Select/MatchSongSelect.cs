@@ -8,7 +8,7 @@ using osu.Game.Screens.Multi;
 
 namespace osu.Game.Screens.Select
 {
-    public class MatchSongSelect : SongSelect, IMultiplayerScreen
+    public class MatchSongSelect : SongSelect, IMultiplayerSubScreen
     {
         public Action<PlaylistItem> Selected;
 

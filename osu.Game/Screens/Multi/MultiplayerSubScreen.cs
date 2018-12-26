@@ -7,7 +7,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Multi
 {
-    public abstract class MultiplayerScreen : OsuScreen, IMultiplayerScreen
+    public abstract class MultiplayerSubScreen : OsuScreen, IMultiplayerSubScreen
     {
         protected virtual Drawable TransitionContent => Content;
 

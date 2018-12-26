@@ -15,7 +15,7 @@ namespace osu.Game.Tests.Visual
         {
             int index = 0;
 
-            OsuScreen currentScreen = new TestMultiplayerScreen(index);
+            OsuScreen currentScreen = new TestMultiplayerSubScreen(index);
 
             Children = new Drawable[]
             {
@@ -23,16 +23,16 @@ namespace osu.Game.Tests.Visual
                 new Header(currentScreen)
             };
 
-            AddStep("push multi screen", () => currentScreen.Push(currentScreen = new TestMultiplayerScreen(++index)));
+            AddStep("push multi screen", () => currentScreen.Push(currentScreen = new TestMultiplayerSubScreen(++index)));
         }
 
-        private class TestMultiplayerScreen : OsuScreen, IMultiplayerScreen
+        private class TestMultiplayerSubScreen : OsuScreen, IMultiplayerSubScreen
         {
             private readonly int index;
 
             public string ShortTitle => $"Screen {index}";
 
-            public TestMultiplayerScreen(int index)
+            public TestMultiplayerSubScreen(int index)
             {
                 this.index = index;
             }

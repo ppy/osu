@@ -10,11 +10,11 @@ using osu.Game.Screens.Ranking.Types;
 
 namespace osu.Game.Screens.Multi.Ranking
 {
-    public class MultiResults : Results
+    public class MatchResults : Results
     {
         private readonly Room room;
 
-        public MultiResults(ScoreInfo score, Room room)
+        public MatchResults(ScoreInfo score, Room room)
             : base(score)
         {
             this.room = room;

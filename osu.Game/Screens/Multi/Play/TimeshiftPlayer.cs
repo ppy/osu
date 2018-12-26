@@ -72,6 +72,6 @@ namespace osu.Game.Screens.Multi.Play
             return score;
         }
 
-        protected override Results CreateResults(ScoreInfo score) => new MultiResults(score, room);
+        protected override Results CreateResults(ScoreInfo score) => new MatchResults(score, room);
     }
 }

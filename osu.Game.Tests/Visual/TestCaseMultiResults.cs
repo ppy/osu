@@ -23,7 +23,7 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(MultiResults),
+            typeof(MatchResults),
             typeof(RoomLeaderboardPageInfo),
             typeof(RoomRankingResultsPage)
         };
@@ -38,22 +38,22 @@ namespace osu.Game.Tests.Visual
             if (beatmapInfo != null)
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
 
-            Child = new TestMultiResults(new ScoreInfo
+            Child = new TestMatchResults(new ScoreInfo
             {
                 User = new User { Id = 10 },
             });
         }
 
-        private class TestMultiResults : MultiResults
+        private class TestMatchResults : MatchResults
         {
             private readonly Room room;
 
-            public TestMultiResults(ScoreInfo score)
+            public TestMatchResults(ScoreInfo score)
                 : this(score, new Room())
             {
             }
 
-            public TestMultiResults(ScoreInfo score, Room room)
+            public TestMatchResults(ScoreInfo score, Room room)
                 : base(score, room)
             {
                 this.room = room;
