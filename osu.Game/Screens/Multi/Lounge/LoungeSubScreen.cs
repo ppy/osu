@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Multi.Lounge.Components;
@@ -21,6 +22,7 @@ namespace osu.Game.Screens.Multi.Lounge
         private readonly Container content;
         private readonly RoomsContainer rooms;
         private readonly Action<Screen> pushGameplayScreen;
+        private readonly ProcessingOverlay processingOverlay;
 
         [Resolved(CanBeNull = true)]
         private IRoomManager roomManager { get; set; }
@@ -43,18 +45,26 @@ namespace osu.Game.Screens.Multi.Lounge
                     RelativeSizeAxes = Axes.Both,
                     Children = new Drawable[]
                     {
-                        new ScrollContainer
+                        new Container
                         {
                             RelativeSizeAxes = Axes.Both,
                             Width = 0.55f,
-                            ScrollbarOverlapsContent = false,
-                            Padding = new MarginPadding(10),
-                            Child = new SearchContainer
+                            Children = new Drawable[]
                             {
-                                RelativeSizeAxes = Axes.X,
-                                AutoSizeAxes = Axes.Y,
-                                Child = rooms = new RoomsContainer { JoinRequested = r => roomManager?.JoinRoom(r) }
-                            },
+                                new ScrollContainer
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                    ScrollbarOverlapsContent = false,
+                                    Padding = new MarginPadding(10),
+                                    Child = new SearchContainer
+                                    {
+                                        RelativeSizeAxes = Axes.X,
+                                        AutoSizeAxes = Axes.Y,
+                                        Child = rooms = new RoomsContainer { JoinRequested = joinRequested }
+                                    },
+                                },
+                                processingOverlay = new ProcessingOverlay { Alpha = 0 }
+                            }
                         },
                         inspector = new RoomInspector
                         {
@@ -72,13 +82,6 @@ namespace osu.Game.Screens.Multi.Lounge
             Filter.Search.Current.ValueChanged += s => filterRooms();
             Filter.Tabs.Current.ValueChanged += t => filterRooms();
             Filter.Search.Exit += Exit;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            if (roomManager != null)
-                roomManager.RoomJoined += Push;
         }
 
         protected override void UpdateAfterChildren()
@@ -123,6 +126,16 @@ namespace osu.Game.Screens.Multi.Lounge
             roomManager?.Filter(Filter.CreateCriteria());
         }
 
+        private void joinRequested(Room room)
+        {
+            processingOverlay.Show();
+            roomManager?.JoinRoom(room, r =>
+            {
+                Push(room);
+                processingOverlay.Hide();
+            }, _ => processingOverlay.Hide());
+        }
+
         /// <summary>
         /// Push a room as a new subscreen.
         /// </summary>
@@ -133,14 +146,6 @@ namespace osu.Game.Screens.Multi.Lounge
                 return;
 
             Push(new MatchSubScreen(room, s => pushGameplayScreen?.Invoke(s)));
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-
-            if (roomManager != null)
-                roomManager.RoomJoined -= Push;
         }
     }
 }

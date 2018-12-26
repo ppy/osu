@@ -71,14 +71,14 @@ namespace osu.Game.Tests.Visual
 
         private class TestRoomManager : IRoomManager
         {
-            public event Action<Room> RoomJoined;
-
             public readonly BindableCollection<Room> Rooms = new BindableCollection<Room>();
             IBindableCollection<Room> IRoomManager.Rooms => Rooms;
 
-            public void CreateRoom(Room room, Action<string> onError = null) => Rooms.Add(room);
+            public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => Rooms.Add(room);
 
-            public void JoinRoom(Room room) => RoomJoined?.Invoke(room);
+            public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
+            {
+            }
 
             public void PartRoom()
             {
