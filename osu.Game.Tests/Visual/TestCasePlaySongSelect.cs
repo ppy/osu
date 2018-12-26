@@ -87,10 +87,7 @@ namespace osu.Game.Tests.Visual
                 usage.Migrate();
 
             Dependencies.Cache(rulesets = new RulesetStore(factory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, null)
-            {
-                DefaultBeatmap = defaultBeatmap = Beatmap.Default
-            });
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, null, null, defaultBeatmap = Beatmap.Default));
 
             Beatmap.SetDefault();
         }
