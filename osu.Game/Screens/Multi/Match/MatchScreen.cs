@@ -73,8 +73,20 @@ namespace osu.Game.Screens.Multi.Match
                                 {
                                     new Drawable[]
                                     {
-                                        leaderboard = new MatchLeaderboard(room) { RelativeSizeAxes = Axes.Both },
-                                        chat = new MatchChatDisplay(room) { RelativeSizeAxes = Axes.Both }
+                                        leaderboard = new MatchLeaderboard(room)
+                                        {
+                                            Padding = new MarginPadding(10),
+                                            RelativeSizeAxes = Axes.Both
+                                        },
+                                        new Container
+                                        {
+                                            Padding = new MarginPadding(10),
+                                            RelativeSizeAxes = Axes.Both,
+                                            Child = chat = new MatchChatDisplay(room)
+                                            {
+                                                RelativeSizeAxes = Axes.Both
+                                            }
+                                        },
                                     },
                                 },
                             }
