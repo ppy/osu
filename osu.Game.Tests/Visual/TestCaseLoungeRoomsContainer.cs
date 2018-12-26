@@ -76,7 +76,7 @@ namespace osu.Game.Tests.Visual
             public readonly BindableCollection<Room> Rooms = new BindableCollection<Room>();
             IBindableCollection<Room> IRoomManager.Rooms => Rooms;
 
-            public void CreateRoom(Room room) => Rooms.Add(room);
+            public void CreateRoom(Room room, Action<string> onError = null) => Rooms.Add(room);
 
             public void JoinRoom(Room room) => RoomJoined?.Invoke(room);
 

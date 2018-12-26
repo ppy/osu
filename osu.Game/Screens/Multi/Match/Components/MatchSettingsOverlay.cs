@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Multi.Match.Components
         protected readonly TriangleButton ApplyButton;
         protected readonly OsuPasswordTextBox PasswordField;
 
+        protected readonly OsuSpriteText ErrorText;
+
         private readonly Room room;
 
         [Resolved(CanBeNull = true)]
@@ -200,14 +202,31 @@ namespace osu.Game.Screens.Multi.Match.Components
                                             RelativeSizeAxes = Axes.Both,
                                             Colour = OsuColour.FromHex(@"28242d").Darken(0.5f).Opacity(1f),
                                         },
-                                        ApplyButton = new CreateRoomButton
+                                        new FillFlowContainer
                                         {
+                                            RelativeSizeAxes = Axes.X,
+                                            AutoSizeAxes = Axes.Y,
+                                            Direction = FillDirection.Vertical,
+                                            Spacing = new Vector2(0, 20),
                                             Margin = new MarginPadding { Vertical = 20 },
-                                            Anchor = Anchor.Centre,
-                                            Origin = Anchor.Centre,
-                                            Size = new Vector2(230, 55),
-                                            Action = apply,
-                                        },
+                                            Children = new Drawable[]
+                                            {
+                                                ApplyButton = new CreateRoomButton
+                                                {
+                                                    Anchor = Anchor.BottomCentre,
+                                                    Origin = Anchor.BottomCentre,
+                                                    Size = new Vector2(230, 55),
+                                                    Action = apply,
+                                                },
+                                                ErrorText = new OsuSpriteText
+                                                {
+                                                    Anchor = Anchor.BottomCentre,
+                                                    Origin = Anchor.BottomCentre,
+                                                    Alpha = 0,
+                                                    Depth = 1
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -229,6 +248,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         private void load(OsuColour colours)
         {
             typeLabel.Colour = colours.Yellow;
+            ErrorText.Colour = colours.RedDark;
 
             MaxParticipantsField.ReadOnly = true;
             PasswordField.ReadOnly = true;
@@ -258,6 +278,8 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private void apply()
         {
+            hideError();
+
             bindings.Name.Value = NameField.Text;
             bindings.Availability.Value = AvailabilityPicker.Current.Value;
             bindings.Type.Value = TypePicker.Current.Value;
@@ -269,7 +291,15 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             bindings.Duration.Value = DurationField.Current.Value;
 
-            manager?.CreateRoom(room);
+            manager?.CreateRoom(room, showError);
+        }
+
+        private void hideError() => ErrorText.FadeOut(50);
+
+        private void showError(string text)
+        {
+            ErrorText.Text = text;
+            ErrorText.FadeIn(50);
         }
 
         private class SettingsTextBox : OsuTextBox

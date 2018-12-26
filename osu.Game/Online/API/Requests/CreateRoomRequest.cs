@@ -4,11 +4,12 @@
 using System.Net.Http;
 using Newtonsoft.Json;
 using osu.Framework.IO.Network;
+using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class CreateRoomRequest : APIRequest<Room>
+    public class CreateRoomRequest : APIRequest<APICreatedRoom>
     {
         private readonly Room room;
 
