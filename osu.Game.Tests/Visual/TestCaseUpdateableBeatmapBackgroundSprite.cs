@@ -40,12 +40,18 @@ namespace osu.Game.Tests.Visual
             AddStep("imported", () => beatmapBindable.Value = imported.Beatmaps.First());
 
             if (api.IsLoggedIn)
+            {
                 AddUntilStep(() => req.Result != null, "wait for api response");
 
-            AddStep("online", () => beatmapBindable.Value = new BeatmapInfo
+                AddStep("online", () => beatmapBindable.Value = new BeatmapInfo
+                {
+                    BeatmapSet = req.Result?.ToBeatmapSet(rulesets)
+                });
+            }
+            else
             {
-                BeatmapSet = req.Result?.ToBeatmapSet(rulesets)
-            });
+                AddStep("online (login first)", () => { });
+            }
         }
     }
 }
