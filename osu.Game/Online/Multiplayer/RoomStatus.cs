@@ -10,5 +10,8 @@ namespace osu.Game.Online.Multiplayer
     {
         public abstract string Message { get; }
         public abstract Color4 GetAppropriateColour(OsuColour colours);
+
+        public override int GetHashCode() => GetType().GetHashCode();
+        public override bool Equals(object obj) => GetType() == obj?.GetType();
     }
 }
