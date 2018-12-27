@@ -155,8 +155,7 @@ namespace osu.Game.Screens.Multi
             foreach (var pi in remote.Playlist)
                 pi.MapObjects(beatmaps, rulesets);
 
-            if (local != remote)
-                local.CopyFrom(remote);
+            local.CopyFrom(remote);
         }
 
         /// <summary>

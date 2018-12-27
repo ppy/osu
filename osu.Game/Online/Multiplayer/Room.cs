@@ -7,6 +7,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using osu.Framework.Configuration;
 using osu.Game.Online.Multiplayer.GameTypes;
+using osu.Game.Online.Multiplayer.RoomStatuses;
 using osu.Game.Users;
 
 namespace osu.Game.Online.Multiplayer
@@ -99,6 +100,9 @@ namespace osu.Game.Online.Multiplayer
             ParticipantCount.Value = other.ParticipantCount.Value;
             Participants.Value = other.Participants.Value.ToArray();
             EndDate.Value = other.EndDate;
+
+            if (DateTimeOffset.Now >= EndDate.Value)
+                Status.Value = new RoomStatusEnded();
 
             // Todo: Temporary, should only remove/add new items (requires framework changes)
             if (Playlist.Count == 0)
