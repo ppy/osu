@@ -99,10 +99,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private void load(OsuColour colours)
         {
             Box sideStrip;
-            OsuSpriteText status;
             ParticipantInfo participantInfo;
             OsuSpriteText name;
-            EndDateInfo endDate;
 
             Children = new Drawable[]
             {
@@ -172,31 +170,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical,
+                                        Spacing = new Vector2(0, 5),
                                         Children = new Drawable[]
                                         {
-                                            status = new OsuSpriteText
-                                            {
-                                                TextSize = 14,
-                                                Font = @"Exo2.0-Bold",
-                                            },
-                                            new FillFlowContainer
-                                            {
-                                                RelativeSizeAxes = Axes.X,
-                                                AutoSizeAxes = Axes.Y,
-                                                Direction = FillDirection.Vertical,
-                                                Spacing = new Vector2(0, 5),
-                                                Children = new Drawable[]
-                                                {
-                                                    endDate = new EndDateInfo
-                                                    {
-                                                        TextSize = 14,
-                                                    },
-                                                    beatmapTitle = new BeatmapTitle
-                                                    {
-                                                        TextSize = 14,
-                                                    },
-                                                }
-                                            }
+                                            new RoomStatusInfo(Room),
+                                            beatmapTitle = new BeatmapTitle { TextSize = 14 },
                                         },
                                     },
                                     modeTypeInfo = new ModeTypeInfo
@@ -220,12 +198,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             participantInfo.ParticipantCount.BindTo(bindings.ParticipantCount);
 
             bindings.Name.BindValueChanged(n => name.Text = n, true);
-            bindings.EndDate.BindValueChanged(d => endDate.Date = d, true);
             bindings.Status.BindValueChanged(s =>
             {
-                status.Text = s.Message;
-
-                foreach (Drawable d in new Drawable[] { selectionBox, sideStrip, status })
+                foreach (Drawable d in new Drawable[] { selectionBox, sideStrip })
                     d.FadeColour(s.GetAppropriateColour(colours), transition_duration);
             }, true);
         }

@@ -2,8 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Allocation;
-using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -20,10 +18,6 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         public Action OnStart;
 
-        private readonly OsuSpriteText availabilityStatus;
-
-        private OsuColour colours;
-
         private readonly RoomBindings bindings = new RoomBindings();
 
         public Info(Room room)
@@ -33,9 +27,8 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             ReadyButton readyButton;
             ViewBeatmapButton viewBeatmapButton;
-            OsuSpriteText name;
-            EndDateInfo endDate;
             HostInfo hostInfo;
+            RoomStatusInfo statusInfo;
 
             Children = new Drawable[]
             {
@@ -65,9 +58,12 @@ namespace osu.Game.Screens.Multi.Match.Components
                                     Direction = FillDirection.Vertical,
                                     Children = new Drawable[]
                                     {
-                                        name = new OsuSpriteText { TextSize = 30 },
-                                        availabilityStatus = new OsuSpriteText { TextSize = 14 },
-                                        endDate = new EndDateInfo { TextSize = 14 }
+                                        new OsuSpriteText
+                                        {
+                                            TextSize = 30,
+                                            Current = bindings.Name
+                                        },
+                                        new RoomStatusInfo(room),
                                     }
                                 },
                                 hostInfo = new HostInfo(),
@@ -98,37 +94,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             readyButton.Beatmap.BindTo(bindings.CurrentBeatmap);
             hostInfo.Host.BindTo(bindings.Host);
 
-            bindings.Availability.BindValueChanged(_ => updateAvailabilityStatus());
-            bindings.Status.BindValueChanged(_ => updateAvailabilityStatus());
-            bindings.Name.BindValueChanged(n => name.Text = n);
-            bindings.EndDate.BindValueChanged(d => endDate.Date = d);
-
             bindings.Room = room;
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            this.colours = colours;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            updateAvailabilityStatus();
-        }
-
-        private void updateAvailabilityStatus()
-        {
-            if (!IsLoaded)
-                return;
-
-            if (bindings.Status.Value != null)
-            {
-                availabilityStatus.FadeColour(bindings.Status.Value.GetAppropriateColour(colours), 100);
-                availabilityStatus.Text = $"{bindings.Availability.Value.GetDescription()}, {bindings.Status.Value.Message}";
-            }
         }
     }
 }
