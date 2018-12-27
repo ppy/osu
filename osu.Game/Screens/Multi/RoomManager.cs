@@ -40,7 +40,6 @@ namespace osu.Game.Screens.Multi
             TimeBetweenPolls = 5000;
         }
 
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);

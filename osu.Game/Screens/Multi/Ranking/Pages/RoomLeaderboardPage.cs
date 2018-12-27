@@ -132,7 +132,6 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
                 private void load()
                 {
                 }
-
             }
         }
     }

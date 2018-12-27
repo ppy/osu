@@ -42,8 +42,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                 }
             };
 
-
-
             Host.BindValueChanged(updateHost);
         }
 
