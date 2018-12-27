@@ -11,6 +11,11 @@ namespace osu.Game.Screens.Multi
     public interface IRoomManager
     {
         /// <summary>
+        /// Invoked when the <see cref="Room"/>s have been updated.
+        /// </summary>
+        event Action RoomsUpdated;
+
+        /// <summary>
         /// All the active <see cref="Room"/>s.
         /// </summary>
         IBindableCollection<Room> Rooms { get; }
