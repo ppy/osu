@@ -2,8 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -56,6 +59,11 @@ namespace osu.Game.Rulesets.Scoring
         /// The current combo.
         /// </summary>
         public readonly BindableInt Combo = new BindableInt();
+
+        /// <summary>
+        /// Create a <see cref="HitWindows"/> for this processor.
+        /// </summary>
+        protected virtual HitWindows CreateHitWindows() => new HitWindows();
 
         /// <summary>
         /// The current rank.
@@ -155,6 +163,8 @@ namespace osu.Game.Rulesets.Scoring
                 AllJudged?.Invoke();
         }
 
+        private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
+
         /// <summary>
         /// Retrieve a score populated with data for the current play this processor is responsible for.
         /// </summary>
@@ -166,7 +176,14 @@ namespace osu.Game.Rulesets.Scoring
             score.Accuracy = Math.Round(Accuracy, 4);
             score.Rank = Rank;
             score.Date = DateTimeOffset.Now;
+
+            var hitWindows = CreateHitWindows();
+
+            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
+                score.Statistics[result] = scoreResultCounts.GetOrDefault(result);
         }
+
+        public abstract double GetStandardisedScore();
     }
 
     public class ScoreProcessor<TObject> : ScoreProcessor
@@ -273,6 +290,8 @@ namespace osu.Game.Rulesets.Scoring
             updateScore();
         }
 
+        private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
+
         /// <summary>
         /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="ScoreProcessor"/>.
         /// </summary>
@@ -283,6 +302,9 @@ namespace osu.Game.Rulesets.Scoring
             result.HighestComboAtJudgement = HighestCombo;
 
             JudgedHits++;
+
+            if (result.Type != HitResult.None)
+                scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
 
             if (result.Judgement.AffectsCombo)
             {
@@ -340,20 +362,28 @@ namespace osu.Game.Rulesets.Scoring
             if (rollingMaxBaseScore != 0)
                 Accuracy.Value = baseScore / rollingMaxBaseScore;
 
-            switch (Mode.Value)
+            TotalScore.Value = getScore(Mode.Value);
+        }
+
+        private double getScore(ScoringMode mode)
+        {
+            switch (mode)
             {
+                default:
                 case ScoringMode.Standardised:
-                    TotalScore.Value = max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo / maxHighestCombo) + bonusScore;
-                    break;
+                    return max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo / maxHighestCombo) + bonusScore;
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    TotalScore.Value = bonusScore + baseScore * (1 + Math.Max(0, HighestCombo - 1) / 25);
-                    break;
+                    return bonusScore + baseScore * (1 + Math.Max(0, HighestCombo - 1) / 25);
             }
         }
 
+        public override double GetStandardisedScore() => getScore(ScoringMode.Standardised);
+
         protected override void Reset(bool storeResults)
         {
+            scoreResultCounts.Clear();
+
             if (storeResults)
             {
                 MaxHits = JudgedHits;
