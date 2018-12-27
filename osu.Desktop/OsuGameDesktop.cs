@@ -70,10 +70,12 @@ namespace osu.Desktop
             {
                 case Intro _:
                 case MainMenu _:
-                    versionManager.State = Visibility.Visible;
+                    if (versionManager != null)
+                        versionManager.State = Visibility.Visible;
                     break;
                 default:
-                    versionManager.State = Visibility.Hidden;
+                    if (versionManager != null)
+                        versionManager.State = Visibility.Hidden;
                     break;
             }
         }
