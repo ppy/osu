@@ -21,6 +21,7 @@ using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
 using osuTK.Input;
+using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Overlays
 {
@@ -82,13 +83,14 @@ namespace osu.Game.Overlays
                         },
                     },
                 },
-                chatContainer = new Container
+                chatContainer = new OsuContextMenuContainer
                 {
                     Name = @"chat container",
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.Both,
                     Height = DEFAULT_HEIGHT,
+                    Masking = true,
                     Children = new[]
                     {
                         new Container

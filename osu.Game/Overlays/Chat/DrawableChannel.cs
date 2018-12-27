@@ -9,7 +9,6 @@ using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Cursor;
 using osu.Game.Online.Chat;
 
 namespace osu.Game.Overlays.Chat
@@ -34,17 +33,12 @@ namespace osu.Game.Overlays.Chat
                     // Some chat lines have effects that slightly protrude to the bottom,
                     // which we do not want to mask away, hence the padding.
                     Padding = new MarginPadding { Bottom = 5 },
-                    Child = new OsuContextMenuContainer
+                    Child = ChatLineFlow = new ChatLineContainer
                     {
+                        Padding = new MarginPadding { Left = 20, Right = 20 },
                         RelativeSizeAxes = Axes.X,
                         AutoSizeAxes = Axes.Y,
-                        Child = ChatLineFlow = new ChatLineContainer
-                        {
-                            Padding = new MarginPadding { Left = 20, Right = 20 },
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                        }
+                        Direction = FillDirection.Vertical,
                     },
                 }
             };
