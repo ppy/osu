@@ -726,7 +726,6 @@ namespace osu.Game
             ScreenChanged(currentScreen, newScreen);
             Logger.Log($"Screen changed → {newScreen}");
 
-
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
         }
