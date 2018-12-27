@@ -23,7 +23,7 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load(LargeTextureStore textures)
         {
             string resource = null;
 
