@@ -265,7 +265,7 @@ namespace osu.Game.Online.Leaderboards
         }
 
         protected virtual bool FadeBottom => true;
-        protected virtual bool FadeTop => true;
+        protected virtual bool FadeTop => false;
 
         protected override void UpdateAfterChildren()
         {
