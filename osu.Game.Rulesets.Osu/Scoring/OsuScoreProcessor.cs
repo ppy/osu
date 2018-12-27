@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using osu.Framework.Extensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
@@ -72,5 +73,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         }
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(judgement);
+
+        protected override HitWindows CreateHitWindows() => new OsuHitWindows();
     }
 }
