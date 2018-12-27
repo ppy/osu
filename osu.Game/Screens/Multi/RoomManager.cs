@@ -35,11 +35,6 @@ namespace osu.Game.Screens.Multi
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public RoomManager()
-        {
-            TimeBetweenPolls = 5000;
-        }
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
