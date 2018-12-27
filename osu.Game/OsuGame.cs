@@ -716,10 +716,15 @@ namespace osu.Game
             this.ruleset.Disabled = rulesetDisabled;
         }
 
-        private void screenAdded(Screen newScreen)
+        protected virtual void ScreenChanged(OsuScreen current, Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
-            Logger.Log($"Screen changed → {currentScreen}");
+        }
+
+        private void screenAdded(Screen newScreen)
+        {
+            ScreenChanged(currentScreen, newScreen);
+            Logger.Log($"Screen changed → {newScreen}");
 
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
@@ -727,7 +732,7 @@ namespace osu.Game
 
         private void screenRemoved(Screen newScreen)
         {
-            currentScreen = (OsuScreen)newScreen;
+            ScreenChanged(currentScreen, newScreen);
             Logger.Log($"Screen changed ← {currentScreen}");
 
             if (newScreen == null)
