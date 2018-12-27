@@ -107,6 +107,8 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
             {
             }
 
+            protected override bool FadeTop => true;
+
             protected override LeaderboardScore CreateDrawableScore(APIRoomScoreInfo model, int index)
                 => new ResultsMatchLeaderboardScore(model, index);
 

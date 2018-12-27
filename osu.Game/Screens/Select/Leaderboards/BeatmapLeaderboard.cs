@@ -36,8 +36,6 @@ namespace osu.Game.Screens.Select.Leaderboards
             }
         }
 
-        protected override bool FadeTop => false;
-
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
