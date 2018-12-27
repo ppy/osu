@@ -167,6 +167,8 @@ namespace osu.Game.Rulesets.Scoring
             score.Rank = Rank;
             score.Date = DateTimeOffset.Now;
         }
+
+        public abstract double GetStandardisedScore();
     }
 
     public class ScoreProcessor<TObject> : ScoreProcessor
@@ -340,17 +342,23 @@ namespace osu.Game.Rulesets.Scoring
             if (rollingMaxBaseScore != 0)
                 Accuracy.Value = baseScore / rollingMaxBaseScore;
 
-            switch (Mode.Value)
+            TotalScore.Value = getScore(Mode.Value);
+        }
+
+        private double getScore(ScoringMode mode)
+        {
+            switch (mode)
             {
+                default:
                 case ScoringMode.Standardised:
-                    TotalScore.Value = max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo / maxHighestCombo) + bonusScore;
-                    break;
+                    return max_score * (base_portion * baseScore / maxBaseScore + combo_portion * HighestCombo / maxHighestCombo) + bonusScore;
                 case ScoringMode.Classic:
                     // should emulate osu-stable's scoring as closely as we can (https://osu.ppy.sh/help/wiki/Score/ScoreV1)
-                    TotalScore.Value = bonusScore + baseScore * (1 + Math.Max(0, HighestCombo - 1) / 25);
-                    break;
+                    return bonusScore + baseScore * (1 + Math.Max(0, HighestCombo - 1) / 25);
             }
         }
+
+        public override double GetStandardisedScore() => getScore(ScoringMode.Standardised);
 
         protected override void Reset(bool storeResults)
         {
