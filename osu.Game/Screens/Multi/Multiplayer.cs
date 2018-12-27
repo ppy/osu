@@ -2,14 +2,17 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.BeatmapSet.Buttons;
@@ -25,12 +28,12 @@ namespace osu.Game.Screens.Multi
     {
         private readonly MultiplayerWaveContainer waves;
 
-        public override bool AllowBeatmapRulesetChange => currentScreen?.AllowBeatmapRulesetChange ?? base.AllowBeatmapRulesetChange;
+        public override bool AllowBeatmapRulesetChange => currentSubScreen?.AllowBeatmapRulesetChange ?? base.AllowBeatmapRulesetChange;
 
         private readonly OsuButton createButton;
         private readonly LoungeSubScreen loungeSubScreen;
 
-        private OsuScreen currentScreen;
+        private OsuScreen currentSubScreen;
 
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
@@ -98,10 +101,25 @@ namespace osu.Game.Screens.Multi
             loungeSubScreen.Exited += _ => Exit();
         }
 
+        private readonly IBindable<bool> isIdle = new BindableBool();
+
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IdleTracker idleTracker)
         {
             api.Register(this);
+            isIdle.BindTo(idleTracker.IsIdle);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            isIdle.BindValueChanged(updatePollingRate, true);
+        }
+
+        private void updatePollingRate(bool idle)
+        {
+            roomManager.TimeBetweenPolls = !IsCurrentScreen || !(currentSubScreen is LoungeSubScreen) ? 0 : (idle ? 120000 : 15000);
+            Logger.Log($"Polling adjusted to {roomManager.TimeBetweenPolls}");
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
@@ -136,11 +154,9 @@ namespace osu.Game.Screens.Multi
 
             Content.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
-            var track = Beatmap.Value.Track;
-            if (track != null)
-                track.Looping = false;
-
+            cancelLooping();
             loungeSubScreen.MakeCurrent();
+            updatePollingRate(isIdle.Value);
 
             return base.OnExiting(next);
         }
@@ -151,6 +167,8 @@ namespace osu.Game.Screens.Multi
 
             Content.FadeIn(250);
             Content.ScaleTo(1, 250, Easing.OutSine);
+
+            updatePollingRate(isIdle.Value);
         }
 
         protected override void OnSuspending(Screen next)
@@ -159,6 +177,7 @@ namespace osu.Game.Screens.Multi
             Content.FadeOut(250);
 
             cancelLooping();
+            roomManager.TimeBetweenPolls = 0;
 
             base.OnSuspending(next);
         }
@@ -183,7 +202,7 @@ namespace osu.Game.Screens.Multi
 
             if (!IsCurrentScreen) return;
 
-            if (currentScreen is MatchSubScreen)
+            if (currentSubScreen is MatchSubScreen)
             {
                 var track = Beatmap.Value.Track;
                 if (track != null)
@@ -200,13 +219,14 @@ namespace osu.Game.Screens.Multi
 
                 createButton.Hide();
             }
-            else if (currentScreen is LoungeSubScreen)
+            else if (currentSubScreen is LoungeSubScreen)
                 createButton.Show();
         }
 
         private void screenAdded(Screen newScreen)
         {
-            currentScreen = (OsuScreen)newScreen;
+            currentSubScreen = (OsuScreen)newScreen;
+            updatePollingRate(isIdle.Value);
 
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
@@ -214,10 +234,11 @@ namespace osu.Game.Screens.Multi
 
         private void screenRemoved(Screen newScreen)
         {
-            if (currentScreen is MatchSubScreen)
+            if (currentSubScreen is MatchSubScreen)
                 cancelLooping();
 
-            currentScreen = (OsuScreen)newScreen;
+            currentSubScreen = (OsuScreen)newScreen;
+            updatePollingRate(isIdle.Value);
         }
 
         protected override void Dispose(bool isDisposing)
