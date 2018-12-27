@@ -171,6 +171,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             participantInfo.Participants.BindTo(bindings.Participants);
 
             participantCount.Participants.BindTo(bindings.Participants);
+            participantCount.ParticipantCount.BindTo(bindings.ParticipantCount);
             participantCount.MaxParticipants.BindTo(bindings.MaxParticipants);
 
             beatmapTypeInfo.Type.BindTo(bindings.Type);
