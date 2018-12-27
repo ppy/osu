@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
@@ -58,6 +59,11 @@ namespace osu.Game.Rulesets.Scoring
         /// The current combo.
         /// </summary>
         public readonly BindableInt Combo = new BindableInt();
+
+        /// <summary>
+        /// Create a <see cref="HitWindows"/> for this processor.
+        /// </summary>
+        protected virtual HitWindows CreateHitWindows() => new HitWindows();
 
         /// <summary>
         /// The current rank.
@@ -171,12 +177,10 @@ namespace osu.Game.Rulesets.Scoring
             score.Rank = Rank;
             score.Date = DateTimeOffset.Now;
 
-            score.Statistics[HitResult.Perfect] = scoreResultCounts.GetOrDefault(HitResult.Perfect);
-            score.Statistics[HitResult.Great] = scoreResultCounts.GetOrDefault(HitResult.Great);
-            score.Statistics[HitResult.Good] = scoreResultCounts.GetOrDefault(HitResult.Good);
-            score.Statistics[HitResult.Ok] = scoreResultCounts.GetOrDefault(HitResult.Ok);
-            score.Statistics[HitResult.Meh] = scoreResultCounts.GetOrDefault(HitResult.Meh);
-            score.Statistics[HitResult.Miss] = scoreResultCounts.GetOrDefault(HitResult.Miss);
+            var hitWindows = CreateHitWindows();
+
+            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r)))
+                score.Statistics[result] = scoreResultCounts.GetOrDefault(result);
         }
 
         public abstract double GetStandardisedScore();
