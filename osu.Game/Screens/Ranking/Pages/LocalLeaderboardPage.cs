@@ -12,9 +12,9 @@ using osuTK;
 
 namespace osu.Game.Screens.Ranking.Pages
 {
-    public class RankingResultsPage : ResultsPage
+    public class LocalLeaderboardPage : ResultsPage
     {
-        public RankingResultsPage(ScoreInfo score, WorkingBeatmap beatmap = null)
+        public LocalLeaderboardPage(ScoreInfo score, WorkingBeatmap beatmap = null)
             : base(score, beatmap)
         {
         }
@@ -26,7 +26,7 @@ namespace osu.Game.Screens.Ranking.Pages
             {
                 new Box
                 {
-                    Colour = colours.GrayE,
+                    Colour = colours.Gray6,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new BeatmapLeaderboard

@@ -19,13 +19,13 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseMultiResults : OsuTestCase
+    public class TestCaseMatchResults : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(MatchResults),
             typeof(RoomLeaderboardPageInfo),
-            typeof(RoomRankingResultsPage)
+            typeof(RoomLeaderboardPage)
         };
 
         [Resolved]
@@ -49,7 +49,11 @@ namespace osu.Game.Tests.Visual
             private readonly Room room;
 
             public TestMatchResults(ScoreInfo score)
-                : this(score, new Room())
+                : this(score, new Room
+                {
+                    RoomID = { Value = 1 },
+                    Name = { Value = "an awesome room" }
+                })
             {
             }
 
@@ -76,12 +80,12 @@ namespace osu.Game.Tests.Visual
                 this.room = room;
             }
 
-            public override ResultsPage CreatePage() => new TestRoomRankingResultsPage(score, beatmap, room);
+            public override ResultsPage CreatePage() => new TestRoomLeaderboardPage(score, beatmap, room);
         }
 
-        private class TestRoomRankingResultsPage : RoomRankingResultsPage
+        private class TestRoomLeaderboardPage : RoomLeaderboardPage
         {
-            public TestRoomRankingResultsPage(ScoreInfo score, WorkingBeatmap beatmap, Room room)
+            public TestRoomLeaderboardPage(ScoreInfo score, WorkingBeatmap beatmap, Room room)
                 : base(score, beatmap, room)
             {
             }
@@ -89,7 +93,7 @@ namespace osu.Game.Tests.Visual
             protected override MatchLeaderboard CreateLeaderboard(Room room) => new TestMatchLeaderboard(room);
         }
 
-        private class TestMatchLeaderboard : MatchLeaderboard
+        private class TestMatchLeaderboard : RoomLeaderboardPage.ResultsMatchLeaderboard
         {
             public TestMatchLeaderboard(Room room)
                 : base(room)
