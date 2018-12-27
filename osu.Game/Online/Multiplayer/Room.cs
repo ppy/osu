@@ -50,7 +50,6 @@ namespace osu.Game.Online.Multiplayer
         [JsonIgnore]
         public Bindable<IEnumerable<User>> Participants { get; private set; } = new Bindable<IEnumerable<User>>(Enumerable.Empty<User>());
 
-
         public Bindable<int> ParticipantCount { get; private set; } = new Bindable<int>();
 
         // todo: TEMPORARY

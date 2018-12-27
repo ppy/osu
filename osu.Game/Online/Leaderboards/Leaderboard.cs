@@ -88,7 +88,6 @@ namespace osu.Game.Online.Leaderboards
                 AutoSizeAxes = Axes.Y,
                 Spacing = new Vector2(0f, 5f),
                 Padding = new MarginPadding { Top = 10, Bottom = 5 },
-
             };
 
         private TScope scope;
