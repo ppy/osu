@@ -23,10 +23,10 @@ namespace osu.Game.Screens.Multi.Ranking.Types
             this.room = room;
         }
 
-        public FontAwesome Icon => FontAwesome.fa_list;
+        public FontAwesome Icon => FontAwesome.fa_users;
 
         public string Name => "Room Leaderboard";
 
-        public virtual ResultsPage CreatePage() => new RoomRankingResultsPage(score, beatmap, room);
+        public virtual ResultsPage CreatePage() => new RoomLeaderboardPage(score, beatmap, room);
     }
 }

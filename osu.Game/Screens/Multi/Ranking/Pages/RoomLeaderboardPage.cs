@@ -13,6 +13,7 @@ using osu.Framework.Lists;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Match.Components;
@@ -20,7 +21,7 @@ using osu.Game.Screens.Ranking;
 
 namespace osu.Game.Screens.Multi.Ranking.Pages
 {
-    public class RoomRankingResultsPage : ResultsPage
+    public class RoomLeaderboardPage : ResultsPage
     {
         private readonly Room room;
 
@@ -28,7 +29,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
 
         private TextFlowContainer rankText;
 
-        public RoomRankingResultsPage(ScoreInfo score, WorkingBeatmap beatmap, Room room)
+        public RoomLeaderboardPage(ScoreInfo score, WorkingBeatmap beatmap, Room room)
             : base(score, beatmap)
         {
             this.room = room;
@@ -45,13 +46,13 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
             {
                 new Box
                 {
-                    Colour = colours.GrayE,
+                    Colour = colours.Gray6,
                     RelativeSizeAxes = Axes.Both,
                 },
                 new BufferedContainer
                 {
                     RelativeSizeAxes = Axes.Both,
-                    BackgroundColour = colours.GrayE,
+                    BackgroundColour = colours.Gray6,
                     Child = leaderboard = CreateLeaderboard(room)
                 },
                 rankText = new TextFlowContainer
@@ -61,7 +62,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
                     RelativeSizeAxes = Axes.X,
                     Width = 0.5f,
                     AutoSizeAxes = Axes.Y,
-                    Y = 75,
+                    Y = 50,
                     TextAnchor = Anchor.TopCentre
                 },
             };
@@ -70,14 +71,20 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
             leaderboard.Anchor = Anchor.Centre;
             leaderboard.RelativeSizeAxes = Axes.Both;
             leaderboard.Height = 0.8f;
-            leaderboard.Y = 95;
+            leaderboard.Y = 55;
             leaderboard.ScoresLoaded = scoresLoaded;
         }
 
         private void scoresLoaded(IEnumerable<APIRoomScoreInfo> scores)
         {
-            Action<SpriteText> gray = s => s.Colour = colours.Gray8;
+            Action<SpriteText> gray = s => s.Colour = colours.GrayC;
+            Action<SpriteText> white = s =>
+            {
+                s.TextSize *= 1.4f;
+                s.Colour = colours.GrayF;
+            };
 
+            rankText.AddText(room.Name + "\n", white);
             rankText.AddText("You are placed ", gray);
 
             int index = scores.IndexOf(new APIRoomScoreInfo { User = Score.User }, new FuncEqualityComparer<APIRoomScoreInfo>((s1, s2) => s1.User.Id.Equals(s2.User.Id)));
@@ -91,6 +98,42 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
             rankText.AddText("in the room!", gray);
         }
 
-        protected virtual MatchLeaderboard CreateLeaderboard(Room room) => new MatchLeaderboard(room);
+        protected virtual MatchLeaderboard CreateLeaderboard(Room room) => new ResultsMatchLeaderboard(room);
+
+        public class ResultsMatchLeaderboard : MatchLeaderboard
+        {
+            public ResultsMatchLeaderboard(Room room)
+                : base(room)
+            {
+            }
+
+            protected override LeaderboardScore CreateDrawableScore(APIRoomScoreInfo model, int index)
+                => new ResultsMatchLeaderboardScore(model, index);
+
+            protected override FillFlowContainer<LeaderboardScore> CreateScoreFlow()
+            {
+                var flow = base.CreateScoreFlow();
+                flow.Padding = new MarginPadding
+                {
+                    Top = LeaderboardScore.HEIGHT * 2,
+                    Bottom = LeaderboardScore.HEIGHT * 3,
+                };
+                return flow;
+            }
+
+            private class ResultsMatchLeaderboardScore : MatchLeaderboardScore
+            {
+                public ResultsMatchLeaderboardScore(APIRoomScoreInfo score, int rank)
+                    : base(score, rank)
+                {
+                }
+
+                [BackgroundDependencyLoader]
+                private void load()
+                {
+                }
+
+            }
+        }
     }
 }
