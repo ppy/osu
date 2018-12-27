@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual
             };
         });
 
-        protected override double TimePerAction => 5000;
+        protected override double TimePerAction => 500;
 
         public class TestPoller : PollingComponent
         {
