@@ -112,6 +112,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             };
 
             beatmapTypeInfo.Beatmap.BindTo(bindings.CurrentBeatmap);
+            beatmapTypeInfo.Ruleset.BindTo(bindings.CurrentRuleset);
             beatmapTypeInfo.Type.BindTo(bindings.Type);
             background.Beatmap.BindTo(bindings.CurrentBeatmap);
             bindings.CurrentMods.BindValueChanged(m => modDisplay.Current.Value = m, true);

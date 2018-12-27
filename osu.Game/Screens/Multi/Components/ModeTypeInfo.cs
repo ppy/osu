@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Components
@@ -19,6 +20,7 @@ namespace osu.Game.Screens.Multi.Components
         private readonly Container rulesetContainer;
 
         public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
         public readonly IBindable<GameType> Type = new Bindable<GameType>();
 
         public ModeTypeInfo()
@@ -47,6 +49,7 @@ namespace osu.Game.Screens.Multi.Components
             };
 
             Beatmap.BindValueChanged(updateBeatmap);
+            Ruleset.BindValueChanged(_ => updateBeatmap(Beatmap.Value));
             Type.BindValueChanged(v => gameTypeContainer.Child = new DrawableGameType(v) { Size = new Vector2(height) });
         }
 
@@ -55,7 +58,7 @@ namespace osu.Game.Screens.Multi.Components
             if (beatmap != null)
             {
                 rulesetContainer.FadeIn(transition_duration);
-                rulesetContainer.Child = new DifficultyIcon(beatmap) { Size = new Vector2(height) };
+                rulesetContainer.Child = new DifficultyIcon(beatmap, Ruleset.Value) { Size = new Vector2(height) };
             }
             else
                 rulesetContainer.FadeOut(transition_duration);

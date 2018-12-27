@@ -174,9 +174,10 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             participantCount.ParticipantCount.BindTo(bindings.ParticipantCount);
             participantCount.MaxParticipants.BindTo(bindings.MaxParticipants);
 
+            beatmapTypeInfo.Beatmap.BindTo(bindings.CurrentBeatmap);
+            beatmapTypeInfo.Ruleset.BindTo(bindings.CurrentRuleset);
             beatmapTypeInfo.Type.BindTo(bindings.Type);
             background.Beatmap.BindTo(bindings.CurrentBeatmap);
-            beatmapTypeInfo.Beatmap.BindTo(bindings.CurrentBeatmap);
 
             bindings.Status.BindValueChanged(displayStatus);
             bindings.Participants.BindValueChanged(p => participantsFlow.ChildrenEnumerable = p.Select(u => new UserTile(u)));
