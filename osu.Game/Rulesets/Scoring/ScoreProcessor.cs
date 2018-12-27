@@ -179,7 +179,7 @@ namespace osu.Game.Rulesets.Scoring
 
             var hitWindows = CreateHitWindows();
 
-            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => hitWindows.IsHitResultAllowed(r)))
+            foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
                 score.Statistics[result] = scoreResultCounts.GetOrDefault(result);
         }
 
