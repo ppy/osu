@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         public override FontAwesome Icon => FontAwesome.fa_paint_brush;
 
-        private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo>();
+        private readonly Bindable<SkinInfo> dropdownBindable = new Bindable<SkinInfo> { Default = SkinInfo.Default };
         private readonly Bindable<int> configBindable = new Bindable<int>();
 
         private SkinManager skins;

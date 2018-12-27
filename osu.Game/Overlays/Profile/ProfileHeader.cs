@@ -82,6 +82,7 @@ namespace osu.Game.Overlays.Profile
                                     Origin = Anchor.BottomLeft,
                                     Masking = true,
                                     CornerRadius = 5,
+                                    OpenOnClick = { Value = false },
                                     EdgeEffect = new EdgeEffectParameters
                                     {
                                         Type = EdgeEffectType.Shadow,
@@ -114,7 +115,7 @@ namespace osu.Game.Overlays.Profile
                                             Y = -48,
                                             Children = new Drawable[]
                                             {
-                                                new OsuSpriteText
+                                                usernameText = new OsuSpriteText
                                                 {
                                                     Text = user.Username,
                                                     Font = @"Exo2.0-RegularItalic",
@@ -316,6 +317,8 @@ namespace osu.Game.Overlays.Profile
             levelBadge.Texture = textures.Get(@"Profile/levelbadge");
         }
 
+        private readonly OsuSpriteText usernameText;
+
         private User user;
 
         public User User
@@ -342,6 +345,8 @@ namespace osu.Game.Overlays.Profile
 
             if (user.IsSupporter)
                 SupporterTag.Show();
+
+            usernameText.Text = user.Username;
 
             if (!string.IsNullOrEmpty(user.Colour))
             {

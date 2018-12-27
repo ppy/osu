@@ -9,7 +9,6 @@ using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Scoring
 {
@@ -22,7 +21,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         private float hpDrainRate;
 
-        private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
         private readonly Dictionary<ComboResult, int> comboResultCounts = new Dictionary<ComboResult, int>();
 
         protected override void ApplyBeatmap(Beatmap<OsuHitObject> beatmap)
@@ -35,19 +33,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
         protected override void Reset(bool storeResults)
         {
             base.Reset(storeResults);
-
-            scoreResultCounts.Clear();
             comboResultCounts.Clear();
-        }
-
-        public override void PopulateScore(ScoreInfo score)
-        {
-            base.PopulateScore(score);
-
-            score.Statistics[HitResult.Great] = scoreResultCounts.GetOrDefault(HitResult.Great);
-            score.Statistics[HitResult.Good] = scoreResultCounts.GetOrDefault(HitResult.Good);
-            score.Statistics[HitResult.Meh] = scoreResultCounts.GetOrDefault(HitResult.Meh);
-            score.Statistics[HitResult.Miss] = scoreResultCounts.GetOrDefault(HitResult.Miss);
         }
 
         private const double harshness = 0.01;
@@ -59,10 +45,7 @@ namespace osu.Game.Rulesets.Osu.Scoring
             var osuResult = (OsuJudgementResult)result;
 
             if (result.Type != HitResult.None)
-            {
-                scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
                 comboResultCounts[osuResult.ComboType] = comboResultCounts.GetOrDefault(osuResult.ComboType) + 1;
-            }
 
             switch (result.Type)
             {
