@@ -2,8 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
@@ -155,6 +157,8 @@ namespace osu.Game.Rulesets.Scoring
                 AllJudged?.Invoke();
         }
 
+        private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
+
         /// <summary>
         /// Retrieve a score populated with data for the current play this processor is responsible for.
         /// </summary>
@@ -166,6 +170,13 @@ namespace osu.Game.Rulesets.Scoring
             score.Accuracy = Math.Round(Accuracy, 4);
             score.Rank = Rank;
             score.Date = DateTimeOffset.Now;
+
+            score.Statistics[HitResult.Perfect] = scoreResultCounts.GetOrDefault(HitResult.Perfect);
+            score.Statistics[HitResult.Great] = scoreResultCounts.GetOrDefault(HitResult.Great);
+            score.Statistics[HitResult.Good] = scoreResultCounts.GetOrDefault(HitResult.Good);
+            score.Statistics[HitResult.Ok] = scoreResultCounts.GetOrDefault(HitResult.Ok);
+            score.Statistics[HitResult.Meh] = scoreResultCounts.GetOrDefault(HitResult.Meh);
+            score.Statistics[HitResult.Miss] = scoreResultCounts.GetOrDefault(HitResult.Miss);
         }
 
         public abstract double GetStandardisedScore();
@@ -275,6 +286,8 @@ namespace osu.Game.Rulesets.Scoring
             updateScore();
         }
 
+        private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
+
         /// <summary>
         /// Applies the score change of a <see cref="JudgementResult"/> to this <see cref="ScoreProcessor"/>.
         /// </summary>
@@ -285,6 +298,9 @@ namespace osu.Game.Rulesets.Scoring
             result.HighestComboAtJudgement = HighestCombo;
 
             JudgedHits++;
+
+            if (result.Type != HitResult.None)
+                scoreResultCounts[result.Type] = scoreResultCounts.GetOrDefault(result.Type) + 1;
 
             if (result.Judgement.AffectsCombo)
             {
@@ -362,6 +378,8 @@ namespace osu.Game.Rulesets.Scoring
 
         protected override void Reset(bool storeResults)
         {
+            scoreResultCounts.Clear();
+
             if (storeResults)
             {
                 MaxHits = JudgedHits;
