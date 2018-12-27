@@ -109,6 +109,8 @@ namespace osu.Game.Screens.Multi
             PollImmediately();
         }
 
+        private GetRoomsRequest pollReq;
+
         protected override Task Poll()
         {
             if (!api.IsLoggedIn)
@@ -116,7 +118,8 @@ namespace osu.Game.Screens.Multi
 
             var tcs = new TaskCompletionSource<bool>();
 
-            var pollReq = new GetRoomsRequest(currentFilter.PrimaryFilter);
+            pollReq?.Cancel();
+            pollReq = new GetRoomsRequest(currentFilter.PrimaryFilter);
 
             pollReq.Success += result =>
             {
