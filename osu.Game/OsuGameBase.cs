@@ -260,7 +260,7 @@ namespace osu.Game
                 RegisterAudioManager(audioManager);
             }
 
-            private OsuBindableBeatmap(WorkingBeatmap defaultValue)
+            public OsuBindableBeatmap(WorkingBeatmap defaultValue)
                 : base(defaultValue)
             {
             }

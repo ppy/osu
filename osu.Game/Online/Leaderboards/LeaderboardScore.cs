@@ -73,8 +73,8 @@ namespace osu.Game.Online.Leaderboards
                     {
                         new OsuSpriteText
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
                             Font = @"Exo2.0-MediumItalic",
                             TextSize = 22,
                             // ReSharper disable once ImpureMethodCallOnReadonlyValueField

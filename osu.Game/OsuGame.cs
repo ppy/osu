@@ -317,7 +317,7 @@ namespace osu.Game
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
                 Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
 
-                currentScreen.Push(new PlayerLoader(new ReplayPlayer(databasedScore)));
+                currentScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
             }
         }
 
@@ -688,6 +688,32 @@ namespace osu.Game
             mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
             MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
+        }
+
+        /// <summary>
+        /// Sets <see cref="Beatmap"/> while ignoring any beatmap.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to set.</param>
+        public void ForcefullySetBeatmap(WorkingBeatmap beatmap)
+        {
+            var beatmapDisabled = Beatmap.Disabled;
+
+            Beatmap.Disabled = false;
+            Beatmap.Value = beatmap;
+            Beatmap.Disabled = beatmapDisabled;
+        }
+
+        /// <summary>
+        /// Sets <see cref="Ruleset"/> while ignoring any ruleset restrictions.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to set.</param>
+        public void ForcefullySetRuleset(RulesetInfo ruleset)
+        {
+            var rulesetDisabled = this.ruleset.Disabled;
+
+            this.ruleset.Disabled = false;
+            this.ruleset.Value = ruleset;
+            this.ruleset.Disabled = rulesetDisabled;
         }
 
         private void screenAdded(Screen newScreen)

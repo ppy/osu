@@ -20,7 +20,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         public UpdateableBeatmapBackgroundSprite()
         {
-            Beatmap.BindValueChanged(b => Schedule(() => Model = b));
+            Beatmap.BindValueChanged(b => Model = b);
         }
 
         protected override Drawable CreateDrawable(BeatmapInfo model)
