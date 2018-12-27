@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -12,7 +11,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
 using osu.Game.Screens.Play;
@@ -136,7 +134,6 @@ namespace osu.Game.Screens.Multi.Match
             base.LoadComplete();
 
             bindings.CurrentBeatmap.BindValueChanged(setBeatmap, true);
-            bindings.CurrentMods.BindValueChanged(setMods, true);
             bindings.CurrentRuleset.BindValueChanged(setRuleset, true);
         }
 
@@ -146,11 +143,6 @@ namespace osu.Game.Screens.Multi.Match
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
 
             game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
-        }
-
-        private void setMods(IEnumerable<Mod> mods)
-        {
-            Beatmap.Value.Mods.Value = mods.ToArray();
         }
 
         private void setRuleset(RulesetInfo ruleset)
@@ -184,6 +176,8 @@ namespace osu.Game.Screens.Multi.Match
 
         private void onStart()
         {
+            Beatmap.Value.Mods.Value = bindings.CurrentMods.Value.ToArray();
+
             switch (bindings.Type.Value)
             {
                 default:
