@@ -88,14 +88,9 @@ namespace osu.Game.Online.Multiplayer
             if (other.Host.Value != null && Host.Value?.Id != other.Host.Value.Id)
                 Host.Value = other.Host;
 
-            if (Status.Value.GetType() != other.Status.Value.GetType())
-                Status.Value = other.Status;
-
+            Status.Value = other.Status;
             Availability.Value = other.Availability;
-
-            if (Type.Value.GetType() != other.Type.Value.GetType())
-                Type.Value = other.Type;
-
+            Type.Value = other.Type;
             MaxParticipants.Value = other.MaxParticipants;
             ParticipantCount.Value = other.ParticipantCount.Value;
             Participants.Value = other.Participants.Value.ToArray();
