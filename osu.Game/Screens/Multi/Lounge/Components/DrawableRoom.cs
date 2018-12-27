@@ -191,8 +191,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             background.Beatmap.BindTo(bindings.CurrentBeatmap);
             modeTypeInfo.Beatmap.BindTo(bindings.CurrentBeatmap);
-            beatmapTitle.Beatmap.BindTo(bindings.CurrentBeatmap);
+            modeTypeInfo.Ruleset.BindTo(bindings.CurrentRuleset);
             modeTypeInfo.Type.BindTo(bindings.Type);
+            beatmapTitle.Beatmap.BindTo(bindings.CurrentBeatmap);
             participantInfo.Host.BindTo(bindings.Host);
             participantInfo.Participants.BindTo(bindings.Participants);
             participantInfo.ParticipantCount.BindTo(bindings.ParticipantCount);

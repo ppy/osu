@@ -9,6 +9,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Components
@@ -16,7 +17,7 @@ namespace osu.Game.Screens.Multi.Components
     public class BeatmapTypeInfo : CompositeDrawable
     {
         public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
-
+        public readonly IBindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
         public readonly IBindable<GameType> Type = new Bindable<GameType>();
 
         public BeatmapTypeInfo()
@@ -56,6 +57,7 @@ namespace osu.Game.Screens.Multi.Components
             };
 
             modeTypeInfo.Beatmap.BindTo(Beatmap);
+            modeTypeInfo.Ruleset.BindTo(Ruleset);
             modeTypeInfo.Type.BindTo(Type);
 
             beatmapTitle.Beatmap.BindTo(Beatmap);
