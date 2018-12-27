@@ -19,6 +19,8 @@ namespace osu.Game.Screens.Multi
 {
     public class RoomManager : PollingComponent, IRoomManager
     {
+        public event Action RoomsUpdated;
+
         private readonly BindableCollection<Room> rooms = new BindableCollection<Room>();
         public IBindableCollection<Room> Rooms => rooms;
 
@@ -44,6 +46,7 @@ namespace osu.Game.Screens.Multi
         public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
             room.Host.Value = api.LocalUser;
+            room.RoomID.Value = 100;
 
             var req = new CreateRoomRequest(room);
 
@@ -51,6 +54,8 @@ namespace osu.Game.Screens.Multi
             {
                 update(room, result);
                 addRoom(room);
+
+                RoomsUpdated?.Invoke();
 
                 onSuccess?.Invoke(room);
             };
@@ -125,12 +130,16 @@ namespace osu.Game.Screens.Multi
                         rooms.Remove(r);
                 }
 
-                // Add new matches, or update existing
-                foreach (var r in result)
+                for (int i = 0; i < result.Count; i++)
                 {
+                    var r = result[i];
+                    r.Position = i;
+
                     update(r, r);
                     addRoom(r);
                 }
+
+                RoomsUpdated?.Invoke();
 
                 tcs.SetResult(true);
             };
