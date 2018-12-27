@@ -101,6 +101,6 @@ namespace osu.Game.Screens.Multi
         public IBindable<IEnumerable<Mod>> CurrentMods => currentMods;
 
         private readonly Bindable<RulesetInfo> currentRuleset = new Bindable<RulesetInfo>();
-        public IBindable<RulesetInfo> CurrentRuleset = new Bindable<RulesetInfo>();
+        public IBindable<RulesetInfo> CurrentRuleset => currentRuleset;
     }
 }
