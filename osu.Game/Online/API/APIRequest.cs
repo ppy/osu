@@ -36,7 +36,7 @@ namespace osu.Game.Online.API
     /// </summary>
     public abstract class APIRequest
     {
-        protected virtual string Target => string.Empty;
+        protected abstract string Target { get; }
 
         protected virtual WebRequest CreateWebRequest() => new WebRequest(Uri);
 
