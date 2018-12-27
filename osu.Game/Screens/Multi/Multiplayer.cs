@@ -103,11 +103,13 @@ namespace osu.Game.Screens.Multi
 
         private readonly IBindable<bool> isIdle = new BindableBool();
 
-        [BackgroundDependencyLoader]
+        [BackgroundDependencyLoader(true)]
         private void load(IdleTracker idleTracker)
         {
             api.Register(this);
-            isIdle.BindTo(idleTracker.IsIdle);
+
+            if (idleTracker != null)
+                isIdle.BindTo(idleTracker.IsIdle);
         }
 
         protected override void LoadComplete()
