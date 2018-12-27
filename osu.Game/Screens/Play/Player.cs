@@ -301,7 +301,8 @@ namespace osu.Game.Screens.Play
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = ruleset,
-                User = api.LocalUser.Value
+                Mods = Beatmap.Value.Mods.Value.ToArray(),
+                User = api.LocalUser.Value,
             };
 
             ScoreProcessor.PopulateScore(score);
