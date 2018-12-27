@@ -119,6 +119,12 @@ namespace osu.Game.Screens.Multi.Match
             chat.Exit += Exit;
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            beatmapManager.ItemAdded += beatmapAdded;
+        }
+
         protected override bool OnExiting(Screen next)
         {
             manager?.PartRoom();
@@ -155,6 +161,21 @@ namespace osu.Game.Screens.Multi.Match
             game?.ForcefullySetRuleset(ruleset);
         }
 
+        private void beatmapAdded(BeatmapSetInfo model, bool existing, bool silent) => Schedule(() =>
+        {
+            if (Beatmap.Value != beatmapManager.DefaultBeatmap)
+                return;
+
+            if (bindings.CurrentBeatmap.Value == null)
+                return;
+
+            // Try to retrieve the corresponding local beatmap
+            var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == bindings.CurrentBeatmap.Value.OnlineBeatmapID);
+
+            if (localBeatmap != null)
+                game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
+        });
+
         private void addPlaylistItem(PlaylistItem item)
         {
             bindings.Playlist.Clear();
@@ -175,6 +196,14 @@ namespace osu.Game.Screens.Multi.Match
                     }));
                     break;
             }
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (beatmapManager != null)
+                beatmapManager.ItemAdded -= beatmapAdded;
         }
     }
 }
