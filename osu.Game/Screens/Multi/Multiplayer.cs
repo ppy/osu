@@ -21,7 +21,7 @@ using osuTK;
 namespace osu.Game.Screens.Multi
 {
     [Cached]
-    public class Multiplayer : OsuScreen
+    public class Multiplayer : OsuScreen, IOnlineComponent
     {
         private readonly MultiplayerWaveContainer waves;
 
@@ -96,6 +96,30 @@ namespace osu.Game.Screens.Multi
 
             screenAdded(loungeSubScreen);
             loungeSubScreen.Exited += _ => Exit();
+        }
+
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            api.Register(this);
+        }
+
+        public void APIStateChanged(APIAccess api, APIState state)
+        {
+            if (state != APIState.Online)
+                forcefullyExit();
+        }
+
+        private void forcefullyExit()
+        {
+            // This is temporary since we don't currently have a way to force screens to be exited
+            if (IsCurrentScreen)
+                Exit();
+            else
+            {
+                MakeCurrent();
+                Schedule(forcefullyExit);
+            }
         }
 
         protected override void OnEntering(Screen last)
@@ -194,6 +218,12 @@ namespace osu.Game.Screens.Multi
                 cancelLooping();
 
             currentScreen = (OsuScreen)newScreen;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            api?.Unregister(this);
         }
 
         private class MultiplayerWaveContainer : WaveContainer
