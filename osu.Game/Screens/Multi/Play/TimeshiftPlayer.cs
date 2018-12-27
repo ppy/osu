@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
@@ -61,15 +62,21 @@ namespace osu.Game.Screens.Multi.Play
 
         protected override ScoreInfo CreateScore()
         {
+            submitScore();
+            return base.CreateScore();
+        }
+
+        private void submitScore()
+        {
             var score = base.CreateScore();
+
+            score.TotalScore = (int)Math.Round(ScoreProcessor.GetStandardisedScore());
 
             Debug.Assert(token != null);
 
             var request = new SubmitRoomScoreRequest(token.Value, room.RoomID.Value ?? 0, playlistItemId, score);
             request.Failure += e => Logger.Error(e, "Failed to submit score");
             api.Queue(request);
-
-            return score;
         }
 
         protected override Results CreateResults(ScoreInfo score) => new MatchResults(score, room);
