@@ -112,7 +112,7 @@ namespace osu.Game.Online
             pollingActive = false;
 
             if (scheduledPoll == null)
-                scheduleNextPoll();
+                pollIfNecessary();
         }
 
         private void scheduleNextPoll()
