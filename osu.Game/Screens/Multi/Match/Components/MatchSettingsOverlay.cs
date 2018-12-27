@@ -157,7 +157,6 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                 RelativeSizeAxes = Axes.X,
                                                                 Items = new[]
                                                                 {
-                                                                    TimeSpan.FromMinutes(1),
                                                                     TimeSpan.FromMinutes(30),
                                                                     TimeSpan.FromHours(1),
                                                                     TimeSpan.FromHours(2),
