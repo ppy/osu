@@ -5,6 +5,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
@@ -157,5 +158,7 @@ namespace osu.Game.Rulesets.Mania.Scoring
                 }
             }
         }
+
+        protected override HitWindows CreateHitWindows() => new ManiaHitWindows();
     }
 }
