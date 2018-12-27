@@ -317,7 +317,7 @@ namespace osu.Game
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
                 Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
 
-                currentScreen.Push(new PlayerLoader(new ReplayPlayer(databasedScore)));
+                currentScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
             }
         }
 
@@ -690,10 +690,41 @@ namespace osu.Game
             MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
 
-        private void screenAdded(Screen newScreen)
+        /// <summary>
+        /// Sets <see cref="Beatmap"/> while ignoring any beatmap.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to set.</param>
+        public void ForcefullySetBeatmap(WorkingBeatmap beatmap)
+        {
+            var beatmapDisabled = Beatmap.Disabled;
+
+            Beatmap.Disabled = false;
+            Beatmap.Value = beatmap;
+            Beatmap.Disabled = beatmapDisabled;
+        }
+
+        /// <summary>
+        /// Sets <see cref="Ruleset"/> while ignoring any ruleset restrictions.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to set.</param>
+        public void ForcefullySetRuleset(RulesetInfo ruleset)
+        {
+            var rulesetDisabled = this.ruleset.Disabled;
+
+            this.ruleset.Disabled = false;
+            this.ruleset.Value = ruleset;
+            this.ruleset.Disabled = rulesetDisabled;
+        }
+
+        protected virtual void ScreenChanged(OsuScreen current, Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
-            Logger.Log($"Screen changed → {currentScreen}");
+        }
+
+        private void screenAdded(Screen newScreen)
+        {
+            ScreenChanged(currentScreen, newScreen);
+            Logger.Log($"Screen changed → {newScreen}");
 
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
@@ -701,7 +732,7 @@ namespace osu.Game
 
         private void screenRemoved(Screen newScreen)
         {
-            currentScreen = (OsuScreen)newScreen;
+            ScreenChanged(currentScreen, newScreen);
             Logger.Log($"Screen changed ← {currentScreen}");
 
             if (newScreen == null)

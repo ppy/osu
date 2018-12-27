@@ -10,17 +10,8 @@ namespace osu.Game.Online.Multiplayer
     {
         public abstract string Message { get; }
         public abstract Color4 GetAppropriateColour(OsuColour colours);
-    }
 
-    public class RoomStatusOpen : RoomStatus
-    {
-        public override string Message => @"Welcoming Players";
-        public override Color4 GetAppropriateColour(OsuColour colours) => colours.GreenLight;
-    }
-
-    public class RoomStatusPlaying : RoomStatus
-    {
-        public override string Message => @"Now Playing";
-        public override Color4 GetAppropriateColour(OsuColour colours) => colours.Purple;
+        public override int GetHashCode() => GetType().GetHashCode();
+        public override bool Equals(object obj) => GetType() == obj?.GetType();
     }
 }
