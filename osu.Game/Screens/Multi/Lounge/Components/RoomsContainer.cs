@@ -52,6 +52,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             rooms.ItemsAdded += addRooms;
             rooms.ItemsRemoved += removeRooms;
 
+            roomManager.RoomsUpdated += updateSorting;
+
             addRooms(rooms);
         }
 
@@ -104,6 +106,12 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             }
         }
 
+        private void updateSorting()
+        {
+            foreach (var room in roomFlow)
+                roomFlow.SetLayoutPosition(room, room.Room.Position);
+        }
+
         private void selectRoom(Room room)
         {
             var drawable = roomFlow.FirstOrDefault(r => r.Room == room);
@@ -114,6 +122,14 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 roomFlow.Children.ForEach(r => r.State = r.Room == room ? SelectionState.Selected : SelectionState.NotSelected);
 
             selectedRoom.Value = room;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            if (roomManager != null)
+                roomManager.RoomsUpdated -= updateSorting;
         }
     }
 }
