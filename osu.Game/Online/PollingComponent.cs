@@ -39,7 +39,7 @@ namespace osu.Game.Online
         /// <summary>
         ///
         /// </summary>
-        /// <param name="timeBetweenPolls">The initial time in milliseconds to wait between polls. Setting to zero stops al polling.</param>
+        /// <param name="timeBetweenPolls">The initial time in milliseconds to wait between polls. Setting to zero stops all polling.</param>
         protected PollingComponent(double timeBetweenPolls = 0)
         {
             TimeBetweenPolls = timeBetweenPolls;
