@@ -163,8 +163,6 @@ namespace osu.Game.Rulesets.Scoring
                 AllJudged?.Invoke();
         }
 
-        private readonly Dictionary<HitResult, int> scoreResultCounts = new Dictionary<HitResult, int>();
-
         /// <summary>
         /// Retrieve a score populated with data for the current play this processor is responsible for.
         /// </summary>
@@ -180,8 +178,10 @@ namespace osu.Game.Rulesets.Scoring
             var hitWindows = CreateHitWindows();
 
             foreach (var result in Enum.GetValues(typeof(HitResult)).OfType<HitResult>().Where(r => r > HitResult.None && hitWindows.IsHitResultAllowed(r)))
-                score.Statistics[result] = scoreResultCounts.GetOrDefault(result);
+                score.Statistics[result] = GetStatistic(result);
         }
+
+        protected abstract int GetStatistic(HitResult result);
 
         public abstract double GetStandardisedScore();
     }
@@ -377,6 +377,8 @@ namespace osu.Game.Rulesets.Scoring
                     return bonusScore + baseScore * (1 + Math.Max(0, HighestCombo - 1) / 25);
             }
         }
+
+        protected override int GetStatistic(HitResult result) => scoreResultCounts.GetOrDefault(result);
 
         public override double GetStandardisedScore() => getScore(ScoringMode.Standardised);
 
