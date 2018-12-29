@@ -7,6 +7,7 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
+using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
@@ -61,11 +62,25 @@ namespace osu.Game.Graphics.Containers
         }
 
         public void AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action<SpriteText> creationParameters = null)
+            => createLink(AddText(text, creationParameters), text, url, linkType, linkArgument, tooltipText);
+
+        public void AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
+            => createLink(AddText(text, creationParameters), text, tooltipText: tooltipText, action: action);
+
+        public void AddLink(IEnumerable<SpriteText> text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
         {
-            AddInternal(new DrawableLinkCompiler(AddText(text, creationParameters).ToList())
+            foreach (var t in text)
+                AddArbitraryDrawable(t);
+
+            createLink(text, null, url, linkType, linkArgument, tooltipText);
+        }
+
+        private void createLink(IEnumerable<Drawable> drawables, string text, string url = null, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action action = null)
+        {
+            AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
             {
                 TooltipText = tooltipText ?? (url != text ? url : string.Empty),
-                Action = () =>
+                Action = action ?? (() =>
                 {
                     switch (linkType)
                     {
@@ -104,7 +119,7 @@ namespace osu.Game.Graphics.Containers
                         default:
                             throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
                     }
-                },
+                }),
             });
         }
     }
