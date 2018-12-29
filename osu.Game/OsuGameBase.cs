@@ -153,9 +153,12 @@ namespace osu.Game
             dependencies.Cache(API);
             dependencies.CacheAs<IAPIProvider>(API);
 
+            var defaultBeatmap = new DummyWorkingBeatmap(this);
+            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
+
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, API, Audio, Host));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap));
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, BeatmapManager, Host.Storage, contextFactory, Host));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
@@ -165,10 +168,6 @@ namespace osu.Game
             fileImporters.Add(BeatmapManager);
             fileImporters.Add(ScoreManager);
             fileImporters.Add(SkinManager);
-
-            var defaultBeatmap = new DummyWorkingBeatmap(this);
-            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
-            BeatmapManager.DefaultBeatmap = defaultBeatmap;
 
             // tracks play so loud our samples can't keep up.
             // this adds a global reduction of track volume for the time being.
@@ -261,7 +260,7 @@ namespace osu.Game
                 RegisterAudioManager(audioManager);
             }
 
-            private OsuBindableBeatmap(WorkingBeatmap defaultValue)
+            public OsuBindableBeatmap(WorkingBeatmap defaultValue)
                 : base(defaultValue)
             {
             }
