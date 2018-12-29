@@ -3,7 +3,7 @@
 
 using UIKit;
 
-namespace osu.Game.Tests.iOS
+namespace osu.Game.Rulesets.Catch.Tests.iOS
 {
     public class Application
     {

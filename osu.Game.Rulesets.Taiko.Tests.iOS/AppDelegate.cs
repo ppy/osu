@@ -3,13 +3,13 @@
 
 using Foundation;
 using osu.Framework.iOS;
-using osu.Game;
+using osu.Game.Tests;
 
-namespace osu.iOS
+namespace osu.Game.Rulesets.Taiko.Tests.iOS
 {
     [Register("AppDelegate")]
     public class AppDelegate : GameAppDelegate
     {
-        protected override Framework.Game CreateGame() => new OsuGame();
+        protected override Framework.Game CreateGame() => new OsuTestBrowser();
     }
 }
