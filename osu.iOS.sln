@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Mania", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.iOS", "osu.iOS\osu.iOS.csproj", "{3F082D0B-A964-43D7-BDF7-C256D76A50D0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Tests.iOS", "osu.Game.Tests.iOS\osu.Game.Tests.iOS.csproj", "{65FF8E19-6934-469B-B690-23C6D6E56A17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -109,6 +111,16 @@ Global
 		{3F082D0B-A964-43D7-BDF7-C256D76A50D0}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
 		{3F082D0B-A964-43D7-BDF7-C256D76A50D0}.Debug|iPhone.ActiveCfg = Debug|iPhone
 		{3F082D0B-A964-43D7-BDF7-C256D76A50D0}.Debug|iPhone.Build.0 = Debug|iPhone
+		{65FF8E19-6934-469B-B690-23C6D6E56A17}.Debug|Any CPU.ActiveCfg = Debug|iPhoneSimulator
+		{65FF8E19-6934-469B-B690-23C6D6E56A17}.Release|Any CPU.ActiveCfg = Release|iPhone
+		{65FF8E19-6934-469B-B690-23C6D6E56A17}.Debug|iPhoneSimulator.ActiveCfg = Debug|iPhoneSimulator
+		{65FF8E19-6934-469B-B690-23C6D6E56A17}.Debug|iPhoneSimulator.Build.0 = Debug|iPhoneSimulator
+		{65FF8E19-6934-469B-B690-23C6D6E56A17}.Release|iPhone.ActiveCfg = Release|iPhone
+		{65FF8E19-6934-469B-B690-23C6D6E56A17}.Release|iPhone.Build.0 = Release|iPhone
+		{65FF8E19-6934-469B-B690-23C6D6E56A17}.Release|iPhoneSimulator.ActiveCfg = Release|iPhoneSimulator
+		{65FF8E19-6934-469B-B690-23C6D6E56A17}.Release|iPhoneSimulator.Build.0 = Release|iPhoneSimulator
+		{65FF8E19-6934-469B-B690-23C6D6E56A17}.Debug|iPhone.ActiveCfg = Debug|iPhone
+		{65FF8E19-6934-469B-B690-23C6D6E56A17}.Debug|iPhone.Build.0 = Debug|iPhone
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
