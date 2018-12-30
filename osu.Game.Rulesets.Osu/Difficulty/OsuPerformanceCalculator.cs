@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         public override double Calculate(double upTo, Dictionary<string, double> categoryRatings = null)
         {
-            Attributes = (OsuDifficultyAttributes)Ruleset.CreateDifficultyCalculator((WorkingBeatmap)Beatmap).Calculate(upTo, Score.Mods);
+            Attributes = (OsuDifficultyAttributes)Ruleset.CreateDifficultyCalculator(Working).Calculate(upTo, Score.Mods);
 
             var consideredHitObjects = Beatmap.HitObjects.Where(b => b.StartTime <= upTo);
 

@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         public override double Calculate(double upTo, Dictionary<string, double> categoryDifficulty = null)
         {
-            Attributes = (ManiaDifficultyAttributes)Ruleset.CreateDifficultyCalculator((WorkingBeatmap)Beatmap).Calculate(upTo, Score.Mods);
+            Attributes = (ManiaDifficultyAttributes)Ruleset.CreateDifficultyCalculator(Working).Calculate(upTo, Score.Mods);
 
             mods = Score.Mods;
             scaledScore = Score.TotalScore;

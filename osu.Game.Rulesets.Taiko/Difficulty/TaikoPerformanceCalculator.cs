@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         public override double Calculate(double upTo, Dictionary<string, double> categoryDifficulty = null)
         {
-            Attributes = (TaikoDifficultyAttributes)Ruleset.CreateDifficultyCalculator((WorkingBeatmap)Beatmap).Calculate(upTo, Score.Mods);
+            Attributes = (TaikoDifficultyAttributes)Ruleset.CreateDifficultyCalculator(Working).Calculate(upTo, Score.Mods);
 
             mods = Score.Mods;
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
