@@ -179,7 +179,7 @@ namespace osu.Game.Overlays
 
         protected override void OnFocus(FocusEvent e)
         {
-            GetContainingInputManager().ChangeFocus(searchTextBox);
+             //GetContainingInputManager().ChangeFocus(searchTextBox);
             base.OnFocus(e);
         }
 

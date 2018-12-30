@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public bool HoldFocus
         {
-            get { return focus; }
+            get => false;
             set
             {
                 focus = value;
