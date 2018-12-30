@@ -110,6 +110,8 @@ namespace osu.Game.Screens.Play
             showHud.TriggerChange();
 
             showPerformance = config.GetBindable<bool>(OsuSetting.ShowPerformance);
+            showPerformance.ValueChanged += performanceVisibility => PerformanceCounter.FadeTo(performanceVisibility ? 1 : 0, duration);
+            showPerformance.TriggerChange();
 
             if (!showHud && !hasShownNotificationOnce)
             {
