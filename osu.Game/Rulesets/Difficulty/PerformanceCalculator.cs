@@ -15,6 +15,7 @@ namespace osu.Game.Rulesets.Difficulty
     {
         protected readonly Ruleset Ruleset;
         protected readonly IBeatmap Beatmap;
+        protected readonly WorkingBeatmap Working;
         protected readonly ScoreInfo Score;
 
         protected double TimeRate { get; private set; } = 1;
@@ -22,6 +23,7 @@ namespace osu.Game.Rulesets.Difficulty
         protected PerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
         {
             Ruleset = ruleset;
+            Working = beatmap;
             Score = score;
 
             beatmap.Mods.Value = score.Mods;
