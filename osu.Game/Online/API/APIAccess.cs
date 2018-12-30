@@ -190,8 +190,8 @@ namespace osu.Game.Online.API
         {
             Debug.Assert(State == APIState.Offline);
 
-            ProvidedUsername = username;
-            this.password = password;
+            ProvidedUsername = username.Trim();
+            this.password = password.Trim();
         }
 
         public RegistrationRequest.RegistrationRequestErrors CreateAccount(string email, string username, string password)
