@@ -36,6 +36,11 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 },
                 new SettingsCheckbox
                 {
+                    LabelText = "Show performance overlay",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowPerformance)
+                },
+                new SettingsCheckbox
+                {
                     LabelText = "Always show key overlay",
                     Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
                 },

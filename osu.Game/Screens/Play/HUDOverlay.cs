@@ -12,8 +12,10 @@ using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Play.HUD;
 using osuTK;
 using osuTK.Input;
@@ -30,6 +32,7 @@ namespace osu.Game.Screens.Play
         public readonly RollingCounter<int> ComboCounter;
         public readonly ScoreCounter ScoreCounter;
         public readonly RollingCounter<double> AccuracyCounter;
+        public readonly RollingCounter<double> PerformanceCounter;
         public readonly HealthDisplay HealthDisplay;
         public readonly SongProgress Progress;
         public readonly ModDisplay ModDisplay;
@@ -37,7 +40,15 @@ namespace osu.Game.Screens.Play
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         private Bindable<bool> showHud;
+        private Bindable<bool> showPerformance;
         private readonly BindableBool replayLoaded = new BindableBool();
+
+        /// <summary>
+        /// Used for dynamic calculation of performance.
+        /// </summary>
+        private readonly ScoreInfo score = new ScoreInfo();
+        private readonly PerformanceCalculator performanceCalculator;
+        private readonly IAdjustableClock performanceClock;
 
         private static bool hasShownNotificationOnce;
 
@@ -54,6 +65,7 @@ namespace osu.Game.Screens.Play
                     ComboCounter = CreateComboCounter(),
                     ScoreCounter = CreateScoreCounter(),
                     AccuracyCounter = CreateAccuracyCounter(),
+                    PerformanceCounter = CreatePerformanceCounter(),
                     HealthDisplay = CreateHealthDisplay(),
                     Progress = CreateProgress(),
                     ModDisplay = CreateModsContainer(),
@@ -85,6 +97,9 @@ namespace osu.Game.Screens.Play
             ModDisplay.Current.BindTo(working.Mods);
 
             PlayerSettingsOverlay.PlaybackSettings.AdjustableClock = adjustableClock;
+
+            performanceCalculator = rulesetContainer.Ruleset.CreatePerformanceCalculator(working, score);
+            performanceClock = adjustableClock;
         }
 
         [BackgroundDependencyLoader(true)]
@@ -93,6 +108,8 @@ namespace osu.Game.Screens.Play
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
             showHud.ValueChanged += hudVisibility => content.FadeTo(hudVisibility ? 1 : 0, duration);
             showHud.TriggerChange();
+
+            showPerformance = config.GetBindable<bool>(OsuSetting.ShowPerformance);
 
             if (!showHud && !hasShownNotificationOnce)
             {
@@ -166,6 +183,14 @@ namespace osu.Game.Screens.Play
             Margin = new MarginPadding { Right = 140 },
         };
 
+        protected virtual RollingCounter<double> CreatePerformanceCounter() => new PerformanceCounter
+        {
+            Anchor = Anchor.TopLeft,
+            Origin = Anchor.TopLeft,
+            Position = new Vector2(35, 35),
+            TextSize = 32
+        };
+
         protected virtual RollingCounter<int> CreateComboCounter() => new SimpleComboCounter
         {
             Anchor = Anchor.TopCentre,
@@ -228,6 +253,13 @@ namespace osu.Game.Screens.Play
             AccuracyCounter?.Current.BindTo(processor.Accuracy);
             ComboCounter?.Current.BindTo(processor.Combo);
             HealthDisplay?.Current.BindTo(processor.Health);
+
+            processor.NewJudgement += _ =>
+            {
+                processor.PopulateScore(score);
+
+                PerformanceCounter.Current.Value = performanceCalculator.Calculate(performanceClock.CurrentTime);
+            };
 
             var shd = HealthDisplay as StandardHealthDisplay;
             if (shd != null)
