@@ -71,6 +71,8 @@ namespace osu.Game.Tests.Visual
 
         private class TestRoomManager : IRoomManager
         {
+            public event Action RoomsUpdated;
+
             public readonly BindableCollection<Room> Rooms = new BindableCollection<Room>();
             IBindableCollection<Room> IRoomManager.Rooms => Rooms;
 

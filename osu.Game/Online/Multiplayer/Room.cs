@@ -79,6 +79,12 @@ namespace osu.Game.Online.Multiplayer
             set => MaxAttempts.Value = value;
         }
 
+        /// <summary>
+        /// The position of this <see cref="Room"/> in the list. This is not read from or written to the API.
+        /// </summary>
+        [JsonIgnore]
+        public int Position = -1;
+
         public void CopyFrom(Room other)
         {
             RoomID.Value = other.RoomID;
@@ -103,6 +109,8 @@ namespace osu.Game.Online.Multiplayer
                 Playlist.AddRange(other.Playlist);
             else if (other.Playlist.Count > 0)
                 Playlist.First().ID = other.Playlist.First().ID;
+
+            Position = other.Position;
         }
 
         public bool ShouldSerializeRoomID() => false;
