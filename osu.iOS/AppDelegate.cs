@@ -1,10 +1,10 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+using System.Threading.Tasks;
 using Foundation;
 using osu.Framework.iOS;
 using osu.Game;
-using osu.Game.Beatmaps;
-using osu.Framework.Allocation;
+using osuTK.Input;
 
 namespace osu.iOS
 {
@@ -21,11 +21,13 @@ namespace osu.iOS
            return iOSOsuGame;
         }
 
-        [Export("application:openURL:options:")]
-        override public bool OpenUrl(UIKit.UIApplication app, NSUrl url, NSDictionary options)
+        override public void fileDrop(object sender, FileDropEventArgs e)
         {
-            iOSOsuGame.Import(url.Path);
-            return true;
+            var filePaths = new[] { e.FileName };
+
+            Task.Factory.StartNew(() => iOSOsuGame.Import(filePaths), TaskCreationOptions.LongRunning);
         }
+
+
     }
 }
