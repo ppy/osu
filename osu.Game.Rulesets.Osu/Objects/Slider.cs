@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
+using osu.Framework.Caching;
 using osu.Framework.Configuration;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -26,8 +27,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
+        private Cached<Vector2> endPositionCache;
+
+        public override Vector2 EndPosition => endPositionCache.IsValid ? endPositionCache.Value : endPositionCache.Value = Position + this.CurvePositionAt(1);
+
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
-        public override Vector2 EndPosition => Position + this.CurvePositionAt(1);
 
         public override int ComboIndex
         {
@@ -56,7 +60,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         public SliderPath Path
         {
             get => PathBindable.Value;
-            set => PathBindable.Value = value;
+            set
+            {
+                PathBindable.Value = value;
+                endPositionCache.Invalidate();
+            }
         }
 
         public double Distance => Path.Distance;
@@ -73,6 +81,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 
                 if (TailCircle != null)
                     TailCircle.Position = EndPosition;
+
+                endPositionCache.Invalidate();
             }
         }
 
@@ -92,7 +102,17 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
 
-        public int RepeatCount { get; set; }
+        private int repeatCount;
+
+        public int RepeatCount
+        {
+            get => repeatCount;
+            set
+            {
+                repeatCount = value;
+                endPositionCache.Invalidate();
+            }
+        }
 
         /// <summary>
         /// The length of one span of this <see cref="Slider"/>.
