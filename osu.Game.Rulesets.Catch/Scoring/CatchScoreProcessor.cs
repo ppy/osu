@@ -43,6 +43,6 @@ namespace osu.Game.Rulesets.Catch.Scoring
             Health.Value += Math.Max(result.Judgement.HealthIncreaseFor(result) - hpDrainRate, 0) * harshness;
         }
 
-        protected override HitWindows CreateHitWindows() => new CatchHitWindows();
+        public override HitWindows CreateHitWindows() => new CatchHitWindows();
     }
 }

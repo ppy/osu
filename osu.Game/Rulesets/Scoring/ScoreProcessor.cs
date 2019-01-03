@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Scoring
         /// <summary>
         /// Create a <see cref="HitWindows"/> for this processor.
         /// </summary>
-        protected virtual HitWindows CreateHitWindows() => new HitWindows();
+        public virtual HitWindows CreateHitWindows() => new HitWindows();
 
         /// <summary>
         /// The current rank.
