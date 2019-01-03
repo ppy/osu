@@ -57,12 +57,20 @@ namespace osu.Game.Scoring.Legacy
                 var countKatu = (int)sr.ReadUInt16();
                 var countMiss = (int)sr.ReadUInt16();
 
-                score.ScoreInfo.Statistics[HitResult.Great] = count300;
-                score.ScoreInfo.Statistics[HitResult.Good] = count100;
-                score.ScoreInfo.Statistics[HitResult.Meh] = count50;
-                score.ScoreInfo.Statistics[HitResult.Perfect] = countGeki;
-                score.ScoreInfo.Statistics[HitResult.Ok] = countKatu;
-                score.ScoreInfo.Statistics[HitResult.Miss] = countMiss;
+                var windows = currentRuleset.CreateRulesetContainerWith(workingBeatmap).CreateScoreProcessor().CreateHitWindows();
+
+                if (windows.IsHitResultAllowed(HitResult.Great))
+                    score.ScoreInfo.Statistics[HitResult.Great] = count300;
+                if (windows.IsHitResultAllowed(HitResult.Good))
+                    score.ScoreInfo.Statistics[HitResult.Good] = count100;
+                if (windows.IsHitResultAllowed(HitResult.Meh))
+                    score.ScoreInfo.Statistics[HitResult.Meh] = count50;
+                if (windows.IsHitResultAllowed(HitResult.Perfect))
+                    score.ScoreInfo.Statistics[HitResult.Perfect] = countGeki;
+                if (windows.IsHitResultAllowed(HitResult.Ok))
+                    score.ScoreInfo.Statistics[HitResult.Ok] = countKatu;
+                if (windows.IsHitResultAllowed(HitResult.Miss))
+                    score.ScoreInfo.Statistics[HitResult.Miss] = countMiss;
 
                 score.ScoreInfo.TotalScore = sr.ReadInt32();
                 score.ScoreInfo.MaxCombo = sr.ReadUInt16();
@@ -116,12 +124,12 @@ namespace osu.Game.Scoring.Legacy
 
         private void calculateAccuracy(ScoreInfo score)
         {
-            int countMiss = score.Statistics[HitResult.Miss];
-            int count50 = score.Statistics[HitResult.Meh];
-            int count100 = score.Statistics[HitResult.Good];
-            int count300 = score.Statistics[HitResult.Great];
-            int countGeki = score.Statistics[HitResult.Perfect];
-            int countKatu = score.Statistics[HitResult.Ok];
+            score.Statistics.TryGetValue(HitResult.Miss, out int countMiss);
+            score.Statistics.TryGetValue(HitResult.Meh, out int count50);
+            score.Statistics.TryGetValue(HitResult.Good, out int count100);
+            score.Statistics.TryGetValue(HitResult.Great, out int count300);
+            score.Statistics.TryGetValue(HitResult.Perfect, out int countGeki);
+            score.Statistics.TryGetValue(HitResult.Ok, out int countKatu);
 
             switch (score.Ruleset.ID)
             {
