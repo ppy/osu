@@ -24,6 +24,12 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
+        /// <summary>
+        /// A very lenient maximum length of a slider for ticks to be generated.
+        /// This exists for edge cases such as /b/1573664 where the beatmap has been edited by the user, and should never be reached in normal usage.
+        /// </summary>
+        private const double max_length_for_ticks = 100000;
+
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
@@ -189,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createTicks()
         {
-            var length = Path.Distance;
+            var length = Math.Min(max_length_for_ticks, Path.Distance);
             var tickDistance = MathHelper.Clamp(TickDistance, 0, length);
 
             if (tickDistance == 0) return;
