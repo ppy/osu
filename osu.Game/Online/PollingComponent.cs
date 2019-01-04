@@ -39,7 +39,7 @@ namespace osu.Game.Online
         /// <summary>
         ///
         /// </summary>
-        /// <param name="timeBetweenPolls">The initial time in milliseconds to wait between polls. Setting to zero stops al polling.</param>
+        /// <param name="timeBetweenPolls">The initial time in milliseconds to wait between polls. Setting to zero stops all polling.</param>
         protected PollingComponent(double timeBetweenPolls = 0)
         {
             TimeBetweenPolls = timeBetweenPolls;
@@ -87,11 +87,20 @@ namespace osu.Game.Online
         }
 
         /// <summary>
-        /// Perform the polling in this method. Call <see cref="pollComplete"/> when done.
+        /// Performs a poll. Implement but do not call this.
         /// </summary>
         protected virtual Task Poll()
         {
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Immediately performs a <see cref="Poll"/>.
+        /// </summary>
+        public void PollImmediately()
+        {
+            lastTimePolled = Time.Current - timeBetweenPolls;
+            scheduleNextPoll();
         }
 
         /// <summary>
@@ -103,7 +112,7 @@ namespace osu.Game.Online
             pollingActive = false;
 
             if (scheduledPoll == null)
-                scheduleNextPoll();
+                pollIfNecessary();
         }
 
         private void scheduleNextPoll()
