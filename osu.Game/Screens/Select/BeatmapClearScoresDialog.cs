@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace osu.Game.Screens.Select
 {
-    public class ClearScoresDialog : PopupDialog
+    public class BeatmapClearScoresDialog : PopupDialog
     {
         private ScoreManager manager;
 
@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Select
             manager = beatmapManager;
         }
 
-        public ClearScoresDialog(BeatmapSetInfo beatmap, IEnumerable<ScoreInfo> scores, Action refresh)
+        public BeatmapClearScoresDialog(BeatmapSetInfo beatmap, IEnumerable<ScoreInfo> scores, Action refresh)
         {
             BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
 
