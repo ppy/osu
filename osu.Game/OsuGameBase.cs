@@ -60,6 +60,8 @@ namespace osu.Game
 
         protected RulesetConfigCache RulesetConfigCache;
 
+        protected APIAccess API;
+
         protected MenuCursorContainer MenuCursorContainer;
 
         private Container content;
@@ -146,14 +148,17 @@ namespace osu.Game
             dependencies.Cache(SkinManager = new SkinManager(Host.Storage, contextFactory, Host, Audio));
             dependencies.CacheAs<ISkinSource>(SkinManager);
 
-            var api = new APIAccess(LocalConfig);
+            API = new APIAccess(LocalConfig);
 
-            dependencies.Cache(api);
-            dependencies.CacheAs<IAPIProvider>(api);
+            dependencies.Cache(API);
+            dependencies.CacheAs<IAPIProvider>(API);
+
+            var defaultBeatmap = new DummyWorkingBeatmap(this);
+            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
 
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, api, Audio, Host));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap));
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, BeatmapManager, Host.Storage, contextFactory, Host));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
@@ -164,10 +169,6 @@ namespace osu.Game
             fileImporters.Add(ScoreManager);
             fileImporters.Add(SkinManager);
 
-            var defaultBeatmap = new DummyWorkingBeatmap(this);
-            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
-            BeatmapManager.DefaultBeatmap = defaultBeatmap;
-
             // tracks play so loud our samples can't keep up.
             // this adds a global reduction of track volume for the time being.
             Audio.Track.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
@@ -177,7 +178,7 @@ namespace osu.Game
 
             FileStore.Cleanup();
 
-            AddInternal(api);
+            AddInternal(API);
 
             GlobalActionContainer globalBinding;
 
@@ -259,7 +260,7 @@ namespace osu.Game
                 RegisterAudioManager(audioManager);
             }
 
-            private OsuBindableBeatmap(WorkingBeatmap defaultValue)
+            public OsuBindableBeatmap(WorkingBeatmap defaultValue)
                 : base(defaultValue)
             {
             }

@@ -149,8 +149,10 @@ namespace osu.Game.Database
                 try
                 {
                     notification.Text = $"Importing ({++current} of {paths.Length})\n{Path.GetFileName(path)}";
+
+                    TModel import;
                     using (ArchiveReader reader = getReaderFrom(path))
-                        imported.Add(Import(reader));
+                        imported.Add(import = Import(reader));
 
                     notification.Progress = (float)current / paths.Length;
 
@@ -160,7 +162,7 @@ namespace osu.Game.Database
                     // TODO: Add a check to prevent files from storage to be deleted.
                     try
                     {
-                        if (File.Exists(path))
+                        if (import != null && File.Exists(path))
                             File.Delete(path);
                     }
                     catch (Exception e)

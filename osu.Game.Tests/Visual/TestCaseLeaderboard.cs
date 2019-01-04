@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osuTK;
 using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets;
 using osu.Game.Scoring;
 
@@ -36,7 +37,7 @@ namespace osu.Game.Tests.Visual
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 Size = new Vector2(550f, 450f),
-                Scope = LeaderboardScope.Global,
+                Scope = BeatmapLeaderboardScope.Global,
             });
 
             AddStep(@"New Scores", newScores);
@@ -275,7 +276,7 @@ namespace osu.Game.Tests.Visual
             };
         }
 
-        private class FailableLeaderboard : Leaderboard
+        private class FailableLeaderboard : BeatmapLeaderboard
         {
             public void SetRetrievalState(PlaceholderState state)
             {

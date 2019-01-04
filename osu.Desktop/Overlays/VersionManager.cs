@@ -128,11 +128,12 @@ namespace osu.Desktop.Overlays
 
         protected override void PopIn()
         {
-            this.FadeIn(1000);
+            this.FadeIn(1400, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
+            this.FadeOut(500, Easing.OutQuint);
         }
     }
 }
