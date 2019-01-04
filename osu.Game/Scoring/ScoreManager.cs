@@ -55,9 +55,7 @@ namespace osu.Game.Scoring
 
         public Score GetScore(ScoreInfo score) => new LegacyDatabasedScore(score, rulesets, beatmaps, Files.Store);
 
-        public List<ScoreInfo> GetAllUsableScores() => ModelStore.ConsumableItems.Where(s => !s.DeletePending).ToList();
-
-        public IEnumerable<ScoreInfo> QueryScores(Expression<Func<ScoreInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().Where(query);
+        public IEnumerable<ScoreInfo> GetAllUsableScores() => ModelStore.ConsumableItems.Where(s => !s.DeletePending);
 
         public ScoreInfo Query(Expression<Func<ScoreInfo, bool>> query) => ModelStore.ConsumableItems.AsNoTracking().FirstOrDefault(query);
     }
