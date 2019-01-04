@@ -75,7 +75,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     AutoSizeDuration = transition_duration,
                     AutoSizeEasing = Easing.OutQuint,
                     Masking = true,
-
                     Children = new Drawable[]
                     {
                         new SettingsSlider<float>
@@ -92,13 +91,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         },
                         new SettingsSlider<float>
                         {
-                            LabelText = "Horizontal size",
+                            LabelText = "Horizontal scale",
                             Bindable = delayedBindable(scalingSizeX),
                             KeyboardStep = 0.01f
                         },
                         new SettingsSlider<float>
                         {
-                            LabelText = "Vertical size",
+                            LabelText = "Vertical scale",
                             Bindable = delayedBindable(scalingSizeY),
                             KeyboardStep = 0.01f
                         },
