@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
 using osu.Framework.Extensions;
@@ -113,24 +112,12 @@ namespace osu.Game.Configuration
         {
         }
 
-        public override TrackedSettings CreateTrackedSettings()
-        {
-            Func<SettingDescription> scalingDescription = () =>
-            {
-                var scalingMode = Get<ScalingMode>(OsuSetting.Scaling);
-                return new SettingDescription(scalingMode, "scaling", scalingMode.GetDescription());
-            };
-
-            return new TrackedSettings
+        public override TrackedSettings CreateTrackedSettings() =>
+            new TrackedSettings
             {
                 new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled")),
-                new TrackedSetting<ScalingMode>(OsuSetting.Scaling, _ => scalingDescription()),
-                new TrackedSetting<float>(OsuSetting.ScalingSizeX, _ => scalingDescription()),
-                new TrackedSetting<float>(OsuSetting.ScalingSizeY, _ => scalingDescription()),
-                new TrackedSetting<float>(OsuSetting.ScalingPositionX, _ => scalingDescription()),
-                new TrackedSetting<float>(OsuSetting.ScalingPositionY, _ => scalingDescription()),
+                new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "scaling", m.GetDescription())),
             };
-        }
     }
 
     public enum OsuSetting
