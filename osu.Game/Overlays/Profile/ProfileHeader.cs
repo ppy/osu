@@ -75,6 +75,7 @@ namespace osu.Game.Overlays.Profile
         private readonly Box headerBottomBox;
         private readonly LinkFlowContainer bottomTopLinkContainer;
         private readonly LinkFlowContainer bottomLinkContainer;
+        private Color4 linkBlue;
 
         private const float cover_height = 150;
         private const float cover_info_height = 75;
@@ -693,6 +694,7 @@ namespace osu.Game.Overlays.Profile
             headerBottomBox.Colour = colours.CommunityUserGrayGreenDarker;
 
             communityUserGrayGreenLighter = colours.CommunityUserGrayGreenLighter;
+            linkBlue = colours.BlueLight;
         }
 
         private User user;
@@ -827,10 +829,10 @@ namespace osu.Game.Overlays.Profile
 
             addSpacer(bottomTopLinkContainer);
 
-            if (user.PlayStyle?.Length > 0)
+            if (user.PlayStyles?.Length > 0)
             {
                 bottomTopLinkContainer.AddText("Plays with ");
-                bottomTopLinkContainer.AddText(string.Join(", ", user.PlayStyle.Select(style => play_styles[style])), bold);
+                bottomTopLinkContainer.AddText(string.Join(", ", user.PlayStyles.Select(style => style.GetDescription())), bold);
 
                 addSpacer(bottomTopLinkContainer);
             }
@@ -857,7 +859,11 @@ namespace osu.Game.Overlays.Profile
                 });
                 if (link != null)
                 {
-                    bottomLinkContainer.AddLink(" " + content, link, creationParameters: bold);
+                    bottomLinkContainer.AddLink(" " + content, link, creationParameters: text =>
+                    {
+                        bold(text);
+                        text.Colour = linkBlue;
+                    });
                 }
                 else
                 {
@@ -888,8 +894,6 @@ namespace osu.Game.Overlays.Profile
 
         private class UserStatsLine : Container
         {
-            private readonly OsuSpriteText rightText;
-
             public UserStatsLine(string left, string right)
             {
                 RelativeSizeAxes = Axes.X;
@@ -902,21 +906,15 @@ namespace osu.Game.Overlays.Profile
                         Text = left,
                         Font = "Exo2.0-Medium"
                     },
-                    rightText = new OsuSpriteText
+                    new OsuSpriteText
                     {
                         Anchor = Anchor.TopRight,
                         Origin = Anchor.TopRight,
                         TextSize = 15,
                         Text = right,
-                        Font = "Exo2.0-Medium"
+                        Font = "Exo2.0-Bold"
                     },
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                rightText.Colour = colours.BlueLight;
             }
         }
 

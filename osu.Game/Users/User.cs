@@ -2,7 +2,11 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Security.Cryptography;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using osu.Framework.Configuration;
 
 namespace osu.Game.Users
@@ -113,8 +117,13 @@ namespace osu.Game.Users
         [JsonProperty(@"follower_count")]
         public int[] FollowerCount;
 
-        [JsonProperty(@"playstyle")]
-        public string[] PlayStyle;
+        [JsonProperty]
+        private string[] playstyle
+        {
+            set { PlayStyles = value?.Select(str => Enum.Parse(typeof(PlayStyle), str, true)).Cast<PlayStyle>().ToArray(); }
+        }
+
+        public PlayStyle[] PlayStyles;
 
         [JsonProperty(@"playmode")]
         public string PlayMode;
@@ -174,5 +183,17 @@ namespace osu.Game.Users
             Username = "system",
             Id = 0
         };
+
+        public enum PlayStyle
+        {
+            [Description("Keyboard")]
+            Keyboard,
+            [Description("Mouse")]
+            Mouse,
+            [Description("Tablet")]
+            Tablet,
+            [Description("Touch Screen")]
+            Touch,
+        }
     }
 }
