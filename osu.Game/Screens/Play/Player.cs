@@ -28,6 +28,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
+using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
 
@@ -284,10 +285,10 @@ namespace osu.Game.Screens.Play
                     if (!IsCurrentScreen) return;
 
                     var score = CreateScore();
-                    if (RulesetContainer.Replay == null)
+                    if (RulesetContainer.ReplayScore == null)
                         scoreManager.Import(score, true);
 
-                    Push(new SoloResults(score));
+                    Push(CreateResults(score));
 
                     onCompletionEvent = null;
                 });
@@ -296,11 +297,12 @@ namespace osu.Game.Screens.Play
 
         protected virtual ScoreInfo CreateScore()
         {
-            var score = new ScoreInfo
+            var score = RulesetContainer.ReplayScore?.ScoreInfo ?? new ScoreInfo
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = ruleset,
-                User = api.LocalUser.Value
+                Mods = Beatmap.Value.Mods.Value.ToArray(),
+                User = api.LocalUser.Value,
             };
 
             ScoreProcessor.PopulateScore(score);
@@ -431,5 +433,7 @@ namespace osu.Game.Screens.Play
             if (storyboardVisible && beatmap.Storyboard.ReplacesBackground)
                 Background?.FadeTo(0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
+
+        protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
     }
 }
