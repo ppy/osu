@@ -631,7 +631,7 @@ namespace osu.Game.Screens.Select
 
             if (BeatmapDetails.Leaderboard.Scores == null || !BeatmapDetails.Leaderboard.Scores.Any()) return;
 
-            dialogOverlay?.Push(new ClearScoresDialog(beatmap, BeatmapDetails.Leaderboard.Scores, () => BeatmapDetails.Leaderboard.RefreshScores()));
+            dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap, BeatmapDetails.Leaderboard.Scores, () => BeatmapDetails.Leaderboard.RefreshScores()));
         }
 
         public override bool OnPressed(GlobalAction action)
