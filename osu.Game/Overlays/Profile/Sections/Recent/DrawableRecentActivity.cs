@@ -10,7 +10,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Chat;
-using osu.Game.Screens.Select.Leaderboards;
+using osu.Game.Online.Leaderboards;
 
 namespace osu.Game.Overlays.Profile.Sections.Recent
 {
