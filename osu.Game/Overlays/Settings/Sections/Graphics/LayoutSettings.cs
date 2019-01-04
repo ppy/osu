@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
@@ -16,9 +17,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
     {
         protected override string Header => "Layout";
 
-        private FillFlowContainer letterboxSettings;
+        private FillFlowContainer scalingSettings;
 
-        private Bindable<bool> letterboxing;
+        private Bindable<ScalingMode> scalingMode;
         private Bindable<Size> sizeFullscreen;
 
         private OsuGameBase game;
@@ -28,11 +29,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private const int transition_duration = 400;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager config, OsuGameBase game)
+        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, OsuGameBase game)
         {
             this.game = game;
 
-            letterboxing = config.GetBindable<bool>(FrameworkSetting.Letterboxing);
+            scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
 
             Container resolutionSettingsContainer;
@@ -49,12 +50,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
                 },
-                new SettingsCheckbox
+                new SettingsEnumDropdown<ScalingMode>
                 {
-                    LabelText = "Letterboxing",
-                    Bindable = letterboxing,
+                    LabelText = "Scaling",
+                    Bindable = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
                 },
-                letterboxSettings = new FillFlowContainer
+                scalingSettings = new FillFlowContainer
                 {
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
@@ -65,16 +66,28 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                     Children = new Drawable[]
                     {
-                        new SettingsSlider<double>
+                        new SettingsSlider<float>
                         {
                             LabelText = "Horizontal position",
-                            Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionX),
+                            Bindable = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX),
                             KeyboardStep = 0.01f
                         },
-                        new SettingsSlider<double>
+                        new SettingsSlider<float>
                         {
                             LabelText = "Vertical position",
-                            Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionY),
+                            Bindable = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY),
+                            KeyboardStep = 0.01f
+                        },
+                        new SettingsSlider<float>
+                        {
+                            LabelText = "Horizontal size",
+                            Bindable = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX),
+                            KeyboardStep = 0.01f
+                        },
+                        new SettingsSlider<float>
+                        {
+                            LabelText = "Vertical size",
+                            Bindable = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY),
                             KeyboardStep = 0.01f
                         },
                     }
@@ -105,13 +118,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 }, true);
             }
 
-            letterboxing.BindValueChanged(isVisible =>
+            scalingMode.BindValueChanged(mode =>
             {
-                letterboxSettings.ClearTransforms();
-                letterboxSettings.AutoSizeAxes = isVisible ? Axes.Y : Axes.None;
+                scalingSettings.ClearTransforms();
+                scalingSettings.AutoSizeAxes = mode != ScalingMode.Off ? Axes.Y : Axes.None;
 
-                if (!isVisible)
-                    letterboxSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
+                if (mode == ScalingMode.Off)
+                    scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
             }, true);
         }
 

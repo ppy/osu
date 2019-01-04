@@ -96,6 +96,14 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ScreenshotCaptureMenuCursor, false);
 
             Set(OsuSetting.SongSelectRightMouseScroll, false);
+
+            Set(OsuSetting.Scaling, ScalingMode.Off);
+
+            Set(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
+            Set(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
+
+            Set(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f);
+            Set(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f);
         }
 
         public OsuConfigManager(Storage storage) : base(storage)
@@ -151,6 +159,11 @@ namespace osu.Game.Configuration
         BeatmapHitsounds,
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
-        ExternalLinkWarning
+        ExternalLinkWarning,
+        Scaling,
+        ScalingPositionX,
+        ScalingPositionY,
+        ScalingSizeX,
+        ScalingSizeY
     }
 }
