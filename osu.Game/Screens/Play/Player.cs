@@ -297,7 +297,7 @@ namespace osu.Game.Screens.Play
 
         protected virtual ScoreInfo CreateScore()
         {
-            var score = RulesetContainer?.ReplayScore?.ScoreInfo ?? new ScoreInfo
+            var score = RulesetContainer.ReplayScore?.ScoreInfo ?? new ScoreInfo
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = ruleset,
