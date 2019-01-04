@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -8,8 +9,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
+using osuTK.Input;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
 {
@@ -26,6 +29,11 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private SettingsDropdown<Size> resolutionDropdown;
         private SettingsEnumDropdown<WindowMode> windowModeDropdown;
 
+        private Bindable<float> scalingPositionX;
+        private Bindable<float> scalingPositionY;
+        private Bindable<float> scalingSizeX;
+        private Bindable<float> scalingSizeY;
+
         private const int transition_duration = 400;
 
         [BackgroundDependencyLoader]
@@ -35,6 +43,10 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
             scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
+            scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
+            scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
+            scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
+            scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
 
             Container resolutionSettingsContainer;
 
@@ -69,25 +81,25 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         new SettingsSlider<float>
                         {
                             LabelText = "Horizontal position",
-                            Bindable = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX),
+                            Bindable = delayedBindable(scalingPositionX),
                             KeyboardStep = 0.01f
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Vertical position",
-                            Bindable = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY),
+                            Bindable = delayedBindable(scalingPositionY),
                             KeyboardStep = 0.01f
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Horizontal size",
-                            Bindable = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX),
+                            Bindable = delayedBindable(scalingSizeX),
                             KeyboardStep = 0.01f
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Vertical size",
-                            Bindable = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY),
+                            Bindable = delayedBindable(scalingSizeY),
                             KeyboardStep = 0.01f
                         },
                     }
@@ -126,6 +138,41 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 if (mode == ScalingMode.Off)
                     scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
             }, true);
+        }
+
+        /// <summary>
+        /// Create a delayed bindable which only updates when a condition is met.
+        /// </summary>
+        /// <param name="configBindable">The config bindable.</param>
+        /// <returns>A bindable which will propagate updates with a delay.</returns>
+        private Bindable<float> delayedBindable(Bindable<float> configBindable)
+        {
+            var delayed = new BindableFloat { MinValue = 0, MaxValue = 1, Default = configBindable.Default };
+
+            configBindable.BindValueChanged(v => delayed.Value = v, true);
+            delayed.ValueChanged += v =>
+            {
+                if (scalingMode == ScalingMode.Everything)
+                    applyWithDelay(() => configBindable.Value = v);
+                else
+                    configBindable.Value = v;
+            };
+
+            return delayed;
+        }
+
+        private ScheduledDelegate delayedApplication;
+
+        private void applyWithDelay(Action func, bool firstRun = true)
+        {
+            if (!firstRun && !GetContainingInputManager().CurrentState.Mouse.IsPressed(MouseButton.Left))
+            {
+                func();
+                return;
+            }
+
+            delayedApplication?.Cancel();
+            delayedApplication = Scheduler.AddDelayed(() => applyWithDelay(func, false), 250);
         }
 
         private IReadOnlyList<Size> getResolutions()
