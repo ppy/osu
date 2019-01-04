@@ -7,7 +7,6 @@ namespace osu.Game.Configuration
 {
     public enum ScalingMode
     {
-
         Off,
         Everything,
         [Description("Excluding overlays")]

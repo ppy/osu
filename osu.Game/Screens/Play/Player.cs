@@ -182,12 +182,11 @@ namespace osu.Game.Screens.Play
                         },
                         new ScalingContainer(ScalingMode.Gameplay)
                         {
-                            Child =
-                                new LocalSkinOverrideContainer(working.Skin)
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Child = RulesetContainer
-                                }
+                            Child = new LocalSkinOverrideContainer(working.Skin)
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = RulesetContainer
+                            }
                         },
                         new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                         {
