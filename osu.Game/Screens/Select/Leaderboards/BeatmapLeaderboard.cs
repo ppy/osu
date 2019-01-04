@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Select.Leaderboards
         {
             if (Scope == BeatmapLeaderboardScope.Local)
             {
-                Scores = scoreManager.QueryScores(s => s.Beatmap.ID == Beatmap.ID).ToArray();
+                Scores = scoreManager.GetAllUsableScores().Where(s => s.Beatmap.ID == Beatmap.ID).ToArray();
                 PlaceholderState = Scores.Any() ? PlaceholderState.Successful : PlaceholderState.NoScores;
                 return null;
             }
