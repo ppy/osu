@@ -23,7 +23,7 @@ namespace osu.Game.Graphics.Containers
         private Bindable<float> posX;
         private Bindable<float> posY;
 
-        private readonly ScalingMode targetMode;
+        private readonly ScalingMode? targetMode;
 
         private Bindable<ScalingMode> scalingMode;
 
@@ -37,8 +37,8 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Create a new instance.
         /// </summary>
-        /// <param name="targetMode">The mode which this container should be handling.</param>
-        public ScalingContainer(ScalingMode targetMode)
+        /// <param name="targetMode">The mode which this container should be handling. Handles all modes if null.</param>
+        public ScalingContainer(ScalingMode? targetMode = null)
         {
             this.targetMode = targetMode;
             RelativeSizeAxes = Axes.Both;
@@ -47,6 +47,7 @@ namespace osu.Game.Graphics.Containers
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Both,
+                Masking = true,
                 CornerRadius = 10,
                 Child = content = new DrawSizePreservingFillContainer()
             };
@@ -76,7 +77,7 @@ namespace osu.Game.Graphics.Containers
             base.LoadComplete();
 
             updateSize();
-            content.FinishTransforms();
+            sizableContainer.FinishTransforms();
         }
 
         private bool requiresBackgroundVisible => (scalingMode == ScalingMode.Everything || scalingMode == ScalingMode.ExcludeOverlays) && (sizeX.Value != 1 || sizeY.Value != 1);
@@ -106,10 +107,10 @@ namespace osu.Game.Graphics.Containers
                     backgroundLayer?.FadeOut(500);
             }
 
-            bool letterbox = scalingMode.Value == targetMode;
+            bool scaling = targetMode == null || scalingMode.Value == targetMode;
 
-            var targetSize = letterbox ? new Vector2(sizeX, sizeY) : Vector2.One;
-            var targetPosition = letterbox ? new Vector2(posX, posY) * (Vector2.One - targetSize) : Vector2.Zero;
+            var targetSize = scaling ? new Vector2(sizeX, sizeY) : Vector2.One;
+            var targetPosition = scaling ? new Vector2(posX, posY) * (Vector2.One - targetSize) : Vector2.Zero;
             bool requiresMasking = targetSize != Vector2.One;
 
             if (requiresMasking)

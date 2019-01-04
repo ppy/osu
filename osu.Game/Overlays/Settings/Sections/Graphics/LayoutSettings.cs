@@ -9,9 +9,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
+using osuTK.Graphics;
 using osuTK.Input;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
@@ -151,13 +154,30 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             configBindable.BindValueChanged(v => delayed.Value = v, true);
             delayed.ValueChanged += v =>
             {
-                if (scalingMode == ScalingMode.Everything)
-                    applyWithDelay(() => configBindable.Value = v);
-                else
-                    configBindable.Value = v;
+                switch (scalingMode.Value)
+                {
+                    case ScalingMode.Everything:
+                        applyWithDelay(() => configBindable.Value = v);
+                        return;
+                    case ScalingMode.Gameplay:
+                        showPreview();
+                        break;
+                }
+
+                configBindable.Value = v;
             };
 
             return delayed;
+        }
+
+        private Drawable preview;
+        private void showPreview()
+        {
+            if (preview?.IsAlive != true)
+                game.Add(preview = new ScalingPreview());
+
+            preview.FadeOutFromOne(1500);
+            preview.Expire();
         }
 
         private ScheduledDelegate delayedApplication;
@@ -189,6 +209,19 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             }
 
             return resolutions;
+        }
+
+        private class ScalingPreview : ScalingContainer
+        {
+            public ScalingPreview()
+            {
+                Child = new Box
+                {
+                    Colour = Color4.White,
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 0.5f,
+                };
+            }
         }
 
         private class ResolutionSettingsDropdown : SettingsDropdown<Size>
