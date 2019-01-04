@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
@@ -19,6 +20,7 @@ using osu.Game.Online.Chat;
 using osu.Game.Overlays.Chat;
 using osu.Game.Overlays.Chat.Selection;
 using osu.Game.Overlays.Chat.Tabs;
+using osuTK.Input;
 
 namespace osu.Game.Overlays
 {
@@ -52,9 +54,9 @@ namespace osu.Game.Overlays
         public Bindable<double> ChatHeight { get; set; }
 
         private readonly Container channelSelectionContainer;
-        private readonly ChannelSelectionOverlay channelSelection;
+        private readonly ChannelSelectionOverlay channelSelectionOverlay;
 
-        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceivePositionalInputAt(screenSpacePos) || channelSelection.State == Visibility.Visible && channelSelection.ReceivePositionalInputAt(screenSpacePos);
+        public override bool Contains(Vector2 screenSpacePos) => chatContainer.ReceivePositionalInputAt(screenSpacePos) || channelSelectionOverlay.State == Visibility.Visible && channelSelectionOverlay.ReceivePositionalInputAt(screenSpacePos);
 
         public ChatOverlay()
         {
@@ -74,7 +76,7 @@ namespace osu.Game.Overlays
                     Masking = true,
                     Children = new[]
                     {
-                        channelSelection = new ChannelSelectionOverlay
+                        channelSelectionOverlay = new ChannelSelectionOverlay
                         {
                             RelativeSizeAxes = Axes.Both,
                         },
@@ -161,9 +163,16 @@ namespace osu.Game.Overlays
             };
 
             channelTabControl.Current.ValueChanged += chat => channelManager.CurrentChannel.Value = chat;
-            channelTabControl.ChannelSelectorActive.ValueChanged += value => channelSelection.State = value ? Visibility.Visible : Visibility.Hidden;
-            channelSelection.StateChanged += state =>
+            channelTabControl.ChannelSelectorActive.ValueChanged += value => channelSelectionOverlay.State = value ? Visibility.Visible : Visibility.Hidden;
+            channelSelectionOverlay.StateChanged += state =>
             {
+                if (state == Visibility.Hidden && channelManager.CurrentChannel.Value == null)
+                {
+                    channelSelectionOverlay.State = Visibility.Visible;
+                    State = Visibility.Hidden;
+                    return;
+                }
+
                 channelTabControl.ChannelSelectorActive.Value = state == Visibility.Visible;
 
                 if (state == Visibility.Visible)
@@ -176,8 +185,8 @@ namespace osu.Game.Overlays
                     textbox.HoldFocus = true;
             };
 
-            channelSelection.OnRequestJoin = channel => channelManager.JoinChannel(channel);
-            channelSelection.OnRequestLeave = channel => channelManager.LeaveChannel(channel);
+            channelSelectionOverlay.OnRequestJoin = channel => channelManager.JoinChannel(channel);
+            channelSelectionOverlay.OnRequestLeave = channel => channelManager.LeaveChannel(channel);
         }
 
         private void currentChannelChanged(Channel channel)
@@ -186,6 +195,7 @@ namespace osu.Game.Overlays
             {
                 textbox.Current.Disabled = true;
                 currentChannelContainer.Clear(false);
+                channelSelectionOverlay.State = Visibility.Visible;
                 return;
             }
 
@@ -214,7 +224,7 @@ namespace osu.Game.Overlays
             else
             {
                 currentChannelContainer.Clear(false);
-                Scheduler.Add(() => currentChannelContainer.Add(loaded));
+                currentChannelContainer.Add(loaded);
             }
         }
 
@@ -239,7 +249,7 @@ namespace osu.Game.Overlays
                 double targetChatHeight = startDragChatHeight - (e.MousePosition.Y - e.MouseDownPosition.Y) / Parent.DrawSize.Y;
 
                 // If the channel selection screen is shown, mind its minimum height
-                if (channelSelection.State == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
+                if (channelSelectionOverlay.State == Visibility.Visible && targetChatHeight > 1f - channel_selection_min_height)
                     targetChatHeight = 1f - channel_selection_min_height;
 
                 ChatHeight.Value = targetChatHeight;
@@ -252,6 +262,39 @@ namespace osu.Game.Overlays
         {
             isDragging = false;
             return base.OnDragEnd(e);
+        }
+
+        private void selectTab(int index)
+        {
+            var channel = channelTabControl.Items.Skip(index).FirstOrDefault();
+            if (channel != null && channel.Name != "+")
+                channelTabControl.Current.Value = channel;
+        }
+
+        protected override bool OnKeyDown(KeyDownEvent e)
+        {
+            if (e.AltPressed)
+            {
+                switch (e.Key)
+                {
+                    case Key.Number1:
+                    case Key.Number2:
+                    case Key.Number3:
+                    case Key.Number4:
+                    case Key.Number5:
+                    case Key.Number6:
+                    case Key.Number7:
+                    case Key.Number8:
+                    case Key.Number9:
+                        selectTab((int)e.Key - (int)Key.Number1);
+                        return true;
+                    case Key.Number0:
+                        selectTab(9);
+                        return true;
+                }
+            }
+
+            return base.OnKeyDown(e);
         }
 
         public override bool AcceptsFocus => true;
@@ -305,7 +348,7 @@ namespace osu.Game.Overlays
             channelManager.AvailableChannels.ItemsRemoved += availableChannelsChanged;
 
             //for the case that channelmanager was faster at fetching the channels than our attachment to CollectionChanged.
-            channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
+            channelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
             foreach (Channel channel in channelManager.JoinedChannels)
                 channelTabControl.AddChannel(channel);
         }
@@ -326,7 +369,7 @@ namespace osu.Game.Overlays
         }
 
         private void availableChannelsChanged(IEnumerable<Channel> channels)
-            => channelSelection.UpdateAvailableChannels(channelManager.AvailableChannels);
+            => channelSelectionOverlay.UpdateAvailableChannels(channelManager.AvailableChannels);
 
         protected override void Dispose(bool isDisposing)
         {
