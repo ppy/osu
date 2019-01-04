@@ -1,11 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using osuTK;
-using osuTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -13,8 +8,8 @@ using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -31,6 +26,11 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
+using osuTK;
+using osuTK.Input;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Screens.Select
 {
@@ -227,7 +227,7 @@ namespace osu.Game.Screens.Select
 
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.fa_trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, colours.Purple, null, Key.Number1);
-                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.fa_eraser, colours.Purple, null, Key.Number2);
+                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.fa_eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapSetInfo), Key.Number2);
             }
 
             if (this.beatmaps == null)
@@ -623,6 +623,15 @@ namespace osu.Game.Screens.Select
         {
             if (beatmap == null || beatmap.ID <= 0) return;
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
+        }
+
+        private void clearScores(BeatmapSetInfo beatmap)
+        {
+            if (beatmap == null || beatmap.ID <= 0) return;
+
+            if (BeatmapDetails.Leaderboard.Scores == null || !BeatmapDetails.Leaderboard.Scores.Any()) return;
+
+            dialogOverlay?.Push(new ClearScoresDialog(beatmap, BeatmapDetails.Leaderboard.Scores, () => BeatmapDetails.Leaderboard.RefreshScores()));
         }
 
         public override bool OnPressed(GlobalAction action)
