@@ -4,9 +4,7 @@
 using System;
 using System.ComponentModel;
 using System.Linq;
-using System.Security.Cryptography;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using osu.Framework.Configuration;
 
 namespace osu.Game.Users
