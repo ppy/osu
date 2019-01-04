@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual
             typeof(Results),
             typeof(ResultsPage),
             typeof(ScoreResultsPage),
-            typeof(RankingResultsPage)
+            typeof(LocalLeaderboardPage)
         };
 
         [BackgroundDependencyLoader]
