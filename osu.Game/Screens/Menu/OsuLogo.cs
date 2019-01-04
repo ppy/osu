@@ -79,8 +79,6 @@ namespace osu.Game.Screens.Menu
 
         private readonly Container impactContainer;
 
-        private const float default_size = 480;
-
         private const double early_activation = 60;
 
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
@@ -88,8 +86,6 @@ namespace osu.Game.Screens.Menu
         public OsuLogo()
         {
             EarlyActivationMilliseconds = early_activation;
-
-            Size = new Vector2(default_size);
 
             Origin = Anchor.Centre;
 

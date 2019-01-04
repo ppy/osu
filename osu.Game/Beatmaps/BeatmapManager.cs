@@ -59,7 +59,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
-        public WorkingBeatmap DefaultBeatmap { private get; set; }
+        public readonly WorkingBeatmap DefaultBeatmap;
 
         public override string[] HandledExtensions => new[] { ".osz" };
 
@@ -77,16 +77,19 @@ namespace osu.Game.Beatmaps
 
         private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, IIpcHost importHost = null)
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, IIpcHost importHost = null,
+                              WorkingBeatmap defaultBeatmap = null)
             : base(storage, contextFactory, new BeatmapStore(contextFactory), importHost)
         {
-            beatmaps = (BeatmapStore)ModelStore;
-            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
-            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
-
             this.rulesets = rulesets;
             this.api = api;
             this.audioManager = audioManager;
+
+            DefaultBeatmap = defaultBeatmap;
+
+            beatmaps = (BeatmapStore)ModelStore;
+            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
+            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
         }
 
         protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive)
@@ -249,10 +252,13 @@ namespace osu.Game.Beatmaps
         /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
         /// </summary>
         /// <param name="beatmapInfo">The beatmap to lookup.</param>
-        /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap.</param>
+        /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap. May be returned if beatmapInfo requested matches</param>
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
         {
+            if (beatmapInfo?.ID > 0 && previous != null && previous.BeatmapInfo?.ID == beatmapInfo.ID)
+                return previous;
+
             if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 

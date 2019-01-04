@@ -65,7 +65,7 @@ namespace osu.Game.Online.API.Requests.Responses
         }
 
         [JsonProperty(@"statistics")]
-        private Dictionary<string, object> jsonStats
+        private Dictionary<string, int> jsonStats
         {
             set
             {
