@@ -1,8 +1,10 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
@@ -106,14 +108,29 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f);
         }
 
-        public OsuConfigManager(Storage storage) : base(storage)
+        public OsuConfigManager(Storage storage)
+            : base(storage)
         {
         }
 
-        public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
+        public override TrackedSettings CreateTrackedSettings()
         {
-            new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled"))
-        };
+            Func<SettingDescription> scalingDescription = () =>
+            {
+                var scalingMode = Get<ScalingMode>(OsuSetting.Scaling);
+                return new SettingDescription(scalingMode, "scaling", scalingMode.GetDescription());
+            };
+
+            return new TrackedSettings
+            {
+                new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled")),
+                new TrackedSetting<ScalingMode>(OsuSetting.Scaling, _ => scalingDescription()),
+                new TrackedSetting<float>(OsuSetting.ScalingSizeX, _ => scalingDescription()),
+                new TrackedSetting<float>(OsuSetting.ScalingSizeY, _ => scalingDescription()),
+                new TrackedSetting<float>(OsuSetting.ScalingPositionX, _ => scalingDescription()),
+                new TrackedSetting<float>(OsuSetting.ScalingPositionY, _ => scalingDescription()),
+            };
+        }
     }
 
     public enum OsuSetting
