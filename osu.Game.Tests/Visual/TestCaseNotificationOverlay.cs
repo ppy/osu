@@ -111,7 +111,7 @@ namespace osu.Game.Tests.Visual
 
             if (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
             {
-                var p = progressingNotifications.FirstOrDefault(n => n.State == ProgressNotificationState.Queued);
+                var p = progressingNotifications.Find(n => n.State == ProgressNotificationState.Queued);
                 if (p != null)
                     p.State = ProgressNotificationState.Active;
             }

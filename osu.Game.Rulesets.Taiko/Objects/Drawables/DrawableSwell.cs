@@ -135,7 +135,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         {
             if (userTriggered)
             {
-                var nextTick = ticks.FirstOrDefault(j => !j.IsHit);
+                var nextTick = ticks.Find(j => !j.IsHit);
 
                 nextTick?.TriggerResult(HitResult.Great);
 
