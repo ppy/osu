@@ -165,8 +165,8 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                     TimeSpan.FromHours(12),
                                                                     //TimeSpan.FromHours(16),
                                                                     TimeSpan.FromHours(24),
-                                                                    //TimeSpan.FromDays(3),
-                                                                    //TimeSpan.FromDays(7)
+                                                                    TimeSpan.FromDays(3),
+                                                                    TimeSpan.FromDays(7)
                                                                 }
                                                             }
                                                         },
