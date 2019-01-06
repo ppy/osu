@@ -3,26 +3,20 @@
 
 using Android.App;
 using Android.OS;
+using Android.Support.V7.App;
 using Android.Runtime;
 using Android.Widget;
-using Android.Views;
-using Android.Content.PM;
 
-namespace osu.Android
+namespace osu.Game.Rulesets.Catch.Tests.Android
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true, ScreenOrientation = ScreenOrientation.Landscape, SupportsPictureInPicture = false)]
-    public class MainActivity : Activity
+    [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
+    public class MainActivity : AppCompatActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
             // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
-            Window.AddFlags(WindowManagerFlags.KeepScreenOn);
-        }
-        public override void OnBackPressed()
-        {
-            
         }
     }
 }

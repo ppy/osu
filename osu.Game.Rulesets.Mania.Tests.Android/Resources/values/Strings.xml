@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">osu.Game.Rulesets.Mania.Tests.Android</string>
+    <string name="action_settings">Settings</string>
+</resources>
