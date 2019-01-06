@@ -17,9 +17,9 @@ namespace osu.Game.Screens.Select
         private ScoreManager manager;
 
         [BackgroundDependencyLoader]
-        private void load(ScoreManager beatmapManager)
+        private void load(ScoreManager scoreManager)
         {
-            manager = beatmapManager;
+            manager = scoreManager;
         }
 
         public BeatmapClearScoresDialog(BeatmapSetInfo beatmap, IEnumerable<ScoreInfo> scores, Action refresh)
