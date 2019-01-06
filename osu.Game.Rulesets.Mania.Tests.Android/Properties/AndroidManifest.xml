@@ -4,6 +4,5 @@
           android:versionName="1.0" 
           package="osu.Game.Rulesets.Mania.Tests.Android.osu.Game.Rulesets.Mania.Tests.Android">
   <uses-sdk android:minSdkVersion="21" android:targetSdkVersion="27" />
-  <application android:allowBackup="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:roundIcon="@mipmap/ic_launcher_round" android:supportsRtl="true" android:theme="@style/AppTheme">
-  </application>
+  <application android:allowBackup="true" android:supportsRtl="true" />
 </manifest>
