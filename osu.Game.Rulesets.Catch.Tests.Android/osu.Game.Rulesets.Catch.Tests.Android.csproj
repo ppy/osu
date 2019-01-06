@@ -10,7 +10,7 @@
     <TemplateGuid>{122416d6-6b49-4ee2-a1e8-b825f31c79fe}</TemplateGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>osu.Game.Rulesets.Catch.Tests.Android</RootNamespace>
+    <RootNamespace>osu.Game.Rulesets.Catch.Tests</RootNamespace>
     <AssemblyName>osu.Game.Rulesets.Catch.Tests.Android</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <AndroidApplication>True</AndroidApplication>
