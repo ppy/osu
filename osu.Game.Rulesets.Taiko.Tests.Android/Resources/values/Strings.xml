@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">osu!lazer</string>
+    <string name="app_name">osu.Game.Rulesets.Taiko.Tests.Android</string>
     <string name="action_settings">Settings</string>
 </resources>
