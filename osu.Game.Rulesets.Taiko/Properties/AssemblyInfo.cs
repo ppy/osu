@@ -9,3 +9,4 @@ using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("osu.Game.Rulesets.Taiko.Tests")]
 [assembly: InternalsVisibleTo("osu.Game.Rulesets.Taiko.Tests.Dynamic")]
+[assembly: InternalsVisibleTo("osu.Game.Rulesets.Taiko.Tests.Android")]
