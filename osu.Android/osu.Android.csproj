@@ -28,7 +28,6 @@
   <ItemGroup>
     <Compile Include="OsuGameActivity.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\osu.licenseheader">

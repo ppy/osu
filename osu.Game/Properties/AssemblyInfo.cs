@@ -9,3 +9,4 @@ using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("osu.Game.Tests")]
 [assembly: InternalsVisibleTo("osu.Game.Tests.Dynamic")]
+[assembly: InternalsVisibleTo("osu.Game.Tests.Android")]
