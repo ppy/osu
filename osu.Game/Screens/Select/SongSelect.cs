@@ -24,6 +24,7 @@ using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
 using osuTK;
@@ -627,6 +628,8 @@ namespace osu.Game.Screens.Select
 
         private void clearScores(BeatmapSetInfo beatmap)
         {
+            if (BeatmapDetails.Leaderboard.Scope != BeatmapLeaderboardScope.Local) return;
+
             if (beatmap == null || beatmap.ID <= 0) return;
 
             if (BeatmapDetails.Leaderboard.Scores == null || !BeatmapDetails.Leaderboard.Scores.Any()) return;
