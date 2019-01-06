@@ -27,7 +27,6 @@
   <Import Project="..\osu.Android.props" />
   <ItemGroup>
     <Compile Include="MainActivity.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\osu.licenseheader">
