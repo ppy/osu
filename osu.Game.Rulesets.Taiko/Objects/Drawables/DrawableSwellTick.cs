@@ -6,11 +6,11 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 {
-    public class DrawableSwellTick : DrawableTaikoHitObject
+    public class DrawableSwellTick : DrawableTaikoHitObject<SwellTick>
     {
         public override bool DisplayResult => false;
 
-        public DrawableSwellTick(TaikoHitObject hitObject)
+        public DrawableSwellTick(SwellTick hitObject)
             : base(hitObject)
         {
         }

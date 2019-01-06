@@ -61,6 +61,8 @@ namespace osu.Game
 
         private DialogOverlay dialogOverlay;
 
+        private AccountCreationOverlay accountCreation;
+
         private DirectOverlay direct;
 
         private SocialOverlay social;
@@ -185,7 +187,13 @@ namespace osu.Game
         }
 
         private ExternalLinkOpener externalLinkOpener;
-        public void OpenUrlExternally(string url) => externalLinkOpener.OpenUrlExternally(url);
+        public void OpenUrlExternally(string url)
+        {
+            if (url.StartsWith("/"))
+                url = $"{API.Endpoint}{url}";
+
+            externalLinkOpener.OpenUrlExternally(url);
+        }
 
         private ScheduledDelegate scoreLoad;
 
@@ -309,7 +317,7 @@ namespace osu.Game
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
                 Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
 
-                currentScreen.Push(new PlayerLoader(new ReplayPlayer(databasedScore)));
+                currentScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
             }
         }
 
@@ -400,9 +408,19 @@ namespace osu.Game
                 Origin = Anchor.TopRight,
             }, overlayContent.Add);
 
-            loadComponentSingleFile(dialogOverlay = new DialogOverlay
+            loadComponentSingleFile(accountCreation = new AccountCreationOverlay
             {
                 Depth = -6,
+            }, overlayContent.Add);
+
+            loadComponentSingleFile(dialogOverlay = new DialogOverlay
+            {
+                Depth = -7,
+            }, overlayContent.Add);
+
+            loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener
+            {
+                Depth = -8,
             }, overlayContent.Add);
 
             dependencies.Cache(idleTracker);
@@ -417,6 +435,9 @@ namespace osu.Game
             dependencies.Cache(beatmapSetOverlay);
             dependencies.Cache(notifications);
             dependencies.Cache(dialogOverlay);
+            dependencies.Cache(accountCreation);
+
+            chatOverlay.StateChanged += state => channelManager.HighPollRate.Value = state == Visibility.Visible;
 
             Add(externalLinkOpener = new ExternalLinkOpener());
 
@@ -553,9 +574,9 @@ namespace osu.Game
 
                     try
                     {
-                        Logger.Log($"Loading {d}...", LoggingTarget.Debug);
+                        Logger.Log($"Loading {d}...", level: LogLevel.Debug);
                         await LoadComponentAsync(d, add);
-                        Logger.Log($"Loaded {d}!", LoggingTarget.Debug);
+                        Logger.Log($"Loaded {d}!", level: LogLevel.Debug);
                     }
                     catch (OperationCanceledException)
                     {
@@ -669,10 +690,41 @@ namespace osu.Game
             MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
 
-        private void screenAdded(Screen newScreen)
+        /// <summary>
+        /// Sets <see cref="Beatmap"/> while ignoring any beatmap.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to set.</param>
+        public void ForcefullySetBeatmap(WorkingBeatmap beatmap)
+        {
+            var beatmapDisabled = Beatmap.Disabled;
+
+            Beatmap.Disabled = false;
+            Beatmap.Value = beatmap;
+            Beatmap.Disabled = beatmapDisabled;
+        }
+
+        /// <summary>
+        /// Sets <see cref="Ruleset"/> while ignoring any ruleset restrictions.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to set.</param>
+        public void ForcefullySetRuleset(RulesetInfo ruleset)
+        {
+            var rulesetDisabled = this.ruleset.Disabled;
+
+            this.ruleset.Disabled = false;
+            this.ruleset.Value = ruleset;
+            this.ruleset.Disabled = rulesetDisabled;
+        }
+
+        protected virtual void ScreenChanged(OsuScreen current, Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
-            Logger.Log($"Screen changed → {currentScreen}");
+        }
+
+        private void screenAdded(Screen newScreen)
+        {
+            ScreenChanged(currentScreen, newScreen);
+            Logger.Log($"Screen changed → {newScreen}");
 
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
@@ -680,7 +732,7 @@ namespace osu.Game
 
         private void screenRemoved(Screen newScreen)
         {
-            currentScreen = (OsuScreen)newScreen;
+            ScreenChanged(currentScreen, newScreen);
             Logger.Log($"Screen changed ← {currentScreen}");
 
             if (newScreen == null)

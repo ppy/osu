@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ResultsPage : Container
+    public abstract class ResultsPage : Container
     {
         protected readonly ScoreInfo Score;
         protected readonly WorkingBeatmap Beatmap;
@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Ranking
 
         protected override Container<Drawable> Content => content;
 
-        public ResultsPage(ScoreInfo score, WorkingBeatmap beatmap)
+        protected ResultsPage(ScoreInfo score, WorkingBeatmap beatmap)
         {
             Score = score;
             Beatmap = beatmap;

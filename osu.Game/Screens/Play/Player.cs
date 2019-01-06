@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Play
                 {
                     Retries = RestartCount,
                     OnRetry = Restart,
-                    OnQuit = Exit,
+                    OnQuit = performUserRequestedExit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
                     Children = new[]
                     {
@@ -211,7 +211,7 @@ namespace osu.Game.Screens.Play
                 failOverlay = new FailOverlay
                 {
                     OnRetry = Restart,
-                    OnQuit = Exit,
+                    OnQuit = performUserRequestedExit,
                 },
                 new HotkeyRetryOverlay
                 {
@@ -225,7 +225,7 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            hudOverlay.HoldToQuit.Action = Exit;
+            hudOverlay.HoldToQuit.Action = performUserRequestedExit;
             hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
@@ -250,8 +250,16 @@ namespace osu.Game.Screens.Play
                 mod.ApplyToClock(sourceClock);
         }
 
+        private void performUserRequestedExit()
+        {
+            if (!IsCurrentScreen) return;
+            Exit();
+        }
+
         public void Restart()
         {
+            if (!IsCurrentScreen) return;
+
             sampleRestart?.Play();
             ValidForResume = false;
             RestartRequested?.Invoke();
@@ -277,10 +285,10 @@ namespace osu.Game.Screens.Play
                     if (!IsCurrentScreen) return;
 
                     var score = CreateScore();
-                    if (RulesetContainer.Replay == null)
+                    if (RulesetContainer.ReplayScore == null)
                         scoreManager.Import(score, true);
 
-                    Push(new Results(score));
+                    Push(CreateResults(score));
 
                     onCompletionEvent = null;
                 });
@@ -289,11 +297,12 @@ namespace osu.Game.Screens.Play
 
         protected virtual ScoreInfo CreateScore()
         {
-            var score = new ScoreInfo
+            var score = RulesetContainer.ReplayScore?.ScoreInfo ?? new ScoreInfo
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = ruleset,
-                User = api.LocalUser.Value
+                Mods = Beatmap.Value.Mods.Value.ToArray(),
+                User = api.LocalUser.Value,
             };
 
             ScoreProcessor.PopulateScore(score);
@@ -424,5 +433,7 @@ namespace osu.Game.Screens.Play
             if (storyboardVisible && beatmap.Storyboard.ReplacesBackground)
                 Background?.FadeTo(0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
+
+        protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
     }
 }

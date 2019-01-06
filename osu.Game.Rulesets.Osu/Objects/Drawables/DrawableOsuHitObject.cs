@@ -21,7 +21,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         protected DrawableOsuHitObject(OsuHitObject hitObject)
             : base(hitObject)
         {
-            base.AddInternal(shakeContainer = new ShakeContainer { RelativeSizeAxes = Axes.Both });
+            base.AddInternal(shakeContainer = new ShakeContainer
+            {
+                ShakeDuration = 30,
+                RelativeSizeAxes = Axes.Both
+            });
             Alpha = 0;
         }
 

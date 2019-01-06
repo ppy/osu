@@ -20,6 +20,11 @@ namespace osu.Game.Rulesets.Objects
     public class HitObject
     {
         /// <summary>
+        /// A small adjustment to the start time of control points to account for rounding/precision errors.
+        /// </summary>
+        private const double control_point_leniency = 1;
+
+        /// <summary>
         /// The time at which the HitObject starts.
         /// </summary>
         public virtual double StartTime { get; set; }
@@ -70,7 +75,7 @@ namespace osu.Game.Rulesets.Objects
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             // This is done here since ApplyDefaultsToSelf may be used to determine the end time
-            SampleControlPoint = controlPointInfo.SamplePointAt((this as IHasEndTime)?.EndTime ?? StartTime);
+            SampleControlPoint = controlPointInfo.SamplePointAt(((this as IHasEndTime)?.EndTime ?? StartTime) + control_point_leniency);
 
             nestedHitObjects.Clear();
 
@@ -87,7 +92,7 @@ namespace osu.Game.Rulesets.Objects
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            Kiai = controlPointInfo.EffectPointAt(StartTime).KiaiMode;
+            Kiai = controlPointInfo.EffectPointAt(StartTime + control_point_leniency).KiaiMode;
 
             if (HitWindows == null)
                 HitWindows = CreateHitWindows();

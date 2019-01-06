@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
 
-        public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer) => rulesetContainer.SetReplay(CreateReplayScore(rulesetContainer.Beatmap)?.Replay);
+        public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer) => rulesetContainer.SetReplayScore(CreateReplayScore(rulesetContainer.Beatmap));
     }
 
     public abstract class ModAutoplay : Mod, IApplicableFailOverride
