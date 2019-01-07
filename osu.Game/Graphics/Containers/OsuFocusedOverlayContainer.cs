@@ -26,7 +26,6 @@ namespace osu.Game.Graphics.Containers
 
         private PreviewTrackManager previewTrackManager;
 
-
         protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>(OverlayActivation.All);
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)

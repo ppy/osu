@@ -3,6 +3,8 @@
 
 using System;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
@@ -26,5 +28,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
             for (int i = 0; i < RequiredHits; i++)
                 AddNested(new SwellTick());
         }
+
+        public override Judgement CreateJudgement() => new TaikoSwellJudgement();
     }
 }

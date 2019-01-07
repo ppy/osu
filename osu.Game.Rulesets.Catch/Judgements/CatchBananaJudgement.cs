@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Catch.Judgements
             }
         }
 
-        protected override float HealthIncreaseFor(HitResult result)
+        protected override double HealthIncreaseFor(HitResult result)
         {
             switch (result)
             {
