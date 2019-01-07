@@ -292,7 +292,7 @@ namespace osu.Game.Screens.Play
                     if (!IsCurrentScreen) return;
 
                     var score = CreateScore();
-                    if (RulesetContainer.Replay == null)
+                    if (RulesetContainer.ReplayScore == null)
                         scoreManager.Import(score, true);
 
                     Push(CreateResults(score));
@@ -304,7 +304,7 @@ namespace osu.Game.Screens.Play
 
         protected virtual ScoreInfo CreateScore()
         {
-            var score = new ScoreInfo
+            var score = RulesetContainer.ReplayScore?.ScoreInfo ?? new ScoreInfo
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = ruleset,

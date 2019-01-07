@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Edit
 
             // Depending on beatSnapLength, we may snap to a beat that is beyond timingPoint's end time, but we want to instead snap to
             // the next timing point's start time
-            var nextTimingPoint = ControlPointInfo.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
+            var nextTimingPoint = ControlPointInfo.TimingPoints.Find(t => t.Time > timingPoint.Time);
             if (position > nextTimingPoint?.Time)
                 position = nextTimingPoint.Time;
 
@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Edit
             if (seekTime < timingPoint.Time && timingPoint != ControlPointInfo.TimingPoints.First())
                 seekTime = timingPoint.Time;
 
-            var nextTimingPoint = ControlPointInfo.TimingPoints.FirstOrDefault(t => t.Time > timingPoint.Time);
+            var nextTimingPoint = ControlPointInfo.TimingPoints.Find(t => t.Time > timingPoint.Time);
             if (seekTime > nextTimingPoint?.Time)
                 seekTime = nextTimingPoint.Time;
 
