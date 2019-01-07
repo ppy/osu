@@ -21,8 +21,8 @@ namespace osu.Game.Screens.Multi
     {
         public event Action RoomsUpdated;
 
-        private readonly BindableCollection<Room> rooms = new BindableCollection<Room>();
-        public IBindableCollection<Room> Rooms => rooms;
+        private readonly BindableList<Room> rooms = new BindableList<Room>();
+        public IBindableList<Room> Rooms => rooms;
 
         private Room currentRoom;
 
