@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -30,6 +31,7 @@ namespace osu.Game.Online.Leaderboards
         private readonly LoadingAnimation loading;
 
         private ScheduledDelegate showScoresDelegate;
+        private CancellationTokenSource showScoresCancellationSource;
 
         private bool scoresLoadedOnce;
 
@@ -60,6 +62,8 @@ namespace osu.Game.Online.Leaderboards
 
                 // schedule because we may not be loaded yet (LoadComponentAsync complains).
                 showScoresDelegate?.Cancel();
+                showScoresCancellationSource?.Cancel();
+
                 if (!IsLoaded)
                     showScoresDelegate = Schedule(showScores);
                 else
@@ -77,7 +81,7 @@ namespace osu.Game.Online.Leaderboards
                     }
 
                     scrollContainer.ScrollTo(0f, false);
-                });
+                }, (showScoresCancellationSource = new CancellationTokenSource()).Token);
             }
         }
 
