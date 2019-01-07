@@ -22,11 +22,18 @@ namespace osu.Game.Skinning
 
         public abstract Texture GetTexture(string componentName);
 
-        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
-            => Configuration is TConfiguration conf ? query?.Invoke(conf) : null;
+        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration
+            => Configuration is TConfiguration conf ? query.Invoke(conf) : default;
 
-        public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
-            => Configuration is TConfiguration conf ? query?.Invoke(conf) : null;
+        public bool TryGetValue<TConfiguration, TValue>(Func<TConfiguration, TValue, bool> query, out TValue val) where TConfiguration : SkinConfiguration
+        {
+            val = default;
+
+            if (Configuration is TConfiguration conf)
+                return query(conf, val);
+
+            return false;
+        }
 
         protected Skin(SkinInfo skin)
         {

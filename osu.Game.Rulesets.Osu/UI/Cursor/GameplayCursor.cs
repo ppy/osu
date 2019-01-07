@@ -111,7 +111,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
             protected override void SkinChanged(ISkinSource skin, bool allowFallback)
             {
-                cursorExpand = skin.GetValue<SkinConfiguration, bool>(s => s.CursorExpand) ?? true;
+                cursorExpand = skin.GetValue<SkinConfiguration, bool>(s => s.CursorExpand ?? true);
             }
 
             [BackgroundDependencyLoader]
