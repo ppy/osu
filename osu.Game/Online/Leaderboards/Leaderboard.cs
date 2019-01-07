@@ -51,6 +51,10 @@ namespace osu.Game.Online.Leaderboards
 
                 loading.Hide();
 
+                // schedule because we may not be loaded yet (LoadComponentAsync complains).
+                showScoresDelegate?.Cancel();
+                showScoresCancellationSource?.Cancel();
+
                 if (scores == null || !scores.Any())
                     return;
 
@@ -59,10 +63,6 @@ namespace osu.Game.Online.Leaderboards
 
                 scrollFlow = CreateScoreFlow();
                 scrollFlow.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
-
-                // schedule because we may not be loaded yet (LoadComponentAsync complains).
-                showScoresDelegate?.Cancel();
-                showScoresCancellationSource?.Cancel();
 
                 if (!IsLoaded)
                     showScoresDelegate = Schedule(showScores);
