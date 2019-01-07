@@ -3,9 +3,9 @@
 
 using System;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
@@ -40,8 +40,9 @@ namespace osu.Game.Rulesets.Catch.Scoring
                 return;
             }
 
-            if (result.Judgement is CatchJudgement catchJudgement)
-                Health.Value += Math.Max(catchJudgement.HealthIncreaseFor(result) - hpDrainRate, 0) * harshness;
+            Health.Value += Math.Max(result.Judgement.HealthIncreaseFor(result) - hpDrainRate, 0) * harshness;
         }
+
+        protected override HitWindows CreateHitWindows() => new CatchHitWindows();
     }
 }

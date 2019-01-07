@@ -10,7 +10,7 @@ We are accepting bug reports (please report with as much detail as possible). Fe
 
 # Requirements
 
-- A desktop platform with the [.NET Core SDK 2.1](https://www.microsoft.com/net/learn/get-started) or higher installed.
+- A desktop platform with the [.NET Core SDK 2.2](https://www.microsoft.com/net/learn/get-started) or higher installed.
 - When working with the codebase, we recommend using an IDE with intellisense and syntax highlighting, such as [Visual Studio Community Edition](https://www.visualstudio.com/) (Windows), [Visual Studio Code](https://code.visualstudio.com/) (with the C# plugin installed) or [Jetbrains Rider](https://www.jetbrains.com/rider/) (commercial).
 
 # Building and running
