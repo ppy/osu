@@ -224,7 +224,7 @@ namespace osu.Game
                 var databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID);
 
                 // Use first beatmap available for current ruleset, else switch ruleset.
-                var first = databasedSet.Beatmaps.FirstOrDefault(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
+                var first = databasedSet.Beatmaps.Find(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
 
                 ruleset.Value = first.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
