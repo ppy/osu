@@ -6,7 +6,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using System.Linq;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Storyboards.Drawables
@@ -66,7 +65,7 @@ namespace osu.Game.Storyboards.Drawables
         private void load(IBindableBeatmap beatmap, TextureStore textureStore)
         {
             var spritePath = Sprite.Path.ToLowerInvariant();
-            var path = beatmap.Value.BeatmapSetInfo.Files.FirstOrDefault(f => f.Filename.ToLowerInvariant() == spritePath)?.FileInfo.StoragePath;
+            var path = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.ToLowerInvariant() == spritePath)?.FileInfo.StoragePath;
             if (path == null)
                 return;
 
