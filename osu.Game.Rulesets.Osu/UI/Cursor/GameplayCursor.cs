@@ -23,11 +23,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         protected override Container<Drawable> Content => fadeContainer;
 
-        private bool cursorExpand;
-
         private readonly Container<Drawable> fadeContainer;
-
-        private SkinnableCursor skinnableCursor;
 
         public GameplayCursor()
         {
@@ -41,30 +37,27 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                         new CursorTrail { Depth = 1 }
                     }
                 },
-                skinnableCursor = new SkinnableCursor()
             };
         }
 
         private int downCount;
 
-        private const float pressed_scale = 1.2f;
-        private const float released_scale = 1f;
-
-        private float targetScale => downCount > 0 ? pressed_scale : released_scale;
+        private void updateExpandedState()
+        {
+            if (downCount > 0)
+                (ActiveCursor as OsuCursor)?.Expand();
+            else
+                (ActiveCursor as OsuCursor)?.Contract();
+        }
 
         public bool OnPressed(OsuAction action)
         {
-            cursorExpand = skinnableCursor.CursorExpand;
-
-            if (!cursorExpand)
-                return false;
-
             switch (action)
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
                     downCount++;
-                    ActiveCursor.ScaleTo(released_scale).ScaleTo(targetScale, 100, Easing.OutQuad);
+                    updateExpandedState();
                     break;
             }
 
@@ -73,15 +66,12 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         public bool OnReleased(OsuAction action)
         {
-            if (!cursorExpand)
-                return false;
-
             switch (action)
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
                     if (--downCount == 0)
-                        ActiveCursor.ScaleTo(targetScale, 200, Easing.OutQuad);
+                        updateExpandedState();
                     break;
             }
 
@@ -93,22 +83,25 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
         protected override void PopIn()
         {
             fadeContainer.FadeTo(1, 300, Easing.OutQuint);
-            ActiveCursor.ScaleTo(targetScale, 400, Easing.OutQuint);
+            ActiveCursor.ScaleTo(1, 400, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
             fadeContainer.FadeTo(0.05f, 450, Easing.OutQuint);
-            ActiveCursor.ScaleTo(targetScale * 0.8f, 450, Easing.OutQuint);
+            ActiveCursor.ScaleTo(0.8f, 450, Easing.OutQuint);
         }
 
-        public class OsuCursor : Container
+        public class OsuCursor : SkinReloadableDrawable
         {
-            private Drawable cursorContainer;
+            private bool cursorExpand;
 
             private Bindable<double> cursorScale;
             private Bindable<bool> autoCursorScale;
             private readonly IBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+
+            private Container expandTarget;
+            private Drawable scaleTarget;
 
             public OsuCursor()
             {
@@ -116,69 +109,80 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 Size = new Vector2(42);
             }
 
+            protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+            {
+                cursorExpand = skin.GetValue<SkinConfiguration, bool>(s => s.CursorExpand) ?? true;
+            }
+
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config, IBindableBeatmap beatmap)
             {
-                Child = cursorContainer = new SkinnableDrawable("cursor", _ => new CircularContainer
+                InternalChild = expandTarget = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    BorderThickness = Size.X / 6,
-                    BorderColour = Color4.White,
-                    EdgeEffect = new EdgeEffectParameters
-                    {
-                        Type = EdgeEffectType.Shadow,
-                        Colour = Color4.Pink.Opacity(0.5f),
-                        Radius = 5,
-                    },
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
-                            AlwaysPresent = true,
-                        },
-                        new CircularContainer
-                        {
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Masking = true,
-                            BorderThickness = Size.X / 3,
-                            BorderColour = Color4.White.Opacity(0.5f),
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Alpha = 0,
-                                    AlwaysPresent = true,
-                                },
-                            },
-                        },
-                        new CircularContainer
-                        {
-                            Origin = Anchor.Centre,
-                            Anchor = Anchor.Centre,
-                            RelativeSizeAxes = Axes.Both,
-                            Scale = new Vector2(0.1f),
-                            Masking = true,
-                            Children = new Drawable[]
-                            {
-                                new Box
-                                {
-                                    RelativeSizeAxes = Axes.Both,
-                                    Colour = Color4.White,
-                                },
-                            },
-                        },
-                    }
-                }, restrictSize: false)
-                {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    RelativeSizeAxes = Axes.Both,
+                    Child = scaleTarget = new SkinnableDrawable("cursor", _ => new CircularContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        BorderThickness = Size.X / 6,
+                        BorderColour = Color4.White,
+                        EdgeEffect = new EdgeEffectParameters
+                        {
+                            Type = EdgeEffectType.Shadow,
+                            Colour = Color4.Pink.Opacity(0.5f),
+                            Radius = 5,
+                        },
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0,
+                                AlwaysPresent = true,
+                            },
+                            new CircularContainer
+                            {
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Masking = true,
+                                BorderThickness = Size.X / 3,
+                                BorderColour = Color4.White.Opacity(0.5f),
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Alpha = 0,
+                                        AlwaysPresent = true,
+                                    },
+                                },
+                            },
+                            new CircularContainer
+                            {
+                                Origin = Anchor.Centre,
+                                Anchor = Anchor.Centre,
+                                RelativeSizeAxes = Axes.Both,
+                                Scale = new Vector2(0.1f),
+                                Masking = true,
+                                Children = new Drawable[]
+                                {
+                                    new Box
+                                    {
+                                        RelativeSizeAxes = Axes.Both,
+                                        Colour = Color4.White,
+                                    },
+                                },
+                            },
+                        }
+                    }, restrictSize: false)
+                    {
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        RelativeSizeAxes = Axes.Both,
+                    }
                 };
 
                 this.beatmap.BindTo(beatmap);
@@ -203,18 +207,19 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                     scale *= (float)(1 - 0.7 * (1 + beatmap.Value.BeatmapInfo.BaseDifficulty.CircleSize - BeatmapDifficulty.DEFAULT_DIFFICULTY) / BeatmapDifficulty.DEFAULT_DIFFICULTY);
                 }
 
-                cursorContainer.Scale = new Vector2(scale);
+                scaleTarget.Scale = new Vector2(scale);
             }
-        }
 
-        private class SkinnableCursor : SkinReloadableDrawable
-        {
-            public bool CursorExpand { get; set; } = true;
+            private const float pressed_scale = 1.2f;
+            private const float released_scale = 1f;
 
-            protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+            public void Expand()
             {
-                CursorExpand = skin.GetValue<SkinConfiguration, bool>(s => s.CursorExpand) ?? true;
+                if (!cursorExpand) return;
+                expandTarget.ScaleTo(released_scale).ScaleTo(pressed_scale, 100, Easing.OutQuad);
             }
+
+            public void Contract() => expandTarget.ScaleTo(released_scale, 100, Easing.OutQuad);
         }
     }
 }
