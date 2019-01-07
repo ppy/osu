@@ -24,14 +24,17 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
             var osuBeatmap = (Beatmap<OsuHitObject>)Beatmap;
 
-            // Reset stacking
-            foreach (var h in osuBeatmap.HitObjects)
-                h.StackHeight = 0;
+            if (osuBeatmap.HitObjects.Count > 0)
+            {
+                // Reset stacking
+                foreach (var h in osuBeatmap.HitObjects)
+                    h.StackHeight = 0;
 
-            if (Beatmap.BeatmapInfo.BeatmapVersion >= 6)
-                applyStacking(osuBeatmap, 0, osuBeatmap.HitObjects.Count - 1);
-            else
-                applyStackingOld(osuBeatmap);
+                if (Beatmap.BeatmapInfo.BeatmapVersion >= 6)
+                    applyStacking(osuBeatmap, 0, osuBeatmap.HitObjects.Count - 1);
+                else
+                    applyStackingOld(osuBeatmap);
+            }
         }
 
         private void applyStacking(Beatmap<OsuHitObject> beatmap, int startIndex, int endIndex)
