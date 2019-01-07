@@ -36,9 +36,9 @@ namespace osu.Game.Rulesets.Osu.Beatmaps
 
         private void applyStacking(Beatmap<OsuHitObject> beatmap, int startIndex, int endIndex)
         {
-            if (startIndex > endIndex) throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(startIndex)} cannot be > {nameof(endIndex)}.");
-            if (startIndex < 0) throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(startIndex)} cannot be < 0.");
-            if (endIndex < 0) throw new ArgumentOutOfRangeException(nameof(endIndex), $"{nameof(endIndex)} cannot be < 0.");
+            if (startIndex > endIndex) throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(startIndex)} cannot be greater than {nameof(endIndex)}.");
+            if (startIndex < 0) throw new ArgumentOutOfRangeException(nameof(startIndex), $"{nameof(startIndex)} cannot be less than 0.");
+            if (endIndex < 0) throw new ArgumentOutOfRangeException(nameof(endIndex), $"{nameof(endIndex)} cannot be less than 0.");
 
             int extendedEndIndex = endIndex;
             if (endIndex < beatmap.HitObjects.Count - 1)
