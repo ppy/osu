@@ -18,7 +18,7 @@ namespace osu.Game.Screens.Multi
         /// <summary>
         /// All the active <see cref="Room"/>s.
         /// </summary>
-        IBindableCollection<Room> Rooms { get; }
+        IBindableList<Room> Rooms { get; }
 
         /// <summary>
         /// Creates a new <see cref="Room"/>.

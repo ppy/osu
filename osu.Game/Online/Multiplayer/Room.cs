@@ -24,7 +24,7 @@ namespace osu.Game.Online.Multiplayer
         public Bindable<User> Host { get; private set; } = new Bindable<User>();
 
         [JsonProperty("playlist")]
-        public BindableCollection<PlaylistItem> Playlist { get; set; } = new BindableCollection<PlaylistItem>();
+        public BindableList<PlaylistItem> Playlist { get; set; } = new BindableList<PlaylistItem>();
 
         [JsonProperty("channel_id")]
         public Bindable<int> ChannelId { get; private set; } = new Bindable<int>();
