@@ -327,7 +327,7 @@ namespace osu.Game.Screens.Tournament
                                 continue;
 
                             // ReSharper disable once AccessToModifiedClosure
-                            DrawingsTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
+                            DrawingsTeam teamToAdd = allTeams.Find(t => t.FullName == line);
 
                             if (teamToAdd == null)
                                 continue;
