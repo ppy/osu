@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Menu
 
         public override bool CursorVisible => false;
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenEmpty();
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
         private Bindable<bool> menuVoice;
         private Bindable<bool> menuMusic;
