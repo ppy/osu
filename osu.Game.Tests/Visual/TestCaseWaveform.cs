@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
+using osu.Framework.Audio;
 
 namespace osu.Game.Tests.Visual
 {
@@ -17,9 +18,9 @@ namespace osu.Game.Tests.Visual
     public class TestCaseWaveform : OsuTestCase
     {
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(AudioManager audioManager)
         {
-            Beatmap.Value = new WaveformTestBeatmap();
+            Beatmap.Value = new WaveformTestBeatmap(audioManager.Track);
 
             FillFlowContainer flow;
             Child = flow = new FillFlowContainer

@@ -19,10 +19,12 @@ namespace osu.Game.Tests
     {
         private readonly ZipArchiveReader reader;
         private readonly FileStream stream;
+        private readonly TrackManager trackManager;
 
-        public WaveformTestBeatmap()
+        public WaveformTestBeatmap(TrackManager trackManager)
             : base(new BeatmapInfo())
         {
+            this.trackManager = trackManager;
             stream = File.OpenRead(ImportBeatmapTest.TEST_OSZ_PATH);
             reader = new ZipArchiveReader(stream);
         }
@@ -38,9 +40,9 @@ namespace osu.Game.Tests
 
         protected override Texture GetBackground() => null;
 
-        protected override Waveform GetWaveform() => new Waveform(getAudioStream());
+        protected override Waveform GetWaveform() => trackManager.CreateWaveform(getAudioStream());
 
-        protected override Track GetTrack() => new TrackBass(getAudioStream());
+        protected override Track GetTrack() => trackManager.CreateTrack(getAudioStream());
 
         private Stream getAudioStream() => reader.GetStream(reader.Filenames.First(f => f.EndsWith(".mp3")));
         private Stream getBeatmapStream() => reader.GetStream(reader.Filenames.First(f => f.EndsWith(".osu")));
