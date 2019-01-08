@@ -1,7 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -13,10 +13,10 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Components;
+using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -37,11 +37,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private Box statusStrip;
         private UpdateableBeatmapBackgroundSprite background;
         private ParticipantCountDisplay participantCount;
-        private FillFlowContainer topFlow, participantsFlow;
+        private FillFlowContainer topFlow;
         private OsuSpriteText name, status;
         private BeatmapTypeInfo beatmapTypeInfo;
-        private ScrollContainer participantsScroll;
         private ParticipantInfo participantInfo;
+        private MatchLeaderboard leaderboard;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -147,23 +147,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                         },
                     },
                 },
-                participantsScroll = new OsuScrollContainer
+                leaderboard = new MatchLeaderboard
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Padding = new MarginPadding { Top = contentPadding.Top, Left = 38, Right = 37 },
-                    Children = new[]
-                    {
-                        participantsFlow = new FillFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            LayoutDuration = transition_duration,
-                            Spacing = new Vector2(5f),
-                        },
-                    },
-                },
+                }
             };
 
             participantInfo.Host.BindTo(bindings.Host);
@@ -180,7 +170,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             background.Beatmap.BindTo(bindings.CurrentBeatmap);
 
             bindings.Status.BindValueChanged(displayStatus);
-            bindings.Participants.BindValueChanged(p => participantsFlow.ChildrenEnumerable = p.Select(u => new UserTile(u)));
             bindings.Name.BindValueChanged(n => name.Text = n);
 
             Room.BindValueChanged(updateRoom, true);
@@ -189,10 +178,10 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private void updateRoom(Room room)
         {
             bindings.Room = room;
+            leaderboard.Room = room;
 
             if (room != null)
             {
-                participantsFlow.FadeIn(transition_duration);
                 participantCount.FadeIn(transition_duration);
                 beatmapTypeInfo.FadeIn(transition_duration);
                 name.FadeIn(transition_duration);
@@ -200,7 +189,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             }
             else
             {
-                participantsFlow.FadeOut(transition_duration);
                 participantCount.FadeOut(transition_duration);
                 beatmapTypeInfo.FadeOut(transition_duration);
                 name.FadeOut(transition_duration);
@@ -214,7 +202,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         {
             base.UpdateAfterChildren();
 
-            participantsScroll.Height = DrawHeight - topFlow.DrawHeight;
+            leaderboard.Height = DrawHeight - topFlow.DrawHeight;
         }
 
         private void displayStatus(RoomStatus s)
