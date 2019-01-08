@@ -175,20 +175,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             preview.Expire();
         }
 
-        private ScheduledDelegate delayedApplication;
-
-        private void applyWithDelay(Action func, bool firstRun = true)
-        {
-            if (!firstRun && !GetContainingInputManager().CurrentState.Mouse.IsPressed(MouseButton.Left))
-            {
-                func();
-                return;
-            }
-
-            delayedApplication?.Cancel();
-            delayedApplication = Scheduler.AddDelayed(() => applyWithDelay(func, false), 250);
-        }
-
         private IReadOnlyList<Size> getResolutions()
         {
             var resolutions = new List<Size> { new Size(9999, 9999) };
