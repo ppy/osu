@@ -112,6 +112,6 @@ namespace osu.Game.Screens.Play
             handleBase.X = xFill;
         }
 
-        protected override void OnUserChange() => OnSeek?.Invoke(Current);
+        protected override void OnUserChange(double value) => OnSeek?.Invoke(value);
     }
 }
