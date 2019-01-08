@@ -70,7 +70,7 @@ namespace osu.Game.Beatmaps
                 try
                 {
                     var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
-                    return trackData == null ? null : trackManager.CreateTrack(trackData, false);
+                    return trackData == null ? null : trackManager.CreateTrack(trackData);
                 }
                 catch
                 {
@@ -91,7 +91,7 @@ namespace osu.Game.Beatmaps
                 try
                 {
                     var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
-                    return trackData == null ? null : new Waveform(trackData);
+                    return trackData == null ? null : trackManager.CreateWaveform(trackData);
                 }
                 catch
                 {
