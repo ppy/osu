@@ -155,13 +155,13 @@
       <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.2.10.0\lib\netstandard1.3\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
     </Reference>
     <Reference Include="osu.Framework">
-      <HintPath>..\packages\ppy.osu.Framework.2018.1226.0\lib\netstandard2.0\osu.Framework.dll</HintPath>
+      <HintPath>..\packages\ppy.osu.Framework.2019.107.0\lib\netstandard2.0\osu.Framework.dll</HintPath>
     </Reference>
     <Reference Include="osuTK.iOS">
       <HintPath>..\packages\ppy.osuTK.iOS.1.0.50\lib\xamarinios10\osuTK.iOS.dll</HintPath>
     </Reference>
     <Reference Include="osu.Framework.iOS">
-      <HintPath>..\packages\ppy.osu.Framework.iOS.2018.1226.0\lib\xamarinios10\osu.Framework.iOS.dll</HintPath>
+      <HintPath>..\packages\ppy.osu.Framework.iOS.2019.107.0\lib\xamarinios10\osu.Framework.iOS.dll</HintPath>
     </Reference>
     <Reference Include="Humanizer">
       <HintPath>..\packages\Humanizer.Core.2.5.16\lib\netstandard2.0\Humanizer.dll</HintPath>
