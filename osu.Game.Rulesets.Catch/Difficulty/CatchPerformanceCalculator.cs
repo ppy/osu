@@ -22,7 +22,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         private int countGood;
         private int countMeh;
         private int countMiss;
-        private int countKatu;
 
         public CatchPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score) { }
@@ -34,7 +33,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
             countMeh = Convert.ToInt32(Score.Statistics[HitResult.Meh]);
             countMiss = Convert.ToInt32(Score.Statistics[HitResult.Miss]);
-            countKatu = Convert.ToInt32(Score.Statistics[HitResult.Ok]);    // TODO: check
 
             // Don't count scores made with supposedly unranked mods
             if (mods.Any(m => !m.Ranked))
@@ -91,7 +89,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         }
 
         private float accuracy() => totalHits() == 0 ? 0 : MathHelper.Clamp((float)totalSuccessfulHits() / totalHits(), 0f, 1f);
-        private int totalHits() => countMeh + countGood + countGreat + countMiss + countKatu;
+        private int totalHits() => countMeh + countGood + countGreat + countMiss;    // TODO: not counting katu
         private int totalSuccessfulHits() => countMeh + countGood + countGreat;
         private int totalComboHits() => countMeh + countGood + countGreat;
     }
