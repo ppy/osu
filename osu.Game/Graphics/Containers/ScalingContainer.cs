@@ -45,7 +45,6 @@ namespace osu.Game.Graphics.Containers
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Both,
-                Masking = true,
                 CornerRadius = 10,
                 Child = content = new DrawSizePreservingFillContainer()
             };
@@ -109,13 +108,13 @@ namespace osu.Game.Graphics.Containers
 
             var targetSize = scaling ? new Vector2(sizeX, sizeY) : Vector2.One;
             var targetPosition = scaling ? new Vector2(posX, posY) * (Vector2.One - targetSize) : Vector2.Zero;
-            bool requiresMasking = targetSize != Vector2.One;
+            bool requiresMasking = scaling && targetSize != Vector2.One;
 
             if (requiresMasking)
                 sizableContainer.Masking = true;
 
             sizableContainer.MoveTo(targetPosition, 500, Easing.OutQuart);
-            sizableContainer.ResizeTo(targetSize, 500, Easing.OutQuart).OnComplete(_ => { content.Masking = requiresMasking; });
+            sizableContainer.ResizeTo(targetSize, 500, Easing.OutQuart).OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
         }
     }
 }
