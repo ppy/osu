@@ -396,11 +396,11 @@ namespace osu.Game.Overlays.Profile
                 infoTextLeft.NewLine();
                 infoTextLeft.AddText("Last seen ", lightText);
                 infoTextLeft.AddText(new DrawableDate(user.LastVisit.Value), boldItalic);
-                infoTextLeft.NewParagraph();
             }
 
             if (user.PlayStyle?.Length > 0)
             {
+                infoTextLeft.NewParagraph();
                 infoTextLeft.AddText("Plays with ", lightText);
                 infoTextLeft.AddText(string.Join(", ", user.PlayStyle), boldItalic);
             }
