@@ -16,9 +16,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
     {
         protected override string Header => "Layout";
 
-        private FillFlowContainer letterboxSettings;
-
-        private Bindable<bool> letterboxing;
         private Bindable<Size> sizeFullscreen;
 
         private OsuGameBase game;
@@ -32,7 +29,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         {
             this.game = game;
 
-            letterboxing = config.GetBindable<bool>(FrameworkSetting.Letterboxing);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
 
             Container resolutionSettingsContainer;
@@ -48,36 +44,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "Letterboxing",
-                    Bindable = letterboxing,
-                },
-                letterboxSettings = new FillFlowContainer
-                {
-                    Direction = FillDirection.Vertical,
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    AutoSizeDuration = transition_duration,
-                    AutoSizeEasing = Easing.OutQuint,
-                    Masking = true,
-
-                    Children = new Drawable[]
-                    {
-                        new SettingsSlider<double>
-                        {
-                            LabelText = "Horizontal position",
-                            Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionX),
-                            KeyboardStep = 0.01f
-                        },
-                        new SettingsSlider<double>
-                        {
-                            LabelText = "Vertical position",
-                            Bindable = config.GetBindable<double>(FrameworkSetting.LetterboxPositionY),
-                            KeyboardStep = 0.01f
-                        },
-                    }
                 },
             };
 
@@ -104,15 +70,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                         resolutionDropdown.Hide();
                 }, true);
             }
-
-            letterboxing.BindValueChanged(isVisible =>
-            {
-                letterboxSettings.ClearTransforms();
-                letterboxSettings.AutoSizeAxes = isVisible ? Axes.Y : Axes.None;
-
-                if (!isVisible)
-                    letterboxSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
-            }, true);
         }
 
         private IReadOnlyList<Size> getResolutions()
