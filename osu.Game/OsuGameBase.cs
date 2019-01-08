@@ -24,6 +24,7 @@ using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
+using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
@@ -189,7 +190,7 @@ namespace osu.Game
                 Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
             };
 
-            base.Content.Add(new DrawSizePreservingFillContainer { Child = MenuCursorContainer });
+            base.Content.Add(new ScalingContainer(ScalingMode.Everything) { Child = MenuCursorContainer });
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);
@@ -247,7 +248,8 @@ namespace osu.Game
             var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
 
             foreach (var importer in fileImporters)
-                if (importer.HandledExtensions.Contains(extension)) importer.Import(paths);
+                if (importer.HandledExtensions.Contains(extension))
+                    importer.Import(paths);
         }
 
         public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
