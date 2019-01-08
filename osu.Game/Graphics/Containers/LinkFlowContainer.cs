@@ -79,6 +79,7 @@ namespace osu.Game.Graphics.Containers
         {
             AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
             {
+                RelativeSizeAxes = Axes.Both,
                 TooltipText = tooltipText ?? (url != text ? url : string.Empty),
                 Action = action ?? (() =>
                 {
@@ -122,5 +123,7 @@ namespace osu.Game.Graphics.Containers
                 }),
             });
         }
+
+        public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Where(c => !(c is DrawableLinkCompiler));
     }
 }
