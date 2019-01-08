@@ -28,7 +28,7 @@ namespace osu.Game.Beatmaps
             {
                 this.store = store;
                 this.audioManager = audioManager;
-                this.trackManager = audioManager.Track;
+                trackManager = audioManager?.Track;
             }
 
             protected override IBeatmap GetBeatmap()
@@ -70,7 +70,7 @@ namespace osu.Game.Beatmaps
                 try
                 {
                     var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
-                    return trackData == null ? null : trackManager.CreateTrack(trackData);
+                    return trackData == null ? null : trackManager?.CreateTrack(trackData) ?? new TrackBass(trackData);
                 }
                 catch
                 {
@@ -91,7 +91,7 @@ namespace osu.Game.Beatmaps
                 try
                 {
                     var trackData = store.GetStream(getPathForFile(Metadata.AudioFile));
-                    return trackData == null ? null : trackManager.CreateWaveform(trackData);
+                    return trackData == null ? null : trackManager?.CreateWaveform(trackData) ?? new Waveform(trackData);
                 }
                 catch
                 {
