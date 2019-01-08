@@ -3,6 +3,7 @@
 
 using osu.Framework.Configuration;
 using osu.Framework.Configuration.Tracking;
+using osu.Framework.Extensions;
 using osu.Framework.Platform;
 using osu.Game.Overlays;
 using osu.Game.Rulesets.Scoring;
@@ -96,15 +97,25 @@ namespace osu.Game.Configuration
             Set(OsuSetting.ScreenshotCaptureMenuCursor, false);
 
             Set(OsuSetting.SongSelectRightMouseScroll, false);
+
+            Set(OsuSetting.Scaling, ScalingMode.Off);
+
+            Set(OsuSetting.ScalingSizeX, 0.8f, 0.2f, 1f);
+            Set(OsuSetting.ScalingSizeY, 0.8f, 0.2f, 1f);
+
+            Set(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f);
+            Set(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f);
         }
 
-        public OsuConfigManager(Storage storage) : base(storage)
+        public OsuConfigManager(Storage storage)
+            : base(storage)
         {
         }
 
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
         {
-            new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled"))
+            new TrackedSetting<bool>(OsuSetting.MouseDisableButtons, v => new SettingDescription(!v, "gameplay mouse buttons", v ? "disabled" : "enabled")),
+            new TrackedSetting<ScalingMode>(OsuSetting.Scaling, m => new SettingDescription(m, "scaling", m.GetDescription())),
         };
     }
 
@@ -151,6 +162,11 @@ namespace osu.Game.Configuration
         BeatmapHitsounds,
         IncreaseFirstObjectVisibility,
         ScoreDisplayMode,
-        ExternalLinkWarning
+        ExternalLinkWarning,
+        Scaling,
+        ScalingPositionX,
+        ScalingPositionY,
+        ScalingSizeX,
+        ScalingSizeY
     }
 }
