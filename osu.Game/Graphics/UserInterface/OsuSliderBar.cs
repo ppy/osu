@@ -47,7 +47,7 @@ namespace osu.Game.Graphics.UserInterface
                     var floatMinValue = bindableDouble?.MinValue ?? bindableFloat.MinValue;
                     var floatMaxValue = bindableDouble?.MaxValue ?? bindableFloat.MaxValue;
 
-                    if (floatMaxValue == 1 && (floatMinValue == 0 || floatMinValue == -1))
+                    if (floatMaxValue == 1 && floatMinValue >= -1)
                         return floatValue.Value.ToString("P0");
 
                     var decimalPrecision = normalise((decimal)floatPrecision, max_decimal_digits);
