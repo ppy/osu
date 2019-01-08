@@ -151,7 +151,7 @@ namespace osu.Game.Beatmaps
 
         public bool WaveformLoaded => waveform.IsResultAvailable;
         public Waveform Waveform => waveform.Value;
-        protected virtual Waveform GetWaveform() => new Waveform();
+        protected virtual Waveform GetWaveform() => new Waveform(null);
         private readonly RecyclableLazy<Waveform> waveform;
 
         public bool StoryboardLoaded => storyboard.IsResultAvailable;
