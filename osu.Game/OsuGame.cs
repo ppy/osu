@@ -692,7 +692,7 @@ namespace osu.Game
             ruleset.Disabled = applyBeatmapRulesetRestrictions;
             Beatmap.Disabled = applyBeatmapRulesetRestrictions;
 
-            mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
+            screenContainer.Padding = new MarginPadding { Top = ToolbarOffset };
 
             MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
