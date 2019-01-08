@@ -22,12 +22,11 @@ namespace osu.Game.Screens.Select
             manager = scoreManager;
         }
 
-        public BeatmapClearScoresDialog(BeatmapSetInfo beatmap, IEnumerable<ScoreInfo> scores, Action refresh)
+        public BeatmapClearScoresDialog(BeatmapInfo beatmap, Action refresh)
         {
             BodyText = $@"{beatmap.Metadata?.Artist} - {beatmap.Metadata?.Title}";
-
             Icon = FontAwesome.fa_eraser;
-            HeaderText = $@"Clearing {scores.Count()} local score(s). Are you sure?";
+            HeaderText = $@"Clearing all local scores. Are you sure?";
             Buttons = new PopupDialogButton[]
             {
                 new PopupDialogOkButton
@@ -35,7 +34,7 @@ namespace osu.Game.Screens.Select
                     Text = @"Yes. Please.",
                     Action = () =>
                     {
-                        manager.Delete(scores.ToList());
+                        manager.Delete(manager.QueryScores(s => !s.DeletePending && s.Beatmap.ID == beatmap.ID).ToList());
                         refresh();
                     }
                 },

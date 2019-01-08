@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Select
 
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.fa_trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
                 BeatmapOptions.AddButton(@"Remove", @"from unplayed", FontAwesome.fa_times_circle_o, colours.Purple, null, Key.Number1);
-                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.fa_eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapSetInfo), Key.Number2);
+                BeatmapOptions.AddButton(@"Clear", @"local scores", FontAwesome.fa_eraser, colours.Purple, () => clearScores(Beatmap.Value.BeatmapInfo), Key.Number2);
             }
 
             if (this.beatmaps == null)
@@ -626,7 +626,7 @@ namespace osu.Game.Screens.Select
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 
-        private void clearScores(BeatmapSetInfo beatmap)
+        private void clearScores(BeatmapInfo beatmap)
         {
             if (BeatmapDetails.Leaderboard.Scope != BeatmapLeaderboardScope.Local) return;
 
@@ -634,7 +634,7 @@ namespace osu.Game.Screens.Select
 
             if (BeatmapDetails.Leaderboard.Scores == null || !BeatmapDetails.Leaderboard.Scores.Any()) return;
 
-            dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap, BeatmapDetails.Leaderboard.Scores, () => BeatmapDetails.Leaderboard.RefreshScores()));
+            dialogOverlay?.Push(new BeatmapClearScoresDialog(beatmap, () => BeatmapDetails.Leaderboard.RefreshScores()));
         }
 
         public override bool OnPressed(GlobalAction action)
