@@ -16,8 +16,6 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class ScalingContainer : Container
     {
-        private readonly bool isTopLevel;
-
         private Bindable<float> sizeX;
         private Bindable<float> sizeY;
         private Bindable<float> posX;
