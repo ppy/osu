@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Settings
     {
         protected abstract Drawable CreateControl();
 
-        protected Drawable Control { get; }
+        public Drawable Control { get; }
 
         private IHasCurrentValue<T> controlWithCurrent => Control as IHasCurrentValue<T>;
 

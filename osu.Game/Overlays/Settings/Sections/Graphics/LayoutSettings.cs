@@ -7,9 +7,11 @@ using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -23,7 +25,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
     {
         protected override string Header => "Layout";
 
-        private FillFlowContainer scalingSettings;
+        private FillFlowContainer<SettingsSlider<float>> scalingSettings;
 
         private Bindable<ScalingMode> scalingMode;
         private Bindable<Size> sizeFullscreen;
@@ -70,7 +72,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Scaling",
                     Bindable = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
                 },
-                scalingSettings = new FillFlowContainer
+                scalingSettings = new FillFlowContainer<SettingsSlider<float>>
                 {
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.X,
@@ -78,35 +80,37 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     AutoSizeDuration = transition_duration,
                     AutoSizeEasing = Easing.OutQuint,
                     Masking = true,
-                    Children = new Drawable[]
+                    Children = new []
                     {
                         new SettingsSlider<float>
                         {
                             LabelText = "Horizontal position",
-                            Bindable = delayedBindable(scalingPositionX),
+                            Bindable = scalingPositionX,
                             KeyboardStep = 0.01f
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Vertical position",
-                            Bindable = delayedBindable(scalingPositionY),
+                            Bindable = scalingPositionY,
                             KeyboardStep = 0.01f
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Horizontal scale",
-                            Bindable = delayedBindable(scalingSizeX),
+                            Bindable = scalingSizeX,
                             KeyboardStep = 0.01f
                         },
                         new SettingsSlider<float>
                         {
                             LabelText = "Vertical scale",
-                            Bindable = delayedBindable(scalingSizeY),
+                            Bindable = scalingSizeY,
                             KeyboardStep = 0.01f
                         },
                     }
                 },
             };
+
+            scalingSettings.ForEach(s => bindPreviewEvent(s.Bindable));
 
             var resolutions = getResolutions();
 
@@ -139,35 +143,27 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
                 if (mode == ScalingMode.Off)
                     scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
+
+                scalingSettings.ForEach(s => ((SliderBar<float>)s.Control).TransferValueOnCommit = mode == ScalingMode.Everything);
             }, true);
         }
 
         /// <summary>
         /// Create a delayed bindable which only updates when a condition is met.
         /// </summary>
-        /// <param name="configBindable">The config bindable.</param>
+        /// <param name="bindable">The config bindable.</param>
         /// <returns>A bindable which will propagate updates with a delay.</returns>
-        private Bindable<float> delayedBindable(Bindable<float> configBindable)
+        private void bindPreviewEvent(Bindable<float> bindable)
         {
-            var delayed = new BindableFloat { MinValue = 0, MaxValue = 1, Default = configBindable.Default };
-
-            configBindable.BindValueChanged(v => delayed.Value = v, true);
-            delayed.ValueChanged += v =>
+            bindable.ValueChanged += v =>
             {
                 switch (scalingMode.Value)
                 {
-                    case ScalingMode.Everything:
-                        applyWithDelay(() => configBindable.Value = v);
-                        return;
                     case ScalingMode.Gameplay:
                         showPreview();
                         break;
                 }
-
-                configBindable.Value = v;
             };
-
-            return delayed;
         }
 
         private Drawable preview;
