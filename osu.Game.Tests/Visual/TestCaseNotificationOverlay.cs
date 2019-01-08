@@ -49,7 +49,6 @@ namespace osu.Game.Tests.Visual
 
             manager.UnreadCount.ValueChanged += count => { displayedCount.Text = $"displayed count: {count}"; };
 
-
             setState(Visibility.Visible);
             AddStep(@"simple #1", sendHelloNotification);
             AddStep(@"simple #2", sendAmazingNotification);
@@ -74,7 +73,6 @@ namespace osu.Game.Tests.Visual
             AddWaitStep(10);
 
             checkProgressingCount(0);
-
 
             setState(Visibility.Visible);
 
@@ -111,7 +109,7 @@ namespace osu.Game.Tests.Visual
 
             if (progressingNotifications.Count(n => n.State == ProgressNotificationState.Active) < 3)
             {
-                var p = progressingNotifications.FirstOrDefault(n => n.State == ProgressNotificationState.Queued);
+                var p = progressingNotifications.Find(n => n.State == ProgressNotificationState.Queued);
                 if (p != null)
                     p.State = ProgressNotificationState.Active;
             }
