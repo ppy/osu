@@ -11,7 +11,6 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Threading;
 using osu.Game.Configuration;
 using osu.Game.Graphics.Containers;
@@ -144,7 +143,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 if (mode == ScalingMode.Off)
                     scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
 
-                scalingSettings.ForEach(s => ((SliderBar<float>)s.Control).TransferValueOnCommit = mode == ScalingMode.Everything);
+                scalingSettings.ForEach(s => s.TransferValueOnCommit = mode == ScalingMode.Everything);
             }, true);
         }
 
