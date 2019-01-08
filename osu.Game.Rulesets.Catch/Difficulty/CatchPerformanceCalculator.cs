@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2019 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         }
 
         private float accuracy() => totalHits() == 0 ? 0 : MathHelper.Clamp((float)totalSuccessfulHits() / totalHits(), 0f, 1f);
-        private int totalHits() => countMeh + countGood + countGreat + countMiss;    // TODO: not counting katu
+        private int totalHits() => countMeh + countGood + countGreat + countMiss;
         private int totalSuccessfulHits() => countMeh + countGood + countGreat;
         private int totalComboHits() => countMeh + countGood + countGreat;
     }
