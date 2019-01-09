@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -19,6 +20,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private const float width = 128;
 
         private Color4 accentColour = Color4.Black;
+
+        public Func<bool> Hit;
 
         /// <summary>
         /// The colour that is used for the slider ball.
@@ -147,22 +150,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private bool canCurrentlyTrack => Time.Current >= slider.StartTime && Time.Current < slider.EndTime;
+
         private OsuAction? trackingAction;
+
+        private bool trackableIfClicked()
+        {
+            return lastScreenSpaceMousePosition.HasValue
+                && ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value);
+        }
 
         protected override void Update()
         {
             base.Update();
+            
             if (Time.Current < slider.EndTime)
             {
                 // Make sure to use the base version of ReceivePositionalInputAt so that we correctly check the position.
-                Tracking = canCurrentlyTrack
-                           && lastScreenSpaceMousePosition.HasValue
-                           && ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value)
-                           && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton) && x == trackingAction) ?? false);
+                Tracking = trackableIfClicked()
+                        && canCurrentlyTrack
+                        && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton) && x == trackingAction) ?? false);
             }
-
-            if (!tracking)
-                trackingAction = null;
         }
 
         public void UpdateProgress(double completionProgress)
@@ -178,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
-                    hit = IsHovered;
+                    hit = trackableIfClicked() && (Hit?.Invoke() ?? false);
                 break;
             }
 
@@ -190,6 +197,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return hit;
         }
 
-        public bool OnReleased(OsuAction action) => false;
+        public bool OnReleased(OsuAction action)
+        {
+            trackingAction = null;
+            return false;
+        }
     }
 }

@@ -59,7 +59,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     BypassAutoSizeAxes = Axes.Both,
                     Scale = new Vector2(s.Scale),
                     AlwaysPresent = true,
-                    Alpha = 0
+                    Alpha = 0,
+                    Hit = () =>
+                    {
+                        if (AllJudged)
+                        return false;
+
+                        UpdateResult(true);
+                        return true;
+                    },
                 },
                 HeadCircle.CreateProxy(),
                 TailCircle = new DrawableSliderTail(s, s.TailCircle)
