@@ -162,7 +162,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         protected override void Update()
         {
             base.Update();
-            
+
             if (Time.Current < slider.EndTime)
             {
                 // Make sure to use the base version of ReceivePositionalInputAt so that we correctly check the position.
