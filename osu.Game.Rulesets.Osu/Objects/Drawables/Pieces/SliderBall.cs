@@ -178,7 +178,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
-                hit = IsHovered;
+                    hit = IsHovered;
                 break;
             }
 
