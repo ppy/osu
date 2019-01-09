@@ -50,6 +50,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 },
                 ticks = new Container<DrawableSliderTick> { RelativeSizeAxes = Axes.Both },
                 repeatPoints = new Container<DrawableRepeatPoint> { RelativeSizeAxes = Axes.Both },
+                HeadCircle = new DrawableSliderHead(s, s.HeadCircle)
+                {
+                    OnShake = Shake
+                },
                 Ball = new SliderBall(s, this)
                 {
                     BypassAutoSizeAxes = Axes.Both,
@@ -57,10 +61,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     AlwaysPresent = true,
                     Alpha = 0
                 },
-                HeadCircle = new DrawableSliderHead(s, s.HeadCircle)
-                {
-                    OnShake = Shake
-                },
+                HeadCircle.CreateProxy(),
                 TailCircle = new DrawableSliderTail(s, s.TailCircle)
             };
 

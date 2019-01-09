@@ -5,6 +5,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK.Graphics;
@@ -13,7 +14,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
-    public class SliderBall : CircularContainer, ISliderProgress
+    public class SliderBall : CircularContainer, ISliderProgress, IKeyBindingHandler<OsuAction>
     {
         private const float width = 128;
 
@@ -146,24 +147,49 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         }
 
         private bool canCurrentlyTrack => Time.Current >= slider.StartTime && Time.Current < slider.EndTime;
+        private OsuAction? trackingAction;
 
         protected override void Update()
         {
             base.Update();
-
             if (Time.Current < slider.EndTime)
             {
                 // Make sure to use the base version of ReceivePositionalInputAt so that we correctly check the position.
                 Tracking = canCurrentlyTrack
                            && lastScreenSpaceMousePosition.HasValue
                            && ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value)
-                           && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+                           && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton) && x == trackingAction) ?? false);
             }
+
+            if (!tracking)
+                trackingAction = null;
         }
 
         public void UpdateProgress(double completionProgress)
         {
             Position = slider.CurvePositionAt(completionProgress);
         }
+
+        public bool OnPressed(OsuAction action)
+        {
+            bool hit = false;
+
+            switch (action)
+            {
+                case OsuAction.LeftButton:
+                case OsuAction.RightButton:
+                hit = IsHovered;
+                break;
+            }
+
+            if (hit)
+            {
+                trackingAction = action;
+            }
+
+            return hit;
+        }
+
+        public bool OnReleased(OsuAction action) => false;
     }
 }
