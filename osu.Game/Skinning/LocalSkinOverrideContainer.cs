@@ -53,22 +53,6 @@ namespace osu.Game.Skinning
             return fallbackSource == null ? default : fallbackSource.GetValue(query);
         }
 
-        public bool TryGetValue<TConfiguration, TValue>(Func<TConfiguration, TValue, bool> query, out TValue val) where TConfiguration : SkinConfiguration
-        {
-            val = default;
-
-            if ((source as Skin)?.Configuration is TConfiguration conf)
-                if (beatmapSkins && query(conf, val))
-                    return true;
-
-            if (fallbackSource == null)
-            {
-                return false;
-            }
-
-            return fallbackSource.TryGetValue(query, out val);
-        }
-
         private readonly ISkinSource source;
         private ISkinSource fallbackSource;
 
