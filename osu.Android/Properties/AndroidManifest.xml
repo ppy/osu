@@ -5,5 +5,5 @@
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.READ_FRAME_BUFFER" />
-	<application android:allowBackup="true" android:supportsRtl="true" android:label="osu!lazer" />
+	<application android:allowBackup="true" android:supportsRtl="true" android:label="osu!lazer" android:icon="@drawable/lazer"/>
 </manifest>
