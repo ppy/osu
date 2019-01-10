@@ -103,8 +103,8 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
         public class ResultsMatchLeaderboard : MatchLeaderboard
         {
             public ResultsMatchLeaderboard(Room room)
-                : base(room)
             {
+                Room = room;
             }
 
             protected override bool FadeTop => true;
