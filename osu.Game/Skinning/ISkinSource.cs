@@ -22,7 +22,5 @@ namespace osu.Game.Skinning
         SampleChannel GetSample(string sampleName);
 
         TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration;
-
-        bool TryGetValue<TConfiguration, TValue>(Func<TConfiguration, TValue, bool> query, out TValue val) where TConfiguration : SkinConfiguration;
     }
 }

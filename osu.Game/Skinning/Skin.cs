@@ -25,16 +25,6 @@ namespace osu.Game.Skinning
         public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration
             => Configuration is TConfiguration conf ? query.Invoke(conf) : default;
 
-        public bool TryGetValue<TConfiguration, TValue>(Func<TConfiguration, TValue, bool> query, out TValue val) where TConfiguration : SkinConfiguration
-        {
-            val = default;
-
-            if (Configuration is TConfiguration conf)
-                return query(conf, val);
-
-            return false;
-        }
-
         protected Skin(SkinInfo skin)
         {
             SkinInfo = skin;
