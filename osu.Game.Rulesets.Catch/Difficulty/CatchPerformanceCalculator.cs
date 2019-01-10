@@ -39,7 +39,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 return 0;
 
             // We are heavily relying on aim in catch the beat
-            // TODO: replaced Aim with StarRating, not sure if this is correct!
             double value = Math.Pow(5.0f * Math.Max(1.0f, Attributes.StarRating / 0.0049f) - 4.0f, 2.0f) / 100000.0f;
 
             // Longer maps are worth more. "Longer" means how many hits there are which can contribute to combo
