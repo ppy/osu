@@ -148,7 +148,6 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
 
                 scalingSettings.ForEach(s => s.TransferValueOnCommit = mode == ScalingMode.Everything);
-
             }, true);
         }
 
