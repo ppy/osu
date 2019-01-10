@@ -124,6 +124,9 @@ namespace osu.Game.Graphics.Containers
             });
         }
 
+        // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.
+        // However due to https://github.com/ppy/osu-framework/issues/2073, it's possible for the compilers to be relative size in the flow's auto-size axes - an unsupported operation.
+        // Since the compilers don't display any content and don't affect the layout, it's simplest to exclude them from the flow.
         public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Where(c => !(c is DrawableLinkCompiler));
     }
 }
