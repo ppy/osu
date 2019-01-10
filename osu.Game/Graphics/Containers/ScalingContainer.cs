@@ -46,8 +46,35 @@ namespace osu.Game.Graphics.Containers
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Both,
                 CornerRadius = 10,
-                Child = content = new DrawSizePreservingFillContainer()
+                Child = content = new ScalingDrawSizePreservingFillContainer(targetMode != ScalingMode.Gameplay)
             };
+        }
+
+        private class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
+        {
+            private readonly bool applyUIScale;
+            private Bindable<float> uiScale;
+
+            public ScalingDrawSizePreservingFillContainer(bool applyUIScale)
+            {
+                this.applyUIScale = applyUIScale;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager osuConfig)
+            {
+                if (applyUIScale)
+                {
+                    uiScale = osuConfig.GetBindable<float>(OsuSetting.UIScale);
+                    uiScale.BindValueChanged(scaleChanged, true);
+                }
+            }
+
+            private void scaleChanged(float value)
+            {
+                this.ScaleTo(new Vector2(value), 500, Easing.Out);
+                this.ResizeTo(new Vector2(1 / value), 500, Easing.Out);
+            }
         }
 
         [BackgroundDependencyLoader]

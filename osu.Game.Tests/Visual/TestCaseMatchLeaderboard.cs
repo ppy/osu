@@ -17,12 +17,13 @@ namespace osu.Game.Tests.Visual
     {
         public TestCaseMatchLeaderboard()
         {
-            Add(new MatchLeaderboard(new Room { RoomID = { Value = 3 } })
+            Add(new MatchLeaderboard
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 Size = new Vector2(550f, 450f),
                 Scope = MatchLeaderboardScope.Overall,
+                Room = new Room { RoomID = { Value = 3 } }
             });
         }
 
