@@ -27,16 +27,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         public GameplayCursor()
         {
-            InternalChildren = new Drawable[]
+            InternalChild = fadeContainer = new Container
             {
-                fadeContainer = new Container
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new CursorTrail { Depth = 1 }
-                    }
-                },
+                    new CursorTrail { Depth = 1 }
+                }
             };
         }
 
