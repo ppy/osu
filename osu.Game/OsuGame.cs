@@ -359,7 +359,10 @@ namespace osu.Game
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                mainContent = new DrawSizePreservingFillContainer(),
+                mainContent = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
                 idleTracker = new IdleTracker(6000)
             });
