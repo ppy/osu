@@ -39,6 +39,7 @@ namespace osu.Game.Screens.Multi
 
                 if (room != null)
                 {
+                    RoomID.UnbindFrom(room.RoomID);
                     Name.UnbindFrom(room.Name);
                     Host.UnbindFrom(room.Host);
                     Status.UnbindFrom(room.Status);
@@ -56,6 +57,7 @@ namespace osu.Game.Screens.Multi
 
                 if (room != null)
                 {
+                    RoomID.BindTo(room.RoomID);
                     Name.BindTo(room.Name);
                     Host.BindTo(room.Host);
                     Status.BindTo(room.Status);
@@ -82,11 +84,12 @@ namespace osu.Game.Screens.Multi
             currentRuleset.Value = playlistItem?.Ruleset;
         }
 
+        public readonly Bindable<int?> RoomID = new Bindable<int?>();
         public readonly Bindable<string> Name = new Bindable<string>();
         public readonly Bindable<User> Host = new Bindable<User>();
         public readonly Bindable<RoomStatus> Status = new Bindable<RoomStatus>();
         public readonly Bindable<GameType> Type = new Bindable<GameType>();
-        public readonly BindableCollection<PlaylistItem> Playlist = new BindableCollection<PlaylistItem>();
+        public readonly BindableList<PlaylistItem> Playlist = new BindableList<PlaylistItem>();
         public readonly Bindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>();
         public readonly Bindable<int> ParticipantCount = new Bindable<int>();
         public readonly Bindable<int?> MaxParticipants = new Bindable<int?>();

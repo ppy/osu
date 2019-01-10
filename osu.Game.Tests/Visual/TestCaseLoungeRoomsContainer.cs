@@ -73,8 +73,8 @@ namespace osu.Game.Tests.Visual
         {
             public event Action RoomsUpdated;
 
-            public readonly BindableCollection<Room> Rooms = new BindableCollection<Room>();
-            IBindableCollection<Room> IRoomManager.Rooms => Rooms;
+            public readonly BindableList<Room> Rooms = new BindableList<Room>();
+            IBindableList<Room> IRoomManager.Rooms => Rooms;
 
             public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => Rooms.Add(room);
 
