@@ -238,11 +238,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     case Key.Right:
                         beatDivisor.Next();
-                        OnUserChange();
+                        OnUserChange(Current);
                         return true;
                     case Key.Left:
                         beatDivisor.Previous();
-                        OnUserChange();
+                        OnUserChange(Current);
                         return true;
                     default:
                         return false;
@@ -279,7 +279,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 var xPosition = (ToLocalSpace(screenSpaceMousePosition).X - RangePadding) / UsableWidth;
 
                 CurrentNumber.Value = availableDivisors.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
-                OnUserChange();
+                OnUserChange(Current);
             }
 
             private float getMappedPosition(float divisor) => (float)Math.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);

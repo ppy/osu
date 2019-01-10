@@ -26,6 +26,7 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
@@ -187,6 +188,7 @@ namespace osu.Game
         }
 
         private ExternalLinkOpener externalLinkOpener;
+
         public void OpenUrlExternally(string url)
         {
             if (url.StartsWith("/"))
@@ -353,7 +355,11 @@ namespace osu.Game
                     ActionRequested = action => volume.Adjust(action),
                     ScrollActionRequested = (action, amount, isPrecise) => volume.Adjust(action, amount, isPrecise),
                 },
-                mainContent = new Container { RelativeSizeAxes = Axes.Both },
+                screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                mainContent = new DrawSizePreservingFillContainer(),
                 overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
                 idleTracker = new IdleTracker(6000)
             });
@@ -362,7 +368,7 @@ namespace osu.Game
             {
                 screenStack.ModePushed += screenAdded;
                 screenStack.Exited += screenRemoved;
-                mainContent.Add(screenStack);
+                screenContainer.Add(screenStack);
             });
 
             loadComponentSingleFile(Toolbar = new Toolbar
@@ -497,7 +503,7 @@ namespace osu.Game
                 if (notifications.State == Visibility.Visible)
                     offset -= ToolbarButton.WIDTH / 2;
 
-                screenStack.MoveToX(offset, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
+                screenContainer.MoveToX(offset, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
             }
 
             settings.StateChanged += _ => updateScreenOffset();
@@ -555,7 +561,7 @@ namespace osu.Game
                 focused.StateChanged += s =>
                 {
                     visibleOverlayCount += s == Visibility.Visible ? 1 : -1;
-                    screenStack.FadeColour(visibleOverlayCount > 0 ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+                    screenContainer.FadeColour(visibleOverlayCount > 0 ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
                 };
             }
 
@@ -646,6 +652,7 @@ namespace osu.Game
 
         private OsuScreen currentScreen;
         private FrameworkConfigManager frameworkConfig;
+        private ScalingContainer screenContainer;
 
         protected override bool OnExiting()
         {
@@ -685,7 +692,7 @@ namespace osu.Game
             ruleset.Disabled = applyBeatmapRulesetRestrictions;
             Beatmap.Disabled = applyBeatmapRulesetRestrictions;
 
-            mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
+            screenContainer.Padding = new MarginPadding { Top = ToolbarOffset };
 
             MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
