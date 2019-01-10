@@ -138,7 +138,7 @@ namespace osu.Game.Tests.Visual
 
             public event Action RoomsUpdated;
 
-            public IBindableCollection<Room> Rooms { get; } = null;
+            public IBindableList<Room> Rooms { get; } = null;
 
             public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
             {
