@@ -26,7 +26,6 @@ namespace osu.Game.Rulesets.Catch.Tests
                 }
             };
 
-
             for (int i = 0; i < 512; i++)
                 beatmap.HitObjects.Add(new Fruit { X = 0.5f + i / 2048f * (i % 10 - 5), StartTime = i * 100, NewCombo = i % 8 == 0 });
 
