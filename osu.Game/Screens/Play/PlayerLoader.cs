@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -24,6 +25,7 @@ namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
+        private readonly Func<Player> createPlayer;
         private static readonly Vector2 background_blur = new Vector2(15);
 
         private Player player;
@@ -35,15 +37,15 @@ namespace osu.Game.Screens.Play
 
         private Task loadTask;
 
-        public PlayerLoader(Player player)
+        public PlayerLoader(Func<Player> createPlayer)
         {
-            this.player = player;
+            this.createPlayer = createPlayer;
+        }
 
-            player.RestartRequested = () =>
-            {
-                hideOverlays = true;
-                ValidForResume = true;
-            };
+        private void restartRequested()
+        {
+            hideOverlays = true;
+            ValidForResume = true;
         }
 
         [BackgroundDependencyLoader]
@@ -71,7 +73,7 @@ namespace osu.Game.Screens.Play
                 }
             });
 
-            loadTask = LoadComponentAsync(player, playerLoaded);
+            loadNewPlayer();
         }
 
         private void playerLoaded(Player player) => info.Loading = false;
@@ -85,13 +87,20 @@ namespace osu.Game.Screens.Play
             info.Loading = true;
 
             //we will only be resumed if the player has requested a re-run (see ValidForResume setting above)
-            loadTask = LoadComponentAsync(player = new Player
-            {
-                RestartCount = player.RestartCount + 1,
-                RestartRequested = player.RestartRequested,
-            }, playerLoaded);
+            loadNewPlayer();
 
             this.Delay(400).Schedule(pushWhenLoaded);
+        }
+
+        private void loadNewPlayer()
+        {
+            var restartCount = player?.RestartCount + 1 ?? 0;
+
+            player = createPlayer();
+            player.RestartCount = restartCount;
+            player.RestartRequested = restartRequested;
+
+            loadTask = LoadComponentAsync(player, playerLoaded);
         }
 
         private void contentIn()

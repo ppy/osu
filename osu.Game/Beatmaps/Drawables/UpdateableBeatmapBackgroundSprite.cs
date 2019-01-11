@@ -20,28 +20,31 @@ namespace osu.Game.Beatmaps.Drawables
 
         public UpdateableBeatmapBackgroundSprite()
         {
-            Beatmap.BindValueChanged(b => Schedule(() => Model = b));
+            Beatmap.BindValueChanged(b => Model = b);
         }
 
         protected override Drawable CreateDrawable(BeatmapInfo model)
         {
-            Drawable drawable;
+            return new DelayedLoadUnloadWrapper(() => {
+                Drawable drawable;
 
-            var localBeatmap = beatmaps.GetWorkingBeatmap(model);
+                var localBeatmap = beatmaps.GetWorkingBeatmap(model);
 
-            if (localBeatmap.BeatmapInfo.ID == 0 && model?.BeatmapSet?.OnlineInfo != null)
-                drawable = new BeatmapSetCover(model.BeatmapSet);
-            else
-                drawable = new BeatmapBackgroundSprite(localBeatmap);
+                if (localBeatmap.BeatmapInfo.ID == 0 && model?.BeatmapSet?.OnlineInfo != null)
+                    drawable = new BeatmapSetCover(model.BeatmapSet);
+                else
+                    drawable = new BeatmapBackgroundSprite(localBeatmap);
 
-            drawable.RelativeSizeAxes = Axes.Both;
-            drawable.Anchor = Anchor.Centre;
-            drawable.Origin = Anchor.Centre;
-            drawable.FillMode = FillMode.Fill;
+                drawable.RelativeSizeAxes = Axes.Both;
+                drawable.Anchor = Anchor.Centre;
+                drawable.Origin = Anchor.Centre;
+                drawable.FillMode = FillMode.Fill;
+                drawable.OnLoadComplete = d => d.FadeInFromZero(400);
 
-            return drawable;
+                return drawable;
+            }, 500, 10000);
         }
 
-        protected override double FadeDuration => 400;
+        protected override double FadeDuration => 0;
     }
 }

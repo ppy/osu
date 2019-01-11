@@ -19,9 +19,9 @@ namespace osu.Game.Online.Chat
     /// </summary>
     public class StandAloneChatDisplay : CompositeDrawable
     {
-        private readonly bool postingTextbox;
-
         public readonly Bindable<Channel> Channel = new Bindable<Channel>();
+
+        public Action Exit;
 
         private readonly FocusedTextBox textbox;
 
@@ -30,6 +30,8 @@ namespace osu.Game.Online.Chat
         private ScrollContainer scroll;
 
         private DrawableChannel drawableChannel;
+
+        private readonly bool postingTextbox;
 
         private const float textbox_height = 30;
 
@@ -66,6 +68,8 @@ namespace osu.Game.Online.Chat
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                 });
+
+                textbox.Exit += () => Exit?.Invoke();
             }
 
             Channel.BindValueChanged(channelChanged);

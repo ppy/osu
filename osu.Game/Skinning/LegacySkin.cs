@@ -102,7 +102,7 @@ namespace osu.Game.Skinning
 
                 string lastPiece = filename.Split('/').Last();
 
-                var file = source.Files.FirstOrDefault(f =>
+                var file = source.Files.Find(f =>
                     string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), lastPiece, StringComparison.InvariantCultureIgnoreCase));
                 return file?.FileInfo.StoragePath;
             }
