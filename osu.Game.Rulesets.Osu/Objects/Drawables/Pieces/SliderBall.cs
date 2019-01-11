@@ -189,7 +189,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 break;
             }
 
-            if (hit && trackingAction == null)
+            if (hit)
             {
                 trackingAction = action;
             }
@@ -199,11 +199,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public bool OnReleased(OsuAction action)
         {
-            if (action != trackingAction)
+            if (action == trackingAction)
             {
-                return false;
+                trackingAction = null;
             }
-            trackingAction = null;
             return false;
         }
     }
