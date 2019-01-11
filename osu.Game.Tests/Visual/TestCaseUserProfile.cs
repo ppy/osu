@@ -32,6 +32,44 @@ namespace osu.Game.Tests.Visual
             typeof(SupporterIcon)
         };
 
+        public static readonly User TEST_USER = new User
+        {
+            Username = @"Somebody",
+            Id = 1,
+            Country = new Country { FullName = @"Alien" },
+            CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
+            JoinDate = DateTimeOffset.Now.AddDays(-1),
+            LastVisit = DateTimeOffset.Now,
+            ProfileOrder = new[] { "me" },
+            Statistics = new UserStatistics
+            {
+                Ranks = new UserStatistics.UserRanks { Global = 2148, Country = 1 },
+                PP = 4567.89m,
+                Level = new UserStatistics.LevelInfo
+                {
+                    Current = 727,
+                    Progress = 69,
+                }
+            },
+            RankHistory = new User.RankHistoryData
+            {
+                Mode = @"osu",
+                Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
+            },
+            Badges = new[]
+            {
+                new Badge
+                {
+                    AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
+                    Description = "Outstanding help by being a voluntary test subject.",
+                    ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg"
+                }
+            },
+            Title = "osu!volunteer",
+            Colour = "ff0000",
+            Achievements = new User.UserAchievement[0],
+        };
+
         public TestCaseUserProfile()
         {
             Add(profile = new TestUserProfileOverlay());
@@ -47,43 +85,7 @@ namespace osu.Game.Tests.Visual
         {
             base.LoadComplete();
 
-            AddStep("Show offline dummy", () => profile.ShowUser(new User
-            {
-                Username = @"Somebody",
-                Id = 1,
-                Country = new Country { FullName = @"Alien" },
-                CoverUrl = @"https://osu.ppy.sh/images/headers/profile-covers/c1.jpg",
-                JoinDate = DateTimeOffset.Now.AddDays(-1),
-                LastVisit = DateTimeOffset.Now,
-                ProfileOrder = new[] { "me" },
-                Statistics = new UserStatistics
-                {
-                    Ranks = new UserStatistics.UserRanks { Global = 2148, Country = 1 },
-                    PP = 4567.89m,
-                    Level = new UserStatistics.LevelInfo
-                    {
-                        Current = 727,
-                        Progress = 69,
-                    }
-                },
-                RankHistory = new User.RankHistoryData
-                {
-                    Mode = @"osu",
-                    Data = Enumerable.Range(2345, 45).Concat(Enumerable.Range(2109, 40)).ToArray()
-                },
-                Badges = new[]
-                {
-                    new Badge
-                    {
-                        AwardedAt = DateTimeOffset.FromUnixTimeSeconds(1505741569),
-                        Description = "Outstanding help by being a voluntary test subject.",
-                        ImageUrl = "https://assets.ppy.sh/profile-badges/contributor.jpg"
-                    }
-                },
-                Title = "osu!volunteer",
-                Colour = "ff0000",
-                Achievements = new User.UserAchievement[0],
-            }, false));
+            AddStep("Show offline dummy", () => profile.ShowUser(TEST_USER, false));
 
             checkSupporterTag(false);
 
