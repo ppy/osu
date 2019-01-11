@@ -153,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private OsuAction? trackingAction;
 
-        private bool trackableIfClicked()
+        private bool cursorTrackingBall()
         {
             return lastScreenSpaceMousePosition.HasValue
                 && ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value);
@@ -166,7 +166,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             if (Time.Current < slider.EndTime)
             {
                 // Make sure to use the base version of ReceivePositionalInputAt so that we correctly check the position.
-                Tracking = trackableIfClicked()
+                Tracking = cursorTrackingBall()
                         && canCurrentlyTrack
                         && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton) && x == trackingAction) ?? false);
             }
@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
-                    hit = trackableIfClicked() && (Hit?.Invoke() ?? false);
+                    hit = cursorTrackingBall() && (Hit?.Invoke() ?? false);
                 break;
             }
 
