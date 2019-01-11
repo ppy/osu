@@ -14,7 +14,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 {
     public class CatchDifficultyCalculator : DifficultyCalculator
     {
-
         /// <summary>
         /// In milliseconds. For difficulty calculation we will only look at the highest strain value in each time interval of size STRAIN_STEP.
         /// This is to eliminate higher influence of stream over aim by simply having more HitObjects with high strain.
