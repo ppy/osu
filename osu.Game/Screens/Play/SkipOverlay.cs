@@ -46,10 +46,10 @@ namespace osu.Game.Screens.Play
             State = Visibility.Visible;
 
             RelativePositionAxes = Axes.Both;
-            RelativeSizeAxes = Axes.Both;
+            RelativeSizeAxes = Axes.X;
 
             Position = new Vector2(0.5f, 0.7f);
-            Size = new Vector2(1, 0.14f);
+            Size = new Vector2(1, 100);
 
             Origin = Anchor.Centre;
         }
