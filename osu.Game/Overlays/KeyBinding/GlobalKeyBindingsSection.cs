@@ -18,7 +18,6 @@ namespace osu.Game.Overlays.KeyBinding
             Add(new InGameKeyBindingsSubsection(manager));
         }
 
-
         private class DefaultBindingsSubsection : KeyBindingsSubsection
         {
             protected override string Header => string.Empty;
