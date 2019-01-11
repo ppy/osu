@@ -15,11 +15,14 @@ using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
+
     [TestFixture]
     public class TestCaseSlider : TestBaseSliders
     {
+        protected override List<Mod> Mods { get; set; }
         public TestCaseSlider()
         {
+            Mods = new List<Mod>();
             base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
 
             AddStep("Big Single", () => testSimpleBig());
@@ -71,11 +74,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddStep("Distance Overflow", () => testDistanceOverflow());
             AddStep("Distance Overflow 1 Repeat", () => testDistanceOverflow(1));
         }
-        
+
         protected Container content;
         protected override Container<Drawable> Content => content;
-        
-        protected readonly List<Mod> Mods = new List<Mod>();
 
         private void testSimpleBig(int repeats = 0) => CreateSlider(2, repeats: repeats);
 

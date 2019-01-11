@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -15,7 +14,6 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
-using System.Text;
 using NUnit.Framework;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
@@ -42,9 +40,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         };
 
         protected int DepthIndex;
-        
-        
-        protected readonly List<Mod> Mods = new List<Mod>();
+
+
+        protected abstract List<Mod> Mods { get; set; }
         protected void CreateSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2, int stackHeight = 0)
         {
             var slider = new Slider
