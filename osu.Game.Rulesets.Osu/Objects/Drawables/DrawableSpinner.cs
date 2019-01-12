@@ -6,12 +6,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
-using osu.Game.Rulesets.Osu.Judgements;
+using osu.Framework.Configuration;
 using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
 
@@ -36,6 +36,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly Color4 baseColour = OsuColour.FromHex(@"002c3c");
         private readonly Color4 fillColour = OsuColour.FromHex(@"005b7c");
+
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
 
         private Color4 normalColour;
         private Color4 completeColour;
@@ -115,9 +117,26 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
+            normalColour = baseColour;
+
+            Background.AccentColour = normalColour;
+
+            completeColour = colours.YellowLight.Opacity(0.75f);
+
+            Disc.AccentColour = fillColour;
+            circle.Colour = colours.BlueDark;
+            glow.Colour = colours.BlueDark;
+
+            positionBindable.BindValueChanged(v => Position = v);
+            positionBindable.BindTo(HitObject.PositionBindable);
+        }
+
         public float Progress => MathHelper.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (Time.Current < HitObject.StartTime) return;
 
@@ -136,36 +155,25 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 glow.FadeColour(completeColour, duration);
             }
 
-            if (!userTriggered && Time.Current >= Spinner.EndTime)
+            if (userTriggered || Time.Current < Spinner.EndTime)
+                return;
+
+            ApplyResult(r =>
             {
                 if (Progress >= 1)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Great });
+                    r.Type = HitResult.Great;
                 else if (Progress > .9)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Good });
+                    r.Type = HitResult.Good;
                 else if (Progress > .75)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Meh });
+                    r.Type = HitResult.Meh;
                 else if (Time.Current >= Spinner.EndTime)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Miss });
-            }
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            normalColour = baseColour;
-
-            Background.AccentColour = normalColour;
-
-            completeColour = colours.YellowLight.Opacity(0.75f);
-
-            Disc.AccentColour = fillColour;
-            circle.Colour = colours.BlueDark;
-            glow.Colour = colours.BlueDark;
+                    r.Type = HitResult.Miss;
+            });
         }
 
         protected override void Update()
         {
-            Disc.Tracking = OsuActionInputManager.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton);
+            Disc.Tracking = OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false;
             if (!spmCounter.IsPresent && Disc.Tracking)
                 spmCounter.FadeIn(HitObject.TimeFadeIn);
 
@@ -209,6 +217,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             switch (state)
             {
+                case ArmedState.Idle:
+                    Expire(true);
+                    break;
                 case ArmedState.Hit:
                     sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
                     break;

@@ -16,8 +16,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -73,16 +73,17 @@ namespace osu.Game.Overlays
             FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
         }
 
-        public void ShowUser(long userId)
-        {
-            if (userId == Header.User.Id)
-                return;
-
-            ShowUser(new User { Id = userId });
-        }
+        public void ShowUser(long userId) => ShowUser(new User { Id = userId });
 
         public void ShowUser(User user, bool fetchOnline = true)
         {
+            if (user == User.SYSTEM_USER) return;
+
+            Show();
+
+            if (user.Id == Header?.User?.Id)
+                return;
+
             userReq?.Cancel();
             Clear();
             lastSection = null;
@@ -97,6 +98,7 @@ namespace osu.Game.Overlays
                 new BeatmapsSection(),
                 new KudosuSection()
             };
+
             tabs = new ProfileTabControl
             {
                 RelativeSizeAxes = Axes.X,
@@ -161,7 +163,6 @@ namespace osu.Game.Overlays
                 userLoadComplete(user);
             }
 
-            Show();
             sectionsContainer.ScrollToTop();
         }
 
@@ -195,7 +196,7 @@ namespace osu.Game.Overlays
                 TabContainer.AutoSizeAxes |= Axes.X;
                 TabContainer.Anchor |= Anchor.x1;
                 TabContainer.Origin |= Anchor.x1;
-                Add(bottom = new Box
+                AddInternal(bottom = new Box
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 1,

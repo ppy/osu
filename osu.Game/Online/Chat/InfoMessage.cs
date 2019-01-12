@@ -6,7 +6,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Online.Chat
 {
-    public class InfoMessage : Message
+    public class InfoMessage : LocalMessage
     {
         private static int infoID = -1;
 
@@ -15,11 +15,7 @@ namespace osu.Game.Online.Chat
             Timestamp = DateTimeOffset.Now;
             Content = message;
 
-            Sender = new User
-            {
-                Username = @"system",
-                Colour = @"0000ff",
-            };
+            Sender = User.SYSTEM_USER;
         }
     }
 }

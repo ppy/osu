@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -13,7 +14,8 @@ using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.UI.Scrolling;
-using OpenTK;
+using osu.Game.Tests.Visual;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.Tests
 {
@@ -24,6 +26,8 @@ namespace osu.Game.Rulesets.Mania.Tests
 
         private readonly List<ManiaStage> stages = new List<ManiaStage>();
 
+        private FillFlowContainer<ScrollingTestContainer> fill;
+
         public TestCaseStage()
             : base(columns)
         {
@@ -32,7 +36,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new FillFlowContainer
+            Child = fill = new FillFlowContainer<ScrollingTestContainer>
             {
                 RelativeSizeAxes = Axes.Both,
                 Anchor = Anchor.Centre,
@@ -54,7 +58,21 @@ namespace osu.Game.Rulesets.Mania.Tests
             AddStep("hold note", createHoldNote);
             AddStep("minor bar line", () => createBarLine(false));
             AddStep("major bar line", () => createBarLine(true));
+
+            AddAssert("check note anchors", () => notesInStageAreAnchored(stages[0], Anchor.TopCentre));
+            AddAssert("check note anchors", () => notesInStageAreAnchored(stages[1], Anchor.BottomCentre));
+
+            AddStep("flip direction", () =>
+            {
+                foreach (var c in fill.Children)
+                    c.Flip();
+            });
+
+            AddAssert("check note anchors", () => notesInStageAreAnchored(stages[0], Anchor.BottomCentre));
+            AddAssert("check note anchors", () => notesInStageAreAnchored(stages[1], Anchor.TopCentre));
         }
+
+        private bool notesInStageAreAnchored(ManiaStage stage, Anchor anchor) => stage.Columns.SelectMany(c => c.AllHitObjects).All(o => o.Anchor == anchor);
 
         private void createNote()
         {
@@ -101,11 +119,11 @@ namespace osu.Game.Rulesets.Mania.Tests
             }
         }
 
-        private Drawable createStage(ScrollingDirection direction, ManiaAction action)
+        private ScrollingTestContainer createStage(ScrollingDirection direction, ManiaAction action)
         {
             var specialAction = ManiaAction.Special1;
 
-            var stage = new ManiaStage(0, new StageDefinition { Columns = 2 }, ref action, ref specialAction) { VisibleTimeRange = { Value = 2000 } };
+            var stage = new ManiaStage(0, new StageDefinition { Columns = 2 }, ref action, ref specialAction);
             stages.Add(stage);
 
             return new ScrollingTestContainer(direction)
@@ -114,6 +132,7 @@ namespace osu.Game.Rulesets.Mania.Tests
                 Origin = Anchor.Centre,
                 RelativeSizeAxes = Axes.Y,
                 AutoSizeAxes = Axes.X,
+                TimeRange = 2000,
                 Child = stage
             };
         }

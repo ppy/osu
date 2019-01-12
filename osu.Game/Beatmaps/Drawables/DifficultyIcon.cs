@@ -9,22 +9,24 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using OpenTK;
-using OpenTK.Graphics;
+using osu.Game.Rulesets;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Drawables
 {
     public class DifficultyIcon : DifficultyColouredContainer
     {
-        private readonly BeatmapInfo beatmap;
+        private readonly RulesetInfo ruleset;
 
-        public DifficultyIcon(BeatmapInfo beatmap)
+        public DifficultyIcon(BeatmapInfo beatmap, RulesetInfo ruleset = null)
             : base(beatmap)
         {
             if (beatmap == null)
                 throw new ArgumentNullException(nameof(beatmap));
 
-            this.beatmap = beatmap;
+            this.ruleset = ruleset ?? beatmap.Ruleset;
+
             Size = new Vector2(20);
         }
 
@@ -58,7 +60,7 @@ namespace osu.Game.Beatmaps.Drawables
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Both,
                     // the null coalesce here is only present to make unit tests work (ruleset dlls aren't copied correctly for testing at the moment)
-                    Icon = beatmap.Ruleset?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.fa_question_circle_o }
+                    Icon = ruleset?.CreateInstance().CreateIcon() ?? new SpriteIcon { Icon = FontAwesome.fa_question_circle_o }
                 }
             };
         }

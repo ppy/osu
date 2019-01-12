@@ -3,10 +3,10 @@
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
+using osu.Game.Replays.Legacy;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Rulesets.Replays.Legacy;
 using osu.Game.Rulesets.Replays.Types;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {

@@ -10,7 +10,7 @@ We are accepting bug reports (please report with as much detail as possible). Fe
 
 # Requirements
 
-- A desktop platform with the [.NET Core SDK 2.1](https://www.microsoft.com/net/learn/get-started) or higher installed.
+- A desktop platform with the [.NET Core SDK 2.2](https://www.microsoft.com/net/learn/get-started) or higher installed.
 - When working with the codebase, we recommend using an IDE with intellisense and syntax highlighting, such as [Visual Studio Community Edition](https://www.visualstudio.com/) (Windows), [Visual Studio Code](https://code.visualstudio.com/) (with the C# plugin installed) or [Jetbrains Rider](https://www.jetbrains.com/rider/) (commercial).
 
 # Building and running
@@ -24,7 +24,10 @@ Clone the repository including submodules
 Build and run
 
 - Using Visual Studio 2017, Rider or Visual Studio Code (configurations are included)
-- From command line using `dotnet run --project osu.Desktop --framework netcoreapp2.1`
+- From command line using `dotnet run --project osu.Desktop`. When building for non-development purposes, add `-c Release` to gain higher performance.
+- To run with code analysis, instead use `powershell ./build.ps1` or `build.sh`. This is currently only supported under windows due to [resharper cli shortcomings](https://youtrack.jetbrains.com/issue/RSRP-410004). Alternative, you can install resharper or use rider to get inline support in your IDE of choice.
+
+Note: If you run from command line under linux, you will need to prefix the output folder to your `LD_LIBRARY_PATH`. See `.vscode/launch.json` for an example
 
 If you run into issues building you may need to restore nuget packages (commonly via `dotnet restore`). Visual Studio Code users must run `Restore` task from debug tab before attempt to build.
 

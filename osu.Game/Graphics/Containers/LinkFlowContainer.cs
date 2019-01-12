@@ -7,7 +7,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Sprites;
 using System.Collections.Generic;
-using osu.Framework.Platform;
+using osu.Framework.Graphics;
+using osu.Framework.Logging;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 
@@ -20,19 +21,16 @@ namespace osu.Game.Graphics.Containers
         {
         }
 
-        public override bool HandleMouseInput => true;
-
         private OsuGame game;
-
+        private ChannelManager channelManager;
         private Action showNotImplementedError;
-        private GameHost host;
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game, NotificationOverlay notifications, GameHost host)
+        private void load(OsuGame game, NotificationOverlay notifications, ChannelManager channelManager)
         {
             // will be null in tests
             this.game = game;
-            this.host = host;
+            this.channelManager = channelManager;
 
             showNotImplementedError = () => notifications?.Post(new SimpleNotification
             {
@@ -64,11 +62,26 @@ namespace osu.Game.Graphics.Containers
         }
 
         public void AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action<SpriteText> creationParameters = null)
+            => createLink(AddText(text, creationParameters), text, url, linkType, linkArgument, tooltipText);
+
+        public void AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
+            => createLink(AddText(text, creationParameters), text, tooltipText: tooltipText, action: action);
+
+        public void AddLink(IEnumerable<SpriteText> text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
         {
-            AddInternal(new DrawableLinkCompiler(AddText(text, creationParameters).ToList())
+            foreach (var t in text)
+                AddArbitraryDrawable(t);
+
+            createLink(text, null, url, linkType, linkArgument, tooltipText);
+        }
+
+        private void createLink(IEnumerable<Drawable> drawables, string text, string url = null, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action action = null)
+        {
+            AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
             {
+                RelativeSizeAxes = Axes.Both,
                 TooltipText = tooltipText ?? (url != text ? url : string.Empty),
-                Action = () =>
+                Action = action ?? (() =>
                 {
                     switch (linkType)
                     {
@@ -82,7 +95,15 @@ namespace osu.Game.Graphics.Containers
                                 game?.ShowBeatmapSet(setId);
                             break;
                         case LinkAction.OpenChannel:
-                            game?.OpenChannel(linkArgument);
+                            try
+                            {
+                                channelManager?.OpenChannel(linkArgument);
+                            }
+                            catch (ChannelNotFoundException e)
+                            {
+                                Logger.Log($"The requested channel \"{linkArgument}\" does not exist");
+                            }
+
                             break;
                         case LinkAction.OpenEditorTimestamp:
                         case LinkAction.JoinMultiplayerMatch:
@@ -90,7 +111,7 @@ namespace osu.Game.Graphics.Containers
                             showNotImplementedError?.Invoke();
                             break;
                         case LinkAction.External:
-                            host.OpenUrlExternally(url);
+                            game?.OpenUrlExternally(url);
                             break;
                         case LinkAction.OpenUserProfile:
                             if (long.TryParse(linkArgument, out long userId))
@@ -99,8 +120,13 @@ namespace osu.Game.Graphics.Containers
                         default:
                             throw new NotImplementedException($"This {nameof(LinkAction)} ({linkType.ToString()}) is missing an associated action.");
                     }
-                },
+                }),
             });
         }
+
+        // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.
+        // However due to https://github.com/ppy/osu-framework/issues/2073, it's possible for the compilers to be relative size in the flow's auto-size axes - an unsupported operation.
+        // Since the compilers don't display any content and don't affect the layout, it's simplest to exclude them from the flow.
+        public override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Where(c => !(c is DrawableLinkCompiler));
     }
 }

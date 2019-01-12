@@ -10,7 +10,6 @@ namespace osu.Game.Input.Bindings
     [Table("KeyBinding")]
     public class DatabasedKeyBinding : KeyBinding, IHasPrimaryKey
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
 
         public int? RulesetID { get; set; }

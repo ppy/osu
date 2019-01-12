@@ -4,7 +4,7 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Storyboards;
@@ -84,6 +84,20 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual(Anchor.Centre, animation.Origin);
                 Assert.AreEqual("SB/red jitter/red_0000.jpg", animation.Path);
                 Assert.AreEqual(78993, animation.StartTime);
+            }
+        }
+
+        [Test]
+        public void TestDecodeVariableWithSuffix()
+        {
+            var decoder = new LegacyStoryboardDecoder();
+            using (var resStream = Resource.OpenResource("variable-with-suffix.osb"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var storyboard = decoder.Decode(stream);
+
+                StoryboardLayer background = storyboard.Layers.Single(l => l.Depth == 3);
+                Assert.AreEqual(123456, ((StoryboardSprite)background.Elements.Single()).InitialPosition.X);
             }
         }
     }

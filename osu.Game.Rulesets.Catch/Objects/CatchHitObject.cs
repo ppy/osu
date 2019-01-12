@@ -16,16 +16,20 @@ namespace osu.Game.Rulesets.Catch.Objects
 
         public int IndexInBeatmap { get; set; }
 
-        public virtual FruitVisualRepresentation VisualRepresentation => (FruitVisualRepresentation)(IndexInBeatmap % 4);
+        public virtual FruitVisualRepresentation VisualRepresentation => (FruitVisualRepresentation)(ComboIndex % 4);
 
         public virtual bool NewCombo { get; set; }
+
+        public int ComboOffset { get; set; }
 
         public int IndexInCurrentCombo { get; set; }
 
         public int ComboIndex { get; set; }
 
         /// <summary>
-        /// The distance for a fruit to to next hyper if it's not a hyper.
+        /// Difference between the distance to the next object
+        /// and the distance that would have triggered a hyper dash.
+        /// A value close to 0 indicates a difficult jump (for difficulty calculation).
         /// </summary>
         public float DistanceToHyperDash { get; set; }
 

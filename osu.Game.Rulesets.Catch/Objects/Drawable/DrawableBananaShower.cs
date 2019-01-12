@@ -26,8 +26,6 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
                 AddNested(getVisualRepresentation?.Invoke(b));
         }
 
-        protected override bool ProvidesJudgement => false;
-
         protected override void AddNested(DrawableHitObject h)
         {
             ((DrawableCatchHitObject)h).CheckPosition = o => CheckPosition?.Invoke(o) ?? false;

@@ -22,31 +22,21 @@ namespace osu.Game.Rulesets.Catch.Judgements
             }
         }
 
-        /// <summary>
-        /// The base health increase for the result achieved.
-        /// </summary>
-        public float HealthIncrease => HealthIncreaseFor(Result);
-
-        /// <summary>
-        /// Whether fruit on the platter should explode or drop.
-        /// Note that this is only checked if the owning object is also <see cref="IHasComboInformation.LastInCombo" />
-        /// </summary>
-        public virtual bool ShouldExplode => IsHit;
-
-        /// <summary>
-        /// Convert a <see cref="HitResult"/> to a base health increase.
-        /// </summary>
-        /// <param name="result">The value to convert.</param>
-        /// <returns>The base health increase.</returns>
-        protected virtual float HealthIncreaseFor(HitResult result)
+        protected override double HealthIncreaseFor(HitResult result)
         {
             switch (result)
             {
                 default:
                     return 0;
                 case HitResult.Perfect:
-                    return 10.2f;
+                    return 10.2;
             }
         }
+
+        /// <summary>
+        /// Whether fruit on the platter should explode or drop.
+        /// Note that this is only checked if the owning object is also <see cref="IHasComboInformation.LastInCombo" />
+        /// </summary>
+        public virtual bool ShouldExplodeFor(JudgementResult result) => result.IsHit;
     }
 }

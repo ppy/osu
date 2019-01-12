@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.IO.File;
 using osu.Game.Storyboards;
@@ -60,7 +60,7 @@ namespace osu.Game.Beatmaps.Formats
         private void handleEvents(string line)
         {
             var depth = 0;
-            while (line.StartsWith(" ") || line.StartsWith("_"))
+            while (line.StartsWith(" ", StringComparison.Ordinal) || line.StartsWith("_", StringComparison.Ordinal))
             {
                 ++depth;
                 line = line.Substring(1);
@@ -269,9 +269,9 @@ namespace osu.Game.Beatmaps.Formats
                     return Anchor.BottomCentre;
                 case LegacyOrigins.BottomRight:
                     return Anchor.BottomRight;
+                default:
+                    return Anchor.TopLeft;
             }
-
-            throw new InvalidDataException($@"Unknown origin: {value}");
         }
 
         private void handleVariables(string line)
@@ -289,20 +289,15 @@ namespace osu.Game.Beatmaps.Formats
             while (line.IndexOf('$') >= 0)
             {
                 string origLine = line;
-                string[] split = line.Split(',');
-                for (int i = 0; i < split.Length; i++)
-                {
-                    var item = split[i];
-                    if (item.StartsWith("$") && variables.ContainsKey(item))
-                        split[i] = variables[item];
-                }
 
-                line = string.Join(",", split);
+                foreach (var v in variables)
+                    line = line.Replace(v.Key, v.Value);
+
                 if (line == origLine)
                     break;
             }
         }
 
-        private string cleanFilename(string path) => FileSafety.PathStandardise(FileSafety.PathSanitise(path.Trim('\"')));
+        private string cleanFilename(string path) => FileSafety.PathStandardise(path.Trim('"'));
     }
 }

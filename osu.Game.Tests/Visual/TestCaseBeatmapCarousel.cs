@@ -40,7 +40,6 @@ namespace osu.Game.Tests.Visual
             typeof(DrawableCarouselBeatmapSet),
         };
 
-
         private readonly Stack<BeatmapSetInfo> selectedSets = new Stack<BeatmapSetInfo>();
         private readonly HashSet<int> eagerSelectedIDs = new HashSet<int>();
 
@@ -148,7 +147,7 @@ namespace osu.Game.Tests.Visual
 
         private bool selectedBeatmapVisible()
         {
-            var currentlySelected = carousel.Items.FirstOrDefault(s => s.Item is CarouselBeatmap && s.Item.State == CarouselItemState.Selected);
+            var currentlySelected = carousel.Items.Find(s => s.Item is CarouselBeatmap && s.Item.State == CarouselItemState.Selected);
             if (currentlySelected == null)
                 return true;
             return currentlySelected.Item.Visible;
@@ -530,7 +529,7 @@ namespace osu.Game.Tests.Visual
         {
             public new List<DrawableCarouselItem> Items => base.Items;
 
-            public bool PendingFilterTask => FilterTask != null;
+            public bool PendingFilterTask => PendingFilter != null;
         }
     }
 }

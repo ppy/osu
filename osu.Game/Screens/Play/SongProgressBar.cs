@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
@@ -112,6 +112,6 @@ namespace osu.Game.Screens.Play
             handleBase.X = xFill;
         }
 
-        protected override void OnUserChange() => OnSeek?.Invoke(Current);
+        protected override void OnUserChange(double value) => OnSeek?.Invoke(value);
     }
 }

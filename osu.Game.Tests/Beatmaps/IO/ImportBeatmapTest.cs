@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             {
                 try
                 {
-                    loadOszIntoOsu(loadOsu(host));
+                    LoadOszIntoOsu(loadOsu(host));
                 }
                 finally
                 {
@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Beatmaps.IO
                 {
                     var osu = loadOsu(host);
 
-                    var imported = loadOszIntoOsu(osu);
+                    var imported = LoadOszIntoOsu(osu);
 
                     deleteBeatmapSet(imported, osu);
                 }
@@ -69,8 +69,8 @@ namespace osu.Game.Tests.Beatmaps.IO
                 {
                     var osu = loadOsu(host);
 
-                    var imported = loadOszIntoOsu(osu);
-                    var importedSecondTime = loadOszIntoOsu(osu);
+                    var imported = LoadOszIntoOsu(osu);
+                    var importedSecondTime = LoadOszIntoOsu(osu);
 
                     // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
                     Assert.IsTrue(imported.ID == importedSecondTime.ID);
@@ -102,10 +102,10 @@ namespace osu.Game.Tests.Beatmaps.IO
                     int fireCount = 0;
 
                     // ReSharper disable once AccessToModifiedClosure
-                    manager.ItemAdded += _ => fireCount++;
+                    manager.ItemAdded += (_, __, ___) => fireCount++;
                     manager.ItemRemoved += _ => fireCount++;
 
-                    var imported = loadOszIntoOsu(osu);
+                    var imported = LoadOszIntoOsu(osu);
 
                     Assert.AreEqual(0, fireCount -= 1);
 
@@ -160,12 +160,12 @@ namespace osu.Game.Tests.Beatmaps.IO
                     var osu = loadOsu(host);
                     var manager = osu.Dependencies.Get<BeatmapManager>();
 
-                    var imported = loadOszIntoOsu(osu);
+                    var imported = LoadOszIntoOsu(osu);
 
                     imported.Hash += "-changed";
                     manager.Update(imported);
 
-                    var importedSecondTime = loadOszIntoOsu(osu);
+                    var importedSecondTime = LoadOszIntoOsu(osu);
 
                     Assert.IsTrue(imported.ID != importedSecondTime.ID);
                     Assert.IsTrue(imported.Beatmaps.First().ID < importedSecondTime.Beatmaps.First().ID);
@@ -191,11 +191,11 @@ namespace osu.Game.Tests.Beatmaps.IO
                 {
                     var osu = loadOsu(host);
 
-                    var imported = loadOszIntoOsu(osu);
+                    var imported = LoadOszIntoOsu(osu);
 
                     deleteBeatmapSet(imported, osu);
 
-                    var importedSecondTime = loadOszIntoOsu(osu);
+                    var importedSecondTime = LoadOszIntoOsu(osu);
 
                     // check the newly "imported" beatmap is actually just the restored previous import. since it matches hash.
                     Assert.IsTrue(imported.ID == importedSecondTime.ID);
@@ -262,7 +262,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             }
         }
 
-        private string createTemporaryBeatmap()
+        private static string createTemporaryBeatmap()
         {
             var temp = Path.GetTempFileName() + ".osz";
             File.Copy(TEST_OSZ_PATH, temp, true);
@@ -270,7 +270,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             return temp;
         }
 
-        private BeatmapSetInfo loadOszIntoOsu(OsuGameBase osu, string path = null)
+        public static BeatmapSetInfo LoadOszIntoOsu(OsuGameBase osu, string path = null)
         {
             var temp = path ?? createTemporaryBeatmap();
 
@@ -305,7 +305,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             return osu;
         }
 
-        private void ensureLoaded(OsuGameBase osu, int timeout = 60000)
+        private static void ensureLoaded(OsuGameBase osu, int timeout = 60000)
         {
             IEnumerable<BeatmapSetInfo> resultSets = null;
             var store = osu.Dependencies.Get<BeatmapManager>();
@@ -343,7 +343,7 @@ namespace osu.Game.Tests.Beatmaps.IO
             Assert.IsTrue(beatmap?.HitObjects.Any() == true);
         }
 
-        private void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 60000)
+        private static void waitForOrAssert(Func<bool> result, string failureMessage, int timeout = 60000)
         {
             Task task = Task.Run(() =>
             {

@@ -34,13 +34,12 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                 {
                     StartTime = obj.StartTime,
                     Samples = obj.Samples,
-                    ControlPoints = curveData.ControlPoints,
-                    CurveType = curveData.CurveType,
-                    Distance = curveData.Distance,
-                    RepeatSamples = curveData.RepeatSamples,
+                    Path = curveData.Path,
+                    NodeSamples = curveData.NodeSamples,
                     RepeatCount = curveData.RepeatCount,
                     X = (positionData?.X ?? 0) / CatchPlayfield.BASE_WIDTH,
                     NewCombo = comboData?.NewCombo ?? false,
+                    ComboOffset = comboData?.ComboOffset ?? 0,
                     LegacyLastTickOffset = legacyOffset?.LegacyLastTickOffset ?? 0
                 };
             }
@@ -51,7 +50,8 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     StartTime = obj.StartTime,
                     Samples = obj.Samples,
                     Duration = endTime.Duration,
-                    NewCombo = comboData?.NewCombo ?? false
+                    NewCombo = comboData?.NewCombo ?? false,
+                    ComboOffset = comboData?.ComboOffset ?? 0,
                 };
             }
             else
@@ -61,6 +61,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                     StartTime = obj.StartTime,
                     Samples = obj.Samples,
                     NewCombo = comboData?.NewCombo ?? false,
+                    ComboOffset = comboData?.ComboOffset ?? 0,
                     X = (positionData?.X ?? 0) / CatchPlayfield.BASE_WIDTH
                 };
             }

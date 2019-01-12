@@ -5,13 +5,12 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play.PlayerSettings
 {
@@ -94,7 +93,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                                 {
                                     Origin = Anchor.CentreLeft,
                                     Anchor = Anchor.CentreLeft,
-                                    Text = Title.ToUpper(),
+                                    Text = Title.ToUpperInvariant(),
                                     TextSize = 17,
                                     Font = @"Exo2.0-Bold",
                                     Margin = new MarginPadding { Left = 10 },
@@ -128,6 +127,27 @@ namespace osu.Game.Screens.Play.PlayerSettings
             };
         }
 
+        private const float fade_duration = 800;
+        private const float inactive_alpha = 0.5f;
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            this.Delay(600).FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+        }
+
+        protected override bool OnHover(HoverEvent e)
+        {
+            this.FadeIn(fade_duration, Easing.OutQuint);
+            return true;
+        }
+
+        protected override void OnHoverLost(HoverLostEvent e)
+        {
+            this.FadeTo(inactive_alpha, fade_duration, Easing.OutQuint);
+            base.OnHoverLost(e);
+        }
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
@@ -140,7 +160,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         protected override Container<Drawable> Content => content;
 
-        protected override bool OnHover(InputState state) => true;
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
     }
 }

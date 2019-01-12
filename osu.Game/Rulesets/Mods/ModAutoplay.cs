@@ -4,10 +4,10 @@
 using System;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Objects;
-using osu.Game.Rulesets.Replays;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -18,14 +18,15 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
 
-        public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer) => rulesetContainer.SetReplay(CreateReplayScore(rulesetContainer.Beatmap)?.Replay);
+        public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer) => rulesetContainer.SetReplayScore(CreateReplayScore(rulesetContainer.Beatmap));
     }
 
     public abstract class ModAutoplay : Mod, IApplicableFailOverride
     {
         public override string Name => "Autoplay";
-        public override string ShortenedName => "AT";
+        public override string Acronym => "AT";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_auto;
+        public override ModType Type => ModType.Automation;
         public override string Description => "Watch a perfect automated play through the song.";
         public override double ScoreMultiplier => 1;
         public bool AllowFail => false;

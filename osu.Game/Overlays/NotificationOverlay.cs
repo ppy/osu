@@ -6,7 +6,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Notifications;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using System;
@@ -96,8 +96,7 @@ namespace osu.Game.Overlays
             base.LoadComplete();
 
             StateChanged += _ => updateProcessingMode();
-            OverlayActivationMode.ValueChanged += _ => updateProcessingMode();
-            OverlayActivationMode.TriggerChange();
+            OverlayActivationMode.BindValueChanged(_ => updateProcessingMode(), true);
         }
 
         private int totalCount => sections.Select(c => c.DisplayedCount).Sum();

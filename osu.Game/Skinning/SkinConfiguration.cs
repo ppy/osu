@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps.Formats;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -14,5 +14,9 @@ namespace osu.Game.Skinning
         public List<Color4> ComboColours { get; set; } = new List<Color4>();
 
         public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
+
+        public string HitCircleFont { get; set; } = "default";
+
+        public bool? CursorExpand { get; set; } = true;
     }
 }

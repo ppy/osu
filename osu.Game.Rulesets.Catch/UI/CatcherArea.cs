@@ -18,16 +18,16 @@ using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatcherArea : Container
     {
-        public const float CATCHER_SIZE = 84;
+        public const float CATCHER_SIZE = 100;
 
-        protected readonly Catcher MovableCatcher;
+        protected internal readonly Catcher MovableCatcher;
 
         public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> GetVisualRepresentation;
 
@@ -48,10 +48,13 @@ namespace osu.Game.Rulesets.Catch.UI
 
         private DrawableCatchHitObject lastPlateableFruit;
 
-        public void OnJudgement(DrawableCatchHitObject fruit, Judgement judgement)
+        public void OnResult(DrawableCatchHitObject fruit, JudgementResult result)
         {
             void runAfterLoaded(Action action)
             {
+                if (lastPlateableFruit == null)
+                    return;
+
                 // this is required to make this run after the last caught fruit runs UpdateState at least once.
                 // TODO: find a better alternative
                 if (lastPlateableFruit.IsLoaded)
@@ -60,7 +63,7 @@ namespace osu.Game.Rulesets.Catch.UI
                     lastPlateableFruit.OnLoadComplete = _ => action();
             }
 
-            if (judgement.IsHit && fruit.CanBePlated)
+            if (result.IsHit && fruit.CanBePlated)
             {
                 var caughtFruit = (DrawableCatchHitObject)GetVisualRepresentation?.Invoke(fruit.HitObject);
 
@@ -83,7 +86,7 @@ namespace osu.Game.Rulesets.Catch.UI
 
             if (fruit.HitObject.LastInCombo)
             {
-                if (((CatchJudgement)judgement).ShouldExplode)
+                if (((CatchJudgement)result.Judgement).ShouldExplodeFor(result))
                     runAfterLoaded(() => MovableCatcher.Explode());
                 else
                     MovableCatcher.Drop();
@@ -103,6 +106,11 @@ namespace osu.Game.Rulesets.Catch.UI
         public bool OnReleased(CatchAction action) => false;
 
         public bool AttemptCatch(CatchHitObject obj) => MovableCatcher.AttemptCatch(obj);
+
+        public static float GetCatcherSize(BeatmapDifficulty difficulty)
+        {
+            return CATCHER_SIZE / CatchPlayfield.BASE_WIDTH * (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
+        }
 
         public class Catcher : Container, IKeyBindingHandler<CatchAction>
         {
@@ -404,9 +412,7 @@ namespace osu.Game.Rulesets.Catch.UI
             /// </summary>
             public void Explode()
             {
-                var fruit = caughtFruit.ToArray();
-
-                foreach (var f in fruit)
+                foreach (var f in caughtFruit.ToArray())
                     Explode(f);
             }
 
@@ -419,15 +425,15 @@ namespace osu.Game.Rulesets.Catch.UI
                     fruit.Anchor = Anchor.TopLeft;
                     fruit.Position = caughtFruit.ToSpaceOfOtherDrawable(fruit.DrawPosition, ExplodingFruitTarget);
 
-                    caughtFruit.Remove(fruit);
+                    if (!caughtFruit.Remove(fruit))
+                        // we may have already been removed by a previous operation (due to the weird OnLoadComplete scheduling).
+                        // this avoids a crash on potentially attempting to Add a fruit to ExplodingFruitTarget twice.
+                        return;
 
                     ExplodingFruitTarget.Add(fruit);
                 }
 
-                fruit.MoveToY(fruit.Y - 50, 250, Easing.OutSine)
-                 .Then()
-                 .MoveToY(fruit.Y + 50, 500, Easing.InSine);
-
+                fruit.MoveToY(fruit.Y - 50, 250, Easing.OutSine).Then().MoveToY(fruit.Y + 50, 500, Easing.InSine);
                 fruit.MoveToX(fruit.X + originalX * 6, 1000);
                 fruit.FadeOut(750);
 

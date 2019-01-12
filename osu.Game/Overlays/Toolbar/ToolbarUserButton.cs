@@ -7,8 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API;
 using osu.Game.Users;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -31,6 +31,7 @@ namespace osu.Game.Overlays.Toolbar
                 Anchor = Anchor.CentreLeft,
                 Origin = Anchor.CentreLeft,
                 CornerRadius = 4,
+                OpenOnClick = { Value = false },
                 EdgeEffect = new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Shadow,

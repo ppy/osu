@@ -8,10 +8,10 @@ using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
-    internal class DrawableManiaJudgement : DrawableJudgement
+    public class DrawableManiaJudgement : DrawableJudgement
     {
-        public DrawableManiaJudgement(Judgement judgement, DrawableHitObject judgedObject)
-            : base(judgement, judgedObject)
+        public DrawableManiaJudgement(JudgementResult result, DrawableHitObject judgedObject)
+            : base(result, judgedObject)
         {
         }
 
@@ -28,12 +28,13 @@ namespace osu.Game.Rulesets.Mania.UI
 
             this.FadeInFromZero(50, Easing.OutQuint);
 
-            if (Judgement.IsHit)
+            if (Result.IsHit)
             {
-                this.ScaleTo(0.8f);
-                this.ScaleTo(1, 250, Easing.OutElastic);
+                JudgementBody.ScaleTo(0.8f);
+                JudgementBody.ScaleTo(1, 250, Easing.OutElastic);
 
-                this.Delay(50).FadeOut(200).ScaleTo(0.75f, 250);
+                JudgementBody.Delay(50).ScaleTo(0.75f, 250);
+                this.Delay(50).FadeOut(200);
             }
 
             Expire();

@@ -5,6 +5,8 @@ using osu.Game.Rulesets.Objects.Types;
 using System;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
@@ -54,12 +56,12 @@ namespace osu.Game.Rulesets.Taiko.Objects
 
         protected override void CreateNestedHitObjects()
         {
-            base.CreateNestedHitObjects();
-
             createTicks();
 
             RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
             RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
+
+            base.CreateNestedHitObjects();
         }
 
         private void createTicks()
@@ -81,5 +83,7 @@ namespace osu.Game.Rulesets.Taiko.Objects
                 first = false;
             }
         }
+
+        public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
     }
 }

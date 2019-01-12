@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
+using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System;
 using System.Collections.Generic;
@@ -10,6 +10,8 @@ using System.IO;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Audio;
 using System.Linq;
+using JetBrains.Annotations;
+using osu.Framework.Logging;
 using osu.Framework.MathUtils;
 
 namespace osu.Game.Rulesets.Objects.Legacy
@@ -19,12 +21,26 @@ namespace osu.Game.Rulesets.Objects.Legacy
     /// </summary>
     public abstract class ConvertHitObjectParser : HitObjectParser
     {
-        public override HitObject Parse(string text)
+        /// <summary>
+        /// The offset to apply to all time values.
+        /// </summary>
+        protected readonly double Offset;
+
+        /// <summary>
+        /// The beatmap version.
+        /// </summary>
+        protected readonly int FormatVersion;
+
+        protected bool FirstObject { get; private set; } = true;
+
+        protected ConvertHitObjectParser(double offset, int formatVersion)
         {
-            return Parse(text, 0);
+            Offset = offset;
+            FormatVersion = formatVersion;
         }
 
-        public HitObject Parse(string text, double offset)
+        [CanBeNull]
+        public override HitObject Parse(string text)
         {
             try
             {
@@ -32,7 +48,11 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 Vector2 pos = new Vector2((int)Convert.ToSingle(split[0], CultureInfo.InvariantCulture), (int)Convert.ToSingle(split[1], CultureInfo.InvariantCulture));
 
-                ConvertHitObjectType type = (ConvertHitObjectType)int.Parse(split[3]) & ~ConvertHitObjectType.ColourHax;
+                ConvertHitObjectType type = (ConvertHitObjectType)int.Parse(split[3]);
+
+                int comboOffset = (int)(type & ConvertHitObjectType.ComboOffset) >> 4;
+                type &= ~ConvertHitObjectType.ComboOffset;
+
                 bool combo = type.HasFlag(ConvertHitObjectType.NewCombo);
                 type &= ~ConvertHitObjectType.NewCombo;
 
@@ -43,48 +63,58 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                 if (type.HasFlag(ConvertHitObjectType.Circle))
                 {
-                    result = CreateHit(pos, combo);
+                    result = CreateHit(pos, combo, comboOffset);
 
                     if (split.Length > 5)
                         readCustomSampleBanks(split[5], bankInfo);
                 }
                 else if (type.HasFlag(ConvertHitObjectType.Slider))
                 {
-                    CurveType curveType = CurveType.Catmull;
+                    PathType pathType = PathType.Catmull;
                     double length = 0;
-                    var points = new List<Vector2> { Vector2.Zero };
 
-                    string[] pointsplit = split[5].Split('|');
-                    foreach (string t in pointsplit)
+                    string[] pointSplit = split[5].Split('|');
+
+                    int pointCount = 1;
+                    foreach (var t in pointSplit)
+                        if (t.Length > 1)
+                            pointCount++;
+
+                    var points = new Vector2[pointCount];
+
+                    int pointIndex = 1;
+                    foreach (string t in pointSplit)
                     {
                         if (t.Length == 1)
                         {
                             switch (t)
                             {
                                 case @"C":
-                                    curveType = CurveType.Catmull;
+                                    pathType = PathType.Catmull;
                                     break;
                                 case @"B":
-                                    curveType = CurveType.Bezier;
+                                    pathType = PathType.Bezier;
                                     break;
                                 case @"L":
-                                    curveType = CurveType.Linear;
+                                    pathType = PathType.Linear;
                                     break;
                                 case @"P":
-                                    curveType = CurveType.PerfectCurve;
+                                    pathType = PathType.PerfectCurve;
                                     break;
                             }
+
                             continue;
                         }
 
                         string[] temp = t.Split(':');
-                        points.Add(new Vector2((int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture), (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)) - pos);
+                        points[pointIndex++] = new Vector2((int)Convert.ToDouble(temp[0], CultureInfo.InvariantCulture), (int)Convert.ToDouble(temp[1], CultureInfo.InvariantCulture)) - pos;
                     }
 
                     // osu-stable special-cased colinear perfect curves to a CurveType.Linear
-                    bool isLinear(List<Vector2> p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
-                    if (points.Count == 3 && curveType == CurveType.PerfectCurve && isLinear(points))
-                        curveType = CurveType.Linear;
+                    bool isLinear(Vector2[] p) => Precision.AlmostEquals(0, (p[1].Y - p[0].Y) * (p[2].X - p[0].X) - (p[1].X - p[0].X) * (p[2].Y - p[0].Y));
+
+                    if (points.Length == 3 && pathType == PathType.PerfectCurve && isLinear(points))
+                        pathType = PathType.Linear;
 
                     int repeatCount = Convert.ToInt32(split[6], CultureInfo.InvariantCulture);
 
@@ -93,7 +123,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
                     // osu-stable treated the first span of the slider as a repeat, but no repeats are happening
                     repeatCount = Math.Max(0, repeatCount - 1);
-
 
                     if (split.Length > 7)
                         length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
@@ -148,11 +177,14 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     for (int i = 0; i < nodes; i++)
                         nodeSamples.Add(convertSoundType(nodeSoundTypes[i], nodeBankInfos[i]));
 
-                    result = CreateSlider(pos, combo, points, length, curveType, repeatCount, nodeSamples);
+                    result = CreateSlider(pos, combo, comboOffset, points, length, pathType, repeatCount, nodeSamples);
+
+                    // The samples are played when the slider ends, which is the last node
+                    result.Samples = nodeSamples[nodeSamples.Count - 1];
                 }
                 else if (type.HasFlag(ConvertHitObjectType.Spinner))
                 {
-                    result = CreateSpinner(new Vector2(512, 384) / 2, Convert.ToDouble(split[5], CultureInfo.InvariantCulture) + offset);
+                    result = CreateSpinner(new Vector2(512, 384) / 2, combo, comboOffset, Convert.ToDouble(split[5], CultureInfo.InvariantCulture) + Offset);
 
                     if (split.Length > 6)
                         readCustomSampleBanks(split[6], bankInfo);
@@ -170,14 +202,21 @@ namespace osu.Game.Rulesets.Objects.Legacy
                         readCustomSampleBanks(string.Join(":", ss.Skip(1)), bankInfo);
                     }
 
-                    result = CreateHold(pos, combo, endTime + offset);
+                    result = CreateHold(pos, combo, comboOffset, endTime + Offset);
                 }
 
                 if (result == null)
-                    throw new InvalidOperationException($@"Unknown hit object type {type}.");
+                {
+                    Logger.Log($"Unknown hit object type: {type}. Skipped.", level: LogLevel.Error);
+                    return null;
+                }
 
-                result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture) + offset;
-                result.Samples = convertSoundType(soundType, bankInfo);
+                result.StartTime = Convert.ToDouble(split[2], CultureInfo.InvariantCulture) + Offset;
+
+                if (result.Samples.Count == 0)
+                    result.Samples = convertSoundType(soundType, bankInfo);
+
+                FirstObject = false;
 
                 return result;
             }
@@ -197,15 +236,15 @@ namespace osu.Game.Rulesets.Objects.Legacy
             var bank = (LegacyBeatmapDecoder.LegacySampleBank)int.Parse(split[0]);
             var addbank = (LegacyBeatmapDecoder.LegacySampleBank)int.Parse(split[1]);
 
-            string stringBank = bank.ToString().ToLower();
+            string stringBank = bank.ToString().ToLowerInvariant();
             if (stringBank == @"none")
                 stringBank = null;
-            string stringAddBank = addbank.ToString().ToLower();
+            string stringAddBank = addbank.ToString().ToLowerInvariant();
             if (stringAddBank == @"none")
                 stringAddBank = null;
 
             bankInfo.Normal = stringBank;
-            bankInfo.Add = stringAddBank;
+            bankInfo.Add = string.IsNullOrEmpty(stringAddBank) ? stringBank : stringAddBank;
 
             if (split.Length > 2)
                 bankInfo.CustomSampleBank = int.Parse(split[2]);
@@ -221,37 +260,42 @@ namespace osu.Game.Rulesets.Objects.Legacy
         /// </summary>
         /// <param name="position">The position of the hit object.</param>
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
+        /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateHit(Vector2 position, bool newCombo);
+        protected abstract HitObject CreateHit(Vector2 position, bool newCombo, int comboOffset);
 
         /// <summary>
         /// Creats a legacy Slider-type hit object.
         /// </summary>
         /// <param name="position">The position of the hit object.</param>
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
+        /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <param name="controlPoints">The slider control points.</param>
         /// <param name="length">The slider length.</param>
-        /// <param name="curveType">The slider curve type.</param>
+        /// <param name="pathType">The slider curve type.</param>
         /// <param name="repeatCount">The slider repeat count.</param>
-        /// <param name="repeatSamples">The samples to be played when the repeat nodes are hit. This includes the head and tail of the slider.</param>
+        /// <param name="nodeSamples">The samples to be played when the slider nodes are hit. This includes the head and tail of the slider.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<List<SampleInfo>> repeatSamples);
+        protected abstract HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, PathType pathType, int repeatCount, List<List<SampleInfo>> nodeSamples);
 
         /// <summary>
         /// Creates a legacy Spinner-type hit object.
         /// </summary>
         /// <param name="position">The position of the hit object.</param>
+        /// <param name="newCombo">Whether the hit object creates a new combo.</param>
+        /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <param name="endTime">The spinner end time.</param>
         /// <returns>The hit object.</returns>
-        protected abstract HitObject CreateSpinner(Vector2 position, double endTime);
+        protected abstract HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime);
 
         /// <summary>
         /// Creates a legacy Hold-type hit object.
         /// </summary>
         /// <param name="position">The position of the hit object.</param>
         /// <param name="newCombo">Whether the hit object creates a new combo.</param>
+        /// <param name="comboOffset">When starting a new combo, the offset of the new combo relative to the current one.</param>
         /// <param name="endTime">The hold end time.</param>
-        protected abstract HitObject CreateHold(Vector2 position, bool newCombo, double endTime);
+        protected abstract HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime);
 
         private List<SampleInfo> convertSoundType(LegacySoundType type, SampleBankInfo bankInfo)
         {

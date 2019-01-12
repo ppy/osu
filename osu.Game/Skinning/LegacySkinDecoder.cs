@@ -19,6 +19,7 @@ namespace osu.Game.Skinning
             switch (section)
             {
                 case Section.General:
+                {
                     var pair = SplitKeyVal(line);
 
                     switch (pair.Key)
@@ -29,9 +30,26 @@ namespace osu.Game.Skinning
                         case @"Author":
                             skin.SkinInfo.Creator = pair.Value;
                             break;
+                        case @"CursorExpand":
+                            skin.CursorExpand = pair.Value != "0";
+                            break;
                     }
 
                     break;
+                }
+                case Section.Fonts:
+                {
+                    var pair = SplitKeyVal(line);
+
+                    switch (pair.Key)
+                    {
+                        case "HitCirclePrefix":
+                            skin.HitCircleFont = pair.Value;
+                            break;
+                    }
+
+                    break;
+                }
             }
 
             base.ParseLine(skin, section, line);

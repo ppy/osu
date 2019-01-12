@@ -10,9 +10,8 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.SearchableList;
-using osu.Game.Screens.Multi.Screens;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi
 {
@@ -86,7 +85,12 @@ namespace osu.Game.Screens.Multi
                 },
             };
 
-            breadcrumbs.Current.ValueChanged += s => screenType.Text = ((MultiplayerScreen)s).Type.ToLower();
+            breadcrumbs.Current.ValueChanged += s =>
+            {
+                if (s is IMultiplayerSubScreen mpScreen)
+                    screenType.Text = mpScreen.ShortTitle.ToLowerInvariant();
+            };
+
             breadcrumbs.Current.TriggerChange();
         }
 
@@ -99,7 +103,8 @@ namespace osu.Game.Screens.Multi
 
         private class HeaderBreadcrumbControl : ScreenBreadcrumbControl
         {
-            public HeaderBreadcrumbControl(Screen initialScreen) : base(initialScreen)
+            public HeaderBreadcrumbControl(Screen initialScreen)
+                : base(initialScreen)
             {
             }
 

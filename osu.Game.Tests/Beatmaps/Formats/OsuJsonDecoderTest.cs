@@ -12,7 +12,7 @@ using osu.Game.IO.Serialization;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Tests.Resources;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Beatmaps.Formats
 {
@@ -149,7 +149,6 @@ namespace osu.Game.Tests.Beatmaps.Formats
             using (var stream = Resource.OpenResource(filename))
             using (var sr = new StreamReader(stream))
             {
-
                 var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
                 using (var ms = new MemoryStream())
                 using (var sw = new StreamWriter(ms))

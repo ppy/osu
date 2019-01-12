@@ -5,12 +5,10 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
-using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
-using OpenTK;
-using osu.Game.Rulesets.Osu.Judgements;
+using osuTK;
 using System.Collections.Generic;
 using System;
 using osu.Game.Rulesets.Mods;
@@ -87,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private class TestDrawableHitCircle : DrawableHitCircle
+        protected class TestDrawableHitCircle : DrawableHitCircle
         {
             private readonly bool auto;
 
@@ -96,19 +94,17 @@ namespace osu.Game.Rulesets.Osu.Tests
                 this.auto = auto;
             }
 
-            protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+            public void TriggerJudgement() => UpdateResult(true);
+
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
                 if (auto && !userTriggered && timeOffset > 0)
                 {
                     // force success
-                    AddJudgement(new OsuJudgement
-                    {
-                        Result = HitResult.Great
-                    });
-                    State.Value = ArmedState.Hit;
+                    ApplyResult(r => r.Type = HitResult.Great);
                 }
                 else
-                    base.CheckForJudgements(userTriggered, timeOffset);
+                    base.CheckForResult(userTriggered, timeOffset);
             }
         }
     }

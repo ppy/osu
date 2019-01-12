@@ -6,12 +6,15 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Game.Skinning;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
     public class CirclePiece : Container, IKeyBindingHandler<OsuAction>
     {
+        // IsHovered is used
+        public override bool HandlePositionalInput => true;
+
         public Func<bool> Hit;
 
         public CirclePiece()

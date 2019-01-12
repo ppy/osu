@@ -3,11 +3,14 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
+    /// <summary>
+    /// A loading spinner.
+    /// </summary>
     public class LoadingAnimation : VisibilityContainer
     {
         private readonly SpriteIcon spinner;

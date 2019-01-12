@@ -3,15 +3,20 @@
 
 using System.IO;
 using NUnit.Framework;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Tests.Resources;
 using System.Linq;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Beatmaps.Timing;
+using osu.Game.Rulesets.Catch.Beatmaps;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Legacy;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Beatmaps;
 using osu.Game.Skinning;
 
 namespace osu.Game.Tests.Beatmaps.Formats
@@ -19,6 +24,25 @@ namespace osu.Game.Tests.Beatmaps.Formats
     [TestFixture]
     public class LegacyBeatmapDecoderTest
     {
+        [Test]
+        public void TestDecodeBeatmapVersion()
+        {
+            using (var resStream = Resource.OpenResource("beatmap-version.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var decoder = Decoder.GetDecoder<Beatmap>(stream);
+
+                stream.BaseStream.Position = 0;
+                stream.DiscardBufferedData();
+
+                var working = new TestWorkingBeatmap(decoder.Decode(stream));
+
+                Assert.AreEqual(6, working.BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(6, working.Beatmap.BeatmapInfo.BeatmapVersion);
+                Assert.AreEqual(6, working.GetPlayableBeatmap(new OsuRuleset().RulesetInfo).BeatmapInfo.BeatmapVersion);
+            }
+        }
+
         [Test]
         public void TestDecodeBeatmapGeneral()
         {
@@ -163,7 +187,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         }
 
         [Test]
-        public void TestDecodeBeatmapColors()
+        public void TestDecodeBeatmapColours()
         {
             var decoder = new LegacySkinDecoder();
             using (var resStream = Resource.OpenResource("Soleily - Renatus (Gamu) [Insane].osu"))
@@ -179,10 +203,55 @@ namespace osu.Game.Tests.Beatmaps.Formats
                     new Color4(128, 255, 128, 255),
                     new Color4(255, 187, 255, 255),
                     new Color4(255, 177, 140, 255),
+                    new Color4(100, 100, 100, 100),
                 };
                 Assert.AreEqual(expectedColors.Length, comboColors.Count);
                 for (int i = 0; i < expectedColors.Length; i++)
                     Assert.AreEqual(expectedColors[i], comboColors[i]);
+            }
+        }
+
+        [Test]
+        public void TestDecodeBeatmapComboOffsetsOsu()
+        {
+            var decoder = new LegacyBeatmapDecoder();
+            using (var resStream = Resource.OpenResource("hitobject-combo-offset.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+
+                var converted = new OsuBeatmapConverter(beatmap).Convert();
+                new OsuBeatmapProcessor(converted).PreProcess();
+                new OsuBeatmapProcessor(converted).PostProcess();
+
+                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndex);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndex);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndex);
+                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndex);
+                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndex);
+                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndex);
+            }
+        }
+
+        [Test]
+        public void TestDecodeBeatmapComboOffsetsCatch()
+        {
+            var decoder = new LegacyBeatmapDecoder();
+            using (var resStream = Resource.OpenResource("hitobject-combo-offset.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var beatmap = decoder.Decode(stream);
+
+                var converted = new CatchBeatmapConverter(beatmap).Convert();
+                new CatchBeatmapProcessor(converted).PreProcess();
+                new CatchBeatmapProcessor(converted).PostProcess();
+
+                Assert.AreEqual(4, ((IHasComboInformation)converted.HitObjects.ElementAt(0)).ComboIndex);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(2)).ComboIndex);
+                Assert.AreEqual(5, ((IHasComboInformation)converted.HitObjects.ElementAt(4)).ComboIndex);
+                Assert.AreEqual(6, ((IHasComboInformation)converted.HitObjects.ElementAt(6)).ComboIndex);
+                Assert.AreEqual(11, ((IHasComboInformation)converted.HitObjects.ElementAt(8)).ComboIndex);
+                Assert.AreEqual(14, ((IHasComboInformation)converted.HitObjects.ElementAt(11)).ComboIndex);
             }
         }
 
@@ -226,6 +295,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
                 Assert.AreEqual("normal-hitnormal", getTestableSampleInfo(hitObjects[1]).LookupNames.First());
                 Assert.AreEqual("normal-hitnormal2", getTestableSampleInfo(hitObjects[2]).LookupNames.First());
                 Assert.AreEqual("normal-hitnormal", getTestableSampleInfo(hitObjects[3]).LookupNames.First());
+
+                // The control point at the end time of the slider should be applied
+                Assert.AreEqual("soft-hitnormal8", getTestableSampleInfo(hitObjects[4]).LookupNames.First());
             }
 
             SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
@@ -264,6 +336,62 @@ namespace osu.Game.Tests.Beatmaps.Formats
             }
 
             SampleInfo getTestableSampleInfo(HitObject hitObject) => hitObject.SampleControlPoint.ApplyTo(hitObject.Samples[0]);
+        }
+
+        [Test]
+        public void TestDecodeSliderSamples()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+            using (var resStream = Resource.OpenResource("slider-samples.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                var slider1 = (ConvertSlider)hitObjects[0];
+
+                Assert.AreEqual(1, slider1.NodeSamples[0].Count);
+                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider1.NodeSamples[0][0].Name);
+                Assert.AreEqual(1, slider1.NodeSamples[1].Count);
+                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider1.NodeSamples[1][0].Name);
+                Assert.AreEqual(1, slider1.NodeSamples[2].Count);
+                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider1.NodeSamples[2][0].Name);
+
+                var slider2 = (ConvertSlider)hitObjects[1];
+
+                Assert.AreEqual(2, slider2.NodeSamples[0].Count);
+                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider2.NodeSamples[0][0].Name);
+                Assert.AreEqual(SampleInfo.HIT_CLAP, slider2.NodeSamples[0][1].Name);
+                Assert.AreEqual(2, slider2.NodeSamples[1].Count);
+                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider2.NodeSamples[1][0].Name);
+                Assert.AreEqual(SampleInfo.HIT_CLAP, slider2.NodeSamples[1][1].Name);
+                Assert.AreEqual(2, slider2.NodeSamples[2].Count);
+                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider2.NodeSamples[2][0].Name);
+                Assert.AreEqual(SampleInfo.HIT_CLAP, slider2.NodeSamples[2][1].Name);
+
+                var slider3 = (ConvertSlider)hitObjects[2];
+
+                Assert.AreEqual(2, slider3.NodeSamples[0].Count);
+                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider3.NodeSamples[0][0].Name);
+                Assert.AreEqual(SampleInfo.HIT_WHISTLE, slider3.NodeSamples[0][1].Name);
+                Assert.AreEqual(1, slider3.NodeSamples[1].Count);
+                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider3.NodeSamples[1][0].Name);
+                Assert.AreEqual(2, slider3.NodeSamples[2].Count);
+                Assert.AreEqual(SampleInfo.HIT_NORMAL, slider3.NodeSamples[2][0].Name);
+                Assert.AreEqual(SampleInfo.HIT_CLAP, slider3.NodeSamples[2][1].Name);
+            }
+        }
+
+        [Test]
+        public void TestDecodeHitObjectNullAdditionBank()
+        {
+            var decoder = new LegacyBeatmapDecoder { ApplyOffsets = false };
+            using (var resStream = Resource.OpenResource("hitobject-no-addition-bank.osu"))
+            using (var stream = new StreamReader(resStream))
+            {
+                var hitObjects = decoder.Decode(stream).HitObjects;
+
+                Assert.AreEqual(hitObjects[0].Samples[0].Bank, hitObjects[0].Samples[1].Bank);
+            }
         }
     }
 }

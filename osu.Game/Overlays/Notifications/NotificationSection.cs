@@ -10,7 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
+using osuTK;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Notifications
@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Notifications
             set
             {
                 title = value;
-                if (titleText != null) titleText.Text = title.ToUpper();
+                if (titleText != null) titleText.Text = title.ToUpperInvariant();
             }
         }
 
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Notifications
                             {
                                 titleText = new OsuSpriteText
                                 {
-                                    Text = title.ToUpper(),
+                                    Text = title.ToUpperInvariant(),
                                     Font = @"Exo2.0-Black",
                                 },
                                 countText = new OsuSpriteText
@@ -154,7 +154,7 @@ namespace osu.Game.Overlays.Notifications
             public string Text
             {
                 get { return text.Text; }
-                set { text.Text = value.ToUpper(); }
+                set { text.Text = value.ToUpperInvariant(); }
             }
         }
 

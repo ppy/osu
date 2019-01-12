@@ -3,11 +3,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Mania.Replays
 {
@@ -22,7 +22,7 @@ namespace osu.Game.Rulesets.Mania.Replays
         public ManiaAutoGenerator(ManiaBeatmap beatmap)
             : base(beatmap)
         {
-            Replay = new Replay { User = new User { Username = @"Autoplay" } };
+            Replay = new Replay();
 
             columnActions = new ManiaAction[Beatmap.TotalColumns];
 

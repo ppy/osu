@@ -2,7 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK;
+using osuTK;
 using osu.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -47,10 +47,10 @@ namespace osu.Game.Graphics.UserInterface
             public readonly SpriteIcon Chevron;
 
             //don't allow clicking between transitions and don't make the chevron clickable
-            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => Alpha == 1f && Text.ReceiveMouseInputAt(screenSpacePos);
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => Alpha == 1f && Text.ReceivePositionalInputAt(screenSpacePos);
 
-            public override bool HandleKeyboardInput => State == Visibility.Visible;
-            public override bool HandleMouseInput => State == Visibility.Visible;
+            public override bool HandleNonPositionalInput => State == Visibility.Visible;
+            public override bool HandlePositionalInput => State == Visibility.Visible;
             public override bool IsRemovable => true;
 
             private Visibility state;

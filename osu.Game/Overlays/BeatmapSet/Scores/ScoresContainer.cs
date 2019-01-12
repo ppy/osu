@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -29,10 +29,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             set => loadingAnimation.FadeTo(value ? 1 : 0, fade_duration);
         }
 
-        private IEnumerable<APIScore> scores;
+        private IEnumerable<APIScoreInfo> scores;
         private BeatmapInfo beatmap;
 
-        public IEnumerable<APIScore> Scores
+        public IEnumerable<APIScoreInfo> Scores
         {
             get { return scores; }
             set
@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 loading = true;
 
                 getScoresRequest = new GetScoresRequest(beatmap, beatmap.Ruleset);
-                getScoresRequest.Success += r => Scores = r.Scores;
+                getScoresRequest.Success += r => Schedule(() => Scores = r.Scores);
                 api.Queue(getScoresRequest);
             }
         }
@@ -133,6 +133,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             this.api = api;
             updateDisplay();
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            getScoresRequest?.Cancel();
         }
     }
 }

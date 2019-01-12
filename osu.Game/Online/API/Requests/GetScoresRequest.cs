@@ -13,15 +13,15 @@ namespace osu.Game.Online.API.Requests
     public class GetScoresRequest : APIRequest<APIScores>
     {
         private readonly BeatmapInfo beatmap;
-        private readonly LeaderboardScope scope;
+        private readonly BeatmapLeaderboardScope scope;
         private readonly RulesetInfo ruleset;
 
-        public GetScoresRequest(BeatmapInfo beatmap, RulesetInfo ruleset, LeaderboardScope scope = LeaderboardScope.Global)
+        public GetScoresRequest(BeatmapInfo beatmap, RulesetInfo ruleset, BeatmapLeaderboardScope scope = BeatmapLeaderboardScope.Global)
         {
             if (!beatmap.OnlineBeatmapID.HasValue)
                 throw new InvalidOperationException($"Cannot lookup a beatmap's scores without having a populated {nameof(BeatmapInfo.OnlineBeatmapID)}.");
 
-            if (scope == LeaderboardScope.Local)
+            if (scope == BeatmapLeaderboardScope.Local)
                 throw new InvalidOperationException("Should not attempt to request online scores for a local scoped leaderboard");
 
             this.beatmap = beatmap;
@@ -33,8 +33,8 @@ namespace osu.Game.Online.API.Requests
 
         private void onSuccess(APIScores r)
         {
-            foreach (APIScore score in r.Scores)
-                score.ApplyBeatmap(beatmap);
+            foreach (APIScoreInfo score in r.Scores)
+                score.Beatmap = beatmap;
         }
 
         protected override WebRequest CreateWebRequest()

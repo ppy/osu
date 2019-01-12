@@ -10,16 +10,21 @@ using osu.Desktop.Overlays;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game;
-using OpenTK.Input;
+using osuTK.Input;
 using Microsoft.Win32;
 using osu.Desktop.Updater;
+using osu.Framework;
 using osu.Framework.Platform.Windows;
+using osu.Framework.Screens;
+using osu.Game.Screens;
+using osu.Game.Screens.Menu;
 
 namespace osu.Desktop
 {
     internal class OsuGameDesktop : OsuGame
     {
         private readonly bool noVersionOverlay;
+        private VersionManager versionManager;
 
         public OsuGameDesktop(string[] args = null)
             : base(args)
@@ -45,17 +50,33 @@ namespace osu.Desktop
 
             if (!noVersionOverlay)
             {
-                LoadComponentAsync(new VersionManager { Depth = int.MinValue }, v =>
+                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, v =>
                 {
                     Add(v);
                     v.State = Visibility.Visible;
                 });
 
-#if NET_FRAMEWORK
-                Add(new SquirrelUpdateManager());
-#else
-                Add(new SimpleUpdateManager());
-#endif
+                if (RuntimeInfo.OS == RuntimeInfo.Platform.Windows)
+                    Add(new SquirrelUpdateManager());
+                else
+                    Add(new SimpleUpdateManager());
+            }
+        }
+
+        protected override void ScreenChanged(OsuScreen current, Screen newScreen)
+        {
+            base.ScreenChanged(current, newScreen);
+            switch (newScreen)
+            {
+                case Intro _:
+                case MainMenu _:
+                    if (versionManager != null)
+                        versionManager.State = Visibility.Visible;
+                    break;
+                default:
+                    if (versionManager != null)
+                        versionManager.State = Visibility.Hidden;
+                    break;
             }
         }
 

@@ -2,8 +2,8 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -99,6 +99,7 @@ namespace osu.Game.Users
                                 User = user,
                                 Masking = true,
                                 CornerRadius = 5,
+                                OpenOnClick = { Value = false },
                                 EdgeEffect = new EdgeEffectParameters
                                 {
                                     Type = EdgeEffectType.Shadow,

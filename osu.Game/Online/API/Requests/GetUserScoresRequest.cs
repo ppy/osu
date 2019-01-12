@@ -6,7 +6,7 @@ using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserScoresRequest : APIRequest<List<APIScore>>
+    public class GetUserScoresRequest : APIRequest<List<APIScoreInfo>>
     {
         private readonly long userId;
         private readonly ScoreType type;
@@ -20,7 +20,7 @@ namespace osu.Game.Online.API.Requests
         }
 
         // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLower()}?offset={offset}";
+        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}?offset={offset}";
     }
 
     public enum ScoreType

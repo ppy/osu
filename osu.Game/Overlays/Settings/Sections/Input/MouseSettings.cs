@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 
@@ -26,12 +26,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Raw Input",
+                    LabelText = "Raw input",
                     Bindable = rawInputToggle
                 },
                 sensitivity = new SensitivitySetting
                 {
-                    LabelText = "Cursor Sensitivity",
+                    LabelText = "Cursor sensitivity",
                     Bindable = config.GetBindable<double>(FrameworkSetting.CursorSensitivity)
                 },
                 new SettingsCheckbox
@@ -59,8 +59,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             rawInputToggle.ValueChanged += enabled =>
             {
                 // this is temporary until we support per-handler settings.
-                const string raw_mouse_handler = @"OpenTKRawMouseHandler";
-                const string standard_mouse_handler = @"OpenTKMouseHandler";
+                const string raw_mouse_handler = @"OsuTKRawMouseHandler";
+                const string standard_mouse_handler = @"OsuTKMouseHandler";
 
                 ignoredInputHandler.Value = enabled ? standard_mouse_handler : raw_mouse_handler;
             };
@@ -124,18 +124,18 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
             private bool isDragging;
 
-            protected override bool OnDragStart(InputState state)
+            protected override bool OnDragStart(DragStartEvent e)
             {
                 isDragging = true;
-                return base.OnDragStart(state);
+                return base.OnDragStart(e);
             }
 
-            protected override bool OnDragEnd(InputState state)
+            protected override bool OnDragEnd(DragEndEvent e)
             {
                 isDragging = false;
                 Current.TriggerChange();
 
-                return base.OnDragEnd(state);
+                return base.OnDragEnd(e);
             }
 
             public override string TooltipText => Current.Disabled ? "Enable raw input to adjust sensitivity" : Current.Value.ToString(@"0.##x");

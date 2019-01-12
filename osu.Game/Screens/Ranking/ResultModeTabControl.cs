@@ -3,11 +3,11 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ResultModeTabControl : TabControl<ResultMode>
+    public class ResultModeTabControl : TabControl<IResultPageInfo>
     {
         public ResultModeTabControl()
         {
@@ -19,9 +19,9 @@ namespace osu.Game.Screens.Ranking
             TabContainer.Padding = new MarginPadding(5);
         }
 
-        protected override Dropdown<ResultMode> CreateDropdown() => null;
+        protected override Dropdown<IResultPageInfo> CreateDropdown() => null;
 
-        protected override TabItem<ResultMode> CreateTabItem(ResultMode value) => new ResultModeButton(value)
+        protected override TabItem<IResultPageInfo> CreateTabItem(IResultPageInfo value) => new ResultModeButton(value)
         {
             Anchor = TabContainer.Anchor,
             Origin = TabContainer.Origin

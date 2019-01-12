@@ -8,8 +8,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Notifications
 {
@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Notifications
         public Action<Notification> CompletionTarget { get; set; }
 
         /// <summary>
-        /// An action to complete when the completion notification is clicked.
+        /// An action to complete when the completion notification is clicked. Return true to close.
         /// </summary>
         public Func<bool> CompletionClickAction;
 
