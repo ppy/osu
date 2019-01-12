@@ -26,7 +26,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public abstract class TestBaseSliders : OsuTestCase
+    public abstract class SliderTestBase : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -43,11 +43,11 @@ namespace osu.Game.Rulesets.Osu.Tests
 
 
         protected abstract List<Mod> Mods { get; set; }
-        protected void CreateSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2, int stackHeight = 0)
+        protected Slider CreateSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2, int stackHeight = 0, bool addToContent = true)
         {
             var slider = new Slider
             {
-                StartTime = Time.Current + 1000,
+                StartTime = addToContent ? Time.Current + 1000 : 1000,
                 Position = new Vector2(-(distance / 2), 0),
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
@@ -59,7 +59,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 StackHeight = stackHeight
             };
 
-            AddSlider(slider, circleSize, speedMultiplier);
+            if (addToContent)
+                AddSlider(slider, circleSize, speedMultiplier);
+
+            return slider;
         }
 
         protected List<List<SampleInfo>> CreateEmptySamples(int repeats)

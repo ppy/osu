@@ -106,7 +106,7 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
-        private void addHitObjectReplay(OsuHitObject h)
+        protected void addHitObjectReplay(OsuHitObject h)
         {
             // Default values for circles/sliders
             Vector2 startPosition = h.StackedPosition;

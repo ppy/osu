@@ -10,11 +10,11 @@ using osu.Game.Rulesets.Osu.Mods;
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
-    public class TestCaseSliderHidden : TestCaseSlider
+    public class SliderTestCaseHidden : SliderTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => base.RequiredTypes.Concat(new[] { typeof(OsuModHidden) }).ToList();
 
-        public TestCaseSliderHidden()
+        public SliderTestCaseHidden()
         {
             Mods.Add(new OsuModHidden());
         }

@@ -17,10 +17,10 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
 
     [TestFixture]
-    public class TestCaseSlider : TestBaseSliders
+    public class SliderTestCase : SliderTestBase
     {
         protected override List<Mod> Mods { get; set; }
-        public TestCaseSlider()
+        public SliderTestCase()
         {
             Mods = new List<Mod>();
             base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
