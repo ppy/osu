@@ -29,7 +29,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class SliderTestCaseInput : SliderTestBase
     {
-        private const double testInterval = 500;
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
@@ -40,75 +39,84 @@ namespace osu.Game.Rulesets.Osu.Tests
             Mods = new List<Mod>();
             base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
 
-            AddStep("Test Slider Tracking", () => trackingInputTest());
+            AddStep("Test key priming", () => correctKeyTest());
         }
 
-        private void trackingInputTest()
+        private void correctKeyTest()
         {
             List<List<OsuAction>> actions = new List<List<OsuAction>>();
 
             List<OsuAction> frame1 = new List<OsuAction>();
             frame1.Add(OsuAction.LeftButton);
-            frame1.Add(OsuAction.RightButton);
             actions.Add(frame1);
 
             List<OsuAction> frame2 = new List<OsuAction>();
             frame2.Add(OsuAction.LeftButton);
+            frame2.Add(OsuAction.RightButton);
             actions.Add(frame2);
 
-            performInputTest(actions, OsuAction.LeftButton);
+            List<OsuAction> frame3 = new List<OsuAction>();
+            frame3.Add(OsuAction.LeftButton);
+            actions.Add(frame3);
+
+            performTrackedInputTest(actions, OsuAction.LeftButton);
         }
 
-        private void performInputTest(List<List<OsuAction>> actions, OsuAction? preAction = null)
+        private void performTrackedInputTest(List<List<OsuAction>> actions, OsuAction? preAction = null)
         {
             List<ReplayFrame> frames = new List<ReplayFrame>();
 
-            Slider sliderToAdd = CreateSlider(3f, 400f, 0, 0.5f, addToContent: false);
+            Slider sliderToAdd = CreateSlider(addToContent: false);
 
             Ruleset ruleset = new OsuRuleset();
 
             sliderToAdd.Position = ToScreenSpace(sliderToAdd.Position);
 
-            Beatmap<OsuHitObject> beatmap = createSpontaneous(sliderToAdd, ruleset);
+            Beatmap<OsuHitObject> beatmap = createBeatmap(sliderToAdd, ruleset);
 
-            Replay thisReplay = generateReplay(beatmap, actions, preAction);
+            Replay thisReplay = generateTrackedReplay(beatmap, actions, true);
 
             Child = loadPlayerFor(ruleset, sliderToAdd, thisReplay, beatmap);
         }
 
-        protected Player CreatePlayer(Ruleset ruleset) => new Player
+        protected Player CreatePlayer(Ruleset ruleset, Score score) => new ReplayPlayer(score)
         {
             AllowPause = false,
             AllowLeadIn = false,
             AllowResults = false,
+
         };
 
-        private Replay generateReplay(Beatmap<OsuHitObject> b, List<List<OsuAction>> actions, OsuAction? preAction = null)
+        private Replay generateTrackedReplay(Beatmap<OsuHitObject> b, List<List<OsuAction>> actions, bool preAction = false)
         {
             Replay replay = new Replay();
             List<ReplayFrame> frames = new List<ReplayFrame>();
             int localIndex = 0;
+            const double testInterval = 250;
 
             Slider s = b.HitObjects[0] as Slider;
 
-            if (preAction.HasValue)
+            if (preAction)
             {
                 OsuReplayFrame f = new OsuReplayFrame();
                 Vector2 pos = new Vector2(0, 0);
                 f.Position = pos;
-                f.Time = s.StartTime - 100;
-                f.Actions.Add(preAction.Value);
+                f.Time = s.StartTime - testInterval;
+                if (localIndex < actions.Count)
+                    f.Actions = actions[localIndex];
 
                 frames.Insert(localIndex, f);
                 localIndex++;
             }
 
-            for (double j = 20; j < s.Duration; j += 20)
+            for (double j = testInterval; j < s.Duration; j += testInterval)
             {
                 OsuReplayFrame f = new OsuReplayFrame();
                 Vector2 pos = s.StackedPositionAt(j / s.Duration);
                 f.Position = pos;
-                f.Time = s.StartTime + (localIndex * 20);
+                f.Time = s.StartTime + (localIndex * testInterval);
+                if (localIndex < actions.Count)
+                    f.Actions = actions[localIndex];
 
                 frames.Insert(localIndex, f);
                 localIndex++;
@@ -118,13 +126,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             return replay;
         }
 
-        private Beatmap<OsuHitObject> createSpontaneous(Slider s, Ruleset r)
+        private Beatmap<OsuHitObject> createBeatmap(Slider s, Ruleset r)
         {
             Beatmap<OsuHitObject> b = new Beatmap<OsuHitObject>();
             b.HitObjects.Add(s);
-            b.BeatmapInfo.Ruleset = r.RulesetInfo;
             b.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = 0.5f });
             b.BeatmapInfo.BaseDifficulty.SliderTickRate = 3;
+            b.BeatmapInfo.Ruleset = r.RulesetInfo;
             return b;
         }
 
@@ -132,29 +140,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var beatmap = b;
             var working = new TestWorkingBeatmap(beatmap);
+            var score = new Score{ Replay = rp };
 
+            Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { new OsuModNoFail() });
             Beatmap.Value = working;
-            Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { new ModTestplay(rp) });
 
-            var player = CreatePlayer(r);
+            var player = CreatePlayer(r, score);
 
             return player;
-        }
-
-        private class ModTestplay : OsuModAutoplay
-        {
-            private Replay replayLocal;
-
-            public ModTestplay(Replay replay)
-            {
-                replayLocal = replay;
-            }
-
-            protected override Score CreateReplayScore(Beatmap<OsuHitObject> beatmap) => new Score
-            {
-                ScoreInfo = new ScoreInfo { User = new User { Username = "Wangs" } },
-                Replay = replayLocal
-            };
         }
     }
 }

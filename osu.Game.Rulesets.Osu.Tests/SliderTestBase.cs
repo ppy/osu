@@ -61,6 +61,13 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             if (addToContent)
                 AddSlider(slider, circleSize, speedMultiplier);
+            else
+            {
+                var cpi = new ControlPointInfo();
+                cpi.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = speedMultiplier });
+
+                slider.ApplyDefaults(cpi, new BeatmapDifficulty { CircleSize = circleSize, SliderTickRate = 3 });
+            }
 
             return slider;
         }
