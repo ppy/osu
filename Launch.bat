@@ -1,0 +1,1 @@
+dotnet run --project osu.Desktop -c Releases
