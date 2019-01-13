@@ -27,8 +27,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Rulesets.Taiko.Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "osu.Game.Rulesets.Osu.Tests", "osu.Game.Rulesets.Osu.Tests\osu.Game.Rulesets.Osu.Tests.csproj", "{6A2D5D58-0261-4A75-BE84-2BE8B076B7C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "osu.Game.Rulesets.Tkacz", "osu.Game.Rulesets.Tkacz\osu.Game.Rulesets.Tkacz.csproj", "{CC2C62E4-1C34-4486-868E-6AF153DF7C8F}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -83,10 +81,6 @@ Global
 		{6A2D5D58-0261-4A75-BE84-2BE8B076B7C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A2D5D58-0261-4A75-BE84-2BE8B076B7C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A2D5D58-0261-4A75-BE84-2BE8B076B7C2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CC2C62E4-1C34-4486-868E-6AF153DF7C8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CC2C62E4-1C34-4486-868E-6AF153DF7C8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CC2C62E4-1C34-4486-868E-6AF153DF7C8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CC2C62E4-1C34-4486-868E-6AF153DF7C8F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
