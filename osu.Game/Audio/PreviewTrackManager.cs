@@ -26,7 +26,7 @@ namespace osu.Game.Audio
         [BackgroundDependencyLoader]
         private void load(AudioManager audio, FrameworkConfigManager config)
         {
-            trackManager = new TrackManager(new OnlineStore());
+            trackManager = new TrackManager(new OnlineStore(), audio.Callback);
 
             this.audio = audio;
             audio.AddItem(trackManager);
