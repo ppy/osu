@@ -55,7 +55,7 @@ namespace osu.Game.Tests.Visual
             linkColour = colours.Blue;
 
             var chatManager = new ChannelManager();
-            BindableCollection<Channel> availableChannels = (BindableCollection<Channel>)chatManager.AvailableChannels;
+            BindableList<Channel> availableChannels = (BindableList<Channel>)chatManager.AvailableChannels;
             availableChannels.Add(new Channel { Name = "#english"});
             availableChannels.Add(new Channel { Name = "#japanese" });
             Dependencies.Cache(chatManager);

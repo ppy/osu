@@ -43,22 +43,14 @@ namespace osu.Game.Skinning
             return fallbackSource?.GetSample(sampleName);
         }
 
-        public TValue? GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue?> query) where TConfiguration : SkinConfiguration where TValue : struct
+        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration
         {
-            TValue? val = null;
+            TValue val;
             if ((source as Skin)?.Configuration is TConfiguration conf)
-                val = query?.Invoke(conf);
+                if (beatmapSkins && (val = query.Invoke(conf)) != null)
+                    return val;
 
-            return val ?? fallbackSource?.GetValue(query);
-        }
-
-        public TValue GetValue<TConfiguration, TValue>(Func<TConfiguration, TValue> query) where TConfiguration : SkinConfiguration where TValue : class
-        {
-            TValue val = null;
-            if ((source as Skin)?.Configuration is TConfiguration conf)
-                val = query?.Invoke(conf);
-
-            return val ?? fallbackSource?.GetValue(query);
+            return fallbackSource == null ? default : fallbackSource.GetValue(query);
         }
 
         private readonly ISkinSource source;
