@@ -1,43 +1,54 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using NUnit.Framework;
+using System;
+using System.Collections.Generic;
 using osu.Game.Beatmaps;
-using osu.Game.Screens.Multi.Screens.Match;
+using osu.Game.Online.Multiplayer;
+using osu.Game.Online.Multiplayer.GameTypes;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Rulesets.Osu.Mods;
+using osu.Game.Screens.Multi.Match.Components;
 
 namespace osu.Game.Tests.Visual
 {
-    [TestFixture]
     public class TestCaseMatchHeader : OsuTestCase
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(Header)
+        };
+
         public TestCaseMatchHeader()
         {
-            Header header = new Header();
-            Add(header);
+            var room = new Room();
 
-            AddStep(@"set beatmap set", () => header.BeatmapSet = new BeatmapSetInfo
+            var header = new Header(room);
+
+            room.Playlist.Add(new PlaylistItem
             {
-                OnlineInfo = new BeatmapSetOnlineInfo
+                Beatmap = new BeatmapInfo
                 {
-                    Covers = new BeatmapSetOnlineCovers
+                    Metadata = new BeatmapMetadata
                     {
-                        Cover = @"https://assets.ppy.sh/beatmaps/760757/covers/cover.jpg?1526944540",
+                        Title = "Title",
+                        Artist = "Artist",
+                        AuthorString = "Author",
                     },
+                    Version = "Version",
+                    Ruleset = new OsuRuleset().RulesetInfo
                 },
+                RequiredMods =
+                {
+                    new OsuModDoubleTime(),
+                    new OsuModNoFail(),
+                    new OsuModRelax(),
+                }
             });
 
-            AddStep(@"change beatmap set", () => header.BeatmapSet = new BeatmapSetInfo
-            {
-                OnlineInfo = new BeatmapSetOnlineInfo
-                {
-                    Covers = new BeatmapSetOnlineCovers
-                    {
-                        Cover = @"https://assets.ppy.sh/beatmaps/761883/covers/cover.jpg?1525557400",
-                    },
-                },
-            });
+            room.Type.Value = new GameTypeTimeshift();
 
-            AddStep(@"null beatmap set", () => header.BeatmapSet = null);
+            Child = header;
         }
     }
 }

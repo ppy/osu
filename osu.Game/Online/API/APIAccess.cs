@@ -101,6 +101,9 @@ namespace osu.Game.Online.API
                         //todo: replace this with a ping request.
                         log.Add(@"In a failing state, waiting a bit before we try again...");
                         Thread.Sleep(5000);
+
+                        if (!IsLoggedIn) goto case APIState.Connecting;
+
                         if (queue.Count == 0)
                         {
                             log.Add(@"Queueing a ping request");
@@ -145,7 +148,8 @@ namespace osu.Game.Online.API
 
                         if (!handleRequest(userReq))
                         {
-                            Thread.Sleep(500);
+                            if (State == APIState.Connecting)
+                                State = APIState.Failing;
                             continue;
                         }
 

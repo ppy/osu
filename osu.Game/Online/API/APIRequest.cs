@@ -36,7 +36,7 @@ namespace osu.Game.Online.API
     /// </summary>
     public abstract class APIRequest
     {
-        protected virtual string Target => string.Empty;
+        protected abstract string Target { get; }
 
         protected virtual WebRequest CreateWebRequest() => new WebRequest(Uri);
 
@@ -92,7 +92,11 @@ namespace osu.Game.Online.API
 
         public void Fail(Exception e)
         {
-            if (cancelled) return;
+            if (WebRequest?.Completed == true)
+                return;
+
+            if (cancelled)
+                return;
 
             cancelled = true;
             WebRequest?.Abort();

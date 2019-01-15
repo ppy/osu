@@ -24,6 +24,7 @@ using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Database;
+using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Input.Bindings;
 using osu.Game.IO;
@@ -153,9 +154,12 @@ namespace osu.Game
             dependencies.Cache(API);
             dependencies.CacheAs<IAPIProvider>(API);
 
+            var defaultBeatmap = new DummyWorkingBeatmap(this);
+            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
+
             dependencies.Cache(RulesetStore = new RulesetStore(contextFactory));
             dependencies.Cache(FileStore = new FileStore(contextFactory, Host.Storage));
-            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, API, Audio, Host));
+            dependencies.Cache(BeatmapManager = new BeatmapManager(Host.Storage, contextFactory, RulesetStore, API, Audio, Host, defaultBeatmap));
             dependencies.Cache(ScoreManager = new ScoreManager(RulesetStore, BeatmapManager, Host.Storage, contextFactory, Host));
             dependencies.Cache(KeyBindingStore = new KeyBindingStore(contextFactory, RulesetStore));
             dependencies.Cache(SettingsStore = new SettingsStore(contextFactory));
@@ -165,10 +169,6 @@ namespace osu.Game
             fileImporters.Add(BeatmapManager);
             fileImporters.Add(ScoreManager);
             fileImporters.Add(SkinManager);
-
-            var defaultBeatmap = new DummyWorkingBeatmap(this);
-            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
-            BeatmapManager.DefaultBeatmap = defaultBeatmap;
 
             // tracks play so loud our samples can't keep up.
             // this adds a global reduction of track volume for the time being.
@@ -190,7 +190,7 @@ namespace osu.Game
                 Child = content = new OsuTooltipContainer(MenuCursorContainer.Cursor) { RelativeSizeAxes = Axes.Both }
             };
 
-            base.Content.Add(new DrawSizePreservingFillContainer { Child = MenuCursorContainer });
+            base.Content.Add(new ScalingContainer(ScalingMode.Everything) { Child = MenuCursorContainer });
 
             KeyBindingStore.Register(globalBinding);
             dependencies.Cache(globalBinding);
@@ -248,7 +248,8 @@ namespace osu.Game
             var extension = Path.GetExtension(paths.First())?.ToLowerInvariant();
 
             foreach (var importer in fileImporters)
-                if (importer.HandledExtensions.Contains(extension)) importer.Import(paths);
+                if (importer.HandledExtensions.Contains(extension))
+                    importer.Import(paths);
         }
 
         public string[] HandledExtensions => fileImporters.SelectMany(i => i.HandledExtensions).ToArray();
@@ -261,7 +262,7 @@ namespace osu.Game
                 RegisterAudioManager(audioManager);
             }
 
-            private OsuBindableBeatmap(WorkingBeatmap defaultValue)
+            public OsuBindableBeatmap(WorkingBeatmap defaultValue)
                 : base(defaultValue)
             {
             }
