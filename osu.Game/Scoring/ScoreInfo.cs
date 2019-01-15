@@ -16,7 +16,7 @@ using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Scoring
 {
-    public class ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete
+    public class     ScoreInfo : IHasFiles<ScoreFileInfo>, IHasPrimaryKey, ISoftDelete
     {
         public int ID { get; set; }
 

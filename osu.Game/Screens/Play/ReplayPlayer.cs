@@ -7,7 +7,7 @@ namespace osu.Game.Screens.Play
 {
     public class ReplayPlayer : Player
     {
-        private readonly Score score;
+        protected readonly Score score;
 
         public ReplayPlayer(Score score)
         {
@@ -18,6 +18,7 @@ namespace osu.Game.Screens.Play
         {
             base.LoadComplete();
             RulesetContainer.SetReplayScore(score);
+
         }
 
         protected override ScoreInfo CreateScore() => score.ScoreInfo;

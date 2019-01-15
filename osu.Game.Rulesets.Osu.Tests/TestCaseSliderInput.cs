@@ -9,12 +9,18 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
+using osu.Game.Rulesets.Osu.Scoring;
+using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
@@ -31,6 +37,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         private int testID = 0;
 
         private Player player;
+
+        private JudgementResult lastResult;
 
         public TestCaseSliderInput()
         {
@@ -53,7 +61,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Perform left click before slider then pressing right on the slider then letting go of right click test", () => performPrimingTest());
             AddUntilStep(() => testID == 0 && ((ScoreAccessibleReplayPlayer)player).ScoreProcessor.TotalScore >= 175000, "Wait for priming test");
-            AddAssert("Test key priming", () => assertPrimingTest());
+            AddAssert("Tracking lost", () => assertMehJudge());
         }
 
         /// <summary>
@@ -69,14 +77,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestLeftBeforeSliderThenRightThenLettingGoOfLeft()
         {
-            AddStep("Perform priming test", () =>
-            {
-
-
-            });
+            AddStep("Perform priming test", () => { });
 
             AddUntilStep(() => testID == 0 && ((ScoreAccessibleReplayPlayer)player).ScoreProcessor.TotalScore >= 175000, "Wait for priming test");
-            AddAssert("Test key priming", () => assertPrimingTest());
+            AddAssert("Test key priming", () => assertPerfectJudge());
         }
 
         /// <summary>
@@ -94,12 +98,17 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Perform priming test", () => performPrimingTest());
             AddUntilStep(() => testID == 0 && ((ScoreAccessibleReplayPlayer)player).ScoreProcessor.TotalScore >= 175000, "Wait for priming test");
-            AddAssert("Test key priming", () => assertPrimingTest());
+            AddAssert("Test key priming", () => assertMehJudge());
         }
 
-        private bool assertPrimingTest()
+        private bool assertMehJudge()
         {
-            return !(((ScoreAccessibleReplayPlayer)player).ScoreProcessor.TotalScore > 175000);
+            return lastResult.Type == HitResult.Meh;
+        }
+
+        private bool assertPerfectJudge()
+        {
+            return lastResult.Type == HitResult.Great;
         }
 
         private void performPrimingTest()
@@ -147,6 +156,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             Player newPlayer = loadPlayerFor(ruleset, sliderToAdd, thisReplay, beatmap);
             player = newPlayer;
             Child = player;
+
+            ((ScoreAccessibleReplayPlayer)player).ScoreProcessor.NewJudgement += result => lastResult = result;
         }
 
         protected Player CreatePlayer(Ruleset ruleset, Score score) => new ScoreAccessibleReplayPlayer(score)
@@ -179,17 +190,20 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             var player = CreatePlayer(r, score);
 
+
+
             return player;
         }
 
         private class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
+            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
+            public new Score score => base.score;
             public ScoreAccessibleReplayPlayer(Score score)
                 : base(score)
             {
             }
 
-            public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
         }
     }
 }
