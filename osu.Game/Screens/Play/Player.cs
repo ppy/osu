@@ -20,6 +20,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -179,10 +180,13 @@ namespace osu.Game.Screens.Play
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
                         },
-                        new LocalSkinOverrideContainer(working.Skin)
+                        new ScalingContainer(ScalingMode.Gameplay)
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = RulesetContainer
+                            Child = new LocalSkinOverrideContainer(working.Skin)
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = RulesetContainer
+                            }
                         },
                         new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                         {
@@ -191,7 +195,10 @@ namespace osu.Game.Screens.Play
                             ProcessCustomClock = false,
                             Breaks = beatmap.Breaks
                         },
-                        RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
+                        new ScalingContainer(ScalingMode.Gameplay)
+                        {
+                            Child = RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
+                        },
                         hudOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
                         {
                             Clock = Clock, // hud overlay doesn't want to use the audio clock directly
@@ -285,7 +292,7 @@ namespace osu.Game.Screens.Play
                     if (!IsCurrentScreen) return;
 
                     var score = CreateScore();
-                    if (RulesetContainer.Replay == null)
+                    if (RulesetContainer.ReplayScore == null)
                         scoreManager.Import(score, true);
 
                     Push(CreateResults(score));
@@ -297,7 +304,7 @@ namespace osu.Game.Screens.Play
 
         protected virtual ScoreInfo CreateScore()
         {
-            var score = new ScoreInfo
+            var score = RulesetContainer.ReplayScore?.ScoreInfo ?? new ScoreInfo
             {
                 Beatmap = Beatmap.Value.BeatmapInfo,
                 Ruleset = ruleset,

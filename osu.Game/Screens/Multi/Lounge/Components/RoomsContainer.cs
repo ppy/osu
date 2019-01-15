@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
         public IBindable<Room> SelectedRoom => selectedRoom;
 
-        private readonly IBindableCollection<Room> rooms = new BindableCollection<Room>();
+        private readonly IBindableList<Room> rooms = new BindableList<Room>();
 
         private readonly FillFlowContainer<DrawableRoom> roomFlow;
         public IReadOnlyList<DrawableRoom> Rooms => roomFlow;
