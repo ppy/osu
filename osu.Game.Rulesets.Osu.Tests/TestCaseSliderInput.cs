@@ -40,6 +40,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private JudgementResult lastResult;
 
+        private bool allJudgedFired = false;
+
         public TestCaseSliderInput()
         {
             Mods = new List<Mod>();
@@ -59,8 +61,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestLeftBeforeSliderThenRight()
         {
+            testID = 0;
             AddStep("Perform left click before slider then pressing right on the slider then letting go of right click test", () => performPrimingTest());
-            AddUntilStep(() => testID == 0 && ((ScoreAccessibleReplayPlayer)player).ScoreProcessor.TotalScore >= 175000, "Wait for priming test");
+            AddUntilStep(() => testID == 0 && allJudgedFired, "Wait for priming test");
             AddAssert("Tracking lost", () => assertMehJudge());
         }
 
@@ -77,10 +80,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestLeftBeforeSliderThenRightThenLettingGoOfLeft()
         {
-            AddStep("Perform priming test", () => { });
-
-            AddUntilStep(() => testID == 0 && ((ScoreAccessibleReplayPlayer)player).ScoreProcessor.TotalScore >= 175000, "Wait for priming test");
-            AddAssert("Test key priming", () => assertPerfectJudge());
+            testID = 1;
+            AddStep("Perform left click before slider then pressing right on the slider then letting go of right click test", () => performPrimingTest());
+            AddUntilStep(() => testID == 1 && allJudgedFired, "Wait for priming test");
+            AddAssert("Tracking lost", () => assertGreatJudge());
         }
 
         /// <summary>
@@ -106,7 +109,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             return lastResult.Type == HitResult.Meh;
         }
 
-        private bool assertPerfectJudge()
+        private bool assertGreatJudge()
         {
             return lastResult.Type == HitResult.Great;
         }
@@ -158,6 +161,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             Child = player;
 
             ((ScoreAccessibleReplayPlayer)player).ScoreProcessor.NewJudgement += result => lastResult = result;
+
+            allJudgedFired = false;
+            ((ScoreAccessibleReplayPlayer)player).ScoreProcessor.AllJudged += () => allJudgedFired = true;
         }
 
         protected Player CreatePlayer(Ruleset ruleset, Score score) => new ScoreAccessibleReplayPlayer(score)
