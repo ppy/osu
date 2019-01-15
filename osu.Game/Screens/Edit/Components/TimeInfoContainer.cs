@@ -17,7 +17,6 @@ namespace osu.Game.Screens.Edit.Components
 
         public TimeInfoContainer()
         {
-
             Children = new Drawable[]
             {
                 trackTimer = new OsuSpriteText
