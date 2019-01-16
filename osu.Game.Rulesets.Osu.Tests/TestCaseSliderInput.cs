@@ -34,7 +34,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
-        private ScoreAccessibleReplayPlayer player;
         private JudgementResult lastResult;
         private bool allJudgedFired;
 
@@ -161,7 +160,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void performStaticInputTest(List<List<OsuAction>> actionsOnSlider, bool primeKey = false)
         {
-            var sliderToAdd = new Slider
+            var slider = new Slider
             {
                 StartTime = 1500,
                 Position = new Vector2(100, 100),
@@ -173,21 +172,21 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
 
             var frames = new List<ReplayFrame>();
-            const double test_interval = 250;
+            double frameTime = 0;
 
             // Empty frame to be added as a workaround for first frame behavior.
             // If an input exists on the first frame, the input would apply to the entire intro lead-in
             // Likely requires some discussion regarding how first frame inputs should be handled.
             frames.Add(new OsuReplayFrame
             {
-                Position = sliderToAdd.Position,
+                Position = slider.Position,
                 Time = 0,
                 Actions = new List<OsuAction>()
             });
 
             frames.Add(new OsuReplayFrame
             {
-                Position = sliderToAdd.Position,
+                Position = slider.Position,
                 Time = 250,
                 Actions = primeKey ? new List<OsuAction> { OsuAction.LeftButton } : new List<OsuAction>()
             });
@@ -196,20 +195,21 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 frames.Add(new OsuReplayFrame
                 {
-                    Position = sliderToAdd.Position,
-                    Time = sliderToAdd.StartTime + test_interval * actionsOnSlider.IndexOf(a),
+                    Position = slider.Position,
+                    Time = slider.StartTime + frameTime,
                     Actions = a
                 });
+                frameTime += 250;
             }
 
             Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
             {
-                HitObjects = { sliderToAdd },
+                HitObjects = { slider },
                 ControlPointInfo = new ControlPointInfo { DifficultyPoints = { new DifficultyControlPoint { SpeedMultiplier = 0.1f } } },
                 BeatmapInfo = new BeatmapInfo { BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 }, Ruleset = new OsuRuleset().RulesetInfo },
             });
 
-            player = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
+            ScoreAccessibleReplayPlayer player = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
             {
                 AllowPause = false,
                 AllowLeadIn = false,
