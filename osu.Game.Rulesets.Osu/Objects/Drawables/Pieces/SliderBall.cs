@@ -191,6 +191,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 trackingAction = null;
             }
+
             return false;
         }
     }

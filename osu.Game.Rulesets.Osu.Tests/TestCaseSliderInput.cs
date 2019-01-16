@@ -64,6 +64,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 performStaticInputTest(actions, true);
             });
+
             AddUntilStep(() => allJudgedFired, "Wait for test 1");
             AddAssert("Tracking lost", assertMehJudge);
         }
@@ -91,6 +92,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 performStaticInputTest(actions);
             });
+
             AddUntilStep(() => allJudgedFired, "Wait for test 2");
             AddAssert("Tracking retained", assertGreatJudge);
         }
@@ -118,6 +120,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 performStaticInputTest(actions);
             });
+
             AddUntilStep(() => allJudgedFired, "Wait for test 3");
             AddAssert("Tracking retained", assertGreatJudge);
         }
@@ -144,6 +147,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
                 performStaticInputTest(actions, true);
             });
+
             AddUntilStep(() => allJudgedFired, "Wait for test 4");
             AddAssert("Tracking retained", assertGreatJudge);
         }

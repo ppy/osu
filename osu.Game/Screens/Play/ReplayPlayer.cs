@@ -19,6 +19,7 @@ namespace osu.Game.Screens.Play
             base.LoadComplete();
             RulesetContainer.SetReplayScore(score);
         }
+
         protected override ScoreInfo CreateScore() => score.ScoreInfo;
     }
 }
