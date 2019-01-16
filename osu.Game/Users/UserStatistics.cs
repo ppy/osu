@@ -78,6 +78,5 @@ namespace osu.Game.Users
             [JsonProperty(@"country")]
             public int? Country;
         }
-
     }
 }
