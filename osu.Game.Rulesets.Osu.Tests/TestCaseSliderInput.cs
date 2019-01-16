@@ -50,7 +50,21 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestLeftBeforeSliderThenRight()
         {
-            AddStep("Invalid key transfer test", performInvalidKeyTransferTest);
+            AddStep("Invalid key transfer test", () =>
+            {
+                var actions = new List<List<OsuAction>>();
+
+                var frame1 = new List<OsuAction> { OsuAction.LeftButton };
+                actions.Add(frame1);
+
+                var frame2 = new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton };
+                actions.Add(frame2);
+
+                var frame3 = new List<OsuAction> { OsuAction.LeftButton };
+                actions.Add(frame3);
+
+                performStaticInputTest(actions, true);
+            });
             AddUntilStep(() => allJudgedFired, "Wait for test 1");
             AddAssert("Tracking lost", assertMehJudge);
         }
@@ -64,10 +78,30 @@ namespace osu.Game.Rulesets.Osu.Tests
         ///     Frame 3: Right Click
         ///     A passing test case will have the cursor continue to track after frame 3.
         /// </summary>
+        [SetUp]
+        public void Setup()
+        {
+            Schedule(() => { allJudgedFired = false; });
+        }
+
         [Test]
         public void TestLeftBeforeSliderThenRightThenLettingGoOfLeft()
         {
-            AddStep("Left to both to right test", performLeftToRightTransferTest);
+            AddStep("Left to both to right test", () =>
+            {
+                var actions = new List<List<OsuAction>>();
+
+                var frame1 = new List<OsuAction> { OsuAction.LeftButton };
+                actions.Add(frame1);
+
+                var frame2 = new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton };
+                actions.Add(frame2);
+
+                var frame3 = new List<OsuAction> { OsuAction.RightButton };
+                actions.Add(frame3);
+
+                performStaticInputTest(actions);
+            });
             AddUntilStep(() => allJudgedFired, "Wait for test 2");
             AddAssert("Tracking retained", assertGreatJudge);
         }
@@ -84,7 +118,21 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTrackingRetentionLeftRightLeft()
         {
-            AddStep("Tracking retention test", performTrackingRetentionTest);
+            AddStep("Tracking retention test", () =>
+            {
+                var actions = new List<List<OsuAction>>();
+
+                var frame1 = new List<OsuAction> { OsuAction.LeftButton };
+                actions.Add(frame1);
+
+                var frame2 = new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton };
+                actions.Add(frame2);
+
+                var frame3 = new List<OsuAction> { OsuAction.LeftButton };
+                actions.Add(frame3);
+
+                performStaticInputTest(actions);
+            });
             AddUntilStep(() => allJudgedFired, "Wait for test 3");
             AddAssert("Tracking retained", assertGreatJudge);
         }
@@ -101,7 +149,21 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTrackingLeftBeforeSliderToRight()
         {
-            AddStep("Tracking retention test", performLeftBeforeSliderToRightTransferTest);
+            AddStep("Tracking retention test", () =>
+            {
+                var actions = new List<List<OsuAction>>();
+
+                var frame1 = new List<OsuAction> { OsuAction.LeftButton };
+                actions.Add(frame1);
+
+                var frame2 = new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton };
+                actions.Add(frame2);
+
+                var frame3 = new List<OsuAction> { OsuAction.RightButton };
+                actions.Add(frame3);
+
+                performStaticInputTest(actions, true);
+            });
             AddUntilStep(() => allJudgedFired, "Wait for test 4");
             AddAssert("Tracking retained", assertGreatJudge);
         }
@@ -114,70 +176,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         private bool assertGreatJudge()
         {
             return lastResult.Type == HitResult.Great;
-        }
-
-        private void performInvalidKeyTransferTest()
-        {
-            var actions = new List<List<OsuAction>>();
-
-            var frame1 = new List<OsuAction> { OsuAction.LeftButton };
-            actions.Add(frame1);
-
-            var frame2 = new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton };
-            actions.Add(frame2);
-
-            var frame3 = new List<OsuAction> { OsuAction.LeftButton };
-            actions.Add(frame3);
-
-            performStaticInputTest(actions, true);
-        }
-
-        private void performLeftToRightTransferTest()
-        {
-            var actions = new List<List<OsuAction>>();
-
-            var frame1 = new List<OsuAction> { OsuAction.LeftButton };
-            actions.Add(frame1);
-
-            var frame2 = new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton };
-            actions.Add(frame2);
-
-            var frame3 = new List<OsuAction> { OsuAction.RightButton };
-            actions.Add(frame3);
-
-            performStaticInputTest(actions);
-        }
-
-        private void performTrackingRetentionTest()
-        {
-            var actions = new List<List<OsuAction>>();
-
-            var frame1 = new List<OsuAction> { OsuAction.LeftButton };
-            actions.Add(frame1);
-
-            var frame2 = new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton };
-            actions.Add(frame2);
-
-            var frame3 = new List<OsuAction> { OsuAction.LeftButton };
-            actions.Add(frame3);
-
-            performStaticInputTest(actions);
-        }
-
-        private void performLeftBeforeSliderToRightTransferTest()
-        {
-            var actions = new List<List<OsuAction>>();
-
-            var frame1 = new List<OsuAction> { OsuAction.LeftButton };
-            actions.Add(frame1);
-
-            var frame2 = new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton };
-            actions.Add(frame2);
-
-            var frame3 = new List<OsuAction> { OsuAction.RightButton };
-            actions.Add(frame3);
-
-            performStaticInputTest(actions, true);
         }
 
         private void performStaticInputTest(List<List<OsuAction>> actions, bool primeKey = false)
@@ -235,7 +233,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                 lastResult = result;
             };
 
-            allJudgedFired = false;
             ((ScoreAccessibleReplayPlayer)player).ScoreProcessor.AllJudged += () =>
             {
                 allJudgedFired = true;
