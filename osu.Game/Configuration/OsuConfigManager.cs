@@ -105,6 +105,8 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.ScalingPositionX, 0.5f, 0f, 1f);
             Set(OsuSetting.ScalingPositionY, 0.5f, 0f, 1f);
+
+            Set(OsuSetting.UIScale, 1f, 0.8f, 1.6f, 0.01f);
         }
 
         public OsuConfigManager(Storage storage)
@@ -167,6 +169,7 @@ namespace osu.Game.Configuration
         ScalingPositionX,
         ScalingPositionY,
         ScalingSizeX,
-        ScalingSizeY
+        ScalingSizeY,
+        UIScale
     }
 }

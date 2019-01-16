@@ -176,7 +176,6 @@ namespace osu.Game.Overlays.Mods
                 section.DeselectTypes(modTypes, immediate);
         }
 
-
         private SampleChannel sampleOn, sampleOff;
 
         private void modButtonPressed(Mod selectedMod)

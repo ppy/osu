@@ -57,5 +57,4 @@ namespace osu.Game.Tests.Visual
             }
         }
     }
-
 }

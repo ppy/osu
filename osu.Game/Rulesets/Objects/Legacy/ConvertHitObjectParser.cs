@@ -124,7 +124,6 @@ namespace osu.Game.Rulesets.Objects.Legacy
                     // osu-stable treated the first span of the slider as a repeat, but no repeats are happening
                     repeatCount = Math.Max(0, repeatCount - 1);
 
-
                     if (split.Length > 7)
                         length = Convert.ToDouble(split[7], CultureInfo.InvariantCulture);
 
