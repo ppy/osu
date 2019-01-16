@@ -102,6 +102,13 @@ namespace osu.Game.Online.API
             WebRequest?.Abort();
 
             Logger.Log($@"Failing request {this} ({e})", LoggingTarget.Network);
+
+            if (!(e is OperationCanceledException) && WebRequest?.ResponseStream?.Length < 1024)
+            {
+                // in the case we fail a request, spitting out the response in the log is quite helpful.
+                Logger.Log($"Failed response was \"{WebRequest.ResponseString}\"", LoggingTarget.Network);
+            }
+
             pendingFailure = () => Failure?.Invoke(e);
             checkAndScheduleFailure();
         }
@@ -121,7 +128,10 @@ namespace osu.Game.Online.API
     }
 
     public delegate void APIFailureHandler(Exception e);
+
     public delegate void APISuccessHandler();
+
     public delegate void APIProgressHandler(long current, long total);
+
     public delegate void APISuccessHandler<in T>(T content);
 }
