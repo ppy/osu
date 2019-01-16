@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -90,6 +91,23 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking retained", () => assertGreatJudge());
         }
 
+        /// <summary>
+        ///     Hitting a slider head, pressing a new key after the initial hit, then letting go of the original key used to hit
+        ///     the slider should reslt in continued tracking.
+        ///     At 250ms intervals:
+        ///     Frame 1: Left Click
+        ///     Frame 2: Left & Right Click
+        ///     Frame 3: Right Click
+        ///     A passing test case will have the cursor continue to track after frame 3.
+        /// </summary>
+        [Test]
+        public void TestTrackingLeftBeforeSliderToRight()
+        {
+            AddStep("Tracking retention test", () => performLeftBeforeSliderToRightTransferTest());
+            AddUntilStep(() => testID == 3 && allJudgedFired, "Wait for test 4");
+            AddAssert("Tracking retained", () => assertGreatJudge());
+        }
+
         private bool assertMehJudge()
         {
             return lastResult.Type == HitResult.Meh;
@@ -118,7 +136,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             actions.Add(frame3);
 
             testID = 0;
-            performStaticInputTest(actions);
+            performStaticInputTest(actions, true);
         }
 
         private void performLeftToRightTransferTest()
@@ -139,7 +157,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             actions.Add(frame3);
 
             testID = 1;
-            performStaticInputTest(actions, true);
+            performStaticInputTest(actions);
         }
 
         private void performTrackingRetentionTest()
@@ -160,10 +178,31 @@ namespace osu.Game.Rulesets.Osu.Tests
             actions.Add(frame3);
 
             testID = 2;
+            performStaticInputTest(actions);
+        }
+
+        private void performLeftBeforeSliderToRightTransferTest()
+        {
+            var actions = new List<List<OsuAction>>();
+
+            var frame1 = new List<OsuAction>();
+            frame1.Add(OsuAction.LeftButton);
+            actions.Add(frame1);
+
+            var frame2 = new List<OsuAction>();
+            frame2.Add(OsuAction.LeftButton);
+            frame2.Add(OsuAction.RightButton);
+            actions.Add(frame2);
+
+            var frame3 = new List<OsuAction>();
+            frame3.Add(OsuAction.RightButton);
+            actions.Add(frame3);
+
+            testID = 3;
             performStaticInputTest(actions, true);
         }
 
-        private void performStaticInputTest(List<List<OsuAction>> actions, bool addEmptyFrame = false)
+        private void performStaticInputTest(List<List<OsuAction>> actions, bool primeKey = false)
         {
             var sliderToAdd = CreateSlider(distance: 5, addToContent: false);
             Ruleset ruleset = new OsuRuleset();
@@ -177,21 +216,35 @@ namespace osu.Game.Rulesets.Osu.Tests
             //Empty frame to be added as a workaround for first frame behavior.
             //If an input exists on the first frame, the input would apply to the entire intro lead-in
             //Likely requires some discussion regarding how first frame inputs should be handled.
-            if (addEmptyFrame)
-                frames.Add(new OsuReplayFrame
-                {
-                    Position = sliderToAdd.Position,
-                    Time = 0,
-                    Actions = new List<OsuAction>()
-                });
+            frames.Add(new OsuReplayFrame
+            {
+                 Position = sliderToAdd.Position,
+                 Time = 0,
+                 Actions = new List<OsuAction>()
+            });
 
             foreach (var a in actions)
-                frames.Add(new OsuReplayFrame
+            {
+                //primeKey sets the first input to happen prior to the actual slider
+                if (primeKey && a == actions.First())
                 {
-                    Position = sliderToAdd.Position,
-                    Time = sliderToAdd.StartTime + testInterval * localIndex,
-                    Actions = actions[localIndex++]
-                });
+                    frames.Add(new OsuReplayFrame
+                    {
+                        Position = sliderToAdd.Position,
+                        Time = 250,
+                        Actions = actions[localIndex++]
+                    });
+                }
+                else
+                {
+                    frames.Add(new OsuReplayFrame
+                    {
+                        Position = sliderToAdd.Position,
+                        Time = sliderToAdd.StartTime + (testInterval * (primeKey ? localIndex - 1: localIndex)),
+                        Actions = actions[localIndex++]
+                    });
+                }
+            }
 
             thisReplay.Frames = frames;
             var newPlayer = loadPlayerFor(ruleset, sliderToAdd, thisReplay, beatmap);

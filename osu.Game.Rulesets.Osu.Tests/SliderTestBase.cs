@@ -22,7 +22,6 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
-
 namespace osu.Game.Rulesets.Osu.Tests
 {
     [TestFixture]
@@ -41,14 +40,13 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected int DepthIndex;
 
-
         protected abstract List<Mod> Mods { get; set; }
         protected Slider CreateSlider(float circleSize = 2, float distance = 400, int repeats = 0, double speedMultiplier = 2, int stackHeight = 0, bool addToContent = true)
         {
             var slider = new Slider
             {
-                StartTime = addToContent ? Time.Current + 1000 : 1000,
-                Position = new Vector2(-(distance / 2), 0),
+                StartTime = addToContent ? Time.Current + 1000 : 1500,
+                Position = addToContent ? new Vector2(-(distance / 2), 0) : new Vector2(100, 100),
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
                     Vector2.Zero,
@@ -61,7 +59,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             if (addToContent)
                 AddSlider(slider, circleSize, speedMultiplier);
-
 
             return slider;
         }

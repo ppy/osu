@@ -12,10 +12,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 
-
 namespace osu.Game.Rulesets.Osu.Tests
 {
-
     [TestFixture]
     public class SliderTestCase : SliderTestBase
     {
@@ -113,7 +111,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         private void testHighSpeed(int repeats = 0) => CreateSlider(repeats: repeats, speedMultiplier: 15);
 
         private void testShortHighSpeed(int repeats = 0) => CreateSlider(distance: 100, repeats: repeats, speedMultiplier: 15);
-
 
         private void testPerfect(int repeats = 0)
         {
@@ -230,6 +227,5 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddSlider(slider, 3, 1);
         }
-
     }
 }
