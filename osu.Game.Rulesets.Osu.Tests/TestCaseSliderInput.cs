@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -35,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
-        private Player player;
+        private ScoreAccessibleReplayPlayer player;
         private JudgementResult lastResult;
         private bool allJudgedFired;
 
@@ -60,7 +59,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var actions = new List<List<OsuAction>>
                 {
-                    new List<OsuAction> { OsuAction.LeftButton },
                     new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton },
                     new List<OsuAction> { OsuAction.LeftButton }
                 };
@@ -141,7 +139,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var actions = new List<List<OsuAction>>
                 {
-                    new List<OsuAction> { OsuAction.LeftButton },
                     new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton },
                     new List<OsuAction> { OsuAction.RightButton }
                 };
@@ -162,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             return lastResult.Type == HitResult.Great;
         }
 
-        private void performStaticInputTest(List<List<OsuAction>> actions, bool primeKey = false)
+        private void performStaticInputTest(List<List<OsuAction>> actionsOnSlider, bool primeKey = false)
         {
             var sliderToAdd = new Slider
             {
@@ -174,12 +171,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(5, 0),
                 }, 5),
             };
-            Ruleset ruleset = new OsuRuleset();
-            var beatmap = createBeatmap(sliderToAdd, ruleset);
-            var thisReplay = new Replay();
+
             var frames = new List<ReplayFrame>();
             const double test_interval = 250;
-            var localIndex = 0;
 
             // Empty frame to be added as a workaround for first frame behavior.
             // If an input exists on the first frame, the input would apply to the entire intro lead-in
@@ -191,79 +185,42 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Actions = new List<OsuAction>()
             });
 
-            foreach (var a in actions)
+            frames.Add(new OsuReplayFrame
             {
-                // primeKey sets the first input to happen prior to the actual slider
-                if (primeKey && a == actions.First())
+                Position = sliderToAdd.Position,
+                Time = 250,
+                Actions = primeKey ? new List<OsuAction> { OsuAction.LeftButton } : new List<OsuAction>()
+            });
+
+            foreach (var a in actionsOnSlider)
+            {
+                frames.Add(new OsuReplayFrame
                 {
-                    frames.Add(new OsuReplayFrame
-                    {
-                        Position = sliderToAdd.Position,
-                        Time = 250,
-                        Actions = a
-                    });
-                    localIndex++;
-                }
-                else
-                {
-                    frames.Add(new OsuReplayFrame
-                    {
-                        Position = sliderToAdd.Position,
-                        Time = sliderToAdd.StartTime + (test_interval * (primeKey ? localIndex - 1 : localIndex)),
-                        Actions = a
-                    });
-                    localIndex++;
-                }
+                    Position = sliderToAdd.Position,
+                    Time = sliderToAdd.StartTime + test_interval * actionsOnSlider.IndexOf(a),
+                    Actions = a
+                });
             }
 
-            thisReplay.Frames = frames;
-            player = loadPlayerFor(ruleset, thisReplay, beatmap);
-            Child = player;
-
-            ((ScoreAccessibleReplayPlayer)player).ScoreProcessor.NewJudgement += result =>
+            Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
             {
-                lastResult = result;
-            };
+                HitObjects = { sliderToAdd },
+                ControlPointInfo = new ControlPointInfo { DifficultyPoints = { new DifficultyControlPoint { SpeedMultiplier = 0.1f } } },
+                BeatmapInfo = new BeatmapInfo { BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 }, Ruleset = new OsuRuleset().RulesetInfo },
+            });
 
-            ((ScoreAccessibleReplayPlayer)player).ScoreProcessor.AllJudged += () =>
-            {
-                allJudgedFired = true;
-            };
-        }
-
-        protected Player CreatePlayer(Ruleset ruleset, Score score)
-        {
-            return new ScoreAccessibleReplayPlayer(score)
+            player = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
             {
                 AllowPause = false,
                 AllowLeadIn = false,
                 AllowResults = false
             };
-        }
 
-        private Beatmap<OsuHitObject> createBeatmap(Slider s, Ruleset r)
-        {
-            var b = new Beatmap<OsuHitObject>
-            {
-                HitObjects = { s }
-            };
-            b.ControlPointInfo.DifficultyPoints.Add(new DifficultyControlPoint { SpeedMultiplier = 0.1f });
-            b.BeatmapInfo.BaseDifficulty.SliderTickRate = 3;
-            b.BeatmapInfo.Ruleset = r.RulesetInfo;
-            return b;
-        }
+            Child = player;
 
-        private Player loadPlayerFor(Ruleset r, Replay rp, Beatmap<OsuHitObject> b)
-        {
-            var beatmap = b;
-            var working = new TestWorkingBeatmap(beatmap);
-            var score = new Score { Replay = rp };
+            player.ScoreProcessor.NewJudgement += result => { lastResult = result; };
 
-            Beatmap.Value = working;
-
-            var p = CreatePlayer(r, score);
-
-            return p;
+            player.ScoreProcessor.AllJudged += () => { allJudgedFired = true; };
         }
 
         private class ScoreAccessibleReplayPlayer : ReplayPlayer
