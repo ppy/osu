@@ -6,7 +6,6 @@ using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
@@ -29,7 +28,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         protected override List<Mod> Mods { get; set; }
 
-        private int testID;
         private Player player;
         private JudgementResult lastResult;
         private bool allJudgedFired;
@@ -53,9 +51,44 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void TestLeftBeforeSliderThenRight()
         {
             AddStep("Invalid key transfer test", performInvalidKeyTransferTest);
-            AddUntilStep(() => testID == 0 && allJudgedFired, "Wait for test 1");
+            AddUntilStep(() => allJudgedFired, "Wait for test 1");
             AddAssert("Tracking lost", assertMehJudge);
         }
+
+        /// <summary>
+        ///     Hitting a slider head, pressing a new key after the initial hit, then letting go of the original key used to hit
+        ///     the slider should reslt in continued tracking.
+        ///     At 250ms intervals:
+        ///     Frame 1: Left Click
+        ///     Frame 2: Left & Right Click
+        ///     Frame 3: Right Click
+        ///     A passing test case will have the cursor continue to track after frame 3.
+        /// </summary>
+        [Test]
+        public void TestLeftBeforeSliderThenRightThenLettingGoOfLeft()
+        {
+            AddStep("Left to both to right test", performLeftToRightTransferTest);
+            AddUntilStep(() => allJudgedFired, "Wait for test 2");
+            AddAssert("Tracking retained", assertGreatJudge);
+        }
+
+        /// <summary>
+        ///     Hitting a slider head, pressing a new key after the initial hit, then letting go of the new key should result
+        ///     in continue tracking,
+        ///     At 250ms intervals:
+        ///     Frame 1: Left Click
+        ///     Frame 2: Left & Right Click
+        ///     Frame 3: Right Click
+        ///     A passing test case will have the cursor continue to track after frame 3.
+        /// </summary>
+        [Test]
+        public void TestTrackingRetentionLeftRightLeft()
+        {
+            AddStep("Tracking retention test", performTrackingRetentionTest);
+            AddUntilStep(() => allJudgedFired, "Wait for test 3");
+            AddAssert("Tracking retained", assertGreatJudge);
+        }
+
 
         /// <summary>
         ///     Pressing a key before a slider, pressing the other key on the slider head, then releasing the former pressed key
@@ -67,44 +100,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         ///     A passing test case will have the cursor continue to track after frame 3.
         /// </summary>
         [Test]
-        public void TestLeftBeforeSliderThenRightThenLettingGoOfLeft()
-        {
-            AddStep("Left to both to right test", performLeftToRightTransferTest);
-            AddUntilStep(() => testID == 1 && allJudgedFired, "Wait for test 2");
-            AddAssert("Tracking retained", assertGreatJudge);
-        }
-
-        /// <summary>
-        ///     Hitting a slider head, pressing a new key after the initial hit, then letting go of the original key used to hit
-        ///     the slider should reslt in continued tracking.
-        ///     At 250ms intervals:
-        ///     Frame 1: Left Click
-        ///     Frame 2: Left & Right Click
-        ///     Frame 3: Right Click
-        ///     A passing test case will have the cursor continue to track after frame 3.
-        /// </summary>
-        [Test]
-        public void TestTrackingRetentionLeftRightLeft()
-        {
-            AddStep("Tracking retention test", performTrackingRetentionTest);
-            AddUntilStep(() => testID == 2 && allJudgedFired, "Wait for test 3");
-            AddAssert("Tracking retained", assertGreatJudge);
-        }
-
-        /// <summary>
-        ///     Hitting a slider head, pressing a new key after the initial hit, then letting go of the original key used to hit
-        ///     the slider should reslt in continued tracking.
-        ///     At 250ms intervals:
-        ///     Frame 1: Left Click
-        ///     Frame 2: Left & Right Click
-        ///     Frame 3: Right Click
-        ///     A passing test case will have the cursor continue to track after frame 3.
-        /// </summary>
-        [Test]
         public void TestTrackingLeftBeforeSliderToRight()
         {
             AddStep("Tracking retention test", performLeftBeforeSliderToRightTransferTest);
-            AddUntilStep(() => testID == 3 && allJudgedFired, "Wait for test 4");
+            AddUntilStep(() => allJudgedFired, "Wait for test 4");
             AddAssert("Tracking retained", assertGreatJudge);
         }
 
@@ -131,7 +130,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             var frame3 = new List<OsuAction> { OsuAction.LeftButton };
             actions.Add(frame3);
 
-            testID = 0;
             performStaticInputTest(actions, true);
         }
 
@@ -148,7 +146,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             var frame3 = new List<OsuAction> { OsuAction.RightButton };
             actions.Add(frame3);
 
-            testID = 1;
             performStaticInputTest(actions);
         }
 
@@ -165,7 +162,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             var frame3 = new List<OsuAction> { OsuAction.LeftButton };
             actions.Add(frame3);
 
-            testID = 2;
             performStaticInputTest(actions);
         }
 
@@ -182,7 +178,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             var frame3 = new List<OsuAction> { OsuAction.RightButton };
             actions.Add(frame3);
 
-            testID = 3;
             performStaticInputTest(actions, true);
         }
 
@@ -197,9 +192,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             const double test_interval = 250;
             var localIndex = 0;
 
-            //Empty frame to be added as a workaround for first frame behavior.
-            //If an input exists on the first frame, the input would apply to the entire intro lead-in
-            //Likely requires some discussion regarding how first frame inputs should be handled.
+            // Empty frame to be added as a workaround for first frame behavior.
+            // If an input exists on the first frame, the input would apply to the entire intro lead-in
+            // Likely requires some discussion regarding how first frame inputs should be handled.
             frames.Add(new OsuReplayFrame
             {
                 Position = sliderToAdd.Position,
@@ -209,7 +204,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             foreach (var a in actions)
             {
-                //primeKey sets the first input to happen prior to the actual slider
+                // primeKey sets the first input to happen prior to the actual slider
                 if (primeKey && a == actions.First())
                 {
                     frames.Add(new OsuReplayFrame
@@ -231,21 +226,18 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
 
             thisReplay.Frames = frames;
-            var newPlayer = loadPlayerFor(ruleset, thisReplay, beatmap);
-            player = newPlayer;
+            player = loadPlayerFor(ruleset, thisReplay, beatmap);
             Child = player;
 
             ((ScoreAccessibleReplayPlayer)player).ScoreProcessor.NewJudgement += result =>
             {
                 lastResult = result;
-                Logger.Log(result.Type.ToString());
             };
 
             allJudgedFired = false;
             ((ScoreAccessibleReplayPlayer)player).ScoreProcessor.AllJudged += () =>
             {
                 allJudgedFired = true;
-                Logger.Log("All judged! Test ID: " + testID);
             };
         }
 
