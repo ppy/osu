@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Container<DrawableSliderTick> ticks;
             Container<DrawableRepeatPoint> repeatPoints;
 
-            InternalChildren = new Drawable[]
+            InternalChildren = new[]
             {
                 Body = new SnakingSliderBody(s)
                 {

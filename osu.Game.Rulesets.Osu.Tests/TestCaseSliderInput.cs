@@ -52,26 +52,26 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestLeftBeforeSliderThenRight()
         {
-            AddStep("Invalid key transfer test", () => performInvalidKeyTransferTest());
+            AddStep("Invalid key transfer test", performInvalidKeyTransferTest);
             AddUntilStep(() => testID == 0 && allJudgedFired, "Wait for test 1");
-            AddAssert("Tracking lost", () => assertMehJudge());
+            AddAssert("Tracking lost", assertMehJudge);
         }
 
         /// <summary>
         ///     Pressing a key before a slider, pressing the other key on the slider head, then releasing the former pressed key
         ///     should result in continued tracking.
         ///     At 250ms intervals:
-        ///     Frame 1 (prior to slider):          Left Click
-        ///     Frame 2 (within slider hit window): Left & Right Click
-        ///     Frame 3 (while tracking):           Right Click
+        ///     Frame 1: Left Click
+        ///     Frame 2: Left & Right Click
+        ///     Frame 3: Right Click
         ///     A passing test case will have the cursor continue to track after frame 3.
         /// </summary>
         [Test]
         public void TestLeftBeforeSliderThenRightThenLettingGoOfLeft()
         {
-            AddStep("Left to both to right test", () => performLeftToRightTransferTest());
+            AddStep("Left to both to right test", performLeftToRightTransferTest);
             AddUntilStep(() => testID == 1 && allJudgedFired, "Wait for test 2");
-            AddAssert("Tracking retained", () => assertGreatJudge());
+            AddAssert("Tracking retained", assertGreatJudge);
         }
 
         /// <summary>
@@ -86,9 +86,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTrackingRetentionLeftRightLeft()
         {
-            AddStep("Tracking retention test", () => performTrackingRetentionTest());
+            AddStep("Tracking retention test", performTrackingRetentionTest);
             AddUntilStep(() => testID == 2 && allJudgedFired, "Wait for test 3");
-            AddAssert("Tracking retained", () => assertGreatJudge());
+            AddAssert("Tracking retained", assertGreatJudge);
         }
 
         /// <summary>
@@ -103,9 +103,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTrackingLeftBeforeSliderToRight()
         {
-            AddStep("Tracking retention test", () => performLeftBeforeSliderToRightTransferTest());
+            AddStep("Tracking retention test", performLeftBeforeSliderToRightTransferTest);
             AddUntilStep(() => testID == 3 && allJudgedFired, "Wait for test 4");
-            AddAssert("Tracking retained", () => assertGreatJudge());
+            AddAssert("Tracking retained", assertGreatJudge);
         }
 
         private bool assertMehJudge()
@@ -122,17 +122,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var actions = new List<List<OsuAction>>();
 
-            var frame1 = new List<OsuAction>();
-            frame1.Add(OsuAction.LeftButton);
+            var frame1 = new List<OsuAction> { OsuAction.LeftButton };
             actions.Add(frame1);
 
-            var frame2 = new List<OsuAction>();
-            frame2.Add(OsuAction.LeftButton);
-            frame2.Add(OsuAction.RightButton);
+            var frame2 = new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton };
             actions.Add(frame2);
 
-            var frame3 = new List<OsuAction>();
-            frame3.Add(OsuAction.LeftButton);
+            var frame3 = new List<OsuAction> { OsuAction.LeftButton };
             actions.Add(frame3);
 
             testID = 0;
@@ -143,17 +139,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var actions = new List<List<OsuAction>>();
 
-            var frame1 = new List<OsuAction>();
-            frame1.Add(OsuAction.LeftButton);
+            var frame1 = new List<OsuAction> { OsuAction.LeftButton };
             actions.Add(frame1);
 
-            var frame2 = new List<OsuAction>();
-            frame2.Add(OsuAction.LeftButton);
-            frame2.Add(OsuAction.RightButton);
+            var frame2 = new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton };
             actions.Add(frame2);
 
-            var frame3 = new List<OsuAction>();
-            frame3.Add(OsuAction.RightButton);
+            var frame3 = new List<OsuAction> { OsuAction.RightButton };
             actions.Add(frame3);
 
             testID = 1;
@@ -164,17 +156,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var actions = new List<List<OsuAction>>();
 
-            var frame1 = new List<OsuAction>();
-            frame1.Add(OsuAction.LeftButton);
+            var frame1 = new List<OsuAction> { OsuAction.LeftButton };
             actions.Add(frame1);
 
-            var frame2 = new List<OsuAction>();
-            frame2.Add(OsuAction.LeftButton);
-            frame2.Add(OsuAction.RightButton);
+            var frame2 = new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton };
             actions.Add(frame2);
 
-            var frame3 = new List<OsuAction>();
-            frame3.Add(OsuAction.LeftButton);
+            var frame3 = new List<OsuAction> { OsuAction.LeftButton };
             actions.Add(frame3);
 
             testID = 2;
@@ -185,17 +173,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             var actions = new List<List<OsuAction>>();
 
-            var frame1 = new List<OsuAction>();
-            frame1.Add(OsuAction.LeftButton);
+            var frame1 = new List<OsuAction> { OsuAction.LeftButton };
             actions.Add(frame1);
 
-            var frame2 = new List<OsuAction>();
-            frame2.Add(OsuAction.LeftButton);
-            frame2.Add(OsuAction.RightButton);
+            var frame2 = new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton };
             actions.Add(frame2);
 
-            var frame3 = new List<OsuAction>();
-            frame3.Add(OsuAction.RightButton);
+            var frame3 = new List<OsuAction> { OsuAction.RightButton };
             actions.Add(frame3);
 
             testID = 3;
@@ -210,7 +194,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             var thisReplay = new Replay();
             var frames = new List<ReplayFrame>();
-            const double testInterval = 250;
+            const double test_interval = 250;
             var localIndex = 0;
 
             //Empty frame to be added as a workaround for first frame behavior.
@@ -218,9 +202,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             //Likely requires some discussion regarding how first frame inputs should be handled.
             frames.Add(new OsuReplayFrame
             {
-                 Position = sliderToAdd.Position,
-                 Time = 0,
-                 Actions = new List<OsuAction>()
+                Position = sliderToAdd.Position,
+                Time = 0,
+                Actions = new List<OsuAction>()
             });
 
             foreach (var a in actions)
@@ -240,14 +224,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                     frames.Add(new OsuReplayFrame
                     {
                         Position = sliderToAdd.Position,
-                        Time = sliderToAdd.StartTime + (testInterval * (primeKey ? localIndex - 1: localIndex)),
+                        Time = sliderToAdd.StartTime + (test_interval * (primeKey ? localIndex - 1 : localIndex)),
                         Actions = actions[localIndex++]
                     });
                 }
             }
 
             thisReplay.Frames = frames;
-            var newPlayer = loadPlayerFor(ruleset, sliderToAdd, thisReplay, beatmap);
+            var newPlayer = loadPlayerFor(ruleset, thisReplay, beatmap);
             player = newPlayer;
             Child = player;
 
@@ -287,7 +271,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             return b;
         }
 
-        private Player loadPlayerFor(Ruleset r, Slider s, Replay rp, Beatmap<OsuHitObject> b)
+        private Player loadPlayerFor(Ruleset r, Replay rp, Beatmap<OsuHitObject> b)
         {
             var beatmap = b;
             var working = new TestWorkingBeatmap(beatmap);
@@ -295,15 +279,14 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             Beatmap.Value = working;
 
-            var player = CreatePlayer(r, score);
+            var p = CreatePlayer(r, score);
 
-            return player;
+            return p;
         }
 
         private class ScoreAccessibleReplayPlayer : ReplayPlayer
         {
             public new ScoreProcessor ScoreProcessor => base.ScoreProcessor;
-            public new Score score => base.score;
 
             public ScoreAccessibleReplayPlayer(Score score)
                 : base(score)

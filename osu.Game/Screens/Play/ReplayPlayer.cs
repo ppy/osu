@@ -7,7 +7,7 @@ namespace osu.Game.Screens.Play
 {
     public class ReplayPlayer : Player
     {
-        protected readonly Score score;
+        private readonly Score score;
 
         public ReplayPlayer(Score score)
         {
