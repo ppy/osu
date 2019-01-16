@@ -16,7 +16,6 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseBreadcrumbs()
         {
-
             Add(breadcrumbs = new BreadcrumbControl<BreadcrumbTab>
             {
                 Anchor = Anchor.Centre,

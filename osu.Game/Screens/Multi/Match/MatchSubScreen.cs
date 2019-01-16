@@ -71,10 +71,11 @@ namespace osu.Game.Screens.Multi.Match
                                 {
                                     new Drawable[]
                                     {
-                                        leaderboard = new MatchLeaderboard(room)
+                                        leaderboard = new MatchLeaderboard
                                         {
                                             Padding = new MarginPadding(10),
-                                            RelativeSizeAxes = Axes.Both
+                                            RelativeSizeAxes = Axes.Both,
+                                            Room = room
                                         },
                                         new Container
                                         {

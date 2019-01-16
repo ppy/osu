@@ -41,7 +41,6 @@ namespace osu.Game.Online.Chat
         /// </summary>
         private readonly List<LocalEchoMessage> pendingMessages = new List<LocalEchoMessage>();
 
-
         /// <summary>
         /// An event that fires when new messages arrived.
         /// </summary>
