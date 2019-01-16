@@ -26,7 +26,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestCaseSliderInput : OsuTestCase
     {
-
         [SetUp]
         public void Setup()
         {
