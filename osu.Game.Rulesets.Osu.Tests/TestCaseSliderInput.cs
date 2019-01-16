@@ -89,7 +89,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking retained", assertGreatJudge);
         }
 
-
         /// <summary>
         ///     Pressing a key before a slider, pressing the other key on the slider head, then releasing the former pressed key
         ///     should result in continued tracking.
@@ -211,8 +210,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                     {
                         Position = sliderToAdd.Position,
                         Time = 250,
-                        Actions = actions[localIndex++]
+                        Actions = a
                     });
+                    localIndex++;
                 }
                 else
                 {
@@ -220,8 +220,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                     {
                         Position = sliderToAdd.Position,
                         Time = sliderToAdd.StartTime + (test_interval * (primeKey ? localIndex - 1 : localIndex)),
-                        Actions = actions[localIndex++]
+                        Actions = a
                     });
+                    localIndex++;
                 }
             }
 
