@@ -11,6 +11,8 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
@@ -18,10 +20,12 @@ using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
+using osu.Game.Tests.Visual;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestCaseSliderInput : SliderTestBase
+    public class TestCaseSliderInput : OsuTestCase
     {
 
         [SetUp]
@@ -33,15 +37,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
-        protected override List<Mod> Mods { get; set; }
-
         private Player player;
         private JudgementResult lastResult;
         private bool allJudgedFired;
 
         public TestCaseSliderInput()
         {
-            Mods = new List<Mod>();
             base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
         }
 
@@ -165,10 +166,18 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private void performStaticInputTest(List<List<OsuAction>> actions, bool primeKey = false)
         {
-            var sliderToAdd = CreateSlider(distance: 5, addToContent: false);
+            var sliderToAdd = new Slider
+            {
+                StartTime = 1500,
+                Position = new Vector2(100, 100),
+                Path = new SliderPath(PathType.PerfectCurve, new[]
+                {
+                    Vector2.Zero,
+                    new Vector2(5, 0),
+                }, 5),
+            };
             Ruleset ruleset = new OsuRuleset();
             var beatmap = createBeatmap(sliderToAdd, ruleset);
-
             var thisReplay = new Replay();
             var frames = new List<ReplayFrame>();
             const double test_interval = 250;
