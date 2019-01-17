@@ -69,6 +69,7 @@ namespace osu.Game.Screens.Select
             switch (op)
             {
                 default:
+                    return;
                 case ":":
                     range.IsInclusive = true;
                     range.Min = value - equalityTolerableDistance;
