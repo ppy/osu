@@ -78,6 +78,8 @@ namespace osu.Game.Beatmaps
         public bool LetterboxInBreaks { get; set; }
         public bool WidescreenStoryboard { get; set; }
 
+        public double Length { get; set; }
+
         // Editor
         // This bookmarks stuff is necessary because DB doesn't know how to store int[]
         [JsonIgnore]
