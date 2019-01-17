@@ -603,7 +603,14 @@ namespace osu.Game.Screens.Select
                 base.Ruleset.ValueChanged += updateSelectedRuleset;
                 Ruleset.ValueChanged += r => base.Ruleset.Value = r;
 
-                Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);
+                Beatmap.BindDisabledChanged(disabled =>
+                {
+                    Carousel.AllowSelection = !disabled;
+                    if (disabled)
+                        FilterControl.Deactivate();
+                    else
+                        FilterControl.Activate();
+                }, true);
                 Beatmap.BindValueChanged(workingBeatmapChanged);
             }
 
