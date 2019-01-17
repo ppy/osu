@@ -297,6 +297,12 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 api.Queue(request);
             }
 
+            protected override void Dispose(bool isDisposing)
+            {
+                request?.Cancel();
+                base.Dispose(isDisposing);
+            }
+
             private class UserTile : CompositeDrawable, IHasTooltip
             {
                 private readonly User user;
