@@ -53,23 +53,20 @@ namespace osu.Game.Screens.Multi
                     Duration.UnbindFrom(room.Duration);
                 }
 
-                room = value;
+                room = value ?? new Room();
 
-                if (room != null)
-                {
-                    RoomID.BindTo(room.RoomID);
-                    Name.BindTo(room.Name);
-                    Host.BindTo(room.Host);
-                    Status.BindTo(room.Status);
-                    Type.BindTo(room.Type);
-                    Playlist.BindTo(room.Playlist);
-                    Participants.BindTo(room.Participants);
-                    ParticipantCount.BindTo(room.ParticipantCount);
-                    MaxParticipants.BindTo(room.MaxParticipants);
-                    EndDate.BindTo(room.EndDate);
-                    Availability.BindTo(room.Availability);
-                    Duration.BindTo(room.Duration);
-                }
+                RoomID.BindTo(room.RoomID);
+                Name.BindTo(room.Name);
+                Host.BindTo(room.Host);
+                Status.BindTo(room.Status);
+                Type.BindTo(room.Type);
+                Playlist.BindTo(room.Playlist);
+                Participants.BindTo(room.Participants);
+                ParticipantCount.BindTo(room.ParticipantCount);
+                MaxParticipants.BindTo(room.MaxParticipants);
+                EndDate.BindTo(room.EndDate);
+                Availability.BindTo(room.Availability);
+                Duration.BindTo(room.Duration);
             }
         }
 
