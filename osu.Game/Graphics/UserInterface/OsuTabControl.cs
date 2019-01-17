@@ -160,7 +160,6 @@ namespace osu.Game.Graphics.UserInterface
                         Anchor = Anchor.BottomLeft,
                         Text = (value as IHasDescription)?.Description ?? (value as Enum)?.GetDescription() ?? value.ToString(),
                         TextSize = 14,
-                        Font = @"Exo2.0-Bold", // Font should only turn bold when active?
                     },
                     Bar = new Box
                     {
@@ -173,6 +172,8 @@ namespace osu.Game.Graphics.UserInterface
                     },
                     new HoverClickSounds()
                 };
+
+                Active.BindValueChanged(val => Text.Font = val ? @"Exo2.0-Bold" : @"Exo2.0", true);
             }
 
             protected override void OnActivated() => fadeActive();
