@@ -266,7 +266,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             private void updateParticipants()
             {
-                var roomId = room.RoomID.Value ?? 0;
+                var roomId = room?.RoomID.Value ?? 0;
 
                 request?.Cancel();
 
