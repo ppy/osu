@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Select
         {
             foreach (Match match in query_syntax_regex.Matches(query))
             {
-                var key = match.Groups["key"].Value;
+                var key = match.Groups["key"].Value.ToLower();
                 var op = match.Groups["op"].Value;
                 var value = match.Groups["value"].Value;
 
