@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select
             @"\b(?<key>stars|ar|dr|cs|divisor|length|objects|status)(?<op>[:><]+)(?<value>\S*)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        private void updateCriteriaRange(ref FilterCriteria.OptionalRange range, string op, double value, double equalityTolerableDistance = 0)
+        private void updateCriteriaRange(ref FilterCriteria.OptionalRange range, string op, double value, double equalityToleration = 0)
         {
             switch (op)
             {
@@ -72,8 +72,8 @@ namespace osu.Game.Screens.Select
                     return;
                 case ":":
                     range.IsInclusive = true;
-                    range.Min = value - equalityTolerableDistance;
-                    range.Max = value + equalityTolerableDistance;
+                    range.Min = value - equalityToleration;
+                    range.Max = value + equalityToleration;
                     break;
                 case ">":
                     range.IsInclusive = false;
