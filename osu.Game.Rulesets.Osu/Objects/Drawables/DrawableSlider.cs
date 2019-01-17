@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Hit = () =>
                     {
                         if (AllJudged)
-                        return false;
+                            return false;
 
                         UpdateResult(true);
                         return true;

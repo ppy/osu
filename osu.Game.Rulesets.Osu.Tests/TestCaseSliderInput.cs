@@ -56,13 +56,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Invalid key transfer test", () =>
             {
-                var actions = new List<List<OsuAction>>
+                var actions = new Dictionary<List<OsuAction>, double>
                 {
-                    new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton },
-                    new List<OsuAction> { OsuAction.LeftButton }
+                    { new List<OsuAction> { OsuAction.LeftButton }, 250 },
+                    { new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton }, 1500 },
+                    { new List<OsuAction> { OsuAction.LeftButton }, 2500 }
                 };
 
-                performStaticInputTest(actions, true);
+                performStaticInputTest(actions);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 1");
@@ -83,11 +84,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Left to both to right test", () =>
             {
-                var actions = new List<List<OsuAction>>
+                var actions = new Dictionary<List<OsuAction>, double>
                 {
-                    new List<OsuAction> { OsuAction.LeftButton },
-                    new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton },
-                    new List<OsuAction> { OsuAction.RightButton }
+                    { new List<OsuAction> { OsuAction.LeftButton }, 1500 },
+                    { new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton }, 2500 },
+                    { new List<OsuAction> { OsuAction.RightButton }, 3500 }
                 };
 
                 performStaticInputTest(actions);
@@ -111,11 +112,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Tracking retention test", () =>
             {
-                var actions = new List<List<OsuAction>>
+                var actions = new Dictionary<List<OsuAction>, double>
                 {
-                    new List<OsuAction> { OsuAction.LeftButton },
-                    new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton },
-                    new List<OsuAction> { OsuAction.LeftButton }
+                    { new List<OsuAction> { OsuAction.LeftButton }, 1500 },
+                    { new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton }, 2500 },
+                    { new List<OsuAction> { OsuAction.LeftButton }, 3500 }
                 };
 
                 performStaticInputTest(actions);
@@ -129,9 +130,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         ///     Pressing a key before a slider, pressing the other key on the slider head, then releasing the former pressed key
         ///     should result in continued tracking.
         ///     At 250ms intervals:
-        ///     Frame 1: Left Click
-        ///     Frame 2: Left & Right Click
-        ///     Frame 3: Right Click
+        ///     Frame 1 (prior to slider):      Left Click
+        ///     Frame 2 (on slider head):       Left & Right Click
+        ///     Frame 3 (tracking slider body): Right Click
         ///     A passing test case will have the cursor continue to track after frame 3.
         /// </summary>
         [Test]
@@ -139,13 +140,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Tracking retention test", () =>
             {
-                var actions = new List<List<OsuAction>>
+                var actions = new Dictionary<List<OsuAction>, double>
                 {
-                    new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton },
-                    new List<OsuAction> { OsuAction.RightButton }
+                    { new List<OsuAction> { OsuAction.LeftButton }, 250 },
+                    { new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton }, 1500 },
+                    { new List<OsuAction> { OsuAction.RightButton }, 2500 }
                 };
 
-                performStaticInputTest(actions, true);
+                performStaticInputTest(actions);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 4");
@@ -162,7 +164,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             return lastResult.Type == HitResult.Great;
         }
 
-        private void performStaticInputTest(List<List<OsuAction>> actionsOnSlider, bool primeKey = false)
+        private void performStaticInputTest(Dictionary<List<OsuAction>, double> actionsOnSlider)
         {
             var slider = new Slider
             {
@@ -176,7 +178,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             };
 
             var frames = new List<ReplayFrame>();
-            double frameTime = 0;
 
             // Empty frame to be added as a workaround for first frame behavior.
             // If an input exists on the first frame, the input would apply to the entire intro lead-in
@@ -188,29 +189,28 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Actions = new List<OsuAction>()
             });
 
-            frames.Add(new OsuReplayFrame
-            {
-                Position = slider.Position,
-                Time = 250,
-                Actions = primeKey ? new List<OsuAction> { OsuAction.LeftButton } : new List<OsuAction>()
-            });
-
             foreach (var a in actionsOnSlider)
             {
                 frames.Add(new OsuReplayFrame
                 {
                     Position = slider.Position,
-                    Time = slider.StartTime + frameTime,
-                    Actions = a
+                    Time = a.Value,
+                    Actions = a.Key
                 });
-                frameTime += 1000;
             }
 
             Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
             {
                 HitObjects = { slider },
-                ControlPointInfo = new ControlPointInfo { DifficultyPoints = { new DifficultyControlPoint { SpeedMultiplier = 0.1f } } },
-                BeatmapInfo = new BeatmapInfo { BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 }, Ruleset = new OsuRuleset().RulesetInfo },
+                ControlPointInfo =
+                {
+                    DifficultyPoints = { new DifficultyControlPoint { SpeedMultiplier = 0.1f } }
+                },
+                BeatmapInfo =
+                {
+                    BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
+                    Ruleset = new OsuRuleset().RulesetInfo
+                },
             });
 
             ScoreAccessibleReplayPlayer player = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
