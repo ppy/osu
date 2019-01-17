@@ -155,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private bool canCurrentlyTrack => Time.Current >= slider.StartTime && Time.Current < slider.EndTime;
 
-        private List<OsuAction> trackingActions = new List<OsuAction>();
+        private readonly List<OsuAction> trackingActions = new List<OsuAction>();
 
         private bool cursorTrackingBall => lastScreenSpaceMousePosition.HasValue
                                         && ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value);
