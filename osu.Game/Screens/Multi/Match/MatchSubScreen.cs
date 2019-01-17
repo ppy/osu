@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Multi.Match
 
             MatchChatDisplay chat;
             Components.Header header;
+            Info info;
+            GridContainer bottomRow;
             MatchSettingsOverlay settings;
 
             Children = new Drawable[]
@@ -61,10 +63,10 @@ namespace osu.Game.Screens.Multi.Match
                     Content = new[]
                     {
                         new Drawable[] { header = new Components.Header(room) { Depth = -1 } },
-                        new Drawable[] { new Info(room) { OnStart = onStart } },
+                        new Drawable[] { info = new Info(room) { OnStart = onStart } },
                         new Drawable[]
                         {
-                            new GridContainer
+                            bottomRow = new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Content = new[]
@@ -110,9 +112,17 @@ namespace osu.Game.Screens.Multi.Match
             header.Tabs.Current.ValueChanged += t =>
             {
                 if (t is SettingsMatchPage)
+                {
                     settings.Show();
+                    info.Hide();
+                    bottomRow.Hide();
+                }
                 else
+                {
                     settings.Hide();
+                    info.Show();
+                    bottomRow.Show();
+                }
             };
 
             chat.Exit += Exit;
