@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         return true;
                     },
                 },
-                HeadCircle.CreateProxy(),
+                HeadCircle.CreateProxy(), // required to allow the sliderball to always receive input for judgement purposes
                 TailCircle = new DrawableSliderTail(s, s.TailCircle)
             };
 
