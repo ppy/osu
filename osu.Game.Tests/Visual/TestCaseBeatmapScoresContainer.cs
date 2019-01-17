@@ -55,7 +55,6 @@ namespace osu.Game.Tests.Visual
             AddStep("resize to normal", () => container.ResizeWidthTo(0.8f, 300));
             AddStep("online scores", () => scoresContainer.Beatmap = new BeatmapInfo { OnlineBeatmapID = 75, Ruleset = new OsuRuleset().RulesetInfo });
 
-
             scores = new[]
             {
                 new APIScoreInfo

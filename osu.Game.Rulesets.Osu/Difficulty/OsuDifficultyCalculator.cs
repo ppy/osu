@@ -57,6 +57,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     s.Process(h);
             }
 
+            // The peak strain will not be saved for the last section in the above loop
+            foreach (Skill s in skills)
+                s.SaveCurrentPeak();
+
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
