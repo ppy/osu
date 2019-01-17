@@ -117,54 +117,46 @@ namespace osu.Game.Screens.Select
         {
             foreach (Match match in query_syntax_regex.Matches(query))
             {
+                var key = match.Groups["key"].Value.ToLower();
                 var op = match.Groups["op"].Value;
                 var value = match.Groups["value"].Value;
 
-                switch (match.Groups["key"].Value.ToLower())
+                switch (key)
                 {
-                    case "stars":
-                        if (double.TryParse(value, out var doubleValue))
-                            updateCriteriaRange(ref criteria.StarDifficulty, op, doubleValue, 0.5);
+                    case "stars" when double.TryParse(value, out var stars):
+                        updateCriteriaRange(ref criteria.StarDifficulty, op, stars, 0.5);
                         break;
-                    case "ar":
-                        if (double.TryParse(value, out doubleValue))
-                            updateCriteriaRange(ref criteria.ApproachRate, op, doubleValue, 0.3);
+                    case "ar" when double.TryParse(value, out var ar):
+                        updateCriteriaRange(ref criteria.ApproachRate, op, ar, 0.3);
                         break;
-                    case "dr":
-                        if (double.TryParse(value, out doubleValue))
-                            updateCriteriaRange(ref criteria.DrainRate, op, doubleValue, 0.3);
+                    case "dr" when double.TryParse(value, out var dr):
+                        updateCriteriaRange(ref criteria.DrainRate, op, dr, 0.3);
                         break;
-                    case "cs":
-                        if (double.TryParse(value, out doubleValue))
-                            updateCriteriaRange(ref criteria.CircleSize, op, doubleValue, 0.3);
+                    case "cs" when double.TryParse(value, out var cs):
+                        updateCriteriaRange(ref criteria.CircleSize, op, cs, 0.3);
                         break;
-                    case "divisor":
-                        if (op == ":" && int.TryParse(value, out var intValue))
-                            criteria.BeatDivisor = intValue;
-                        break;
-                    case "length":
-                        var lengthScale =
+                    case "length" when double.TryParse(value.TrimEnd('m', 's', 'h'), out var length):
+                        var scale =
                             value.EndsWith("ms") ? 1 :
                             value.EndsWith("s") ? 1000 :
                             value.EndsWith("m") ? 60000 :
-                            value.EndsWith("h") ? 3600000 :
-                            0;
-                        var length = double.TryParse(value.TrimEnd('m', 's', 'h'), out doubleValue) ? doubleValue * lengthScale : 0;
+                            value.EndsWith("h") ? 3600000 : 0;
 
-                        if (length > 0)
-                            updateCriteriaRange(ref criteria.Length, op, length, lengthScale / 2.0);
+                        if (scale != 0)
+                            updateCriteriaRange(ref criteria.Length, op, length * scale, scale / 2.0);
                         break;
-                    case "objects":
-                        if (int.TryParse(value, out intValue))
-                            updateCriteriaRange(ref criteria.ObjectCount, op, intValue, 10);
+                    case "objects" when int.TryParse(value, out var objects):
+                        updateCriteriaRange(ref criteria.ObjectCount, op, objects, 10);
                         break;
-                    case "status":
-                        if (op == ":" && Enum.TryParse<BeatmapSetOnlineStatus>(value, ignoreCase: true, out var statusValue))
-                            criteria.OnlineStatus = statusValue;
+                    case "divisor" when op == ":" && int.TryParse(value, out var divisor):
+                        criteria.BeatDivisor = divisor;
+                        break;
+                    case "status" when op == ":" && Enum.TryParse<BeatmapSetOnlineStatus>(value, ignoreCase: true, out var statusValue):
+                        criteria.OnlineStatus = statusValue;
                         break;
                 }
 
-                query = query.Replace(match.Value, string.Empty);
+                query = query.Remove(match.Index, match.Length);
             }
         }
 
