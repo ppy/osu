@@ -177,11 +177,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 }, 25),
             };
 
-            var frames = new List<ReplayFrame> { new OsuReplayFrame { Position = slider.Position, Time = 0, Actions = new List<OsuAction>() } };
-
             // Empty frame to be added as a workaround for first frame behavior.
             // If an input exists on the first frame, the input would apply to the entire intro lead-in
             // Likely requires some discussion regarding how first frame inputs should be handled.
+            var frames = new List<ReplayFrame> { new OsuReplayFrame { Position = slider.Position, Time = 0, Actions = new List<OsuAction>() } };
 
             foreach (var a in actionsOnSlider)
             {
