@@ -103,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         ///     At 250ms intervals:
         ///     Frame 1: Left Click
         ///     Frame 2: Left & Right Click
-        ///     Frame 3: Right Click
+        ///     Frame 3: Left Click
         ///     A passing test case will have the cursor continue to track after frame 3.
         /// </summary>
         [Test]
@@ -171,8 +171,8 @@ namespace osu.Game.Rulesets.Osu.Tests
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(5, 0),
-                }, 5),
+                    new Vector2(25, 0),
+                }, 25),
             };
 
             var frames = new List<ReplayFrame>();
@@ -203,7 +203,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     Time = slider.StartTime + frameTime,
                     Actions = a
                 });
-                frameTime += 250;
+                frameTime += 1000;
             }
 
             Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>

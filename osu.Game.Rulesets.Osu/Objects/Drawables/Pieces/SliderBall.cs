@@ -21,6 +21,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private Color4 accentColour = Color4.Black;
 
+        /// <summary>
+        /// Used for figuring out whether or not the slider has been judged as a hit.
+        /// </summary>
         public Func<bool> Hit;
 
         /// <summary>
