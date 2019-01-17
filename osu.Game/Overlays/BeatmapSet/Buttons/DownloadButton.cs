@@ -11,6 +11,7 @@ using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
+using osu.Game.Overlays.Direct;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
@@ -28,44 +29,53 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             Width = 120;
 
             BeatmapSetDownloader downloader;
-            Add(new Container
+            AddRange(new Drawable[]
             {
-                Depth = -1,
-                RelativeSizeAxes = Axes.Both,
-                Padding = new MarginPadding { Horizontal = 10 },
-                Children = new Drawable[]
+                new Container
                 {
-                    downloader = new BeatmapSetDownloader(set, noVideo),
-                    new FillFlowContainer
+                    Depth = -1,
+                    RelativeSizeAxes = Axes.Both,
+                    Padding = new MarginPadding { Horizontal = 10 },
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.CentreLeft,
-                        Origin = Anchor.CentreLeft,
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Children = new[]
+                        downloader = new BeatmapSetDownloader(set, noVideo),
+                        new FillFlowContainer
                         {
-                            new OsuSpriteText
+                            Anchor = Anchor.CentreLeft,
+                            Origin = Anchor.CentreLeft,
+                            AutoSizeAxes = Axes.Both,
+                            Direction = FillDirection.Vertical,
+                            Children = new[]
                             {
-                                Text = "Download",
-                                TextSize = 13,
-                                Font = @"Exo2.0-Bold",
-                            },
-                            new OsuSpriteText
-                            {
-                                Text = set.OnlineInfo.HasVideo && noVideo ? "without Video" : string.Empty,
-                                TextSize = 11,
-                                Font = @"Exo2.0-Bold",
+                                new OsuSpriteText
+                                {
+                                    Text = "Download",
+                                    TextSize = 13,
+                                    Font = @"Exo2.0-Bold",
+                                },
+                                new OsuSpriteText
+                                {
+                                    Text = set.OnlineInfo.HasVideo && noVideo ? "without Video" : string.Empty,
+                                    TextSize = 11,
+                                    Font = @"Exo2.0-Bold",
+                                },
                             },
                         },
+                        new SpriteIcon
+                        {
+                            Anchor = Anchor.CentreRight,
+                            Origin = Anchor.CentreRight,
+                            Icon = FontAwesome.fa_download,
+                            Size = new Vector2(16),
+                            Margin = new MarginPadding { Right = 5 },
+                        },
                     },
-                    new SpriteIcon
-                    {
-                        Anchor = Anchor.CentreRight,
-                        Origin = Anchor.CentreRight,
-                        Icon = FontAwesome.fa_download,
-                        Size = new Vector2(16),
-                        Margin = new MarginPadding { Right = 5 },
-                    },
+                },
+                new DownloadProgressBar(set)
+                {
+                    Depth = -2,
+                    Anchor = Anchor.BottomLeft,
+                    Origin = Anchor.BottomLeft,
                 },
             });
 
