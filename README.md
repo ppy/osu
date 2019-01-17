@@ -22,7 +22,7 @@ If you are not interested in developing the game, please head over to the [relea
 - Windows 64 bit users should download and run `install.exe`.
 - MacOS users should download and run `osu.app.zip`.
 
-There is currently no release for Windows 32 bit, Linux, or any other platform. If you are not running Windows 64 bit or MacOS, you should build osu! from the source code (see bellow).
+There is currently no release for Windows 32 bit, Linux, or any other platform. If you are not running Windows 64 bit or MacOS, you should build osu! from the source code (see below).
 
 ## Downloading the source code
 
