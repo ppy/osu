@@ -61,8 +61,7 @@ namespace osu.Game.Screens.Select
         }
 
         private static readonly Regex query_syntax_regex = new Regex(
-            @"\b((?<key>stars|ar|dr|cs|divisor|length|objects)(?<op>[:><])(?<value>\d*([.,]\d+)?))|" +
-            @"((?<key>group|sort|status)(?<op>:)(?<value>\w*))\b",
+            @"\b(?<key>stars|ar|dr|cs|divisor|length|objects|status)(?<op>[:><]+)(?<value>\S*)",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private void updateCriteriaRange(ref FilterCriteria.OptionalRange range, string op, double value, double equalityTolerableDistance = 0)
@@ -117,33 +116,30 @@ namespace osu.Game.Screens.Select
         {
             foreach (Match match in query_syntax_regex.Matches(query))
             {
-                var key = match.Groups["key"].Value.ToLower();
                 var op = match.Groups["op"].Value;
                 var value = match.Groups["value"].Value;
 
-                if (string.IsNullOrWhiteSpace(value))
-                {
-                    query = query.Replace(match.Value, string.Empty);
-                    continue;
-                }
-
-                switch (key)
+                switch (match.Groups["key"].Value.ToLower())
                 {
                     case "stars":
-                        updateCriteriaRange(ref criteria.StarDifficulty, op, Convert.ToDouble(value), 0.5);
+                        if (double.TryParse(value, out var doubleValue))
+                            updateCriteriaRange(ref criteria.StarDifficulty, op, doubleValue, 0.5);
                         break;
                     case "ar":
-                        updateCriteriaRange(ref criteria.ApproachRate, op, Convert.ToDouble(value), 0.3);
+                        if (double.TryParse(value, out doubleValue))
+                            updateCriteriaRange(ref criteria.ApproachRate, op, doubleValue, 0.3);
                         break;
                     case "dr":
-                        updateCriteriaRange(ref criteria.DrainRate, op, Convert.ToDouble(value), 0.3);
+                        if (double.TryParse(value, out doubleValue))
+                            updateCriteriaRange(ref criteria.DrainRate, op, doubleValue, 0.3);
                         break;
                     case "cs":
-                        updateCriteriaRange(ref criteria.CircleSize, op, Convert.ToDouble(value), 0.3);
+                        if (double.TryParse(value, out doubleValue))
+                            updateCriteriaRange(ref criteria.CircleSize, op, doubleValue, 0.3);
                         break;
                     case "divisor":
-                        if (op == ":")
-                            criteria.BeatDivisor = Convert.ToInt32(value);
+                        if (op == ":" && int.TryParse(value, out var intValue))
+                            criteria.BeatDivisor = intValue;
                         break;
                     case "length":
                         var lengthScale =
@@ -152,33 +148,18 @@ namespace osu.Game.Screens.Select
                             value.EndsWith("m") ? 60000 :
                             value.EndsWith("h") ? 3600000 :
                             0;
-                        var length = Convert.ToDouble(value.TrimEnd('m', 's', 'h')) * lengthScale;
+                        var length = double.TryParse(value.TrimEnd('m', 's', 'h'), out doubleValue) ? doubleValue * lengthScale : 0;
 
                         if (length > 0)
                             updateCriteriaRange(ref criteria.Length, op, length, lengthScale / 2.0);
                         break;
                     case "objects":
-                        updateCriteriaRange(ref criteria.ObjectCount, op, Convert.ToInt32(value), 10);
-                        break;
-                    case "group":
-                        if (Enum.TryParse<GroupMode>(value, ignoreCase: true, out var groupMode))
-                            Schedule(() =>
-                            {
-                                groupTabs.Current.Value = groupMode;
-                                searchTextBox.Text = searchTextBox.Text.Replace(match.Value, string.Empty);
-                            });
-                        break;
-                    case "sort":
-                        if (Enum.TryParse<SortMode>(value, ignoreCase: true, out var sortMode))
-                            Schedule(() =>
-                            {
-                                sortTabs.Current.Value = sortMode;
-                                searchTextBox.Text = searchTextBox.Text.Replace(match.Value, string.Empty);
-                            });
+                        if (int.TryParse(value, out intValue))
+                            updateCriteriaRange(ref criteria.ObjectCount, op, intValue, 10);
                         break;
                     case "status":
-                        if (Enum.TryParse<BeatmapSetOnlineStatus>(value, ignoreCase: true, out var status))
-                            criteria.OnlineStatus = status;
+                        if (op == ":" && Enum.TryParse<BeatmapSetOnlineStatus>(value, ignoreCase: true, out var statusValue))
+                            criteria.OnlineStatus = statusValue;
                         break;
                 }
 
