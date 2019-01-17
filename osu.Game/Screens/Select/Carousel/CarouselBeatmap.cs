@@ -39,10 +39,11 @@ namespace osu.Game.Screens.Select.Carousel
             match &= criteria.BeatDivisor.HasValue ? criteria.BeatDivisor == Beatmap.BeatDivisor : true;
             match &= criteria.OnlineStatus.HasValue ? criteria.OnlineStatus == Beatmap.Status : true;
 
-            foreach (var criteriaTerm in criteria.SearchTerms)
-                match &=
-                    Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0) ||
-                    Beatmap.Version.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0;
+            if (match)
+                foreach (var criteriaTerm in criteria.SearchTerms)
+                    match &=
+                        Beatmap.Metadata.SearchableTerms.Any(term => term.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0) ||
+                        Beatmap.Version.IndexOf(criteriaTerm, StringComparison.InvariantCultureIgnoreCase) >= 0;
 
             Filtered.Value = !match;
         }
