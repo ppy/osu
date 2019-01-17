@@ -92,6 +92,12 @@ namespace osu.Game.Graphics.UserInterface
             AccentColour = colours.Pink;
         }
 
+        protected override void LoadComplete()
+        {
+            updateTooltipText(Current.Value);
+            base.LoadComplete();
+        }
+
         protected override bool OnHover(HoverEvent e)
         {
             Nub.Glowing = true;
