@@ -29,12 +29,12 @@ namespace osu.Game.Screens.Select.Carousel
                 Beatmap.RulesetID == criteria.Ruleset.ID ||
                 (Beatmap.RulesetID == 0 && criteria.Ruleset.ID > 0 && criteria.AllowConvertedBeatmaps);
 
-            match &= criteria.StarDifficulty.IsTrue(Beatmap.StarDifficulty);
-            match &= criteria.ApproachRate.IsTrue(Beatmap.BaseDifficulty.ApproachRate);
-            match &= criteria.DrainRate.IsTrue(Beatmap.BaseDifficulty.DrainRate);
-            match &= criteria.CircleSize.IsTrue(Beatmap.BaseDifficulty.CircleSize);
-            match &= criteria.Length.IsTrue(Beatmap.OnlineInfo?.Length ?? 0);
-            match &= criteria.ObjectCount.IsTrue(Beatmap.OnlineInfo?.CircleCount ?? 0);
+            match &= criteria.StarDifficulty.IsInRange(Beatmap.StarDifficulty);
+            match &= criteria.ApproachRate.IsInRange(Beatmap.BaseDifficulty.ApproachRate);
+            match &= criteria.DrainRate.IsInRange(Beatmap.BaseDifficulty.DrainRate);
+            match &= criteria.CircleSize.IsInRange(Beatmap.BaseDifficulty.CircleSize);
+            match &= criteria.Length.IsInRange(Beatmap.OnlineInfo?.Length ?? 0);
+            match &= criteria.ObjectCount.IsInRange(Beatmap.OnlineInfo?.CircleCount ?? 0);
 
             if (criteria.BeatDivisor.HasValue)
                 match &= criteria.BeatDivisor == Beatmap.BeatDivisor;

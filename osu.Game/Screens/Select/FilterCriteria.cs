@@ -33,7 +33,7 @@ namespace osu.Game.Screens.Select
 
         public struct OptionalRange : IEquatable<OptionalRange>
         {
-            public bool IsTrue(double value)
+            public bool IsInRange(double value)
             {
                 if (Min.HasValue && (IsInclusive ? value < Min.Value : value <= Min.Value))
                     return false;
