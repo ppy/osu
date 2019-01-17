@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -154,7 +155,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private bool canCurrentlyTrack => Time.Current >= slider.StartTime && Time.Current < slider.EndTime;
 
-        private OsuAction? trackingAction;
+        private List<OsuAction> trackingActions = new List<OsuAction>();
 
         private bool cursorTrackingBall => lastScreenSpaceMousePosition.HasValue
                                         && ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value);
@@ -166,9 +167,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             if (Time.Current < slider.EndTime)
             {
                 // Make sure to use the base version of ReceivePositionalInputAt so that we correctly check the position.
-                Tracking = cursorTrackingBall
-                        && canCurrentlyTrack
-                        && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton) && x == trackingAction) ?? false);
+                Tracking = canCurrentlyTrack
+                        && cursorTrackingBall
+                        && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton) && trackingActions.Contains(x)) ?? false);
             }
         }
 
@@ -181,7 +182,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             if (cursorTrackingBall && (Hit?.Invoke() ?? false))
             {
-                trackingAction = action;
+                trackingActions.Add(action);
                 return true;
             }
 
@@ -190,9 +191,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public bool OnReleased(OsuAction action)
         {
-            if (action == trackingAction)
+            if (trackingActions.Contains(action))
             {
-                trackingAction = null;
+                trackingActions.Remove(action);
             }
 
             return false;
