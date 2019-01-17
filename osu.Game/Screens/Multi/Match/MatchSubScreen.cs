@@ -111,17 +111,18 @@ namespace osu.Game.Screens.Multi.Match
             header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect { Selected = addPlaylistItem });
             header.Tabs.Current.ValueChanged += t =>
             {
+                const float fade_duration = 500;
                 if (t is SettingsMatchPage)
                 {
                     settings.Show();
-                    info.Hide();
-                    bottomRow.Hide();
+                    info.FadeOut(fade_duration, Easing.OutQuint);
+                    bottomRow.FadeOut(fade_duration, Easing.OutQuint);
                 }
                 else
                 {
                     settings.Hide();
-                    info.Show();
-                    bottomRow.Show();
+                    info.FadeIn(fade_duration, Easing.OutQuint);
+                    bottomRow.FadeIn(fade_duration, Easing.OutQuint);
                 }
             };
 
