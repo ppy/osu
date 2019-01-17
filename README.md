@@ -13,23 +13,68 @@ We are accepting bug reports (please report with as much detail as possible). Fe
 - A desktop platform with the [.NET Core SDK 2.2](https://www.microsoft.com/net/learn/get-started) or higher installed.
 - When working with the codebase, we recommend using an IDE with intellisense and syntax highlighting, such as [Visual Studio Community Edition](https://www.visualstudio.com/) (Windows), [Visual Studio Code](https://code.visualstudio.com/) (with the C# plugin installed) or [Jetbrains Rider](https://www.jetbrains.com/rider/) (commercial).
 
-# Building and running
+# Running osu!
 
-If you are not interested in developing the game, please head over to the [releases](https://github.com/ppy/osu/releases) to download a precompiled build with automatic updating enabled (download and run the install executable for your platform).
+## Releases
 
-Clone the repository including submodules
+If you are not interested in developing the game, please head over to the [releases](https://github.com/ppy/osu/releases) to download a precompiled build with automatic updating enabled.
 
-`git clone --recurse-submodules https://github.com/ppy/osu`
+- Windows 64 bit users should download and run `install.exe`.
+- MacOS users should download and run `osu.app.zip`.
 
-Build and run
+There is currently no release for Windows 32 bit, Linux, or any other platform. If you are not running Windows 64 bit or MacOS, you should build osu! from the source code (see bellow).
 
-- Using Visual Studio 2017, Rider or Visual Studio Code (configurations are included)
-- From command line using `dotnet run --project osu.Desktop`. When building for non-development purposes, add `-c Release` to gain higher performance.
-- To run with code analysis, instead use `powershell ./build.ps1` or `build.sh`. This is currently only supported under windows due to [resharper cli shortcomings](https://youtrack.jetbrains.com/issue/RSRP-410004). Alternative, you can install resharper or use rider to get inline support in your IDE of choice.
+## Downloading the source code
 
-Note: If you run from command line under linux, you will need to prefix the output folder to your `LD_LIBRARY_PATH`. See `.vscode/launch.json` for an example
+Clone the repository **including submodules**:
 
-If you run into issues building you may need to restore nuget packages (commonly via `dotnet restore`). Visual Studio Code users must run `Restore` task from debug tab before attempt to build.
+```
+git clone --recurse-submodules https://github.com/ppy/osu
+cd osu
+```
+
+> If you forgot the `--recurse-submodules` option, run this command inside the `osu` directory:
+>
+> `git submodule update --init --recursive`
+
+To update the source code to the latest commit, run the following command inside the `osu` directory:
+
+```
+git pull --recurse-submodules
+```
+
+## Building
+
+Configuration for Visual Studio 2017, Rider and Visual Studio Code is included in the source code.
+
+> Visual Studio Code users must run the `Restore` task before any build attempt.
+
+You can also build osu! from the command-line, with `dotnet`:
+
+```
+dotnet restore
+dotnet run --project osu.Desktop -c Release
+```
+
+The `-c Release` option **must be omitted** when building for development purposes.
+
+### A note for Linux users
+
+On Linux, the environment variable `LD_LIBRARY_PATH` must point to the build directory (replace `Release` with `Debug` in the following paths if you do not want to include the `-c Release` flag).
+
+The build directory is located at `osu.Desktop/bin/Release/netcoreappX.X`, where `X.X` is the version of the .NET Core SDK (see Requirements). The required value can be found in `osu.Desktop/osu.Desktop.csproj`, look for a line starting with "TargetFramework".
+
+For example, you can run osu! with the following commands:
+
+```
+export NETCORE_VERSION="$(grep TargetFramework osu.Desktop/osu.Desktop.csproj | sed -r 's/.*>(.*)<\/.*/\1/')"
+export LD_LIBRARY_PATH="$(pwd)/osu.Desktop/bin/Release/$NETCORE_VERSION"
+dotnet run --project osu.Desktop -c Release
+```
+
+## Code analysis
+
+Code analysis can be run with `powershell ./build.ps1` or `build.sh`. This is currently only supported under windows due to [resharper cli shortcomings](https://youtrack.jetbrains.com/issue/RSRP-410004). Alternative, you can install resharper or use rider to get inline support in your IDE of choice.
 
 # Contributing
 
