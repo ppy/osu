@@ -213,7 +213,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
             });
 
-            ScoreAccessibleReplayPlayer player = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
+            var player = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
             {
                 AllowPause = false,
                 AllowLeadIn = false,
