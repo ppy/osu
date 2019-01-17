@@ -60,12 +60,12 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        static readonly Regex query_syntax_regex = new Regex(
+        private static readonly Regex query_syntax_regex = new Regex(
             @"\b((?<key>stars|ar|dr|cs|divisor|length|objects)(?<op>[:><])(?<value>\d*([.,]\d+)?))|" +
             @"((?<key>group|sort|status)(?<op>:)(?<value>\w*))\b",
             RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-        void updateCriteriaRange(ref FilterCriteria.OptionalRange range, string op, double value, double equalityTolerableDistance = 0)
+        private void updateCriteriaRange(ref FilterCriteria.OptionalRange range, string op, double value, double equalityTolerableDistance = 0)
         {
             switch (op)
             {
@@ -113,7 +113,7 @@ namespace osu.Game.Screens.Select
             return criteria;
         }
 
-        void applyQueries(FilterCriteria criteria, ref string query)
+        private void applyQueries(FilterCriteria criteria, ref string query)
         {
             foreach (Match match in query_syntax_regex.Matches(query))
             {
@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Select
                         var length = Convert.ToDouble(value.TrimEnd('m', 's', 'h')) * lengthScale;
 
                         if (length > 0)
-                            updateCriteriaRange(ref criteria.Length, op, length, lengthScale / 2);
+                            updateCriteriaRange(ref criteria.Length, op, length, lengthScale / 2.0);
                         break;
                     case "objects":
                         updateCriteriaRange(ref criteria.ObjectCount, op, Convert.ToInt32(value), 10);

@@ -33,11 +33,11 @@ namespace osu.Game.Screens.Select.Carousel
             match &= criteria.ApproachRate.IsInRange(Beatmap.BaseDifficulty.ApproachRate);
             match &= criteria.DrainRate.IsInRange(Beatmap.BaseDifficulty.DrainRate);
             match &= criteria.CircleSize.IsInRange(Beatmap.BaseDifficulty.CircleSize);
-            match &= criteria.Length.IsInRange(Beatmap.OnlineInfo?.Length ?? 0);
-            match &= criteria.ObjectCount.IsInRange(Beatmap.OnlineInfo?.CircleCount ?? 0);
+            match &= criteria.Length.IsInRange(Beatmap.Length);
+            // match &= criteria.ObjectCount.IsInRange(Beatmap.OnlineInfo?.CircleCount ?? 0);
 
-            match &= criteria.BeatDivisor.HasValue ? criteria.BeatDivisor == Beatmap.BeatDivisor : true;
-            match &= criteria.OnlineStatus.HasValue ? criteria.OnlineStatus == Beatmap.Status : true;
+            match &= !criteria.BeatDivisor.HasValue || criteria.BeatDivisor == Beatmap.BeatDivisor;
+            match &= !criteria.OnlineStatus.HasValue || criteria.OnlineStatus == Beatmap.Status;
 
             if (match)
                 foreach (var criteriaTerm in criteria.SearchTerms)
