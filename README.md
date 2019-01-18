@@ -23,7 +23,7 @@ If you are not interested in developing the game, please head over to the [relea
 - macOS users (10.12 "Sierra" and higher) should download and run `osu.app.zip`.
 - iOS users can join the [TestFlight beta program](https://t.co/xQJmHkfC18).
 
-There is currently no release for Windows 32 bit, Linux, or any other platform. If you are not running Windows 64 bit or MacOS, you should build osu! from the source code (see below).
+If your platform is not listed above, there is still a chance you can manually build it by following the instructions below.
 
 ## Downloading the source code
 
