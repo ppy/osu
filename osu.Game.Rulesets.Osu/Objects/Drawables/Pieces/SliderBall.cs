@@ -4,15 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.CodeAnalysis.CSharp;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 using osuTK;
@@ -55,13 +52,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             this.drawableSlider = drawableSlider;
             this.slider = slider;
-
-            //We no longer care about whether or not the slider is being tracked by the correct key if the head circle was never hit.
-            if (drawableSlider != null)
-                drawableSlider.HeadCircle.OnNewResult += (o, result) =>
-                {
-                    headJudged = true;
-                };
 
             Masking = true;
             AutoSizeAxes = Axes.Both;
