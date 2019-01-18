@@ -193,9 +193,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var frames = new List<ReplayFrame>
                 {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 1500},
+                    new OsuReplayFrame { Position = new Vector2(50, 50), Actions = { OsuAction.LeftButton }, Time = 1500},
+                    new OsuReplayFrame { Position = new Vector2(150, 150), Actions = { OsuAction.LeftButton }, Time = 2000},
                     new OsuReplayFrame { Position = new Vector2(200, 200), Actions = { OsuAction.LeftButton }, Time = 2500},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 3500},
+                    new OsuReplayFrame { Position = new Vector2(150, 150), Actions = { OsuAction.LeftButton }, Time = 3000},
+                    new OsuReplayFrame { Position = new Vector2(125, 125), Actions = { OsuAction.LeftButton }, Time = 3500},
                 };
 
                 performStaticInputTest(frames);
@@ -231,12 +233,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             var slider = new Slider
             {
                 StartTime = 1500,
-                Position = new Vector2(0, 0),
+                Position = new Vector2(50, 50),
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
                     Vector2.Zero,
-                    new Vector2(25, 0),
-                }, 25),
+                    new Vector2(300, 0),
+                }, 300),
             };
 
             // Empty frame to be added as a workaround for first frame behavior.
@@ -249,11 +251,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                 HitObjects = { slider },
                 ControlPointInfo =
                 {
-                    DifficultyPoints = { new DifficultyControlPoint { SpeedMultiplier = 0.1f } }
+                    DifficultyPoints = { new DifficultyControlPoint { SpeedMultiplier = 0.5f } }
                 },
                 BeatmapInfo =
                 {
-                    BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
+                    BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 1 },
                     Ruleset = new OsuRuleset().RulesetInfo
                 },
             });

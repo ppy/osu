@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 using osuTK;
@@ -22,6 +21,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private const float width = 128;
 
         private Color4 accentColour = Color4.Black;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         /// <summary>
         /// Used for figuring out whether or not the slider has been judged as a hit.
@@ -46,7 +47,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public readonly Drawable FollowCircle;
         private Drawable drawableBall;
         private readonly DrawableSlider drawableSlider;
-        private bool headHit;
 
         public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
         {
@@ -161,7 +161,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private readonly List<OsuAction> trackingActions = new List<OsuAction>();
 
         private bool cursorTrackingBall => lastScreenSpaceMousePosition.HasValue
-                                        && ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value);
+                                           && base.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value);
+
 
         protected override void Update()
         {
@@ -169,11 +170,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
             if (Time.Current < slider.EndTime)
             {
-                // Make sure to use the base version of ReceivePositionalInputAt so that we correctly check the position.
                 Tracking = canCurrentlyTrack
-                        && cursorTrackingBall
-                        && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton)
-                                                                                           && trackingActions.Contains(x)) ?? false);
+                           && cursorTrackingBall
+                           && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton)
+                                                                                              && trackingActions.Contains(x)) ?? false);
             }
         }
 
