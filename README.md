@@ -20,7 +20,7 @@ We are accepting bug reports (please report with as much detail as possible). Fe
 If you are not interested in developing the game, please head over to the [releases](https://github.com/ppy/osu/releases) to download a precompiled build with automatic updating enabled.
 
 - Windows (x64) users should download and run `install.exe`.
-- MacOS users should download and run `osu.app.zip`.
+- macOS users (10.12 "Sierra" and higher) should download and run `osu.app.zip`.
 - iOS users can join the [TestFlight beta program](https://t.co/xQJmHkfC18).
 
 There is currently no release for Windows 32 bit, Linux, or any other platform. If you are not running Windows 64 bit or MacOS, you should build osu! from the source code (see below).
