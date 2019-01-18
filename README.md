@@ -53,24 +53,23 @@ Build configurations for [Visual Studio 2017+](https://visualstudio.microsoft.co
 You can also build osu! from the command-line:
 
 ```
-dotnet restore
-dotnet run --project osu.Desktop -c Release
+dotnet run --project osu.Desktop
 ```
 
-The `-c Release` option **must be omitted** when building for development purposes.
+If you are not interested in debugging osu!, you can add `-c Release` to gain performance. In this case, you must replace `Debug` with `Release` in the following section.
+
+If the build fails, try to restore nuget packages with `dotnet restore`.
 
 ### A note for Linux users
 
-On Linux, the environment variable `LD_LIBRARY_PATH` must point to the build directory (replace `Release` with `Debug` in the following paths if you do not want to include the `-c Release` flag).
+On Linux, the environment variable `LD_LIBRARY_PATH` must point to the build directory, located at `osu.Desktop/bin/Debug/$NETCORE_VERSION`.
 
-The build directory is located at `osu.Desktop/bin/Release/netcoreappX.X`, where `X.X` is the version of the .NET Core SDK (see Requirements). The required value can be found in `osu.Desktop/osu.Desktop.csproj`, look for a line starting with "TargetFramework".
+`$NETCORE_VERSION` is the version of .NET Core SDK. You can have it with `grep TargetFramework osu.Desktop/osu.Desktop.csproj | sed -r 's/.*>(.*)<\/.*/\1/'`.
 
-For example, you can run osu! with the following commands:
+For example, you can run osu! with the following command:
 
 ```
-export NETCORE_VERSION="$(grep TargetFramework osu.Desktop/osu.Desktop.csproj | sed -r 's/.*>(.*)<\/.*/\1/')"
-export LD_LIBRARY_PATH="$(pwd)/osu.Desktop/bin/Release/$NETCORE_VERSION"
-dotnet run --project osu.Desktop -c Release
+LD_LIBRARY_PATH="$(pwd)/osu.Desktop/bin/Debug/netcoreapp2.2" dotnet run --project osu.Desktop
 ```
 
 ## Code analysis
