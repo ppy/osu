@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -29,14 +30,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void Setup()
         {
             Schedule(() => { allJudgedFired = false; });
-            headResult = null;
+            judgementResults = new List<JudgementResult>();
         }
 
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
-        private JudgementResult lastResult;
-        private JudgementResult headResult;
+        private List<JudgementResult> judgementResults;
         private bool allJudgedFired;
 
         public TestCaseSliderInput()
@@ -182,13 +182,9 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking retained, sliderhead miss", assertHeadMissTailMeh);
         }
 
+
         /// <summary>
-        ///     Pressing a key in the middle of the slider should result in tracking.
-        ///     Only one frame is required:
-        ///     Frame 1: Left Click
-        ///     In a successful test case:
-        ///     The head of the slider should be judged as a miss.
-        ///     The slider end should be judged as a meh.
+        /// Hitting a slider head, leaving the slider, then coming back into the slider to track it should re-start tracking.
         /// </summary>
         [Test]
         public void TestTrackingMidSlider()
@@ -197,29 +193,37 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var frames = new List<ReplayFrame>
                 {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 2500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 1500},
+                    new OsuReplayFrame { Position = new Vector2(200, 200), Actions = { OsuAction.LeftButton }, Time = 2500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 3500},
                 };
 
                 performStaticInputTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 6");
-            AddAssert("Tracking retained, sliderhead miss", assertHeadMissTailMeh);
+            AddAssert("Tracking re-acquired", assertMidSliderJudgements);
         }
+
 
         private bool assertMehJudge()
         {
-            return lastResult.Type == HitResult.Meh;
+            return judgementResults.Last().Type == HitResult.Meh;
         }
 
         private bool assertGreatJudge()
         {
-            return lastResult.Type == HitResult.Great;
+            return judgementResults.Last().Type == HitResult.Great;
         }
 
         private bool assertHeadMissTailMeh()
         {
-            return lastResult.Type == HitResult.Meh && headResult.Type == HitResult.Miss;
+            return judgementResults.Last().Type == HitResult.Meh && judgementResults.First().Type == HitResult.Miss;
+        }
+
+        private bool assertMidSliderJudgements()
+        {
+            return false;
         }
 
         private void performStaticInputTest(List<ReplayFrame> frames)
@@ -263,13 +267,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             Child = player;
 
-            player.ScoreProcessor.NewJudgement += result =>
-            {
-                if (headResult == null)
-                    headResult = result;
-                else
-                    lastResult = result;
-            };
+            player.ScoreProcessor.NewJudgement += result => judgementResults.Add(result);
 
             player.ScoreProcessor.AllJudged += () => { allJudgedFired = true; };
         }

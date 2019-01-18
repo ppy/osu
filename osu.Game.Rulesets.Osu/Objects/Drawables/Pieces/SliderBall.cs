@@ -52,13 +52,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             this.drawableSlider = drawableSlider;
             this.slider = slider;
-            //We no longer care about whether or not the slider is being tracked by the correct key if the head circle was never hit.
-            if (drawableSlider != null)
-                drawableSlider.HeadCircle.OnNewResult += (o, result) =>
-                {
-                    if (result.Type != HitResult.Miss)
-                        headHit = true;
-                };
 
             Masking = true;
             AutoSizeAxes = Axes.Both;
@@ -180,7 +173,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 Tracking = canCurrentlyTrack
                         && cursorTrackingBall
                         && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton)
-                                                                                           && (trackingActions.Contains(x) || !headHit)) ?? false);
+                                                                                           && trackingActions.Contains(x)) ?? false);
             }
         }
 
