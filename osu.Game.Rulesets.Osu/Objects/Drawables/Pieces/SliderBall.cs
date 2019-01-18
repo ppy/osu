@@ -46,7 +46,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public readonly Drawable FollowCircle;
         private Drawable drawableBall;
         private readonly DrawableSlider drawableSlider;
-        private bool headHit = false;
+        private bool headHit;
 
         public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
         {
@@ -191,7 +191,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public bool OnPressed(OsuAction action)
         {
-            if (cursorTrackingBall && (Hit?.Invoke() ?? false))
+            if (cursorTrackingBall && (Hit?.Invoke() ?? false) && (action == OsuAction.LeftButton || action == OsuAction.RightButton))
             {
                 trackingActions.Add(action);
                 return true;
@@ -202,7 +202,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public bool OnReleased(OsuAction action)
         {
-            trackingActions.Remove(action);
+            if (action == OsuAction.LeftButton || action == OsuAction.RightButton)
+                trackingActions.Remove(action);
 
             return false;
         }

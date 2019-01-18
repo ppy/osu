@@ -12,7 +12,6 @@ using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
@@ -220,7 +219,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private bool assertHeadMissTailMeh()
         {
-            Logger.Log(lastResult.Type.ToString() + headResult.Type.ToString());
             return lastResult.Type == HitResult.Meh && headResult.Type == HitResult.Miss;
         }
 
