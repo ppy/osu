@@ -65,28 +65,54 @@ namespace osu.Game.Screens
 
         private OsuLogo logo;
 
-        /// <summary>
-        /// Whether the beatmap or ruleset should be allowed to be changed by the user or game.
-        /// Used to mark exclusive areas where this is strongly prohibited, like gameplay.
-        /// </summary>
-        public virtual bool AllowBeatmapRulesetChange => true;
-
-        protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
-
         protected virtual float BackgroundParallaxAmount => 1;
 
         private ParallaxContainer backgroundParallaxContainer;
 
-        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        protected IMutableBindable<WorkingBeatmap> Beatmap;
+
+        protected IMutableBindable<RulesetInfo> Ruleset;
+
+        /// <summary>
+        /// Disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
+        /// </summary>
+        protected virtual bool DisallowExternalBeatmapRulesetChanges => false;
 
         private SampleChannel sampleExit;
+        private bool leaseOwner;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            if (DisallowExternalBeatmapRulesetChanges)
+            {
+                Beatmap = dependencies.Get<LeasedBindable<WorkingBeatmap>>()?.GetBoundCopy();
+                if (Beatmap == null)
+                {
+                    leaseOwner = true;
+                    dependencies.Cache(Beatmap = dependencies.Get<LeasableBindable<WorkingBeatmap>>().BeginLease());
+                }
+
+                Ruleset = dependencies.Get<LeasedBindable<RulesetInfo>>()?.GetBoundCopy();
+                if (Ruleset == null)
+                {
+                    leaseOwner = true;
+                    dependencies.Cache(Ruleset = dependencies.Get<LeasableBindable<RulesetInfo>>().BeginLease());
+                }
+            }
+            else
+            {
+                dependencies.Get<LeasableBindable<WorkingBeatmap>>().GetBoundCopy();
+                dependencies.Get<LeasableBindable<RulesetInfo>>().GetBoundCopy();
+            }
+
+            return dependencies;
+        }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BindableBeatmap beatmap, OsuGame osu, AudioManager audio, Bindable<RulesetInfo> ruleset)
+        private void load(OsuGame osu, AudioManager audio)
         {
-            Beatmap.BindTo(beatmap);
-            Ruleset.BindTo(ruleset);
-
             if (osu != null)
             {
                 OverlayActivationMode.BindTo(osu.OverlayActivationMode);
@@ -191,7 +217,17 @@ namespace osu.Game.Screens
             if (base.OnExiting(next))
                 return true;
 
-            Beatmap.UnbindAll();
+            if (leaseOwner)
+            {
+                ((LeasedBindable<WorkingBeatmap>)Beatmap).Return();
+                ((LeasedBindable<RulesetInfo>)Ruleset).Return();
+            }
+            else
+            {
+                Beatmap.UnbindAll();
+                Ruleset.UnbindAll();
+            }
+
             return false;
         }
 

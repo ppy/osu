@@ -28,8 +28,6 @@ namespace osu.Game.Screens.Multi
     {
         private readonly MultiplayerWaveContainer waves;
 
-        public override bool AllowBeatmapRulesetChange => currentSubScreen?.AllowBeatmapRulesetChange ?? base.AllowBeatmapRulesetChange;
-
         private readonly OsuButton createButton;
         private readonly LoungeSubScreen loungeSubScreen;
 

@@ -19,7 +19,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         private readonly Room room;
 
         [Resolved]
-        private IBindableBeatmap gameBeatmap { get; set; }
+        private IBindable<WorkingBeatmap> gameBeatmap { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }

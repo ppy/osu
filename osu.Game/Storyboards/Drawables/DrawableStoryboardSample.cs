@@ -4,6 +4,7 @@
 using System.IO;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 
@@ -28,7 +29,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap)
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
             // Try first with the full name, then attempt with no path
             channel = beatmap.Value.Skin.GetSample(sample.Path) ?? beatmap.Value.Skin.GetSample(Path.ChangeExtension(sample.Path, null));

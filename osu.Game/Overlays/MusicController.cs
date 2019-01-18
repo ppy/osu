@@ -66,7 +66,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(BindableBeatmap beatmap, BeatmapManager beatmaps, OsuColour colours)
+        private void load(IMutableBindable<WorkingBeatmap> beatmap, BeatmapManager beatmaps, OsuColour colours)
         {
             this.beatmap.BindTo(beatmap);
             this.beatmaps = beatmaps;

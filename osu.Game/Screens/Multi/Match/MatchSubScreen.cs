@@ -20,7 +20,8 @@ namespace osu.Game.Screens.Multi.Match
 {
     public class MatchSubScreen : MultiplayerSubScreen
     {
-        public override bool AllowBeatmapRulesetChange => false;
+        protected override bool DisallowExternalBeatmapRulesetChanges => true;
+
         public override string Title => room.RoomID.Value == null ? "New room" : room.Name.Value;
         public override string ShortTitle => "room";
 
@@ -108,7 +109,10 @@ namespace osu.Game.Screens.Multi.Match
                 },
             };
 
-            header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect { Selected = addPlaylistItem });
+            header.OnRequestSelectBeatmap = () =>
+            {
+                Push(new MatchSongSelect { Selected = addPlaylistItem });
+            };
             header.Tabs.Current.ValueChanged += t =>
             {
                 const float fade_duration = 500;
@@ -154,7 +158,7 @@ namespace osu.Game.Screens.Multi.Match
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
 
-            game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
+            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         }
 
         private void setRuleset(RulesetInfo ruleset)
@@ -162,7 +166,7 @@ namespace osu.Game.Screens.Multi.Match
             if (ruleset == null)
                 return;
 
-            game?.ForcefullySetRuleset(ruleset);
+            Ruleset.Value = ruleset;
         }
 
         private void beatmapAdded(BeatmapSetInfo model, bool existing, bool silent) => Schedule(() =>
@@ -177,7 +181,7 @@ namespace osu.Game.Screens.Multi.Match
             var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == bindings.CurrentBeatmap.Value.OnlineBeatmapID);
 
             if (localBeatmap != null)
-                game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
+                Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         });
 
         private void addPlaylistItem(PlaylistItem item)

@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         public bool DidLoadMenu;
 
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
+        private readonly IMutableBindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
 
         private MainMenu mainMenu;
         private SampleChannel welcome;
@@ -47,7 +47,7 @@ namespace osu.Game.Screens.Menu
         private WorkingBeatmap introBeatmap;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game, BindableBeatmap beatmap)
+        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game, IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
 
