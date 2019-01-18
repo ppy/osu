@@ -91,20 +91,20 @@ namespace osu.Game.Screens
                 if (Beatmap == null)
                 {
                     leaseOwner = true;
-                    dependencies.Cache(Beatmap = dependencies.Get<LeasableBindable<WorkingBeatmap>>().BeginLease());
+                    dependencies.Cache(Beatmap = dependencies.Get<LeasableBindable<WorkingBeatmap>>().BeginLease(true));
                 }
 
                 Ruleset = dependencies.Get<LeasedBindable<RulesetInfo>>()?.GetBoundCopy();
                 if (Ruleset == null)
                 {
                     leaseOwner = true;
-                    dependencies.Cache(Ruleset = dependencies.Get<LeasableBindable<RulesetInfo>>().BeginLease());
+                    dependencies.Cache(Ruleset = dependencies.Get<LeasableBindable<RulesetInfo>>().BeginLease(true));
                 }
             }
             else
             {
-                dependencies.Get<LeasableBindable<WorkingBeatmap>>().GetBoundCopy();
-                dependencies.Get<LeasableBindable<RulesetInfo>>().GetBoundCopy();
+                Beatmap = dependencies.Get<LeasableBindable<WorkingBeatmap>>().GetBoundCopy();
+                Ruleset = dependencies.Get<LeasableBindable<RulesetInfo>>().GetBoundCopy();
             }
 
             return dependencies;
