@@ -1,21 +1,56 @@
-// Copyright (c) 2007-2019 ppy Pty Ltd <contact@ppy.sh>.
+// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
+using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.Direct
 {
-    public abstract class DownloadTrackingComponent : CompositeDrawable
+    public abstract class DownloadTrackingComposite : CompositeDrawable
     {
-        private readonly BeatmapSetInfo setInfo;
+        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
+
         private BeatmapManager beatmaps;
 
-        protected DownloadTrackingComponent(BeatmapSetInfo beatmapSetInfo)
+        /// <summary>
+        /// Holds the current download state of the beatmap, whether is has already been downloaded, is in progress, or is not downloaded.
+        /// </summary>
+        protected readonly Bindable<DownloadState> State = new Bindable<DownloadState>();
+
+        protected readonly Bindable<double> Progress = new Bindable<double>();
+
+        protected DownloadTrackingComposite(BeatmapSetInfo beatmapSet = null)
         {
-            setInfo = beatmapSetInfo;
+            BeatmapSet.Value = beatmapSet;
+        }
+
+        [BackgroundDependencyLoader(true)]
+        private void load(BeatmapManager beatmaps)
+        {
+            this.beatmaps = beatmaps;
+
+            BeatmapSet.BindValueChanged(set =>
+            {
+                if (set == null)
+                    attachDownload(null);
+                else if (beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID).Any())
+                    State.Value = DownloadState.LocallyAvailable;
+                else
+                    attachDownload(beatmaps.GetExistingDownload(set));
+            }, true);
+
+            beatmaps.BeatmapDownloadBegan += download =>
+            {
+                if (download.BeatmapSet.OnlineBeatmapSetID == BeatmapSet.Value?.OnlineBeatmapSetID)
+                    attachDownload(download);
+            };
+
+            beatmaps.ItemAdded += setAdded;
         }
 
         #region Disposal
@@ -29,49 +64,62 @@ namespace osu.Game.Overlays.Direct
 
         #endregion
 
-        [BackgroundDependencyLoader(true)]
-        private void load(BeatmapManager beatmaps)
-        {
-            this.beatmaps = beatmaps;
-
-            var downloadRequest = beatmaps.GetExistingDownload(setInfo);
-
-            if (downloadRequest != null)
-                attachDownload(downloadRequest);
-
-            beatmaps.BeatmapDownloadBegan += attachDownload;
-            beatmaps.ItemAdded += setAdded;
-        }
+        private DownloadBeatmapSetRequest attachedRequest;
 
         private void attachDownload(DownloadBeatmapSetRequest request)
         {
-            if (request.BeatmapSet.OnlineBeatmapSetID != setInfo.OnlineBeatmapSetID)
-                return;
+            if (attachedRequest != null)
+            {
+                attachedRequest.Failure -= onRequestFailure;
+                attachedRequest.DownloadProgressed -= onRequestProgress;
+                attachedRequest.Success -= onRequestSuccess;
+            }
 
-            DownloadStarted();
+            attachedRequest = request;
 
-            request.Failure += e => { DownloadFailed(); };
-
-            request.DownloadProgressed += progress => Schedule(() => ProgressChanged(progress));
-            request.Success += data => { DownloadComleted(); };
+            if (attachedRequest != null)
+            {
+                State.Value = DownloadState.Downloading;
+                attachedRequest.Failure += onRequestFailure;
+                attachedRequest.DownloadProgressed += onRequestProgress;
+                attachedRequest.Success += onRequestSuccess;
+            }
+            else
+            {
+                State.Value = DownloadState.NotDownloaded;
+            }
         }
 
-        protected abstract void ProgressChanged(float progress);
+        private void onRequestSuccess(byte[] data)
+        {
+            Schedule(() => State.Value = DownloadState.Downloaded);
+            attachDownload(null);
+        }
 
-        protected abstract void DownloadFailed();
+        private void onRequestProgress(float progress)
+        {
+            Schedule(() => Progress.Value = progress);
+        }
 
-        protected abstract void DownloadComleted();
-
-        protected abstract void BeatmapImported();
-
-        protected abstract void DownloadStarted();
+        private void onRequestFailure(Exception e)
+        {
+            Schedule(() => State.Value = DownloadState.Downloading);
+        }
 
         private void setAdded(BeatmapSetInfo s, bool existing, bool silent)
         {
-            if (s.OnlineBeatmapSetID != setInfo.OnlineBeatmapSetID)
+            if (s.OnlineBeatmapSetID != BeatmapSet.Value?.OnlineBeatmapSetID)
                 return;
 
-            Schedule(BeatmapImported);
+            Schedule(() => State.Value = DownloadState.LocallyAvailable);
         }
+    }
+
+    public enum DownloadState
+    {
+        NotDownloaded,
+        Downloading,
+        Downloaded,
+        LocallyAvailable
     }
 }
