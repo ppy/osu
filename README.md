@@ -50,7 +50,7 @@ Build configurations for [Visual Studio 2017+](https://visualstudio.microsoft.co
 
 > Visual Studio Code users must run the `Restore` task before any build attempt.
 
-You can also build osu! from the command-line, with `dotnet`:
+You can also build osu! from the command-line:
 
 ```
 dotnet restore
