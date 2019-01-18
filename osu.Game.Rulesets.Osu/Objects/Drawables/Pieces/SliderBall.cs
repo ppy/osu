@@ -4,12 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.CodeAnalysis.CSharp;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 using osuTK;
@@ -52,6 +55,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             this.drawableSlider = drawableSlider;
             this.slider = slider;
+
+            //We no longer care about whether or not the slider is being tracked by the correct key if the head circle was never hit.
+            if (drawableSlider != null)
+                drawableSlider.HeadCircle.OnNewResult += (o, result) =>
+                {
+                    headJudged = true;
+                };
 
             Masking = true;
             AutoSizeAxes = Axes.Both;
@@ -163,17 +173,21 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private bool cursorTrackingBall => lastScreenSpaceMousePosition.HasValue
                                            && base.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value);
 
+        private bool validPressedNote;
 
         protected override void Update()
         {
             base.Update();
+
+            if (!cursorTrackingBall)
+                validPressedNote = false;
 
             if (Time.Current < slider.EndTime)
             {
                 Tracking = canCurrentlyTrack
                            && cursorTrackingBall
                            && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton)
-                                                                                              && trackingActions.Contains(x)) ?? false);
+                                                                                              && (trackingActions.Contains(x) || !validPressedNote && trackingActions.Count == 0)) ?? false);
             }
         }
 
@@ -186,6 +200,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             if (cursorTrackingBall && (Hit?.Invoke() ?? false) && (action == OsuAction.LeftButton || action == OsuAction.RightButton))
             {
+                validPressedNote = true;
                 trackingActions.Add(action);
                 return true;
             }
