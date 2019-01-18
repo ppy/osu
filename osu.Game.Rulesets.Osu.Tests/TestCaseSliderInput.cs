@@ -206,7 +206,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        /// Pressing a key before a slider, hitting a slider head, leaving the slider, then coming back into the slider to track it should re-start tracking.
+        /// Pressing a key before a slider, hitting a slider head, leaving the slider, then coming back into the slider to track it should NOT start retracking.
         /// </summary>
         [Test]
         public void TestTrackingReturnMidSliderKeyDownBefore()
@@ -227,7 +227,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 7");
-            AddAssert("Tracking re-acquired", assertMidSliderJudgements);
+            AddAssert("Tracking lost", assertMidSliderJudgementFail);
         }
 
         /// <summary>
@@ -271,6 +271,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         private bool assertMidSliderJudgements()
         {
             return judgementResults[judgementResults.Count - 2].Type == HitResult.Great;
+        }
+
+        private bool assertMidSliderJudgementFail()
+        {
+            return judgementResults[judgementResults.Count - 2].Type == HitResult.Miss;
         }
 
         private void performStaticInputTest(List<ReplayFrame> frames)

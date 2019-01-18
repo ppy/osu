@@ -169,9 +169,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             base.Update();
 
-            if (!cursorTrackingBall)
-                validPressedNote = false;
-
             if (Time.Current < slider.EndTime)
             {
                 Tracking = canCurrentlyTrack
