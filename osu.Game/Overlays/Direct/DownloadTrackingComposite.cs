@@ -114,12 +114,4 @@ namespace osu.Game.Overlays.Direct
             Schedule(() => State.Value = DownloadState.LocallyAvailable);
         }
     }
-
-    public enum DownloadState
-    {
-        NotDownloaded,
-        Downloading,
-        Downloaded,
-        LocallyAvailable
-    }
 }
