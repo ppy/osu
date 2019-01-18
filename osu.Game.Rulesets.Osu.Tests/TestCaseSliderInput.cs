@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
@@ -59,14 +58,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Invalid key transfer test", () =>
             {
-                var actions = new Dictionary<List<OsuAction>, double>
+                var frames = new List<ReplayFrame>
                 {
-                    { new List<OsuAction> { OsuAction.LeftButton }, 250 },
-                    { new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton }, 1500 },
-                    { new List<OsuAction> { OsuAction.LeftButton }, 2500 }
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 250},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = 1500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 2500},
                 };
 
-                performStaticInputTest(actions);
+                performStaticInputTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 1");
@@ -87,14 +86,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Left to both to right test", () =>
             {
-                var actions = new Dictionary<List<OsuAction>, double>
+                var frames = new List<ReplayFrame>
                 {
-                    { new List<OsuAction> { OsuAction.LeftButton }, 1500 },
-                    { new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton }, 2500 },
-                    { new List<OsuAction> { OsuAction.RightButton }, 3500 }
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 1500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = 2500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = 3500},
                 };
 
-                performStaticInputTest(actions);
+                performStaticInputTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 2");
@@ -115,14 +114,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Tracking retention test", () =>
             {
-                var actions = new Dictionary<List<OsuAction>, double>
+                var frames = new List<ReplayFrame>
                 {
-                    { new List<OsuAction> { OsuAction.LeftButton }, 1500 },
-                    { new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton }, 2500 },
-                    { new List<OsuAction> { OsuAction.LeftButton }, 3500 }
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 250},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = 1500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = 2500},
                 };
 
-                performStaticInputTest(actions);
+                performStaticInputTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 3");
@@ -143,14 +142,15 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Tracking retention test", () =>
             {
-                var actions = new Dictionary<List<OsuAction>, double>
+                var frames = new List<ReplayFrame>
                 {
-                    { new List<OsuAction> { OsuAction.LeftButton }, 250 },
-                    { new List<OsuAction> { OsuAction.LeftButton, OsuAction.RightButton }, 1500 },
-                    { new List<OsuAction> { OsuAction.RightButton }, 2500 }
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 250},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = 1500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = 2500},
                 };
 
-                performStaticInputTest(actions);
+                performStaticInputTest(frames);
+
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 4");
@@ -170,12 +170,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Tracking retention test", () =>
             {
-                var actions = new Dictionary<List<OsuAction>, double>
+                var frames = new List<ReplayFrame>
                 {
-                    { new List<OsuAction> { OsuAction.LeftButton }, 250 },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 250},
                 };
 
-                performStaticInputTest(actions);
+                performStaticInputTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 5");
@@ -195,12 +195,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             AddStep("Tracking retention test", () =>
             {
-                var actions = new Dictionary<List<OsuAction>, double>
+                var frames = new List<ReplayFrame>
                 {
-                    { new List<OsuAction> { OsuAction.LeftButton }, 2500 },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 2500},
                 };
 
-                performStaticInputTest(actions);
+                performStaticInputTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 6");
@@ -222,12 +222,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             return lastResult.Type == HitResult.Meh && headResult.Type == HitResult.Miss;
         }
 
-        private void performStaticInputTest(Dictionary<List<OsuAction>, double> actionsOnSlider)
+        private void performStaticInputTest(List<ReplayFrame> frames)
         {
             var slider = new Slider
             {
                 StartTime = 1500,
-                Position = new Vector2(100, 100),
+                Position = new Vector2(0, 0),
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
                     Vector2.Zero,
@@ -238,17 +238,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             // Empty frame to be added as a workaround for first frame behavior.
             // If an input exists on the first frame, the input would apply to the entire intro lead-in
             // Likely requires some discussion regarding how first frame inputs should be handled.
-            var frames = new List<ReplayFrame> { new OsuReplayFrame { Position = slider.Position, Time = 0, Actions = new List<OsuAction>() } };
-
-            foreach (var a in actionsOnSlider)
-            {
-                frames.Add(new OsuReplayFrame
-                {
-                    Position = slider.Position,
-                    Time = a.Value,
-                    Actions = a.Key
-                });
-            }
+            frames.Insert(0, new OsuReplayFrame { Position = slider.Position, Time = 0, Actions = new List<OsuAction>() });
 
             Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
             {
