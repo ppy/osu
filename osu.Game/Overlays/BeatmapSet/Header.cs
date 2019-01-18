@@ -28,10 +28,8 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box tabsBg;
         private readonly UpdateableBeatmapSetCover cover;
         private readonly OsuSpriteText title, artist;
-        private readonly Container noVideoButtons;
-        private readonly FillFlowContainer videoButtons;
         private readonly AuthorInfo author;
-        private readonly Container downloadButtonsContainer;
+        private readonly FillFlowContainer downloadButtonsContainer;
         private readonly BeatmapSetOnlineStatusPill onlineStatusPill;
         public Details Details;
 
@@ -54,8 +52,13 @@ namespace osu.Game.Overlays.BeatmapSet
             }
         }
 
+        private BeatmapSetDownloader downloader;
+
         private void updateDisplay()
         {
+            downloader?.Expire();
+
+
             title.Text = BeatmapSet?.Metadata.Title ?? string.Empty;
             artist.Text = BeatmapSet?.Metadata.Artist ?? string.Empty;
             onlineStatusPill.Status = BeatmapSet?.OnlineInfo.Status ?? BeatmapSetOnlineStatus.None;
@@ -66,24 +69,30 @@ namespace osu.Game.Overlays.BeatmapSet
                 downloadButtonsContainer.FadeIn(transition_duration);
                 favouriteButton.FadeIn(transition_duration);
 
-                if (BeatmapSet.OnlineInfo.HasVideo)
+                Add(downloader = new BeatmapSetDownloader(BeatmapSet));
+                downloader.DownloadState.BindValueChanged(state =>
                 {
-                    videoButtons.Children = new[]
+                    switch (state)
                     {
-                        new DownloadButton(BeatmapSet),
-                        new DownloadButton(BeatmapSet, true),
-                    };
-
-                    videoButtons.FadeIn(transition_duration);
-                    noVideoButtons.FadeOut(transition_duration);
-                }
-                else
-                {
-                    noVideoButtons.Child = new DownloadButton(BeatmapSet);
-
-                    noVideoButtons.FadeIn(transition_duration);
-                    videoButtons.FadeOut(transition_duration);
-                }
+                        case BeatmapSetDownloader.DownloadStatus.Downloaded:
+                            // temporary for UX until new design is implemented.
+                            downloadButtonsContainer.Child = new osu.Game.Overlays.Direct.DownloadButton(BeatmapSet)
+                            {
+                                Width = 50,
+                                RelativeSizeAxes = Axes.Y
+                            };
+                            break;
+                        case BeatmapSetDownloader.DownloadStatus.Downloading:
+                            // temporary to avoid showing two buttons for maps with novideo. will be fixed in new beatmap overlay design.
+                            downloadButtonsContainer.Child = new DownloadButton(BeatmapSet);
+                            break;
+                        default:
+                            downloadButtonsContainer.Child = new DownloadButton(BeatmapSet);
+                            if (BeatmapSet.OnlineInfo.HasVideo)
+                                downloadButtonsContainer.Add(new DownloadButton(BeatmapSet, true));
+                            break;
+                    }
+                }, true);
             }
             else
             {
@@ -196,24 +205,11 @@ namespace osu.Game.Overlays.BeatmapSet
                                         Children = new Drawable[]
                                         {
                                             favouriteButton = new FavouriteButton(),
-                                            downloadButtonsContainer = new Container
+                                            downloadButtonsContainer = new FillFlowContainer
                                             {
                                                 RelativeSizeAxes = Axes.Both,
                                                 Padding = new MarginPadding { Left = buttons_height + buttons_spacing },
-                                                Children = new Drawable[]
-                                                {
-                                                    noVideoButtons = new Container
-                                                    {
-                                                        RelativeSizeAxes = Axes.Both,
-                                                        Alpha = 0f,
-                                                    },
-                                                    videoButtons = new FillFlowContainer
-                                                    {
-                                                        RelativeSizeAxes = Axes.Both,
-                                                        Spacing = new Vector2(buttons_spacing),
-                                                        Alpha = 0f,
-                                                    },
-                                                },
+                                                Spacing = new Vector2(buttons_spacing),
                                             },
                                         },
                                     },

@@ -29,6 +29,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             Width = 120;
 
             BeatmapSetDownloader downloader;
+            FillFlowContainer textSprites;
+
             AddRange(new Drawable[]
             {
                 new Container
@@ -39,27 +41,14 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     Children = new Drawable[]
                     {
                         downloader = new BeatmapSetDownloader(set, noVideo),
-                        new FillFlowContainer
+                        textSprites = new FillFlowContainer
                         {
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             AutoSizeAxes = Axes.Both,
+                            AutoSizeDuration = 500,
+                            AutoSizeEasing = Easing.OutQuint,
                             Direction = FillDirection.Vertical,
-                            Children = new[]
-                            {
-                                new OsuSpriteText
-                                {
-                                    Text = "Download",
-                                    TextSize = 13,
-                                    Font = @"Exo2.0-Bold",
-                                },
-                                new OsuSpriteText
-                                {
-                                    Text = set.OnlineInfo.HasVideo && noVideo ? "without Video" : string.Empty,
-                                    TextSize = 11,
-                                    Font = @"Exo2.0-Bold",
-                                },
-                            },
                         },
                         new SpriteIcon
                         {
@@ -97,14 +86,42 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             {
                 switch (state)
                 {
+                    case BeatmapSetDownloader.DownloadStatus.Downloading:
+                        textSprites.Children = new Drawable[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Text = "Downloading...",
+                                TextSize = 13,
+                                Font = @"Exo2.0-Bold",
+                            },
+                        };
+                        break;
                     case BeatmapSetDownloader.DownloadStatus.Downloaded:
                         this.FadeOut(200);
                         break;
                     case BeatmapSetDownloader.DownloadStatus.NotDownloaded:
+                        textSprites.Children = new Drawable[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Text = "Download",
+                                TextSize = 13,
+                                Font = @"Exo2.0-Bold",
+                            },
+                            new OsuSpriteText
+                            {
+                                Text = set.OnlineInfo.HasVideo && noVideo ? "without Video" : string.Empty,
+                                TextSize = 11,
+                                Font = @"Exo2.0-Bold",
+                            },
+                        };
                         this.FadeIn(200);
                         break;
                 }
             };
+
+            downloader.DownloadState.TriggerChange();
         }
 
         [BackgroundDependencyLoader]
