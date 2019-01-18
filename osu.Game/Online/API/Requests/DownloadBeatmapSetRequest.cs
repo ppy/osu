@@ -10,7 +10,7 @@ namespace osu.Game.Online.API.Requests
     {
         public readonly BeatmapSetInfo BeatmapSet;
 
-        public Action<float> DownloadProgressed;
+        public event Action<float> DownloadProgressed;
 
         private readonly bool noVideo;
 

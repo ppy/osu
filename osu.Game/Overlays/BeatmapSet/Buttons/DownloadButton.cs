@@ -7,8 +7,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API;
 using osu.Game.Overlays.Direct;
@@ -18,75 +18,100 @@ using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
-    public class DownloadButton : HeaderButton, IHasTooltip
+    public class DownloadButton : DownloadTrackingComposite, IHasTooltip
     {
-        public string TooltipText => Enabled ? null : "You gotta be an osu!supporter to download for now 'yo";
+        private readonly bool noVideo;
+        public string TooltipText => button.Enabled ? null : "You gotta be an osu!supporter to download for now 'yo";
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
-        public DownloadButton(BeatmapSetInfo set, bool noVideo = false)
-        {
-            Width = 120;
+        private ShakeContainer shakeContainer;
+        private HeaderButton button;
 
-            BeatmapSetDownloader downloader;
+        public DownloadButton(BeatmapSetInfo beatmapSet, bool noVideo = false)
+            : base(beatmapSet)
+        {
+            this.noVideo = noVideo;
+
+            Width = 120;
+            RelativeSizeAxes = Axes.Y;
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(APIAccess api, BeatmapManager beatmaps)
+        {
             FillFlowContainer textSprites;
 
-            AddRange(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
-                new Container
+                shakeContainer = new ShakeContainer
                 {
                     Depth = -1,
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = 10 },
+                    Masking = true,
+                    CornerRadius = 5,
                     Children = new Drawable[]
                     {
-                        downloader = new BeatmapSetDownloader(set, noVideo),
-                        textSprites = new FillFlowContainer
+                        button = new HeaderButton { RelativeSizeAxes = Axes.Both },
+                        new Container
                         {
-                            Anchor = Anchor.CentreLeft,
-                            Origin = Anchor.CentreLeft,
-                            AutoSizeAxes = Axes.Both,
-                            AutoSizeDuration = 500,
-                            AutoSizeEasing = Easing.OutQuint,
-                            Direction = FillDirection.Vertical,
+                            // cannot nest inside here due to the structure of button (putting things in its own content).
+                            // requires framework fix.
+                            Padding = new MarginPadding { Horizontal = 10 },
+                            RelativeSizeAxes = Axes.Both,
+                            Children = new Drawable[]
+                            {
+                                textSprites = new FillFlowContainer
+                                {
+                                    Depth = -1,
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.CentreLeft,
+                                    AutoSizeAxes = Axes.Both,
+                                    AutoSizeDuration = 500,
+                                    AutoSizeEasing = Easing.OutQuint,
+                                    Direction = FillDirection.Vertical,
+                                },
+                                new SpriteIcon
+                                {
+                                    Depth = -1,
+                                    Anchor = Anchor.CentreRight,
+                                    Origin = Anchor.CentreRight,
+                                    Icon = FontAwesome.fa_download,
+                                    Size = new Vector2(16),
+                                    Margin = new MarginPadding { Right = 5 },
+                                },
+                            }
                         },
-                        new SpriteIcon
+                        new DownloadProgressBar(BeatmapSet)
                         {
-                            Anchor = Anchor.CentreRight,
-                            Origin = Anchor.CentreRight,
-                            Icon = FontAwesome.fa_download,
-                            Size = new Vector2(16),
-                            Margin = new MarginPadding { Right = 5 },
+                            Depth = -2,
+                            Anchor = Anchor.BottomLeft,
+                            Origin = Anchor.BottomLeft,
                         },
                     },
                 },
-                new DownloadProgressBar(set)
-                {
-                    Depth = -2,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.BottomLeft,
-                },
             });
 
-            Action = () =>
+            button.Action = () =>
             {
-                if (downloader.DownloadState.Value == BeatmapSetDownloader.DownloadStatus.Downloading)
+                if (State.Value == DownloadState.Downloading)
                 {
-                    Content.MoveToX(-5, 50, Easing.OutSine).Then()
-                           .MoveToX(5, 100, Easing.InOutSine).Then()
-                           .MoveToX(-5, 100, Easing.InOutSine).Then()
-                           .MoveToX(0, 50, Easing.InSine);
+                    shakeContainer.Shake();
                     return;
                 }
 
-                downloader.Download();
+                beatmaps.Download(BeatmapSet, noVideo);
             };
 
-            downloader.DownloadState.ValueChanged += state =>
+            localUser.BindTo(api.LocalUser);
+            localUser.BindValueChanged(userChanged, true);
+            button.Enabled.BindValueChanged(enabledChanged, true);
+
+            State.BindValueChanged(state =>
             {
                 switch (state)
                 {
-                    case BeatmapSetDownloader.DownloadStatus.Downloading:
+                    case DownloadState.Downloading:
                         textSprites.Children = new Drawable[]
                         {
                             new OsuSpriteText
@@ -97,10 +122,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             },
                         };
                         break;
-                    case BeatmapSetDownloader.DownloadStatus.Downloaded:
+                    case DownloadState.Downloaded:
                         this.FadeOut(200);
                         break;
-                    case BeatmapSetDownloader.DownloadStatus.NotDownloaded:
+                    case DownloadState.NotDownloaded:
                         textSprites.Children = new Drawable[]
                         {
                             new OsuSpriteText
@@ -111,7 +136,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             },
                             new OsuSpriteText
                             {
-                                Text = set.OnlineInfo.HasVideo && noVideo ? "without Video" : string.Empty,
+                                Text = BeatmapSet.Value.OnlineInfo.HasVideo && noVideo ? "without Video" : string.Empty,
                                 TextSize = 11,
                                 Font = @"Exo2.0-Bold",
                             },
@@ -119,20 +144,10 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         this.FadeIn(200);
                         break;
                 }
-            };
-
-            downloader.DownloadState.TriggerChange();
+            }, true);
         }
 
-        [BackgroundDependencyLoader]
-        private void load(APIAccess api)
-        {
-            localUser.BindTo(api.LocalUser);
-            localUser.BindValueChanged(userChanged, true);
-            Enabled.BindValueChanged(enabledChanged, true);
-        }
-
-        private void userChanged(User user) => Enabled.Value = user.IsSupporter;
+        private void userChanged(User user) => button.Enabled.Value = user.IsSupporter;
 
         private void enabledChanged(bool enabled) => this.FadeColour(enabled ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
     }
