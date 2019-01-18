@@ -150,7 +150,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                 };
 
                 performStaticInputTest(frames);
-
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 4");
@@ -181,7 +180,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep(() => allJudgedFired, "Wait for test 5");
             AddAssert("Tracking retained, sliderhead miss", assertHeadMissTailMeh);
         }
-
 
         /// <summary>
         /// Hitting a slider head, leaving the slider, then coming back into the slider to track it should re-start tracking.

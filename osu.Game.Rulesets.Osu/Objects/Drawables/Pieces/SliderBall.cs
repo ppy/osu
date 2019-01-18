@@ -187,7 +187,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 Tracking = canCurrentlyTrack
                            && cursorTrackingBall
                            && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton)
-                                                                                              && (trackingActions.Contains(x) || !validPressedNote && trackingActions.Count == 0)) ?? false);
+                                                                                              && (trackingActions.Contains(x) || (!validPressedNote && trackingActions.Count == 0))) ?? false);
             }
         }
 
