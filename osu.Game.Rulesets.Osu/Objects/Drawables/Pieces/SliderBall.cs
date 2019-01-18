@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
 using osuTK;
@@ -45,11 +46,20 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public readonly Drawable FollowCircle;
         private Drawable drawableBall;
         private readonly DrawableSlider drawableSlider;
+        private bool headHit = false;
 
         public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
         {
             this.drawableSlider = drawableSlider;
             this.slider = slider;
+            //We no longer care about whether or not the slider is being tracked by the correct key if the head circle was never hit.
+            if (drawableSlider != null)
+                drawableSlider.HeadCircle.OnNewResult += (o, result) =>
+                {
+                    if (result.Type != HitResult.Miss)
+                        headHit = true;
+                };
+
             Masking = true;
             AutoSizeAxes = Axes.Both;
             Blending = BlendingMode.Additive;
@@ -169,7 +179,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 // Make sure to use the base version of ReceivePositionalInputAt so that we correctly check the position.
                 Tracking = canCurrentlyTrack
                         && cursorTrackingBall
-                        && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton) && trackingActions.Contains(x)) ?? false);
+                        && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton)
+                                                                                           && (trackingActions.Contains(x) || !headHit)) ?? false);
             }
         }
 
@@ -191,10 +202,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public bool OnReleased(OsuAction action)
         {
-            if (trackingActions.Contains(action))
-            {
-                trackingActions.Remove(action);
-            }
+            trackingActions.Remove(action);
 
             return false;
         }

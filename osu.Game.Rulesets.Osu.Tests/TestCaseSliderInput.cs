@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Logging;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Judgements;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
@@ -29,12 +31,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void Setup()
         {
             Schedule(() => { allJudgedFired = false; });
+            headResult = null;
         }
 
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
         private JudgementResult lastResult;
+        private JudgementResult headResult;
         private bool allJudgedFired;
 
         public TestCaseSliderInput()
@@ -154,6 +158,56 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking retained", assertGreatJudge);
         }
 
+        /// <summary>
+        ///     Pressing a key before a slider and holding the slider throughout the body should result in tracking, but a miss on the slider head.
+        ///     Only one frame is required:
+        ///     Frame 1: Left Click
+        ///     In a successful test case:
+        ///     The head of the slider should be judged as a miss.
+        ///     The slider end should be judged as a meh.
+        /// </summary>
+        [Test]
+        public void TestTrackingPreclicked()
+        {
+            AddStep("Tracking retention test", () =>
+            {
+                var actions = new Dictionary<List<OsuAction>, double>
+                {
+                    { new List<OsuAction> { OsuAction.LeftButton }, 250 },
+                };
+
+                performStaticInputTest(actions);
+            });
+
+            AddUntilStep(() => allJudgedFired, "Wait for test 5");
+            AddAssert("Tracking retained, sliderhead miss", assertHeadMissTailMeh);
+        }
+
+        /// <summary>
+        ///     Pressing a key in the middle of the slider should result in tracking.
+        ///     Only one frame is required:
+        ///     Frame 1: Left Click
+        ///     In a successful test case:
+        ///     The head of the slider should be judged as a miss.
+        ///     The slider end should be judged as a meh.
+        /// </summary>
+        [Test]
+        public void TestTrackingMidSlider()
+        {
+            AddStep("Tracking retention test", () =>
+            {
+                var actions = new Dictionary<List<OsuAction>, double>
+                {
+                    { new List<OsuAction> { OsuAction.LeftButton }, 2500 },
+                };
+
+                performStaticInputTest(actions);
+            });
+
+            AddUntilStep(() => allJudgedFired, "Wait for test 6");
+            AddAssert("Tracking retained, sliderhead miss", assertHeadMissTailMeh);
+        }
+
         private bool assertMehJudge()
         {
             return lastResult.Type == HitResult.Meh;
@@ -162,6 +216,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         private bool assertGreatJudge()
         {
             return lastResult.Type == HitResult.Great;
+        }
+
+        private bool assertHeadMissTailMeh()
+        {
+            Logger.Log(lastResult.Type.ToString() + headResult.Type.ToString());
+            return lastResult.Type == HitResult.Meh && headResult.Type == HitResult.Miss;
         }
 
         private void performStaticInputTest(Dictionary<List<OsuAction>, double> actionsOnSlider)
@@ -215,7 +275,13 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             Child = player;
 
-            player.ScoreProcessor.NewJudgement += result => { lastResult = result; };
+            player.ScoreProcessor.NewJudgement += result =>
+            {
+                if (headResult == null)
+                    headResult = result;
+                else
+                    lastResult = result;
+            };
 
             player.ScoreProcessor.AllJudged += () => { allJudgedFired = true; };
         }
