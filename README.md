@@ -46,7 +46,7 @@ git pull --recurse-submodules
 
 ## Building
 
-Configuration for Visual Studio 2017, Rider and Visual Studio Code is included in the source code.
+Build configurations for [Visual Studio 2017+](https://visualstudio.microsoft.com/vs/), [Jetbrains Rider](https://www.jetbrains.com/rider/) and [Visual Studio Code](https://code.visualstudio.com/) are included in the source code.
 
 > Visual Studio Code users must run the `Restore` task before any build attempt.
 
