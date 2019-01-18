@@ -206,7 +206,8 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        /// Pressing a key before a slider, hitting a slider head, leaving the slider, then coming back into the slider to track it should NOT start retracking.
+        /// Pressing a key before a slider, hitting a slider head, leaving the slider, then coming back into the slider to track it should NOT start retracking
+        /// This is current stable behavior.
         /// </summary>
         [Test]
         public void TestTrackingReturnMidSliderKeyDownBefore()
@@ -231,7 +232,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        /// Pressing a key before a slider, then starting to hover the slider afterwards should result in tracking
+        /// Halfway into a slider outside of the slider, then starting to hover the slider afterwards should result in tracking
         /// </summary>
         [Test]
         public void TestTrackingMidSlider()
@@ -252,6 +253,32 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep(() => allJudgedFired, "Wait for test 8");
             AddAssert("Tracking acquired", assertMidSliderJudgements);
         }
+
+
+        /// <summary>
+        /// Pressing a key before a slider, clicking another key after the slider, holding both of them and
+        /// leaving tracking, then releasing both keys, then pressing the originally pressed key should start tracking
+        /// </summary>
+        [Test]
+        public void TestTrackingPressBeforeSliderClickingOtherKeyLeavingSliderReleaseThenTrackOriginal()
+        {
+            AddStep("Mid-slider new tracking acquisition", () =>
+            {
+                var frames = new List<ReplayFrame>
+                {
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 250},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = 1500},
+                    new OsuReplayFrame { Position = new Vector2(100, 100), Time = 1750},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 3500},
+                };
+
+                performStaticInputTest(frames);
+            });
+
+            AddUntilStep(() => allJudgedFired, "Wait for test 9");
+            AddAssert("Tracking acquired", assertMidSliderJudgements);
+        }
+
 
         private bool assertMehJudge()
         {
