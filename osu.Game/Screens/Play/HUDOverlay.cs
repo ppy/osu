@@ -24,8 +24,6 @@ namespace osu.Game.Screens.Play
     {
         private const int duration = 100;
 
-        private readonly Container content;
-
         public readonly KeyCounterCollection KeyCounter;
         public readonly RollingCounter<int> ComboCounter;
         public readonly ScoreCounter ScoreCounter;
@@ -37,6 +35,7 @@ namespace osu.Game.Screens.Play
         public readonly PlayerSettingsOverlay PlayerSettingsOverlay;
 
         private Bindable<bool> showHud;
+        private readonly Container visibilityContainer;
         private readonly BindableBool replayLoaded = new BindableBool();
 
         private static bool hasShownNotificationOnce;
@@ -45,34 +44,35 @@ namespace osu.Game.Screens.Play
         {
             RelativeSizeAxes = Axes.Both;
 
-            Add(content = new Container
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                AlwaysPresent = true, // The hud may be hidden but certain elements may need to still be updated
-                Children = new Drawable[]
+                visibilityContainer = new Container {
+                    RelativeSizeAxes = Axes.Both,
+                    AlwaysPresent = true,    // The hud may be hidden but certain elements may need to still be updated
+                    Children = new  Drawable[] {
+                        ComboCounter = CreateComboCounter(),
+                        ScoreCounter = CreateScoreCounter(),
+                        AccuracyCounter = CreateAccuracyCounter(),
+                        HealthDisplay = CreateHealthDisplay(),
+                        Progress = CreateProgress(),
+                        ModDisplay = CreateModsContainer(),
+                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
+                    }
+                },
+                new FillFlowContainer
                 {
-                    ComboCounter = CreateComboCounter(),
-                    ScoreCounter = CreateScoreCounter(),
-                    AccuracyCounter = CreateAccuracyCounter(),
-                    HealthDisplay = CreateHealthDisplay(),
-                    Progress = CreateProgress(),
-                    ModDisplay = CreateModsContainer(),
-                    PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
-                    new FillFlowContainer
+                    Anchor = Anchor.BottomRight,
+                    Origin = Anchor.BottomRight,
+                    Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
+                    AutoSizeAxes = Axes.Both,
+                    Direction = FillDirection.Vertical,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.BottomRight,
-                        Origin = Anchor.BottomRight,
-                        Position = -new Vector2(5, TwoLayerButton.SIZE_RETRACTED.Y),
-                        AutoSizeAxes = Axes.Both,
-                        Direction = FillDirection.Vertical,
-                        Children = new Drawable[]
-                        {
-                            KeyCounter = CreateKeyCounter(adjustableClock as IFrameBasedClock),
-                            HoldToQuit = CreateHoldForMenuButton(),
-                        }
+                        KeyCounter = CreateKeyCounter(adjustableClock as IFrameBasedClock),
+                        HoldToQuit = CreateHoldForMenuButton(),
                     }
                 }
-            });
+            };
 
             BindProcessor(scoreProcessor);
             BindRulesetContainer(rulesetContainer);
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Play
         private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
         {
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
-            showHud.ValueChanged += hudVisibility => content.FadeTo(hudVisibility ? 1 : 0, duration);
+            showHud.ValueChanged += hudVisibility => visibilityContainer.FadeTo(hudVisibility ? 1 : 0, duration);
             showHud.TriggerChange();
 
             if (!showHud && !hasShownNotificationOnce)
