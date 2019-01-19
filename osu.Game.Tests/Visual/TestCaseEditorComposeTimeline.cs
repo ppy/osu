@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(AudioManager audioManager)
         {
-            Beatmap.Value = new WaveformTestBeatmap(audioManager.Track);
+            Beatmap.Value = new WaveformTestBeatmap();
 
             Children = new Drawable[]
             {

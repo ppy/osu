@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load(AudioManager audioManager)
         {
-            Beatmap.Value = new WaveformTestBeatmap(audioManager.Track);
+            Beatmap.Value = new WaveformTestBeatmap();
 
             FillFlowContainer flow;
             Child = flow = new FillFlowContainer
