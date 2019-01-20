@@ -122,14 +122,8 @@ namespace osu.Game.Beatmaps.ControlPoints
                     return list[pivot];
             }
 
-            if (l > 0)
-            {
-                // l will be the first control point with Time > time, but we want the one before it
-                return list[l - 1];
-            }
-
-            // If the binary search failed, l will be unaffected
-            return list[l];
+            // l will be the first control point with Time > time, but we want the one before it
+            return list[l - 1];
         }
     }
 }
