@@ -50,13 +50,13 @@ Build configurations for the recommended IDEs (listed above) are included. You s
 
 > Visual Studio Code users must run the `Restore` task before any build attempt.
 
-You can also build osu! from the command-line:
+You can also build and run osu! from the command-line with a single command:
 
 ```shell
 dotnet run --project osu.Desktop
 ```
 
-If you are not interested in debugging osu!, you can add `-c Release` to gain performance. In this case, you must replace `Debug` with `Release` in the following section.
+If you are not interested in debugging osu!, you can add `-c Release` to gain performance. In this case, you must replace `Debug` with `Release` in any commands mentioned in this document.
 
 If the build fails, try to restore nuget packages with `dotnet restore`.
 
