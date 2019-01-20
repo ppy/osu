@@ -11,7 +11,7 @@ We are accepting bug reports (please report with as much detail as possible). Fe
 # Requirements
 
 - A desktop platform with the [.NET Core SDK 2.2](https://www.microsoft.com/net/learn/get-started) or higher installed.
-- When working with the codebase, we recommend using an IDE with intellisense and syntax highlighting, such as [Visual Studio Community Edition](https://www.visualstudio.com/) (Windows), [Visual Studio Code](https://code.visualstudio.com/) (with the C# plugin installed) or [Jetbrains Rider](https://www.jetbrains.com/rider/) (commercial).
+- When working with the codebase, we recommend using an IDE with intellisense and syntax highlighting, such as [Visual Studio 2017+](https://visualstudio.microsoft.com/vs/), [Jetbrains Rider](https://www.jetbrains.com/rider/) or [Visual Studio Code](https://code.visualstudio.com/).
 
 # Running osu!
 
@@ -29,7 +29,7 @@ If your platform is not listed above, there is still a chance you can manually b
 
 Clone the repository **including submodules**:
 
-```
+```shell
 git clone --recurse-submodules https://github.com/ppy/osu
 cd osu
 ```
@@ -40,19 +40,19 @@ cd osu
 
 To update the source code to the latest commit, run the following command inside the `osu` directory:
 
-```
+```shell
 git pull --recurse-submodules
 ```
 
 ## Building
 
-Build configurations for [Visual Studio 2017+](https://visualstudio.microsoft.com/vs/), [Jetbrains Rider](https://www.jetbrains.com/rider/) and [Visual Studio Code](https://code.visualstudio.com/) are included in the source code.
+Build configurations for the recommended IDEs (listed above) are included. You should use the provided Build/Run functionality of your IDE to get things going. When testing or building new components, it's highly encouraged you use the `VisualTests` project/configuration. More information on this provided below.
 
 > Visual Studio Code users must run the `Restore` task before any build attempt.
 
 You can also build osu! from the command-line:
 
-```
+```shell
 dotnet run --project osu.Desktop
 ```
 
@@ -68,7 +68,7 @@ On Linux, the environment variable `LD_LIBRARY_PATH` must point to the build dir
 
 For example, you can run osu! with the following command:
 
-```
+```shell
 LD_LIBRARY_PATH="$(pwd)/osu.Desktop/bin/Debug/netcoreapp2.2" dotnet run --project osu.Desktop
 ```
 
