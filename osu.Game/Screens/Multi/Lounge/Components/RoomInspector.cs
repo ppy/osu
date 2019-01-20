@@ -266,7 +266,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             private void updateParticipants()
             {
-                var roomId = room.RoomID.Value ?? 0;
+                var roomId = room?.RoomID.Value ?? 0;
 
                 request?.Cancel();
 
@@ -295,6 +295,12 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 };
 
                 api.Queue(request);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                request?.Cancel();
+                base.Dispose(isDisposing);
             }
 
             private class UserTile : CompositeDrawable, IHasTooltip
