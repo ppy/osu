@@ -3,7 +3,6 @@
 
 using osuTK;
 using osuTK.Graphics;
-using osuTK.Graphics.ES30;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
