@@ -36,11 +36,12 @@ namespace osu.Game.Online.API.Requests
 
         [Description("Ranked & Approved")]
         RankedApproved = 0,
-        Approved = 1,
+        Qualified = 3,
         Loved = 8,
         Favourites = 2,
-        Qualified = 3,
-        Pending = 4,
+
+        [Description("Pending & WIP")]
+        PendingWIP = 4,
         Graveyard = 5,
 
         [Description("My Maps")]
