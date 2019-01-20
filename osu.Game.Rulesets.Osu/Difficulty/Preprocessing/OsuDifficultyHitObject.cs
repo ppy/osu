@@ -119,8 +119,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             float approxFollowCircleRadius = (float)(slider.Radius * 3);
             var computeVertex = new Action<double>(t =>
             {
-                double progress = ((int)t - (int)slider.StartTime) / (float)(int)slider.SpanDuration;
-                if (progress % 2 > 1)
+                double progress = (t - slider.StartTime) / slider.SpanDuration;
+                if (progress % 2 >= 1)
                     progress = 1 - progress % 1;
                 else
                     progress = progress % 1;
