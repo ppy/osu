@@ -60,12 +60,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        ///     Pressing a key before a slider, pressing the other key on the slider head, then releasing the latter pressed key
-        ///     should result in tracking to end.
-        ///     Frame 1 (prior to slider):          Left Click
-        ///     Frame 2 (within slider hit window): Left &amp; Right Click
-        ///     Frame 3 (while tracking):           Left Click
-        ///     A passing test case will have the cursor lose tracking on frame 3.
+        /// Scenario:
+        /// - Press a key before a slider starts
+        /// - Press the other key on the slider head timed correctly while holding the original key
+        /// - Release the latter pressed key
+        /// Expected Result:
+        /// A passing test case will have the cursor lose tracking on frame 3.
         /// </summary>
         [Test]
         public void TestLeftBeforeSliderThenRight()
@@ -87,12 +87,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        ///     Hitting a slider head, pressing a new key after the initial hit, then letting go of the original key used to hit
-        ///     the slider should reslt in continued tracking.
-        ///     Frame 1: Left Click
-        ///     Frame 2: Left &amp; Right Click
-        ///     Frame 3: Right Click
-        ///     A passing test case will have the cursor continue to track after frame 3.
+        /// Scenario:
+        /// - Press a key on the slider head timed correctly
+        /// - Press the other key in the middle of the slider while holding the original key
+        /// - Release the original key used to hit the slider
+        /// Expected Result:
+        /// A passing test case will have the cursor continue tracking on frame 3.
         /// </summary>
         [Test]
         public void TestLeftBeforeSliderThenRightThenLettingGoOfLeft()
@@ -114,12 +114,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        ///     Hitting a slider head, pressing a new key after the initial hit, then letting go of the new key should result
-        ///     in continue tracking,
-        ///     Frame 1: Left Click
-        ///     Frame 2: Left &amp; Right Click
-        ///     Frame 3: Left Click
-        ///     A passing test case will have the cursor continue to track after frame 3.
+        /// Scenario:
+        /// - Press a key on the slider head timed correctly
+        /// - Press the other key in the middle of the slider while holding the original key
+        /// - Release the new key that was pressed second
+        /// Expected Result:
+        /// A passing test case will have the cursor continue tracking on frame 3.
         /// </summary>
         [Test]
         public void TestTrackingRetentionLeftRightLeft()
@@ -141,12 +141,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        ///     Pressing a key before a slider, pressing the other key on the slider head, then releasing the former pressed key
-        ///     should result in continued tracking.
-        ///     Frame 1 (prior to slider):      Left Click
-        ///     Frame 2 (on slider head):       Left &amp; Right Click
-        ///     Frame 3 (tracking slider body): Right Click
-        ///     A passing test case will have the cursor continue to track after frame 3.
+        /// Scenario:
+        /// - Press a key before a slider starts
+        /// - Press the other key on the slider head timed correctly while holding the original key
+        /// - Release the key that was held down before the slider started.
+        /// Expected Result:
+        /// A passing test case will have the cursor continue tracking on frame 3
         /// </summary>
         [Test]
         public void TestTrackingLeftBeforeSliderToRight()
@@ -168,12 +168,11 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        ///     Pressing a key before a slider and holding the slider throughout the body should result in tracking, but a miss on the slider head.
-        ///     Only one frame is required:
-        ///     Frame 1: Left Click
-        ///     In a successful test case:
-        ///     The head of the slider should be judged as a miss.
-        ///     The slider end should be judged as a meh.
+        /// Scenario:
+        /// - Press a key before a slider starts
+        /// - Hold the key down throughout the slider without pressing any other buttons.
+        /// Expected Result:
+        /// A passing test case will have the cursor track the slider, but miss the slider head.
         /// </summary>
         [Test]
         public void TestTrackingPreclicked()
@@ -193,11 +192,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        ///     Hitting a slider head, leaving the slider, then coming back into the slider with the same button to track it should re-start tracking.
-        ///     Only one frame is required:
-        ///     Frame 1: Left Click
-        ///     In a successful test case:
-        ///     The last tick of the slider should be judged as a great.
+        /// Scenario:
+        /// - Press a key before a slider starts
+        /// - Hold the key down after the slider starts
+        /// - Move the cursor away from the slider body
+        /// - Move the cursor back onto the body
+        /// Expected Result:
+        /// A passing test case will have the cursor track the slider, miss the head, miss the ticks where its outside of the body, and resume tracking when the cursor returns.
         /// </summary>
         [Test]
         public void TestTrackingReturnMidSlider()
@@ -221,10 +222,14 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        ///     Pressing a key before a slider, hitting a slider head, leaving the slider, then coming back into the slider to track it should NOT start retracking
-        ///     This is current stable behavior.
-        ///     In a successful test case:
-        ///     The last tick of the slider should be judged as a miss.
+        /// Scenario:
+        /// - Press a key before a slider starts
+        /// - Press the other key on the slider head timed correctly while holding the original key
+        /// - Release the key used to hit the slider head
+        /// - While holding the first key, move the cursor away from the slider body
+        /// - Still holding the first key, move the cursor back to the slider body
+        /// Expected Result:
+        /// A passing test case will have the slider not track despite having the cursor return to the slider body.
         /// </summary>
         [Test]
         public void TestTrackingReturnMidSliderKeyDownBefore()
@@ -249,9 +254,12 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        ///     Halfway into a slider outside of the slider, then starting to hover the slider afterwards should result in tracking
-        ///     In a successful test case:
-        ///     The last tick of the slider should be judged as a great.
+        /// Scenario:
+        /// - Wait for the slider to reach a mid-point
+        /// - Press a key away from the slider body
+        /// - While holding down the key, move into the slider body
+        /// Expected Result:
+        /// A passing test case will have the slider track the cursor after the cursor enters the slider body.
         /// </summary>
         [Test]
         public void TestTrackingMidSlider()
@@ -274,13 +282,16 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        ///     Pressing a key before a slider, clicking another key after the slider, holding both of them and
-        ///     leaving tracking, then releasing both keys, then pressing the originally pressed key should start tracking
-        ///     In a successful test case:
-        ///     The last tick of the slider should be judged as a great.
+        /// Scenario:
+        /// - Press a key before the slider starts
+        /// - Press another key on the slider head while holding the original key
+        /// - Move out of the slider body while releasing the two pressed keys
+        /// - Move back into the slider body while pressing any key.
+        /// Expected Result:
+        /// A passing test case will have the slider track the cursor after the cursor enters the slider body.
         /// </summary>
         [Test]
-        public void TestTrackingPressBeforeSliderClickingOtherKeyLeavingSliderReleaseThenTrackOriginal()
+        public void TestTrackingReleasedKeys()
         {
             AddStep("Mid-slider new tracking acquisition", () =>
             {
@@ -300,13 +311,17 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        ///     Pressing a key before a slider, clicking another key after the slider, holding both of them and
-        ///     leaving tracking, then releasing both keys, then pressing the originally pressed key should start tracking
-        ///     In a successful test case:
-        ///     The last tick of the slider should be judged as a great.
+        /// Scenario:
+        /// - Press a key on the slider head
+        /// - While holding the key, move outside of the slider body with the cursor
+        /// - Release the key while outside of the slider body
+        /// - Press the key again while outside of the slider body
+        /// - Move back into the slider body while holding the pressed key
+        /// Expected Result:
+        /// A passing test case will have the slider track the cursor after the cursor enters the slider body.
         /// </summary>
         [Test]
-        public void TestClickingBeforeLeavingSliderReleasingClickingAgainThenTracking()
+        public void TestTrackingReleasedValidKey()
         {
             AddStep("Mid-slider new tracking acquisition", () =>
             {
