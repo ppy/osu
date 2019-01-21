@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         ///
         /// In all other cases, no special handling is required (either key being pressed is allowable as valid tracking).
         ///
-        /// The reason for storing this as a time value (rather than a bool) is to correct handle rewind scenarios.
+        /// The reason for storing this as a time value (rather than a bool) is to correctly handle rewind scenarios.
         /// </summary>
         private double? timeToAcceptAnyKeyAfter;
 
