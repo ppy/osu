@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             this.slider = slider;
 
             if (drawableSlider != null)
-                drawableSlider.HeadCircle.OnNewResult += (o, result) => headJudged = false;
+                drawableSlider.HeadCircle.OnNewResult += (o, result) => headJudged = true;
 
             Masking = true;
             AutoSizeAxes = Axes.Both;
@@ -186,7 +186,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Position = slider.CurvePositionAt(completionProgress);
         }
 
-        private bool containsOtherKey(OsuAction action)
+        // Checks if the currently pressed actions has the other key already held down.
+        private bool otherKeyAlreadyPressed(OsuAction action)
         {
             switch (action)
             {
@@ -198,6 +199,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
+        // Returns the opposite pressed key. eg. otherKey(left) would return right
         private OsuAction? otherKey(OsuAction action)
         {
             switch (action)
@@ -213,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public bool OnPressed(OsuAction action)
         {
-            if (cursorTrackingBall && (Hit?.Invoke() ?? false) && (action == OsuAction.LeftButton || action == OsuAction.RightButton) && containsOtherKey(action) && !headJudged)
+            if (cursorTrackingBall && (Hit?.Invoke() ?? false) && (action == OsuAction.LeftButton || action == OsuAction.RightButton) && otherKeyAlreadyPressed(action) && !headJudged)
             {
                 blockedAction = otherKey(action);
                 return true;
