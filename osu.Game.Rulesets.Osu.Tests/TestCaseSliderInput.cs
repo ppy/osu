@@ -41,7 +41,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(DrawableOsuHitObject)
         };
 
-
         [SetUp]
         public void Setup()
         {
@@ -269,7 +268,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep(() => allJudgedFired, "Wait for test 8");
             AddAssert("Tracking acquired", assertMidSliderJudgements);
         }
-
 
         /// <summary>
         /// Pressing a key before a slider, clicking another key after the slider, holding both of them and
