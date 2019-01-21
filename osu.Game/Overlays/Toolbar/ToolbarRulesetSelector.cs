@@ -68,7 +68,7 @@ namespace osu.Game.Overlays.Toolbar
         }
 
         [BackgroundDependencyLoader]
-        private void load(RulesetStore rulesets, IMutableBindable<RulesetInfo> parentRuleset)
+        private void load(RulesetStore rulesets, Bindable<RulesetInfo> parentRuleset)
         {
             this.rulesets = rulesets;
             foreach (var r in rulesets.AvailableRulesets)

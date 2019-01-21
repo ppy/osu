@@ -69,9 +69,9 @@ namespace osu.Game.Screens
 
         private ParallaxContainer backgroundParallaxContainer;
 
-        protected IMutableBindable<WorkingBeatmap> Beatmap;
+        protected Bindable<WorkingBeatmap> Beatmap;
 
-        protected IMutableBindable<RulesetInfo> Ruleset;
+        protected Bindable<RulesetInfo> Ruleset;
 
         /// <summary>
         /// Disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
@@ -91,20 +91,20 @@ namespace osu.Game.Screens
                 if (Beatmap == null)
                 {
                     leaseOwner = true;
-                    dependencies.Cache(Beatmap = dependencies.Get<LeasableBindable<WorkingBeatmap>>().BeginLease(true));
+                    dependencies.Cache(Beatmap = dependencies.Get<Bindable<WorkingBeatmap>>().BeginLease(true));
                 }
 
                 Ruleset = dependencies.Get<LeasedBindable<RulesetInfo>>()?.GetBoundCopy();
                 if (Ruleset == null)
                 {
                     leaseOwner = true;
-                    dependencies.Cache(Ruleset = dependencies.Get<LeasableBindable<RulesetInfo>>().BeginLease(true));
+                    dependencies.Cache(Ruleset = dependencies.Get<Bindable<RulesetInfo>>().BeginLease(true));
                 }
             }
             else
             {
-                Beatmap = dependencies.Get<LeasableBindable<WorkingBeatmap>>().GetBoundCopy();
-                Ruleset = dependencies.Get<LeasableBindable<RulesetInfo>>().GetBoundCopy();
+                Beatmap = (dependencies.Get<LeasedBindable<WorkingBeatmap>>() ?? dependencies.Get<Bindable<WorkingBeatmap>>()).GetBoundCopy();
+                Ruleset = (dependencies.Get<LeasedBindable<RulesetInfo>>() ?? dependencies.Get<Bindable<RulesetInfo>>()).GetBoundCopy();
             }
 
             return dependencies;

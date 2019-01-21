@@ -69,9 +69,9 @@ namespace osu.Game
 
         protected override Container<Drawable> Content => content;
 
-        private LeasableBindable<WorkingBeatmap> beatmap;
+        private Bindable<WorkingBeatmap> beatmap;
 
-        protected IMutableBindable<WorkingBeatmap> Beatmap => beatmap;
+        protected Bindable<WorkingBeatmap> Beatmap => beatmap;
 
         private Bindable<bool> fpsDisplayVisible;
 
@@ -174,10 +174,9 @@ namespace osu.Game
             // this adds a global reduction of track volume for the time being.
             Audio.Track.AddAdjustment(AdjustableProperty.Volume, new BindableDouble(0.8));
 
-            beatmap = new LeasableBindable<WorkingBeatmap>(new OsuBindableBeatmap(defaultBeatmap, Audio));
+            beatmap = new OsuBindableBeatmap(defaultBeatmap, Audio);
 
             dependencies.CacheAs<IBindable<WorkingBeatmap>>(beatmap);
-            dependencies.CacheAs<IMutableBindable<WorkingBeatmap>>(beatmap);
             dependencies.CacheAs(beatmap);
 
             FileStore.Cleanup();

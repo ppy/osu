@@ -102,7 +102,7 @@ namespace osu.Game
         private OnScreenDisplay onscreenDisplay;
 
         private Bindable<int> configRuleset;
-        private readonly LeasableBindable<RulesetInfo> ruleset = new LeasableBindable<RulesetInfo>(new Bindable<RulesetInfo>());
+        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
 
         private Bindable<int> configSkin;
 
@@ -172,7 +172,6 @@ namespace osu.Game
 
             dependencies.CacheAs(ruleset);
             dependencies.CacheAs<IBindable<RulesetInfo>>(ruleset);
-            dependencies.CacheAs<IMutableBindable<RulesetInfo>>(ruleset);
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
