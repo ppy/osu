@@ -37,10 +37,10 @@ namespace osu.Game.Online.Multiplayer
         public RulesetInfo Ruleset { get; set; }
 
         [JsonIgnore]
-        public readonly BindableCollection<Mod> AllowedMods = new BindableCollection<Mod>();
+        public readonly BindableList<Mod> AllowedMods = new BindableList<Mod>();
 
         [JsonIgnore]
-        public readonly BindableCollection<Mod> RequiredMods = new BindableCollection<Mod>();
+        public readonly BindableList<Mod> RequiredMods = new BindableList<Mod>();
 
         [JsonProperty("beatmap")]
         private APIBeatmap apiBeatmap { get; set; }

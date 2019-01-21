@@ -101,7 +101,6 @@ namespace osu.Game.Screens.Select
 
         private readonly Container<DrawableCarouselItem> scrollableContent;
 
-
         public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
 
         public Bindable<RandomSelectAlgorithm> RandomAlgorithm = new Bindable<RandomSelectAlgorithm>();
