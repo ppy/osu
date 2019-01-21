@@ -2,7 +2,6 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -54,7 +53,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             this.drawableSlider = drawableSlider;
             this.slider = slider;
 
-            drawableSlider.HeadCircle.OnNewResult += (o, result) => headJudged = false;
+            if (drawableSlider != null)
+                drawableSlider.HeadCircle.OnNewResult += (o, result) => headJudged = false;
 
             Masking = true;
             AutoSizeAxes = Axes.Both;
