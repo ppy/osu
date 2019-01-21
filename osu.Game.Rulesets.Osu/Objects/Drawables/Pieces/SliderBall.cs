@@ -47,11 +47,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         public readonly Drawable FollowCircle;
         private Drawable drawableBall;
         private readonly DrawableSlider drawableSlider;
+        private bool headJudged;
 
         public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
         {
             this.drawableSlider = drawableSlider;
             this.slider = slider;
+
+            drawableSlider.HeadCircle.OnNewResult += (o, result) => headJudged = false;
 
             Masking = true;
             AutoSizeAxes = Axes.Both;
@@ -158,12 +161,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private bool canCurrentlyTrack => Time.Current >= slider.StartTime && Time.Current < slider.EndTime;
 
-        private readonly List<OsuAction> trackingActions = new List<OsuAction>();
+        private OsuAction? blockedAction;
 
         private bool cursorTrackingBall => lastScreenSpaceMousePosition.HasValue
                                            && base.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value);
 
-        private bool hitPerformed;
 
         protected override void Update()
         {
@@ -174,8 +176,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 Tracking = canCurrentlyTrack
                            && cursorTrackingBall
                            && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton)
-                                                                                              && (trackingActions.Contains(x) || (trackingActions.Count == 0))) ?? false);
+                                                                                              && x != blockedAction) ?? false);
             }
+
         }
 
         public void UpdateProgress(double completionProgress)
@@ -183,13 +186,35 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Position = slider.CurvePositionAt(completionProgress);
         }
 
+        private bool containsOtherKey(OsuAction action)
+        {
+            if (action == OsuAction.LeftButton && drawableSlider.OsuActionInputManager.PressedActions.Contains(OsuAction.RightButton))
+                return true;
+
+            if (action == OsuAction.RightButton && drawableSlider.OsuActionInputManager.PressedActions.Contains(OsuAction.LeftButton))
+                return true;
+
+            return false;
+        }
+
+        private OsuAction? otherKey(OsuAction action)
+        {
+            switch (action)
+            {
+                case OsuAction.LeftButton:
+                    return OsuAction.RightButton;
+                case OsuAction.RightButton:
+                    return OsuAction.LeftButton;
+                default:
+                    return null;
+            }
+        }
 
         public bool OnPressed(OsuAction action)
         {
-            if (cursorTrackingBall && (Hit?.Invoke() ?? false) && (action == OsuAction.LeftButton || action == OsuAction.RightButton))
+            if (cursorTrackingBall && (Hit?.Invoke() ?? false) && (action == OsuAction.LeftButton || action == OsuAction.RightButton) && containsOtherKey(action) && !headJudged)
             {
-                hitPerformed = true;
-                trackingActions.Add(action);
+                blockedAction = otherKey(action);
                 return true;
             }
 
@@ -198,9 +223,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public bool OnReleased(OsuAction action)
         {
-            if (action == OsuAction.LeftButton || action == OsuAction.RightButton)
-                trackingActions.Remove(action);
-
+            if (action == blockedAction)
+                blockedAction = null;
             return false;
         }
     }
