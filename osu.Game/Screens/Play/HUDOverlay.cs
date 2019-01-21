@@ -58,8 +58,8 @@ namespace osu.Game.Screens.Play
                         ModDisplay = CreateModsContainer(),
                     }
                 },
-                PlayerSettingsOverlay = CreatePlayerSettingsOverlay(), 
-                new FillFlowContainer                                  
+                PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
+                new FillFlowContainer
                 {
                     Anchor = Anchor.BottomRight,
                     Origin = Anchor.BottomRight,
