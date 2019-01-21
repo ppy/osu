@@ -359,11 +359,11 @@ namespace osu.Game
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                mainContent = new Container
+                overlayContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
-                overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
+                floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
                 idleTracker = new IdleTracker(6000)
             });
 
@@ -382,32 +382,32 @@ namespace osu.Game
                     CloseAllOverlays(false);
                     intro?.ChildScreen?.MakeCurrent();
                 },
-            }, overlayContent.Add);
+            }, floatingOverlayContent.Add);
 
-            loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
+            loadComponentSingleFile(volume = new VolumeOverlay(), floatingOverlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 
             //overlay elements
-            loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
-            loadComponentSingleFile(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
+            loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, overlayContent.Add);
+            loadComponentSingleFile(social = new SocialOverlay { Depth = -1 }, overlayContent.Add);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal);
-            loadComponentSingleFile(chatOverlay = new ChatOverlay { Depth = -1 }, mainContent.Add);
+            loadComponentSingleFile(chatOverlay = new ChatOverlay { Depth = -1 }, overlayContent.Add);
             loadComponentSingleFile(settings = new MainSettings
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Depth = -1
-            }, overlayContent.Add);
-            loadComponentSingleFile(userProfile = new UserProfileOverlay { Depth = -2 }, mainContent.Add);
-            loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -3 }, mainContent.Add);
+            }, floatingOverlayContent.Add);
+            loadComponentSingleFile(userProfile = new UserProfileOverlay { Depth = -2 }, overlayContent.Add);
+            loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -3 }, overlayContent.Add);
             loadComponentSingleFile(musicController = new MusicController
             {
                 Depth = -5,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, overlayContent.Add);
+            }, floatingOverlayContent.Add);
 
             loadComponentSingleFile(notifications = new NotificationOverlay
             {
@@ -415,22 +415,22 @@ namespace osu.Game
                 Depth = -4,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, overlayContent.Add);
+            }, floatingOverlayContent.Add);
 
             loadComponentSingleFile(accountCreation = new AccountCreationOverlay
             {
                 Depth = -6,
-            }, overlayContent.Add);
+            }, floatingOverlayContent.Add);
 
             loadComponentSingleFile(dialogOverlay = new DialogOverlay
             {
                 Depth = -7,
-            }, overlayContent.Add);
+            }, floatingOverlayContent.Add);
 
             loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener
             {
                 Depth = -8,
-            }, overlayContent.Add);
+            }, floatingOverlayContent.Add);
 
             dependencies.Cache(idleTracker);
             dependencies.Cache(settings);
@@ -649,9 +649,9 @@ namespace osu.Game
 
         public bool OnReleased(GlobalAction action) => false;
 
-        private Container mainContent;
-
         private Container overlayContent;
+
+        private Container floatingOverlayContent;
 
         private OsuScreen currentScreen;
         private FrameworkConfigManager frameworkConfig;
@@ -696,6 +696,7 @@ namespace osu.Game
             Beatmap.Disabled = applyBeatmapRulesetRestrictions;
 
             screenContainer.Padding = new MarginPadding { Top = ToolbarOffset };
+            overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
             MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
