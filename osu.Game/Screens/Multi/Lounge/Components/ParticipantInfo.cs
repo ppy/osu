@@ -93,10 +93,14 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             Host.BindValueChanged(v =>
             {
                 hostText.Clear();
-                hostText.AddText("hosted by ");
-                hostText.AddLink(v.Username, null, LinkAction.OpenUserProfile, v.Id.ToString(), "Open profile", s => s.Font = "Exo2.0-BoldItalic");
+                flagContainer.Clear();
 
-                flagContainer.Child = new DrawableFlag(v.Country) { RelativeSizeAxes = Axes.Both };
+                if (v != null)
+                {
+                    hostText.AddText("hosted by ");
+                    hostText.AddLink(v.Username, null, LinkAction.OpenUserProfile, v.Id.ToString(), "Open profile", s => s.Font = "Exo2.0-BoldItalic");
+                    flagContainer.Child = new DrawableFlag(v.Country) { RelativeSizeAxes = Axes.Both };
+                }
             });
 
             ParticipantCount.BindValueChanged(v => summary.Text = $"{v:#,0}{" participant".Pluralize(v == 1)}");
