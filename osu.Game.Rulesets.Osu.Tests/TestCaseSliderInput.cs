@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         ///     Pressing a key before a slider, pressing the other key on the slider head, then releasing the latter pressed key
         ///     should result in tracking to end.
         ///     Frame 1 (prior to slider):          Left Click
-        ///     Frame 2 (within slider hit window): Left & Right Click
+        ///     Frame 2 (within slider hit window): Left &amp; Right Click
         ///     Frame 3 (while tracking):           Left Click
         ///     A passing test case will have the cursor lose tracking on frame 3.
         /// </summary>
@@ -90,7 +90,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         ///     Hitting a slider head, pressing a new key after the initial hit, then letting go of the original key used to hit
         ///     the slider should reslt in continued tracking.
         ///     Frame 1: Left Click
-        ///     Frame 2: Left & Right Click
+        ///     Frame 2: Left &amp; Right Click
         ///     Frame 3: Right Click
         ///     A passing test case will have the cursor continue to track after frame 3.
         /// </summary>
@@ -117,7 +117,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         ///     Hitting a slider head, pressing a new key after the initial hit, then letting go of the new key should result
         ///     in continue tracking,
         ///     Frame 1: Left Click
-        ///     Frame 2: Left & Right Click
+        ///     Frame 2: Left &amp; Right Click
         ///     Frame 3: Left Click
         ///     A passing test case will have the cursor continue to track after frame 3.
         /// </summary>
@@ -144,7 +144,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         ///     Pressing a key before a slider, pressing the other key on the slider head, then releasing the former pressed key
         ///     should result in continued tracking.
         ///     Frame 1 (prior to slider):      Left Click
-        ///     Frame 2 (on slider head):       Left & Right Click
+        ///     Frame 2 (on slider head):       Left &amp; Right Click
         ///     Frame 3 (tracking slider body): Right Click
         ///     A passing test case will have the cursor continue to track after frame 3.
         /// </summary>
