@@ -6,11 +6,29 @@ using System.Collections.Generic;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Framework.Allocation;
+using osu.Game.Configuration;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
     public class FollowPointRenderer : ConnectionRenderer<OsuHitObject>
     {
+        private Bindable<int> preEmpt;
+        private Bindable<int> offset;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            /// <summary>
+            /// Follow points to the next hitobject start appearing for this(preEmpt - offset) many milliseconds before an hitobject's end time.
+            /// </summary>
+            preEmpt = config.GetBindable<int>(OsuSetting.FollowPointAppearTime);
+            offset = config.GetBindable<int>(OsuSetting.FollowPointDelay);
+            preEmpt.ValueChanged += _ => update();
+            offset.ValueChanged += _ => update();
+        }
+
         private int pointDistance = 32;
         /// <summary>
         /// Determines how much space there is between points.
@@ -22,21 +40,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             {
                 if (pointDistance == value) return;
                 pointDistance = value;
-                update();
-            }
-        }
-
-        private int preEmpt = 800;
-        /// <summary>
-        /// Follow points to the next hitobject start appearing for this many milliseconds before an hitobject's end time.
-        /// </summary>
-        public int PreEmpt
-        {
-            get { return preEmpt; }
-            set
-            {
-                if (preEmpt == value) return;
-                preEmpt = value;
                 update();
             }
         }
@@ -81,8 +84,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                         float fraction = (float)d / distance;
                         Vector2 pointStartPosition = startPosition + (fraction - 0.1f) * distanceVector;
                         Vector2 pointEndPosition = startPosition + fraction * distanceVector;
-                        double fadeOutTime = startTime + fraction * duration;
-                        double fadeInTime = fadeOutTime - PreEmpt;
+                        double fadeInTime = startTime + fraction * duration - preEmpt.Value + offset.Value;
 
                         FollowPoint fp;
 
@@ -101,7 +103,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                             fp.MoveTo(pointEndPosition, currHitObject.TimeFadeIn, Easing.Out);
 
-                            fp.Delay(fadeOutTime - fadeInTime).FadeOut(currHitObject.TimeFadeIn);
+                            fp.Delay(preEmpt.Value).FadeOut(currHitObject.TimeFadeIn);
                         }
 
                         fp.Expire(true);

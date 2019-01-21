@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Overlays.Settings.Sections.Gameplay
@@ -43,8 +44,26 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
                 {
                     LabelText = "Score display mode",
                     Bindable = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode)
+                },
+                new SettingsSlider<int, TimeSlider>
+                {
+                    LabelText = "Followpoint fadeout time",
+                    TransferValueOnCommit = true,
+                    Bindable = config.GetBindable<int>(OsuSetting.FollowPointAppearTime),
+                    KeyboardStep = 1
+                },
+                new SettingsSlider<int, TimeSlider>
+                {
+                    LabelText = "Followpoint fadeout offset",
+                    TransferValueOnCommit = true,
+                    Bindable = config.GetBindable<int>(OsuSetting.FollowPointDelay),
+                    KeyboardStep = 1
                 }
             };
+        }
+        private class TimeSlider : OsuSliderBar<int>
+        {
+            public override string TooltipText => base.TooltipText + "ms";
         }
     }
 }

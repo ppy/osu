@@ -88,6 +88,9 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
 
+            Set(OsuSetting.FollowPointAppearTime, 800, 100, 1000);
+            Set(OsuSetting.FollowPointDelay, 0, -500, 500);
+
             // Update
             Set(OsuSetting.ReleaseStream, ReleaseStream.Lazer);
 
@@ -170,6 +173,8 @@ namespace osu.Game.Configuration
         ScalingPositionY,
         ScalingSizeX,
         ScalingSizeY,
-        UIScale
+        UIScale,
+        FollowPointAppearTime,
+        FollowPointDelay
     }
 }
