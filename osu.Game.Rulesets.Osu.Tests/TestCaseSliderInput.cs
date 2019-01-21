@@ -62,7 +62,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// <summary>
         ///     Pressing a key before a slider, pressing the other key on the slider head, then releasing the latter pressed key
         ///     should result in tracking to end.
-        ///     At 250ms intervals:
         ///     Frame 1 (prior to slider):          Left Click
         ///     Frame 2 (within slider hit window): Left & Right Click
         ///     Frame 3 (while tracking):           Left Click
@@ -90,7 +89,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// <summary>
         ///     Hitting a slider head, pressing a new key after the initial hit, then letting go of the original key used to hit
         ///     the slider should reslt in continued tracking.
-        ///     At 250ms intervals:
         ///     Frame 1: Left Click
         ///     Frame 2: Left & Right Click
         ///     Frame 3: Right Click
@@ -118,7 +116,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// <summary>
         ///     Hitting a slider head, pressing a new key after the initial hit, then letting go of the new key should result
         ///     in continue tracking,
-        ///     At 250ms intervals:
         ///     Frame 1: Left Click
         ///     Frame 2: Left & Right Click
         ///     Frame 3: Left Click
@@ -146,7 +143,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// <summary>
         ///     Pressing a key before a slider, pressing the other key on the slider head, then releasing the former pressed key
         ///     should result in continued tracking.
-        ///     At 250ms intervals:
         ///     Frame 1 (prior to slider):      Left Click
         ///     Frame 2 (on slider head):       Left & Right Click
         ///     Frame 3 (tracking slider body): Right Click
@@ -225,8 +221,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        /// Pressing a key before a slider, hitting a slider head, leaving the slider, then coming back into the slider to track it should NOT start retracking
-        /// This is current stable behavior.
+        ///     Pressing a key before a slider, hitting a slider head, leaving the slider, then coming back into the slider to track it should NOT start retracking
+        ///     This is current stable behavior.
+        ///     In a successful test case:
+        ///     The last tick of the slider should be judged as a miss.
         /// </summary>
         [Test]
         public void TestTrackingReturnMidSliderKeyDownBefore()
@@ -251,7 +249,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        /// Halfway into a slider outside of the slider, then starting to hover the slider afterwards should result in tracking
+        ///     Halfway into a slider outside of the slider, then starting to hover the slider afterwards should result in tracking
+        ///     In a successful test case:
+        ///     The last tick of the slider should be judged as a great.
         /// </summary>
         [Test]
         public void TestTrackingMidSlider()
@@ -274,8 +274,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        /// Pressing a key before a slider, clicking another key after the slider, holding both of them and
-        /// leaving tracking, then releasing both keys, then pressing the originally pressed key should start tracking
+        ///     Pressing a key before a slider, clicking another key after the slider, holding both of them and
+        ///     leaving tracking, then releasing both keys, then pressing the originally pressed key should start tracking
+        ///     In a successful test case:
+        ///     The last tick of the slider should be judged as a great.
         /// </summary>
         [Test]
         public void TestTrackingPressBeforeSliderClickingOtherKeyLeavingSliderReleaseThenTrackOriginal()
@@ -298,8 +300,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         /// <summary>
-        /// Pressing a key before a slider, clicking another key after the slider, holding both of them and
-        /// leaving tracking, then releasing both keys, then pressing the originally pressed key should start tracking
+        ///     Pressing a key before a slider, clicking another key after the slider, holding both of them and
+        ///     leaving tracking, then releasing both keys, then pressing the originally pressed key should start tracking
+        ///     In a successful test case:
+        ///     The last tick of the slider should be judged as a great.
         /// </summary>
         [Test]
         public void TestClickingBeforeLeavingSliderReleasingClickingAgainThenTracking()
