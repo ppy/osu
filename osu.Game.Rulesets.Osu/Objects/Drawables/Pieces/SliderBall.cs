@@ -157,15 +157,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         /// <summary>
         /// The point in time after which we can accept any key for tracking. Before this time, we may need to restrict tracking to the key used to hit the head circle.
-        /// This is a requirement to stop the case where a player holds down one key (from before the slider) and taps the second key while maintaining full scoring (tracking) of sliders.
         ///
-        ///  Visually, if time is increasing from left to right:
+        /// This is a requirement to stop the case where a player holds down one key (from before the slider) and taps the second key while maintaining full scoring (tracking) of sliders.
+        /// Visually, this special case can be seen below (time increasing from left to right):
         ///
         ///  Z  Z+X  Z
         ///      o========o
         ///
-        /// Without this logic, tracking would continue through the entire slider even though no key hold is directly attributing to it.
+        /// Without this logic, tracking would continue through the entire slider even though no key hold action is directly attributing to it.
         ///
+        /// In all other cases, no special handling is required (either key being pressed is allowable as valid tracking).
+        ///
+        /// The reason for storing this as a time value (rather than a bool) is to correct handle rewind scenarios.
         /// </summary>
         private double? timeToAcceptAnyKeyAfter;
 
