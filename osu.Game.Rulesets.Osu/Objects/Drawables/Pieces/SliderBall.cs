@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,6 +19,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private const float width = 128;
 
         private Color4 accentColour = Color4.Black;
+
+        public Func<OsuAction?> GetInitialHitAction;
 
         /// <summary>
         /// The colour that is used for the slider ball.
@@ -145,19 +148,35 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             }
         }
 
-        private bool canCurrentlyTrack => Time.Current >= slider.StartTime && Time.Current < slider.EndTime;
+        private bool canCurrentlyTrack => Time.Current >= slider.StartTime && Time.Current < slider.EndTime && lastScreenSpaceMousePosition.HasValue && base.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value);
+
+        /// <summary>
+        /// The point in time up to which we need to include the key which was used to press the head circle in tracking conditions.
+        /// </summary>
+        private double? initialHitConditionDismissed;
 
         protected override void Update()
         {
             base.Update();
 
-            if (Time.Current < slider.EndTime)
+            var initialHitAction = GetInitialHitAction();
+
+            if (initialHitAction == null)
+                initialHitConditionDismissed = null;
+
+            if (canCurrentlyTrack)
             {
+                var pressed = drawableSlider?.OsuActionInputManager?.PressedActions;
+
+                if (initialHitConditionDismissed == null && !pressed.Contains(initialHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton))
+                    initialHitConditionDismissed = Time.Current;
+
                 // Make sure to use the base version of ReceivePositionalInputAt so that we correctly check the position.
-                Tracking = canCurrentlyTrack
-                           && lastScreenSpaceMousePosition.HasValue
-                           && ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value)
-                           && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+                Tracking = drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => !initialHitConditionDismissed.HasValue || initialHitConditionDismissed.Value < Time.Current ? x == OsuAction.LeftButton || x == OsuAction.RightButton : x == initialHitAction) ?? false;
+            }
+            else
+            {
+                Tracking = false;
             }
         }
 
