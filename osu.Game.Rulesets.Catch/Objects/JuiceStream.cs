@@ -62,15 +62,22 @@ namespace osu.Game.Rulesets.Catch.Objects
                 X = X
             });
 
-            double lastDropletTime = StartTime;
+            double lastTickTime = StartTime;
 
             for (int span = 0; span < this.SpanCount(); span++)
             {
                 var spanStartTime = StartTime + span * spanDuration;
                 var reversed = span % 2 == 1;
 
-                for (double d = 0; d <= length; d += tickDistance)
+                for (double d = tickDistance;; d += tickDistance)
                 {
+                    bool isLastTick = false;
+                    if (d + minDistanceFromEnd >= length)
+                    {
+                        d = length;
+                        isLastTick = true;
+                    }
+
                     var timeProgress = d / length;
                     var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
 
@@ -79,15 +86,15 @@ namespace osu.Game.Rulesets.Catch.Objects
                     if (LegacyLastTickOffset != null)
                     {
                         // If we're the last tick, apply the legacy offset
-                        if (span == this.SpanCount() - 1 && d + tickDistance > length)
+                        if (span == this.SpanCount() - 1 && isLastTick)
                             time = Math.Max(StartTime + Duration / 2, time - LegacyLastTickOffset.Value);
                     }
 
-                    double tinyTickInterval = time - lastDropletTime;
+                    double tinyTickInterval = time - lastTickTime;
                     while (tinyTickInterval > 100)
                         tinyTickInterval /= 2;
 
-                    for (double t = lastDropletTime + tinyTickInterval; t < time; t += tinyTickInterval)
+                    for (double t = lastTickTime + tinyTickInterval; t < time; t += tinyTickInterval)
                     {
                         double progress = reversed ? 1 - (t - spanStartTime) / spanDuration : (t - spanStartTime) / spanDuration;
 
@@ -104,22 +111,22 @@ namespace osu.Game.Rulesets.Catch.Objects
                         });
                     }
 
-                    if (d > minDistanceFromEnd && Math.Abs(d - length) > minDistanceFromEnd)
-                    {
-                        AddNested(new Droplet
-                        {
-                            StartTime = time,
-                            X = X + Path.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
-                            Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
-                            {
-                                Bank = s.Bank,
-                                Name = @"slidertick",
-                                Volume = s.Volume
-                            }))
-                        });
-                    }
+                    lastTickTime = time;
 
-                    lastDropletTime = time;
+                    if (isLastTick)
+                        break;
+
+                    AddNested(new Droplet
+                    {
+                        StartTime = time,
+                        X = X + Path.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
+                        Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
+                        {
+                            Bank = s.Bank,
+                            Name = @"slidertick",
+                            Volume = s.Volume
+                        }))
+                    });
                 }
 
                 AddNested(new Fruit
