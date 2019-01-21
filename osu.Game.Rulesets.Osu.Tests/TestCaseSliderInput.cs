@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
@@ -13,6 +14,8 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets.Osu.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
@@ -26,6 +29,19 @@ namespace osu.Game.Rulesets.Osu.Tests
 {
     public class TestCaseSliderInput : OsuTestCase
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(Slider),
+            typeof(SliderBall),
+            typeof(SliderBody),
+            typeof(SliderTick),
+            typeof(DrawableSlider),
+            typeof(DrawableSliderTick),
+            typeof(DrawableRepeatPoint),
+            typeof(DrawableOsuHitObject)
+        };
+
+
         [SetUp]
         public void Setup()
         {
@@ -279,6 +295,30 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking acquired", assertMidSliderJudgements);
         }
 
+        /// <summary>
+        /// Pressing a key before a slider, clicking another key after the slider, holding both of them and
+        /// leaving tracking, then releasing both keys, then pressing the originally pressed key should start tracking
+        /// </summary>
+        [Test]
+        public void TestClickingBeforeLeavingSliderReleasingClickingAgainThenTracking()
+        {
+            AddStep("Mid-slider new tracking acquisition", () =>
+            {
+                var frames = new List<ReplayFrame>
+                {
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 1500},
+                    new OsuReplayFrame { Position = new Vector2(100, 100), Actions = { OsuAction.LeftButton }, Time = 2500},
+                    new OsuReplayFrame { Position = new Vector2(100, 100), Time = 2750},
+                    new OsuReplayFrame { Position = new Vector2(100, 100), Actions = { OsuAction.LeftButton }, Time = 2750},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 3500},
+                };
+
+                performStaticInputTest(frames);
+            });
+
+            AddUntilStep(() => allJudgedFired, "Wait for test 10");
+            AddAssert("Tracking acquired", assertMidSliderJudgements);
+        }
 
         private bool assertMehJudge()
         {

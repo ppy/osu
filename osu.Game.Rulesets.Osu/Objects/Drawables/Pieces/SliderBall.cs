@@ -163,7 +163,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private bool cursorTrackingBall => lastScreenSpaceMousePosition.HasValue
                                            && base.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value);
 
-        private bool validPressedNote;
+        private bool hitPerformed;
 
         protected override void Update()
         {
@@ -174,7 +174,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 Tracking = canCurrentlyTrack
                            && cursorTrackingBall
                            && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => (x == OsuAction.LeftButton || x == OsuAction.RightButton)
-                                                                                              && (trackingActions.Contains(x) || (!validPressedNote && trackingActions.Count == 0))) ?? false);
+                                                                                              && (trackingActions.Contains(x) || (trackingActions.Count == 0))) ?? false);
             }
         }
 
@@ -183,11 +183,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             Position = slider.CurvePositionAt(completionProgress);
         }
 
+
         public bool OnPressed(OsuAction action)
         {
             if (cursorTrackingBall && (Hit?.Invoke() ?? false) && (action == OsuAction.LeftButton || action == OsuAction.RightButton))
             {
-                validPressedNote = true;
+                hitPerformed = true;
                 trackingActions.Add(action);
                 return true;
             }
