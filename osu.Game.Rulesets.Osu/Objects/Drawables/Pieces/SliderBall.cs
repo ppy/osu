@@ -168,11 +168,11 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 var pressed = drawableSlider?.OsuActionInputManager?.PressedActions;
 
-                if (initialHitConditionDismissed == null && !pressed.Contains(initialHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton))
+                if (initialHitAction != null && !pressed.Contains(initialHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton))
                     initialHitConditionDismissed = Time.Current;
 
                 // Make sure to use the base version of ReceivePositionalInputAt so that we correctly check the position.
-                Tracking = drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => !initialHitConditionDismissed.HasValue || initialHitConditionDismissed.Value < Time.Current ? x == OsuAction.LeftButton || x == OsuAction.RightButton : x == initialHitAction) ?? false;
+                Tracking = drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => !initialHitAction.HasValue || (initialHitConditionDismissed.HasValue && initialHitConditionDismissed.Value < Time.Current) ? x == OsuAction.LeftButton || x == OsuAction.RightButton : x == initialHitAction) ?? false;
             }
             else
             {
