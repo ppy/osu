@@ -188,13 +188,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         private bool containsOtherKey(OsuAction action)
         {
-            if (action == OsuAction.LeftButton && drawableSlider.OsuActionInputManager.PressedActions.Contains(OsuAction.RightButton))
-                return true;
-
-            if (action == OsuAction.RightButton && drawableSlider.OsuActionInputManager.PressedActions.Contains(OsuAction.LeftButton))
-                return true;
-
-            return false;
+            switch (action)
+            {
+                case OsuAction.LeftButton when drawableSlider.OsuActionInputManager.PressedActions.Contains(OsuAction.RightButton):
+                case OsuAction.RightButton when drawableSlider.OsuActionInputManager.PressedActions.Contains(OsuAction.LeftButton):
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         private OsuAction? otherKey(OsuAction action)
