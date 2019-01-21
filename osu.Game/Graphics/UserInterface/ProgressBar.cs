@@ -62,6 +62,6 @@ namespace osu.Game.Graphics.UserInterface
             fill.Width = value * UsableWidth;
         }
 
-        protected override void OnUserChange() => OnSeek?.Invoke(Current);
+        protected override void OnUserChange(double value) => OnSeek?.Invoke(value);
     }
 }

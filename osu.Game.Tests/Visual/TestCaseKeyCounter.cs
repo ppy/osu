@@ -39,7 +39,6 @@ namespace osu.Game.Tests.Visual
                 },
             };
 
-
             AddStep("Add random", () =>
             {
                 Key key = (Key)((int)Key.A + RNG.Next(26));
