@@ -151,33 +151,69 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private bool canCurrentlyTrack => Time.Current >= slider.StartTime && Time.Current < slider.EndTime && lastScreenSpaceMousePosition.HasValue && base.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value);
 
         /// <summary>
-        /// The point in time up to which we need to include the key which was used to press the head circle in tracking conditions.
+        /// If the cursor moves out of the ball's radius we still need to be able to receive positional updates to stop tracking.
         /// </summary>
-        private double? initialHitConditionDismissed;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+        /// <summary>
+        /// The point in time after which we can accept any key for tracking. Before this time, we may need to restrict tracking to the key used to hit the head circle.
+        /// This is a requirement to stop the case where a player holds down one key (from before the slider) and taps the second key while maintaining full scoring (tracking) of sliders.
+        ///
+        ///  Visually, if time is increasing from left to right:
+        ///
+        ///  Z  Z+X  Z
+        ///      o========o
+        ///
+        /// Without this logic, tracking would continue through the entire slider even though no key hold is directly attributing to it.
+        ///
+        /// </summary>
+        private double? timeToAcceptAnyKeyAfter;
 
         protected override void Update()
         {
             base.Update();
 
-            var initialHitAction = GetInitialHitAction();
+            // from the point at which the head circle is hit, this will be non-null.
+            // it may be null if the head circle was missed.
+            var headCircleHitAction = GetInitialHitAction();
 
-            if (initialHitAction == null)
-                initialHitConditionDismissed = null;
+            if (headCircleHitAction == null)
+                timeToAcceptAnyKeyAfter = null;
 
             if (canCurrentlyTrack)
             {
                 var pressed = drawableSlider?.OsuActionInputManager?.PressedActions;
 
-                if (initialHitAction != null && !pressed.Contains(initialHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton))
-                    initialHitConditionDismissed = Time.Current;
+                // if the head circle was hit with a specific key, tracking should only occur while that key is pressed.
+                if (headCircleHitAction != null && timeToAcceptAnyKeyAfter == null)
+                {
+                    var otherKey = headCircleHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton;
 
-                // Make sure to use the base version of ReceivePositionalInputAt so that we correctly check the position.
-                Tracking = drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => !initialHitAction.HasValue || (initialHitConditionDismissed.HasValue && initialHitConditionDismissed.Value < Time.Current) ? x == OsuAction.LeftButton || x == OsuAction.RightButton : x == initialHitAction) ?? false;
+                    // we can return to accepting all keys if the initial head circle key is the *only* key pressed, or all keys have been released.
+                    if (!pressed.Contains(otherKey))
+                        timeToAcceptAnyKeyAfter = Time.Current;
+                }
+
+                Tracking = drawableSlider?.OsuActionInputManager?.PressedActions.Any(isValidTrackingAction) ?? false;
             }
             else
             {
                 Tracking = false;
             }
+        }
+
+        /// <summary>
+        /// Check whether a given user input is a valid tracking action.
+        /// </summary>
+        private bool isValidTrackingAction(OsuAction action)
+        {
+            bool headCircleHit = GetInitialHitAction().HasValue;
+
+            // if the head circle was hit, we may not yet be allowed to accept any key, so we must use the initial hit action.
+            if (headCircleHit && (!timeToAcceptAnyKeyAfter.HasValue || Time.Current <= timeToAcceptAnyKeyAfter.Value))
+                return action == GetInitialHitAction();
+
+            return action == OsuAction.LeftButton || action == OsuAction.RightButton;
         }
 
         public void UpdateProgress(double completionProgress)
