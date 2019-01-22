@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
+using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -19,6 +20,6 @@ namespace osu.Game.Graphics.Containers
 
         public void AddArbitraryDrawable(Drawable drawable) => AddInternal(drawable);
 
-        public void AddIcon(FontAwesome icon, Action<SpriteText> creationParameters = null) => AddText(((char)icon).ToString(), creationParameters);
+        public IEnumerable<Drawable> AddIcon(FontAwesome icon, Action<SpriteText> creationParameters = null) => AddText(((char)icon).ToString(), creationParameters);
     }
 }

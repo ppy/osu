@@ -101,9 +101,10 @@ namespace osu.Game.Skinning
                 bool hasExtension = filename.Contains('.');
 
                 string lastPiece = filename.Split('/').Last();
+                var legacyName = filename.StartsWith("Gameplay/taiko/") ? "taiko-" + lastPiece : lastPiece;
 
                 var file = source.Files.Find(f =>
-                    string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), lastPiece, StringComparison.InvariantCultureIgnoreCase));
+                    string.Equals(hasExtension ? f.Filename : Path.ChangeExtension(f.Filename, null), legacyName, StringComparison.InvariantCultureIgnoreCase));
                 return file?.FileInfo.StoragePath;
             }
 
