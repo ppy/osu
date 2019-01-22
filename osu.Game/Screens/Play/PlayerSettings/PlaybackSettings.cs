@@ -68,11 +68,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
             var clockRate = AdjustableClock.Rate;
 
-            sliderbar.Bindable.BindValueChanged(multiplier =>
-            {
-                multiplierText.Text = $"{multiplier:0.0}x";
-                AdjustableClock.Rate = clockRate * multiplier;
-            }, true);
+            // can't trigger this line instantly as the underlying clock may not be ready to accept adjustments yet.
+            sliderbar.Bindable.ValueChanged += multiplier => AdjustableClock.Rate = clockRate * multiplier;
+
+            sliderbar.Bindable.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier:0.0}x", true);
         }
     }
 }
