@@ -64,9 +64,9 @@ namespace osu.Game.Screens.Play
                         HealthDisplay = CreateHealthDisplay(),
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
-                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                     }
                 },
+                PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                 new FillFlowContainer
                 {
                     Anchor = Anchor.BottomRight,
