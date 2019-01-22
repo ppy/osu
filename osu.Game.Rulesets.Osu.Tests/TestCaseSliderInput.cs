@@ -30,13 +30,18 @@ namespace osu.Game.Rulesets.Osu.Tests
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
             typeof(Slider),
+            typeof(SliderCircle),
             typeof(SliderBall),
             typeof(SliderBody),
             typeof(SliderTick),
+            typeof(SliderTailCircle),
             typeof(DrawableSlider),
+            typeof(SnakingSliderBody),
             typeof(DrawableSliderTick),
             typeof(DrawableRepeatPoint),
-            typeof(DrawableOsuHitObject)
+            typeof(DrawableOsuHitObject),
+            typeof(DrawableSliderHead),
+            typeof(DrawableSliderTail)
         };
 
         [SetUp]
