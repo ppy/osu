@@ -59,13 +59,20 @@ namespace osu.Game.Rulesets.Osu.Tests
             base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
         }
 
+        private const double time_before_slider = 250;
+        private const double time_slider_start = 1500;
+        private const double time_during_slide_1 = 2500;
+        private const double time_during_slide_2 = 3000;
+        private const double time_during_slide_3 = 3500;
+        private const double time_during_slide_4 = 4000;
+
         /// <summary>
         /// Scenario:
         /// - Press a key before a slider starts
         /// - Press the other key on the slider head timed correctly while holding the original key
         /// - Release the latter pressed key
         /// Expected Result:
-        /// A passing test case will have the cursor lose tracking on frame 3.
+        /// A passing test case will have the cursor lose tracking on replay frame 3.
         /// </summary>
         [Test]
         public void TestLeftBeforeSliderThenRight()
@@ -74,12 +81,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var frames = new List<ReplayFrame>
                 {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 250},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = 1500},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 2500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_before_slider },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_during_slide_1 },
                 };
 
-                performStaticInputTest(frames);
+                performTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 1");
@@ -92,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// - Press the other key in the middle of the slider while holding the original key
         /// - Release the original key used to hit the slider
         /// Expected Result:
-        /// A passing test case will have the cursor continue tracking on frame 3.
+        /// A passing test case will have the cursor continue tracking on replay frame 3.
         /// </summary>
         [Test]
         public void TestLeftBeforeSliderThenRightThenLettingGoOfLeft()
@@ -101,12 +108,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var frames = new List<ReplayFrame>
                 {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 1500},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = 2500},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = 3500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_during_slide_1 },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_2 },
                 };
 
-                performStaticInputTest(frames);
+                performTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 2");
@@ -119,7 +126,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// - Press the other key in the middle of the slider while holding the original key
         /// - Release the new key that was pressed second
         /// Expected Result:
-        /// A passing test case will have the cursor continue tracking on frame 3.
+        /// A passing test case will have the cursor continue tracking on replay frame 3.
         /// </summary>
         [Test]
         public void TestTrackingRetentionLeftRightLeft()
@@ -128,12 +135,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var frames = new List<ReplayFrame>
                 {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 250},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = 1500},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = 2500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_before_slider },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_1 },
                 };
 
-                performStaticInputTest(frames);
+                performTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 3");
@@ -146,7 +153,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         /// - Press the other key on the slider head timed correctly while holding the original key
         /// - Release the key that was held down before the slider started.
         /// Expected Result:
-        /// A passing test case will have the cursor continue tracking on frame 3
+        /// A passing test case will have the cursor continue tracking on replay frame 3
         /// </summary>
         [Test]
         public void TestTrackingLeftBeforeSliderToRight()
@@ -155,12 +162,12 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var frames = new List<ReplayFrame>
                 {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 250},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = 1500},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = 2500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_before_slider },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_1 },
                 };
 
-                performStaticInputTest(frames);
+                performTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 4");
@@ -181,10 +188,10 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var frames = new List<ReplayFrame>
                 {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 250},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_before_slider },
                 };
 
-                performStaticInputTest(frames);
+                performTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 5");
@@ -207,14 +214,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var frames = new List<ReplayFrame>
                 {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 1500},
-                    new OsuReplayFrame { Position = new Vector2(150, 150), Actions = { OsuAction.LeftButton }, Time = 2000},
-                    new OsuReplayFrame { Position = new Vector2(200, 200), Actions = { OsuAction.LeftButton }, Time = 2500},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 3000},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 3500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
+                    new OsuReplayFrame { Position = new Vector2(150, 150), Actions = { OsuAction.LeftButton }, Time = time_during_slide_1 },
+                    new OsuReplayFrame { Position = new Vector2(200, 200), Actions = { OsuAction.LeftButton }, Time = time_during_slide_2 },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_during_slide_3 },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_during_slide_4 },
                 };
 
-                performStaticInputTest(frames);
+                performTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 6");
@@ -238,15 +245,15 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var frames = new List<ReplayFrame>
                 {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 250},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = 1500},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 2000},
-                    new OsuReplayFrame { Position = new Vector2(200, 200), Actions = { OsuAction.LeftButton }, Time = 2500},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 3000},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 3500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_before_slider },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_during_slide_1 },
+                    new OsuReplayFrame { Position = new Vector2(200, 200), Actions = { OsuAction.LeftButton }, Time = time_during_slide_2 },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_during_slide_3 },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_during_slide_4 },
                 };
 
-                performStaticInputTest(frames);
+                performTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 7");
@@ -268,13 +275,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var frames = new List<ReplayFrame>
                 {
-                    new OsuReplayFrame { Position = new Vector2(150, 150), Actions = { OsuAction.LeftButton }, Time = 2000},
-                    new OsuReplayFrame { Position = new Vector2(200, 200), Actions = { OsuAction.LeftButton }, Time = 2500},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 3000},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 3500},
+                    new OsuReplayFrame { Position = new Vector2(150, 150), Actions = { OsuAction.LeftButton }, Time = time_during_slide_1 },
+                    new OsuReplayFrame { Position = new Vector2(200, 200), Actions = { OsuAction.LeftButton }, Time = time_during_slide_2 },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_during_slide_3 },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_during_slide_4 },
                 };
 
-                performStaticInputTest(frames);
+                performTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 8");
@@ -297,13 +304,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var frames = new List<ReplayFrame>
                 {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 250},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = 1500},
-                    new OsuReplayFrame { Position = new Vector2(100, 100), Time = 1750},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 3500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_before_slider },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
+                    new OsuReplayFrame { Position = new Vector2(100, 100), Time = time_during_slide_1 },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_during_slide_2 },
                 };
 
-                performStaticInputTest(frames);
+                performTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 9");
@@ -327,14 +334,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 var frames = new List<ReplayFrame>
                 {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 1500},
-                    new OsuReplayFrame { Position = new Vector2(100, 100), Actions = { OsuAction.LeftButton }, Time = 2500},
-                    new OsuReplayFrame { Position = new Vector2(100, 100), Time = 2750},
-                    new OsuReplayFrame { Position = new Vector2(100, 100), Actions = { OsuAction.LeftButton }, Time = 3000},
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = 3500},
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
+                    new OsuReplayFrame { Position = new Vector2(100, 100), Actions = { OsuAction.LeftButton }, Time = time_during_slide_1 },
+                    new OsuReplayFrame { Position = new Vector2(100, 100), Time = time_during_slide_2 },
+                    new OsuReplayFrame { Position = new Vector2(100, 100), Actions = { OsuAction.LeftButton }, Time = time_during_slide_3 },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_during_slide_4 },
                 };
 
-                performStaticInputTest(frames);
+                performTest(frames);
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 10");
@@ -366,11 +373,11 @@ namespace osu.Game.Rulesets.Osu.Tests
             return judgementResults[judgementResults.Count - 2].Type == HitResult.Miss;
         }
 
-        private void performStaticInputTest(List<ReplayFrame> frames)
+        private void performTest(List<ReplayFrame> frames)
         {
             var slider = new Slider
             {
-                StartTime = 1500,
+                StartTime = time_slider_start,
                 Position = new Vector2(0, 0),
                 Path = new SliderPath(PathType.PerfectCurve, new[]
                 {
@@ -408,7 +415,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             Child = player;
 
             player.ScoreProcessor.NewJudgement += result => judgementResults.Add(result);
-
             player.ScoreProcessor.AllJudged += () => { allJudgedFired = true; };
         }
 
