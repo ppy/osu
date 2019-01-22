@@ -14,15 +14,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 {
     public class FollowPointRenderer : ConnectionRenderer<OsuHitObject>
     {
+        /// <summary>
+        /// Follow points to the next hitobject start to fade for this many milliseconds before an hitobject's end time.
+        /// Fading start time can be offset.
+        /// </summary>
         private Bindable<int> preEmpt;
+        /// <summary>
+        /// Follow points to the next hitobject start appearing offset by this many milliseconds before an hitobject's end time.
+        /// </summary>
         private Bindable<int> offset;
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            /// <summary>
-            /// Follow points to the next hitobject start appearing for this(preEmpt - offset) many milliseconds before an hitobject's end time.
-            /// </summary>
             preEmpt = config.GetBindable<int>(OsuSetting.FollowPointAppearTime);
             offset = config.GetBindable<int>(OsuSetting.FollowPointDelay);
             preEmpt.ValueChanged += _ => update();
