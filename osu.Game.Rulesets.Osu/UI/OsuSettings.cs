@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Configuration;
+using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Settings;
 
 namespace osu.Game.Rulesets.Osu.UI
@@ -32,7 +33,25 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "Snaking out sliders",
                     Bindable = config.GetBindable<bool>(OsuSetting.SnakingOutSliders)
                 },
+                new SettingsSlider<int, TimeSlider>
+                {
+                    LabelText = "Followpoint fadeout time",
+                    TransferValueOnCommit = true,
+                    Bindable = config.GetBindable<int>(OsuSetting.FollowPointAppearTime),
+                    KeyboardStep = 1
+                },
+                new SettingsSlider<int, TimeSlider>
+                {
+                    LabelText = "Followpoint fadeout offset",
+                    TransferValueOnCommit = true,
+                    Bindable = config.GetBindable<int>(OsuSetting.FollowPointDelay),
+                    KeyboardStep = 1
+                }
             };
+        }
+        private class TimeSlider : OsuSliderBar<int>
+        {
+            public override string TooltipText => base.TooltipText + "ms";
         }
     }
 }
