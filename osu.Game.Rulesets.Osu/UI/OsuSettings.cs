@@ -59,7 +59,6 @@ namespace osu.Game.Rulesets.Osu.UI
             public override string TooltipText => base.TooltipText + "ms";
 
         }
-
         protected virtual SettingsSlider<int, TimeSlider> CreateFadeOutSettingsSlider(OsuConfigManager config)
         {
             return new SettingsSlider<int, TimeSlider>
