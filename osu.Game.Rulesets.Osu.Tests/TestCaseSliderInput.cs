@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
@@ -46,17 +44,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             allJudgedFired = false;
             judgementResults = new List<JudgementResult>();
-
-        private readonly Container content;
-        protected override Container<Drawable> Content => content;
+        });
 
         private List<JudgementResult> judgementResults;
         private bool allJudgedFired;
-
-        public TestCaseSliderInput()
-        {
-            base.Content.Add(content = new OsuInputManager(new RulesetInfo { ID = 0 }));
-        }
 
         private const double time_before_slider = 250;
         private const double time_slider_start = 1500;
@@ -411,7 +402,10 @@ namespace osu.Game.Rulesets.Osu.Tests
                 AllowResults = false
             };
 
-            Child = player;
+            Child = new OsuInputManager(new RulesetInfo { ID = 0 })
+            {
+                Child = player
+            };
 
             player.ScoreProcessor.NewJudgement += result => judgementResults.Add(result);
             player.ScoreProcessor.AllJudged += () => { allJudgedFired = true; };
