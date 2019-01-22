@@ -42,11 +42,10 @@ namespace osu.Game.Rulesets.Osu.Tests
         };
 
         [SetUp]
-        public void Setup()
+        public void Setup() => Schedule(() =>
         {
-            Schedule(() => { allJudgedFired = false; });
+            allJudgedFired = false;
             judgementResults = new List<JudgementResult>();
-        }
 
         private readonly Container content;
         protected override Container<Drawable> Content => content;
