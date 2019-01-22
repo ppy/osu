@@ -96,6 +96,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             updateTooltipText(Current.Value);
             base.LoadComplete();
+            CurrentNumber.ValueChanged += _ => updateTooltipText(_);
         }
 
         protected override bool OnHover(HoverEvent e)
@@ -126,7 +127,6 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnUserChange(value);
             playSample(value);
-            updateTooltipText(value);
         }
 
         private void playSample(T value)
