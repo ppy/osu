@@ -49,18 +49,18 @@ namespace osu.Game.Overlays.Settings.Sections
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Use beatmap skins",
+                    LabelText = "Adjust gameplay cursor size based on current beatmap",
+                    Bindable = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Beatmap skins",
                     Bindable = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
                 },
                 new SettingsCheckbox
                 {
-                    LabelText = "Use beatmap hitsounds",
+                    LabelText = "Beatmap hitsounds",
                     Bindable = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
-                },
-                new SettingsCheckbox
-                {
-                    LabelText = "Adjust gameplay cursor size based on current beatmap",
-                    Bindable = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
                 },
             };
 
