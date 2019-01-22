@@ -55,6 +55,8 @@ namespace osu.Game.Screens.Play
                             Origin = Anchor.TopCentre,
                             Y = 30,
                             AutoSizeAxes = Axes.Both,
+                            AutoSizeDuration = 200,
+                            AutoSizeEasing = Easing.Out,
                             Children = new Drawable[] {
                                 AccuracyCounter = CreateAccuracyCounter(),
                                 ScoreCounter = CreateScoreCounter(),
