@@ -96,7 +96,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             updateTooltipText(Current.Value);
             base.LoadComplete();
-            CurrentNumber.ValueChanged += _ => updateTooltipText(_);
+            CurrentNumber.ValueChanged += updateTooltipText;
         }
 
         protected override bool OnHover(HoverEvent e)
