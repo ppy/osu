@@ -221,8 +221,8 @@ namespace osu.Game
                     return;
                 }
 
-                var databasedSet =
-                    BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID) ??
+                var databasedSet = beatmap.OnlineBeatmapSetID != null ?
+                    BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID) :
                     BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
 
                 if (databasedSet != null)
