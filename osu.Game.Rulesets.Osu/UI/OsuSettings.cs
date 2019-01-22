@@ -11,6 +11,9 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuSettings : RulesetSettingsSubsection
     {
+        public  SettingsSlider<int, TimeSlider> FollowpointFadeoutSlider;
+        public  SettingsSlider<int, TimeSlider> FollowpointDelaySlider;
+
         protected override string Header => "osu!";
 
         public OsuSettings(Ruleset ruleset)
@@ -33,25 +36,50 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "Snaking out sliders",
                     Bindable = config.GetBindable<bool>(OsuSetting.SnakingOutSliders)
                 },
-                new SettingsSlider<int, TimeSlider>
+                FollowpointFadeoutSlider = CreateFadeOutSettingsSlider(config),
+                FollowpointDelaySlider = CreateOffsetSettingsSlider(config)
+            };
+            FollowpointDelaySlider.Bindable.ValueChanged += _ =>
+            {
+                if (FollowpointFadeoutSlider.Bindable.Value - FollowpointDelaySlider.Bindable.Value > 800)
                 {
-                    LabelText = "Followpoint fadeout time",
-                    TransferValueOnCommit = true,
-                    Bindable = config.GetBindable<int>(OsuSetting.FollowPointAppearTime),
-                    KeyboardStep = 1
-                },
-                new SettingsSlider<int, TimeSlider>
+                    FollowpointFadeoutSlider.Bindable.Value = 800 + FollowpointDelaySlider.Bindable.Value;
+                }
+            };
+            FollowpointFadeoutSlider.Bindable.ValueChanged += _ =>
+            {
+                if (FollowpointFadeoutSlider.Bindable.Value - FollowpointDelaySlider.Bindable.Value > 800)
                 {
-                    LabelText = "Followpoint fadeout offset",
-                    TransferValueOnCommit = true,
-                    Bindable = config.GetBindable<int>(OsuSetting.FollowPointDelay),
-                    KeyboardStep = 1
+                    FollowpointDelaySlider.Bindable.Value = FollowpointFadeoutSlider.Bindable.Value - 800;
                 }
             };
         }
-        private class TimeSlider : OsuSliderBar<int>
+       public class TimeSlider : OsuSliderBar<int>
         {
             public override string TooltipText => base.TooltipText + "ms";
+
+        }
+
+        protected virtual SettingsSlider<int, TimeSlider> CreateFadeOutSettingsSlider(OsuConfigManager config)
+        {
+            return new SettingsSlider<int, TimeSlider>
+            {
+                LabelText = "Followpoint fadeout time",
+                TransferValueOnCommit = true,
+                Bindable = config.GetBindable<int>(OsuSetting.FollowPointAppearTime),
+                KeyboardStep = 1
+            };
+        }
+
+        protected virtual SettingsSlider<int, TimeSlider> CreateOffsetSettingsSlider(OsuConfigManager config)
+        {
+            return new SettingsSlider<int, TimeSlider>
+            {
+                LabelText = "Followpoint fadeout offset",
+                TransferValueOnCommit = true,
+                Bindable = config.GetBindable<int>(OsuSetting.FollowPointDelay),
+                KeyboardStep = 1
+            };
         }
     }
 }

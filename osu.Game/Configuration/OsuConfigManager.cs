@@ -88,7 +88,7 @@ namespace osu.Game.Configuration
 
             Set(OsuSetting.IncreaseFirstObjectVisibility, true);
 
-            Set(OsuSetting.FollowPointAppearTime, 800, 100, 1000);
+            Set(OsuSetting.FollowPointAppearTime, 800, 0, 800);
             Set(OsuSetting.FollowPointDelay, 0, -500, 500);
 
             // Update
