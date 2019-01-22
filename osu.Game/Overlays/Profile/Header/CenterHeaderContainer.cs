@@ -278,7 +278,6 @@ namespace osu.Game.Overlays.Profile.Header
 
             hiddenDetailGlobal.Content = user?.Statistics?.Ranks.Global?.ToString("#,##0") ?? "-";
             hiddenDetailCountry.Content = user?.Statistics?.Ranks.Country?.ToString("#,##0") ?? "-";
-
         }
 
         private class ProfileHeaderButton : OsuHoverContainer
