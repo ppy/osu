@@ -72,7 +72,7 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
-        public IEnumerable<string> FilterTerms => new[] { LabelText };
+        public virtual IEnumerable<string> FilterTerms => new[] { LabelText };
 
         public bool MatchingFilter
         {
