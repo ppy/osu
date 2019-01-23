@@ -48,7 +48,6 @@ namespace osu.Game.Screens.Play
             {
                 visibilityContainer = new Container {
                     RelativeSizeAxes = Axes.Both,
-                    AlwaysPresent = true,    // The hud may be hidden but certain elements may need to still be updated
                     Children = new  Drawable[] {
                         new Container {
                             Anchor = Anchor.TopCentre,
