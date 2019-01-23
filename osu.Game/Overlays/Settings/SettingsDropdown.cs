@@ -26,6 +26,8 @@ namespace osu.Game.Overlays.Settings
             }
         }
 
+        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(Control.Items.Select(i => i.ToString()));
+
         protected sealed override Drawable CreateControl() => CreateDropdown();
 
         protected virtual OsuDropdown<T> CreateDropdown() => new DropdownControl { Items = Items };
