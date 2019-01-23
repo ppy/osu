@@ -6,6 +6,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
 
@@ -60,14 +61,14 @@ namespace osu.Game.Screens.Play
         protected virtual void InitializeBackgroundElements() => UpdateBackgroundElements();
 
         /// <summary>
-        /// Called wen background elements require updates, usually due to a user changing a setting.
+        /// Called when background elements require updates, usually due to a user changing a setting.
         /// </summary>
         /// <param name="userChange"></param>
         protected virtual void UpdateBackgroundElements()
         {
             if (!IsCurrentScreen) return;
 
-            Background?.FadeTo(BackgroundOpacity, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            Background?.FadeColour(OsuColour.Gray(BackgroundOpacity), BACKGROUND_FADE_DURATION, Easing.OutQuint);
             Background?.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }

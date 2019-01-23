@@ -32,6 +32,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -401,6 +402,7 @@ namespace osu.Game.Screens.Play
         {
             float fadeOutDuration = instant ? 0 : 250;
             Content.FadeOut(fadeOutDuration);
+            Background?.FadeColour(Color4.White, fadeOutDuration, Easing.OutQuint);
         }
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
@@ -438,7 +440,7 @@ namespace osu.Game.Screens.Play
                 .FadeTo(storyboardVisible && BackgroundOpacity > 0 ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
             if (storyboardVisible && beatmap.Storyboard.ReplacesBackground)
-                Background?.FadeTo(0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                Background?.FadeColour(Color4.Black, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
         protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
