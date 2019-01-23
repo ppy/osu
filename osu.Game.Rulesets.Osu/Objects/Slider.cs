@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             if (tickDistance == 0) return;
 
-            var minDistanceFromEnd = Velocity * 0.01;
+            var minDistanceFromEnd = Velocity * 10;
 
             var spanCount = this.SpanCount();
 

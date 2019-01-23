@@ -250,14 +250,14 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            KeyBindingInputManager.Children = new Drawable[]
+            KeyBindingInputManager.AddRange(new Drawable[]
             {
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
                 Playfield
-            };
+            });
 
             if (Cursor != null)
                 KeyBindingInputManager.Add(Cursor);
