@@ -82,7 +82,7 @@ namespace osu.Game.Screens.Play
         protected ScoreProcessor ScoreProcessor;
         protected RulesetContainer RulesetContainer;
 
-        private HUDOverlay hudOverlay;
+        protected HUDOverlay HUDOverlay;
         private FailOverlay failOverlay;
 
         private DrawableStoryboard storyboard;
@@ -199,7 +199,7 @@ namespace osu.Game.Screens.Play
                         {
                             Child = RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
                         },
-                        hudOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
+                        HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
                         {
                             Clock = Clock, // hud overlay doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
@@ -232,8 +232,8 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            hudOverlay.HoldToQuit.Action = performUserRequestedExit;
-            hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
+            HUDOverlay.HoldToQuit.Action = performUserRequestedExit;
+            HUDOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
 
