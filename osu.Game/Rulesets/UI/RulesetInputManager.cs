@@ -27,14 +27,6 @@ namespace osu.Game.Rulesets.UI
     public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler
         where T : struct
     {
-        public class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
-        {
-            public RulesetKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
-                : base(ruleset, variant, unique)
-            {
-            }
-        }
-
         protected override InputState CreateInitialState()
         {
             var state = base.CreateInitialState();
@@ -251,6 +243,14 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
             => new RulesetKeyBindingContainer(ruleset, variant, unique);
+
+        public class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
+        {
+            public RulesetKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+                : base(ruleset, variant, unique)
+            {
+            }
+        }
     }
 
     /// <summary>
