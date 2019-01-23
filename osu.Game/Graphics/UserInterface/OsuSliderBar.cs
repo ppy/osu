@@ -94,8 +94,8 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void LoadComplete()
         {
-            updateTooltipText(Current.Value);
             base.LoadComplete();
+            CurrentNumber.BindValueChanged(updateTooltipText, true);
         }
 
         protected override bool OnHover(HoverEvent e)
