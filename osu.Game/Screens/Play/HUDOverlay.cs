@@ -48,17 +48,26 @@ namespace osu.Game.Screens.Play
             {
                 visibilityContainer = new Container {
                     RelativeSizeAxes = Axes.Both,
-                    AlwaysPresent = true,    // The hud may be hidden but certain elements may need to still be updated
                     Children = new  Drawable[] {
-                        ComboCounter = CreateComboCounter(),
-                        ScoreCounter = CreateScoreCounter(),
-                        AccuracyCounter = CreateAccuracyCounter(),
+                        new Container {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            Y = 30,
+                            AutoSizeAxes = Axes.Both,
+                            AutoSizeDuration = 200,
+                            AutoSizeEasing = Easing.Out,
+                            Children = new Drawable[] {
+                                AccuracyCounter = CreateAccuracyCounter(),
+                                ScoreCounter = CreateScoreCounter(),
+                                ComboCounter = CreateComboCounter(),
+                            },
+                        },
                         HealthDisplay = CreateHealthDisplay(),
                         Progress = CreateProgress(),
                         ModDisplay = CreateModsContainer(),
-                        PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                     }
                 },
+                PlayerSettingsOverlay = CreatePlayerSettingsOverlay(),
                 new FillFlowContainer
                 {
                     Anchor = Anchor.BottomRight,
@@ -159,20 +168,27 @@ namespace osu.Game.Screens.Play
 
         protected virtual RollingCounter<double> CreateAccuracyCounter() => new PercentageCounter
         {
-            Anchor = Anchor.TopCentre,
-            Origin = Anchor.TopRight,
-            Position = new Vector2(0, 35),
             TextSize = 20,
-            Margin = new MarginPadding { Right = 140 },
+            BypassAutoSizeAxes = Axes.X,
+            Anchor = Anchor.TopLeft,
+            Origin = Anchor.TopRight,
+            Margin = new MarginPadding { Top = 5, Right = 20 },
+        };
+
+        protected virtual ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
+        {
+            TextSize = 40,
+            Anchor = Anchor.TopCentre,
+            Origin = Anchor.TopCentre,
         };
 
         protected virtual RollingCounter<int> CreateComboCounter() => new SimpleComboCounter
         {
-            Anchor = Anchor.TopCentre,
-            Origin = Anchor.TopLeft,
-            Position = new Vector2(0, 35),
-            Margin = new MarginPadding { Left = 140 },
             TextSize = 20,
+            BypassAutoSizeAxes = Axes.X,
+            Anchor = Anchor.TopRight,
+            Origin = Anchor.TopLeft,
+            Margin = new MarginPadding { Top = 5, Left = 20 },
         };
 
         protected virtual HealthDisplay CreateHealthDisplay() => new StandardHealthDisplay
@@ -189,14 +205,6 @@ namespace osu.Game.Screens.Play
             Origin = Anchor.BottomRight,
             Margin = new MarginPadding(10),
             AudioClock = offsetClock
-        };
-
-        protected virtual ScoreCounter CreateScoreCounter() => new ScoreCounter(6)
-        {
-            Anchor = Anchor.TopCentre,
-            Origin = Anchor.TopCentre,
-            TextSize = 40,
-            Position = new Vector2(0, 30),
         };
 
         protected virtual SongProgress CreateProgress() => new SongProgress
