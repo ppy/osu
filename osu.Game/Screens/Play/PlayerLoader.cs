@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play
 
         protected override void InitializeBackgroundElements()
         {
-            Background?.FadeTo(1, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            Background?.FadeColour(Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             Background?.BlurTo(background_blur, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
