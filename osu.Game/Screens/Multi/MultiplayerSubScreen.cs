@@ -9,40 +9,40 @@ namespace osu.Game.Screens.Multi
 {
     public abstract class MultiplayerSubScreen : OsuScreen, IMultiplayerSubScreen
     {
-        protected virtual Drawable TransitionContent => Content;
+        protected virtual Drawable TransitionContent => this;
 
         public virtual string ShortTitle => Title;
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            Content.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            this.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
             TransitionContent.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
             TransitionContent.MoveToX(200).MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
-            Content.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
             TransitionContent.MoveToX(200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
 
             return base.OnExiting(next);
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
 
-            Content.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            this.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
             TransitionContent.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
 
-            Content.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
             TransitionContent.MoveToX(-200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
         }
     }

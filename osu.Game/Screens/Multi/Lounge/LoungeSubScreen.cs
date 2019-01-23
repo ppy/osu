@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Multi.Lounge
 
             RoomInspector inspector;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 Filter = new FilterControl { Depth = -1 },
                 content = new Container
@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Multi.Lounge
 
             Filter.Search.Current.ValueChanged += s => filterRooms();
             Filter.Tabs.Current.ValueChanged += t => filterRooms();
-            Filter.Search.Exit += Exit;
+            Filter.Search.Exit += this.Exit;
         }
 
         protected override void UpdateAfterChildren()
@@ -101,20 +101,20 @@ namespace osu.Game.Screens.Multi.Lounge
             GetContainingInputManager().ChangeFocus(Filter.Search);
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             Filter.Search.HoldFocus = true;
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
             Filter.Search.HoldFocus = false;
             // no base call; don't animate
             return false;
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
             Filter.Search.HoldFocus = false;
@@ -142,10 +142,10 @@ namespace osu.Game.Screens.Multi.Lounge
         public void Push(Room room)
         {
             // Handles the case where a room is clicked 3 times in quick succession
-            if (!IsCurrentScreen)
+            if (!this.IsCurrentScreen())
                 return;
 
-            Push(new MatchSubScreen(room, s => pushGameplayScreen?.Invoke(s)));
+            this.Push(new MatchSubScreen(room, s => pushGameplayScreen?.Invoke(s)));
         }
     }
 }

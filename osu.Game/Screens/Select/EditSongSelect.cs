@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using osu.Framework.Screens;
+
 namespace osu.Game.Screens.Select
 {
     public class EditSongSelect : SongSelect
@@ -9,7 +11,7 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnStart()
         {
-            Exit();
+            this.Exit();
             return true;
         }
     }

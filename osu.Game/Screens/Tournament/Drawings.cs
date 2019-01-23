@@ -22,6 +22,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -70,13 +71,13 @@ namespace osu.Game.Screens.Tournament
 
             if (!TeamList.Teams.Any())
             {
-                Exit();
+                this.Exit();
                 return;
             }
 
             drawingsConfig = new DrawingsConfigManager(storage);
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {

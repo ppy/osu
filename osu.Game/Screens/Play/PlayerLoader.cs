@@ -51,14 +51,14 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(info = new BeatmapMetadataDisplay(Beatmap.Value)
+            AddInternal(info = new BeatmapMetadataDisplay(Beatmap.Value)
             {
                 Alpha = 0,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             });
 
-            Add(new FillFlowContainer<PlayerSettingsGroup>
+            AddInternal(new FillFlowContainer<PlayerSettingsGroup>
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play
 
         private void playerLoaded(Player player) => info.Loading = false;
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
 
@@ -105,21 +105,21 @@ namespace osu.Game.Screens.Play
 
         private void contentIn()
         {
-            Content.ScaleTo(1, 650, Easing.OutQuint);
-            Content.FadeInFromZero(400);
+            this.ScaleTo(1, 650, Easing.OutQuint);
+            this.FadeInFromZero(400);
         }
 
         private void contentOut()
         {
-            Content.ScaleTo(0.7f, 300, Easing.InQuint);
-            Content.FadeOut(250);
+            this.ScaleTo(0.7f, 300, Easing.InQuint);
+            this.FadeOut(250);
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            Content.ScaleTo(0.7f);
+            this.ScaleTo(0.7f);
 
             contentIn();
 
@@ -170,7 +170,7 @@ namespace osu.Game.Screens.Play
 
         private void pushWhenLoaded()
         {
-            if (!IsCurrentScreen) return;
+            if (!this.IsCurrentScreen()) return;
 
             try
             {
@@ -191,7 +191,7 @@ namespace osu.Game.Screens.Play
 
                     this.Delay(250).Schedule(() =>
                     {
-                        if (!IsCurrentScreen) return;
+                        if (!this.IsCurrentScreen()) return;
 
                         loadTask = null;
 
@@ -200,9 +200,9 @@ namespace osu.Game.Screens.Play
                         ValidForResume = false;
 
                         if (player.LoadedBeatmapSuccessfully)
-                            Push(player);
+                            this.Push(player);
                         else
-                            Exit();
+                            this.Exit();
                     });
                 }, 500);
             }
@@ -218,15 +218,15 @@ namespace osu.Game.Screens.Play
             pushDebounce = null;
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
             cancelLoad();
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
-            Content.ScaleTo(0.7f, 150, Easing.InQuint);
+            this.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
             cancelLoad();
 

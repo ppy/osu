@@ -10,45 +10,26 @@ namespace osu.Game.Graphics.UserInterface
     /// <summary>
     /// A <see cref="BreadcrumbControl"/> which follows the active screen (and allows navigation) in a <see cref="Screen"/> stack.
     /// </summary>
-    public class ScreenBreadcrumbControl : BreadcrumbControl<Screen>
+    public class ScreenBreadcrumbControl : BreadcrumbControl<IScreen>
     {
-        private Screen last;
-
-        public ScreenBreadcrumbControl(Screen initialScreen)
+        public ScreenBreadcrumbControl(ScreenStack stack)
         {
-            Current.ValueChanged += newScreen =>
-            {
-                if (last != newScreen && !newScreen.IsCurrentScreen)
-                    newScreen.MakeCurrent();
-            };
+            stack.ScreenPushed += onPushed;
+            stack.ScreenExited += onExited;
 
-            onPushed(initialScreen);
+            Current.ValueChanged += newScreen => newScreen.MakeCurrent();
         }
 
-        private void screenChanged(Screen newScreen)
+        private void onPushed(IScreen lastScreen, IScreen newScreen)
         {
-            if (newScreen == null) return;
-
-            if (last != null)
-            {
-                last.Exited -= screenChanged;
-                last.ModePushed -= onPushed;
-            }
-
-            last = newScreen;
-
-            newScreen.Exited += screenChanged;
-            newScreen.ModePushed += onPushed;
-
             Current.Value = newScreen;
+            AddItem(newScreen);
         }
 
-        private void onPushed(Screen screen)
+        private void onExited(IScreen lastScreen, IScreen newScreen)
         {
-            Items.ToList().SkipWhile(i => i != Current.Value).Skip(1).ForEach(RemoveItem);
-            AddItem(screen);
-
-            screenChanged(screen);
+            Current.Value = newScreen;
+            Items.ToList().SkipWhile(s => s != Current.Value).Skip(1).ForEach(RemoveItem);
         }
     }
 }

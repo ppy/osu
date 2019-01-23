@@ -28,16 +28,16 @@ namespace osu.Game.Tests.Visual
             {
                 nextScreen = screen;
 
-                if (IsCurrentScreen)
+                if (this.IsCurrentScreen())
                 {
-                    Push(screen);
+                   this.Push(screen);
                     nextScreen = null;
                 }
                 else
-                    MakeCurrent();
+                    this.MakeCurrent();
             });
 
-            protected override void OnResuming(Screen last)
+            public override void OnResuming(IScreen last)
             {
                 base.OnResuming(last);
                 if (nextScreen != null)

@@ -28,12 +28,11 @@ namespace osu.Game.Screens.Multi
     {
         private readonly MultiplayerWaveContainer waves;
 
-        public override bool AllowBeatmapRulesetChange => currentSubScreen?.AllowBeatmapRulesetChange ?? base.AllowBeatmapRulesetChange;
+        public override bool AllowBeatmapRulesetChange => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.AllowBeatmapRulesetChange ?? base.AllowBeatmapRulesetChange;
 
         private readonly OsuButton createButton;
         private readonly LoungeSubScreen loungeSubScreen;
-
-        private OsuScreen currentSubScreen;
+        private readonly ScreenStack screenStack;
 
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
@@ -43,10 +42,12 @@ namespace osu.Game.Screens.Multi
 
         public Multiplayer()
         {
-            Child = waves = new MultiplayerWaveContainer
+            InternalChild = waves = new MultiplayerWaveContainer
             {
                 RelativeSizeAxes = Axes.Both,
             };
+
+            screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen(this.Push)) { RelativeSizeAxes = Axes.Both };
 
             waves.AddRange(new Drawable[]
             {
@@ -74,9 +75,9 @@ namespace osu.Game.Screens.Multi
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = Header.HEIGHT },
-                    Child = loungeSubScreen = new LoungeSubScreen(Push),
+                    Child = screenStack
                 },
-                new Header(loungeSubScreen),
+                new Header(screenStack),
                 createButton = new HeaderButton
                 {
                     Anchor = Anchor.TopRight,
@@ -97,8 +98,8 @@ namespace osu.Game.Screens.Multi
                 roomManager = new RoomManager()
             });
 
-            screenAdded(loungeSubScreen);
-            loungeSubScreen.Exited += _ => Exit();
+            screenStack.ScreenPushed += screenPushed;
+            screenStack.ScreenExited += screenExited;
         }
 
         private readonly IBindable<bool> isIdle = new BindableBool();
@@ -120,7 +121,7 @@ namespace osu.Game.Screens.Multi
 
         private void updatePollingRate(bool idle)
         {
-            roomManager.TimeBetweenPolls = !IsCurrentScreen || !(currentSubScreen is LoungeSubScreen) ? 0 : (idle ? 120000 : 15000);
+            roomManager.TimeBetweenPolls = !this.IsCurrentScreen() || !(screenStack.CurrentScreen is LoungeSubScreen) ? 0 : (idle ? 120000 : 15000);
             Logger.Log($"Polling adjusted to {roomManager.TimeBetweenPolls}");
         }
 
@@ -133,28 +134,28 @@ namespace osu.Game.Screens.Multi
         private void forcefullyExit()
         {
             // This is temporary since we don't currently have a way to force screens to be exited
-            if (IsCurrentScreen)
-                Exit();
+            if (this.IsCurrentScreen())
+                this.Exit();
             else
             {
-                MakeCurrent();
+                this.MakeCurrent();
                 Schedule(forcefullyExit);
             }
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
-            Content.FadeIn();
+            this.FadeIn();
 
             base.OnEntering(last);
             waves.Show();
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
             waves.Hide();
 
-            Content.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
+            this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
             cancelLooping();
             loungeSubScreen.MakeCurrent();
@@ -163,20 +164,20 @@ namespace osu.Game.Screens.Multi
             return base.OnExiting(next);
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
 
-            Content.FadeIn(250);
-            Content.ScaleTo(1, 250, Easing.OutSine);
+            this.FadeIn(250);
+            this.ScaleTo(1, 250, Easing.OutSine);
 
             updatePollingRate(isIdle.Value);
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
-            Content.ScaleTo(1.1f, 250, Easing.InSine);
-            Content.FadeOut(250);
+            this.ScaleTo(1.1f, 250, Easing.InSine);
+            this.FadeOut(250);
 
             cancelLooping();
             roomManager.TimeBetweenPolls = 0;
@@ -202,9 +203,9 @@ namespace osu.Game.Screens.Multi
         {
             base.Update();
 
-            if (!IsCurrentScreen) return;
+            if (!this.IsCurrentScreen()) return;
 
-            if (currentSubScreen is MatchSubScreen)
+            if (screenStack.CurrentScreen is MatchSubScreen)
             {
                 var track = Beatmap.Value.Track;
                 if (track != null)
@@ -221,25 +222,18 @@ namespace osu.Game.Screens.Multi
 
                 createButton.Hide();
             }
-            else if (currentSubScreen is LoungeSubScreen)
+            else if (screenStack.CurrentScreen is LoungeSubScreen)
                 createButton.Show();
         }
 
-        private void screenAdded(Screen newScreen)
-        {
-            currentSubScreen = (OsuScreen)newScreen;
-            updatePollingRate(isIdle.Value);
+        private void screenPushed(IScreen lastScreen, IScreen newScreen)
+            => updatePollingRate(isIdle.Value);
 
-            newScreen.ModePushed += screenAdded;
-            newScreen.Exited += screenRemoved;
-        }
-
-        private void screenRemoved(Screen newScreen)
+        private void screenExited(IScreen lastScreen, IScreen newScreen)
         {
-            if (currentSubScreen is MatchSubScreen)
+            if (lastScreen is MatchSubScreen)
                 cancelLooping();
 
-            currentSubScreen = (OsuScreen)newScreen;
             updatePollingRate(isIdle.Value);
         }
 

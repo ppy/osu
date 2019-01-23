@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Select
             }, Key.Number3);
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             player = null;
 
@@ -64,7 +64,7 @@ namespace osu.Game.Screens.Select
 
             LoadComponentAsync(player = new PlayerLoader(() => new Player()), l =>
             {
-                if (IsCurrentScreen) Push(player);
+                if (this.IsCurrentScreen())this.Push(player);
             });
 
             return true;
