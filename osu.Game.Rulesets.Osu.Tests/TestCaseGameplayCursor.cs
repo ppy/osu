@@ -8,6 +8,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics.Cursor;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Tests.Visual;
 
@@ -20,6 +21,16 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public override IReadOnlyList<Type> RequiredTypes => new [] { typeof(CursorTrail) };
 
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            var configCache = dependencies.Get<RulesetConfigCache>();
+            dependencies.CacheAs((OsuConfigManager)configCache.GetConfigFor(new OsuRuleset()));
+
+            return dependencies;
+        }
+        
         public CursorContainer Cursor => cursor;
 
         public bool ProvidingUserCursor => true;
