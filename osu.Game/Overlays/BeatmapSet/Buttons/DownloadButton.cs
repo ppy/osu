@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 {
     public class DownloadButton : HeaderButton, IHasTooltip
     {
-        public string TooltipText => Enabled ? null : "You gotta be an osu!supporter to download for now 'yo";
+        public string TooltipText => "Download this beatmap";
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
@@ -101,11 +101,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
         private void load(APIAccess api)
         {
             localUser.BindTo(api.LocalUser);
-            localUser.BindValueChanged(userChanged, true);
             Enabled.BindValueChanged(enabledChanged, true);
         }
-
-        private void userChanged(User user) => Enabled.Value = user.IsSupporter;
 
         private void enabledChanged(bool enabled) => this.FadeColour(enabled ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
     }
