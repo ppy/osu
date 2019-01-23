@@ -49,7 +49,6 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
             Api.Queue(request);
         }
 
-
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);

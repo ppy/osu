@@ -3,14 +3,14 @@
 
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Game.Rulesets.Mania.Objects;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.UI;
 using System.Linq;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mania.Beatmaps;
 
 namespace osu.Game.Rulesets.Mania.Mods
 {
-    public class ManiaModMirror : Mod, IApplicableToRulesetContainer<ManiaHitObject>
+    public class ManiaModMirror : Mod, IApplicableToBeatmap<ManiaHitObject>
     {
         public override string Name => "Mirror";
         public override string Acronym => "MR";
@@ -18,11 +18,11 @@ namespace osu.Game.Rulesets.Mania.Mods
         public override double ScoreMultiplier => 1;
         public override bool Ranked => true;
 
-        public void ApplyToRulesetContainer(RulesetContainer<ManiaHitObject> rulesetContainer)
+        public void ApplyToBeatmap(Beatmap<ManiaHitObject> beatmap)
         {
-            var availableColumns = ((ManiaRulesetContainer)rulesetContainer).Beatmap.TotalColumns;
+            var availableColumns = ((ManiaBeatmap)beatmap).TotalColumns;
 
-            rulesetContainer.Objects.OfType<ManiaHitObject>().ForEach(h => h.Column = availableColumns - 1 - h.Column);
+            beatmap.HitObjects.OfType<ManiaHitObject>().ForEach(h => h.Column = availableColumns - 1 - h.Column);
         }
     }
 }

@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Multi.Match
 
             MatchChatDisplay chat;
             Components.Header header;
+            Info info;
+            GridContainer bottomRow;
             MatchSettingsOverlay settings;
 
             Children = new Drawable[]
@@ -61,20 +63,21 @@ namespace osu.Game.Screens.Multi.Match
                     Content = new[]
                     {
                         new Drawable[] { header = new Components.Header(room) { Depth = -1 } },
-                        new Drawable[] { new Info(room) { OnStart = onStart } },
+                        new Drawable[] { info = new Info(room) { OnStart = onStart } },
                         new Drawable[]
                         {
-                            new GridContainer
+                            bottomRow = new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Content = new[]
                                 {
                                     new Drawable[]
                                     {
-                                        leaderboard = new MatchLeaderboard(room)
+                                        leaderboard = new MatchLeaderboard
                                         {
                                             Padding = new MarginPadding(10),
-                                            RelativeSizeAxes = Axes.Both
+                                            RelativeSizeAxes = Axes.Both,
+                                            Room = room
                                         },
                                         new Container
                                         {
@@ -108,10 +111,19 @@ namespace osu.Game.Screens.Multi.Match
             header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect { Selected = addPlaylistItem });
             header.Tabs.Current.ValueChanged += t =>
             {
+                const float fade_duration = 500;
                 if (t is SettingsMatchPage)
+                {
                     settings.Show();
+                    info.FadeOut(fade_duration, Easing.OutQuint);
+                    bottomRow.FadeOut(fade_duration, Easing.OutQuint);
+                }
                 else
+                {
                     settings.Hide();
+                    info.FadeIn(fade_duration, Easing.OutQuint);
+                    bottomRow.FadeIn(fade_duration, Easing.OutQuint);
+                }
             };
 
             chat.Exit += Exit;

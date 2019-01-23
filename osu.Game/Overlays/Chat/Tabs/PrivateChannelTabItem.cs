@@ -77,7 +77,6 @@ namespace osu.Game.Overlays.Chat.Tabs
             CloseButton.FadeIn(TRANSITION_LENGTH, Easing.OutQuint);
         }
 
-
         protected override void FadeInactive()
         {
             base.FadeInactive();

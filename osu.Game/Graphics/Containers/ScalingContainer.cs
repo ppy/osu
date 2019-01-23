@@ -28,6 +28,8 @@ namespace osu.Game.Graphics.Containers
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
         private readonly Container sizableContainer;
 
         private Drawable backgroundLayer;
@@ -41,13 +43,42 @@ namespace osu.Game.Graphics.Containers
             this.targetMode = targetMode;
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = sizableContainer = new Container
+            InternalChild = sizableContainer = new AlwaysInputContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Both,
                 CornerRadius = 10,
-                Child = content = new DrawSizePreservingFillContainer()
+                Child = content = new ScalingDrawSizePreservingFillContainer(targetMode != ScalingMode.Gameplay)
             };
+        }
+
+        private class ScalingDrawSizePreservingFillContainer : DrawSizePreservingFillContainer
+        {
+            private readonly bool applyUIScale;
+            private Bindable<float> uiScale;
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+            public ScalingDrawSizePreservingFillContainer(bool applyUIScale)
+            {
+                this.applyUIScale = applyUIScale;
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager osuConfig)
+            {
+                if (applyUIScale)
+                {
+                    uiScale = osuConfig.GetBindable<float>(OsuSetting.UIScale);
+                    uiScale.BindValueChanged(scaleChanged, true);
+                }
+            }
+
+            private void scaleChanged(float value)
+            {
+                this.ScaleTo(new Vector2(value), 500, Easing.Out);
+                this.ResizeTo(new Vector2(1 / value), 500, Easing.Out);
+            }
         }
 
         [BackgroundDependencyLoader]
@@ -115,6 +146,16 @@ namespace osu.Game.Graphics.Containers
 
             sizableContainer.MoveTo(targetPosition, 500, Easing.OutQuart);
             sizableContainer.ResizeTo(targetSize, 500, Easing.OutQuart).OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
+        }
+
+        private class AlwaysInputContainer : Container
+        {
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+            public AlwaysInputContainer()
+            {
+                RelativeSizeAxes = Axes.Both;
+            }
         }
     }
 }

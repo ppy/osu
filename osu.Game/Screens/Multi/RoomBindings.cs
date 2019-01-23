@@ -39,6 +39,7 @@ namespace osu.Game.Screens.Multi
 
                 if (room != null)
                 {
+                    RoomID.UnbindFrom(room.RoomID);
                     Name.UnbindFrom(room.Name);
                     Host.UnbindFrom(room.Host);
                     Status.UnbindFrom(room.Status);
@@ -52,22 +53,20 @@ namespace osu.Game.Screens.Multi
                     Duration.UnbindFrom(room.Duration);
                 }
 
-                room = value;
+                room = value ?? new Room();
 
-                if (room != null)
-                {
-                    Name.BindTo(room.Name);
-                    Host.BindTo(room.Host);
-                    Status.BindTo(room.Status);
-                    Type.BindTo(room.Type);
-                    Playlist.BindTo(room.Playlist);
-                    Participants.BindTo(room.Participants);
-                    ParticipantCount.BindTo(room.ParticipantCount);
-                    MaxParticipants.BindTo(room.MaxParticipants);
-                    EndDate.BindTo(room.EndDate);
-                    Availability.BindTo(room.Availability);
-                    Duration.BindTo(room.Duration);
-                }
+                RoomID.BindTo(room.RoomID);
+                Name.BindTo(room.Name);
+                Host.BindTo(room.Host);
+                Status.BindTo(room.Status);
+                Type.BindTo(room.Type);
+                Playlist.BindTo(room.Playlist);
+                Participants.BindTo(room.Participants);
+                ParticipantCount.BindTo(room.ParticipantCount);
+                MaxParticipants.BindTo(room.MaxParticipants);
+                EndDate.BindTo(room.EndDate);
+                Availability.BindTo(room.Availability);
+                Duration.BindTo(room.Duration);
             }
         }
 
@@ -82,6 +81,7 @@ namespace osu.Game.Screens.Multi
             currentRuleset.Value = playlistItem?.Ruleset;
         }
 
+        public readonly Bindable<int?> RoomID = new Bindable<int?>();
         public readonly Bindable<string> Name = new Bindable<string>();
         public readonly Bindable<User> Host = new Bindable<User>();
         public readonly Bindable<RoomStatus> Status = new Bindable<RoomStatus>();
