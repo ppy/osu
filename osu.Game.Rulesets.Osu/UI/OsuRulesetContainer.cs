@@ -8,6 +8,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Replays;
@@ -20,6 +21,8 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuRulesetContainer : RulesetContainer<OsuPlayfield, OsuHitObject>
     {
+        protected new OsuConfigManager Config => (OsuConfigManager)base.Config;
+
         public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
