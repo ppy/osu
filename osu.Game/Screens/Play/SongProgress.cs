@@ -125,7 +125,6 @@ namespace osu.Game.Screens.Play
             set
             {
                 if (allowSeeking == value) return;
-                if (!replayLoaded) return;
                 allowSeeking = value;
                 updateBarVisibility();
             }
