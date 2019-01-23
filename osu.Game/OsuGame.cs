@@ -221,9 +221,7 @@ namespace osu.Game
                     return;
                 }
 
-                var databasedSet = beatmap.OnlineBeatmapSetID != null ?
-                    BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID) :
-                    BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
+                var databasedSet = beatmap.OnlineBeatmapSetID != null ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID) : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
 
                 if (databasedSet != null)
                 {
@@ -520,12 +518,20 @@ namespace osu.Game
 
         public class GameIdleTracker : IdleTracker
         {
+            private InputManager inputManager;
+
             public GameIdleTracker(int time)
                 : base(time)
             {
             }
 
-            protected override bool AllowIdle => GetContainingInputManager().FocusedDrawable == null;
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                inputManager = GetContainingInputManager();
+            }
+
+            protected override bool AllowIdle => inputManager.FocusedDrawable == null;
         }
 
         private void forwardLoggedErrorsToNotifications()
