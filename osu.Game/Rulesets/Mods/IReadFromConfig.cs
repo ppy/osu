@@ -10,6 +10,6 @@ namespace osu.Game.Rulesets.Mods
     /// </summary>
     public interface IReadFromConfig
     {
-        void ReadFromConfig(OsuConfigManager config);
+        void ReadFromConfig(GameConfigManager config);
     }
 }

@@ -173,11 +173,11 @@ namespace osu.Game.Screens.Select
         public readonly Box Background;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, IBindable<RulesetInfo> parentRuleset, OsuConfigManager config)
+        private void load(OsuColour colours, IBindable<RulesetInfo> parentRuleset, GameConfigManager config)
         {
             sortTabs.AccentColour = colours.GreenLight;
 
-            showConverted = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
+            showConverted = config.GetBindable<bool>(GameSetting.ShowConvertedBeatmaps);
             showConverted.ValueChanged += val => updateCriteria();
 
             ruleset.BindTo(parentRuleset);

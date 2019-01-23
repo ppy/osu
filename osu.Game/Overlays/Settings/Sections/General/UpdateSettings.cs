@@ -13,14 +13,14 @@ namespace osu.Game.Overlays.Settings.Sections.General
         protected override string Header => "Updates";
 
         [BackgroundDependencyLoader]
-        private void load(Storage storage, OsuConfigManager config)
+        private void load(Storage storage, GameConfigManager config)
         {
             Children = new Drawable[]
             {
                 new SettingsEnumDropdown<ReleaseStream>
                 {
                     LabelText = "Release stream",
-                    Bindable = config.GetBindable<ReleaseStream>(OsuSetting.ReleaseStream),
+                    Bindable = config.GetBindable<ReleaseStream>(GameSetting.ReleaseStream),
                 },
                 new SettingsButton
                 {

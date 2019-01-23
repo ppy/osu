@@ -13,14 +13,14 @@ namespace osu.Game.Screens.Play.PlayerSettings
         protected override string Title => @"discussions";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(GameConfigManager config)
         {
             Children = new Drawable[]
             {
                 new PlayerCheckbox
                 {
                     LabelText = "Show floating comments",
-                    Bindable = config.GetBindable<bool>(OsuSetting.FloatingComments)
+                    Bindable = config.GetBindable<bool>(GameSetting.FloatingComments)
                 },
                 new FocusedTextBox
                 {

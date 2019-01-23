@@ -47,12 +47,12 @@ namespace osu.Game.Screens.Menu
         private WorkingBeatmap introBeatmap;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game, BindableBeatmap beatmap)
+        private void load(AudioManager audio, GameConfigManager config, BeatmapManager beatmaps, Framework.Game game, BindableBeatmap beatmap)
         {
             this.beatmap.BindTo(beatmap);
 
-            menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
-            menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
+            menuVoice = config.GetBindable<bool>(GameSetting.MenuVoice);
+            menuMusic = config.GetBindable<bool>(GameSetting.MenuMusic);
 
             BeatmapSetInfo setInfo = null;
 

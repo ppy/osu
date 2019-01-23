@@ -12,29 +12,29 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         protected override string Header => "Detail Settings";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(GameConfigManager config)
         {
             Children = new Drawable[]
             {
                 new SettingsCheckbox
                 {
                     LabelText = "Storyboards",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard)
+                    Bindable = config.GetBindable<bool>(GameSetting.ShowStoryboard)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Rotate cursor when dragging",
-                    Bindable = config.GetBindable<bool>(OsuSetting.CursorRotation)
+                    Bindable = config.GetBindable<bool>(GameSetting.CursorRotation)
                 },
                 new SettingsEnumDropdown<ScreenshotFormat>
                 {
                     LabelText = "Screenshot format",
-                    Bindable = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat)
+                    Bindable = config.GetBindable<ScreenshotFormat>(GameSetting.ScreenshotFormat)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Show menu cursor in screenshots",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor)
+                    Bindable = config.GetBindable<bool>(GameSetting.ScreenshotCaptureMenuCursor)
                 }
             };
         }

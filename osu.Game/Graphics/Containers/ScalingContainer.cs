@@ -65,11 +65,11 @@ namespace osu.Game.Graphics.Containers
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuConfigManager osuConfig)
+            private void load(GameConfigManager gameConfig)
             {
                 if (applyUIScale)
                 {
-                    uiScale = osuConfig.GetBindable<float>(OsuSetting.UIScale);
+                    uiScale = gameConfig.GetBindable<float>(GameSetting.UIScale);
                     uiScale.BindValueChanged(scaleChanged, true);
                 }
             }
@@ -82,21 +82,21 @@ namespace osu.Game.Graphics.Containers
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(GameConfigManager config)
         {
-            scalingMode = config.GetBindable<ScalingMode>(OsuSetting.Scaling);
+            scalingMode = config.GetBindable<ScalingMode>(GameSetting.Scaling);
             scalingMode.ValueChanged += _ => updateSize();
 
-            sizeX = config.GetBindable<float>(OsuSetting.ScalingSizeX);
+            sizeX = config.GetBindable<float>(GameSetting.ScalingSizeX);
             sizeX.ValueChanged += _ => updateSize();
 
-            sizeY = config.GetBindable<float>(OsuSetting.ScalingSizeY);
+            sizeY = config.GetBindable<float>(GameSetting.ScalingSizeY);
             sizeY.ValueChanged += _ => updateSize();
 
-            posX = config.GetBindable<float>(OsuSetting.ScalingPositionX);
+            posX = config.GetBindable<float>(GameSetting.ScalingPositionX);
             posX.ValueChanged += _ => updateSize();
 
-            posY = config.GetBindable<float>(OsuSetting.ScalingPositionY);
+            posY = config.GetBindable<float>(GameSetting.ScalingPositionY);
             posY.ValueChanged += _ => updateSize();
         }
 

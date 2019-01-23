@@ -101,9 +101,9 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
+        private void load(GameConfigManager config, NotificationOverlay notificationOverlay)
         {
-            showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
+            showHud = config.GetBindable<bool>(GameSetting.ShowInterface);
             showHud.ValueChanged += hudVisibility => visibilityContainer.FadeTo(hudVisibility ? 1 : 0, duration);
             showHud.TriggerChange();
 

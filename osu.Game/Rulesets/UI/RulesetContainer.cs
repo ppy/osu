@@ -248,7 +248,7 @@ namespace osu.Game.Rulesets.UI
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(GameConfigManager config)
         {
             KeyBindingInputManager.AddRange(new Drawable[]
             {
@@ -291,7 +291,7 @@ namespace osu.Game.Rulesets.UI
         /// Applies the active mods to this RulesetContainer.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyRulesetMods(IEnumerable<Mod> mods, OsuConfigManager config)
+        private void applyRulesetMods(IEnumerable<Mod> mods, GameConfigManager config)
         {
             if (mods == null)
                 return;

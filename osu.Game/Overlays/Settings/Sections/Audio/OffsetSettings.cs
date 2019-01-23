@@ -13,14 +13,14 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         protected override string Header => "Offset Adjustment";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(GameConfigManager config)
         {
             Children = new Drawable[]
             {
                 new SettingsSlider<double, OffsetSlider>
                 {
                     LabelText = "Audio offset",
-                    Bindable = config.GetBindable<double>(OsuSetting.AudioOffset),
+                    Bindable = config.GetBindable<double>(GameSetting.AudioOffset),
                     KeyboardStep = 1f
                 },
                 new SettingsButton

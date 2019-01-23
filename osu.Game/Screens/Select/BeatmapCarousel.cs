@@ -125,10 +125,10 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuConfigManager config)
+        private void load(GameConfigManager config)
         {
-            config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
-            config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
+            config.BindWith(GameSetting.RandomSelectAlgorithm, RandomAlgorithm);
+            config.BindWith(GameSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
 
             RightClickScrollingEnabled.ValueChanged += v => RightMouseScrollbar = v;
             RightClickScrollingEnabled.TriggerChange();
