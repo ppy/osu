@@ -21,7 +21,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
     public class DownloadButton : DownloadTrackingComposite, IHasTooltip
     {
         private readonly bool noVideo;
-        public string TooltipText => button.Enabled ? null : "You gotta be an osu!supporter to download for now 'yo";
+
+        public string TooltipText => button.Enabled ? "Download this beatmap" : "Login to download";
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
@@ -147,7 +148,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             }, true);
         }
 
-        private void userChanged(User user) => button.Enabled.Value = user.IsSupporter;
+        private void userChanged(User user) => button.Enabled.Value = !(user is GuestUser);
 
         private void enabledChanged(bool enabled) => this.FadeColour(enabled ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
     }
