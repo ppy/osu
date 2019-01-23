@@ -109,12 +109,12 @@ namespace osu.Game.Scoring.Legacy
                 }
             }
 
-            calculateAccuracy(score.ScoreInfo);
+            CalculateAccuracy(score.ScoreInfo);
 
             return score;
         }
 
-        private void calculateAccuracy(ScoreInfo score)
+        protected void CalculateAccuracy(ScoreInfo score)
         {
             int countMiss = score.Statistics[HitResult.Miss];
             int count50 = score.Statistics[HitResult.Meh];
