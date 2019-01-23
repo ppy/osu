@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play
         protected virtual void InitializeBackgroundElements() => UpdateBackgroundElements();
 
         /// <summary>
-        /// Called wen background elements require updates, usually due to a user changing a setting.
+        /// Called when background elements require updates, usually due to a user changing a setting.
         /// </summary>
         /// <param name="userChange"></param>
         protected virtual void UpdateBackgroundElements()
