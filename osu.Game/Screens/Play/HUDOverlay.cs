@@ -46,18 +46,21 @@ namespace osu.Game.Screens.Play
 
             Children = new Drawable[]
             {
-                visibilityContainer = new Container {
+                visibilityContainer = new Container
+                {
                     RelativeSizeAxes = Axes.Both,
-                    AlwaysPresent = true,    // The hud may be hidden but certain elements may need to still be updated
-                    Children = new  Drawable[] {
-                        new Container {
+                    Children = new Drawable[]
+                    {
+                        new Container
+                        {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Y = 30,
                             AutoSizeAxes = Axes.Both,
                             AutoSizeDuration = 200,
                             AutoSizeEasing = Easing.Out,
-                            Children = new Drawable[] {
+                            Children = new Drawable[]
+                            {
                                 AccuracyCounter = CreateAccuracyCounter(),
                                 ScoreCounter = CreateScoreCounter(),
                                 ComboCounter = CreateComboCounter(),
