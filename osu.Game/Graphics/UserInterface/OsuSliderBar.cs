@@ -127,6 +127,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.OnUserChange(value);
             playSample(value);
+            updateTooltipText(value);
         }
 
         private void playSample(T value)
