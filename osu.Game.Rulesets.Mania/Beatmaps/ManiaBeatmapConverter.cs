@@ -180,7 +180,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 foreach (var obj in newPattern.HitObjects)
                     yield return obj;
-
             }
         }
 
