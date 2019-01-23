@@ -6,6 +6,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
 
@@ -67,7 +68,7 @@ namespace osu.Game.Screens.Play
         {
             if (!IsCurrentScreen) return;
 
-            Background?.FadeTo(BackgroundOpacity, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            Background?.FadeColour(OsuColour.Gray(BackgroundOpacity), BACKGROUND_FADE_DURATION, Easing.OutQuint);
             Background?.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
