@@ -48,7 +48,6 @@ namespace osu.Game.Screens.Play
             {
                 visibilityContainer = new Container {
                     RelativeSizeAxes = Axes.Both,
-                    AlwaysPresent = true,    // The hud may be hidden but certain elements may need to still be updated
                     Children = new  Drawable[] {
                         new Container {
                             Anchor = Anchor.TopCentre,
@@ -102,7 +101,6 @@ namespace osu.Game.Screens.Play
         {
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
             showHud.ValueChanged += hudVisibility => visibilityContainer.FadeTo(hudVisibility ? 1 : 0, duration);
-            showHud.ValueChanged += v => Progress.AllowSeeking = v;
             showHud.TriggerChange();
 
             if (!showHud && !hasShownNotificationOnce)
