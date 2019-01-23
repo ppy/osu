@@ -8,22 +8,22 @@ namespace osu.Game.Overlays.AccountCreation
 {
     public abstract class AccountCreationScreen : Screen
     {
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            Content.FadeOut().Delay(200).FadeIn(200);
+            this.FadeOut().Delay(200).FadeIn(200);
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
-            Content.FadeIn(200);
+            this.FadeIn(200);
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
-            Content.FadeOut(200);
+            this.FadeOut(200);
         }
     }
 }

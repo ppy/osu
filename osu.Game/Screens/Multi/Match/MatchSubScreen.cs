@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Multi.Match
             GridContainer bottomRow;
             MatchSettingsOverlay settings;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new GridContainer
                 {
@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Multi.Match
                 },
             };
 
-            header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect { Selected = addPlaylistItem });
+            header.OnRequestSelectBeatmap = () => this.Push(new MatchSongSelect { Selected = addPlaylistItem });
             header.Tabs.Current.ValueChanged += t =>
             {
                 const float fade_duration = 500;
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Multi.Match
                 }
             };
 
-            chat.Exit += Exit;
+            chat.Exit += this.Exit;
         }
 
         [BackgroundDependencyLoader]
@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Multi.Match
             beatmapManager.ItemAdded += beatmapAdded;
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
             manager?.PartRoom();
             return base.OnExiting(next);
@@ -194,11 +194,9 @@ namespace osu.Game.Screens.Multi.Match
             {
                 default:
                 case GameTypeTimeshift _:
-                    pushGameplayScreen?.Invoke(new PlayerLoader(() => {
-                        var player = new TimeshiftPlayer(room, room.Playlist.First().ID);
-                        player.Exited += _ => leaderboard.RefreshScores();
-
-                        return player;
+                    pushGameplayScreen?.Invoke(new PlayerLoader(() => new TimeshiftPlayer(room, room.Playlist.First().ID)
+                    {
+                        Exited = () => leaderboard.RefreshScores()
                     }));
                     break;
             }

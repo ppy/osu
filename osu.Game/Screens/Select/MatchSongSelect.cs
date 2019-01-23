@@ -3,6 +3,7 @@
 
 using System;
 using Humanizer;
+using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi;
 
@@ -28,8 +29,8 @@ namespace osu.Game.Screens.Select
 
             Selected?.Invoke(item);
 
-            if (IsCurrentScreen)
-                Exit();
+            if (this.IsCurrentScreen())
+                this.Exit();
 
             return true;
         }

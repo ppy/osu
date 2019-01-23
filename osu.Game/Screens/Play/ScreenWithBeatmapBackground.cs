@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Play
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             DimLevel.ValueChanged += _ => UpdateBackgroundElements();
@@ -49,7 +49,7 @@ namespace osu.Game.Screens.Play
             InitializeBackgroundElements();
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
             InitializeBackgroundElements();
@@ -66,7 +66,7 @@ namespace osu.Game.Screens.Play
         /// <param name="userChange"></param>
         protected virtual void UpdateBackgroundElements()
         {
-            if (!IsCurrentScreen) return;
+            if (!this.IsCurrentScreen()) return;
 
             Background?.FadeColour(OsuColour.Gray(BackgroundOpacity), BACKGROUND_FADE_DURATION, Easing.OutQuint);
             Background?.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);

@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Play
     {
         protected override bool AllowBackButton => false; // handled by HoldForMenuButton
 
-        protected override float BackgroundParallaxAmount => 0.1f;
+        public override float BackgroundParallaxAmount => 0.1f;
 
         protected override bool HideOverlaysOnEnter => true;
 
@@ -166,7 +166,7 @@ namespace osu.Game.Screens.Play
             if (!ScoreProcessor.Mode.Disabled)
                 config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 pauseContainer = new PauseContainer(offsetClock, adjustableClock)
                 {
@@ -225,7 +225,7 @@ namespace osu.Game.Screens.Play
                 {
                     Action = () =>
                     {
-                        if (!IsCurrentScreen) return;
+                        if (!this.IsCurrentScreen()) return;
 
                         fadeOut(true);
                         Restart();
@@ -260,18 +260,18 @@ namespace osu.Game.Screens.Play
 
         private void performUserRequestedExit()
         {
-            if (!IsCurrentScreen) return;
-            Exit();
+            if (!this.IsCurrentScreen()) return;
+            this.Exit();
         }
 
         public void Restart()
         {
-            if (!IsCurrentScreen) return;
+            if (!this.IsCurrentScreen()) return;
 
             sampleRestart?.Play();
             ValidForResume = false;
             RestartRequested?.Invoke();
-            Exit();
+            this.Exit();
         }
 
         private ScheduledDelegate onCompletionEvent;
@@ -290,13 +290,13 @@ namespace osu.Game.Screens.Play
             {
                 onCompletionEvent = Schedule(delegate
                 {
-                    if (!IsCurrentScreen) return;
+                    if (!this.IsCurrentScreen()) return;
 
                     var score = CreateScore();
                     if (RulesetContainer.ReplayScore == null)
                         scoreManager.Import(score, true);
 
-                    Push(CreateResults(score));
+                   this.Push(CreateResults(score));
 
                     onCompletionEvent = null;
                 });
@@ -331,15 +331,15 @@ namespace osu.Game.Screens.Play
             return true;
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
             if (!LoadedBeatmapSuccessfully)
                 return;
 
-            Content.Alpha = 0;
-            Content
+            Alpha = 0;
+            this
                 .ScaleTo(0.7f)
                 .ScaleTo(1, 750, Easing.OutQuint)
                 .Delay(250)
@@ -368,13 +368,13 @@ namespace osu.Game.Screens.Play
             pauseContainer.FadeIn(750, Easing.OutQuint);
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
             fadeOut();
             base.OnSuspending(next);
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
             if (onCompletionEvent != null)
             {
@@ -401,7 +401,7 @@ namespace osu.Game.Screens.Play
         private void fadeOut(bool instant = false)
         {
             float fadeOutDuration = instant ? 0 : 250;
-            Content.FadeOut(fadeOutDuration);
+            this.FadeOut(fadeOutDuration);
             Background?.FadeColour(Color4.White, fadeOutDuration, Easing.OutQuint);
         }
 
@@ -425,7 +425,7 @@ namespace osu.Game.Screens.Play
 
         protected override void UpdateBackgroundElements()
         {
-            if (!IsCurrentScreen) return;
+            if (!this.IsCurrentScreen()) return;
 
             base.UpdateBackgroundElements();
 

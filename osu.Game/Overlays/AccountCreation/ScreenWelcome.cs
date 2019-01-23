@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Screens;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Settings;
 using osu.Game.Screens.Menu;
@@ -16,7 +17,7 @@ namespace osu.Game.Overlays.AccountCreation
         [BackgroundDependencyLoader]
         private void load()
         {
-            Child = new FillFlowContainer
+            InternalChild = new FillFlowContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 Direction = FillDirection.Vertical,
@@ -56,7 +57,7 @@ namespace osu.Game.Overlays.AccountCreation
                     {
                         Text = "Let's create an account!",
                         Margin = new MarginPadding { Vertical = 120 },
-                        Action = () => Push(new ScreenWarning())
+                        Action = () => this.Push(new ScreenWarning())
                     }
                 }
             };

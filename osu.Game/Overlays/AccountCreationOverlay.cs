@@ -6,6 +6,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.API;
@@ -82,7 +83,7 @@ namespace osu.Game.Overlays
             base.PopIn();
             this.FadeIn(transition_time, Easing.OutQuint);
 
-            if (welcomeScreen.ChildScreen != null)
+            if (welcomeScreen.GetChildScreen() != null)
                 welcomeScreen.MakeCurrent();
         }
 

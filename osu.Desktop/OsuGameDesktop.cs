@@ -16,7 +16,6 @@ using osu.Desktop.Updater;
 using osu.Framework;
 using osu.Framework.Platform.Windows;
 using osu.Framework.Screens;
-using osu.Game.Screens;
 using osu.Game.Screens.Menu;
 
 namespace osu.Desktop
@@ -63,9 +62,10 @@ namespace osu.Desktop
             }
         }
 
-        protected override void ScreenChanged(OsuScreen current, Screen newScreen)
+        protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
         {
-            base.ScreenChanged(current, newScreen);
+            base.ScreenChanged(lastScreen, newScreen);
+
             switch (newScreen)
             {
                 case Intro _:

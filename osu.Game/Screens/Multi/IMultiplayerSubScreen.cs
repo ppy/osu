@@ -3,7 +3,7 @@
 
 namespace osu.Game.Screens.Multi
 {
-    public interface IMultiplayerSubScreen
+    public interface IMultiplayerSubScreen : IOsuScreen
     {
         string ShortTitle { get; }
     }

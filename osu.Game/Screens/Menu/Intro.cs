@@ -111,7 +111,7 @@ namespace osu.Game.Screens.Menu
                     Scheduler.AddDelayed(delegate
                     {
                         DidLoadMenu = true;
-                        Push(mainMenu);
+                        this.Push(mainMenu);
                     }, delay_step_one);
                 }, delay_step_two);
             }
@@ -145,22 +145,22 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
-            Content.FadeOut(300);
+            this.FadeOut(300);
             base.OnSuspending(next);
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
             //cancel exiting if we haven't loaded the menu yet.
             return !DidLoadMenu;
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             if (!(last is MainMenu))
-                Content.FadeIn(300);
+                this.FadeIn(300);
 
             double fadeOutTime = EXIT_DELAY;
             //we also handle the exit transition.
@@ -169,7 +169,7 @@ namespace osu.Game.Screens.Menu
             else
                 fadeOutTime = 500;
 
-            Scheduler.AddDelayed(Exit, fadeOutTime);
+            Scheduler.AddDelayed(this.Exit, fadeOutTime);
 
             //don't want to fade out completely else we will stop running updates and shit will hit the fan.
             Game.FadeTo(0.01f, fadeOutTime);

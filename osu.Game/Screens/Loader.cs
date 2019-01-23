@@ -55,11 +55,11 @@ namespace osu.Game.Screens
 
         protected virtual ShaderPrecompiler CreateShaderPrecompiler() => new ShaderPrecompiler();
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            LoadComponentAsync(precompiler = CreateShaderPrecompiler(), Add);
+            LoadComponentAsync(precompiler = CreateShaderPrecompiler(), AddInternal);
             LoadComponentAsync(loadableScreen = CreateLoadableScreen());
 
             checkIfLoaded();
@@ -73,7 +73,7 @@ namespace osu.Game.Screens
                 return;
             }
 
-            Push(loadableScreen);
+            this.Push(loadableScreen);
         }
 
         [BackgroundDependencyLoader]
