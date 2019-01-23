@@ -30,7 +30,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             return dependencies;
         }
-        
+
         public CursorContainer Cursor => cursor;
 
         public bool ProvidingUserCursor => true;
