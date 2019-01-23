@@ -160,6 +160,10 @@ namespace osu.Game.Overlays
         {
             if (configManager == null) throw new ArgumentNullException(nameof(configManager));
 
+            var trackedSettings = configManager.CreateTrackedSettings();
+            if (trackedSettings == null)
+                return;
+
             if (!trackedConfigManagers.TryGetValue((source, configManager), out var existing))
                 throw new InvalidOperationException($"{nameof(configManager)} is not registered.");
 
