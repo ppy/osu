@@ -16,11 +16,13 @@ using osuTK.Graphics;
 using osu.Game.Rulesets.Mods;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Osu.Tests
@@ -38,6 +40,16 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(DrawableRepeatPoint),
             typeof(DrawableOsuHitObject)
         };
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            var configCache = dependencies.Get<RulesetConfigCache>();
+            dependencies.CacheAs((OsuConfigManager)configCache.GetConfigFor(new OsuRuleset()));
+
+            return dependencies;
+        }
 
         private readonly Container content;
         protected override Container<Drawable> Content => content;

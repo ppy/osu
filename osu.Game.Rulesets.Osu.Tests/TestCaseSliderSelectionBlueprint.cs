@@ -3,11 +3,13 @@
 
 using System;
 using System.Collections.Generic;
+using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Edit;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
 using osu.Game.Rulesets.Osu.Objects;
@@ -28,6 +30,16 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(PathControlPointVisualiser),
             typeof(PathControlPointPiece)
         };
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            var configCache = dependencies.Get<RulesetConfigCache>();
+            dependencies.CacheAs((OsuConfigManager)configCache.GetConfigFor(new OsuRuleset()));
+
+            return dependencies;
+        }
 
         private readonly DrawableSlider drawableObject;
 
