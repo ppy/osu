@@ -10,8 +10,8 @@ using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
 using osu.Game.Skinning;
@@ -93,10 +93,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(GameConfigManager config)
+        private void load(OsuConfigManager config)
         {
-            config.BindWith(GameSetting.SnakingInSliders, Body.SnakingIn);
-            config.BindWith(GameSetting.SnakingOutSliders, Body.SnakingOut);
+            config.BindWith(OsuSetting.SnakingInSliders, Body.SnakingIn);
+            config.BindWith(OsuSetting.SnakingOutSliders, Body.SnakingOut);
 
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             scaleBindable.BindValueChanged(v =>
