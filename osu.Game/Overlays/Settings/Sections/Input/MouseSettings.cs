@@ -19,7 +19,7 @@ namespace osu.Game.Overlays.Settings.Sections.Input
         private SensitivitySetting sensitivity;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager osuConfig, FrameworkConfigManager config)
+        private void load(GameConfigManager gameConfig, FrameworkConfigManager config)
         {
             Children = new Drawable[]
             {
@@ -46,12 +46,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 new SettingsCheckbox
                 {
                     LabelText = "Disable mouse wheel during gameplay",
-                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableWheel)
+                    Bindable = gameConfig.GetBindable<bool>(GameSetting.MouseDisableWheel)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Disable mouse buttons during gameplay",
-                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.MouseDisableButtons)
+                    Bindable = gameConfig.GetBindable<bool>(GameSetting.MouseDisableButtons)
                 },
             };
 

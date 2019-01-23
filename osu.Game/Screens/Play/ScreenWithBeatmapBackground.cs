@@ -33,11 +33,11 @@ namespace osu.Game.Screens.Play
         #endregion
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(GameConfigManager config)
         {
-            DimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
-            BlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
-            ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
+            DimLevel = config.GetBindable<double>(GameSetting.DimLevel);
+            BlurLevel = config.GetBindable<double>(GameSetting.BlurLevel);
+            ShowStoryboard = config.GetBindable<bool>(GameSetting.ShowStoryboard);
         }
 
         protected override void OnEntering(Screen last)

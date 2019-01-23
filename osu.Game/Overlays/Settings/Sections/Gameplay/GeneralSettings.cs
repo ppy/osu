@@ -13,36 +13,36 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         protected override string Header => "General";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(GameConfigManager config)
         {
             Children = new Drawable[]
             {
                 new SettingsSlider<double>
                 {
                     LabelText = "Background dim",
-                    Bindable = config.GetBindable<double>(OsuSetting.DimLevel),
+                    Bindable = config.GetBindable<double>(GameSetting.DimLevel),
                     KeyboardStep = 0.01f
                 },
                 new SettingsSlider<double>
                 {
                     LabelText = "Background blur",
-                    Bindable = config.GetBindable<double>(OsuSetting.BlurLevel),
+                    Bindable = config.GetBindable<double>(GameSetting.BlurLevel),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Show score overlay",
-                    Bindable = config.GetBindable<bool>(OsuSetting.ShowInterface)
+                    Bindable = config.GetBindable<bool>(GameSetting.ShowInterface)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Always show key overlay",
-                    Bindable = config.GetBindable<bool>(OsuSetting.KeyOverlay)
+                    Bindable = config.GetBindable<bool>(GameSetting.KeyOverlay)
                 },
                 new SettingsEnumDropdown<ScoringMode>
                 {
                     LabelText = "Score display mode",
-                    Bindable = config.GetBindable<ScoringMode>(OsuSetting.ScoreDisplayMode)
+                    Bindable = config.GetBindable<ScoringMode>(GameSetting.ScoreDisplayMode)
                 }
             };
         }

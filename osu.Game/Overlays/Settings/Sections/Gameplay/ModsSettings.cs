@@ -11,14 +11,14 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         protected override string Header => "Mods";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(GameConfigManager config)
         {
             Children = new[]
             {
                 new SettingsCheckbox
                 {
                     LabelText = "Increase visibility of first object with \"Hidden\" mod",
-                    Bindable = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility)
+                    Bindable = config.GetBindable<bool>(GameSetting.IncreaseFirstObjectVisibility)
                 },
             };
         }

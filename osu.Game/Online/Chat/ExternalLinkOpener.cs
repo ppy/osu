@@ -18,11 +18,11 @@ namespace osu.Game.Online.Chat
         private Bindable<bool> externalLinkWarning;
 
         [BackgroundDependencyLoader(true)]
-        private void load(GameHost host, DialogOverlay dialogOverlay, OsuConfigManager config)
+        private void load(GameHost host, DialogOverlay dialogOverlay, GameConfigManager config)
         {
             this.host = host;
             this.dialogOverlay = dialogOverlay;
-            externalLinkWarning = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning);
+            externalLinkWarning = config.GetBindable<bool>(GameSetting.ExternalLinkWarning);
         }
 
         public void OpenUrlExternally(string url)

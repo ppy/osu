@@ -93,10 +93,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(GameConfigManager config)
         {
-            config.BindWith(OsuSetting.SnakingInSliders, Body.SnakingIn);
-            config.BindWith(OsuSetting.SnakingOutSliders, Body.SnakingOut);
+            config.BindWith(GameSetting.SnakingInSliders, Body.SnakingIn);
+            config.BindWith(GameSetting.SnakingOutSliders, Body.SnakingOut);
 
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             scaleBindable.BindValueChanged(v =>

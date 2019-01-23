@@ -11,14 +11,14 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         protected override string Header => "User Interface";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(GameConfigManager config)
         {
             Children = new[]
             {
                 new SettingsCheckbox
                 {
                     LabelText = "Parallax",
-                    Bindable = config.GetBindable<bool>(OsuSetting.MenuParallax)
+                    Bindable = config.GetBindable<bool>(GameSetting.MenuParallax)
                 },
             };
         }

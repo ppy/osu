@@ -11,19 +11,19 @@ namespace osu.Game.Overlays.Settings.Sections.Audio
         protected override string Header => "Main Menu";
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(GameConfigManager config)
         {
             Children = new[]
             {
                 new SettingsCheckbox
                 {
                     LabelText = "Interface voices",
-                    Bindable = config.GetBindable<bool>(OsuSetting.MenuVoice)
+                    Bindable = config.GetBindable<bool>(GameSetting.MenuVoice)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "osu! music theme",
-                    Bindable = config.GetBindable<bool>(OsuSetting.MenuMusic)
+                    Bindable = config.GetBindable<bool>(GameSetting.MenuMusic)
                 },
             };
         }

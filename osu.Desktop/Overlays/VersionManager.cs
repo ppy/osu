@@ -22,13 +22,13 @@ namespace osu.Desktop.Overlays
 {
     public class VersionManager : OverlayContainer
     {
-        private OsuConfigManager config;
+        private GameConfigManager config;
         private OsuGameBase game;
         private NotificationOverlay notificationOverlay;
         private GameHost host;
 
         [BackgroundDependencyLoader]
-        private void load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game, OsuConfigManager config, GameHost host)
+        private void load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game, GameConfigManager config, GameHost host)
         {
             notificationOverlay = notification;
             this.config = config;
@@ -95,10 +95,10 @@ namespace osu.Desktop.Overlays
             base.LoadComplete();
 
             var version = game.Version;
-            var lastVersion = config.Get<string>(OsuSetting.Version);
+            var lastVersion = config.Get<string>(GameSetting.Version);
             if (game.IsDeployedBuild && version != lastVersion)
             {
-                config.Set(OsuSetting.Version, version);
+                config.Set(GameSetting.Version, version);
 
                 // only show a notification if we've previously saved a version to the config file (ie. not the first run).
                 if (!string.IsNullOrEmpty(lastVersion))

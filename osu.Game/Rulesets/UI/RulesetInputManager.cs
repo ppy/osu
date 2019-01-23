@@ -193,9 +193,9 @@ namespace osu.Game.Rulesets.UI
         private Bindable<bool> mouseDisabled;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
+        private void load(GameConfigManager config)
         {
-            mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
+            mouseDisabled = config.GetBindable<bool>(GameSetting.MouseDisableButtons);
         }
 
         protected override bool Handle(UIEvent e)

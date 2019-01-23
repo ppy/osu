@@ -325,9 +325,9 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager)
+        private void load(GameConfigManager config, OsuColour colours, ChannelManager channelManager)
         {
-            ChatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
+            ChatHeight = config.GetBindable<double>(GameSetting.ChatDisplayHeight);
             ChatHeight.ValueChanged += h =>
             {
                 chatContainer.Height = (float)h;

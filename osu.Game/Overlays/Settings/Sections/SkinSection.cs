@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections
         private SkinManager skins;
 
         [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config, SkinManager skins)
+        private void load(GameConfigManager config, SkinManager skins)
         {
             this.skins = skins;
 
@@ -38,41 +38,41 @@ namespace osu.Game.Overlays.Settings.Sections
                 new SettingsSlider<double, SizeSlider>
                 {
                     LabelText = "Menu cursor size",
-                    Bindable = config.GetBindable<double>(OsuSetting.MenuCursorSize),
+                    Bindable = config.GetBindable<double>(GameSetting.MenuCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsSlider<double, SizeSlider>
                 {
                     LabelText = "Gameplay cursor size",
-                    Bindable = config.GetBindable<double>(OsuSetting.GameplayCursorSize),
+                    Bindable = config.GetBindable<double>(GameSetting.GameplayCursorSize),
                     KeyboardStep = 0.01f
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Adjust gameplay cursor size based on current beatmap",
-                    Bindable = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
+                    Bindable = config.GetBindable<bool>(GameSetting.AutoCursorSize)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Beatmap skins",
-                    Bindable = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
+                    Bindable = config.GetBindable<bool>(GameSetting.BeatmapSkins)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Beatmap hitsounds",
-                    Bindable = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
+                    Bindable = config.GetBindable<bool>(GameSetting.BeatmapHitsounds)
                 },
             };
 
             skins.ItemAdded += itemAdded;
             skins.ItemRemoved += itemRemoved;
 
-            config.BindWith(OsuSetting.Skin, configBindable);
+            config.BindWith(GameSetting.Skin, configBindable);
 
             skinDropdown.Bindable = dropdownBindable;
             skinDropdown.Items = skins.GetAllUsableSkins().ToArray();
 
-            // Todo: This should not be necessary when OsuConfigManager is databased
+            // Todo: This should not be necessary when GameConfigManager is databased
             if (skinDropdown.Items.All(s => s.ID != configBindable.Value))
                 configBindable.Value = 0;
 
