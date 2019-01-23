@@ -34,6 +34,11 @@ namespace osu.Game.Rulesets.Osu.UI
                     LabelText = "Snaking out sliders",
                     Bindable = config.GetBindable<bool>(OsuSetting.SnakingOutSliders)
                 },
+                new SettingsCheckbox
+                {
+                    LabelText = "Show cursor trail",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowCursorTrail)
+                },
             };
         }
     }

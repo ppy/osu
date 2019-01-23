@@ -19,12 +19,14 @@ namespace osu.Game.Rulesets.Osu.Configuration
 
             Set(OsuSetting.SnakingInSliders, true);
             Set(OsuSetting.SnakingOutSliders, true);
+            Set(OsuSetting.ShowCursorTrail, true);
         }
     }
 
     public enum OsuSetting
     {
         SnakingInSliders,
-        SnakingOutSliders
+        SnakingOutSliders,
+        ShowCursorTrail
     }
 }

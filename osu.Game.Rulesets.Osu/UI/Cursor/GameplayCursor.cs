@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Bindings;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Rulesets.Osu.Configuration;
 using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
@@ -23,6 +24,8 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
 
         protected override Container<Drawable> Content => fadeContainer;
 
+        private Bindable<bool> showTrail;
+        private readonly CursorTrail cursorTrail;
         private readonly Container<Drawable> fadeContainer;
 
         public GameplayCursor()
@@ -32,9 +35,16 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 RelativeSizeAxes = Axes.Both,
                 Children = new Drawable[]
                 {
-                    new CursorTrail { Depth = 1 }
+                    cursorTrail = new CursorTrail { Depth = 1 }
                 }
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            showTrail = config.GetBindable<bool>(OsuSetting.ShowCursorTrail);
+            showTrail.ValueChanged += v => cursorTrail.Alpha = v ? 1 : 0;
         }
 
         private int downCount;
