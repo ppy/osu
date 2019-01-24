@@ -668,6 +668,23 @@ namespace osu.Game
         private FrameworkConfigManager frameworkConfig;
         private ScalingContainer screenContainer;
 
+        protected override bool OnExiting()
+        {
+            if (screenStack.CurrentScreen is Loader)
+                return false;
+
+            if (introScreen == null)
+                return true;
+
+            if (!introScreen.DidLoadMenu || !(screenStack.CurrentScreen is Intro))
+            {
+                Scheduler.Add(introScreen.MakeCurrent);
+                return true;
+            }
+
+            return base.OnExiting();
+        }
+
         /// <summary>
         /// Use to programatically exit the game as if the user was triggering via alt-f4.
         /// Will keep persisting until an exit occurs (exit may be blocked multiple times).
