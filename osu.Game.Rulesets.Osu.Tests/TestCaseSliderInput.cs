@@ -49,6 +49,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             allJudgedFired = false;
             judgementResults = new List<JudgementResult>();
+            loadBeatmap();
         });
 
         private List<JudgementResult> judgementResults;
@@ -72,6 +73,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestLeftBeforeSliderThenRightThenLettingGoOfLeft()
         {
+            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
             AddStep("Left to both to right test", () =>
             {
                 var frames = new List<ReplayFrame>
@@ -99,6 +101,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestLeftBeforeSliderThenRight()
         {
+            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
             AddStep("Invalid key transfer test", () =>
             {
                 var frames = new List<ReplayFrame>
@@ -126,6 +129,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTrackingRetentionLeftRightLeft()
         {
+            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
             AddStep("Tracking retention test", () =>
             {
                 var frames = new List<ReplayFrame>
@@ -153,6 +157,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTrackingLeftBeforeSliderToRight()
         {
+            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
             AddStep("Tracking retention test", () =>
             {
                 var frames = new List<ReplayFrame>
@@ -179,6 +184,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTrackingPreclicked()
         {
+            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
             AddStep("Tracking retention test", () =>
             {
                 var frames = new List<ReplayFrame>
@@ -205,6 +211,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTrackingReturnMidSlider()
         {
+            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
             AddStep("Mid-sldier tracking re-acquisition", () =>
             {
                 var frames = new List<ReplayFrame>
@@ -236,6 +243,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTrackingReturnMidSliderKeyDownBefore()
         {
+            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
             AddStep("Key held down before slider, mid-slider tracking re-acquisition", () =>
             {
                 var frames = new List<ReplayFrame>
@@ -266,6 +274,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTrackingMidSlider()
         {
+            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
             AddStep("Mid-slider new tracking acquisition", () =>
             {
                 var frames = new List<ReplayFrame>
@@ -295,6 +304,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTrackingReleasedKeys()
         {
+            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
             AddStep("Mid-slider new tracking acquisition", () =>
             {
                 var frames = new List<ReplayFrame>
@@ -325,6 +335,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public void TestTrackingReleasedValidKey()
         {
+            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
             AddStep("Mid-slider new tracking acquisition", () =>
             {
                 var frames = new List<ReplayFrame>
@@ -368,7 +379,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             return judgementResults[judgementResults.Count - 2].Type == HitResult.Miss;
         }
 
-        private void performTest(List<ReplayFrame> frames)
+        private void loadBeatmap()
         {
             var slider = new Slider
             {
@@ -380,11 +391,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(25, 0),
                 }, 25),
             };
-
-            // Empty frame to be added as a workaround for first frame behavior.
-            // If an input exists on the first frame, the input would apply to the entire intro lead-in
-            // Likely requires some discussion regarding how first frame inputs should be handled.
-            frames.Insert(0, new OsuReplayFrame { Position = slider.Position, Time = 0, Actions = new List<OsuAction>() });
 
             Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
             {
@@ -399,6 +405,14 @@ namespace osu.Game.Rulesets.Osu.Tests
                     Ruleset = new OsuRuleset().RulesetInfo
                 },
             });
+        }
+
+        private void performTest(List<ReplayFrame> frames)
+        {
+            // Empty frame to be added as a workaround for first frame behavior.
+            // If an input exists on the first frame, the input would apply to the entire intro lead-in
+            // Likely requires some discussion regarding how first frame inputs should be handled.
+            frames.Insert(0, new OsuReplayFrame { Position = new Vector2(0, 0), Time = 0, Actions = new List<OsuAction>() });
 
             var player = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
             {
