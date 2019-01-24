@@ -118,7 +118,11 @@ namespace osu.Game.Screens.Multi.Match
                 },
             };
 
-            header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect { Selected = addPlaylistItem });
+            header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect
+            {
+                Selected = addPlaylistItem,
+                Padding = new MarginPadding { Horizontal = Multiplayer.OVERFLOW_PADDING }
+            });
             header.Tabs.Current.ValueChanged += t =>
             {
                 const float fade_duration = 500;
