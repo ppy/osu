@@ -28,6 +28,12 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract T DefaultTab { get; }
         protected virtual Drawable CreateSupplementaryControls() => null;
 
+        /// <summary>
+        /// Add padding to internal components of the control.
+        /// This does not affect the background and the tab strip.
+        /// </summary>
+        protected virtual float InternalPadding => 0;
+
         protected SearchableListFilterControl()
         {
             if (!typeof(T).IsEnum)
@@ -62,7 +68,11 @@ namespace osu.Game.Overlays.SearchableList
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Top = padding, Horizontal = SearchableListOverlay.WIDTH_PADDING },
+                            Padding = new MarginPadding
+                            {
+                                Top = padding,
+                                Horizontal = SearchableListOverlay.WIDTH_PADDING + InternalPadding
+                            },
                             Children = new Drawable[]
                             {
                                 Search = new FilterSearchTextBox
