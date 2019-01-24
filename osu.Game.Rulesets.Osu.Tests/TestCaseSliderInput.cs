@@ -29,19 +29,13 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
-            typeof(Slider),
-            typeof(SliderCircle),
             typeof(SliderBall),
-            typeof(SliderBody),
-            typeof(SliderTick),
-            typeof(SliderTailCircle),
             typeof(DrawableSlider),
-            typeof(SnakingSliderBody),
             typeof(DrawableSliderTick),
             typeof(DrawableRepeatPoint),
             typeof(DrawableOsuHitObject),
             typeof(DrawableSliderHead),
-            typeof(DrawableSliderTail)
+            typeof(DrawableSliderTail),
         };
 
         [SetUp]
@@ -49,8 +43,13 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             allJudgedFired = false;
             judgementResults = new List<JudgementResult>();
-            loadBeatmap();
         });
+
+        public TestCaseSliderInput()
+        {
+            loadBeatmap();
+        }
+
 
         private List<JudgementResult> judgementResults;
         private bool allJudgedFired;
@@ -61,34 +60,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const double time_during_slide_2 = 3000;
         private const double time_during_slide_3 = 3500;
         private const double time_during_slide_4 = 4000;
-
-        /// <summary>
-        /// Scenario:
-        /// - Press a key on the slider head timed correctly
-        /// - Press the other key in the middle of the slider while holding the original key
-        /// - Release the original key used to hit the slider
-        /// Expected Result:
-        /// A passing test case will have the cursor continue tracking on replay frame 3.
-        /// </summary>
-        [Test]
-        public void TestLeftBeforeSliderThenRightThenLettingGoOfLeft()
-        {
-            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
-            AddStep("Left to both to right test", () =>
-            {
-                var frames = new List<ReplayFrame>
-                {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_during_slide_1 },
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_2 },
-                };
-
-                performTest(frames);
-            });
-
-            AddUntilStep(() => allJudgedFired, "Wait for test 1");
-            AddAssert("Tracking retained", assertGreatJudge);
-        }
 
         /// <summary>
         /// Scenario:
@@ -114,8 +85,36 @@ namespace osu.Game.Rulesets.Osu.Tests
                 performTest(frames);
             });
 
+            AddUntilStep(() => allJudgedFired, "Wait for test 1");
+            AddAssert("Tracking lost", assertMidSliderJudgementFail);
+        }
+
+        /// <summary>
+        /// Scenario:
+        /// - Press a key on the slider head timed correctly
+        /// - Press the other key in the middle of the slider while holding the original key
+        /// - Release the original key used to hit the slider
+        /// Expected Result:
+        /// A passing test case will have the cursor continue tracking on replay frame 3.
+        /// </summary>
+        [Test]
+        public void TestLeftBeforeSliderThenRightThenLettingGoOfLeft()
+        {
+            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
+            AddStep("Left to both to right test", () =>
+            {
+                var frames = new List<ReplayFrame>
+                {
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_during_slide_1 },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_2 },
+                };
+
+                performTest(frames);
+            });
+
             AddUntilStep(() => allJudgedFired, "Wait for test 2");
-            AddAssert("Tracking lost", assertMehJudge);
+            AddAssert("Tracking retained", assertGreatJudge);
         }
 
         /// <summary>
@@ -196,7 +195,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             });
 
             AddUntilStep(() => allJudgedFired, "Wait for test 5");
-            AddAssert("Tracking retained, sliderhead miss", assertHeadMissTailMeh);
+            AddAssert("Tracking retained, sliderhead miss", assertHeadMissTailTracked);
         }
 
         /// <summary>
@@ -292,6 +291,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking acquired", assertMidSliderJudgements);
         }
 
+
         /// <summary>
         /// Scenario:
         /// - Press a key before the slider starts
@@ -354,19 +354,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking acquired", assertMidSliderJudgements);
         }
 
-        private bool assertMehJudge()
-        {
-            return judgementResults.Last().Type == HitResult.Meh;
-        }
-
         private bool assertGreatJudge()
         {
             return judgementResults.Last().Type == HitResult.Great;
         }
 
-        private bool assertHeadMissTailMeh()
+        private bool assertHeadMissTailTracked()
         {
-            return judgementResults.Last().Type == HitResult.Meh && judgementResults.First().Type == HitResult.Miss;
+            return judgementResults[judgementResults.Count - 2].Type == HitResult.Great && judgementResults.First().Type == HitResult.Miss;
         }
 
         private bool assertMidSliderJudgements()
@@ -378,6 +373,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             return judgementResults[judgementResults.Count - 2].Type == HitResult.Miss;
         }
+
 
         private void loadBeatmap()
         {
@@ -391,6 +387,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(25, 0),
                 }, 25),
             };
+
 
             Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
             {
