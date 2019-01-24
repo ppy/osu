@@ -47,7 +47,30 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public TestCaseSliderInput()
         {
-            loadBeatmap();
+            var slider = new Slider
+            {
+                StartTime = time_slider_start,
+                Position = new Vector2(0, 0),
+                Path = new SliderPath(PathType.PerfectCurve, new[]
+                {
+                    Vector2.Zero,
+                    new Vector2(25, 0),
+                }, 25),
+            };
+
+            Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
+            {
+                HitObjects = { slider },
+                ControlPointInfo =
+                {
+                    DifficultyPoints = { new DifficultyControlPoint { SpeedMultiplier = 0.1f } }
+                },
+                BeatmapInfo =
+                {
+                    BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
+                    Ruleset = new OsuRuleset().RulesetInfo
+                },
+            });
         }
 
         private const double time_before_slider = 250;
@@ -370,34 +393,6 @@ namespace osu.Game.Rulesets.Osu.Tests
         private bool assertMidSliderJudgementFail()
         {
             return judgementResults[judgementResults.Count - 2].Type == HitResult.Miss;
-        }
-
-        private void loadBeatmap()
-        {
-            var slider = new Slider
-            {
-                StartTime = time_slider_start,
-                Position = new Vector2(0, 0),
-                Path = new SliderPath(PathType.PerfectCurve, new[]
-                {
-                    Vector2.Zero,
-                    new Vector2(25, 0),
-                }, 25),
-            };
-
-            Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
-            {
-                HitObjects = { slider },
-                ControlPointInfo =
-                {
-                    DifficultyPoints = { new DifficultyControlPoint { SpeedMultiplier = 0.1f } }
-                },
-                BeatmapInfo =
-                {
-                    BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
-                    Ruleset = new OsuRuleset().RulesetInfo
-                },
-            });
         }
 
         private void performTest(List<ReplayFrame> frames)
