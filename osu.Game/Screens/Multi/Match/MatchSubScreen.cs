@@ -75,13 +75,23 @@ namespace osu.Game.Screens.Multi.Match
                                     {
                                         leaderboard = new MatchLeaderboard
                                         {
-                                            Padding = new MarginPadding(10),
+                                            Padding = new MarginPadding
+                                            {
+                                                Left = 10 + Multiplayer.OVERFLOW_PADDING,
+                                                Right = 10,
+                                                Vertical = 10,
+                                            },
                                             RelativeSizeAxes = Axes.Both,
                                             Room = room
                                         },
                                         new Container
                                         {
-                                            Padding = new MarginPadding(10),
+                                            Padding = new MarginPadding
+                                            {
+                                                Left = 10,
+                                                Right = 10 + Multiplayer.OVERFLOW_PADDING,
+                                                Vertical = 10,
+                                            },
                                             RelativeSizeAxes = Axes.Both,
                                             Child = chat = new MatchChatDisplay(room)
                                             {

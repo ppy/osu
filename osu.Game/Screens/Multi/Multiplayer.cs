@@ -53,11 +53,7 @@ namespace osu.Game.Screens.Multi
                 RelativeSizeAxes = Axes.Both,
             };
 
-            Padding = new MarginPadding
-            {
-                Left = -OVERFLOW_PADDING,
-                Right = -OVERFLOW_PADDING
-            };
+            Padding = new MarginPadding { Horizontal = -OVERFLOW_PADDING };
 
             waves.AddRange(new Drawable[]
             {

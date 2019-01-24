@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING },
+                    Padding = new MarginPadding { Horizontal = SearchableListOverlay.WIDTH_PADDING + Multiplayer.OVERFLOW_PADDING },
                     Children = new Drawable[]
                     {
                         new FillFlowContainer
