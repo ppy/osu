@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class TestCasePlayer : TestCasePlayerBase
+    public abstract class TestCasePlayer : TestCaseRateAdjustedBeatmap
     {
         private readonly Ruleset ruleset;
 

@@ -3,7 +3,7 @@
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCasePlayerBase : ScreenTestCase
+    public class TestCaseRateAdjustedBeatmap : ScreenTestCase
     {
         protected override void Update()
         {
