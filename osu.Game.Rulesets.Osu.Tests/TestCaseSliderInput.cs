@@ -63,33 +63,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         /// <summary>
         /// Scenario:
-        /// - Press a key before a slider starts
-        /// - Press the other key on the slider head timed correctly while holding the original key
-        /// - Release the latter pressed key
-        /// Expected Result:
-        /// A passing test case will have the cursor lose tracking on replay frame 3.
-        /// </summary>
-        [Test]
-        public void TestLeftBeforeSliderThenRight()
-        {
-            AddStep("Invalid key transfer test", () =>
-            {
-                var frames = new List<ReplayFrame>
-                {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_before_slider },
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_during_slide_1 },
-                };
-
-                performTest(frames);
-            });
-
-            AddUntilStep(() => allJudgedFired, "Wait for test 2");
-            AddAssert("Tracking lost", assertMehJudge);
-        }
-
-        /// <summary>
-        /// Scenario:
         /// - Press a key on the slider head timed correctly
         /// - Press the other key in the middle of the slider while holding the original key
         /// - Release the original key used to hit the slider
@@ -113,6 +86,33 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddUntilStep(() => allJudgedFired, "Wait for test 1");
             AddAssert("Tracking retained", assertGreatJudge);
+        }
+
+        /// <summary>
+        /// Scenario:
+        /// - Press a key before a slider starts
+        /// - Press the other key on the slider head timed correctly while holding the original key
+        /// - Release the latter pressed key
+        /// Expected Result:
+        /// A passing test case will have the cursor lose tracking on replay frame 3.
+        /// </summary>
+        [Test]
+        public void TestLeftBeforeSliderThenRight()
+        {
+            AddStep("Invalid key transfer test", () =>
+            {
+                var frames = new List<ReplayFrame>
+                {
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_before_slider },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_during_slide_1 },
+                };
+
+                performTest(frames);
+            });
+
+            AddUntilStep(() => allJudgedFired, "Wait for test 2");
+            AddAssert("Tracking lost", assertMehJudge);
         }
 
         /// <summary>
@@ -410,7 +410,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             LoadComponentAsync(player, p =>
             {
                 Child = p;
-
                 p.ScoreProcessor.NewJudgement += result => judgementResults.Add(result);
                 p.ScoreProcessor.AllJudged += () => { allJudgedFired = true; };
             });
