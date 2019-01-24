@@ -59,7 +59,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private List<JudgementResult> judgementResults;
         private bool allJudgedFired;
-        
         /// <summary>
         /// Scenario:
         /// - Press a key before a slider starts
