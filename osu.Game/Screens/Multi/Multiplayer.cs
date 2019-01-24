@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Multi
     public class Multiplayer : OsuScreen, IOnlineComponent
     {
         /// <summary>
-        ///How much this container should overflow the sides of the screen to account for parallax shifting.
+        /// How much this container should overflow the sides of the screen to account for parallax shifting.
         /// </summary>
         public const float OVERFLOW_PADDING = 50;
 
