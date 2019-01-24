@@ -159,8 +159,7 @@ namespace osu.Game.Screens.Menu
 
         public override void OnResuming(IScreen last)
         {
-            if (!(last is MainMenu))
-                this.FadeIn(300);
+            this.FadeIn(300);
 
             double fadeOutTime = EXIT_DELAY;
             //we also handle the exit transition.
