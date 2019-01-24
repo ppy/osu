@@ -72,9 +72,6 @@ namespace osu.Game.Configuration
 
             Set(GameSetting.MenuParallax, true);
 
-            Set(GameSetting.SnakingInSliders, true);
-            Set(GameSetting.SnakingOutSliders, true);
-
             // Gameplay
             Set(GameSetting.DimLevel, 0.3, 0, 1, 0.01);
             Set(GameSetting.BlurLevel, 0, 0, 1, 0.01);
@@ -150,8 +147,6 @@ namespace osu.Game.Configuration
         DisplayStarsMinimum,
         DisplayStarsMaximum,
         RandomSelectAlgorithm,
-        SnakingInSliders,
-        SnakingOutSliders,
         ShowFpsDisplay,
         ChatDisplayHeight,
         Version,
