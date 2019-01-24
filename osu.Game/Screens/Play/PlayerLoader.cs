@@ -30,6 +30,8 @@ namespace osu.Game.Screens.Play
 
         private Player player;
 
+        private Container content;
+
         private BeatmapMetadataDisplay info;
 
         private bool hideOverlays;
@@ -51,27 +53,35 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddInternal(info = new BeatmapMetadataDisplay(Beatmap.Value)
+            InternalChild = content = new Container
             {
-                Alpha = 0,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-            });
-
-            AddInternal(new FillFlowContainer<PlayerSettingsGroup>
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 20),
-                Margin = new MarginPadding(25),
-                Children = new PlayerSettingsGroup[]
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    visualSettings = new VisualSettings(),
-                    new InputSettings()
+                    info = new BeatmapMetadataDisplay(Beatmap.Value)
+                    {
+                        Alpha = 0,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    new FillFlowContainer<PlayerSettingsGroup>
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 20),
+                        Margin = new MarginPadding(25),
+                        Children = new PlayerSettingsGroup[]
+                        {
+                            visualSettings = new VisualSettings(),
+                            new InputSettings()
+                        }
+                    }
                 }
-            });
+            };
 
             loadNewPlayer();
         }
@@ -105,21 +115,21 @@ namespace osu.Game.Screens.Play
 
         private void contentIn()
         {
-            this.ScaleTo(1, 650, Easing.OutQuint);
-            this.FadeInFromZero(400);
+            content.ScaleTo(1, 650, Easing.OutQuint);
+            content.FadeInFromZero(400);
         }
 
         private void contentOut()
         {
-            this.ScaleTo(0.7f, 300, Easing.InQuint);
-            this.FadeOut(250);
+            content.ScaleTo(0.7f, 300, Easing.InQuint);
+            content.FadeOut(250);
         }
 
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            this.ScaleTo(0.7f);
+            content.ScaleTo(0.7f);
 
             contentIn();
 
@@ -226,7 +236,7 @@ namespace osu.Game.Screens.Play
 
         public override bool OnExiting(IScreen next)
         {
-            this.ScaleTo(0.7f, 150, Easing.InQuint);
+            content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
             cancelLoad();
 
