@@ -49,9 +49,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             loadBeatmap();
         }
-        private List<JudgementResult> judgementResults;
-        private bool allJudgedFired;
-        
+
         private const double time_before_slider = 250;
         private const double time_slider_start = 1500;
         private const double time_during_slide_1 = 2500;
@@ -59,6 +57,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const double time_during_slide_3 = 3500;
         private const double time_during_slide_4 = 4000;
 
+        private List<JudgementResult> judgementResults;
+        private bool allJudgedFired;
+        
         /// <summary>
         /// Scenario:
         /// - Press a key before a slider starts
