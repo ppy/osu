@@ -25,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestCaseSliderInput : OsuTestCase
+    public class TestCaseSliderInput : TestCasePlayerBase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
