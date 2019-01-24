@@ -25,7 +25,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestCaseSliderInput : TestCasePlayerBase
+    public class TestCaseSliderInput : TestCaseRateAdjustedBeatmap
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -47,20 +47,18 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         public TestCaseSliderInput()
         {
-            var slider = new Slider
-            {
-                StartTime = time_slider_start,
-                Position = new Vector2(0, 0),
-                Path = new SliderPath(PathType.PerfectCurve, new[]
-                {
-                    Vector2.Zero,
-                    new Vector2(25, 0),
-                }, 25),
-            };
-
             Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
             {
-                HitObjects = { slider },
+                HitObjects = { new Slider
+                {
+                    StartTime = time_slider_start,
+                    Position = new Vector2(0, 0),
+                    Path = new SliderPath(PathType.PerfectCurve, new[]
+                    {
+                        Vector2.Zero,
+                        new Vector2(25, 0),
+                    }, 25),
+                }},
                 ControlPointInfo =
                 {
                     DifficultyPoints = { new DifficultyControlPoint { SpeedMultiplier = 0.1f } }
@@ -107,7 +105,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 performTest(frames);
             });
 
-            AddUntilStep(() => allJudgedFired, "Wait for test 1");
+            waitForJudged();
             AddAssert("Tracking lost", assertMidSliderJudgementFail);
         }
 
@@ -134,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 performTest(frames);
             });
 
-            AddUntilStep(() => allJudgedFired, "Wait for test 2");
+            waitForJudged();
             AddAssert("Tracking retained", assertGreatJudge);
         }
 
@@ -161,7 +159,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 performTest(frames);
             });
 
-            AddUntilStep(() => allJudgedFired, "Wait for test 3");
+            waitForJudged();
             AddAssert("Tracking retained", assertGreatJudge);
         }
 
@@ -188,7 +186,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 performTest(frames);
             });
 
-            AddUntilStep(() => allJudgedFired, "Wait for test 4");
+            waitForJudged();
             AddAssert("Tracking retained", assertGreatJudge);
         }
 
@@ -212,7 +210,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 performTest(frames);
             });
 
-            AddUntilStep(() => allJudgedFired, "Wait for test 5");
+            waitForJudged();
             AddAssert("Tracking retained, sliderhead miss", assertHeadMissTailTracked);
         }
 
@@ -242,7 +240,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 performTest(frames);
             });
 
-            AddUntilStep(() => allJudgedFired, "Wait for test 6");
+            waitForJudged();
             AddAssert("Tracking re-acquired", assertMidSliderJudgements);
         }
 
@@ -274,7 +272,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 performTest(frames);
             });
 
-            AddUntilStep(() => allJudgedFired, "Wait for test 7");
+            waitForJudged();
             AddAssert("Tracking lost", assertMidSliderJudgementFail);
         }
 
@@ -302,7 +300,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 performTest(frames);
             });
 
-            AddUntilStep(() => allJudgedFired, "Wait for test 8");
+            waitForJudged();
             AddAssert("Tracking acquired", assertMidSliderJudgements);
         }
 
@@ -332,7 +330,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 performTest(frames);
             });
 
-            AddUntilStep(() => allJudgedFired, "Wait for test 9");
+            waitForJudged();
             AddAssert("Tracking acquired", assertMidSliderJudgements);
         }
 
@@ -363,9 +361,11 @@ namespace osu.Game.Rulesets.Osu.Tests
                 performTest(frames);
             });
 
-            AddUntilStep(() => allJudgedFired, "Wait for test 10");
+            waitForJudged();
             AddAssert("Tracking acquired", assertMidSliderJudgements);
         }
+
+        private void waitForJudged() => AddUntilStep(() => allJudgedFired, "Wait for all judged");
 
         private bool assertGreatJudge()
         {
