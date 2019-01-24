@@ -63,33 +63,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         /// <summary>
         /// Scenario:
-        /// - Press a key on the slider head timed correctly
-        /// - Press the other key in the middle of the slider while holding the original key
-        /// - Release the original key used to hit the slider
-        /// Expected Result:
-        /// A passing test case will have the cursor continue tracking on replay frame 3.
-        /// </summary>
-        [Test]
-        public void TestLeftBeforeSliderThenRightThenLettingGoOfLeft()
-        {
-            AddStep("Left to both to right test", () =>
-            {
-                var frames = new List<ReplayFrame>
-                {
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_during_slide_1 },
-                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_2 },
-                };
-
-                performTest(frames);
-            });
-
-            AddUntilStep(() => allJudgedFired, "Wait for test 1");
-            AddAssert("Tracking retained", assertGreatJudge);
-        }
-
-        /// <summary>
-        /// Scenario:
         /// - Press a key before a slider starts
         /// - Press the other key on the slider head timed correctly while holding the original key
         /// - Release the latter pressed key
@@ -113,6 +86,33 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddUntilStep(() => allJudgedFired, "Wait for test 2");
             AddAssert("Tracking lost", assertMehJudge);
+        }
+
+        /// <summary>
+        /// Scenario:
+        /// - Press a key on the slider head timed correctly
+        /// - Press the other key in the middle of the slider while holding the original key
+        /// - Release the original key used to hit the slider
+        /// Expected Result:
+        /// A passing test case will have the cursor continue tracking on replay frame 3.
+        /// </summary>
+        [Test]
+        public void TestLeftBeforeSliderThenRightThenLettingGoOfLeft()
+        {
+            AddStep("Left to both to right test", () =>
+            {
+                var frames = new List<ReplayFrame>
+                {
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_slider_start },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_during_slide_1 },
+                    new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_2 },
+                };
+
+                performTest(frames);
+            });
+
+            AddUntilStep(() => allJudgedFired, "Wait for test 1");
+            AddAssert("Tracking retained", assertGreatJudge);
         }
 
         /// <summary>
@@ -407,13 +407,13 @@ namespace osu.Game.Rulesets.Osu.Tests
                 AllowResults = false
             };
 
-            Child = new OsuInputManager(new RulesetInfo { ID = 0 })
+            LoadComponentAsync(player, p =>
             {
-                Child = player
-            };
+                Child = p;
 
-            player.ScoreProcessor.NewJudgement += result => judgementResults.Add(result);
-            player.ScoreProcessor.AllJudged += () => { allJudgedFired = true; };
+                p.ScoreProcessor.NewJudgement += result => judgementResults.Add(result);
+                p.ScoreProcessor.AllJudged += () => { allJudgedFired = true; };
+            });
         }
 
         private class ScoreAccessibleReplayPlayer : ReplayPlayer
