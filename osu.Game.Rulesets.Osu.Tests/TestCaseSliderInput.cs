@@ -49,11 +49,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         {
             loadBeatmap();
         }
-
-
         private List<JudgementResult> judgementResults;
         private bool allJudgedFired;
-
+        
         private const double time_before_slider = 250;
         private const double time_slider_start = 1500;
         private const double time_during_slide_1 = 2500;
@@ -374,7 +372,6 @@ namespace osu.Game.Rulesets.Osu.Tests
             return judgementResults[judgementResults.Count - 2].Type == HitResult.Miss;
         }
 
-
         private void loadBeatmap()
         {
             var slider = new Slider
@@ -387,7 +384,6 @@ namespace osu.Game.Rulesets.Osu.Tests
                     new Vector2(25, 0),
                 }, 25),
             };
-
 
             Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
             {
