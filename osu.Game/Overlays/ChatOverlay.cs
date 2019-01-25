@@ -302,7 +302,7 @@ namespace osu.Game.Overlays
         protected override void OnFocus(FocusEvent e)
         {
             //this is necessary as textbox is masked away and therefore can't get focus :(
-            GetContainingInputManager().ChangeFocus(textbox);
+            //GetContainingInputManager().ChangeFocus(textbox);
             base.OnFocus(e);
         }
 
