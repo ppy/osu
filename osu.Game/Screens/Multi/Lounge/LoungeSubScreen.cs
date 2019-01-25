@@ -172,5 +172,7 @@ namespace osu.Game.Screens.Multi.Lounge
 
             this.Push(new MatchSubScreen(room, s => pushGameplayScreen?.Invoke(s)));
         }
+
+        public override string ToString() => Title;
     }
 }
