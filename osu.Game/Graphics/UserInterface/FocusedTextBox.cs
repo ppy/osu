@@ -3,7 +3,9 @@
 
 using osuTK.Graphics;
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Game.Input.Bindings;
 using osuTK.Input;
 
@@ -21,15 +23,30 @@ namespace osu.Game.Graphics.UserInterface
 
         private bool focus;
 
+        private bool allowImmediateFocus => host?.OnScreenKeyboardOverlapsGameWindow != true;
+
+        public void TakeFocus()
+        {
+            if (allowImmediateFocus) GetContainingInputManager().ChangeFocus(this);
+        }
+
         public bool HoldFocus
         {
-            get { return focus; }
+            get { return allowImmediateFocus && focus; }
             set
             {
                 focus = value;
                 if (!focus && HasFocus)
                     base.KillFocus();
             }
+        }
+
+        private GameHost host;
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
+        {
+            this.host = host;
         }
 
         // We may not be focused yet, but we need to handle keyboard input to be able to request focus
