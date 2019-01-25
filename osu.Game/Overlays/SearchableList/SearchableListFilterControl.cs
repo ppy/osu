@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osuTK.Graphics;
@@ -27,6 +27,11 @@ namespace osu.Game.Overlays.SearchableList
         protected abstract Color4 BackgroundColour { get; }
         protected abstract T DefaultTab { get; }
         protected virtual Drawable CreateSupplementaryControls() => null;
+
+        /// <summary>
+        /// The amount of padding added to content (does not affect background or tab control strip).
+        /// </summary>
+        protected virtual float ContentHorizontalPadding => SearchableListOverlay.WIDTH_PADDING;
 
         protected SearchableListFilterControl()
         {
@@ -62,7 +67,11 @@ namespace osu.Game.Overlays.SearchableList
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Padding = new MarginPadding { Top = padding, Horizontal = SearchableListOverlay.WIDTH_PADDING },
+                            Padding = new MarginPadding
+                            {
+                                Top = padding,
+                                Horizontal = ContentHorizontalPadding
+                            },
                             Children = new Drawable[]
                             {
                                 Search = new FilterSearchTextBox
