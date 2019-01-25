@@ -78,14 +78,14 @@ namespace osu.Game.Beatmaps
 
         private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, GameHost importHost = null,
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null)
-            : base(storage, contextFactory, new BeatmapStore(contextFactory), importHost)
+            : base(storage, contextFactory, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
             this.api = api;
             this.audioManager = audioManager;
-            host = importHost;
+            this.host = host;
 
             DefaultBeatmap = defaultBeatmap;
 
