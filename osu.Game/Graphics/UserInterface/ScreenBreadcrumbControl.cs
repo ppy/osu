@@ -17,13 +17,15 @@ namespace osu.Game.Graphics.UserInterface
             stack.ScreenPushed += onPushed;
             stack.ScreenExited += onExited;
 
+            onPushed(null, stack.CurrentScreen);
+
             Current.ValueChanged += newScreen => newScreen.MakeCurrent();
         }
 
         private void onPushed(IScreen lastScreen, IScreen newScreen)
         {
-            Current.Value = newScreen;
             AddItem(newScreen);
+            Current.Value = newScreen;
         }
 
         private void onExited(IScreen lastScreen, IScreen newScreen)
