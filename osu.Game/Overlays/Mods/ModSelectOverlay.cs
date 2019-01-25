@@ -300,7 +300,7 @@ namespace osu.Game.Overlays.Mods
                                 Padding = new MarginPadding
                                 {
                                     Vertical = 10,
-                                    Horizontal = -OsuScreen.HORIZONTAL_OVERFLOW_PADDING
+                                    Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING
                                 },
                                 Child = ModSectionsContainer = new FillFlowContainer<ModSection>
                                 {
