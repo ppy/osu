@@ -29,10 +29,9 @@ namespace osu.Game.Overlays.SearchableList
         protected virtual Drawable CreateSupplementaryControls() => null;
 
         /// <summary>
-        /// Add padding to internal components of the control.
-        /// This does not affect the background and the tab strip.
+        /// The amount of padding added to content (does not affect background or tab control strip).
         /// </summary>
-        protected virtual float InternalPadding => 0;
+        protected virtual float ContentHorizontalPadding => SearchableListOverlay.WIDTH_PADDING;
 
         protected SearchableListFilterControl()
         {
@@ -71,7 +70,7 @@ namespace osu.Game.Overlays.SearchableList
                             Padding = new MarginPadding
                             {
                                 Top = padding,
-                                Horizontal = SearchableListOverlay.WIDTH_PADDING + InternalPadding
+                                Horizontal = ContentHorizontalPadding
                             },
                             Children = new Drawable[]
                             {
