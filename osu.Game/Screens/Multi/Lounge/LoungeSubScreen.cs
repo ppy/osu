@@ -7,6 +7,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
@@ -15,8 +16,20 @@ using osu.Game.Screens.Multi.Match;
 
 namespace osu.Game.Screens.Multi.Lounge
 {
-    public class LoungeSubScreen : MultiplayerSubScreen
+    public class LoungeSubScreen : CompositeDrawable, IMultiplayerSubScreen
     {
+        public bool AllowBeatmapRulesetChange => true;
+        public bool AllowExternalScreenChange => true;
+        public bool CursorVisible => true;
+
+        public string Title => "Lounge";
+        public string ShortTitle => Title;
+
+        public bool ValidForResume { get; set; } = true;
+        public bool ValidForPush { get; set; } = true;
+
+        public override bool RemoveWhenNotAlive => false;
+
         protected readonly FilterControl Filter;
 
         private readonly Container content;
@@ -27,13 +40,11 @@ namespace osu.Game.Screens.Multi.Lounge
         [Resolved(CanBeNull = true)]
         private IRoomManager roomManager { get; set; }
 
-        public override string Title => "Lounge";
-
-        protected override Drawable TransitionContent => content;
-
         public LoungeSubScreen(Action<Screen> pushGameplayScreen)
         {
             this.pushGameplayScreen = pushGameplayScreen;
+
+            RelativeSizeAxes = Axes.Both;
 
             RoomInspector inspector;
 
@@ -101,22 +112,36 @@ namespace osu.Game.Screens.Multi.Lounge
             GetContainingInputManager().ChangeFocus(Filter.Search);
         }
 
-        public override void OnEntering(IScreen last)
+        public void OnEntering(IScreen last)
         {
-            base.OnEntering(last);
+            this.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            this.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            this.MoveToX(200).MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+
             Filter.Search.HoldFocus = true;
         }
 
-        public override bool OnExiting(IScreen next)
+        public bool OnExiting(IScreen next)
         {
+            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+            this.MoveToX(200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+
             Filter.Search.HoldFocus = false;
-            // no base call; don't animate
+
             return false;
         }
 
-        public override void OnSuspending(IScreen next)
+        public void OnResuming(IScreen last)
         {
-            base.OnSuspending(next);
+            this.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            this.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+        }
+
+        public void OnSuspending(IScreen next)
+        {
+            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+            this.MoveToX(-200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+
             Filter.Search.HoldFocus = false;
         }
 

@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Rulesets;
@@ -18,11 +19,19 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.Multi.Match
 {
-    public class MatchSubScreen : MultiplayerSubScreen
+    public class MatchSubScreen : CompositeDrawable, IMultiplayerSubScreen
     {
-        public override bool AllowBeatmapRulesetChange => false;
-        public override string Title => room.RoomID.Value == null ? "New room" : room.Name.Value;
-        public override string ShortTitle => "room";
+        public bool AllowBeatmapRulesetChange => false;
+        public bool AllowExternalScreenChange => true;
+        public bool CursorVisible => true;
+
+        public string Title => room.RoomID.Value == null ? "New room" : room.Name.Value;
+        public string ShortTitle => "room";
+
+        public bool ValidForResume { get; set; } = true;
+        public bool ValidForPush { get; set; } = true;
+
+        public override bool RemoveWhenNotAlive => false;
 
         private readonly RoomBindings bindings = new RoomBindings();
 
@@ -32,6 +41,9 @@ namespace osu.Game.Screens.Multi.Match
 
         [Cached]
         private readonly Room room;
+
+        [Resolved]
+        private IBindableBeatmap beatmap { get; set; }
 
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
@@ -46,6 +58,8 @@ namespace osu.Game.Screens.Multi.Match
         {
             this.room = room;
             this.pushGameplayScreen = pushGameplayScreen;
+
+            RelativeSizeAxes = Axes.Both;
 
             bindings.Room = room;
 
@@ -135,10 +149,33 @@ namespace osu.Game.Screens.Multi.Match
             beatmapManager.ItemAdded += beatmapAdded;
         }
 
-        public override bool OnExiting(IScreen next)
+        public void OnEntering(IScreen last)
+        {
+            this.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            this.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            this.MoveToX(200).MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+        }
+
+        public bool OnExiting(IScreen next)
         {
             manager?.PartRoom();
-            return base.OnExiting(next);
+
+            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+            this.MoveToX(200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+
+            return false;
+        }
+
+        public void OnResuming(IScreen last)
+        {
+            this.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+            this.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
+        }
+
+        public void OnSuspending(IScreen next)
+        {
+            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+            this.MoveToX(-200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
         }
 
         protected override void LoadComplete()
@@ -167,7 +204,7 @@ namespace osu.Game.Screens.Multi.Match
 
         private void beatmapAdded(BeatmapSetInfo model, bool existing, bool silent) => Schedule(() =>
         {
-            if (Beatmap.Value != beatmapManager.DefaultBeatmap)
+            if (beatmap.Value != beatmapManager.DefaultBeatmap)
                 return;
 
             if (bindings.CurrentBeatmap.Value == null)
@@ -188,7 +225,7 @@ namespace osu.Game.Screens.Multi.Match
 
         private void onStart()
         {
-            Beatmap.Value.Mods.Value = bindings.CurrentMods.Value.ToArray();
+            beatmap.Value.Mods.Value = bindings.CurrentMods.Value.ToArray();
 
             switch (bindings.Type.Value)
             {
