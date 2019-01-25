@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Allocation;
@@ -51,6 +51,16 @@ namespace osu.Game.Overlays.Settings.Sections
                 {
                     LabelText = "Adjust gameplay cursor size based on current beatmap",
                     Bindable = config.GetBindable<bool>(OsuSetting.AutoCursorSize)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Beatmap skins",
+                    Bindable = config.GetBindable<bool>(OsuSetting.BeatmapSkins)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Beatmap hitsounds",
+                    Bindable = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds)
                 },
             };
 

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,6 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -147,16 +146,6 @@ namespace osu.Game.Beatmaps
             var existing = GetExistingDownload(beatmapSetInfo);
 
             if (existing != null || api == null) return false;
-
-            if (!api.LocalUser.Value.IsSupporter)
-            {
-                PostNotification?.Invoke(new SimpleNotification
-                {
-                    Icon = FontAwesome.fa_superpowers,
-                    Text = "You gotta be an osu!supporter to download for now 'yo"
-                });
-                return false;
-            }
 
             var downloadNotification = new DownloadNotification
             {

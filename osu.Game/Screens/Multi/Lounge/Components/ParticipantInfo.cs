@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using Humanizer;
@@ -93,10 +93,14 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             Host.BindValueChanged(v =>
             {
                 hostText.Clear();
-                hostText.AddText("hosted by ");
-                hostText.AddLink(v.Username, null, LinkAction.OpenUserProfile, v.Id.ToString(), "Open profile", s => s.Font = "Exo2.0-BoldItalic");
+                flagContainer.Clear();
 
-                flagContainer.Child = new DrawableFlag(v.Country) { RelativeSizeAxes = Axes.Both };
+                if (v != null)
+                {
+                    hostText.AddText("hosted by ");
+                    hostText.AddLink(v.Username, null, LinkAction.OpenUserProfile, v.Id.ToString(), "Open profile", s => s.Font = "Exo2.0-BoldItalic");
+                    flagContainer.Child = new DrawableFlag(v.Country) { RelativeSizeAxes = Axes.Both };
+                }
             });
 
             ParticipantCount.BindValueChanged(v => summary.Text = $"{v:#,0}{" participant".Pluralize(v == 1)}");
