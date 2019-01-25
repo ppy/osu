@@ -26,11 +26,6 @@ namespace osu.Game.Screens.Multi
     [Cached]
     public class Multiplayer : OsuScreen, IOnlineComponent
     {
-        /// <summary>
-        /// How much this container should overflow the sides of the screen to account for parallax shifting.
-        /// </summary>
-        public const float OVERFLOW_PADDING = 50;
-
         private readonly MultiplayerWaveContainer waves;
 
         public override bool AllowBeatmapRulesetChange => currentSubScreen?.AllowBeatmapRulesetChange ?? base.AllowBeatmapRulesetChange;
@@ -53,7 +48,7 @@ namespace osu.Game.Screens.Multi
                 RelativeSizeAxes = Axes.Both,
             };
 
-            Padding = new MarginPadding { Horizontal = -OVERFLOW_PADDING };
+            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
 
             waves.AddRange(new Drawable[]
             {
@@ -93,7 +88,7 @@ namespace osu.Game.Screens.Multi
                     Margin = new MarginPadding
                     {
                         Top = 10,
-                        Right = 10 + OVERFLOW_PADDING,
+                        Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
                     },
                     Text = "Create room",
                     Action = () => loungeSubScreen.Push(new Room

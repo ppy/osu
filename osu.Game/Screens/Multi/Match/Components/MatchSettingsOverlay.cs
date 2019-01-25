@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                 {
                                     Padding = new MarginPadding
                                     {
-                                        Horizontal = Multiplayer.OVERFLOW_PADDING,
+                                        Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
                                         Vertical = 10
                                     },
                                     RelativeSizeAxes = Axes.Both,
@@ -214,7 +214,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                             Direction = FillDirection.Vertical,
                                             Spacing = new Vector2(0, 20),
                                             Margin = new MarginPadding { Vertical = 20 },
-                                            Padding = new MarginPadding { Horizontal = Multiplayer.OVERFLOW_PADDING },
+                                            Padding = new MarginPadding { Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                                             Children = new Drawable[]
                                             {
                                                 ApplyButton = new CreateRoomButton
