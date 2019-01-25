@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         protected override string Header => "Renderer";
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager config, OsuConfigManager gameConfig)
+        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig)
         {
             // NOTE: Compatability mode omitted
             Children = new Drawable[]
@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 new SettingsCheckbox
                 {
                     LabelText = "Show FPS",
-                    Bindable = gameConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
+                    Bindable = osuConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay)
                 },
             };
         }

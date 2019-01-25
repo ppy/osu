@@ -38,16 +38,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         private const int transition_duration = 400;
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager config, OsuConfigManager gameConfig, OsuGameBase game)
+        private void load(FrameworkConfigManager config, OsuConfigManager osuConfig, OsuGameBase game)
         {
             this.game = game;
 
-            scalingMode = gameConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
+            scalingMode = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling);
             sizeFullscreen = config.GetBindable<Size>(FrameworkSetting.SizeFullscreen);
-            scalingSizeX = gameConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
-            scalingSizeY = gameConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
-            scalingPositionX = gameConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
-            scalingPositionY = gameConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
+            scalingSizeX = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeX);
+            scalingSizeY = osuConfig.GetBindable<float>(OsuSetting.ScalingSizeY);
+            scalingPositionX = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionX);
+            scalingPositionY = osuConfig.GetBindable<float>(OsuSetting.ScalingPositionY);
 
             Container resolutionSettingsContainer;
 
@@ -67,13 +67,13 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 {
                     LabelText = "UI Scaling",
                     TransferValueOnCommit = true,
-                    Bindable = gameConfig.GetBindable<float>(OsuSetting.UIScale),
+                    Bindable = osuConfig.GetBindable<float>(OsuSetting.UIScale),
                     KeyboardStep = 0.01f
                 },
                 new SettingsEnumDropdown<ScalingMode>
                 {
                     LabelText = "Screen Scaling",
-                    Bindable = gameConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
+                    Bindable = osuConfig.GetBindable<ScalingMode>(OsuSetting.Scaling),
                 },
                 scalingSettings = new FillFlowContainer<SettingsSlider<float>>
                 {
