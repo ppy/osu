@@ -155,14 +155,7 @@ namespace osu.Game.Screens
         /// </summary>
         protected virtual void LogoArriving(OsuLogo logo, bool resuming)
         {
-            logo.Action = null;
-            logo.FadeOut(300, Easing.OutQuint);
-            logo.Anchor = Anchor.TopLeft;
-            logo.Origin = Anchor.Centre;
-            logo.RelativePositionAxes = Axes.None;
-            logo.BeatMatching = true;
-            logo.Triangles = true;
-            logo.Ripple = true;
+            ApplyLogoArrivingDefaults(logo);
         }
 
         private void applyArrivingDefaults(bool isResuming)
@@ -177,6 +170,23 @@ namespace osu.Game.Screens
             OverlayActivationMode.Value = InitialOverlayActivationMode;
 
             updateOverlayStates?.Invoke();
+        }
+
+        /// <summary>
+        /// Applies default animations to an arriving logo.
+        /// Todo: This should not exist.
+        /// </summary>
+        /// <param name="logo">The logo to apply animations to.</param>
+        public static void ApplyLogoArrivingDefaults(OsuLogo logo)
+        {
+            logo.Action = null;
+            logo.FadeOut(300, Easing.OutQuint);
+            logo.Anchor = Anchor.TopLeft;
+            logo.Origin = Anchor.Centre;
+            logo.RelativePositionAxes = Axes.None;
+            logo.BeatMatching = true;
+            logo.Triangles = true;
+            logo.Ripple = true;
         }
 
         private void onExitingLogo()

@@ -181,11 +181,8 @@ namespace osu.Game.Screens.Multi
             loungeSubScreen.MakeCurrent();
             updatePollingRate(isIdle.Value);
 
-            logo?.AppendAnimatingAction(() =>
-            {
-                // the wave overlay transition takes longer than expected to run.
-                logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut();
-            }, false);
+            // the wave overlay transition takes longer than expected to run.
+            logo?.AppendAnimatingAction(() => logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut(), false);
 
             return false;
         }
@@ -194,6 +191,8 @@ namespace osu.Game.Screens.Multi
         {
             this.FadeIn(250);
             this.ScaleTo(1, 250, Easing.OutSine);
+
+            logo?.AppendAnimatingAction(() => OsuScreen.ApplyLogoArrivingDefaults(logo), true);
 
             updatePollingRate(isIdle.Value);
         }
