@@ -6,9 +6,9 @@ using osu.Game.Rulesets.Configuration;
 
 namespace osu.Game.Rulesets.Osu.Configuration
 {
-    public class OsuConfigManager : RulesetConfigManager<OsuSetting>
+    public class OsuRulesetConfigManager : RulesetConfigManager<OsuRulesetSetting>
     {
-        public OsuConfigManager(SettingsStore settings, RulesetInfo ruleset, int? variant = null)
+        public OsuRulesetConfigManager(SettingsStore settings, RulesetInfo ruleset, int? variant = null)
             : base(settings, ruleset, variant)
         {
         }
@@ -17,12 +17,12 @@ namespace osu.Game.Rulesets.Osu.Configuration
         {
             base.InitialiseDefaults();
 
-            Set(OsuSetting.SnakingInSliders, true);
-            Set(OsuSetting.SnakingOutSliders, true);
+            Set(OsuRulesetSetting.SnakingInSliders, true);
+            Set(OsuRulesetSetting.SnakingOutSliders, true);
         }
     }
 
-    public enum OsuSetting
+    public enum OsuRulesetSetting
     {
         SnakingInSliders,
         SnakingOutSliders

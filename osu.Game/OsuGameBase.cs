@@ -43,7 +43,7 @@ namespace osu.Game
     /// </summary>
     public class OsuGameBase : Framework.Game, ICanAcceptFiles
     {
-        protected GameConfigManager LocalConfig;
+        protected OsuConfigManager LocalConfig;
 
         protected BeatmapManager BeatmapManager;
 
@@ -206,7 +206,7 @@ namespace osu.Game
 
             // TODO: This is temporary until we reimplement the local FPS display.
             // It's just to allow end-users to access the framework FPS display without knowing the shortcut key.
-            fpsDisplayVisible = LocalConfig.GetBindable<bool>(GameSetting.ShowFpsDisplay);
+            fpsDisplayVisible = LocalConfig.GetBindable<bool>(OsuSetting.ShowFpsDisplay);
             fpsDisplayVisible.ValueChanged += val => { FrameStatisticsMode = val ? FrameStatisticsMode.Minimal : FrameStatisticsMode.None; };
             fpsDisplayVisible.TriggerChange();
         }
@@ -237,7 +237,7 @@ namespace osu.Game
         public override void SetHost(GameHost host)
         {
             if (LocalConfig == null)
-                LocalConfig = new GameConfigManager(host.Storage);
+                LocalConfig = new OsuConfigManager(host.Storage);
             base.SetHost(host);
         }
 

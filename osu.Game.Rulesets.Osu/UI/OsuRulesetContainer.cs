@@ -21,7 +21,7 @@ namespace osu.Game.Rulesets.Osu.UI
 {
     public class OsuRulesetContainer : RulesetContainer<OsuPlayfield, OsuHitObject>
     {
-        protected new OsuConfigManager Config => (OsuConfigManager)base.Config;
+        protected new OsuRulesetConfigManager Config => (OsuRulesetConfigManager)base.Config;
 
         public OsuRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)

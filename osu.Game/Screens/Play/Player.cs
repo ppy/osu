@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play
         public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, APIAccess api, GameConfigManager config)
+        private void load(AudioManager audio, APIAccess api, OsuConfigManager config)
         {
             this.api = api;
 
@@ -102,8 +102,8 @@ namespace osu.Game.Screens.Play
 
             sampleRestart = audio.Sample.Get(@"Gameplay/restart");
 
-            mouseWheelDisabled = config.GetBindable<bool>(GameSetting.MouseDisableWheel);
-            userAudioOffset = config.GetBindable<double>(GameSetting.AudioOffset);
+            mouseWheelDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableWheel);
+            userAudioOffset = config.GetBindable<double>(OsuSetting.AudioOffset);
 
             IBeatmap beatmap;
 
@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Play
 
             ScoreProcessor = RulesetContainer.CreateScoreProcessor();
             if (!ScoreProcessor.Mode.Disabled)
-                config.BindWith(GameSetting.ScoreDisplayMode, ScoreProcessor.Mode);
+                config.BindWith(OsuSetting.ScoreDisplayMode, ScoreProcessor.Mode);
 
             Children = new Drawable[]
             {

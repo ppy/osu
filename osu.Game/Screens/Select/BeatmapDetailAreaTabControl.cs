@@ -31,11 +31,11 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour, GameConfigManager config)
+        private void load(OsuColour colour, OsuConfigManager config)
         {
             modsCheckbox.AccentColour = tabs.AccentColour = colour.YellowLight;
 
-            selectedTab = config.GetBindable<BeatmapDetailTab>(GameSetting.BeatmapDetailTab);
+            selectedTab = config.GetBindable<BeatmapDetailTab>(OsuSetting.BeatmapDetailTab);
 
             tabs.Current.BindTo(selectedTab);
             tabs.Current.TriggerChange();

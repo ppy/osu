@@ -20,19 +20,19 @@ namespace osu.Game.Rulesets.Osu.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            var config = (OsuConfigManager)Config;
+            var config = (OsuRulesetConfigManager)Config;
 
             Children = new Drawable[]
             {
                 new SettingsCheckbox
                 {
                     LabelText = "Snaking in sliders",
-                    Bindable = config.GetBindable<bool>(OsuSetting.SnakingInSliders)
+                    Bindable = config.GetBindable<bool>(OsuRulesetSetting.SnakingInSliders)
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Snaking out sliders",
-                    Bindable = config.GetBindable<bool>(OsuSetting.SnakingOutSliders)
+                    Bindable = config.GetBindable<bool>(OsuRulesetSetting.SnakingOutSliders)
                 },
             };
         }

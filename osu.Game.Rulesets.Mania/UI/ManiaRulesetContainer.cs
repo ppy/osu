@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public IEnumerable<BarLine> BarLines;
 
-        protected new ManiaConfigManager Config => (ManiaConfigManager)base.Config;
+        protected new ManiaRulesetConfigManager Config => (ManiaRulesetConfigManager)base.Config;
 
         private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
 
@@ -75,10 +75,10 @@ namespace osu.Game.Rulesets.Mania.UI
         {
             BarLines.ForEach(Playfield.Add);
 
-            Config.BindWith(ManiaSetting.ScrollDirection, configDirection);
+            Config.BindWith(ManiaRulesetSetting.ScrollDirection, configDirection);
             configDirection.BindValueChanged(v => Direction.Value = (ScrollingDirection)v, true);
 
-            Config.BindWith(ManiaSetting.ScrollTime, TimeRange);
+            Config.BindWith(ManiaRulesetSetting.ScrollTime, TimeRange);
         }
 
         /// <summary>

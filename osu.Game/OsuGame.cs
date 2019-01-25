@@ -174,17 +174,17 @@ namespace osu.Game
             dependencies.CacheAs<IBindable<RulesetInfo>>(ruleset);
 
             // bind config int to database RulesetInfo
-            configRuleset = LocalConfig.GetBindable<int>(GameSetting.Ruleset);
+            configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
             ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
 
             // bind config int to database SkinInfo
-            configSkin = LocalConfig.GetBindable<int>(GameSetting.Skin);
+            configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
             SkinManager.CurrentSkinInfo.ValueChanged += s => configSkin.Value = s.ID;
             configSkin.ValueChanged += id => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == id) ?? SkinInfo.Default;
             configSkin.TriggerChange();
 
-            LocalConfig.BindWith(GameSetting.VolumeInactive, inactiveVolumeAdjust);
+            LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -631,7 +631,7 @@ namespace osu.Game
                     direct.ToggleVisibility();
                     return true;
                 case GlobalAction.ToggleGameplayMouseButtons:
-                    LocalConfig.Set(GameSetting.MouseDisableButtons, !LocalConfig.Get<bool>(GameSetting.MouseDisableButtons));
+                    LocalConfig.Set(OsuSetting.MouseDisableButtons, !LocalConfig.Get<bool>(OsuSetting.MouseDisableButtons));
                     return true;
             }
 

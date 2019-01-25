@@ -206,7 +206,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
             }
 
             [BackgroundDependencyLoader(permitNulls: true)]
-            private void load(APIAccess api, GameConfigManager config, AccountCreationOverlay accountCreation)
+            private void load(APIAccess api, OsuConfigManager config, AccountCreationOverlay accountCreation)
             {
                 this.api = api;
                 Direction = FillDirection.Vertical;
@@ -232,12 +232,12 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     new SettingsCheckbox
                     {
                         LabelText = "Remember email address",
-                        Bindable = config.GetBindable<bool>(GameSetting.SaveUsername),
+                        Bindable = config.GetBindable<bool>(OsuSetting.SaveUsername),
                     },
                     new SettingsCheckbox
                     {
                         LabelText = "Stay signed in",
-                        Bindable = config.GetBindable<bool>(GameSetting.SavePassword),
+                        Bindable = config.GetBindable<bool>(OsuSetting.SavePassword),
                     },
                     new SettingsButton
                     {
