@@ -164,7 +164,7 @@ namespace osu.Game.Overlays.Chat.Selection
 
         protected override void OnFocus(FocusEvent e)
         {
-            GetContainingInputManager().ChangeFocus(search);
+            search.TakeFocus();
             base.OnFocus(e);
         }
 
