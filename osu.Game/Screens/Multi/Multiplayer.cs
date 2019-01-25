@@ -48,6 +48,8 @@ namespace osu.Game.Screens.Multi
                 RelativeSizeAxes = Axes.Both,
             };
 
+            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
+
             waves.AddRange(new Drawable[]
             {
                 new Container
@@ -86,7 +88,7 @@ namespace osu.Game.Screens.Multi
                     Margin = new MarginPadding
                     {
                         Top = 10,
-                        Right = 10,
+                        Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
                     },
                     Text = "Create room",
                     Action = () => loungeSubScreen.Push(new Room
