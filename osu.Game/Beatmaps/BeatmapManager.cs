@@ -74,15 +74,18 @@ namespace osu.Game.Beatmaps
 
         private readonly AudioManager audioManager;
 
+        private readonly GameHost host;
+
         private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, IIpcHost importHost = null,
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null)
-            : base(storage, contextFactory, new BeatmapStore(contextFactory), importHost)
+            : base(storage, contextFactory, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
             this.api = api;
             this.audioManager = audioManager;
+            this.host = host;
 
             DefaultBeatmap = defaultBeatmap;
 
@@ -254,7 +257,7 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
-            WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(Files.Store, beatmapInfo, audioManager);
+            WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(Files.Store, new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager);
 
             previous?.TransferTo(working);
 
