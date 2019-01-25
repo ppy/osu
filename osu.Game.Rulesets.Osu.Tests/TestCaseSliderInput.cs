@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                 },
             });
 
-            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
+            AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait until beatmap is loaded");
         }
 
         [SetUp]
