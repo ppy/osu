@@ -2,12 +2,10 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
-using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
@@ -16,19 +14,9 @@ using osu.Game.Screens.Multi.Match;
 
 namespace osu.Game.Screens.Multi.Lounge
 {
-    public class LoungeSubScreen : CompositeDrawable, IMultiplayerSubScreen
+    public class LoungeSubScreen : MultiplayerSubScreen
     {
-        public bool AllowBeatmapRulesetChange => true;
-        public bool AllowExternalScreenChange => true;
-        public bool CursorVisible => true;
-
-        public string Title => "Lounge";
-        public string ShortTitle => Title;
-
-        public bool ValidForResume { get; set; } = true;
-        public bool ValidForPush { get; set; } = true;
-
-        public override bool RemoveWhenNotAlive => false;
+        public override string Title => "Lounge";
 
         protected readonly FilterControl Filter;
 
@@ -37,14 +25,9 @@ namespace osu.Game.Screens.Multi.Lounge
         private readonly Action<Screen> pushGameplayScreen;
         private readonly ProcessingOverlay processingOverlay;
 
-        [Resolved(CanBeNull = true)]
-        private IRoomManager roomManager { get; set; }
-
         public LoungeSubScreen(Action<Screen> pushGameplayScreen)
         {
             this.pushGameplayScreen = pushGameplayScreen;
-
-            RelativeSizeAxes = Axes.Both;
 
             RoomInspector inspector;
 
@@ -112,49 +95,34 @@ namespace osu.Game.Screens.Multi.Lounge
             GetContainingInputManager().ChangeFocus(Filter.Search);
         }
 
-        public void OnEntering(IScreen last)
+        public override void OnEntering(IScreen last)
         {
-            this.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-            this.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-            this.MoveToX(200).MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-
+            base.OnEntering(last);
             Filter.Search.HoldFocus = true;
         }
 
-        public bool OnExiting(IScreen next)
+        public override bool OnExiting(IScreen next)
         {
-            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
-            this.MoveToX(200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
-
             Filter.Search.HoldFocus = false;
-
-            return false;
+            return base.OnExiting(next);
         }
 
-        public void OnResuming(IScreen last)
+        public override void OnSuspending(IScreen next)
         {
-            this.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-            this.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-        }
-
-        public void OnSuspending(IScreen next)
-        {
-            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
-            this.MoveToX(-200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
-
+            base.OnSuspending(next);
             Filter.Search.HoldFocus = false;
         }
 
         private void filterRooms()
         {
             rooms.Filter(Filter.CreateCriteria());
-            roomManager?.Filter(Filter.CreateCriteria());
+            Manager?.Filter(Filter.CreateCriteria());
         }
 
         private void joinRequested(Room room)
         {
             processingOverlay.Show();
-            roomManager?.JoinRoom(room, r =>
+            Manager?.JoinRoom(room, r =>
             {
                 Push(room);
                 processingOverlay.Hide();
@@ -172,7 +140,5 @@ namespace osu.Game.Screens.Multi.Lounge
 
             this.Push(new MatchSubScreen(room, s => pushGameplayScreen?.Invoke(s)));
         }
-
-        public override string ToString() => Title;
     }
 }
