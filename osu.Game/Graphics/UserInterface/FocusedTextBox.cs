@@ -32,7 +32,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public bool HoldFocus
         {
-            get { return allowImmediateFocus && focus; }
+            get => allowImmediateFocus && focus;
             set
             {
                 focus = value;
