@@ -74,7 +74,7 @@ namespace osu.Game.Beatmaps
 
         private readonly AudioManager audioManager;
 
-        private GameHost host;
+        private readonly GameHost host;
 
         private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
 
@@ -85,7 +85,7 @@ namespace osu.Game.Beatmaps
             this.rulesets = rulesets;
             this.api = api;
             this.audioManager = audioManager;
-            this.host = importHost;
+            host = importHost;
 
             DefaultBeatmap = defaultBeatmap;
 
