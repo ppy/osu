@@ -117,10 +117,10 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager frameworkConfig, OsuConfigManager gameConfig)
+        private void load(FrameworkConfigManager frameworkConfig, OsuConfigManager osuConfig)
         {
             BeginTracking(this, frameworkConfig);
-            BeginTracking(this, gameConfig);
+            BeginTracking(this, osuConfig);
         }
 
         private readonly Dictionary<(object, IConfigManager), TrackedSettings> trackedConfigManagers = new Dictionary<(object, IConfigManager), TrackedSettings>();

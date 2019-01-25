@@ -65,11 +65,11 @@ namespace osu.Game.Graphics.Containers
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuConfigManager gameConfig)
+            private void load(OsuConfigManager osuConfig)
             {
                 if (applyUIScale)
                 {
-                    uiScale = gameConfig.GetBindable<float>(OsuSetting.UIScale);
+                    uiScale = osuConfig.GetBindable<float>(OsuSetting.UIScale);
                     uiScale.BindValueChanged(scaleChanged, true);
                 }
             }
