@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Multi
 
         protected MultiplayerSubScreen()
         {
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
         }
 
