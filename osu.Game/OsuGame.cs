@@ -85,8 +85,7 @@ namespace osu.Game
 
         public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
-        private ParallaxContainer backgroundParallax;
-        private ScreenStack backgroundStack;
+        private BackgroundScreenStack backgroundStack;
         private ScreenStack screenStack;
         private VolumeOverlay volume;
         private OnScreenDisplay onscreenDisplay;
@@ -356,12 +355,7 @@ namespace osu.Game
                     ActionRequested = action => volume.Adjust(action),
                     ScrollActionRequested = (action, amount, isPrecise) => volume.Adjust(action, amount, isPrecise),
                 },
-                backgroundParallax = new ParallaxContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Scale = new Vector2(1.06f),
-                    Child = backgroundStack = new ScreenStack { RelativeSizeAxes = Axes.Both }
-                },
+                backgroundStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
                 screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -375,6 +369,8 @@ namespace osu.Game
                 floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
                 idleTracker = new IdleTracker(6000)
             });
+
+            dependencies.Cache(backgroundStack);
 
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
@@ -742,9 +738,6 @@ namespace osu.Game
 
         protected virtual void ScreenChanged(IScreen lastScreen, IScreen newScreen)
         {
-            if (newScreen is IOsuScreen newOsuScreen)
-                backgroundParallax.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * newOsuScreen.BackgroundParallaxAmount;
-
             switch (newScreen)
             {
                 case Intro intro:
@@ -758,18 +751,12 @@ namespace osu.Game
 
         private void screenPushed(IScreen lastScreen, IScreen newScreen)
         {
-            if (newScreen is IOsuScreen newOsuScreen && newOsuScreen.Background != null)
-                backgroundStack.Push(newOsuScreen.Background);
-
             ScreenChanged(lastScreen, newScreen);
             Logger.Log($"Screen changed → {newScreen}");
         }
 
         private void screenExited(IScreen lastScreen, IScreen newScreen)
         {
-            if (newScreen is IOsuScreen newOsuScreen)
-                newOsuScreen.Background?.MakeCurrent();
-
             ScreenChanged(lastScreen, newScreen);
             Logger.Log($"Screen changed ← {newScreen}");
 

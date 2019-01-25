@@ -19,9 +19,5 @@ namespace osu.Game.Screens
         /// Whether this <see cref="OsuScreen"/> allows the cursor to be displayed.
         /// </summary>
         bool CursorVisible { get; }
-
-        BackgroundScreen Background { get; }
-
-        float BackgroundParallaxAmount { get; }
     }
 }

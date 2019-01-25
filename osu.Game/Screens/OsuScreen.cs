@@ -21,8 +21,6 @@ namespace osu.Game.Screens
 {
     public abstract class OsuScreen : Screen, IOsuScreen, IKeyBindingHandler<GlobalAction>, IHasDescription
     {
-        public BackgroundScreen Background { get; }
-
         /// <summary>
         /// A user-facing title for this screen.
         /// </summary>
@@ -33,12 +31,6 @@ namespace osu.Game.Screens
         protected virtual bool AllowBackButton => true;
 
         public virtual bool AllowExternalScreenChange => false;
-
-        /// <summary>
-        /// Override to create a BackgroundMode for the current screen.
-        /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
-        /// </summary>
-        protected virtual BackgroundScreen CreateBackground() => null;
 
         private Action updateOverlayStates;
 
@@ -58,9 +50,6 @@ namespace osu.Game.Screens
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-        [Resolved]
-        private OsuLogo logo { get; set; }
-
         public virtual bool AllowBeatmapRulesetChange => true;
 
         protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
@@ -71,12 +60,20 @@ namespace osu.Game.Screens
 
         private SampleChannel sampleExit;
 
+        protected BackgroundScreen Background => backgroundStack?.Current;
+
+        private BackgroundScreen localBackground;
+
+        [Resolved]
+        private BackgroundScreenStack backgroundStack { get; set; }
+
+        [Resolved]
+        private OsuLogo logo { get; set; }
+
         protected OsuScreen()
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
-
-            Background = CreateBackground();
         }
 
         [BackgroundDependencyLoader(true)]
@@ -134,6 +131,8 @@ namespace osu.Game.Screens
         {
             applyArrivingDefaults(false);
 
+            backgroundStack.Push(localBackground = CreateBackground());
+
             base.OnEntering(last);
         }
 
@@ -144,6 +143,8 @@ namespace osu.Game.Screens
 
             if (base.OnExiting(next))
                 return true;
+
+            backgroundStack.Exit(localBackground);
 
             Beatmap.UnbindAll();
             return false;
@@ -170,6 +171,8 @@ namespace osu.Game.Screens
             {
                 if (this.IsCurrentScreen()) LogoArriving(logo, isResuming);
             }, true);
+
+            backgroundStack.ParallaxAmount = BackgroundParallaxAmount;
 
             OverlayActivationMode.Value = InitialOverlayActivationMode;
 
@@ -199,5 +202,11 @@ namespace osu.Game.Screens
         protected virtual void LogoSuspending(OsuLogo logo)
         {
         }
+
+        /// <summary>
+        /// Override to create a BackgroundMode for the current screen.
+        /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
+        /// </summary>
+        protected virtual BackgroundScreen CreateBackground() => null;
     }
 }
