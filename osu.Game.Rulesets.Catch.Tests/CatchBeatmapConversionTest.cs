@@ -21,6 +21,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         [TestCase("basic")]
         [TestCase("spinner")]
         [TestCase("spinner-and-circles")]
+        [TestCase("slider")]
         public new void Test(string name)
         {
             base.Test(name);
