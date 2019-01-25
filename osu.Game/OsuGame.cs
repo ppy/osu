@@ -221,9 +221,7 @@ namespace osu.Game
                     return;
                 }
 
-                var databasedSet = beatmap.OnlineBeatmapSetID != null ?
-                    BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID) :
-                    BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
+                var databasedSet = beatmap.OnlineBeatmapSetID != null ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID) : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
 
                 if (databasedSet != null)
                 {
@@ -369,7 +367,7 @@ namespace osu.Game
                     RelativeSizeAxes = Axes.Both,
                 },
                 floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
-                idleTracker = new IdleTracker(6000)
+                idleTracker = new GameIdleTracker(6000)
             });
 
             loadComponentSingleFile(screenStack = new Loader(), d =>
@@ -437,7 +435,7 @@ namespace osu.Game
                 Depth = -8,
             }, floatingOverlayContent.Add);
 
-            dependencies.Cache(idleTracker);
+            dependencies.CacheAs(idleTracker);
             dependencies.Cache(settings);
             dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
@@ -516,6 +514,24 @@ namespace osu.Game
 
             settings.StateChanged += _ => updateScreenOffset();
             notifications.StateChanged += _ => updateScreenOffset();
+        }
+
+        public class GameIdleTracker : IdleTracker
+        {
+            private InputManager inputManager;
+
+            public GameIdleTracker(int time)
+                : base(time)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                inputManager = GetContainingInputManager();
+            }
+
+            protected override bool AllowIdle => inputManager.FocusedDrawable == null;
         }
 
         private void forwardLoggedErrorsToNotifications()

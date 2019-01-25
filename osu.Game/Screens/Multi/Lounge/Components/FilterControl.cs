@@ -13,6 +13,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"362e42");
         protected override PrimaryFilter DefaultTab => PrimaryFilter.Open;
 
+        protected override float ContentHorizontalPadding => base.ContentHorizontalPadding + OsuScreen.HORIZONTAL_OVERFLOW_PADDING;
+
         public FilterControl()
         {
             DisplayStyleControl.Hide();

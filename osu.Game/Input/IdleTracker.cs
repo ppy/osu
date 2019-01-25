@@ -28,6 +28,11 @@ namespace osu.Game.Input
         private readonly BindableBool isIdle = new BindableBool();
 
         /// <summary>
+        /// Whether the game can currently enter an idle state.
+        /// </summary>
+        protected virtual bool AllowIdle => true;
+
+        /// <summary>
         /// Intstantiate a new <see cref="IdleTracker"/>.
         /// </summary>
         /// <param name="timeToIdle">The length in milliseconds until an idle state should be assumed.</param>
@@ -40,7 +45,7 @@ namespace osu.Game.Input
         protected override void Update()
         {
             base.Update();
-            isIdle.Value = TimeSpentIdle > timeToIdle;
+            isIdle.Value = TimeSpentIdle > timeToIdle && AllowIdle;
         }
 
         public bool OnPressed(PlatformAction action) => updateLastInteractionTime();
