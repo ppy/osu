@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -24,11 +25,18 @@ using osuTK;
 namespace osu.Game.Screens.Multi
 {
     [Cached]
-    public class Multiplayer : OsuScreen, IOnlineComponent
+    public class Multiplayer : CompositeDrawable, IOsuScreen, IOnlineComponent
     {
-        private readonly MultiplayerWaveContainer waves;
+        public bool AllowBeatmapRulesetChange => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.AllowBeatmapRulesetChange ?? true;
+        public bool AllowExternalScreenChange => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.AllowExternalScreenChange ?? true;
+        public bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.AllowExternalScreenChange ?? true;
 
-        public override bool AllowBeatmapRulesetChange => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.AllowBeatmapRulesetChange ?? base.AllowBeatmapRulesetChange;
+        public bool ValidForResume { get; set; } = true;
+        public bool ValidForPush { get; set; } = true;
+
+        public override bool RemoveWhenNotAlive => false;
+
+        private readonly MultiplayerWaveContainer waves;
 
         private readonly OsuButton createButton;
         private readonly LoungeSubScreen loungeSubScreen;
@@ -38,10 +46,21 @@ namespace osu.Game.Screens.Multi
         private RoomManager roomManager;
 
         [Resolved]
+        private IBindableBeatmap beatmap { get; set; }
+
+        [Resolved]
+        private OsuGameBase game { get; set; }
+
+        [Resolved]
         private APIAccess api { get; set; }
+
+        [Resolved]
+        private OsuLogo logo { get; set; }
 
         public Multiplayer()
         {
+            RelativeSizeAxes = Axes.Both;
+
             InternalChild = waves = new MultiplayerWaveContainer
             {
                 RelativeSizeAxes = Axes.Both,
@@ -143,15 +162,14 @@ namespace osu.Game.Screens.Multi
             }
         }
 
-        public override void OnEntering(IScreen last)
+        public void OnEntering(IScreen last)
         {
             this.FadeIn();
 
-            base.OnEntering(last);
             waves.Show();
         }
 
-        public override bool OnExiting(IScreen next)
+        public bool OnExiting(IScreen next)
         {
             waves.Hide();
 
@@ -161,42 +179,37 @@ namespace osu.Game.Screens.Multi
             loungeSubScreen.MakeCurrent();
             updatePollingRate(isIdle.Value);
 
-            return base.OnExiting(next);
+            logo?.AppendAnimatingAction(() =>
+            {
+                // the wave overlay transition takes longer than expected to run.
+                logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut();
+            }, false);
+
+            return false;
         }
 
-        public override void OnResuming(IScreen last)
+        public void OnResuming(IScreen last)
         {
-            base.OnResuming(last);
-
             this.FadeIn(250);
             this.ScaleTo(1, 250, Easing.OutSine);
 
             updatePollingRate(isIdle.Value);
         }
 
-        public override void OnSuspending(IScreen next)
+        public void OnSuspending(IScreen next)
         {
             this.ScaleTo(1.1f, 250, Easing.InSine);
             this.FadeOut(250);
 
             cancelLooping();
             roomManager.TimeBetweenPolls = 0;
-
-            base.OnSuspending(next);
         }
 
         private void cancelLooping()
         {
-            var track = Beatmap.Value.Track;
+            var track = beatmap.Value.Track;
             if (track != null)
                 track.Looping = false;
-        }
-
-        protected override void LogoExiting(OsuLogo logo)
-        {
-            // the wave overlay transition takes longer than expected to run.
-            logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut();
-            base.LogoExiting(logo);
         }
 
         protected override void Update()
@@ -207,15 +220,15 @@ namespace osu.Game.Screens.Multi
 
             if (screenStack.CurrentScreen is MatchSubScreen)
             {
-                var track = Beatmap.Value.Track;
+                var track = beatmap.Value.Track;
                 if (track != null)
                 {
                     track.Looping = true;
 
                     if (!track.IsRunning)
                     {
-                        Game.Audio.AddItemToList(track);
-                        track.Seek(Beatmap.Value.Metadata.PreviewTime);
+                        game.Audio.AddItemToList(track);
+                        track.Seek(beatmap.Value.Metadata.PreviewTime);
                         track.Start();
                     }
                 }
@@ -235,6 +248,9 @@ namespace osu.Game.Screens.Multi
                 cancelLooping();
 
             updatePollingRate(isIdle.Value);
+
+            if (screenStack.CurrentScreen == null)
+                this.Exit();
         }
 
         protected override void Dispose(bool isDisposing)
