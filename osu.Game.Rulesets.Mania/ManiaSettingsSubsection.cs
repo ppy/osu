@@ -34,7 +34,6 @@ namespace osu.Game.Rulesets.Mania
                 new SettingsSlider<double, TimeSlider>
                 {
                     LabelText = "Scroll speed",
-                    TransferValueOnCommit = true,
                     Bindable = config.GetBindable<double>(ManiaSetting.ScrollTime)
                 },
             };
