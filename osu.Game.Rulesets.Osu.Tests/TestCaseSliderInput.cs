@@ -38,27 +38,33 @@ namespace osu.Game.Rulesets.Osu.Tests
             typeof(DrawableSliderTail),
         };
 
-        [SetUp]
-        public void Setup() => Schedule(() =>
-        {
-            allJudgedFired = false;
-            judgementResults = new List<JudgementResult>();
-        });
+        private const double time_before_slider = 250;
+        private const double time_slider_start = 1500;
+        private const double time_during_slide_1 = 2500;
+        private const double time_during_slide_2 = 3000;
+        private const double time_during_slide_3 = 3500;
+        private const double time_during_slide_4 = 4000;
+
+        private List<JudgementResult> judgementResults;
+        private bool allJudgedFired;
 
         public TestCaseSliderInput()
         {
             Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
             {
-                HitObjects = { new Slider
+                HitObjects =
                 {
-                    StartTime = time_slider_start,
-                    Position = new Vector2(0, 0),
-                    Path = new SliderPath(PathType.PerfectCurve, new[]
+                    new Slider
                     {
-                        Vector2.Zero,
-                        new Vector2(25, 0),
-                    }, 25),
-                }},
+                        StartTime = time_slider_start,
+                        Position = new Vector2(0, 0),
+                        Path = new SliderPath(PathType.PerfectCurve, new[]
+                        {
+                            Vector2.Zero,
+                            new Vector2(25, 0),
+                        }, 25),
+                    }
+                },
                 ControlPointInfo =
                 {
                     DifficultyPoints = { new DifficultyControlPoint { SpeedMultiplier = 0.1f } }
@@ -73,15 +79,13 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddUntilStep(() => Beatmap.Value.BeatmapLoaded, "Wait for bm load");
         }
 
-        private const double time_before_slider = 250;
-        private const double time_slider_start = 1500;
-        private const double time_during_slide_1 = 2500;
-        private const double time_during_slide_2 = 3000;
-        private const double time_during_slide_3 = 3500;
-        private const double time_during_slide_4 = 4000;
+        [SetUp]
+        public void Setup() => Schedule(() =>
+        {
+            allJudgedFired = false;
+            judgementResults = new List<JudgementResult>();
+        });
 
-        private List<JudgementResult> judgementResults;
-        private bool allJudgedFired;
         /// <summary>
         /// Scenario:
         /// - Press a key before a slider starts
@@ -392,16 +396,14 @@ namespace osu.Game.Rulesets.Osu.Tests
             // Empty frame to be added as a workaround for first frame behavior.
             // If an input exists on the first frame, the input would apply to the entire intro lead-in
             // Likely requires some discussion regarding how first frame inputs should be handled.
-            frames.Insert(0, new OsuReplayFrame { Position = new Vector2(0, 0), Time = 0, Actions = new List<OsuAction>() });
+            frames.Insert(0, new OsuReplayFrame());
 
-            var player = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
+            LoadComponentAsync(new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
             {
                 AllowPause = false,
                 AllowLeadIn = false,
                 AllowResults = false
-            };
-
-            LoadComponentAsync(player, p =>
+            }, p =>
             {
                 Child = p;
                 p.ScoreProcessor.NewJudgement += result => judgementResults.Add(result);
