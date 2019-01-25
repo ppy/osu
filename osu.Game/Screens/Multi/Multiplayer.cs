@@ -59,6 +59,8 @@ namespace osu.Game.Screens.Multi
 
         public Multiplayer()
         {
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
 
             InternalChild = waves = new MultiplayerWaveContainer
