@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Multi
 {
     public abstract class MultiplayerSubScreen : CompositeDrawable, IMultiplayerSubScreen, IKeyBindingHandler<GlobalAction>
     {
-        public bool AllowBeatmapRulesetChange => true;
+        public virtual bool AllowBeatmapRulesetChange => true;
         public bool AllowExternalScreenChange => true;
         public bool CursorVisible => true;
 

@@ -20,7 +20,8 @@ namespace osu.Game.Screens.Multi.Match
 {
     public class MatchSubScreen : MultiplayerSubScreen
     {
-        public bool AllowBeatmapRulesetChange => false;
+        public override bool AllowBeatmapRulesetChange => false;
+
         public override string Title => room.RoomID.Value == null ? "New room" : room.Name.Value;
         public override string ShortTitle => "room";
 
