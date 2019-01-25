@@ -239,6 +239,8 @@ namespace osu.Game.Screens.Multi.Match
             }
         }
 
+        public override string ToString() => Title;
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
