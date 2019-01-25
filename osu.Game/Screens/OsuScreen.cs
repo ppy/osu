@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -23,6 +23,12 @@ namespace osu.Game.Screens
 {
     public abstract class OsuScreen : Screen, IKeyBindingHandler<GlobalAction>, IHasDescription
     {
+        /// <summary>
+        /// The amount of negative padding that should be applied to game background content which touches both the left and right sides of the screen.
+        /// This allows for the game content to be pushed byt he options/notification overlays without causing black areas to appear.
+        /// </summary>
+        public const float HORIZONTAL_OVERFLOW_PADDING = 50;
+
         public BackgroundScreen Background { get; private set; }
 
         /// <summary>
