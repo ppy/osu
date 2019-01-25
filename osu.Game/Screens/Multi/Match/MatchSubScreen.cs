@@ -8,7 +8,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
-using osu.Game.Graphics.Containers;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Rulesets;
@@ -19,19 +18,11 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Screens.Multi.Match
 {
-    public class MatchSubScreen : CompositeDrawable, IMultiplayerSubScreen
+    public class MatchSubScreen : MultiplayerSubScreen
     {
         public bool AllowBeatmapRulesetChange => false;
-        public bool AllowExternalScreenChange => true;
-        public bool CursorVisible => true;
-
-        public string Title => room.RoomID.Value == null ? "New room" : room.Name.Value;
-        public string ShortTitle => "room";
-
-        public bool ValidForResume { get; set; } = true;
-        public bool ValidForPush { get; set; } = true;
-
-        public override bool RemoveWhenNotAlive => false;
+        public override string Title => room.RoomID.Value == null ? "New room" : room.Name.Value;
+        public override string ShortTitle => "room";
 
         private readonly RoomBindings bindings = new RoomBindings();
 
@@ -43,23 +34,12 @@ namespace osu.Game.Screens.Multi.Match
         private readonly Room room;
 
         [Resolved]
-        private IBindableBeatmap beatmap { get; set; }
-
-        [Resolved]
         private BeatmapManager beatmapManager { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private OsuGame game { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private IRoomManager manager { get; set; }
 
         public MatchSubScreen(Room room, Action<Screen> pushGameplayScreen)
         {
             this.room = room;
             this.pushGameplayScreen = pushGameplayScreen;
-
-            RelativeSizeAxes = Axes.Both;
 
             bindings.Room = room;
 
@@ -149,33 +129,10 @@ namespace osu.Game.Screens.Multi.Match
             beatmapManager.ItemAdded += beatmapAdded;
         }
 
-        public void OnEntering(IScreen last)
+        public override bool OnExiting(IScreen next)
         {
-            this.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-            this.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-            this.MoveToX(200).MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-        }
-
-        public bool OnExiting(IScreen next)
-        {
-            manager?.PartRoom();
-
-            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
-            this.MoveToX(200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
-
-            return false;
-        }
-
-        public void OnResuming(IScreen last)
-        {
-            this.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-            this.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
-        }
-
-        public void OnSuspending(IScreen next)
-        {
-            this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
-            this.MoveToX(-200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+            Manager?.PartRoom();
+            return base.OnExiting(next);
         }
 
         protected override void LoadComplete()
@@ -191,7 +148,7 @@ namespace osu.Game.Screens.Multi.Match
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
 
-            game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
+            Game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
         }
 
         private void setRuleset(RulesetInfo ruleset)
@@ -199,12 +156,12 @@ namespace osu.Game.Screens.Multi.Match
             if (ruleset == null)
                 return;
 
-            game?.ForcefullySetRuleset(ruleset);
+            Game?.ForcefullySetRuleset(ruleset);
         }
 
         private void beatmapAdded(BeatmapSetInfo model, bool existing, bool silent) => Schedule(() =>
         {
-            if (beatmap.Value != beatmapManager.DefaultBeatmap)
+            if (Beatmap.Value != beatmapManager.DefaultBeatmap)
                 return;
 
             if (bindings.CurrentBeatmap.Value == null)
@@ -214,7 +171,7 @@ namespace osu.Game.Screens.Multi.Match
             var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == bindings.CurrentBeatmap.Value.OnlineBeatmapID);
 
             if (localBeatmap != null)
-                game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
+                Game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
         });
 
         private void addPlaylistItem(PlaylistItem item)
@@ -225,7 +182,7 @@ namespace osu.Game.Screens.Multi.Match
 
         private void onStart()
         {
-            beatmap.Value.Mods.Value = bindings.CurrentMods.Value.ToArray();
+            Beatmap.Value.Mods.Value = bindings.CurrentMods.Value.ToArray();
 
             switch (bindings.Type.Value)
             {
@@ -238,8 +195,6 @@ namespace osu.Game.Screens.Multi.Match
                     break;
             }
         }
-
-        public override string ToString() => Title;
 
         protected override void Dispose(bool isDisposing)
         {
