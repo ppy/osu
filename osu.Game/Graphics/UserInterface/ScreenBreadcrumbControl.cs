@@ -30,7 +30,9 @@ namespace osu.Game.Graphics.UserInterface
 
         private void onExited(IScreen lastScreen, IScreen newScreen)
         {
-            Current.Value = newScreen;
+            if (newScreen != null)
+                Current.Value = newScreen;
+
             Items.ToList().SkipWhile(s => s != Current.Value).Skip(1).ForEach(RemoveItem);
         }
     }
