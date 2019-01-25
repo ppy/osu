@@ -161,7 +161,7 @@ namespace osu.Game.Overlays
             if (configManager == null) throw new ArgumentNullException(nameof(configManager));
 
             if (!trackedConfigManagers.TryGetValue((source, configManager), out var existing))
-                throw new InvalidOperationException($"{nameof(configManager)} is not registered.");
+                return;
 
             existing.Unload();
             existing.SettingChanged -= display;
