@@ -120,7 +120,11 @@ namespace osu.Game.Screens.Multi.Match
                 }
             };
 
-            chat.Exit += this.Exit;
+            chat.Exit += () =>
+            {
+                if (this.IsCurrentScreen())
+                    this.Exit();
+            };
         }
 
         [BackgroundDependencyLoader]
