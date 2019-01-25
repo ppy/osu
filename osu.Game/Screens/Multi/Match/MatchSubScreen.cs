@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Multi.Match
                                         {
                                             Padding = new MarginPadding
                                             {
-                                                Left = 10 + Multiplayer.OVERFLOW_PADDING,
+                                                Left = 10 + HORIZONTAL_OVERFLOW_PADDING,
                                                 Right = 10,
                                                 Vertical = 10,
                                             },
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Multi.Match
                                             Padding = new MarginPadding
                                             {
                                                 Left = 10,
-                                                Right = 10 + Multiplayer.OVERFLOW_PADDING,
+                                                Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
                                                 Vertical = 10,
                                             },
                                             RelativeSizeAxes = Axes.Both,
@@ -121,8 +121,9 @@ namespace osu.Game.Screens.Multi.Match
             header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect
             {
                 Selected = addPlaylistItem,
-                Padding = new MarginPadding { Horizontal = Multiplayer.OVERFLOW_PADDING }
+                Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING }
             });
+
             header.Tabs.Current.ValueChanged += t =>
             {
                 const float fade_duration = 500;
