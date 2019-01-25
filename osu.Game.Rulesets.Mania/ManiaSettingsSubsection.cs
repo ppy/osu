@@ -22,19 +22,19 @@ namespace osu.Game.Rulesets.Mania
         [BackgroundDependencyLoader]
         private void load()
         {
-            var config = (ManiaConfigManager)Config;
+            var config = (ManiaRulesetConfigManager)Config;
 
             Children = new Drawable[]
             {
                 new SettingsEnumDropdown<ManiaScrollingDirection>
                 {
                     LabelText = "Scrolling direction",
-                    Bindable = config.GetBindable<ManiaScrollingDirection>(ManiaSetting.ScrollDirection)
+                    Bindable = config.GetBindable<ManiaScrollingDirection>(ManiaRulesetSetting.ScrollDirection)
                 },
                 new SettingsSlider<double, TimeSlider>
                 {
                     LabelText = "Scroll speed",
-                    Bindable = config.GetBindable<double>(ManiaSetting.ScrollTime)
+                    Bindable = config.GetBindable<double>(ManiaRulesetSetting.ScrollTime)
                 },
             };
         }

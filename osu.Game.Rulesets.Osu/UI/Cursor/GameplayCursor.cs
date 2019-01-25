@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
 
             [BackgroundDependencyLoader]
-            private void load(GameConfigManager config, IBindableBeatmap beatmap)
+            private void load(OsuConfigManager config, IBindableBeatmap beatmap)
             {
                 InternalChild = expandTarget = new Container
                 {
@@ -185,10 +185,10 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 this.beatmap.BindTo(beatmap);
                 this.beatmap.ValueChanged += v => calculateScale();
 
-                cursorScale = config.GetBindable<double>(GameSetting.GameplayCursorSize);
+                cursorScale = config.GetBindable<double>(OsuSetting.GameplayCursorSize);
                 cursorScale.ValueChanged += v => calculateScale();
 
-                autoCursorScale = config.GetBindable<bool>(GameSetting.AutoCursorSize);
+                autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
                 autoCursorScale.ValueChanged += v => calculateScale();
 
                 calculateScale();

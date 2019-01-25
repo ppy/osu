@@ -20,9 +20,9 @@ namespace osu.Game.Rulesets.Mods
 
         protected Bindable<bool> IncreaseFirstObjectVisibility = new Bindable<bool>();
 
-        public void ReadFromConfig(GameConfigManager config)
+        public void ReadFromConfig(OsuConfigManager config)
         {
-            IncreaseFirstObjectVisibility = config.GetBindable<bool>(GameSetting.IncreaseFirstObjectVisibility);
+            IncreaseFirstObjectVisibility = config.GetBindable<bool>(OsuSetting.IncreaseFirstObjectVisibility);
         }
 
         public virtual void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)

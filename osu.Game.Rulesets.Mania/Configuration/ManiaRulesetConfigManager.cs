@@ -8,9 +8,9 @@ using osu.Game.Rulesets.Mania.UI;
 
 namespace osu.Game.Rulesets.Mania.Configuration
 {
-    public class ManiaConfigManager : RulesetConfigManager<ManiaSetting>
+    public class ManiaRulesetConfigManager : RulesetConfigManager<ManiaRulesetSetting>
     {
-        public ManiaConfigManager(SettingsStore settings, RulesetInfo ruleset, int? variant = null)
+        public ManiaRulesetConfigManager(SettingsStore settings, RulesetInfo ruleset, int? variant = null)
             : base(settings, ruleset, variant)
         {
         }
@@ -19,17 +19,17 @@ namespace osu.Game.Rulesets.Mania.Configuration
         {
             base.InitialiseDefaults();
 
-            Set(ManiaSetting.ScrollTime, 2250.0, 50.0, 10000.0, 50.0);
-            Set(ManiaSetting.ScrollDirection, ManiaScrollingDirection.Down);
+            Set(ManiaRulesetSetting.ScrollTime, 2250.0, 50.0, 10000.0, 50.0);
+            Set(ManiaRulesetSetting.ScrollDirection, ManiaScrollingDirection.Down);
         }
 
         public override TrackedSettings CreateTrackedSettings() => new TrackedSettings
         {
-            new TrackedSetting<double>(ManiaSetting.ScrollTime, v => new SettingDescription(v, "Scroll Time", $"{v}ms"))
+            new TrackedSetting<double>(ManiaRulesetSetting.ScrollTime, v => new SettingDescription(v, "Scroll Time", $"{v}ms"))
         };
     }
 
-    public enum ManiaSetting
+    public enum ManiaRulesetSetting
     {
         ScrollTime,
         ScrollDirection

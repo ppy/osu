@@ -12,14 +12,14 @@ namespace osu.Game.Overlays.Settings.Sections.Online
         protected override string Header => "Web";
 
         [BackgroundDependencyLoader]
-        private void load(GameConfigManager config)
+        private void load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {
                 new SettingsCheckbox
                 {
                     LabelText = "Warn about opening external links",
-                    Bindable = config.GetBindable<bool>(GameSetting.ExternalLinkWarning)
+                    Bindable = config.GetBindable<bool>(OsuSetting.ExternalLinkWarning)
                 },
             };
         }

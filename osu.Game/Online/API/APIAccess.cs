@@ -19,7 +19,7 @@ namespace osu.Game.Online.API
 {
     public class APIAccess : Component, IAPIProvider
     {
-        private readonly GameConfigManager config;
+        private readonly OsuConfigManager config;
         private readonly OAuth authentication;
 
         public string Endpoint = @"https://osu.ppy.sh";
@@ -43,16 +43,16 @@ namespace osu.Game.Online.API
 
         private readonly Logger log;
 
-        public APIAccess(GameConfigManager config)
+        public APIAccess(OsuConfigManager config)
         {
             this.config = config;
 
             authentication = new OAuth(client_id, client_secret, Endpoint);
             log = Logger.GetLogger(LoggingTarget.Network);
 
-            ProvidedUsername = config.Get<string>(GameSetting.Username);
+            ProvidedUsername = config.Get<string>(OsuSetting.Username);
 
-            authentication.TokenString = config.Get<string>(GameSetting.Token);
+            authentication.TokenString = config.Get<string>(OsuSetting.Token);
             authentication.Token.ValueChanged += onTokenChanged;
 
             var thread = new Thread(run)
@@ -64,7 +64,7 @@ namespace osu.Game.Online.API
             thread.Start();
         }
 
-        private void onTokenChanged(OAuthToken token) => config.Set(GameSetting.Token, config.Get<bool>(GameSetting.SavePassword) ? authentication.TokenString : string.Empty);
+        private void onTokenChanged(OAuthToken token) => config.Set(OsuSetting.Token, config.Get<bool>(OsuSetting.SavePassword) ? authentication.TokenString : string.Empty);
 
         private readonly List<IOnlineComponent> components = new List<IOnlineComponent>();
 
@@ -124,7 +124,7 @@ namespace osu.Game.Online.API
                         State = APIState.Connecting;
 
                         // save the username at this point, if the user requested for it to be.
-                        config.Set(GameSetting.Username, config.Get<bool>(GameSetting.SaveUsername) ? ProvidedUsername : string.Empty);
+                        config.Set(OsuSetting.Username, config.Get<bool>(OsuSetting.SaveUsername) ? ProvidedUsername : string.Empty);
 
                         if (!authentication.HasValidAccessToken && !authentication.AuthenticateWithLogin(ProvidedUsername, password))
                         {

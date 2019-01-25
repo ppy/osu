@@ -49,9 +49,9 @@ namespace osu.Game.Screens.Play
         }
 
         [BackgroundDependencyLoader]
-        private void load(GameConfigManager config)
+        private void load(OsuConfigManager config)
         {
-            config.BindWith(GameSetting.KeyOverlay, configVisibility);
+            config.BindWith(OsuSetting.KeyOverlay, configVisibility);
 
             Visible.BindValueChanged(_ => updateVisibility());
             configVisibility.BindValueChanged(_ => updateVisibility(), true);

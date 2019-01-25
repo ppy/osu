@@ -74,10 +74,10 @@ namespace osu.Game.Skinning
         }
 
         [BackgroundDependencyLoader]
-        private void load(GameConfigManager config)
+        private void load(OsuConfigManager config)
         {
-            config.BindWith(GameSetting.BeatmapSkins, beatmapSkins);
-            config.BindWith(GameSetting.BeatmapHitsounds, beatmapHitsounds);
+            config.BindWith(OsuSetting.BeatmapSkins, beatmapSkins);
+            config.BindWith(OsuSetting.BeatmapHitsounds, beatmapHitsounds);
         }
 
         protected override void LoadComplete()

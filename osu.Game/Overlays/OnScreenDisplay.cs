@@ -117,7 +117,7 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(FrameworkConfigManager frameworkConfig, GameConfigManager gameConfig)
+        private void load(FrameworkConfigManager frameworkConfig, OsuConfigManager gameConfig)
         {
             BeginTracking(this, frameworkConfig);
             BeginTracking(this, gameConfig);

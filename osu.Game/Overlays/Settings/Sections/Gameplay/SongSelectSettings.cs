@@ -13,36 +13,36 @@ namespace osu.Game.Overlays.Settings.Sections.Gameplay
         protected override string Header => "Song Select";
 
         [BackgroundDependencyLoader]
-        private void load(GameConfigManager config)
+        private void load(OsuConfigManager config)
         {
             Children = new Drawable[]
             {
                 new SettingsCheckbox
                 {
                     LabelText = "Right mouse drag to absolute scroll",
-                    Bindable = config.GetBindable<bool>(GameSetting.SongSelectRightMouseScroll),
+                    Bindable = config.GetBindable<bool>(OsuSetting.SongSelectRightMouseScroll),
                 },
                 new SettingsCheckbox
                 {
                     LabelText = "Show converted beatmaps",
-                    Bindable = config.GetBindable<bool>(GameSetting.ShowConvertedBeatmaps),
+                    Bindable = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps),
                 },
                 new SettingsSlider<double, StarSlider>
                 {
                     LabelText = "Display beatmaps from",
-                    Bindable = config.GetBindable<double>(GameSetting.DisplayStarsMinimum),
+                    Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMinimum),
                     KeyboardStep = 0.1f
                 },
                 new SettingsSlider<double, StarSlider>
                 {
                     LabelText = "up to",
-                    Bindable = config.GetBindable<double>(GameSetting.DisplayStarsMaximum),
+                    Bindable = config.GetBindable<double>(OsuSetting.DisplayStarsMaximum),
                     KeyboardStep = 0.1f
                 },
                 new SettingsEnumDropdown<RandomSelectAlgorithm>
                 {
                     LabelText = "Random selection algorithm",
-                    Bindable = config.GetBindable<RandomSelectAlgorithm>(GameSetting.RandomSelectAlgorithm),
+                    Bindable = config.GetBindable<RandomSelectAlgorithm>(OsuSetting.RandomSelectAlgorithm),
                 }
             };
         }

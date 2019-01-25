@@ -40,9 +40,9 @@ namespace osu.Game.Graphics.Containers
         protected override Container<Drawable> Content => content;
 
         [BackgroundDependencyLoader]
-        private void load(GameConfigManager config)
+        private void load(OsuConfigManager config)
         {
-            parallaxEnabled = config.GetBindable<bool>(GameSetting.MenuParallax);
+            parallaxEnabled = config.GetBindable<bool>(OsuSetting.MenuParallax);
             parallaxEnabled.ValueChanged += delegate
             {
                 if (!parallaxEnabled)

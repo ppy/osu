@@ -36,7 +36,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             var configCache = dependencies.Get<RulesetConfigCache>();
-            dependencies.CacheAs((OsuConfigManager)configCache.GetConfigFor(new OsuRuleset()));
+            dependencies.CacheAs((OsuRulesetConfigManager)configCache.GetConfigFor(new OsuRuleset()));
 
             return dependencies;
         }

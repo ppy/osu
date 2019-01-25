@@ -31,9 +31,9 @@ namespace osu.Game.Graphics.Cursor
         private Vector2 positionMouseDown;
 
         [BackgroundDependencyLoader(true)]
-        private void load([NotNull] GameConfigManager config, [CanBeNull] ScreenshotManager screenshotManager)
+        private void load([NotNull] OsuConfigManager config, [CanBeNull] ScreenshotManager screenshotManager)
         {
-            cursorRotate = config.GetBindable<bool>(GameSetting.CursorRotation);
+            cursorRotate = config.GetBindable<bool>(OsuSetting.CursorRotation);
 
             if (screenshotManager != null)
                 screenshotCursorVisibility.BindTo(screenshotManager.CursorVisibility);
@@ -131,7 +131,7 @@ namespace osu.Game.Graphics.Cursor
             }
 
             [BackgroundDependencyLoader]
-            private void load(GameConfigManager config, TextureStore textures, OsuColour colour)
+            private void load(OsuConfigManager config, TextureStore textures, OsuColour colour)
             {
                 Children = new Drawable[]
                 {
@@ -155,7 +155,7 @@ namespace osu.Game.Graphics.Cursor
                     }
                 };
 
-                cursorScale = config.GetBindable<double>(GameSetting.MenuCursorSize);
+                cursorScale = config.GetBindable<double>(OsuSetting.MenuCursorSize);
                 cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2((float)newScale * base_scale);
                 cursorScale.TriggerChange();
             }

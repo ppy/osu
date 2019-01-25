@@ -43,13 +43,13 @@ namespace osu.Game.Screens.Play.PlayerSettings
         }
 
         [BackgroundDependencyLoader]
-        private void load(GameConfigManager config)
+        private void load(OsuConfigManager config)
         {
-            dimSliderBar.Bindable = config.GetBindable<double>(GameSetting.DimLevel);
-            blurSliderBar.Bindable = config.GetBindable<double>(GameSetting.BlurLevel);
-            showStoryboardToggle.Bindable = config.GetBindable<bool>(GameSetting.ShowStoryboard);
-            beatmapSkinsToggle.Bindable = config.GetBindable<bool>(GameSetting.BeatmapSkins);
-            beatmapHitsoundsToggle.Bindable = config.GetBindable<bool>(GameSetting.BeatmapHitsounds);
+            dimSliderBar.Bindable = config.GetBindable<double>(OsuSetting.DimLevel);
+            blurSliderBar.Bindable = config.GetBindable<double>(OsuSetting.BlurLevel);
+            showStoryboardToggle.Bindable = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
+            beatmapSkinsToggle.Bindable = config.GetBindable<bool>(OsuSetting.BeatmapSkins);
+            beatmapHitsoundsToggle.Bindable = config.GetBindable<bool>(OsuSetting.BeatmapHitsounds);
         }
     }
 }
