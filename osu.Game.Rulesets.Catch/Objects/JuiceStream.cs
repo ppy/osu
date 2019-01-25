@@ -94,7 +94,8 @@ namespace osu.Game.Rulesets.Catch.Objects
                     while (tinyTickInterval > 100)
                         tinyTickInterval /= 2;
 
-                    for (double t = lastTickTime + tinyTickInterval; t < time; t += tinyTickInterval)
+                    // we don't want to generate at (t == time - epsilon) due to floating point accuracy. time - 1 seems working.
+                    for (double t = lastTickTime + tinyTickInterval; t < time - 1; t += tinyTickInterval)
                     {
                         double progress = reversed ? 1 - (t - spanStartTime) / spanDuration : (t - spanStartTime) / spanDuration;
 
