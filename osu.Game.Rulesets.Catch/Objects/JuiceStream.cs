@@ -55,6 +55,13 @@ namespace osu.Game.Rulesets.Catch.Objects
 
             var minDistanceFromEnd = Velocity * 0.01;
 
+            var tickSamples = Samples.Select(s => new SampleInfo
+            {
+                Bank = s.Bank,
+                Name = @"slidertick",
+                Volume = s.Volume
+            }).ToList();
+
             AddNested(new Fruit
             {
                 Samples = Samples,
@@ -107,12 +114,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                         {
                             StartTime = t,
                             X = X + Path.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
-                            Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
-                            {
-                                Bank = s.Bank,
-                                Name = @"slidertick",
-                                Volume = s.Volume
-                            }))
+                            Samples = tickSamples
                         });
                     }
 
@@ -125,12 +127,7 @@ namespace osu.Game.Rulesets.Catch.Objects
                     {
                         StartTime = time,
                         X = X + Path.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
-                        Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
-                        {
-                            Bank = s.Bank,
-                            Name = @"slidertick",
-                            Volume = s.Volume
-                        }))
+                        Samples = tickSamples
                     });
                 }
 
