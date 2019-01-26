@@ -99,6 +99,11 @@ namespace osu.Game.Rulesets.Catch
                         new MultiMod(new CatchModAutoplay(), new ModCinema()),
                         new CatchModRelax(),
                     };
+                case ModType.Fun:
+                    return new Mod[]
+                    {
+                        new MultiMod(new CatchModWindUp(), new CatchModWindDown())
+                    };
                 default:
                     return new Mod[] { };
             }
