@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyReduction;
         public override string Description => "Less zoom...";
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModDoubleTime), typeof(ModWindUp) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModDoubleTime), typeof(ModTimeRamp) };
 
         public virtual void ApplyToClock(IAdjustableClock clock)
         {
