@@ -6,6 +6,5 @@ namespace osu.Game.Rulesets.Mania.Mods
 {
     public class ManiaModWindUp : ModWindUp<ManiaHitObject>
     {
-        
     }
 }

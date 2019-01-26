@@ -6,6 +6,5 @@ namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModWindUp : ModWindUp<TaikoHitObject>
     {
-        
     }
 }

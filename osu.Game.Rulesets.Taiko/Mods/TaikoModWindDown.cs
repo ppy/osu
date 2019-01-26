@@ -5,7 +5,6 @@ using osu.Game.Rulesets.Taiko.Objects;
 namespace osu.Game.Rulesets.Taiko.Mods
 {
     public class TaikoModWindDown : ModWindDown<TaikoHitObject>
-    {
-        
+    {  
     }
 }
