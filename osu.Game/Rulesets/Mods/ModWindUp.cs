@@ -9,6 +9,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.Objects;
+using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -24,10 +25,10 @@ namespace osu.Game.Rulesets.Mods
         public abstract double AppendRate { get; }
     }
 
-    public class ModWindUp<T> : ModWindUp, IUpdatableByPlayfield, IApplicableToClock, IApplicableToRulesetContainer<T>
+    public abstract class ModWindUp<T> : ModWindUp, IUpdatableByPlayfield, IApplicableToClock, IApplicableToBeatmap<T>
         where T : HitObject
     {
-        private Track Track;
+        private double LastObjectEndTime;
         private IAdjustableClock Clock;
         private IHasPitchAdjust ClockAdjust;
         public override double AppendRate => 0.5;
@@ -38,14 +39,15 @@ namespace osu.Game.Rulesets.Mods
             ClockAdjust = clock as IHasPitchAdjust;
         }
 
-        public virtual void ApplyToRulesetContainer(RulesetContainer<T> ruleset)
+        public virtual void ApplyToBeatmap(Beatmap<T> beatmap)
         {
-            Track = ruleset.WorkingBeatmap.Track;
+            HitObject LastObject = beatmap.HitObjects[beatmap.HitObjects.Count - 1];
+            LastObjectEndTime = (LastObject as IHasEndTime)?.EndTime ?? LastObject?.StartTime ?? 0;
         }
 
         public virtual void Update(Playfield playfield)
         {
-            double newRate = 1 + (AppendRate * (Track.CurrentTime / Track.Length));
+            double newRate = 1 + (AppendRate * (Clock.CurrentTime / LastObjectEndTime));
             Clock.Rate = newRate;
             ClockAdjust.PitchAdjust = newRate;
         }
