@@ -399,7 +399,6 @@ namespace osu.Game.Screens.Select
                 {
                     Logger.Log($"beatmap changed from \"{Beatmap.Value.BeatmapInfo}\" to \"{beatmap}\"");
 
-                    preview = beatmap?.BeatmapSetInfoID != Beatmap.Value?.BeatmapInfo.BeatmapSetInfoID;
                     Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap, Beatmap.Value);
 
                     if (beatmap != null)
@@ -411,7 +410,8 @@ namespace osu.Game.Screens.Select
                     }
                 }
 
-                if (IsCurrentScreen) ensurePlayingSelected(preview);
+                if (IsCurrentScreen)
+                    ensurePlayingSelected(true);
                 UpdateBeatmap(Beatmap.Value);
             }
 
