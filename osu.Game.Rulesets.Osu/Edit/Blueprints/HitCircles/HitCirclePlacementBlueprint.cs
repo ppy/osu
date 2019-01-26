@@ -22,8 +22,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles
         {
             base.LoadComplete();
 
-            // Fixes a 1-frame position discrpancy due to the first mouse move event happening in the next frame
-            HitObject.Position = GetContainingInputManager().CurrentState.Mouse.Position;
+            // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
+            HitObject.Position = Parent.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
         }
 
         protected override bool OnClick(ClickEvent e)
