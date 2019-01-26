@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// The <see cref="WorkingBeatmap"/> this <see cref="RulesetContainer{TObject}"/> was created with.
         /// </summary>
-        public readonly WorkingBeatmap WorkingBeatmap;
+        protected readonly WorkingBeatmap WorkingBeatmap;
 
         public override ScoreProcessor CreateScoreProcessor() => new ScoreProcessor<TObject>(this);
 
