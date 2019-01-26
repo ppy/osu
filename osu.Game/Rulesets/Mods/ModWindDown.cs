@@ -15,5 +15,4 @@ namespace osu.Game.Rulesets.Mods
         public override FontAwesome Icon => FontAwesome.fa_chevron_circle_down;
         public override double AppendRate => -0.25;
     }
-
 }
