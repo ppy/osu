@@ -6,6 +6,5 @@ namespace osu.Game.Rulesets.Catch.Mods
 {
     public class CatchModWindDown : ModWindDown<CatchHitObject>
     {
-        
     }
 }

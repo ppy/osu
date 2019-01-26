@@ -6,6 +6,5 @@ namespace osu.Game.Rulesets.Osu.Mods
 {
     public class OsuModWindDown : ModWindDown<OsuHitObject>
     {
-
     }
 }
