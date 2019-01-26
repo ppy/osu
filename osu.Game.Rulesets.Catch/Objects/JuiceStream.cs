@@ -90,13 +90,17 @@ namespace osu.Game.Rulesets.Catch.Objects
                             time = Math.Max(StartTime + Duration / 2, time - LegacyLastTickOffset.Value);
                     }
 
+                    int tinyTickCount = 1;
                     double tinyTickInterval = time - lastTickTime;
-                    while (tinyTickInterval > 100)
-                        tinyTickInterval /= 2;
-
-                    // we don't want to generate at (t == time - epsilon) due to floating point accuracy. time - 1 seems working.
-                    for (double t = lastTickTime + tinyTickInterval; t < time - 1; t += tinyTickInterval)
+                    while (tinyTickInterval > 100 && tinyTickCount < 10000)
                     {
+                        tinyTickInterval /= 2;
+                        tinyTickCount *= 2;
+                    }
+
+                    for (int tinyTickIndex = 0; tinyTickIndex < tinyTickCount - 1; tinyTickIndex++)
+                    {
+                        var t = lastTickTime + (tinyTickIndex + 1) * tinyTickInterval;
                         double progress = reversed ? 1 - (t - spanStartTime) / spanDuration : (t - spanStartTime) / spanDuration;
 
                         AddNested(new TinyDroplet
