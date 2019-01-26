@@ -99,6 +99,11 @@ namespace osu.Game.Rulesets.Taiko
                         new MultiMod(new TaikoModAutoplay(), new ModCinema()),
                         new TaikoModRelax(),
                     };
+                case ModType.Fun:
+                    return new Mod[]
+                    {
+                        new MultiMod(new TaikoModWindUp(), new TaikoModWindDown())
+                    };
                 default:
                     return new Mod[] { };
             }

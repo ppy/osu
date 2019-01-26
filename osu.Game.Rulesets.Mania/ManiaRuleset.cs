@@ -145,6 +145,11 @@ namespace osu.Game.Rulesets.Mania
                     {
                         new MultiMod(new ManiaModAutoplay(), new ModCinema()),
                     };
+                case ModType.Fun:
+                    return new Mod[]
+                    {
+                        new MultiMod(new ManiaModWindUp(), new ManiaModWindDown())
+                    };
                 default:
                     return new Mod[] { };
             }

@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Mods
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Zoooooooooom...";
         public override bool Ranked => true;
-        public override Type[] IncompatibleMods => new[] { typeof(ModHalfTime) };
+        public override Type[] IncompatibleMods => new[] { typeof(ModHalfTime), typeof(ModWindUp) };
 
         public virtual void ApplyToClock(IAdjustableClock clock)
         {
