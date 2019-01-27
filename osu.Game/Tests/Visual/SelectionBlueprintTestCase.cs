@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -29,8 +29,11 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            base.Content.Add(blueprint = CreateBlueprint());
+            blueprint = CreateBlueprint();
+            blueprint.Depth = float.MinValue;
             blueprint.SelectionRequested += (_, __) => blueprint.Select();
+
+            Add(blueprint);
 
             AddStep("Select", () => blueprint.Select());
             AddStep("Deselect", () => blueprint.Deselect());

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
 using System.Linq;
@@ -19,13 +19,10 @@ namespace osu.Game.Tests.Visual
             Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { ruleset.GetAutoplayMod() });
             var dummyRulesetContainer = ruleset.CreateRulesetContainerWith(Beatmap.Value);
 
-            // We have the replay
-            var replay = dummyRulesetContainer.Replay;
-
             // Reset the mods
             Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Where(m => !(m is ModAutoplay));
 
-            return new ReplayPlayer(replay);
+            return new ReplayPlayer(dummyRulesetContainer.ReplayScore);
         }
     }
 }

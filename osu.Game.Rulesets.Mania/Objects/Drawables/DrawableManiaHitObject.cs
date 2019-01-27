@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using JetBrains.Annotations;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Mania.UI;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
 
@@ -13,6 +12,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
     public abstract class DrawableManiaHitObject : DrawableHitObject<ManiaHitObject>
     {
+        /// <summary>
+        /// Whether this <see cref="DrawableManiaHitObject"/> should always remain alive.
+        /// </summary>
+        internal bool AlwaysAlive;
+
         /// <summary>
         /// The <see cref="ManiaAction"/> which causes this <see cref="DrawableManiaHitObject{TObject}"/> to be hit.
         /// </summary>
@@ -34,6 +38,8 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             Direction.BindTo(scrollingInfo.Direction);
             Direction.BindValueChanged(OnDirectionChanged, true);
         }
+
+        protected override bool ShouldBeAlive => AlwaysAlive || base.ShouldBeAlive;
 
         protected virtual void OnDirectionChanged(ScrollingDirection direction)
         {

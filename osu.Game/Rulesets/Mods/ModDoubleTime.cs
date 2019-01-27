@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Timing;
@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModDoubleTime : Mod, IApplicableToClock
     {
         public override string Name => "Double Time";
-        public override string ShortenedName => "DT";
+        public override string Acronym => "DT";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_doubletime;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Zoooooooooom...";

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,6 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -59,9 +58,11 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// A default representation of a WorkingBeatmap to use when no beatmap is available.
         /// </summary>
-        public WorkingBeatmap DefaultBeatmap { private get; set; }
+        public readonly WorkingBeatmap DefaultBeatmap;
 
         public override string[] HandledExtensions => new[] { ".osz" };
+
+        protected override string[] HashableFileTypes => new[] { ".osu" };
 
         protected override string ImportFromStablePath => "Songs";
 
@@ -73,18 +74,24 @@ namespace osu.Game.Beatmaps
 
         private readonly AudioManager audioManager;
 
+        private readonly GameHost host;
+
         private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, IIpcHost importHost = null)
-            : base(storage, contextFactory, new BeatmapStore(contextFactory), importHost)
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, GameHost host = null,
+                              WorkingBeatmap defaultBeatmap = null)
+            : base(storage, contextFactory, new BeatmapStore(contextFactory), host)
         {
-            beatmaps = (BeatmapStore)ModelStore;
-            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
-            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
-
             this.rulesets = rulesets;
             this.api = api;
             this.audioManager = audioManager;
+            this.host = host;
+
+            DefaultBeatmap = defaultBeatmap;
+
+            beatmaps = (BeatmapStore)ModelStore;
+            beatmaps.BeatmapHidden += b => BeatmapHidden?.Invoke(b);
+            beatmaps.BeatmapRestored += b => BeatmapRestored?.Invoke(b);
         }
 
         protected override void Populate(BeatmapSetInfo beatmapSet, ArchiveReader archive)
@@ -129,19 +136,6 @@ namespace osu.Game.Beatmaps
                 beatmaps.ForEach(b => b.OnlineBeatmapID = null);
         }
 
-        protected override BeatmapSetInfo CheckForExisting(BeatmapSetInfo model)
-        {
-            // check if this beatmap has already been imported and exit early if so
-            var existingHashMatch = beatmaps.ConsumableItems.FirstOrDefault(b => b.Hash == model.Hash);
-            if (existingHashMatch != null)
-            {
-                Undelete(existingHashMatch);
-                return existingHashMatch;
-            }
-
-            return null;
-        }
-
         /// <summary>
         /// Downloads a beatmap.
         /// This will post notifications tracking progress.
@@ -154,16 +148,6 @@ namespace osu.Game.Beatmaps
             var existing = GetExistingDownload(beatmapSetInfo);
 
             if (existing != null || api == null) return false;
-
-            if (!api.LocalUser.Value.IsSupporter)
-            {
-                PostNotification?.Invoke(new SimpleNotification
-                {
-                    Icon = FontAwesome.fa_superpowers,
-                    Text = "You gotta be an osu!supporter to download for now 'yo"
-                });
-                return false;
-            }
 
             var downloadNotification = new DownloadNotification
             {
@@ -260,17 +244,20 @@ namespace osu.Game.Beatmaps
         /// Retrieve a <see cref="WorkingBeatmap"/> instance for the provided <see cref="BeatmapInfo"/>
         /// </summary>
         /// <param name="beatmapInfo">The beatmap to lookup.</param>
-        /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap.</param>
+        /// <param name="previous">The currently loaded <see cref="WorkingBeatmap"/>. Allows for optimisation where elements are shared with the new beatmap. May be returned if beatmapInfo requested matches</param>
         /// <returns>A <see cref="WorkingBeatmap"/> instance correlating to the provided <see cref="BeatmapInfo"/>.</returns>
         public WorkingBeatmap GetWorkingBeatmap(BeatmapInfo beatmapInfo, WorkingBeatmap previous = null)
         {
+            if (beatmapInfo?.ID > 0 && previous != null && previous.BeatmapInfo?.ID == beatmapInfo.ID)
+                return previous;
+
             if (beatmapInfo?.BeatmapSet == null || beatmapInfo == DefaultBeatmap?.BeatmapInfo)
                 return DefaultBeatmap;
 
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
-            WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(Files.Store, beatmapInfo, audioManager);
+            WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(Files.Store, new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager);
 
             previous?.TransferTo(working);
 
@@ -317,20 +304,6 @@ namespace osu.Game.Beatmaps
         /// <returns>Results from the provided query.</returns>
         public IQueryable<BeatmapInfo> QueryBeatmaps(Expression<Func<BeatmapInfo, bool>> query) => beatmaps.Beatmaps.AsNoTracking().Where(query);
 
-        /// <summary>
-        /// Create a SHA-2 hash from the provided archive based on contained beatmap (.osu) file content.
-        /// </summary>
-        private string computeBeatmapSetHash(ArchiveReader reader)
-        {
-            // for now, concatenate all .osu files in the set to create a unique hash.
-            MemoryStream hashable = new MemoryStream();
-            foreach (string file in reader.Filenames.Where(f => f.EndsWith(".osu")))
-                using (Stream s = reader.GetStream(file))
-                    s.CopyTo(hashable);
-
-            return hashable.ComputeSHA2Hash();
-        }
-
         protected override BeatmapSetInfo CreateModel(ArchiveReader reader)
         {
             // let's make sure there are actually .osu files to import.
@@ -349,7 +322,6 @@ namespace osu.Game.Beatmaps
             {
                 OnlineBeatmapSetID = beatmap.BeatmapInfo.BeatmapSet?.OnlineBeatmapSetID,
                 Beatmaps = new List<BeatmapInfo>(),
-                Hash = computeBeatmapSetHash(reader),
                 Metadata = beatmap.Metadata,
             };
         }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
@@ -20,11 +20,10 @@ namespace osu.Game.Rulesets.Mania.Objects
             { HitResult.Miss, (376, 346, 316) },
         };
 
+        public override bool IsHitResultAllowed(HitResult result) => true;
+
         public override void SetDifficulty(double difficulty)
         {
-            AllowsPerfect = true;
-            AllowsOk = true;
-
             Perfect = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Perfect]);
             Great = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Great]);
             Good = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Good]);

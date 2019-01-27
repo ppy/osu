@@ -1,7 +1,7 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
@@ -58,6 +58,7 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.CentreLeft,
                     RelativeSizeAxes = Axes.Y,
                     Width = box_width * 2,
+                    Height = 1.5f,
                     // align off-screen to make sure our edges don't become visible during parallax.
                     X = -box_width,
                     Alpha = 0,
@@ -70,6 +71,7 @@ namespace osu.Game.Screens.Menu
                     Origin = Anchor.CentreRight,
                     RelativeSizeAxes = Axes.Y,
                     Width = box_width * 2,
+                    Height = 1.5f,
                     X = box_width,
                     Alpha = 0,
                     Blending = BlendingMode.Additive,

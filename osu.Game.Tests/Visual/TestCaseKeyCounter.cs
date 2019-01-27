@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Framework.Timing;
 using osu.Game.Screens.Play;
-using OpenTK.Input;
+using osuTK.Input;
 
 namespace osu.Game.Tests.Visual
 {
@@ -38,7 +38,6 @@ namespace osu.Game.Tests.Visual
                     new KeyCounterMouse(MouseButton.Right),
                 },
             };
-
 
             AddStep("Add random", () =>
             {

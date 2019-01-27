@@ -1,20 +1,19 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
-using osu.Framework.MathUtils;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Edit;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components;
-using OpenTK;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Input;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 {
@@ -119,12 +118,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private void updateSlider()
         {
-            for (int i = 0; i < segments.Count; i++)
-                segments[i].Calculate(i == segments.Count - 1 ? (Vector2?)cursor : null);
-
-            HitObject.ControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
-            HitObject.PathType = HitObject.ControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear;
-            HitObject.Distance = segments.Sum(s => s.Distance);
+            var newControlPoints = segments.SelectMany(s => s.ControlPoints).Concat(cursor.Yield()).ToArray();
+            HitObject.Path = new SliderPath(newControlPoints.Length > 2 ? PathType.Bezier : PathType.Linear, newControlPoints);
         }
 
         private void setState(PlacementState newState)
@@ -140,40 +135,11 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
 
         private class Segment
         {
-            public float Distance { get; private set; }
-
             public readonly List<Vector2> ControlPoints = new List<Vector2>();
 
             public Segment(Vector2 offset)
             {
                 ControlPoints.Add(offset);
-            }
-
-            public void Calculate(Vector2? cursor = null)
-            {
-                Span<Vector2> allControlPoints = stackalloc Vector2[ControlPoints.Count + (cursor.HasValue ? 1 : 0)];
-
-                for (int i = 0; i < ControlPoints.Count; i++)
-                    allControlPoints[i] = ControlPoints[i];
-                if (cursor.HasValue)
-                    allControlPoints[allControlPoints.Length - 1] = cursor.Value;
-
-                List<Vector2> result;
-
-                switch (allControlPoints.Length)
-                {
-                    case 1:
-                    case 2:
-                        result = PathApproximator.ApproximateLinear(allControlPoints);
-                        break;
-                    default:
-                        result = PathApproximator.ApproximateBezier(allControlPoints);
-                        break;
-                }
-
-                Distance = 0;
-                for (int i = 0; i < result.Count - 1; i++)
-                    Distance += Vector2.Distance(result[i], result[i + 1]);
             }
         }
     }

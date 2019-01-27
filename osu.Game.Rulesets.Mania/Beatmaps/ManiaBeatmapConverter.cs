@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Mania.Objects;
 using System;
@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy;
-using OpenTK;
+using osuTK;
 using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps
@@ -180,7 +180,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps
 
                 foreach (var obj in newPattern.HitObjects)
                     yield return obj;
-
             }
         }
 

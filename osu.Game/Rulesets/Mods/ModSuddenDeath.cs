@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Game.Graphics;
@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModSuddenDeath : Mod, IApplicableToScoreProcessor
     {
         public override string Name => "Sudden Death";
-        public override string ShortenedName => "SD";
+        public override string Acronym => "SD";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_suddendeath;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Miss and fail.";

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Game.Beatmaps;
@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModEasy : Mod, IApplicableToDifficulty
     {
         public override string Name => "Easy";
-        public override string ShortenedName => "EZ";
+        public override string Acronym => "EZ";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_easy;
         public override ModType Type => ModType.DifficultyReduction;
         public override double ScoreMultiplier => 0.5;
