@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -28,6 +28,8 @@ namespace osu.Game.Graphics.Containers
         private readonly Container content;
         protected override Container<Drawable> Content => content;
 
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
         private readonly Container sizableContainer;
 
         private Drawable backgroundLayer;
@@ -41,7 +43,7 @@ namespace osu.Game.Graphics.Containers
             this.targetMode = targetMode;
             RelativeSizeAxes = Axes.Both;
 
-            InternalChild = sizableContainer = new Container
+            InternalChild = sizableContainer = new AlwaysInputContainer
             {
                 RelativeSizeAxes = Axes.Both,
                 RelativePositionAxes = Axes.Both,
@@ -54,6 +56,8 @@ namespace osu.Game.Graphics.Containers
         {
             private readonly bool applyUIScale;
             private Bindable<float> uiScale;
+
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
             public ScalingDrawSizePreservingFillContainer(bool applyUIScale)
             {
@@ -142,6 +146,16 @@ namespace osu.Game.Graphics.Containers
 
             sizableContainer.MoveTo(targetPosition, 500, Easing.OutQuart);
             sizableContainer.ResizeTo(targetSize, 500, Easing.OutQuart).OnComplete(_ => { sizableContainer.Masking = requiresMasking; });
+        }
+
+        private class AlwaysInputContainer : Container
+        {
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
+
+            public AlwaysInputContainer()
+            {
+                RelativeSizeAxes = Axes.Both;
+            }
         }
     }
 }
