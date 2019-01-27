@@ -39,6 +39,12 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected virtual Action BackAction => () => InternalButtons.Children.Last().Click();
 
+        /// <summary>
+        /// Action that is invoked when <see cref="GlobalAction.Select"/> is triggered.
+        /// </summary>
+        protected Action SelectAction => () => InternalButtons.Children.FirstOrDefault(f => f.Selected)?.Click();
+   
+
         public abstract string Header { get; }
         public abstract string Description { get; }
 
@@ -235,6 +241,12 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
+            if (action == GlobalAction.Select)
+            {
+                SelectAction.Invoke();
+                return true;
+            }
+
             return false;
         }
 
@@ -288,15 +300,6 @@ namespace osu.Game.Screens.Play
             {
                 Selected.Value = true;
                 return base.OnMouseMove(e);
-            }
-
-            protected override bool OnKeyDown(KeyDownEvent e)
-            {
-                if (e.Repeat || e.Key != Key.Enter || !Selected)
-                    return false;
-
-                Click();
-                return true;
             }
         }
     }
