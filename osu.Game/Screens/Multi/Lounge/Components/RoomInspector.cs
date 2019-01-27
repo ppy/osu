@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -266,7 +266,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
             private void updateParticipants()
             {
-                var roomId = room.RoomID.Value ?? 0;
+                var roomId = room?.RoomID.Value ?? 0;
 
                 request?.Cancel();
 
@@ -295,6 +295,12 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 };
 
                 api.Queue(request);
+            }
+
+            protected override void Dispose(bool isDisposing)
+            {
+                request?.Cancel();
+                base.Dispose(isDisposing);
             }
 
             private class UserTile : CompositeDrawable, IHasTooltip

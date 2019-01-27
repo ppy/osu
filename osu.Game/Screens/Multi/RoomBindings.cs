@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -53,23 +53,20 @@ namespace osu.Game.Screens.Multi
                     Duration.UnbindFrom(room.Duration);
                 }
 
-                room = value;
+                room = value ?? new Room();
 
-                if (room != null)
-                {
-                    RoomID.BindTo(room.RoomID);
-                    Name.BindTo(room.Name);
-                    Host.BindTo(room.Host);
-                    Status.BindTo(room.Status);
-                    Type.BindTo(room.Type);
-                    Playlist.BindTo(room.Playlist);
-                    Participants.BindTo(room.Participants);
-                    ParticipantCount.BindTo(room.ParticipantCount);
-                    MaxParticipants.BindTo(room.MaxParticipants);
-                    EndDate.BindTo(room.EndDate);
-                    Availability.BindTo(room.Availability);
-                    Duration.BindTo(room.Duration);
-                }
+                RoomID.BindTo(room.RoomID);
+                Name.BindTo(room.Name);
+                Host.BindTo(room.Host);
+                Status.BindTo(room.Status);
+                Type.BindTo(room.Type);
+                Playlist.BindTo(room.Playlist);
+                Participants.BindTo(room.Participants);
+                ParticipantCount.BindTo(room.ParticipantCount);
+                MaxParticipants.BindTo(room.MaxParticipants);
+                EndDate.BindTo(room.EndDate);
+                Availability.BindTo(room.Availability);
+                Duration.BindTo(room.Duration);
             }
         }
 

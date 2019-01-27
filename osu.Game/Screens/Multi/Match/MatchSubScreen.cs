@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -51,6 +51,8 @@ namespace osu.Game.Screens.Multi.Match
 
             MatchChatDisplay chat;
             Components.Header header;
+            Info info;
+            GridContainer bottomRow;
             MatchSettingsOverlay settings;
 
             Children = new Drawable[]
@@ -61,10 +63,10 @@ namespace osu.Game.Screens.Multi.Match
                     Content = new[]
                     {
                         new Drawable[] { header = new Components.Header(room) { Depth = -1 } },
-                        new Drawable[] { new Info(room) { OnStart = onStart } },
+                        new Drawable[] { info = new Info(room) { OnStart = onStart } },
                         new Drawable[]
                         {
-                            new GridContainer
+                            bottomRow = new GridContainer
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Content = new[]
@@ -73,13 +75,23 @@ namespace osu.Game.Screens.Multi.Match
                                     {
                                         leaderboard = new MatchLeaderboard
                                         {
-                                            Padding = new MarginPadding(10),
+                                            Padding = new MarginPadding
+                                            {
+                                                Left = 10 + HORIZONTAL_OVERFLOW_PADDING,
+                                                Right = 10,
+                                                Vertical = 10,
+                                            },
                                             RelativeSizeAxes = Axes.Both,
                                             Room = room
                                         },
                                         new Container
                                         {
-                                            Padding = new MarginPadding(10),
+                                            Padding = new MarginPadding
+                                            {
+                                                Left = 10,
+                                                Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
+                                                Vertical = 10,
+                                            },
                                             RelativeSizeAxes = Axes.Both,
                                             Child = chat = new MatchChatDisplay(room)
                                             {
@@ -106,13 +118,27 @@ namespace osu.Game.Screens.Multi.Match
                 },
             };
 
-            header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect { Selected = addPlaylistItem });
+            header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect
+            {
+                Selected = addPlaylistItem,
+                Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING }
+            });
+
             header.Tabs.Current.ValueChanged += t =>
             {
+                const float fade_duration = 500;
                 if (t is SettingsMatchPage)
+                {
                     settings.Show();
+                    info.FadeOut(fade_duration, Easing.OutQuint);
+                    bottomRow.FadeOut(fade_duration, Easing.OutQuint);
+                }
                 else
+                {
                     settings.Hide();
+                    info.FadeIn(fade_duration, Easing.OutQuint);
+                    bottomRow.FadeIn(fade_duration, Easing.OutQuint);
+                }
             };
 
             chat.Exit += Exit;
