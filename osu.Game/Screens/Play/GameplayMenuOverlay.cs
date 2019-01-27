@@ -43,7 +43,6 @@ namespace osu.Game.Screens.Play
         /// Action that is invoked when <see cref="GlobalAction.Select"/> is triggered.
         /// </summary>
         protected Action SelectAction => () => InternalButtons.Children.FirstOrDefault(f => f.Selected)?.Click();
-   
         public abstract string Header { get; }
         public abstract string Description { get; }
 
