@@ -228,6 +228,7 @@ namespace osu.Game.Screens.Play
         {
             Content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
+            Background?.FadeColour(Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             cancelLoad();
 
             return base.OnExiting(next);
