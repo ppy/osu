@@ -1,23 +1,23 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
 {
-    public class SliderBodyPiece : CompositeDrawable
+    public class SliderBodyPiece : SliderPiece
     {
         private readonly Slider slider;
         private readonly ManualSliderBody body;
 
         public SliderBodyPiece(Slider slider)
+            : base(slider)
         {
             this.slider = slider;
 
@@ -26,9 +26,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
                 AccentColour = Color4.Transparent,
                 PathWidth = slider.Scale * 64
             };
-
-            slider.PositionChanged += _ => updatePosition();
-            slider.ScaleChanged += _ => body.PathWidth = slider.Scale * 64;
         }
 
         [BackgroundDependencyLoader]
@@ -36,7 +33,8 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         {
             body.BorderColour = colours.Yellow;
 
-            updatePosition();
+            PositionBindable.BindValueChanged(_ => updatePosition(), true);
+            ScaleBindable.BindValueChanged(v => body.PathWidth = v * 64, true);
         }
 
         private void updatePosition() => Position = slider.StackedPosition;
@@ -44,8 +42,6 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
         protected override void Update()
         {
             base.Update();
-
-            slider.Path.Calculate();
 
             var vertices = new List<Vector2>();
             slider.Path.GetPathToProgress(vertices, 0, 1);

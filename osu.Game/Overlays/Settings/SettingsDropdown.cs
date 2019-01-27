@@ -1,37 +1,44 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
     public class SettingsDropdown<T> : SettingsItem<T>
     {
-        private Dropdown<T> dropdown;
+        protected new OsuDropdown<T> Control => (OsuDropdown<T>)base.Control;
 
-        private IEnumerable<KeyValuePair<string, T>> items = new KeyValuePair<string, T>[] { };
-        public IEnumerable<KeyValuePair<string, T>> Items
+        private IEnumerable<T> items = Enumerable.Empty<T>();
+
+        public IEnumerable<T> Items
         {
-            get
-            {
-                return items;
-            }
+            get => items;
             set
             {
                 items = value;
-                if (dropdown != null)
-                    dropdown.Items = value;
+
+                if (Control != null)
+                    Control.Items = value;
             }
         }
 
-        protected override Drawable CreateControl() => dropdown = new OsuDropdown<T>
+        public override IEnumerable<string> FilterTerms => base.FilterTerms.Concat(Control.Items.Select(i => i.ToString()));
+
+        protected sealed override Drawable CreateControl() => CreateDropdown();
+
+        protected virtual OsuDropdown<T> CreateDropdown() => new DropdownControl { Items = Items };
+
+        protected class DropdownControl : OsuDropdown<T>
         {
-            Margin = new MarginPadding { Top = 5 },
-            RelativeSizeAxes = Axes.X,
-            Items = Items,
-        };
+            public DropdownControl()
+            {
+                Margin = new MarginPadding { Top = 5 };
+                RelativeSizeAxes = Axes.X;
+            }
+        }
     }
 }

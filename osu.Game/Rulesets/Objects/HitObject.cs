@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -19,6 +19,11 @@ namespace osu.Game.Rulesets.Objects
     /// </summary>
     public class HitObject
     {
+        /// <summary>
+        /// A small adjustment to the start time of control points to account for rounding/precision errors.
+        /// </summary>
+        private const double control_point_leniency = 1;
+
         /// <summary>
         /// The time at which the HitObject starts.
         /// </summary>
@@ -69,6 +74,9 @@ namespace osu.Game.Rulesets.Objects
         {
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
+            // This is done here since ApplyDefaultsToSelf may be used to determine the end time
+            SampleControlPoint = controlPointInfo.SamplePointAt(((this as IHasEndTime)?.EndTime ?? StartTime) + control_point_leniency);
+
             nestedHitObjects.Clear();
 
             CreateNestedHitObjects();
@@ -84,11 +92,7 @@ namespace osu.Game.Rulesets.Objects
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            SampleControlPoint samplePoint = controlPointInfo.SamplePointAt(StartTime);
-            EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
-
-            Kiai = effectPoint.KiaiMode;
-            SampleControlPoint = samplePoint;
+            Kiai = controlPointInfo.EffectPointAt(StartTime + control_point_leniency).KiaiMode;
 
             if (HitWindows == null)
                 HitWindows = CreateHitWindows();

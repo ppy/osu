@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -20,6 +20,7 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
 using osu.Game.Overlays;
@@ -27,14 +28,18 @@ using osu.Game.Rulesets;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
     public class Player : ScreenWithBeatmapBackground, IProvideCursor
     {
+        protected override bool AllowBackButton => false; // handled by HoldForMenuButton
+
         protected override float BackgroundParallaxAmount => 0.1f;
 
         protected override bool HideOverlaysOnEnter => true;
@@ -64,6 +69,9 @@ namespace osu.Game.Screens.Play
         /// </summary>
         private DecoupleableInterpolatingFramedClock adjustableClock;
 
+        [Resolved]
+        private ScoreManager scoreManager { get; set; }
+
         private PauseContainer pauseContainer;
 
         private RulesetInfo ruleset;
@@ -75,7 +83,7 @@ namespace osu.Game.Screens.Play
         protected ScoreProcessor ScoreProcessor;
         protected RulesetContainer RulesetContainer;
 
-        private HUDOverlay hudOverlay;
+        protected HUDOverlay HUDOverlay;
         private FailOverlay failOverlay;
 
         private DrawableStoryboard storyboard;
@@ -164,7 +172,7 @@ namespace osu.Game.Screens.Play
                 {
                     Retries = RestartCount,
                     OnRetry = Restart,
-                    OnQuit = Exit,
+                    OnQuit = performUserRequestedExit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
                     Children = new[]
                     {
@@ -173,10 +181,13 @@ namespace osu.Game.Screens.Play
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
                         },
-                        new LocalSkinOverrideContainer(working.Skin)
+                        new ScalingContainer(ScalingMode.Gameplay)
                         {
-                            RelativeSizeAxes = Axes.Both,
-                            Child = RulesetContainer
+                            Child = new LocalSkinOverrideContainer(working.Skin)
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Child = RulesetContainer
+                            }
                         },
                         new BreakOverlay(beatmap.BeatmapInfo.LetterboxInBreaks, ScoreProcessor)
                         {
@@ -185,8 +196,11 @@ namespace osu.Game.Screens.Play
                             ProcessCustomClock = false,
                             Breaks = beatmap.Breaks
                         },
-                        RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
-                        hudOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
+                        new ScalingContainer(ScalingMode.Gameplay)
+                        {
+                            Child = RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
+                        },
+                        HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
                         {
                             Clock = Clock, // hud overlay doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
@@ -205,7 +219,7 @@ namespace osu.Game.Screens.Play
                 failOverlay = new FailOverlay
                 {
                     OnRetry = Restart,
-                    OnQuit = Exit,
+                    OnQuit = performUserRequestedExit,
                 },
                 new HotkeyRetryOverlay
                 {
@@ -219,8 +233,8 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            hudOverlay.HoldToQuit.Action = Exit;
-            hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
+            HUDOverlay.HoldToQuit.Action = performUserRequestedExit;
+            HUDOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
 
@@ -244,8 +258,16 @@ namespace osu.Game.Screens.Play
                 mod.ApplyToClock(sourceClock);
         }
 
+        private void performUserRequestedExit()
+        {
+            if (!IsCurrentScreen) return;
+            Exit();
+        }
+
         public void Restart()
         {
+            if (!IsCurrentScreen) return;
+
             sampleRestart?.Play();
             ValidForResume = false;
             RestartRequested?.Invoke();
@@ -270,18 +292,30 @@ namespace osu.Game.Screens.Play
                 {
                     if (!IsCurrentScreen) return;
 
-                    var score = new Score
-                    {
-                        Beatmap = Beatmap.Value.BeatmapInfo,
-                        Ruleset = ruleset
-                    };
-                    ScoreProcessor.PopulateScore(score);
-                    score.User = RulesetContainer.Replay?.User ?? api.LocalUser.Value;
-                    Push(new Results(score));
+                    var score = CreateScore();
+                    if (RulesetContainer.ReplayScore == null)
+                        scoreManager.Import(score, true);
+
+                    Push(CreateResults(score));
 
                     onCompletionEvent = null;
                 });
             }
+        }
+
+        protected virtual ScoreInfo CreateScore()
+        {
+            var score = RulesetContainer.ReplayScore?.ScoreInfo ?? new ScoreInfo
+            {
+                Beatmap = Beatmap.Value.BeatmapInfo,
+                Ruleset = ruleset,
+                Mods = Beatmap.Value.Mods.Value.ToArray(),
+                User = api.LocalUser.Value,
+            };
+
+            ScoreProcessor.PopulateScore(score);
+
+            return score;
         }
 
         private bool onFail()
@@ -368,6 +402,7 @@ namespace osu.Game.Screens.Play
         {
             float fadeOutDuration = instant ? 0 : 250;
             Content.FadeOut(fadeOutDuration);
+            Background?.FadeColour(Color4.White, fadeOutDuration, Easing.OutQuint);
         }
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
@@ -405,7 +440,9 @@ namespace osu.Game.Screens.Play
                 .FadeTo(storyboardVisible && BackgroundOpacity > 0 ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
             if (storyboardVisible && beatmap.Storyboard.ReplacesBackground)
-                Background?.FadeTo(0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                Background?.FadeColour(Color4.Black, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
+
+        protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
     }
 }

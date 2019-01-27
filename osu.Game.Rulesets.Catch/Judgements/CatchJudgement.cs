@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
@@ -22,28 +22,16 @@ namespace osu.Game.Rulesets.Catch.Judgements
             }
         }
 
-        /// <summary>
-        /// Retrieves the numeric health increase of a <see cref="HitResult"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="HitResult"/> to find the numeric health increase for.</param>
-        /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
-        protected virtual float HealthIncreaseFor(HitResult result)
+        protected override double HealthIncreaseFor(HitResult result)
         {
             switch (result)
             {
                 default:
                     return 0;
                 case HitResult.Perfect:
-                    return 10.2f;
+                    return 10.2;
             }
         }
-
-        /// <summary>
-        /// Retrieves the numeric health increase of a <see cref="JudgementResult"/>.
-        /// </summary>
-        /// <param name="result">The <see cref="JudgementResult"/> to find the numeric health increase for.</param>
-        /// <returns>The numeric health increase of <paramref name="result"/>.</returns>
-        public float HealthIncreaseFor(JudgementResult result) => HealthIncreaseFor(result.Type);
 
         /// <summary>
         /// Whether fruit on the platter should explode or drop.

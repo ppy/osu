@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework;
@@ -41,24 +40,32 @@ namespace osu.Desktop.Updater
 
         private async void checkForUpdateAsync()
         {
-            var releases = new JsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
-            await releases.PerformAsync();
-
-            var latest = releases.ResponseObject;
-
-            if (latest.TagName != version)
+            try
             {
-                notificationOverlay.Post(new SimpleNotification
+                var releases = new JsonWebRequest<GitHubRelease>("https://api.github.com/repos/ppy/osu/releases/latest");
+
+                await releases.PerformAsync();
+
+                var latest = releases.ResponseObject;
+
+                if (latest.TagName != version)
                 {
-                    Text = $"A newer release of osu! has been found ({version} → {latest.TagName}).\n\n"
-                           + "Click here to download the new version, which can be installed over the top of your existing installation",
-                    Icon = FontAwesome.fa_upload,
-                    Activated = () =>
+                    notificationOverlay.Post(new SimpleNotification
                     {
-                        host.OpenUrlExternally(getBestUrl(latest));
-                        return true;
-                    }
-                });
+                        Text = $"A newer release of osu! has been found ({version} → {latest.TagName}).\n\n"
+                               + "Click here to download the new version, which can be installed over the top of your existing installation",
+                        Icon = FontAwesome.fa_upload,
+                        Activated = () =>
+                        {
+                            host.OpenUrlExternally(getBestUrl(latest));
+                            return true;
+                        }
+                    });
+                }
+            }
+            catch
+            {
+                // we shouldn't crash on a web failure. or any failure for the matter.
             }
         }
 
@@ -69,10 +76,10 @@ namespace osu.Desktop.Updater
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:
-                    bestAsset = release.Assets?.FirstOrDefault(f => f.Name.EndsWith(".exe"));
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".exe"));
                     break;
                 case RuntimeInfo.Platform.MacOsx:
-                    bestAsset = release.Assets?.FirstOrDefault(f => f.Name.EndsWith(".app.zip"));
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip"));
                     break;
             }
 

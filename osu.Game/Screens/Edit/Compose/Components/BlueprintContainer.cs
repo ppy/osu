@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -18,8 +18,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
     public class BlueprintContainer : CompositeDrawable
     {
         private SelectionBlueprintContainer selectionBlueprints;
+
         private Container<PlacementBlueprint> placementBlueprintContainer;
-        private SelectionBox selectionBox;
+        private PlacementBlueprint currentPlacement;
+
+        private SelectionHandler selectionHandler;
 
         private IEnumerable<SelectionBlueprint> selections => selectionBlueprints.Children.Where(c => c.IsAlive);
 
@@ -34,16 +37,16 @@ namespace osu.Game.Screens.Edit.Compose.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            selectionBox = composer.CreateSelectionBox();
-            selectionBox.DeselectAll = deselectAll;
+            selectionHandler = composer.CreateSelectionHandler();
+            selectionHandler.DeselectAll = deselectAll;
 
             var dragBox = new DragBox(select);
-            dragBox.DragEnd += () => selectionBox.UpdateVisibility();
+            dragBox.DragEnd += () => selectionHandler.UpdateVisibility();
 
             InternalChildren = new[]
             {
                 dragBox,
-                selectionBox,
+                selectionHandler,
                 selectionBlueprints = new SelectionBlueprintContainer { RelativeSizeAxes = Axes.Both },
                 placementBlueprintContainer = new Container<PlacementBlueprint> { RelativeSizeAxes = Axes.Both },
                 dragBox.CreateProxy()
@@ -117,18 +120,31 @@ namespace osu.Game.Screens.Edit.Compose.Components
             return true;
         }
 
+        protected override void Update()
+        {
+            base.Update();
+
+            if (currentPlacement != null)
+            {
+                if (composer.CursorInPlacementArea)
+                    currentPlacement.State = PlacementState.Shown;
+                else if (currentPlacement?.PlacementBegun == false)
+                    currentPlacement.State = PlacementState.Hidden;
+            }
+        }
+
         /// <summary>
         /// Refreshes the current placement tool.
         /// </summary>
         private void refreshTool()
         {
             placementBlueprintContainer.Clear();
+            currentPlacement = null;
 
             var blueprint = CurrentTool?.CreatePlacementBlueprint();
             if (blueprint != null)
-                placementBlueprintContainer.Child = blueprint;
+                placementBlueprintContainer.Child = currentPlacement = blueprint;
         }
-
 
         /// <summary>
         /// Select all masks in a given rectangle selection area.
@@ -152,19 +168,19 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
         private void onBlueprintSelected(SelectionBlueprint blueprint)
         {
-            selectionBox.HandleSelected(blueprint);
+            selectionHandler.HandleSelected(blueprint);
             selectionBlueprints.ChangeChildDepth(blueprint, 1);
         }
 
         private void onBlueprintDeselected(SelectionBlueprint blueprint)
         {
-            selectionBox.HandleDeselected(blueprint);
+            selectionHandler.HandleDeselected(blueprint);
             selectionBlueprints.ChangeChildDepth(blueprint, 0);
         }
 
-        private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionBox.HandleSelectionRequested(blueprint, state);
+        private void onSelectionRequested(SelectionBlueprint blueprint, InputState state) => selectionHandler.HandleSelectionRequested(blueprint, state);
 
-        private void onDragRequested(DragEvent dragEvent) => selectionBox.HandleDrag(dragEvent);
+        private void onDragRequested(SelectionBlueprint blueprint, DragEvent dragEvent) => selectionHandler.HandleDrag(blueprint, dragEvent);
 
         private class SelectionBlueprintContainer : Container<SelectionBlueprint>
         {

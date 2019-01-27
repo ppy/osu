@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -9,14 +9,14 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Osu.Objects;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Mods
 {
     internal class OsuModWiggle : Mod, IApplicableToDrawableHitObjects
     {
         public override string Name => "Wiggle";
-        public override string ShortenedName => "WG";
+        public override string Acronym => "WG";
         public override FontAwesome Icon => FontAwesome.fa_certificate;
         public override ModType Type => ModType.Fun;
         public override string Description => "They just won't stay still...";

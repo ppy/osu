@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Threading;
 using osu.Framework.Allocation;
@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Visual
         {
             Beatmap.Value = new DummyWorkingBeatmap(game);
 
-            AddStep("load dummy beatmap", () => Add(loader = new PlayerLoader(new Player
+            AddStep("load dummy beatmap", () => Add(loader = new PlayerLoader(() => new Player
             {
                 AllowPause = false,
                 AllowLeadIn = false,
@@ -30,9 +30,9 @@ namespace osu.Game.Tests.Visual
 
             AddStep("load slow dummy beatmap", () =>
             {
-                SlowLoadPlayer slow;
+                SlowLoadPlayer slow = null;
 
-                Add(loader = new PlayerLoader(slow = new SlowLoadPlayer
+                Add(loader = new PlayerLoader(() => slow = new SlowLoadPlayer
                 {
                     AllowPause = false,
                     AllowLeadIn = false,
@@ -57,5 +57,4 @@ namespace osu.Game.Tests.Visual
             }
         }
     }
-
 }
