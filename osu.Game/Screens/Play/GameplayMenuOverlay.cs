@@ -44,7 +44,6 @@ namespace osu.Game.Screens.Play
         /// </summary>
         protected Action SelectAction => () => InternalButtons.Children.FirstOrDefault(f => f.Selected)?.Click();
    
-
         public abstract string Header { get; }
         public abstract string Description { get; }
 
