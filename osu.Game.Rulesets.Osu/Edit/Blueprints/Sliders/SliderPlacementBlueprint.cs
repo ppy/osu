@@ -47,6 +47,14 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders
             setState(PlacementState.Initial);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // Fixes a 1-frame position discrepancy due to the first mouse move event happening in the next frame
+            HitObject.Position = Parent?.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position) ?? Vector2.Zero;
+        }
+
         protected override bool OnMouseMove(MouseMoveEvent e)
         {
             switch (state)
