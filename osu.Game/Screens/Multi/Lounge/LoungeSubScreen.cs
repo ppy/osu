@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Multi.Lounge
 
         protected override void OnFocus(FocusEvent e)
         {
-            GetContainingInputManager().ChangeFocus(Filter.Search);
+            Filter.Search.TakeFocus();
         }
 
         protected override void OnEntering(Screen last)
