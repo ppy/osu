@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Music
         protected override void PopIn()
         {
             filter.Search.HoldFocus = true;
-            Schedule(() => GetContainingInputManager().ChangeFocus(filter.Search));
+            Schedule(() => filter.Search.TakeFocus());
 
             this.ResizeTo(new Vector2(1, playlist_height), transition_duration, Easing.OutQuint);
             this.FadeIn(transition_duration, Easing.OutQuint);
