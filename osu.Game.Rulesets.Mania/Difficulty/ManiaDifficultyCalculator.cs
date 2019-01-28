@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
         }
 
-        protected override DifficultyAttributes Calculate(double upTo, IBeatmap beatmap, Mod[] mods, double timeRate)
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate, double upTo = Double.PositiveInfinity)
         {
             if (!beatmap.HitObjects.Any())
                 return new ManiaDifficultyAttributes(mods, 0);

@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -39,6 +40,6 @@ namespace osu.Game.Rulesets.Difficulty
             TimeRate = clock.Rate;
         }
 
-        public abstract double Calculate(double upTo, Dictionary<string, double> categoryDifficulty = null);
+        public abstract double Calculate(Dictionary<string, double> categoryDifficulty = null, double upTo = Double.PositiveInfinity);
     }
 }

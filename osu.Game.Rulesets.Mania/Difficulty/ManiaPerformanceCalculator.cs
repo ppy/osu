@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
         }
 
-        public override double Calculate(double upTo, Dictionary<string, double> categoryDifficulty = null)
+        public override double Calculate(Dictionary<string, double> categoryDifficulty = null, double upTo = Double.PositiveInfinity)
         {
             Attributes = (ManiaDifficultyAttributes)Ruleset.CreateDifficultyCalculator(Working).Calculate(upTo, Score.Mods);
 

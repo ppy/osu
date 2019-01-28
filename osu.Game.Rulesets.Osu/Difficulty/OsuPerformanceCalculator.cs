@@ -35,7 +35,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        public override double Calculate(double upTo, Dictionary<string, double> categoryRatings = null)
+        public override double Calculate(Dictionary<string, double> categoryRatings = null, double upTo = Double.PositiveInfinity)
         {
             Attributes = (OsuDifficultyAttributes)Ruleset.CreateDifficultyCalculator(Working).Calculate(upTo, Score.Mods);
 

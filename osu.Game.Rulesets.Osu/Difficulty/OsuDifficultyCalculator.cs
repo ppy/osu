@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        protected override DifficultyAttributes Calculate(double upTo, IBeatmap beatmap, Mod[] mods, double timeRate)
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate, double upTo = Double.PositiveInfinity)
         {
             if (!beatmap.HitObjects.Any())
                 return new OsuDifficultyAttributes(mods, 0);
