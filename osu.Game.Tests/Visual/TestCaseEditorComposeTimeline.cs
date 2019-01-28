@@ -15,7 +15,6 @@ using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Edit.Compose.Components.Timeline;
 using osuTK.Graphics;
-using osu.Framework.Audio;
 
 namespace osu.Game.Tests.Visual
 {
@@ -31,7 +30,7 @@ namespace osu.Game.Tests.Visual
         };
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audioManager)
+        private void load()
         {
             Beatmap.Value = new WaveformTestBeatmap();
 

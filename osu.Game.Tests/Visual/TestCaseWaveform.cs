@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Sprites;
-using osu.Framework.Audio;
 
 namespace osu.Game.Tests.Visual
 {
@@ -18,7 +17,7 @@ namespace osu.Game.Tests.Visual
     public class TestCaseWaveform : OsuTestCase
     {
         [BackgroundDependencyLoader]
-        private void load(AudioManager audioManager)
+        private void load()
         {
             Beatmap.Value = new WaveformTestBeatmap();
 
