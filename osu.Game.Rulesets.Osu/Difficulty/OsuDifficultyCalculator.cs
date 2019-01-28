@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -56,6 +56,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 foreach (Skill s in skills)
                     s.Process(h);
             }
+
+            // The peak strain will not be saved for the last section in the above loop
+            foreach (Skill s in skills)
+                s.SaveCurrentPeak();
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;

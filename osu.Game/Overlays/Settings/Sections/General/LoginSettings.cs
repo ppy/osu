@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -17,6 +17,7 @@ using osu.Game.Graphics;
 using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics.Containers;
 using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 using Container = osu.Framework.Graphics.Containers.Container;
 
@@ -86,25 +87,29 @@ namespace osu.Game.Overlays.Settings.Sections.General
                     };
                     break;
                 case APIState.Failing:
-                    Children = new Drawable[]
-                    {
-                        new OsuSpriteText
-                        {
-                            Text = "Connection failing :(",
-                        },
-                    };
-                    break;
                 case APIState.Connecting:
+                    LinkFlowContainer linkFlow;
+
                     Children = new Drawable[]
                     {
-                        new OsuSpriteText
+                        new LoadingAnimation
                         {
-                            Anchor = Anchor.Centre,
-                            Origin = Anchor.Centre,
-                            Text = "Connecting...",
+                            State = Visibility.Visible,
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        },
+                        linkFlow = new LinkFlowContainer
+                        {
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                            TextAnchor = Anchor.TopCentre,
+                            AutoSizeAxes = Axes.Both,
+                            Text = state == APIState.Failing ? "Connection is failing, will attempt to reconnect... " : "Attempting to connect... ",
                             Margin = new MarginPadding { Top = 10, Bottom = 10 },
                         },
                     };
+
+                    linkFlow.AddLink("cancel", api.Logout, string.Empty);
                     break;
                 case APIState.Online:
                     Children = new Drawable[]

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps.Formats;
@@ -16,5 +16,7 @@ namespace osu.Game.Skinning
         public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
 
         public string HitCircleFont { get; set; } = "default";
+
+        public bool? CursorExpand { get; set; } = true;
     }
 }

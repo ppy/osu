@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Menu
 
         public override bool CursorVisible => false;
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenEmpty();
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBlack();
 
         private Bindable<bool> menuVoice;
         private Bindable<bool> menuMusic;

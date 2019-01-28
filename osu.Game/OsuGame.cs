@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -26,6 +26,7 @@ using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Input;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Rulesets;
@@ -187,6 +188,7 @@ namespace osu.Game
         }
 
         private ExternalLinkOpener externalLinkOpener;
+
         public void OpenUrlExternally(string url)
         {
             if (url.StartsWith("/"))
@@ -219,13 +221,16 @@ namespace osu.Game
                     return;
                 }
 
-                var databasedSet = BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID);
+                var databasedSet = beatmap.OnlineBeatmapSetID != null ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID) : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
 
-                // Use first beatmap available for current ruleset, else switch ruleset.
-                var first = databasedSet.Beatmaps.FirstOrDefault(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
+                if (databasedSet != null)
+                {
+                    // Use first beatmap available for current ruleset, else switch ruleset.
+                    var first = databasedSet.Beatmaps.Find(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
 
-                ruleset.Value = first.Ruleset;
-                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
+                    ruleset.Value = first.Ruleset;
+                    Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
+                }
             }
 
             switch (currentScreen)
@@ -317,7 +322,7 @@ namespace osu.Game
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
                 Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
 
-                currentScreen.Push(new PlayerLoader(new ReplayPlayer(databasedScore)));
+                currentScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
             }
         }
 
@@ -353,16 +358,23 @@ namespace osu.Game
                     ActionRequested = action => volume.Adjust(action),
                     ScrollActionRequested = (action, amount, isPrecise) => volume.Adjust(action, amount, isPrecise),
                 },
-                mainContent = new Container { RelativeSizeAxes = Axes.Both },
-                overlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
-                idleTracker = new IdleTracker(6000)
+                screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                overlayContent = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                floatingOverlayContent = new Container { RelativeSizeAxes = Axes.Both, Depth = float.MinValue },
+                idleTracker = new GameIdleTracker(6000)
             });
 
             loadComponentSingleFile(screenStack = new Loader(), d =>
             {
                 screenStack.ModePushed += screenAdded;
                 screenStack.Exited += screenRemoved;
-                mainContent.Add(screenStack);
+                screenContainer.Add(screenStack);
             });
 
             loadComponentSingleFile(Toolbar = new Toolbar
@@ -373,32 +385,32 @@ namespace osu.Game
                     CloseAllOverlays(false);
                     intro?.ChildScreen?.MakeCurrent();
                 },
-            }, overlayContent.Add);
+            }, floatingOverlayContent.Add);
 
-            loadComponentSingleFile(volume = new VolumeOverlay(), overlayContent.Add);
+            loadComponentSingleFile(volume = new VolumeOverlay(), floatingOverlayContent.Add);
             loadComponentSingleFile(onscreenDisplay = new OnScreenDisplay(), Add);
 
             loadComponentSingleFile(screenshotManager, Add);
 
             //overlay elements
-            loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, mainContent.Add);
-            loadComponentSingleFile(social = new SocialOverlay { Depth = -1 }, mainContent.Add);
+            loadComponentSingleFile(direct = new DirectOverlay { Depth = -1 }, overlayContent.Add);
+            loadComponentSingleFile(social = new SocialOverlay { Depth = -1 }, overlayContent.Add);
             loadComponentSingleFile(channelManager = new ChannelManager(), AddInternal);
-            loadComponentSingleFile(chatOverlay = new ChatOverlay { Depth = -1 }, mainContent.Add);
+            loadComponentSingleFile(chatOverlay = new ChatOverlay { Depth = -1 }, overlayContent.Add);
             loadComponentSingleFile(settings = new MainSettings
             {
                 GetToolbarHeight = () => ToolbarOffset,
                 Depth = -1
-            }, overlayContent.Add);
-            loadComponentSingleFile(userProfile = new UserProfileOverlay { Depth = -2 }, mainContent.Add);
-            loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -3 }, mainContent.Add);
+            }, floatingOverlayContent.Add);
+            loadComponentSingleFile(userProfile = new UserProfileOverlay { Depth = -2 }, overlayContent.Add);
+            loadComponentSingleFile(beatmapSetOverlay = new BeatmapSetOverlay { Depth = -3 }, overlayContent.Add);
             loadComponentSingleFile(musicController = new MusicController
             {
                 Depth = -5,
                 Position = new Vector2(0, Toolbar.HEIGHT),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, overlayContent.Add);
+            }, floatingOverlayContent.Add);
 
             loadComponentSingleFile(notifications = new NotificationOverlay
             {
@@ -406,24 +418,24 @@ namespace osu.Game
                 Depth = -4,
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-            }, overlayContent.Add);
+            }, floatingOverlayContent.Add);
 
             loadComponentSingleFile(accountCreation = new AccountCreationOverlay
             {
                 Depth = -6,
-            }, overlayContent.Add);
+            }, floatingOverlayContent.Add);
 
             loadComponentSingleFile(dialogOverlay = new DialogOverlay
             {
                 Depth = -7,
-            }, overlayContent.Add);
+            }, floatingOverlayContent.Add);
 
             loadComponentSingleFile(externalLinkOpener = new ExternalLinkOpener
             {
                 Depth = -8,
-            }, overlayContent.Add);
+            }, floatingOverlayContent.Add);
 
-            dependencies.Cache(idleTracker);
+            dependencies.CacheAs(idleTracker);
             dependencies.Cache(settings);
             dependencies.Cache(onscreenDisplay);
             dependencies.Cache(social);
@@ -497,11 +509,29 @@ namespace osu.Game
                 if (notifications.State == Visibility.Visible)
                     offset -= ToolbarButton.WIDTH / 2;
 
-                screenStack.MoveToX(offset, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
+                screenContainer.MoveToX(offset, SettingsOverlay.TRANSITION_LENGTH, Easing.OutQuint);
             }
 
             settings.StateChanged += _ => updateScreenOffset();
             notifications.StateChanged += _ => updateScreenOffset();
+        }
+
+        public class GameIdleTracker : IdleTracker
+        {
+            private InputManager inputManager;
+
+            public GameIdleTracker(int time)
+                : base(time)
+            {
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                inputManager = GetContainingInputManager();
+            }
+
+            protected override bool AllowIdle => inputManager.FocusedDrawable == null;
         }
 
         private void forwardLoggedErrorsToNotifications()
@@ -555,7 +585,7 @@ namespace osu.Game
                 focused.StateChanged += s =>
                 {
                     visibleOverlayCount += s == Visibility.Visible ? 1 : -1;
-                    screenStack.FadeColour(visibleOverlayCount > 0 ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
+                    screenContainer.FadeColour(visibleOverlayCount > 0 ? OsuColour.Gray(0.5f) : Color4.White, 500, Easing.OutQuint);
                 };
             }
 
@@ -640,12 +670,13 @@ namespace osu.Game
 
         public bool OnReleased(GlobalAction action) => false;
 
-        private Container mainContent;
-
         private Container overlayContent;
+
+        private Container floatingOverlayContent;
 
         private OsuScreen currentScreen;
         private FrameworkConfigManager frameworkConfig;
+        private ScalingContainer screenContainer;
 
         protected override bool OnExiting()
         {
@@ -685,15 +716,47 @@ namespace osu.Game
             ruleset.Disabled = applyBeatmapRulesetRestrictions;
             Beatmap.Disabled = applyBeatmapRulesetRestrictions;
 
-            mainContent.Padding = new MarginPadding { Top = ToolbarOffset };
+            screenContainer.Padding = new MarginPadding { Top = ToolbarOffset };
+            overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
             MenuCursorContainer.CanShowCursor = currentScreen?.CursorVisible ?? false;
         }
 
-        private void screenAdded(Screen newScreen)
+        /// <summary>
+        /// Sets <see cref="Beatmap"/> while ignoring any beatmap.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to set.</param>
+        public void ForcefullySetBeatmap(WorkingBeatmap beatmap)
+        {
+            var beatmapDisabled = Beatmap.Disabled;
+
+            Beatmap.Disabled = false;
+            Beatmap.Value = beatmap;
+            Beatmap.Disabled = beatmapDisabled;
+        }
+
+        /// <summary>
+        /// Sets <see cref="Ruleset"/> while ignoring any ruleset restrictions.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to set.</param>
+        public void ForcefullySetRuleset(RulesetInfo ruleset)
+        {
+            var rulesetDisabled = this.ruleset.Disabled;
+
+            this.ruleset.Disabled = false;
+            this.ruleset.Value = ruleset;
+            this.ruleset.Disabled = rulesetDisabled;
+        }
+
+        protected virtual void ScreenChanged(OsuScreen current, Screen newScreen)
         {
             currentScreen = (OsuScreen)newScreen;
-            Logger.Log($"Screen changed → {currentScreen}");
+        }
+
+        private void screenAdded(Screen newScreen)
+        {
+            ScreenChanged(currentScreen, newScreen);
+            Logger.Log($"Screen changed → {newScreen}");
 
             newScreen.ModePushed += screenAdded;
             newScreen.Exited += screenRemoved;
@@ -701,7 +764,7 @@ namespace osu.Game
 
         private void screenRemoved(Screen newScreen)
         {
-            currentScreen = (OsuScreen)newScreen;
+            ScreenChanged(currentScreen, newScreen);
             Logger.Log($"Screen changed ← {currentScreen}");
 
             if (newScreen == null)

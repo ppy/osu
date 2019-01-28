@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -29,8 +29,8 @@ namespace osu.Game.Online.Chat
             @"#lobby"
         };
 
-        private readonly BindableCollection<Channel> availableChannels = new BindableCollection<Channel>();
-        private readonly BindableCollection<Channel> joinedChannels = new BindableCollection<Channel>();
+        private readonly BindableList<Channel> availableChannels = new BindableList<Channel>();
+        private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
         /// <summary>
         /// The currently opened channel
@@ -40,12 +40,12 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// The Channels the player has joined
         /// </summary>
-        public IBindableCollection<Channel> JoinedChannels => joinedChannels;
+        public IBindableList<Channel> JoinedChannels => joinedChannels;
 
         /// <summary>
         /// The channels available for the player to join
         /// </summary>
-        public IBindableCollection<Channel> AvailableChannels => availableChannels;
+        public IBindableList<Channel> AvailableChannels => availableChannels;
 
         private IAPIProvider api;
 

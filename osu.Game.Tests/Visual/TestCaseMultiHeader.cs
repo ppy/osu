@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
+using osu.Game.Screens;
 using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Screens.Lounge;
 
 namespace osu.Game.Tests.Visual
 {
@@ -13,15 +13,31 @@ namespace osu.Game.Tests.Visual
     {
         public TestCaseMultiHeader()
         {
-            Lounge lounge;
+            int index = 0;
+
+            OsuScreen currentScreen = new TestMultiplayerSubScreen(index);
+
             Children = new Drawable[]
             {
-                lounge = new Lounge
-                {
-                    Padding = new MarginPadding { Top = Header.HEIGHT },
-                },
-                new Header(lounge),
+                currentScreen,
+                new Header(currentScreen)
             };
+
+            AddStep("push multi screen", () => currentScreen.Push(currentScreen = new TestMultiplayerSubScreen(++index)));
+        }
+
+        private class TestMultiplayerSubScreen : OsuScreen, IMultiplayerSubScreen
+        {
+            private readonly int index;
+
+            public string ShortTitle => $"Screen {index}";
+
+            public TestMultiplayerSubScreen(int index)
+            {
+                this.index = index;
+            }
+
+            public override string ToString() => ShortTitle;
         }
     }
 }

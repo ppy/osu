@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -18,7 +19,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Online.Leaderboards
 {
-    public abstract class Leaderboard<TScope, ScoreInfo> : Container
+    public abstract class Leaderboard<TScope, ScoreInfo> : Container, IOnlineComponent
     {
         private const double fade_duration = 300;
 
@@ -30,6 +31,7 @@ namespace osu.Game.Online.Leaderboards
         private readonly LoadingAnimation loading;
 
         private ScheduledDelegate showScoresDelegate;
+        private CancellationTokenSource showScoresCancellationSource;
 
         private bool scoresLoadedOnce;
 
@@ -49,43 +51,48 @@ namespace osu.Game.Online.Leaderboards
 
                 loading.Hide();
 
+                // schedule because we may not be loaded yet (LoadComponentAsync complains).
+                showScoresDelegate?.Cancel();
+                showScoresCancellationSource?.Cancel();
+
                 if (scores == null || !scores.Any())
                     return;
 
                 // ensure placeholder is hidden when displaying scores
                 PlaceholderState = PlaceholderState.Successful;
 
-                var flow = scrollFlow = new FillFlowContainer<LeaderboardScore>
-                {
-                    RelativeSizeAxes = Axes.X,
-                    AutoSizeAxes = Axes.Y,
-                    Spacing = new Vector2(0f, 5f),
-                    Padding = new MarginPadding { Top = 10, Bottom = 5 },
-                    ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1))
-                };
+                scrollFlow = CreateScoreFlow();
+                scrollFlow.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
 
-                // schedule because we may not be loaded yet (LoadComponentAsync complains).
-                showScoresDelegate?.Cancel();
                 if (!IsLoaded)
                     showScoresDelegate = Schedule(showScores);
                 else
                     showScores();
 
-                void showScores() => LoadComponentAsync(flow, _ =>
+                void showScores() => LoadComponentAsync(scrollFlow, _ =>
                 {
-                    scrollContainer.Add(flow);
+                    scrollContainer.Add(scrollFlow);
 
                     int i = 0;
-                    foreach (var s in flow.Children)
+                    foreach (var s in scrollFlow.Children)
                     {
                         using (s.BeginDelayedSequence(i++ * 50, true))
                             s.Show();
                     }
 
                     scrollContainer.ScrollTo(0f, false);
-                });
+                }, (showScoresCancellationSource = new CancellationTokenSource()).Token);
             }
         }
+
+        protected virtual FillFlowContainer<LeaderboardScore> CreateScoreFlow()
+            => new FillFlowContainer<LeaderboardScore>
+            {
+                RelativeSizeAxes = Axes.X,
+                AutoSizeAxes = Axes.Y,
+                Spacing = new Vector2(0f, 5f),
+                Padding = new MarginPadding { Top = 10, Bottom = 5 },
+            };
 
         private TScope scope;
 
@@ -175,26 +182,22 @@ namespace osu.Game.Online.Leaderboards
         private void load(APIAccess api)
         {
             this.api = api;
-
-            if (api != null)
-                api.OnStateChange += handleApiStateChange;
+            api?.Register(this);
         }
 
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
-
-            if (api != null)
-                api.OnStateChange -= handleApiStateChange;
+            api?.Unregister(this);
         }
 
         public void RefreshScores() => UpdateScores();
 
         private APIRequest getScoresRequest;
 
-        private void handleApiStateChange(APIState oldState, APIState newState)
+        public void APIStateChanged(APIAccess api, APIState state)
         {
-            if (newState == APIState.Online)
+            if (state == APIState.Online)
                 UpdateScores();
         }
 
@@ -265,14 +268,18 @@ namespace osu.Game.Online.Leaderboards
             currentPlaceholder = placeholder;
         }
 
+        protected virtual bool FadeBottom => true;
+        protected virtual bool FadeTop => false;
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();
 
-            var fadeStart = scrollContainer.Current + scrollContainer.DrawHeight;
+            var fadeBottom = scrollContainer.Current + scrollContainer.DrawHeight;
+            var fadeTop = scrollContainer.Current + LeaderboardScore.HEIGHT;
 
             if (!scrollContainer.IsScrolledToEnd())
-                fadeStart -= LeaderboardScore.HEIGHT;
+                fadeBottom -= LeaderboardScore.HEIGHT;
 
             if (scrollFlow == null)
                 return;
@@ -282,15 +289,23 @@ namespace osu.Game.Online.Leaderboards
                 var topY = c.ToSpaceOfOtherDrawable(Vector2.Zero, scrollFlow).Y;
                 var bottomY = topY + LeaderboardScore.HEIGHT;
 
-                if (bottomY < fadeStart)
+                bool requireTopFade = FadeTop && topY <= fadeTop;
+                bool requireBottomFade = FadeBottom && bottomY >= fadeBottom;
+
+                if (!requireTopFade && !requireBottomFade)
                     c.Colour = Color4.White;
-                else if (topY > fadeStart + LeaderboardScore.HEIGHT)
+                else if (topY > fadeBottom + LeaderboardScore.HEIGHT || bottomY < fadeTop - LeaderboardScore.HEIGHT)
                     c.Colour = Color4.Transparent;
                 else
                 {
-                    c.Colour = ColourInfo.GradientVertical(
-                        Color4.White.Opacity(Math.Min(1 - (topY - fadeStart) / LeaderboardScore.HEIGHT, 1)),
-                        Color4.White.Opacity(Math.Min(1 - (bottomY - fadeStart) / LeaderboardScore.HEIGHT, 1)));
+                    if (bottomY - fadeBottom > 0 && FadeBottom)
+                        c.Colour = ColourInfo.GradientVertical(
+                            Color4.White.Opacity(Math.Min(1 - (topY - fadeBottom) / LeaderboardScore.HEIGHT, 1)),
+                            Color4.White.Opacity(Math.Min(1 - (bottomY - fadeBottom) / LeaderboardScore.HEIGHT, 1)));
+                    else if (FadeTop)
+                        c.Colour = ColourInfo.GradientVertical(
+                            Color4.White.Opacity(Math.Min(1 - (fadeTop - topY) / LeaderboardScore.HEIGHT, 1)),
+                            Color4.White.Opacity(Math.Min(1 - (fadeTop - bottomY) / LeaderboardScore.HEIGHT, 1)));
                 }
             }
         }

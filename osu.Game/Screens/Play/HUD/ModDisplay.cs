@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -21,6 +21,8 @@ namespace osu.Game.Screens.Play.HUD
     {
         private const int fade_duration = 1000;
 
+        public bool DisplayUnrankedText = true;
+
         private readonly Bindable<IEnumerable<Mod>> current = new Bindable<IEnumerable<Mod>>();
 
         public Bindable<IEnumerable<Mod>> Current
@@ -41,6 +43,8 @@ namespace osu.Game.Screens.Play.HUD
 
         public ModDisplay()
         {
+            AutoSizeAxes = Axes.Both;
+
             Children = new Drawable[]
             {
                 iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
@@ -53,7 +57,6 @@ namespace osu.Game.Screens.Play.HUD
                 },
                 unrankedText = new OsuSpriteText
                 {
-                    AlwaysPresent = true,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre,
                     Text = @"/ UNRANKED /",
@@ -89,7 +92,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void appearTransform()
         {
-            if (Current.Value.Any(m => !m.Ranked))
+            if (DisplayUnrankedText && Current.Value.Any(m => !m.Ranked))
                 unrankedText.FadeInFromZero(fade_duration, Easing.OutQuint);
             else
                 unrankedText.Hide();

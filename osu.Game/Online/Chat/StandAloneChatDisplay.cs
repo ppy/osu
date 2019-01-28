@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -19,9 +19,9 @@ namespace osu.Game.Online.Chat
     /// </summary>
     public class StandAloneChatDisplay : CompositeDrawable
     {
-        private readonly bool postingTextbox;
-
         public readonly Bindable<Channel> Channel = new Bindable<Channel>();
+
+        public Action Exit;
 
         private readonly FocusedTextBox textbox;
 
@@ -30,6 +30,8 @@ namespace osu.Game.Online.Chat
         private ScrollContainer scroll;
 
         private DrawableChannel drawableChannel;
+
+        private readonly bool postingTextbox;
 
         private const float textbox_height = 30;
 
@@ -66,6 +68,8 @@ namespace osu.Game.Online.Chat
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                 });
+
+                textbox.Exit += () => Exit?.Invoke();
             }
 
             Channel.BindValueChanged(channelChanged);

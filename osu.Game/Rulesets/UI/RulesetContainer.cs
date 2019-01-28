@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -22,6 +22,7 @@ using osu.Game.Overlays;
 using osu.Game.Replays;
 using osu.Game.Rulesets.Configuration;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -130,7 +131,7 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
-        public Replay Replay { get; private set; }
+        public Score ReplayScore { get; private set; }
 
         /// <summary>
         /// Whether the game is paused. Used to block user input.
@@ -140,14 +141,14 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Sets a replay to be used, overriding local input.
         /// </summary>
-        /// <param name="replay">The replay, null for local input.</param>
-        public virtual void SetReplay(Replay replay)
+        /// <param name="replayScore">The replay, null for local input.</param>
+        public virtual void SetReplayScore(Score replayScore)
         {
             if (ReplayInputManager == null)
                 throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports replay loading is not available");
 
-            Replay = replay;
-            ReplayInputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
+            ReplayScore = replayScore;
+            ReplayInputManager.ReplayInputHandler = replayScore != null ? CreateReplayInputHandler(replayScore.Replay) : null;
 
             HasReplayLoaded.Value = ReplayInputManager.ReplayInputHandler != null;
         }
@@ -249,14 +250,14 @@ namespace osu.Game.Rulesets.UI
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            KeyBindingInputManager.Children = new Drawable[]
+            KeyBindingInputManager.AddRange(new Drawable[]
             {
                 content = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
                 },
                 Playfield
-            };
+            });
 
             if (Cursor != null)
                 KeyBindingInputManager.Add(Cursor);
@@ -302,9 +303,9 @@ namespace osu.Game.Rulesets.UI
                 mod.ReadFromConfig(config);
         }
 
-        public override void SetReplay(Replay replay)
+        public override void SetReplayScore(Score replayScore)
         {
-            base.SetReplay(replay);
+            base.SetReplayScore(replayScore);
 
             if (ReplayInputManager?.ReplayInputHandler != null)
                 ReplayInputManager.ReplayInputHandler.GamefieldToScreenSpace = Playfield.GamefieldToScreenSpace;
