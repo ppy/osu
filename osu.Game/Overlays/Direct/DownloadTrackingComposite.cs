@@ -103,7 +103,7 @@ namespace osu.Game.Overlays.Direct
 
         private void onRequestFailure(Exception e)
         {
-            Schedule(() => State.Value = DownloadState.Downloading);
+            Schedule(() => State.Value = DownloadState.NotDownloaded);
         }
 
         private void setAdded(BeatmapSetInfo s, bool existing, bool silent)
