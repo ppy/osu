@@ -88,7 +88,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                         Add(fp = new FollowPoint
                         {
-                            Position = pointStartPosition,
+                            Position = pointEndPosition,
                             Rotation = rotation,
                             Alpha = 0,
                             Scale = new Vector2(1.5f),
