@@ -35,7 +35,7 @@ namespace osu.Game.Screens.Play
         private BeatmapMetadataDisplay info;
 
         private bool hideOverlays;
-        protected override bool HideOverlaysOnEnter => hideOverlays;
+        public override bool HideOverlaysOnEnter => hideOverlays;
 
         private Task loadTask;
 

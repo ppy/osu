@@ -747,6 +747,16 @@ namespace osu.Game
                     menuScreen = menu;
                     break;
             }
+
+            if (newScreen is IOsuScreen newOsuScreen)
+            {
+                OverlayActivationMode.Value = newOsuScreen.InitialOverlayActivationMode;
+
+                if (newOsuScreen.HideOverlaysOnEnter)
+                    CloseAllOverlays();
+                else
+                    Toolbar.State = Visibility.Visible;
+            }
         }
 
         private void screenPushed(IScreen lastScreen, IScreen newScreen)

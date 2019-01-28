@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
-using System;
 using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -15,7 +14,6 @@ using osu.Game.Input.Bindings;
 using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osu.Game.Overlays;
-using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Screens
 {
@@ -32,19 +30,15 @@ namespace osu.Game.Screens
 
         public virtual bool AllowExternalScreenChange => false;
 
-        private Action updateOverlayStates;
-
         /// <summary>
         /// Whether all overlays should be hidden when this screen is entered or resumed.
         /// </summary>
-        protected virtual bool HideOverlaysOnEnter => false;
-
-        protected readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
+        public virtual bool HideOverlaysOnEnter => false;
 
         /// <summary>
         /// Whether overlays should be able to be opened once this screen is entered or resumed.
         /// </summary>
-        protected virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
+        public virtual OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
 
         public virtual bool CursorVisible => true;
 
@@ -81,19 +75,6 @@ namespace osu.Game.Screens
         {
             Beatmap.BindTo(beatmap);
             Ruleset.BindTo(ruleset);
-
-            if (osu != null)
-            {
-                OverlayActivationMode.BindTo(osu.OverlayActivationMode);
-
-                updateOverlayStates = () =>
-                {
-                    if (HideOverlaysOnEnter)
-                        osu.CloseAllOverlays();
-                    else
-                        osu.Toolbar.State = Visibility.Visible;
-                };
-            }
 
             sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
@@ -166,10 +147,6 @@ namespace osu.Game.Screens
             }, true);
 
             backgroundStack.ParallaxAmount = BackgroundParallaxAmount;
-
-            OverlayActivationMode.Value = InitialOverlayActivationMode;
-
-            updateOverlayStates?.Invoke();
         }
 
         /// <summary>

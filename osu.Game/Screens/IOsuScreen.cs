@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Screens;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens
 {
@@ -19,5 +20,15 @@ namespace osu.Game.Screens
         /// Whether this <see cref="OsuScreen"/> allows the cursor to be displayed.
         /// </summary>
         bool CursorVisible { get; }
+
+        /// <summary>
+        /// Whether all overlays should be hidden when this screen is entered or resumed.
+        /// </summary>
+        bool HideOverlaysOnEnter { get; }
+
+        /// <summary>
+        /// Whether overlays should be able to be opened once this screen is entered or resumed.
+        /// </summary>
+        OverlayActivation InitialOverlayActivationMode { get; }
     }
 }
