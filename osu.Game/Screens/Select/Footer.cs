@@ -41,7 +41,8 @@ namespace osu.Game.Screens.Select
         /// <para>Higher depth to be put on the left, and lower to be put on the right.</para>
         /// <para>Notice this is different to <see cref="Options.BeatmapOptionsOverlay"/>!</para>
         /// </param>
-        public void AddButton(string text, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
+        /// <returns>The <see cref="FooterButton"/> that this method creates.</returns>
+        public FooterButton AddButton(string text, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
         {
             var button = new FooterButton
             {
@@ -59,6 +60,7 @@ namespace osu.Game.Screens.Select
 
             buttons.Add(button);
             buttons.SetLayoutPosition(button, -depth);
+            return button;
         }
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
@@ -71,10 +73,11 @@ namespace osu.Game.Screens.Select
         /// <para>Higher depth to be put on the left, and lower to be put on the right.</para>
         /// <para>Notice this is different to <see cref="Options.BeatmapOptionsOverlay"/>!</para>
         /// </param>
-        public void AddButton(string text, Color4 colour, OverlayContainer overlay, Key? hotkey = null, float depth = 0)
+        /// <returns>The <see cref="FooterButton"/> that this method creates.</returns>
+        public FooterButton AddButton(string text, Color4 colour, OverlayContainer overlay, Key? hotkey = null, float depth = 0)
         {
             overlays.Add(overlay);
-            AddButton(text, colour, () =>
+            return AddButton(text, colour, () =>
             {
                 foreach (var o in overlays)
                 {

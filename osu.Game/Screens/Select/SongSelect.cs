@@ -68,6 +68,7 @@ namespace osu.Game.Screens.Select
         private readonly BeatmapInfoWedge beatmapInfoWedge;
         private DialogOverlay dialogOverlay;
         private BeatmapManager beatmaps;
+        private FooterButton randomFooterButton;
 
         protected readonly ModSelectOverlay ModSelect;
 
@@ -222,7 +223,7 @@ namespace osu.Game.Screens.Select
             if (Footer != null)
             {
                 Footer.AddButton(@"mods", colours.Yellow, ModSelect, Key.F1);
-                Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
+                randomFooterButton = Footer.AddButton(@"random", colours.Green, triggerRandom, Key.F2);
                 Footer.AddButton(@"options", colours.Blue, BeatmapOptions, Key.F3);
 
                 BeatmapOptions.AddButton(@"Delete", @"all difficulties", FontAwesome.fa_trash, colours.Pink, () => delete(Beatmap.Value.BeatmapSetInfo), Key.Number4, float.MaxValue);
@@ -654,9 +655,25 @@ namespace osu.Game.Screens.Select
                     }
 
                     break;
+                case Key.ShiftLeft:
+                case Key.ShiftRight:
+                    randomFooterButton.FadeText("rewind", 120, Easing.InQuad);
+                    break;
             }
 
             return base.OnKeyDown(e);
+        }
+
+        protected override bool OnKeyUp(KeyUpEvent e)
+        {
+            switch (e.Key)
+            {
+                case Key.ShiftLeft:
+                case Key.ShiftRight:
+                    randomFooterButton.FadeText("random", 120, Easing.InQuad);
+                    break;
+            }
+            return base.OnKeyUp(e);
         }
 
         private class ResetScrollContainer : Container

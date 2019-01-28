@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private readonly SpriteText spriteText;
+        private SpriteText spriteText;
         private readonly Box box;
         private readonly Box light;
 
@@ -132,6 +132,18 @@ namespace osu.Game.Screens.Select
             }
 
             return base.OnKeyDown(e);
+        }
+
+        public void FadeText(string newText, double duration = 0d, Easing easing = Easing.None)
+        {
+            spriteText?.FadeOut(duration, easing).Expire();
+            Add(spriteText = new OsuSpriteText
+            {
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Text = newText,
+            });
+            spriteText.FadeInFromZero(duration, easing);
         }
     }
 }
