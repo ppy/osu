@@ -17,9 +17,9 @@ namespace osu.Game.Screens
     {
         private bool showDisclaimer;
 
-        protected override bool HideOverlaysOnEnter => true;
+        public override bool HideOverlaysOnEnter => true;
 
-        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
+        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
         protected override bool AllowBackButton => false;
 

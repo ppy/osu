@@ -23,8 +23,8 @@ namespace osu.Game.Screens.Menu
         private Color4 iconColour;
         private LinkFlowContainer textFlow;
 
-        protected override bool HideOverlaysOnEnter => true;
-        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
+        public override bool HideOverlaysOnEnter => true;
+        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
         public override bool CursorVisible => false;
 

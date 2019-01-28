@@ -9,6 +9,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Multi
 {
@@ -17,6 +18,9 @@ namespace osu.Game.Screens.Multi
         public virtual bool AllowBeatmapRulesetChange => true;
         public bool AllowExternalScreenChange => true;
         public bool CursorVisible => true;
+
+        public bool HideOverlaysOnEnter => false;
+        public OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
 
         public bool ValidForResume { get; set; } = true;
         public bool ValidForPush { get; set; } = true;

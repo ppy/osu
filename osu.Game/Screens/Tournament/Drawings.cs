@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Tournament
     {
         private const string results_filename = "drawings_results.txt";
 
-        protected override bool HideOverlaysOnEnter => true;
+        public override bool HideOverlaysOnEnter => true;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 

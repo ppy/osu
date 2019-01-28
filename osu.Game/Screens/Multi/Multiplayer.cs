@@ -16,6 +16,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Multi.Lounge;
@@ -31,6 +32,9 @@ namespace osu.Game.Screens.Multi
         public bool AllowExternalScreenChange => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.AllowExternalScreenChange ?? true;
         public bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.AllowExternalScreenChange ?? true;
 
+        public bool HideOverlaysOnEnter => false;
+        public OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
+
         public bool ValidForResume { get; set; } = true;
         public bool ValidForPush { get; set; } = true;
 
@@ -42,6 +46,8 @@ namespace osu.Game.Screens.Multi
         private readonly LoungeSubScreen loungeSubScreen;
         private readonly ScreenStack screenStack;
 
+        private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>();
+
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
 
@@ -50,6 +56,9 @@ namespace osu.Game.Screens.Multi
 
         [Resolved]
         private OsuGameBase game { get; set; }
+
+        [Resolved]
+        private OsuGame osuGame { get; set; }
 
         [Resolved]
         private APIAccess api { get; set; }
@@ -132,6 +141,9 @@ namespace osu.Game.Screens.Multi
 
             if (idleTracker != null)
                 isIdle.BindTo(idleTracker.IsIdle);
+
+            if (osuGame != null)
+                overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
         }
 
         protected override void LoadComplete()
@@ -168,6 +180,8 @@ namespace osu.Game.Screens.Multi
         {
             this.FadeIn();
 
+            osuGame.Toolbar.State = Visibility.Visible;
+
             waves.Show();
         }
 
@@ -193,6 +207,9 @@ namespace osu.Game.Screens.Multi
             this.ScaleTo(1, 250, Easing.OutSine);
 
             logo?.AppendAnimatingAction(() => OsuScreen.ApplyLogoArrivingDefaults(logo), true);
+
+            overlayActivationMode.Value = OverlayActivation.All;
+            osuGame.Toolbar.State = Visibility.Visible;
 
             updatePollingRate(isIdle.Value);
         }
