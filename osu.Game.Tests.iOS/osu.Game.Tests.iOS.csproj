@@ -26,30 +26,7 @@
     </LinkDescription>
     <Compile Include="Application.cs" />
     <Compile Include="AppDelegate.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\osu.Game.Tests\**\Beatmaps\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\Chat\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\NonVisual\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\Scores\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\ScrollAlgorithms\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\Visual\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\**\Resources\**\*.cs">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
-    <Compile Include="..\osu.Game.Tests\*.cs">
+    <Compile Include="..\osu.Game.Tests\**\*.cs" Exclude="**\obj\**">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>

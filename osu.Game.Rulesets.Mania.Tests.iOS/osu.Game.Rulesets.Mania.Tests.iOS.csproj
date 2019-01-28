@@ -26,9 +26,7 @@
     </LinkDescription>
     <Compile Include="Application.cs" />
     <Compile Include="AppDelegate.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\osu.Game.Rulesets.Mania.Tests\*.cs">
+    <Compile Include="..\osu.Game.Rulesets.Mania.Tests\**\*.cs" Exclude="**\obj\**">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
     </Compile>
   </ItemGroup>
