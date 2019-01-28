@@ -146,7 +146,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         /// <returns>The <see cref="Beatmap"/> after being decoded by an <see cref="LegacyBeatmapDecoder"/>.</returns>
         private Beatmap decode(string filename, out Beatmap jsonDecoded)
         {
-            using (var stream = Resource.OpenResource(filename))
+            using (var stream = TestResources.OpenResource(filename))
             using (var sr = new StreamReader(stream))
             {
                 var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
