@@ -182,7 +182,7 @@ namespace osu.Game.Database
         /// <summary>
         /// Import one <see cref="TModel"/> from the filesystem and delete the file on success.
         /// </summary>
-        /// <param name="paths">The archive location on disk.</param>
+        /// <param name="path">The archive location on disk.</param>
         /// <returns>The imported model, if successful.</returns>
         public TModel Import(string path)
         {
