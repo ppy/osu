@@ -1,18 +1,17 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Screens.Select;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    internal class TestCaseBeatmapDetailArea : OsuTestCase
+    [System.ComponentModel.Description("PlaySongSelect leaderboard/details area")]
+    public class TestCaseBeatmapDetailArea : OsuTestCase
     {
-        public override string Description => @"Beatmap details in song select";
-
         public TestCaseBeatmapDetailArea()
         {
             Add(new BeatmapDetailArea

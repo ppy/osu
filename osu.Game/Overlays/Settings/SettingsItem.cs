@@ -1,21 +1,21 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osuTK;
 
 namespace osu.Game.Overlays.Settings
 {
@@ -33,21 +33,9 @@ namespace osu.Game.Overlays.Settings
 
         private SpriteText text;
 
-        private readonly RestoreDefaultValueButton restoreDefaultValueButton = new RestoreDefaultValueButton();
+        private readonly RestoreDefaultValueButton restoreDefaultButton;
 
         public bool ShowsDefaultIndicator = true;
-
-        private Color4? restoreDefaultValueColour;
-
-        public Color4 RestoreDefaultValueColour
-        {
-            get { return restoreDefaultValueColour ?? Color4.White; }
-            set
-            {
-                restoreDefaultValueColour = value;
-                restoreDefaultValueButton?.SetButtonColour(RestoreDefaultValueColour);
-            }
-        }
 
         public virtual string LabelText
         {
@@ -57,7 +45,8 @@ namespace osu.Game.Overlays.Settings
                 if (text == null)
                 {
                     // construct lazily for cases where the label is not needed (may be provided by the Control).
-                    Add(text = new OsuSpriteText { Depth = 1 });
+                    Add(text = new OsuSpriteText());
+                    FlowContent.SetLayoutPosition(text, -1);
                 }
 
                 text.Text = value;
@@ -69,10 +58,7 @@ namespace osu.Game.Overlays.Settings
 
         public virtual Bindable<T> Bindable
         {
-            get
-            {
-                return bindable;
-            }
+            get { return bindable; }
 
             set
             {
@@ -80,13 +66,13 @@ namespace osu.Game.Overlays.Settings
                 controlWithCurrent?.Current.BindTo(bindable);
                 if (ShowsDefaultIndicator)
                 {
-                    restoreDefaultValueButton.Bindable = bindable.GetBoundCopy();
-                    restoreDefaultValueButton.Bindable.TriggerChange();
+                    restoreDefaultButton.Bindable = bindable.GetBoundCopy();
+                    restoreDefaultButton.Bindable.TriggerChange();
                 }
             }
         }
 
-        public IEnumerable<string> FilterTerms => new[] { LabelText };
+        public virtual IEnumerable<string> FilterTerms => new[] { LabelText };
 
         public bool MatchingFilter
         {
@@ -103,38 +89,30 @@ namespace osu.Game.Overlays.Settings
             AutoSizeAxes = Axes.Y;
             Padding = new MarginPadding { Right = SettingsOverlay.CONTENT_MARGINS };
 
-            FlowContent = new FillFlowContainer
+            InternalChildren = new Drawable[]
             {
-                RelativeSizeAxes = Axes.X,
-                AutoSizeAxes = Axes.Y,
-                Padding = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS, Right = 5 },
+                restoreDefaultButton = new RestoreDefaultValueButton(),
+                FlowContent = new FillFlowContainer
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Padding = new MarginPadding { Left = SettingsOverlay.CONTENT_MARGINS },
+                    Child = Control = CreateControl()
+                },
             };
-
-            if ((Control = CreateControl()) != null)
-            {
-                if (controlWithCurrent != null)
-                    controlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
-                FlowContent.Add(Control);
-            }
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load()
         {
-            AddInternal(FlowContent);
-
-            if (restoreDefaultValueButton != null)
-            {
-                if (!restoreDefaultValueColour.HasValue)
-                    restoreDefaultValueColour = colours.Yellow;
-                restoreDefaultValueButton.SetButtonColour(RestoreDefaultValueColour);
-                AddInternal(restoreDefaultValueButton);
-            }
+            if (controlWithCurrent != null)
+                controlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
         }
 
-        private class RestoreDefaultValueButton : Box, IHasTooltip
+        private class RestoreDefaultValueButton : Container, IHasTooltip
         {
             private Bindable<T> bindable;
+
             public Bindable<T> Bindable
             {
                 get { return bindable; }
@@ -157,29 +135,57 @@ namespace osu.Game.Overlays.Settings
                 Alpha = 0f;
             }
 
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colour)
+            {
+                buttonColour = colour.Yellow;
+
+                Child = new Container
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    CornerRadius = 3,
+                    Masking = true,
+                    Colour = buttonColour,
+                    EdgeEffect = new EdgeEffectParameters
+                    {
+                        Colour = buttonColour.Opacity(0.1f),
+                        Type = EdgeEffectType.Glow,
+                        Radius = 2,
+                    },
+                    Size = new Vector2(0.33f, 0.8f),
+                    Child = new Box { RelativeSizeAxes = Axes.Both },
+                };
+            }
+
+            protected override void LoadComplete()
+            {
+                base.LoadComplete();
+                UpdateState();
+            }
+
             public string TooltipText => "Revert to default";
 
-            public override bool HandleInput => true;
+            protected override bool OnMouseDown(MouseDownEvent e) => true;
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+            protected override bool OnMouseUp(MouseUpEvent e) => true;
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args) => true;
-
-            protected override bool OnClick(InputState state)
+            protected override bool OnClick(ClickEvent e)
             {
                 if (bindable != null && !bindable.Disabled)
                     bindable.SetDefault();
                 return true;
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 hovering = true;
                 UpdateState();
-                return true;
+                return false;
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 hovering = false;
                 UpdateState();
@@ -195,9 +201,10 @@ namespace osu.Game.Overlays.Settings
             {
                 if (bindable == null)
                     return;
-                var colour = bindable.Disabled ? Color4.Gray : buttonColour;
-                this.FadeTo(bindable.IsDefault ? 0f : hovering && !bindable.Disabled ? 1f : 0.5f, 200, Easing.OutQuint);
-                this.FadeColour(ColourInfo.GradientHorizontal(colour.Opacity(0.8f), colour.Opacity(0)), 200, Easing.OutQuint);
+
+                this.FadeTo(bindable.IsDefault ? 0f :
+                    hovering && !bindable.Disabled ? 1f : 0.65f, 200, Easing.OutQuint);
+                this.FadeColour(bindable.Disabled ? Color4.Gray : buttonColour, 200, Easing.OutQuint);
             }
         }
     }

@@ -1,23 +1,20 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Timing;
 using osu.Game.Beatmaps.Timing;
-using osu.Game.Screens.Play.BreaksOverlay;
 using System.Collections.Generic;
+using NUnit.Framework;
+using osu.Game.Screens.Play;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseBreakOverlay : OsuTestCase
+    [TestFixture]
+    public class TestCaseBreakOverlay : OsuTestCase
     {
-        public override string Description => @"Tests breaks behavior";
-
         private readonly BreakOverlay breakOverlay;
 
         public TestCaseBreakOverlay()
         {
-            Clock = new FramedClock();
-
             Child = breakOverlay = new BreakOverlay(true);
 
             AddStep("2s break", () => startBreak(2000));

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics;
@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Select
         protected override Container<Drawable> Content => content;
 
         public readonly BeatmapDetails Details;
-        public readonly Leaderboard Leaderboard;
+        public readonly BeatmapLeaderboard Leaderboard;
 
         private WorkingBeatmap beatmap;
         public WorkingBeatmap Beatmap
@@ -52,6 +52,7 @@ namespace osu.Game.Screens.Select
 
                             default:
                                 Details.Hide();
+                                Leaderboard.Scope = (BeatmapLeaderboardScope)tab - 1;
                                 Leaderboard.Show();
                                 break;
                         }
@@ -72,7 +73,7 @@ namespace osu.Game.Screens.Select
                     Alpha = 0,
                     Margin = new MarginPadding { Top = details_padding },
                 },
-                Leaderboard = new Leaderboard
+                Leaderboard = new BeatmapLeaderboard
                 {
                     RelativeSizeAxes = Axes.Both,
                 }

@@ -1,7 +1,7 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Game.Audio;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
@@ -13,30 +13,31 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
     /// </summary>
     public class ConvertHitObjectParser : Legacy.ConvertHitObjectParser
     {
-        protected override HitObject CreateHit(Vector2 position, bool newCombo)
+        public ConvertHitObjectParser(double offset, int formatVersion)
+            : base(offset, formatVersion)
+        {
+        }
+
+        protected override HitObject CreateHit(Vector2 position, bool newCombo, int comboOffset)
         {
             return new ConvertHit
             {
-                X = position.X,
-                NewCombo = newCombo,
+                X = position.X
             };
         }
 
-        protected override HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<SampleInfoList> repeatSamples)
+        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, PathType pathType, int repeatCount, List<List<SampleInfo>> nodeSamples)
         {
             return new ConvertSlider
             {
                 X = position.X,
-                NewCombo = newCombo,
-                ControlPoints = controlPoints,
-                Distance = length,
-                CurveType = curveType,
-                RepeatSamples = repeatSamples,
+                Path = new SliderPath(pathType, controlPoints, length),
+                NodeSamples = nodeSamples,
                 RepeatCount = repeatCount
             };
         }
 
-        protected override HitObject CreateSpinner(Vector2 position, double endTime)
+        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime)
         {
             return new ConvertSpinner
             {
@@ -45,7 +46,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
             };
         }
 
-        protected override HitObject CreateHold(Vector2 position, bool newCombo, double endTime)
+        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime)
         {
             return new ConvertHold
             {

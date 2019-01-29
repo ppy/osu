@@ -1,13 +1,15 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using OpenTK;
-using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Osu.Judgements;
+using osuTK;
+using osu.Game.Rulesets.Scoring;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -21,46 +23,43 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
 
-        public DrawableHitCircle(OsuHitObject h) : base(h)
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+        private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
+        private readonly IBindable<float> scaleBindable = new Bindable<float>();
+
+        public DrawableHitCircle(HitCircle h)
+            : base(h)
         {
             Origin = Anchor.Centre;
 
             Position = HitObject.StackedPosition;
-            Scale = new Vector2(HitObject.Scale);
+            Scale = new Vector2(h.Scale);
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
-                glow = new GlowPiece
-                {
-                    Colour = AccentColour
-                },
+                glow = new GlowPiece(),
                 circle = new CirclePiece
                 {
-                    Colour = AccentColour,
                     Hit = () =>
                     {
                         if (AllJudged)
                             return false;
 
-                        UpdateJudgement(true);
+                        UpdateResult(true);
                         return true;
                     },
                 },
                 number = new NumberPiece
                 {
-                    Text = h is Spinner ? "S" : (HitObject.ComboIndex + 1).ToString(),
+                    Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
                 },
                 ring = new RingPiece(),
                 flash = new FlashPiece(),
-                explode = new ExplodePiece
-                {
-                    Colour = AccentColour,
-                },
+                explode = new ExplodePiece(),
                 ApproachCircle = new ApproachCircle
                 {
                     Alpha = 0,
                     Scale = new Vector2(4),
-                    Colour = AccentColour,
                 }
             };
 
@@ -68,45 +67,76 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             Size = circle.DrawSize;
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            stackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            scaleBindable.BindValueChanged(v => Scale = new Vector2(v));
+
+            positionBindable.BindTo(HitObject.PositionBindable);
+            stackHeightBindable.BindTo(HitObject.StackHeightBindable);
+            scaleBindable.BindTo(HitObject.ScaleBindable);
+        }
+
+        public override Color4 AccentColour
+        {
+            get { return base.AccentColour; }
+            set
+            {
+                base.AccentColour = value;
+                explode.Colour = AccentColour;
+                glow.Colour = AccentColour;
+                circle.Colour = AccentColour;
+                ApproachCircle.Colour = AccentColour;
+            }
+        }
+
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
-                if (timeOffset > HitObject.HitWindowFor(HitResult.Meh))
-                    AddJudgement(new OsuJudgement { Result = HitResult.Miss });
+                if (!HitObject.HitWindows.CanBeHit(timeOffset))
+                    ApplyResult(r => r.Type = HitResult.Miss);
+
                 return;
             }
 
-            AddJudgement(new OsuJudgement
+            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            if (result == HitResult.None)
             {
-                Result = HitObject.ScoreResultForOffset(Math.Abs(timeOffset)),
-                PositionOffset = Vector2.Zero //todo: set to correct value
-            });
+                Shake(Math.Abs(timeOffset) - HitObject.HitWindows.HalfWindowFor(HitResult.Miss));
+                return;
+            }
+
+            ApplyResult(r => r.Type = result);
         }
 
         protected override void UpdatePreemptState()
         {
             base.UpdatePreemptState();
 
-            ApproachCircle.FadeIn(Math.Min(TIME_FADEIN * 2, TIME_PREEMPT));
-            ApproachCircle.ScaleTo(1.1f, TIME_PREEMPT);
+            ApproachCircle.FadeIn(Math.Min(HitObject.TimeFadeIn * 2, HitObject.TimePreempt));
+            ApproachCircle.ScaleTo(1.1f, HitObject.TimePreempt);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            double duration = ((HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime) - HitObject.StartTime;
-
-            glow.Delay(duration).FadeOut(400);
+            glow.FadeOut(400);
 
             switch (state)
             {
                 case ArmedState.Idle:
-                    this.Delay(duration + TIME_PREEMPT).FadeOut(TIME_FADEOUT);
+                    this.Delay(HitObject.TimePreempt).FadeOut(500);
+
                     Expire(true);
+
+                    // override lifetime end as FadeIn may have been changed externally, causing out expiration to be too early.
+                    LifetimeEnd = HitObject.StartTime + HitObject.HitWindows.HalfWindowFor(HitResult.Miss);
                     break;
                 case ArmedState.Miss:
                     ApproachCircle.FadeOut(50);
-                    this.FadeOut(TIME_FADEOUT / 5);
+                    this.FadeOut(100);
                     Expire();
                     break;
                 case ArmedState.Hit:

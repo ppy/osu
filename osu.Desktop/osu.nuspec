@@ -3,7 +3,7 @@
     <metadata>
         <id>osulazer</id>
         <version>0.0.0</version>
-        <title>osulazer</title>
+        <title>osu!lazer</title>
         <authors>ppy Pty Ltd</authors>
         <owners>Dean Herbert</owners>
         <projectUrl>https://osu.ppy.sh/</projectUrl>
@@ -12,15 +12,13 @@
         <description>click the circles. to the beat.</description>
         <summary>click the circles.</summary>
         <releaseNotes>testing</releaseNotes>
-        <copyright>Copyright ppy Pty Ltd 2007-2017</copyright>
+        <copyright>Copyright (c) 2019 ppy Pty Ltd</copyright>
         <language>en-AU</language>
     </metadata>
     <files>
-      <file src="*.exe" target="lib\net45\" exclude="**vshost**"/>
-      <file src="*.dll" target="lib\net45\"/>
-      <file src="*.config" target="lib\net45\"/>
-      <file src="x86\*.dll" target="lib\net45\x86\"/>
-      <file src="x64\*.dll" target="lib\net45\x64\"/>
+      <file src="**.exe" target="lib\net45\" exclude="**vshost**"/>
+      <file src="**.dll" target="lib\net45\"/>
+      <file src="**.config" target="lib\net45\"/>
     </files>
 </package>
 

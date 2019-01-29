@@ -1,7 +1,7 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,6 +14,8 @@ namespace osu.Game.Rulesets.Taiko.UI
 {
     public class KiaiHitExplosion : CircularContainer
     {
+        public override bool RemoveWhenNotAlive => true;
+
         public readonly DrawableHitObject JudgedObject;
 
         private readonly bool isRim;
@@ -62,7 +64,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             this.ScaleTo(new Vector2(1, 3f), 500, Easing.OutQuint);
             this.FadeOut(250);
 
-            Expire();
+            Expire(true);
         }
     }
 }

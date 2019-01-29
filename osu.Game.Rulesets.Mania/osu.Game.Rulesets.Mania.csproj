@@ -1,126 +1,13 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{48F4582B-7687-4621-9CBE-5C24197CB536}</ProjectGuid>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\osu.Game.props" />
+  <PropertyGroup Label="Project">
+    <TargetFramework>netstandard2.0</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>osu.Game.Rulesets.Mania</RootNamespace>
-    <AssemblyName>osu.Game.Rulesets.Mania</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>smash the keys. to the beat.</Description>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <LangVersion>6</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\OpenTK.3.0.0-git00009\lib\net20\OpenTK.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
+  <ItemGroup Label="Project References">
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Beatmaps\Patterns\Legacy\EndTimeObjectPatternGenerator.cs" />
-    <Compile Include="Beatmaps\Patterns\Legacy\DistanceObjectPatternGenerator.cs" />
-    <Compile Include="Beatmaps\Patterns\Legacy\PatternGenerator.cs" />
-    <Compile Include="Beatmaps\Patterns\PatternGenerator.cs" />
-    <Compile Include="Beatmaps\Patterns\Legacy\HitObjectPatternGenerator.cs" />
-    <Compile Include="Beatmaps\Patterns\Legacy\PatternType.cs" />
-    <Compile Include="Beatmaps\ManiaBeatmapConverter.cs" />
-    <Compile Include="Beatmaps\Patterns\Pattern.cs" />
-    <Compile Include="MathUtils\FastRandom.cs" />
-    <Compile Include="Judgements\HitWindows.cs" />
-    <Compile Include="Judgements\HoldNoteTailJudgement.cs" />
-    <Compile Include="Judgements\HoldNoteTickJudgement.cs" />
-    <Compile Include="Judgements\ManiaJudgement.cs" />
-    <Compile Include="ManiaDifficultyCalculator.cs" />
-    <Compile Include="Mods\IGenerateSpeedAdjustments.cs" />
-    <Compile Include="Objects\Drawables\DrawableBarLine.cs" />
-    <Compile Include="Objects\Drawables\DrawableHoldNote.cs" />
-    <Compile Include="Objects\Drawables\DrawableHoldNoteTick.cs" />
-    <Compile Include="Objects\Drawables\DrawableManiaHitObject.cs" />
-    <Compile Include="Objects\Drawables\DrawableNote.cs" />
-    <Compile Include="Objects\Drawables\Pieces\BodyPiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\GlowPiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\LaneGlowPiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\NotePiece.cs" />
-    <Compile Include="Objects\Types\IHasColumn.cs" />
-    <Compile Include="Replays\ManiaAutoGenerator.cs" />
-    <Compile Include="Replays\ManiaFramedReplayInputHandler.cs" />
-    <Compile Include="Scoring\ManiaScoreProcessor.cs" />
-    <Compile Include="Objects\BarLine.cs" />
-    <Compile Include="Objects\HoldNote.cs" />
-    <Compile Include="Objects\HoldNoteTick.cs" />
-    <Compile Include="Objects\ManiaHitObject.cs" />
-    <Compile Include="Objects\Note.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ManiaInputManager.cs" />
-    <Compile Include="Tests\TestCaseManiaHitObjects.cs" />
-    <Compile Include="Tests\TestCaseManiaPlayfield.cs" />
-    <Compile Include="Timing\GravityScrollingContainer.cs" />
-    <Compile Include="Timing\ScrollingAlgorithm.cs" />
-    <Compile Include="UI\Column.cs" />
-    <Compile Include="UI\DrawableManiaJudgement.cs" />
-    <Compile Include="UI\HitExplosion.cs" />
-    <Compile Include="UI\ManiaRulesetContainer.cs" />
-    <Compile Include="UI\ManiaPlayfield.cs" />
-    <Compile Include="ManiaRuleset.cs" />
-    <Compile Include="Mods\ManiaMod.cs" />
-    <Compile Include="Mods\ManiaModGravity.cs" />
-    <Compile Include="UI\SpecialColumnPosition.cs" />
-    <Compile Include="Timing\ManiaSpeedAdjustmentContainer.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\osu.licenseheader">
-      <Link>osu.licenseheader</Link>
-    </None>
-    <None Include="app.config" />
-    <None Include="OpenTK.dll.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
-      <Project>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</Project>
-      <Name>osu.Framework</Name>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
-      <Name>osu.Game</Name>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

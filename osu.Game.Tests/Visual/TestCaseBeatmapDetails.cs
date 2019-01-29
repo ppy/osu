@@ -1,6 +1,7 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System.ComponentModel;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
@@ -8,10 +9,9 @@ using osu.Game.Screens.Select;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseBeatmapDetails : OsuTestCase
+    [Description("PlaySongSelect beatmap details")]
+    public class TestCaseBeatmapDetails : OsuTestCase
     {
-        public override string Description => "BeatmapDetails tab of BeatmapDetailArea";
-
         public TestCaseBeatmapDetails()
         {
             BeatmapDetails details;

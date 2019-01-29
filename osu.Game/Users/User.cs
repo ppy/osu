@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using Newtonsoft.Json;
@@ -23,13 +23,6 @@ namespace osu.Game.Users
 
         public Bindable<UserStatus> Status = new Bindable<UserStatus>();
 
-        [JsonProperty(@"age")]
-        public int? Age;
-
-        public int GlobalRank;
-
-        public int CountryRank;
-
         //public Team Team;
 
         [JsonProperty(@"profile_colour")]
@@ -39,10 +32,14 @@ namespace osu.Game.Users
         public string AvatarUrl;
 
         [JsonProperty(@"cover_url")]
-        public string CoverUrl;
+        public string CoverUrl
+        {
+            get { return Cover?.Url; }
+            set { Cover = new UserCover { Url = value }; }
+        }
 
-        //[JsonProperty(@"cover")]
-        //public UserCover Cover;
+        [JsonProperty(@"cover")]
+        public UserCover Cover;
 
         public class UserCover
         {
@@ -56,26 +53,26 @@ namespace osu.Game.Users
             public int? Id;
         }
 
-        [JsonProperty(@"isAdmin")]
+        [JsonProperty(@"is_admin")]
         public bool IsAdmin;
 
-        [JsonProperty(@"isSupporter")]
+        [JsonProperty(@"is_supporter")]
         public bool IsSupporter;
 
-        [JsonProperty(@"isGMT")]
+        [JsonProperty(@"is_gmt")]
         public bool IsGMT;
 
-        [JsonProperty(@"isQAT")]
+        [JsonProperty(@"is_qat")]
         public bool IsQAT;
 
-        [JsonProperty(@"isBNG")]
+        [JsonProperty(@"is_bng")]
         public bool IsBNG;
 
         [JsonProperty(@"is_active")]
         public bool Active;
 
         [JsonProperty(@"interests")]
-        public string Intrerests;
+        public string Interests;
 
         [JsonProperty(@"occupation")]
         public string Occupation;
@@ -86,8 +83,8 @@ namespace osu.Game.Users
         [JsonProperty(@"location")]
         public string Location;
 
-        [JsonProperty(@"lastvisit")]
-        public DateTimeOffset LastVisit;
+        [JsonProperty(@"last_visit")]
+        public DateTimeOffset? LastVisit;
 
         [JsonProperty(@"twitter")]
         public string Twitter;
@@ -98,8 +95,14 @@ namespace osu.Game.Users
         [JsonProperty(@"skype")]
         public string Skype;
 
+        [JsonProperty(@"discord")]
+        public string Discord;
+
         [JsonProperty(@"website")]
         public string Website;
+
+        [JsonProperty(@"post_count")]
+        public int PostCount;
 
         [JsonProperty(@"playstyle")]
         public string[] PlayStyle;
@@ -107,7 +110,7 @@ namespace osu.Game.Users
         [JsonProperty(@"playmode")]
         public string PlayMode;
 
-        [JsonProperty(@"profileOrder")]
+        [JsonProperty(@"profile_order")]
         public string[] ProfileOrder;
 
         [JsonProperty(@"kudosu")]
@@ -136,5 +139,19 @@ namespace osu.Game.Users
 
         [JsonProperty(@"rankHistory")]
         public RankHistoryData RankHistory;
+
+        [JsonProperty("badges")]
+        public Badge[] Badges;
+
+        public override string ToString() => Username;
+
+        /// <summary>
+        /// A user instance for displaying locally created system messages.
+        /// </summary>
+        public static readonly User SYSTEM_USER = new User
+        {
+            Username = "system",
+            Id = 0
+        };
     }
 }

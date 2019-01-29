@@ -1,7 +1,7 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System.Collections.Generic;
@@ -26,10 +26,10 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 direction = value;
-                base.Direction = (direction & BarDirection.Horizontal) > 0 ? FillDirection.Vertical : FillDirection.Horizontal;
+                base.Direction = direction.HasFlag(BarDirection.Horizontal) ? FillDirection.Vertical : FillDirection.Horizontal;
                 foreach (var bar in Children)
                 {
-                    bar.Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, 1.0f / Children.Count) : new Vector2(1.0f / Children.Count, 1);
+                    bar.Size = direction.HasFlag(BarDirection.Horizontal) ? new Vector2(1, 1.0f / Children.Count) : new Vector2(1.0f / Children.Count, 1);
                     bar.Direction = direction;
                 }
             }
@@ -56,14 +56,14 @@ namespace osu.Game.Graphics.UserInterface
                     if (bar.Bar != null)
                     {
                         bar.Bar.Length = length;
-                        bar.Bar.Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, size) : new Vector2(size, 1);
+                        bar.Bar.Size = direction.HasFlag(BarDirection.Horizontal) ? new Vector2(1, size) : new Vector2(size, 1);
                     }
                     else
                     {
                         Add(new Bar
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Size = (direction & BarDirection.Horizontal) > 0 ? new Vector2(1, size) : new Vector2(size, 1),
+                            Size = direction.HasFlag(BarDirection.Horizontal) ? new Vector2(1, size) : new Vector2(size, 1),
                             Length = length,
                             Direction = Direction,
                         });

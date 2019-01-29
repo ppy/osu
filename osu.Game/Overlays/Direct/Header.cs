@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -13,7 +13,6 @@ namespace osu.Game.Overlays.Direct
     public class Header : SearchableListHeader<DirectTab>
     {
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"252f3a");
-        protected override float TabStripWidth => 298;
 
         protected override DirectTab DefaultTab => DirectTab.Search;
         protected override Drawable CreateHeaderText() => new OsuSpriteText { Text = @"osu!direct", TextSize = 25 };

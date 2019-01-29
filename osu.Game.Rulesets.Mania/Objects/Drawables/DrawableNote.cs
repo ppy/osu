@@ -1,13 +1,14 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System;
-using OpenTK.Graphics;
+using osu.Framework.Extensions.Color4Extensions;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
-using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -16,31 +17,25 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableNote : DrawableManiaHitObject<Note>, IKeyBindingHandler<ManiaAction>
     {
-        protected readonly GlowPiece GlowPiece;
-
-        private readonly LaneGlowPiece laneGlowPiece;
         private readonly NotePiece headPiece;
 
-        public DrawableNote(Note hitObject, ManiaAction action)
-            : base(hitObject, action)
+        public DrawableNote(Note hitObject)
+            : base(hitObject)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Children = new Drawable[]
-            {
-                laneGlowPiece = new LaneGlowPiece
-                {
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre
-                },
-                GlowPiece = new GlowPiece(),
-                headPiece = new NotePiece
-                {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre
-                }
-            };
+            CornerRadius = 5;
+            Masking = true;
+
+            InternalChild = headPiece = new NotePiece();
+        }
+
+        protected override void OnDirectionChanged(ScrollingDirection direction)
+        {
+            base.OnDirectionChanged(direction);
+
+            headPiece.Anchor = headPiece.Origin = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
         public override Color4 AccentColour
@@ -48,43 +43,40 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             get { return base.AccentColour; }
             set
             {
-                if (base.AccentColour == value)
-                    return;
                 base.AccentColour = value;
+                headPiece.AccentColour = AccentColour;
 
-                laneGlowPiece.AccentColour = value;
-                GlowPiece.AccentColour = value;
-                headPiece.AccentColour = value;
+                EdgeEffect = new EdgeEffectParameters
+                {
+                    Type = EdgeEffectType.Glow,
+                    Colour = AccentColour.Lighten(1f).Opacity(0.6f),
+                    Radius = 10,
+                };
             }
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
-                if (timeOffset > HitObject.HitWindows.Bad / 2)
-                    AddJudgement(new ManiaJudgement { Result = HitResult.Miss });
+                if (!HitObject.HitWindows.CanBeHit(timeOffset))
+                    ApplyResult(r => r.Type = HitResult.Miss);
                 return;
             }
 
-            double offset = Math.Abs(timeOffset);
-
-            if (offset > HitObject.HitWindows.Miss / 2)
+            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            if (result == HitResult.None)
                 return;
 
-            AddJudgement(new ManiaJudgement { Result = HitObject.HitWindows.ResultFor(offset) ?? HitResult.Miss });
-        }
-
-        protected override void UpdateState(ArmedState state)
-        {
+            ApplyResult(r => r.Type = result);
         }
 
         public virtual bool OnPressed(ManiaAction action)
         {
-            if (action != Action)
+            if (action != Action.Value)
                 return false;
 
-            return UpdateJudgement(true);
+            return UpdateResult(true);
         }
 
         public virtual bool OnReleased(ManiaAction action) => false;

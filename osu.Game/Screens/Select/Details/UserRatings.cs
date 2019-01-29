@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -21,6 +21,7 @@ namespace osu.Game.Screens.Select.Details
         private readonly BarGraph graph;
 
         private BeatmapMetrics metrics;
+
         public BeatmapMetrics Metrics
         {
             get { return metrics; }
@@ -29,11 +30,27 @@ namespace osu.Game.Screens.Select.Details
                 if (value == metrics) return;
                 metrics = value;
 
-                var ratings = Metrics.Ratings.ToList();
-                negativeRatings.Text = ratings.GetRange(0, ratings.Count / 2 + 1).Sum().ToString();
-                positiveRatings.Text = ratings.GetRange(ratings.Count / 2 + 1, ratings.Count / 2).Sum().ToString();
-                ratingsBar.Length = (float)ratings.GetRange(0, ratings.Count / 2 + 1).Sum() / ratings.Sum();
-                graph.Values = Metrics.Ratings.Select(r => (float)r);
+                const int rating_range = 10;
+
+                if (metrics == null)
+                {
+                    negativeRatings.Text = "0";
+                    positiveRatings.Text = "0";
+                    ratingsBar.Length = 0;
+                    graph.Values = new float[rating_range];
+                }
+                else
+                {
+                    var ratings = Metrics.Ratings.Skip(1).Take(rating_range); // adjust for API returning weird empty data at 0.
+
+                    var negativeCount = ratings.Take(rating_range / 2).Sum();
+                    var totalCount = ratings.Sum();
+
+                    negativeRatings.Text = negativeCount.ToString();
+                    positiveRatings.Text = (totalCount - negativeCount).ToString();
+                    ratingsBar.Length = totalCount == 0 ? 0 : (float)negativeCount / totalCount;
+                    graph.Values = ratings.Take(rating_range).Select(r => (float)r);
+                }
             }
         }
 

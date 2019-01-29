@@ -1,28 +1,29 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
+using osu.Framework.Graphics.UserInterface;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Settings
 {
-    public class SidebarButton : Container
+    public class SidebarButton : Button
     {
         private readonly SpriteIcon drawableIcon;
         private readonly SpriteText headerText;
-        private readonly Box backgroundBox;
         private readonly Box selectionIndicator;
         private readonly Container text;
-        public Action<SettingsSection> Action;
+        public new Action<SettingsSection> Action;
 
         private SettingsSection section;
         public SettingsSection Section
@@ -61,17 +62,14 @@ namespace osu.Game.Overlays.Settings
 
         public SidebarButton()
         {
+            BackgroundColour = OsuColour.Gray(60);
+            Background.Alpha = 0;
+
             Height = Sidebar.DEFAULT_WIDTH;
             RelativeSizeAxes = Axes.X;
-            Children = new Drawable[]
+
+            AddRange(new Drawable[]
             {
-                backgroundBox = new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Blending = BlendingMode.Additive,
-                    Colour = OsuColour.Gray(60),
-                    Alpha = 0,
-                },
                 text = new Container
                 {
                     Width = Sidebar.DEFAULT_WIDTH,
@@ -100,8 +98,9 @@ namespace osu.Game.Overlays.Settings
                     Width = 5,
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
-                }
-            };
+                },
+                new HoverClickSounds(HoverSampleSet.Loud),
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -110,23 +109,22 @@ namespace osu.Game.Overlays.Settings
             selectionIndicator.Colour = colours.Yellow;
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             Action?.Invoke(section);
-            backgroundBox.FlashColour(Color4.White, 400);
-            return true;
+            return base.OnClick(e);
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
-            backgroundBox.FadeTo(0.4f, 200);
-            return base.OnHover(state);
+            Background.FadeTo(0.4f, 200);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
-            backgroundBox.FadeTo(0, 200);
-            base.OnHoverLost(state);
+            Background.FadeTo(0, 200);
+            base.OnHoverLost(e);
         }
     }
 }

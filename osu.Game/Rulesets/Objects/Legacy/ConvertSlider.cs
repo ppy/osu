@@ -1,54 +1,39 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Types;
-using System;
 using System.Collections.Generic;
-using OpenTK;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 
 namespace osu.Game.Rulesets.Objects.Legacy
 {
-    internal abstract class ConvertSlider : HitObject, IHasCurve
+    internal abstract class ConvertSlider : HitObject, IHasCurve, IHasLegacyLastTickOffset
     {
         /// <summary>
         /// Scoring distance with a speed-adjusted beat length of 1 second.
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public List<Vector2> ControlPoints { get; set; }
-        public CurveType CurveType { get; set; }
+        /// <summary>
+        /// <see cref="ConvertSlider"/>s don't need a curve since they're converted to ruleset-specific hitobjects.
+        /// </summary>
+        public SliderPath Path { get; set; }
 
-        public double Distance { get; set; }
+        public double Distance => Path.Distance;
 
-        public List<SampleInfoList> RepeatSamples { get; set; }
-        public int RepeatCount { get; set; } = 1;
+        public List<List<SampleInfo>> NodeSamples { get; set; }
+        public int RepeatCount { get; set; }
 
-        public double EndTime => StartTime + RepeatCount * Distance / Velocity;
+        public double EndTime => StartTime + this.SpanCount() * Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
         public double Velocity = 1;
 
-        public Vector2 PositionAt(double progress)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            throw new NotImplementedException();
-        }
-
-        public double ProgressAt(double progress)
-        {
-            throw new NotImplementedException();
-        }
-
-        public int RepeatAt(double progress)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
-        {
-            base.ApplyDefaults(controlPointInfo, difficulty);
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
@@ -57,5 +42,7 @@ namespace osu.Game.Rulesets.Objects.Legacy
 
             Velocity = scoringDistance / timingPoint.BeatLength;
         }
+
+        public double LegacyLastTickOffset => 36;
     }
 }

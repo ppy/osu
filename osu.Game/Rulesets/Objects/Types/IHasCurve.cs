@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Objects.Types
 {
@@ -12,36 +11,43 @@ namespace osu.Game.Rulesets.Objects.Types
     public interface IHasCurve : IHasDistance, IHasRepeats
     {
         /// <summary>
-        /// The control points that shape the curve.
+        /// The curve.
         /// </summary>
-        List<Vector2> ControlPoints { get; }
+        SliderPath Path { get; }
+    }
+
+    public static class HasCurveExtensions
+    {
+        /// <summary>
+        /// Computes the position on the curve relative to how much of the <see cref="HitObject"/> has been completed.
+        /// </summary>
+        /// <param name="obj">The curve.</param>
+        /// <param name="progress">[0, 1] where 0 is the start time of the <see cref="HitObject"/> and 1 is the end time of the <see cref="HitObject"/>.</param>
+        /// <returns>The position on the curve.</returns>
+        public static Vector2 CurvePositionAt(this IHasCurve obj, double progress)
+            => obj.Path.PositionAt(obj.ProgressAt(progress));
 
         /// <summary>
-        /// The type of curve.
+        /// Computes the progress along the curve relative to how much of the <see cref="HitObject"/> has been completed.
         /// </summary>
-        CurveType CurveType { get; }
-
-        /// <summary>
-        /// Computes the position on the curve at a given progress, accounting for repeat logic.
-        /// <para>
-        /// Ranges from [0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.
-        /// </para>
-        /// </summary>
-        /// <param name="progress">[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</param>
-        Vector2 PositionAt(double progress);
-
-        /// <summary>
-        /// Finds the progress along the curve, accounting for repeat logic.
-        /// </summary>
-        /// <param name="progress">[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</param>
+        /// <param name="obj">The curve.</param>
+        /// <param name="progress">[0, 1] where 0 is the start time of the <see cref="HitObject"/> and 1 is the end time of the <see cref="HitObject"/>.</param>
         /// <returns>[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</returns>
-        double ProgressAt(double progress);
+        public static double ProgressAt(this IHasCurve obj, double progress)
+        {
+            double p = progress * obj.SpanCount() % 1;
+            if (obj.SpanAt(progress) % 2 == 1)
+                p = 1 - p;
+            return p;
+        }
 
         /// <summary>
-        /// Determines which repeat of the curve the progress point is on.
+        /// Determines which span of the curve the progress point is on.
         /// </summary>
+        /// <param name="obj">The curve.</param>
         /// <param name="progress">[0, 1] where 0 is the beginning of the curve and 1 is the end of the curve.</param>
-        /// <returns>[0, RepeatCount] where 0 is the first run.</returns>
-        int RepeatAt(double progress);
+        /// <returns>[0, SpanCount) where 0 is the first run.</returns>
+        public static int SpanAt(this IHasCurve obj, double progress)
+            => (int)(progress * obj.SpanCount());
     }
 }

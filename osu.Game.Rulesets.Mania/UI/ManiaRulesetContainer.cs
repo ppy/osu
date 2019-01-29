@@ -1,51 +1,52 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
-using osu.Framework.Lists;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Input.Handlers;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Configuration;
+using osu.Game.Rulesets.Mania.Mods;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mania.Objects.Drawables;
 using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mania.Scoring;
-using osu.Game.Rulesets.Mania.Timing;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
-using osu.Game.Rulesets.Timing;
 using osu.Game.Rulesets.UI;
+using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
     public class ManiaRulesetContainer : ScrollingRulesetContainer<ManiaPlayfield, ManiaHitObject>
     {
-        /// <summary>
-        /// The number of columns which the <see cref="ManiaPlayfield"/> should display, and which
-        /// the beatmap converter will attempt to convert beatmaps to use.
-        /// </summary>
-        public int AvailableColumns { get; private set; }
+        public new ManiaBeatmap Beatmap => (ManiaBeatmap)base.Beatmap;
 
-        public IEnumerable<DrawableBarLine> BarLines;
+        public IEnumerable<BarLine> BarLines;
 
-        public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap, bool isForCurrentRuleset)
-            : base(ruleset, beatmap, isForCurrentRuleset)
+        protected new ManiaConfigManager Config => (ManiaConfigManager)base.Config;
+
+        private readonly Bindable<ManiaScrollingDirection> configDirection = new Bindable<ManiaScrollingDirection>();
+
+        public ManiaRulesetContainer(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
             // Generate the bar lines
             double lastObjectTime = (Objects.LastOrDefault() as IHasEndTime)?.EndTime ?? Objects.LastOrDefault()?.StartTime ?? double.MaxValue;
 
-            SortedList<TimingControlPoint> timingPoints = Beatmap.ControlPointInfo.TimingPoints;
-            var barLines = new List<DrawableBarLine>();
+            var timingPoints = Beatmap.ControlPointInfo.TimingPoints;
+            var barLines = new List<BarLine>();
 
             for (int i = 0; i < timingPoints.Count; i++)
             {
@@ -57,12 +58,12 @@ namespace osu.Game.Rulesets.Mania.UI
                 int index = 0;
                 for (double t = timingPoints[i].Time; Precision.DefinitelyBigger(endTime, t); t += point.BeatLength, index++)
                 {
-                    barLines.Add(new DrawableBarLine(new BarLine
+                    barLines.Add(new BarLine
                     {
                         StartTime = t,
                         ControlPoint = point,
                         BeatIndex = index
-                    }));
+                    });
                 }
             }
 
@@ -73,9 +74,21 @@ namespace osu.Game.Rulesets.Mania.UI
         private void load()
         {
             BarLines.ForEach(Playfield.Add);
+
+            Config.BindWith(ManiaSetting.ScrollDirection, configDirection);
+            configDirection.BindValueChanged(v => Direction.Value = (ScrollingDirection)v, true);
+
+            Config.BindWith(ManiaSetting.ScrollTime, TimeRange);
         }
 
-        protected sealed override Playfield CreatePlayfield() => new ManiaPlayfield(AvailableColumns)
+        /// <summary>
+        /// Retrieves the column that intersects a screen-space position.
+        /// </summary>
+        /// <param name="screenSpacePosition">The screen-space position.</param>
+        /// <returns>The column which intersects with <paramref name="screenSpacePosition"/>.</returns>
+        public Column GetColumnByPosition(Vector2 screenSpacePosition) => Playfield.GetColumnByPosition(screenSpacePosition);
+
+        protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
         {
             Anchor = Anchor.Centre,
             Origin = Anchor.Centre,
@@ -83,47 +96,23 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public override ScoreProcessor CreateScoreProcessor() => new ManiaScoreProcessor(this);
 
-        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, AvailableColumns);
+        public override int Variant => (int)(Mods.OfType<IPlayfieldTypeMod>().FirstOrDefault()?.PlayfieldType ?? PlayfieldType.Single) + Beatmap.TotalColumns;
 
-        protected override BeatmapConverter<ManiaHitObject> CreateBeatmapConverter()
+        public override PassThroughInputManager CreateInputManager() => new ManiaInputManager(Ruleset.RulesetInfo, Variant);
+
+        public override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
         {
-            if (IsForCurrentRuleset)
-                AvailableColumns = (int)Math.Max(1, Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.CircleSize));
-            else
+            switch (h)
             {
-                float percentSliderOrSpinner = (float)WorkingBeatmap.Beatmap.HitObjects.Count(h => h is IHasEndTime) / WorkingBeatmap.Beatmap.HitObjects.Count;
-                if (percentSliderOrSpinner < 0.2)
-                    AvailableColumns = 7;
-                else if (percentSliderOrSpinner < 0.3 || Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.CircleSize) >= 5)
-                    AvailableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty) > 5 ? 7 : 6;
-                else if (percentSliderOrSpinner > 0.6)
-                    AvailableColumns = Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty) > 4 ? 5 : 4;
-                else
-                    AvailableColumns = Math.Max(4, Math.Min((int)Math.Round(WorkingBeatmap.BeatmapInfo.BaseDifficulty.OverallDifficulty) + 1, 7));
+                case HoldNote holdNote:
+                    return new DrawableHoldNote(holdNote);
+                case Note note:
+                    return new DrawableNote(note);
+                default:
+                    return null;
             }
-
-            return new ManiaBeatmapConverter(IsForCurrentRuleset, AvailableColumns);
         }
 
-        protected override DrawableHitObject<ManiaHitObject> GetVisualRepresentation(ManiaHitObject h)
-        {
-            ManiaAction action = Playfield.Columns.ElementAt(h.Column).Action;
-
-            var holdNote = h as HoldNote;
-            if (holdNote != null)
-                return new DrawableHoldNote(holdNote, action);
-
-            var note = h as Note;
-            if (note != null)
-                return new DrawableNote(note, action);
-
-            return null;
-        }
-
-        protected override Vector2 GetPlayfieldAspectAdjust() => new Vector2(1, 0.8f);
-
-        protected override SpeedAdjustmentContainer CreateSpeedAdjustmentContainer(MultiplierControlPoint controlPoint) => new ManiaSpeedAdjustmentContainer(controlPoint, ScrollingAlgorithm.Basic);
-
-        protected override FramedReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
+        protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ManiaFramedReplayInputHandler(replay);
     }
 }

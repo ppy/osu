@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using Newtonsoft.Json;
@@ -27,9 +27,19 @@ namespace osu.Game.Beatmaps
         public DateTimeOffset? LastUpdated { get; set; }
 
         /// <summary>
+        /// The status of this beatmap set.
+        /// </summary>
+        public BeatmapSetOnlineStatus Status { get; set; }
+
+        /// <summary>
         /// Whether or not this beatmap set has a background video.
         /// </summary>
         public bool HasVideo { get; set; }
+
+        /// <summary>
+        /// Whether or not this beatmap set has a storyboard.
+        /// </summary>
+        public bool HasStoryboard { get; set; }
 
         /// <summary>
         /// The different sizes of cover art for this beatmap set.

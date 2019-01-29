@@ -1,12 +1,14 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using osu.Framework.Audio.Track;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Beatmaps
@@ -15,36 +17,27 @@ namespace osu.Game.Beatmaps
     {
         private readonly OsuGameBase game;
 
-        public DummyWorkingBeatmap(OsuGameBase game)
+        public DummyWorkingBeatmap(OsuGameBase game = null)
             : base(new BeatmapInfo
             {
                 Metadata = new BeatmapMetadata
                 {
                     Artist = "please load a beatmap!",
-                    Title = "no beatmaps available!",
-                    AuthorString = "no one",
+                    Title = "no beatmaps available!"
                 },
                 BeatmapSet = new BeatmapSetInfo(),
-                BaseDifficulty = new BeatmapDifficulty
-                {
-                    DrainRate = 0,
-                    CircleSize = 0,
-                    OverallDifficulty = 0,
-                    ApproachRate = 0,
-                    SliderMultiplier = 0,
-                    SliderTickRate = 0,
-                },
+                BaseDifficulty = new BeatmapDifficulty(),
                 Ruleset = new DummyRulesetInfo()
             })
         {
             this.game = game;
         }
 
-        protected override Beatmap GetBeatmap() => new Beatmap();
+        protected override IBeatmap GetBeatmap() => new Beatmap();
 
-        protected override Texture GetBackground() => game.Textures.Get(@"Backgrounds/bg4");
+        protected override Texture GetBackground() => game?.Textures.Get(@"Backgrounds/bg4");
 
-        protected override Track GetTrack() => new TrackVirtual();
+        protected override Track GetTrack() => new TrackVirtual { Length = 1000 };
 
         private class DummyRulesetInfo : RulesetInfo
         {
@@ -54,18 +47,30 @@ namespace osu.Game.Beatmaps
             {
                 public override IEnumerable<Mod> GetModsFor(ModType type) => new Mod[] { };
 
-                public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap, bool isForCurrentRuleset)
+                public override RulesetContainer CreateRulesetContainerWith(WorkingBeatmap beatmap)
                 {
                     throw new NotImplementedException();
                 }
 
-                public override DifficultyCalculator CreateDifficultyCalculator(Beatmap beatmap, Mod[] mods = null) => null;
+                public override IBeatmapConverter CreateBeatmapConverter(IBeatmap beatmap) => new DummyBeatmapConverter { Beatmap = beatmap };
+
+                public override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => null;
 
                 public override string Description => "dummy";
 
-                public DummyRuleset(RulesetInfo rulesetInfo)
+                public override string ShortName => "dummy";
+
+                public DummyRuleset(RulesetInfo rulesetInfo = null)
                     : base(rulesetInfo)
                 {
+                }
+
+                private class DummyBeatmapConverter : IBeatmapConverter
+                {
+                    public event Action<HitObject, IEnumerable<HitObject>> ObjectConverted;
+                    public IBeatmap Beatmap { get; set; }
+                    public bool CanConvert => true;
+                    public IBeatmap Convert() => Beatmap;
                 }
             }
         }

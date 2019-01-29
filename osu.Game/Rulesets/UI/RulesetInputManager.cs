@@ -1,52 +1,63 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
+using osu.Framework.Input.StateChanges.Events;
+using osu.Framework.Input.States;
 using osu.Framework.Timing;
 using osu.Game.Configuration;
 using osu.Game.Input.Bindings;
 using osu.Game.Input.Handlers;
 using osu.Game.Screens.Play;
-using OpenTK.Input;
+using osuTK.Input;
+using static osu.Game.Input.Handlers.ReplayInputHandler;
+using JoystickState = osu.Framework.Input.States.JoystickState;
+using KeyboardState = osu.Framework.Input.States.KeyboardState;
+using MouseState = osu.Framework.Input.States.MouseState;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class RulesetInputManager<T> : DatabasedKeyBindingInputManager<T>, ICanAttachKeyCounter, IHasReplayHandler
+    public abstract class RulesetInputManager<T> : PassThroughInputManager, ICanAttachKeyCounter, IHasReplayHandler
         where T : struct
     {
-        protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique) : base(ruleset, variant, unique)
+        protected override InputState CreateInitialState()
         {
+            var state = base.CreateInitialState();
+            return new RulesetInputManagerInputState<T>(state.Mouse, state.Keyboard, state.Joystick);
+        }
+
+        protected readonly KeyBindingContainer<T> KeyBindingContainer;
+
+        protected override Container<Drawable> Content => KeyBindingContainer;
+
+        protected RulesetInputManager(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+        {
+            InternalChild = KeyBindingContainer = CreateKeyBindingContainer(ruleset, variant, unique);
         }
 
         #region Action mapping (for replays)
 
-        private List<T> lastPressedActions = new List<T>();
-
-        protected override void HandleNewState(InputState state)
+        public override void HandleInputStateChange(InputStateChangeEvent inputStateChange)
         {
-            base.HandleNewState(state);
+            if (inputStateChange is ReplayStateChangeEvent<T> replayStateChanged)
+            {
+                foreach (var action in replayStateChanged.ReleasedActions)
+                    KeyBindingContainer.TriggerReleased(action);
 
-            var replayState = state as ReplayInputHandler.ReplayState<T>;
-
-            if (replayState == null) return;
-
-            // Here we handle states specifically coming from a replay source.
-            // These have extra action information rather than keyboard keys or mouse buttons.
-
-            List<T> newActions = replayState.PressedActions;
-
-            foreach (var released in lastPressedActions.Except(newActions))
-                PropagateReleased(KeyBindingInputQueue, released);
-
-            foreach (var pressed in newActions.Except(lastPressedActions))
-                PropagatePressed(KeyBindingInputQueue, pressed);
-
-            lastPressedActions = newActions;
+                foreach (var action in replayStateChanged.PressedActions)
+                    KeyBindingContainer.TriggerPressed(action);
+            }
+            else
+            {
+                base.HandleInputStateChange(inputStateChange);
+            }
         }
 
         #endregion
@@ -54,18 +65,16 @@ namespace osu.Game.Rulesets.UI
         #region IHasReplayHandler
 
         private ReplayInputHandler replayInputHandler;
+
         public ReplayInputHandler ReplayInputHandler
         {
-            get
-            {
-                return replayInputHandler;
-            }
+            get => replayInputHandler;
             set
             {
                 if (replayInputHandler != null) RemoveHandler(replayInputHandler);
 
                 replayInputHandler = value;
-                UseParentState = replayInputHandler == null;
+                UseParentInput = replayInputHandler == null;
 
                 if (replayInputHandler != null)
                     AddHandler(replayInputHandler);
@@ -75,8 +84,6 @@ namespace osu.Game.Rulesets.UI
         #endregion
 
         #region Clock control
-
-        protected override bool ShouldProcessClock => false; // We handle processing the clock ourselves
 
         private ManualClock clock;
         private IFrameBasedClock parentClock;
@@ -88,6 +95,7 @@ namespace osu.Game.Rulesets.UI
             //our clock will now be our parent's clock, but we want to replace this to allow manual control.
             parentClock = Clock;
 
+            ProcessCustomClock = false;
             Clock = new FramedClock(clock = new ManualClock
             {
                 CurrentTime = parentClock.CurrentTime,
@@ -109,7 +117,7 @@ namespace osu.Game.Rulesets.UI
 
         protected override bool RequiresChildrenUpdate => base.RequiresChildrenUpdate && validState;
 
-        private bool isAttached => replayInputHandler != null && !UseParentState;
+        private bool isAttached => replayInputHandler != null && !UseParentInput;
 
         private const int max_catch_up_updates_per_frame = 50;
 
@@ -121,8 +129,21 @@ namespace osu.Game.Rulesets.UI
             int loops = 0;
 
             while (validState && requireMoreUpdateLoops && loops++ < max_catch_up_updates_per_frame)
+            {
                 if (!base.UpdateSubTree())
                     return false;
+
+                UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
+
+                if (isAttached)
+                {
+                    // When handling replay input, we need to consider the possibility of fast-forwarding, which may cause the clock to be updated
+                    // to a point very far into the future, then playing a frame at that time. In such a case, lifetime MUST be updated before
+                    // input is handled. This is why base.Update is not called from the derived Update when handling replay input, and is instead
+                    // called manually at the correct time here.
+                    base.Update();
+                }
+            }
 
             return true;
         }
@@ -158,8 +179,11 @@ namespace osu.Game.Rulesets.UI
             // to ensure that the its time is valid for our children before input is processed
             Clock.ProcessFrame();
 
-            // Process input
-            base.Update();
+            if (!isAttached)
+            {
+                // For non-replay input handling, this provides equivalent input ordering as if Update was not overridden
+                base.Update();
+            }
         }
 
         #endregion
@@ -174,23 +198,20 @@ namespace osu.Game.Rulesets.UI
             mouseDisabled = config.GetBindable<bool>(OsuSetting.MouseDisableButtons);
         }
 
-        protected override void TransformState(InputState state)
+        protected override bool Handle(UIEvent e)
         {
-            base.TransformState(state);
-
-            // we don't want to transform the state if a replay is present (for now, at least).
-            if (replayInputHandler != null) return;
-
-            var mouse = state.Mouse as Framework.Input.MouseState;
-
-            if (mouse != null)
+            switch (e)
             {
-                if (mouseDisabled.Value)
-                {
-                    mouse.SetPressed(MouseButton.Left, false);
-                    mouse.SetPressed(MouseButton.Right, false);
-                }
+                case MouseDownEvent mouseDown when mouseDown.Button == MouseButton.Left || mouseDown.Button == MouseButton.Right:
+                    if (mouseDisabled.Value)
+                        return false;
+                    break;
+                case MouseUpEvent mouseUp:
+                    if (!CurrentState.Mouse.IsPressed(mouseUp.Button))
+                        return false;
+                    break;
             }
+            return base.Handle(e);
         }
 
         #endregion
@@ -203,7 +224,7 @@ namespace osu.Game.Rulesets.UI
             Add(receptor);
             keyCounter.SetReceptor(receptor);
 
-            keyCounter.AddRange(DefaultKeyBindings.Select(b => b.GetAction<T>()).Distinct().Select(b => new KeyCounterAction<T>(b)));
+            keyCounter.AddRange(KeyBindingContainer.DefaultKeyBindings.Select(b => b.GetAction<T>()).Distinct().Select(b => new KeyCounterAction<T>(b)));
         }
 
         public class ActionReceptor : KeyCounterCollection.Receptor, IKeyBindingHandler<T>
@@ -219,6 +240,17 @@ namespace osu.Game.Rulesets.UI
         }
 
         #endregion
+
+        protected virtual RulesetKeyBindingContainer CreateKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+            => new RulesetKeyBindingContainer(ruleset, variant, unique);
+
+        public class RulesetKeyBindingContainer : DatabasedKeyBindingContainer<T>
+        {
+            public RulesetKeyBindingContainer(RulesetInfo ruleset, int variant, SimultaneousBindingMode unique)
+                : base(ruleset, variant, unique)
+            {
+            }
+        }
     }
 
     /// <summary>
@@ -236,5 +268,16 @@ namespace osu.Game.Rulesets.UI
     public interface ICanAttachKeyCounter
     {
         void Attach(KeyCounterCollection keyCounter);
+    }
+
+    public class RulesetInputManagerInputState<T> : InputState
+        where T : struct
+    {
+        public ReplayState<T> LastReplayState;
+
+        public RulesetInputManagerInputState(MouseState mouse = null, KeyboardState keyboard = null, JoystickState joystick = null)
+            : base(mouse, keyboard, joystick)
+        {
+        }
     }
 }

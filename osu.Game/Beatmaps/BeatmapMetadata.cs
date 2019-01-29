@@ -1,35 +1,30 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using osu.Game.Database;
 using osu.Game.Users;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapMetadata
+    [Serializable]
+    public class BeatmapMetadata : IEquatable<BeatmapMetadata>, IHasPrimaryKey
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
-
-        private int? onlineBeatmapSetID;
-
-        [NotMapped]
-        [JsonProperty(@"id")]
-        public int? OnlineBeatmapSetID
-        {
-            get { return onlineBeatmapSetID; }
-            set { onlineBeatmapSetID = value > 0 ? value : null; }
-        }
 
         public string Title { get; set; }
         public string TitleUnicode { get; set; }
         public string Artist { get; set; }
         public string ArtistUnicode { get; set; }
 
+        [JsonIgnore]
         public List<BeatmapInfo> Beatmaps { get; set; }
+
+        [JsonIgnore]
         public List<BeatmapSetInfo> BeatmapSets { get; set; }
 
         /// <summary>
@@ -46,6 +41,7 @@ namespace osu.Game.Beatmaps
         /// <summary>
         /// The author of the beatmaps in this set.
         /// </summary>
+        [JsonIgnore]
         public User Author;
 
         public string Source { get; set; }
@@ -56,6 +52,9 @@ namespace osu.Game.Beatmaps
         public string AudioFile { get; set; }
         public string BackgroundFile { get; set; }
 
+        public override string ToString() => $"{Artist} - {Title} ({Author})";
+
+        [JsonIgnore]
         public string[] SearchableTerms => new[]
         {
             Author?.Username,
@@ -66,5 +65,22 @@ namespace osu.Game.Beatmaps
             Source,
             Tags
         }.Where(s => !string.IsNullOrEmpty(s)).ToArray();
+
+        public bool Equals(BeatmapMetadata other)
+        {
+            if (other == null)
+                return false;
+
+            return Title == other.Title
+                && TitleUnicode == other.TitleUnicode
+                && Artist == other.Artist
+                && ArtistUnicode == other.ArtistUnicode
+                && AuthorString == other.AuthorString
+                && Source == other.Source
+                && Tags == other.Tags
+                && PreviewTime == other.PreviewTime
+                && AudioFile == other.AudioFile
+                && BackgroundFile == other.BackgroundFile;
+        }
     }
 }

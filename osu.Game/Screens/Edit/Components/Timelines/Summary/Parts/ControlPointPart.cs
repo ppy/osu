@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Allocation;
@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
             cpi.TimingPoints.ForEach(addTimingPoint);
 
             // Consider all non-timing points as the same type
-            cpi.SoundPoints.Select(c => (ControlPoint)c)
+            cpi.SamplePoints.Select(c => (ControlPoint)c)
                 .Concat(cpi.EffectPoints)
                 .Concat(cpi.DifficultyPoints)
                 .Distinct()

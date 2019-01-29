@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Taiko.Judgements;
+using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -15,17 +15,16 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         /// <summary>
         /// A list of keys which can result in hits for this HitObject.
         /// </summary>
-        protected abstract TaikoAction[] HitActions { get; }
+        public abstract TaikoAction[] HitActions { get; }
 
         /// <summary>
-        /// Whether a second hit is allowed to be processed. This occurs once this hit object has been hit successfully.
+        /// The action that caused this <see cref="DrawableHit"/> to be hit.
         /// </summary>
-        protected bool SecondHitAllowed { get; private set; }
+        public TaikoAction? HitAction { get; private set; }
 
-        /// <summary>
-        /// Whether the last key pressed is a valid hit key.
-        /// </summary>
-        private bool validKeyPressed;
+        private bool validActionPressed;
+
+        private bool pressHandledThisFrame;
 
         protected DrawableHit(Hit hit)
             : base(hit)
@@ -33,46 +32,62 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             FillMode = FillMode.Fit;
         }
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
             if (!userTriggered)
             {
-                if (timeOffset > HitObject.HitWindowGood)
-                    AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
+                if (!HitObject.HitWindows.CanBeHit(timeOffset))
+                    ApplyResult(r => r.Type = HitResult.Miss);
                 return;
             }
 
-            double hitOffset = Math.Abs(timeOffset);
-
-            if (hitOffset > HitObject.HitWindowMiss)
+            var result = HitObject.HitWindows.ResultFor(timeOffset);
+            if (result == HitResult.None)
                 return;
 
-            if (!validKeyPressed)
-                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
-            else if (hitOffset < HitObject.HitWindowGood)
-            {
-                AddJudgement(new TaikoJudgement
-                {
-                    Result = hitOffset < HitObject.HitWindowGreat ? HitResult.Great : HitResult.Good,
-                    Final = !HitObject.IsStrong
-                });
-
-                SecondHitAllowed = true;
-            }
+            if (!validActionPressed)
+                ApplyResult(r => r.Type = HitResult.Miss);
             else
-                AddJudgement(new TaikoJudgement { Result = HitResult.Miss });
+                ApplyResult(r => r.Type = result);
         }
 
         public override bool OnPressed(TaikoAction action)
         {
-            validKeyPressed = HitActions.Contains(action);
+            if (pressHandledThisFrame)
+                return true;
 
-            return UpdateJudgement(true);
+            if (Judged)
+                return false;
+
+            validActionPressed = HitActions.Contains(action);
+
+            // Only count this as handled if the new judgement is a hit
+            var result = UpdateResult(true);
+
+            if (IsHit)
+                HitAction = action;
+
+            // Regardless of whether we've hit or not, any secondary key presses in the same frame should be discarded
+            // E.g. hitting a non-strong centre as a strong should not fall through and perform a hit on the next note
+            pressHandledThisFrame = true;
+
+            return result;
+        }
+
+        public override bool OnReleased(TaikoAction action)
+        {
+            if (action == HitAction)
+                HitAction = null;
+            return base.OnReleased(action);
         }
 
         protected override void Update()
         {
             base.Update();
+
+            // The input manager processes all input prior to us updating, so this is the perfect time
+            // for us to remove the extra press blocking, before input is handled in the next frame
+            pressHandledThisFrame = false;
 
             Size = BaseSize * Parent.RelativeChildSize;
         }
@@ -88,13 +103,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                 switch (State.Value)
                 {
                     case ArmedState.Idle:
-                        this.Delay(HitObject.HitWindowMiss).Expire();
+                        validActionPressed = false;
+
+                        UnproxyContent();
+                        this.Delay(HitObject.HitWindows.HalfWindowFor(HitResult.Miss)).Expire();
                         break;
                     case ArmedState.Miss:
                         this.FadeOut(100)
                             .Expire();
                         break;
                     case ArmedState.Hit:
+                        // If we're far enough away from the left stage, we should bring outselves in front of it
+                        ProxyContent();
+
                         var flash = circlePiece?.FlashBox;
                         if (flash != null)
                         {
@@ -105,7 +126,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
                         const float gravity_time = 300;
                         const float gravity_travel_height = 200;
 
-                        Content.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
+                        this.ScaleTo(0.8f, gravity_time * 2, Easing.OutQuad);
 
                         this.MoveToY(-gravity_travel_height, gravity_time, Easing.Out)
                             .Then()
@@ -116,6 +137,66 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                         break;
                 }
+            }
+        }
+
+        protected override DrawableStrongNestedHit CreateStrongHit(StrongHitObject hitObject) => new StrongNestedHit(hitObject, this);
+
+        private class StrongNestedHit : DrawableStrongNestedHit
+        {
+            /// <summary>
+            /// The lenience for the second key press.
+            /// This does not adjust by map difficulty in ScoreV2 yet.
+            /// </summary>
+            private const double second_hit_window = 30;
+
+            public new DrawableHit MainObject => (DrawableHit)base.MainObject;
+
+            public StrongNestedHit(StrongHitObject strong, DrawableHit hit)
+                : base(strong, hit)
+            {
+            }
+
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
+            {
+                if (!MainObject.Result.HasResult)
+                {
+                    base.CheckForResult(userTriggered, timeOffset);
+                    return;
+                }
+
+                if (!MainObject.Result.IsHit)
+                {
+                    ApplyResult(r => r.Type = HitResult.Miss);
+                    return;
+                }
+
+                if (!userTriggered)
+                {
+                    if (timeOffset - MainObject.Result.TimeOffset > second_hit_window)
+                        ApplyResult(r => r.Type = HitResult.Miss);
+                    return;
+                }
+
+                if (Math.Abs(timeOffset - MainObject.Result.TimeOffset) <= second_hit_window)
+                    ApplyResult(r => r.Type = MainObject.Result.Type);
+            }
+
+            public override bool OnPressed(TaikoAction action)
+            {
+                // Don't process actions until the main hitobject is hit
+                if (!MainObject.IsHit)
+                    return false;
+
+                // Don't process actions if the pressed button was released
+                if (MainObject.HitAction == null)
+                    return false;
+
+                // Don't handle invalid hit action presses
+                if (!MainObject.HitActions.Contains(action))
+                    return false;
+
+                return UpdateResult(true);
             }
         }
     }

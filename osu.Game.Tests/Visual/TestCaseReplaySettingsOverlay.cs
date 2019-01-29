@@ -1,22 +1,22 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play.HUD;
-using osu.Game.Screens.Play.ReplaySettings;
+using osu.Game.Screens.Play.PlayerSettings;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseReplaySettingsOverlay : OsuTestCase
+    [TestFixture]
+    public class TestCaseReplaySettingsOverlay : OsuTestCase
     {
-        public override string Description => @"Settings visible in replay/auto";
-
         public TestCaseReplaySettingsOverlay()
         {
             ExampleContainer container;
 
-            Add(new ReplaySettingsOverlay
+            Add(new PlayerSettingsOverlay
             {
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
@@ -24,13 +24,13 @@ namespace osu.Game.Tests.Visual
 
             Add(container = new ExampleContainer());
 
-            AddStep(@"Add button", () => container.Add(new OsuButton
+            AddStep(@"Add button", () => container.Add(new TriangleButton
             {
                 RelativeSizeAxes = Axes.X,
                 Text = @"Button",
             }));
 
-            AddStep(@"Add checkbox", () => container.Add(new ReplayCheckbox
+            AddStep(@"Add checkbox", () => container.Add(new PlayerCheckbox
             {
                 LabelText = "Checkbox",
             }));
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Visual
             }));
         }
 
-        private class ExampleContainer : ReplayGroup
+        private class ExampleContainer : PlayerSettingsGroup
         {
             protected override string Title => @"example";
         }

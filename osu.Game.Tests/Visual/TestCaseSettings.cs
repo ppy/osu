@@ -1,25 +1,37 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using NUnit.Framework;
+using osu.Framework.Allocation;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseSettings : OsuTestCase
+    [TestFixture]
+    public class TestCaseSettings : OsuTestCase
     {
-        public override string Description => @"Tests the settings overlay";
-
         private readonly SettingsOverlay settings;
+        private readonly DialogOverlay dialogOverlay;
 
         public TestCaseSettings()
         {
-            Children = new[] { settings = new MainSettings() };
+            settings = new MainSettings
+            {
+                State = Visibility.Visible
+            };
+            Add(dialogOverlay = new DialogOverlay
+            {
+                Depth = -1
+            });
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-            settings.ToggleVisibility();
+            Dependencies.Cache(dialogOverlay);
+
+            Add(settings);
         }
     }
 }

@@ -1,26 +1,26 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using NUnit.Framework;
 using osu.Framework.Audio.Track;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Lists;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
-using OpenTK.Graphics;
+using osuTK.Graphics;
+using osu.Framework.Lists;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseBeatSyncedContainer : OsuTestCase
+    [TestFixture]
+    public class TestCaseBeatSyncedContainer : OsuTestCase
     {
-        public override string Description => @"Tests beat synced containers.";
-
         private readonly MusicController mc;
 
         public TestCaseBeatSyncedContainer()

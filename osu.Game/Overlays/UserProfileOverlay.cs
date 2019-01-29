@@ -1,16 +1,13 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using OpenTK;
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.UserInterface;
@@ -19,6 +16,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Profile;
 using osu.Game.Overlays.Profile.Sections;
 using osu.Game.Users;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -28,27 +27,18 @@ namespace osu.Game.Overlays
         private ProfileSection[] sections;
         private GetUserRequest userReq;
         private APIAccess api;
-        private ProfileHeader header;
+        protected ProfileHeader Header;
         private SectionsContainer<ProfileSection> sectionsContainer;
         private ProfileTabControl tabs;
 
         public const float CONTENT_X_MARGIN = 50;
 
-        // receive input outside our bounds so we can trigger a close event on ourselves.
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
-
-        protected override bool OnClick(InputState state)
-        {
-            State = Visibility.Hidden;
-            return true;
-        }
-
         public UserProfileOverlay()
         {
-            FirstWaveColour = OsuColour.Gray(0.4f);
-            SecondWaveColour = OsuColour.Gray(0.3f);
-            ThirdWaveColour = OsuColour.Gray(0.2f);
-            FourthWaveColour = OsuColour.Gray(0.1f);
+            Waves.FirstWaveColour = OsuColour.Gray(0.4f);
+            Waves.SecondWaveColour = OsuColour.Gray(0.3f);
+            Waves.ThirdWaveColour = OsuColour.Gray(0.2f);
+            Waves.FourthWaveColour = OsuColour.Gray(0.1f);
 
             RelativeSizeAxes = Axes.Both;
             RelativePositionAxes = Axes.Both;
@@ -74,17 +64,26 @@ namespace osu.Game.Overlays
         protected override void PopIn()
         {
             base.PopIn();
-            FadeEdgeEffectTo(0.5f, APPEAR_DURATION, Easing.In);
+            FadeEdgeEffectTo(0.5f, WaveContainer.APPEAR_DURATION, Easing.In);
         }
 
         protected override void PopOut()
         {
             base.PopOut();
-            FadeEdgeEffectTo(0, DISAPPEAR_DURATION, Easing.Out);
+            FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out);
         }
+
+        public void ShowUser(long userId) => ShowUser(new User { Id = userId });
 
         public void ShowUser(User user, bool fetchOnline = true)
         {
+            if (user == User.SYSTEM_USER) return;
+
+            Show();
+
+            if (user.Id == Header?.User?.Id)
+                return;
+
             userReq?.Cancel();
             Clear();
             lastSection = null;
@@ -92,13 +91,14 @@ namespace osu.Game.Overlays
             sections = new ProfileSection[]
             {
                 //new AboutSection(),
-                //new RecentSection(),
+                new RecentSection(),
                 new RanksSection(),
                 //new MedalsSection(),
                 new HistoricalSection(),
                 new BeatmapsSection(),
-                //new KudosuSection()
+                new KudosuSection()
             };
+
             tabs = new ProfileTabControl
             {
                 RelativeSizeAxes = Axes.X,
@@ -113,12 +113,12 @@ namespace osu.Game.Overlays
                 Colour = OsuColour.Gray(0.2f)
             });
 
-            header = new ProfileHeader(user);
+            Header = new ProfileHeader(user);
 
             Add(sectionsContainer = new SectionsContainer<ProfileSection>
             {
                 RelativeSizeAxes = Axes.Both,
-                ExpandableHeader = header,
+                ExpandableHeader = Header,
                 FixedHeader = tabs,
                 HeaderBackground = new Box
                 {
@@ -163,23 +163,25 @@ namespace osu.Game.Overlays
                 userLoadComplete(user);
             }
 
-            Show();
             sectionsContainer.ScrollToTop();
         }
 
         private void userLoadComplete(User user)
         {
-            header.User = user;
+            Header.User = user;
 
-            foreach (string id in user.ProfileOrder)
+            if (user.ProfileOrder != null)
             {
-                var sec = sections.FirstOrDefault(s => s.Identifier == id);
-                if (sec != null)
+                foreach (string id in user.ProfileOrder)
                 {
-                    sec.User.Value = user;
+                    var sec = sections.FirstOrDefault(s => s.Identifier == id);
+                    if (sec != null)
+                    {
+                        sec.User.Value = user;
 
-                    sectionsContainer.Add(sec);
-                    tabs.AddItem(sec);
+                        sectionsContainer.Add(sec);
+                        tabs.AddItem(sec);
+                    }
                 }
             }
         }
@@ -194,7 +196,7 @@ namespace osu.Game.Overlays
                 TabContainer.AutoSizeAxes |= Axes.X;
                 TabContainer.Anchor |= Anchor.x1;
                 TabContainer.Origin |= Anchor.x1;
-                Add(bottom = new Box
+                AddInternal(bottom = new Box
                 {
                     RelativeSizeAxes = Axes.X,
                     Height = 1,

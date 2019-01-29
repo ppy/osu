@@ -1,25 +1,65 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Screens.Select.Leaderboards;
 using osu.Game.Users;
-using OpenTK;
+using osu.Framework.Allocation;
+using osuTK;
+using System.Linq;
+using osu.Game.Beatmaps;
+using osu.Game.Online.Leaderboards;
+using osu.Game.Rulesets;
+using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseLeaderboard : OsuTestCase
+    [Description("PlaySongSelect leaderboard")]
+    public class TestCaseLeaderboard : OsuTestCase
     {
-        public override string Description => @"From song select";
+        public override IReadOnlyList<Type> RequiredTypes => new[] {
+            typeof(Placeholder),
+            typeof(MessagePlaceholder),
+            typeof(RetrievalFailurePlaceholder),
+        };
 
-        private readonly Leaderboard leaderboard;
+        private RulesetStore rulesets;
+
+        private readonly FailableLeaderboard leaderboard;
+
+        public TestCaseLeaderboard()
+        {
+            Add(leaderboard = new FailableLeaderboard
+            {
+                Origin = Anchor.Centre,
+                Anchor = Anchor.Centre,
+                Size = new Vector2(550f, 450f),
+                Scope = BeatmapLeaderboardScope.Global,
+            });
+
+            AddStep(@"New Scores", newScores);
+            AddStep(@"Empty Scores", () => leaderboard.SetRetrievalState(PlaceholderState.NoScores));
+            AddStep(@"Network failure", () => leaderboard.SetRetrievalState(PlaceholderState.NetworkFailure));
+            AddStep(@"No supporter", () => leaderboard.SetRetrievalState(PlaceholderState.NotSupporter));
+            AddStep(@"Not logged in", () => leaderboard.SetRetrievalState(PlaceholderState.NotLoggedIn));
+            AddStep(@"Unavailable", () => leaderboard.SetRetrievalState(PlaceholderState.Unavailable));
+            AddStep(@"Real beatmap", realBeatmap);
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(RulesetStore rulesets)
+        {
+            this.rulesets = rulesets;
+        }
 
         private void newScores()
         {
             var scores = new[]
             {
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.XH,
                     Accuracy = 1,
@@ -37,7 +77,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.X,
                     Accuracy = 1,
@@ -55,7 +95,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.SH,
                     Accuracy = 1,
@@ -73,7 +113,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.S,
                     Accuracy = 1,
@@ -91,7 +131,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.A,
                     Accuracy = 1,
@@ -109,7 +149,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.B,
                     Accuracy = 0.9826,
@@ -127,7 +167,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.C,
                     Accuracy = 0.9654,
@@ -145,7 +185,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.F,
                     Accuracy = 0.6025,
@@ -163,7 +203,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.F,
                     Accuracy = 0.5140,
@@ -181,7 +221,7 @@ namespace osu.Game.Tests.Visual
                         },
                     },
                 },
-                new Score
+                new ScoreInfo
                 {
                     Rank = ScoreRank.F,
                     Accuracy = 0.4222,
@@ -204,17 +244,44 @@ namespace osu.Game.Tests.Visual
             leaderboard.Scores = scores;
         }
 
-        public TestCaseLeaderboard()
+        private void realBeatmap()
         {
-            Add(leaderboard = new Leaderboard
+            leaderboard.Beatmap = new BeatmapInfo
             {
-                Origin = Anchor.Centre,
-                Anchor = Anchor.Centre,
-                Size = new Vector2(550f, 450f),
-            });
+                StarDifficulty = 1.36,
+                Version = @"BASIC",
+                OnlineBeatmapID = 1113057,
+                Ruleset = rulesets.GetRuleset(0),
+                BaseDifficulty = new BeatmapDifficulty
+                {
+                    CircleSize = 4,
+                    DrainRate = 6.5f,
+                    OverallDifficulty = 6.5f,
+                    ApproachRate = 5,
+                },
+                OnlineInfo = new BeatmapOnlineInfo
+                {
+                    Length = 115000,
+                    CircleCount = 265,
+                    SliderCount = 71,
+                    PlayCount = 47906,
+                    PassCount = 19899,
+                },
+                Metrics = new BeatmapMetrics
+                {
+                    Ratings = Enumerable.Range(0, 11),
+                    Fails = Enumerable.Range(1, 100).Select(i => i % 12 - 6),
+                    Retries = Enumerable.Range(-2, 100).Select(i => i % 12 - 6),
+                },
+            };
+        }
 
-            AddStep(@"New Scores", newScores);
-            newScores();
+        private class FailableLeaderboard : BeatmapLeaderboard
+        {
+            public void SetRetrievalState(PlaceholderState state)
+            {
+                PlaceholderState = state;
+            }
         }
     }
 }

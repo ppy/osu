@@ -1,33 +1,47 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Framework.Input;
+using System.Linq;
+using osu.Framework.Input.StateChanges;
+using osu.Framework.MathUtils;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Replays;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
-    public class OsuReplayInputHandler : FramedReplayInputHandler
+    public class OsuReplayInputHandler : FramedReplayInputHandler<OsuReplayFrame>
     {
         public OsuReplayInputHandler(Replay replay)
             : base(replay)
         {
         }
 
-        public override List<InputState> GetPendingStates()
+        protected override bool IsImportant(OsuReplayFrame frame) => frame.Actions.Any();
+
+        protected Vector2? Position
         {
-            List<OsuAction> actions = new List<OsuAction>();
-
-            if (CurrentFrame?.MouseLeft ?? false) actions.Add(OsuAction.LeftButton);
-            if (CurrentFrame?.MouseRight ?? false) actions.Add(OsuAction.RightButton);
-
-            return new List<InputState>
+            get
             {
+                if (!HasFrames)
+                    return null;
+
+                return Interpolation.ValueAt(CurrentTime, CurrentFrame.Position, NextFrame.Position, CurrentFrame.Time, NextFrame.Time);
+            }
+        }
+
+        public override List<IInput> GetPendingInputs()
+        {
+            return new List<IInput>
+            {
+                new MousePositionAbsoluteInput
+                {
+                    Position = GamefieldToScreenSpace(Position ?? Vector2.Zero)
+                },
                 new ReplayState<OsuAction>
                 {
-                    Mouse = new ReplayMouseState(ToScreenSpace(Position ?? Vector2.Zero)),
-                    PressedActions = actions
+                    PressedActions = CurrentFrame.Actions
                 }
             };
         }

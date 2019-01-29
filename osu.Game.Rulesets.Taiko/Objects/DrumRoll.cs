@@ -1,13 +1,12 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Types;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Taiko.Judgements;
 
 namespace osu.Game.Rulesets.Taiko.Objects
 {
@@ -38,63 +37,53 @@ namespace osu.Game.Rulesets.Taiko.Objects
         public double RequiredGreatHits { get; protected set; }
 
         /// <summary>
-        /// Total number of drum roll ticks.
-        /// </summary>
-        public int TotalTicks => Ticks.Count();
-
-        /// <summary>
-        /// Initializes the drum roll ticks if not initialized and returns them.
-        /// </summary>
-        public IEnumerable<DrumRollTick> Ticks => ticks ?? (ticks = createTicks());
-
-        private List<DrumRollTick> ticks;
-
-        /// <summary>
         /// The length (in milliseconds) between ticks of this drumroll.
         /// <para>Half of this value is the hit window of the ticks.</para>
         /// </summary>
         private double tickSpacing = 100;
 
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        private float overallDifficulty = BeatmapDifficulty.DEFAULT_DIFFICULTY;
+
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(controlPointInfo, difficulty);
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
 
             tickSpacing = timingPoint.BeatLength / TickRate;
-
-            RequiredGoodHits = TotalTicks * Math.Min(0.15, 0.05 + 0.10 / 6 * difficulty.OverallDifficulty);
-            RequiredGreatHits = TotalTicks * Math.Min(0.30, 0.10 + 0.20 / 6 * difficulty.OverallDifficulty);
+            overallDifficulty = difficulty.OverallDifficulty;
         }
 
-        private List<DrumRollTick> createTicks()
+        protected override void CreateNestedHitObjects()
         {
-            var ret = new List<DrumRollTick>();
+            createTicks();
 
+            RequiredGoodHits = NestedHitObjects.Count * Math.Min(0.15, 0.05 + 0.10 / 6 * overallDifficulty);
+            RequiredGreatHits = NestedHitObjects.Count * Math.Min(0.30, 0.10 + 0.20 / 6 * overallDifficulty);
+
+            base.CreateNestedHitObjects();
+        }
+
+        private void createTicks()
+        {
             if (tickSpacing == 0)
-                return ret;
+                return;
 
             bool first = true;
             for (double t = StartTime; t < EndTime + tickSpacing / 2; t += tickSpacing)
             {
-                ret.Add(new DrumRollTick
+                AddNested(new DrumRollTick
                 {
                     FirstTick = first,
                     TickSpacing = tickSpacing,
                     StartTime = t,
-                    IsStrong = IsStrong,
-                    Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
-                    {
-                        Bank = s.Bank,
-                        Name = @"slidertick",
-                        Volume = s.Volume
-                    }))
+                    IsStrong = IsStrong
                 });
 
                 first = false;
             }
-
-            return ret;
         }
+
+        public override Judgement CreateJudgement() => new TaikoDrumRollJudgement();
     }
 }

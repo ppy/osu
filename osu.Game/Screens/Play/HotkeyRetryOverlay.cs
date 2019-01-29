@@ -1,77 +1,28 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Input;
-using OpenTK.Input;
-using osu.Framework.Allocation;
-using System;
-using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Shapes;
-using OpenTK.Graphics;
+using osu.Framework.Input.Bindings;
+using osu.Game.Input.Bindings;
+using osu.Game.Overlays;
 
 namespace osu.Game.Screens.Play
 {
-    public class HotkeyRetryOverlay : Container
+    public class HotkeyRetryOverlay : HoldToConfirmOverlay, IKeyBindingHandler<GlobalAction>
     {
-        public Action Action;
-
-        private Box overlay;
-
-        private const int activate_delay = 400;
-        private const int fadeout_delay = 200;
-
-        private bool fired;
-
-        [BackgroundDependencyLoader]
-        private void load()
+        public bool OnPressed(GlobalAction action)
         {
-            RelativeSizeAxes = Axes.Both;
-            AlwaysPresent = true;
+            if (action != GlobalAction.QuickRetry) return false;
 
-            Children = new Drawable[]
-            {
-                overlay = new Box
-                {
-                    Alpha = 0,
-                    Colour = Color4.Black,
-                    RelativeSizeAxes = Axes.Both,
-                }
-            };
+            BeginConfirm();
+            return true;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        public bool OnReleased(GlobalAction action)
         {
-            if (args.Repeat) return false;
+            if (action != GlobalAction.QuickRetry) return false;
 
-            if (args.Key == Key.Tilde)
-            {
-                overlay.FadeIn(activate_delay, Easing.Out);
-                return true;
-            }
-
-            return base.OnKeyDown(state, args);
-        }
-
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
-        {
-            if (args.Key == Key.Tilde && !fired)
-            {
-                overlay.FadeOut(fadeout_delay, Easing.Out);
-                return true;
-            }
-
-            return base.OnKeyUp(state, args);
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-            if (!fired && overlay.Alpha == 1)
-            {
-                fired = true;
-                Action?.Invoke();
-            }
+            AbortConfirm();
+            return true;
         }
     }
 }

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Game.Beatmaps;
@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModHardRock : Mod, IApplicableToDifficulty
     {
         public override string Name => "Hard Rock";
-        public override string ShortenedName => "HR";
+        public override string Acronym => "HR";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_hardrock;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Everything just got a bit harder...";
@@ -19,10 +19,10 @@ namespace osu.Game.Rulesets.Mods
         public void ApplyToDifficulty(BeatmapDifficulty difficulty)
         {
             const float ratio = 1.4f;
-            difficulty.CircleSize *= 1.3f; // CS uses a custom 1.3 ratio.
-            difficulty.ApproachRate *= ratio;
-            difficulty.DrainRate *= ratio;
-            difficulty.OverallDifficulty *= ratio;
+            difficulty.CircleSize = Math.Min(difficulty.CircleSize * 1.3f, 10.0f); // CS uses a custom 1.3 ratio.
+            difficulty.ApproachRate = Math.Min(difficulty.ApproachRate * ratio, 10.0f);
+            difficulty.DrainRate = Math.Min(difficulty.DrainRate * ratio, 10.0f);
+            difficulty.OverallDifficulty = Math.Min(difficulty.OverallDifficulty * ratio, 10.0f);
         }
     }
 }

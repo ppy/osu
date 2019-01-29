@@ -1,7 +1,7 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
@@ -9,16 +9,19 @@ using System.Collections.Generic;
 using osu.Game.Graphics;
 using osu.Framework.Allocation;
 using System.Linq;
+using osu.Framework.Configuration;
 using osu.Framework.Timing;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.UI;
+
 namespace osu.Game.Screens.Play
 {
     public class SongProgress : OverlayContainer
     {
         private const int bottom_bar_height = 5;
 
-        private static readonly Vector2 handle_size = new Vector2(14, 25);
+        private static readonly Vector2 handle_size = new Vector2(10, 18);
 
         private const float transition_duration = 200;
 
@@ -28,7 +31,8 @@ namespace osu.Game.Screens.Play
 
         public Action<double> OnSeek;
 
-        public override bool HandleInput => AllowSeeking;
+        public override bool HandleNonPositionalInput => AllowSeeking;
+        public override bool HandlePositionalInput => AllowSeeking;
 
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = info.AudioClock = value; } }
@@ -52,6 +56,8 @@ namespace osu.Game.Screens.Play
                 bar.EndTime = lastHitTime;
             }
         }
+
+        private readonly BindableBool replayLoaded = new BindableBool();
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
@@ -97,6 +103,14 @@ namespace osu.Game.Screens.Play
         protected override void LoadComplete()
         {
             State = Visibility.Visible;
+
+            replayLoaded.ValueChanged += v => AllowSeeking = v;
+            replayLoaded.TriggerChange();
+        }
+
+        public void BindRulestContainer(RulesetContainer rulesetContainer)
+        {
+            replayLoaded.BindTo(rulesetContainer.HasReplayLoaded);
         }
 
         private bool allowSeeking;
@@ -121,6 +135,8 @@ namespace osu.Game.Screens.Play
         {
             bar.FadeTo(allowSeeking ? 1 : 0, transition_duration, Easing.In);
             this.MoveTo(new Vector2(0, allowSeeking ? 0 : bottom_bar_height), transition_duration, Easing.In);
+
+            info.Margin = new MarginPadding { Bottom = Height - (allowSeeking ? 0 : handle_size.Y) };
         }
 
         protected override void PopIn()

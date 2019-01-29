@@ -1,9 +1,10 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Mania.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Mania.Objects
@@ -56,66 +57,46 @@ namespace osu.Game.Rulesets.Mania.Objects
         /// <summary>
         /// The tail note of the hold.
         /// </summary>
-        public readonly Note Tail = new TailNote();
+        public readonly TailNote Tail = new TailNote();
 
         /// <summary>
         /// The time between ticks of this hold.
         /// </summary>
         private double tickSpacing = 50;
 
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(controlPointInfo, difficulty);
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             tickSpacing = timingPoint.BeatLength / difficulty.SliderTickRate;
-
-            Head.ApplyDefaults(controlPointInfo, difficulty);
-            Tail.ApplyDefaults(controlPointInfo, difficulty);
         }
 
-        /// <summary>
-        /// The scoring scoring ticks of the hold note.
-        /// </summary>
-        public IEnumerable<HoldNoteTick> Ticks => ticks ?? (ticks = createTicks());
-        private List<HoldNoteTick> ticks;
-
-        private List<HoldNoteTick> createTicks()
+        protected override void CreateNestedHitObjects()
         {
-            var ret = new List<HoldNoteTick>();
+            base.CreateNestedHitObjects();
 
+            createTicks();
+
+            AddNested(Head);
+            AddNested(Tail);
+        }
+
+        private void createTicks()
+        {
             if (tickSpacing == 0)
-                return ret;
+                return;
 
             for (double t = StartTime + tickSpacing; t <= EndTime - tickSpacing; t += tickSpacing)
             {
-                ret.Add(new HoldNoteTick
+                AddNested(new HoldNoteTick
                 {
                     StartTime = t,
                     Column = Column
                 });
             }
-
-            return ret;
         }
 
-        /// <summary>
-        /// The tail of the hold note.
-        /// </summary>
-        private class TailNote : Note
-        {
-            /// <summary>
-            /// Lenience of release hit windows. This is to make cases where the hold note release
-            /// is timed alongside presses of other hit objects less awkward.
-            /// </summary>
-            private const double release_window_lenience = 1.5;
-
-            public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
-            {
-                base.ApplyDefaults(controlPointInfo, difficulty);
-
-                HitWindows *= release_window_lenience;
-            }
-        }
+        public override Judgement CreateJudgement() => new HoldNoteJudgement();
     }
 }

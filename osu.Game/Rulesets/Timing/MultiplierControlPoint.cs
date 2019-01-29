@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Game.Beatmaps.ControlPoints;
@@ -15,12 +15,17 @@ namespace osu.Game.Rulesets.Timing
         /// <summary>
         /// The time in milliseconds at which this <see cref="MultiplierControlPoint"/> starts.
         /// </summary>
-        public readonly double StartTime;
+        public double StartTime;
 
         /// <summary>
-        /// The multiplier which this <see cref="MultiplierControlPoint"/> provides.
+        /// The aggregate multiplier which this <see cref="MultiplierControlPoint"/> provides.
         /// </summary>
-        public double Multiplier => 1000 / TimingPoint.BeatLength * DifficultyPoint.SpeedMultiplier;
+        public double Multiplier => Velocity * DifficultyPoint.SpeedMultiplier * 1000 / TimingPoint.BeatLength;
+
+        /// <summary>
+        /// The velocity multiplier.
+        /// </summary>
+        public double Velocity = 1;
 
         /// <summary>
         /// The <see cref="TimingControlPoint"/> that provides the timing information for this <see cref="MultiplierControlPoint"/>.
@@ -48,18 +53,7 @@ namespace osu.Game.Rulesets.Timing
             StartTime = startTime;
         }
 
-        /// <summary>
-        /// Creates a <see cref="MultiplierControlPoint"/> by copying another <see cref="MultiplierControlPoint"/>.
-        /// </summary>
-        /// <param name="startTime">The start time of this <see cref="MultiplierControlPoint"/>.</param>
-        /// <param name="other">The <see cref="MultiplierControlPoint"/> to copy.</param>
-        public MultiplierControlPoint(double startTime, MultiplierControlPoint other)
-            : this(startTime)
-        {
-            TimingPoint = other.TimingPoint;
-            DifficultyPoint = other.DifficultyPoint;
-        }
-
+        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
         public int CompareTo(MultiplierControlPoint other) => StartTime.CompareTo(other?.StartTime);
     }
 }

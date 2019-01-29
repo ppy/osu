@@ -1,35 +1,42 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Sample;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Graphics.Containers
 {
     public class OsuClickableContainer : ClickableContainer
     {
-        protected SampleChannel SampleClick, SampleHover;
+        private readonly HoverSampleSet sampleSet;
+
+        private readonly Container content = new Container { RelativeSizeAxes = Axes.Both };
+
+        protected override Container<Drawable> Content => content;
+
+        protected virtual HoverClickSounds CreateHoverClickSounds(HoverSampleSet sampleSet) => new HoverClickSounds(sampleSet);
+
+        public OsuClickableContainer(HoverSampleSet sampleSet = HoverSampleSet.Normal)
+        {
+            this.sampleSet = sampleSet;
+        }
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio)
+        private void load()
         {
-            SampleHover = audio.Sample.Get(@"UI/generic-hover");
-            SampleClick = audio.Sample.Get(@"UI/generic-click");
-        }
+            if (AutoSizeAxes != Axes.None)
+            {
+                content.RelativeSizeAxes = RelativeSizeAxes;
+                content.AutoSizeAxes = AutoSizeAxes;
+            }
 
-        protected override bool OnHover(InputState state)
-        {
-            SampleHover?.Play();
-            return base.OnHover(state);
-        }
-
-        protected override bool OnClick(InputState state)
-        {
-            SampleClick?.Play();
-            return base.OnClick(state);
+            InternalChildren = new Drawable[]
+            {
+                content,
+                CreateHoverClickSounds(sampleSet)
+            };
         }
     }
 }

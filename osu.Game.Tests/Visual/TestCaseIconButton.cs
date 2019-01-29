@@ -1,8 +1,9 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using NUnit.Framework;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -12,10 +13,9 @@ using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseIconButton : OsuTestCase
     {
-        public override string Description => "Various display modes of icon buttons";
-
         public TestCaseIconButton()
         {
             Child = new FillFlowContainer
@@ -25,11 +25,7 @@ namespace osu.Game.Tests.Visual
                 Children = new[]
                 {
                     new NamedIconButton("No change", new IconButton()),
-                    new NamedIconButton("Background colours", new IconButton
-                    {
-                        FlashColour = Color4.DarkGreen,
-                        HoverColour = Color4.Green,
-                    }),
+                    new NamedIconButton("Background colours", new ColouredIconButton()),
                     new NamedIconButton("Full-width", new IconButton { ButtonSize = new Vector2(200, 30) }),
                     new NamedIconButton("Unchanging size", new IconButton(), false),
                     new NamedIconButton("Icon colours", new IconButton
@@ -39,6 +35,15 @@ namespace osu.Game.Tests.Visual
                     })
                 }
             };
+        }
+
+        private class ColouredIconButton : IconButton
+        {
+            public ColouredIconButton()
+            {
+                FlashColour = Color4.DarkGreen;
+                HoverColour = Color4.Green;
+            }
         }
 
         private class NamedIconButton : Container

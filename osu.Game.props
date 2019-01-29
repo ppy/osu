@@ -1,0 +1,24 @@
+<!-- Contains required properties for osu!framework projects. -->
+<Project>
+  <PropertyGroup Label="C#">
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>..\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup Label="License">
+    <None Include="..\osu.licenseheader">
+      <Link>osu.licenseheader</Link>
+    </None>
+  </ItemGroup>
+  <ItemGroup Label="Resources">
+    <EmbeddedResource Include="Resources\**\*.*" />
+  </ItemGroup>
+  <PropertyGroup Label="Project">
+    <Company>ppy Pty Ltd</Company>
+    <Copyright>Copyright (c) 2019 ppy Pty Ltd</Copyright>
+    <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
+    This is required due to https://github.com/NuGet/Home/issues/5740 -->
+    <NoWarn>NU1701</NoWarn>
+  </PropertyGroup>
+</Project>

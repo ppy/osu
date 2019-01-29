@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -85,11 +85,13 @@ namespace osu.Game.Screens.Play
 
             if (currentSecond != previousSecond && songCurrentTime < songLength)
             {
-                timeCurrent.Text = TimeSpan.FromSeconds(currentSecond).ToString(songCurrentTime < 0 ? @"\-m\:ss" : @"m\:ss");
-                timeLeft.Text = TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime).ToString(@"\-m\:ss");
+                timeCurrent.Text = formatTime(TimeSpan.FromSeconds(currentSecond));
+                timeLeft.Text = formatTime(TimeSpan.FromMilliseconds(endTime - AudioClock.CurrentTime));
 
                 previousSecond = currentSecond;
             }
         }
+
+        private string formatTime(TimeSpan timeSpan) => $"{(timeSpan < TimeSpan.Zero ? "-" : "")}{Math.Floor(timeSpan.Duration().TotalMinutes)}:{timeSpan.Duration().Seconds:D2}";
     }
 }

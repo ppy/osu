@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Graphics.Textures;
-using System.Linq;
+using osu.Game.Beatmaps;
 
 namespace osu.Game.Storyboards.Drawables
 {
@@ -16,6 +16,8 @@ namespace osu.Game.Storyboards.Drawables
 
         public bool FlipH { get; set; }
         public bool FlipV { get; set; }
+
+        public override bool RemoveWhenNotAlive => false;
 
         protected override Vector2 DrawScale
             => new Vector2(FlipH ? -base.DrawScale.X : base.DrawScale.X, FlipV ? -base.DrawScale.Y : base.DrawScale.Y);
@@ -61,14 +63,14 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuGameBase game, TextureStore textureStore)
+        private void load(IBindableBeatmap beatmap, TextureStore textureStore)
         {
             var basePath = Animation.Path.ToLowerInvariant();
             for (var frame = 0; frame < Animation.FrameCount; frame++)
             {
                 var framePath = basePath.Replace(".", frame + ".");
 
-                var path = game.Beatmap.Value.BeatmapSetInfo.Files.FirstOrDefault(f => f.Filename.ToLowerInvariant() == framePath)?.FileInfo.StoragePath;
+                var path = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.ToLowerInvariant() == framePath)?.FileInfo.StoragePath;
                 if (path == null)
                     continue;
 

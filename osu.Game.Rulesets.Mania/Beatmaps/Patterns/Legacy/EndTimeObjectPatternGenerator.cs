@@ -1,12 +1,13 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Beatmaps;
+using System.Collections.Generic;
 using osu.Game.Rulesets.Mania.MathUtils;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using System.Linq;
 using osu.Game.Audio;
+using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mania.Objects;
 
 namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
@@ -15,46 +16,38 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
     {
         private readonly double endTime;
 
-        public EndTimeObjectPatternGenerator(FastRandom random, HitObject hitObject, Beatmap beatmap, int availableColumns)
-            : base(random, hitObject, beatmap, availableColumns, new Pattern())
+        public EndTimeObjectPatternGenerator(FastRandom random, HitObject hitObject, ManiaBeatmap beatmap, IBeatmap originalBeatmap)
+            : base(random, hitObject, beatmap, new Pattern(), originalBeatmap)
         {
-            var endtimeData = HitObject as IHasEndTime;
-
-            endTime = endtimeData?.EndTime ?? 0;
+            endTime = (HitObject as IHasEndTime)?.EndTime ?? 0;
         }
 
-        public override Pattern Generate()
+        public override IEnumerable<Pattern> Generate()
+        {
+            yield return generate();
+        }
+
+        private Pattern generate()
         {
             var pattern = new Pattern();
 
             bool generateHold = endTime - HitObject.StartTime >= 100;
 
-            if (AvailableColumns == 8)
+            switch (TotalColumns)
             {
-                if (HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000)
+                case 8 when HitObject.Samples.Any(s => s.Name == SampleInfo.HIT_FINISH) && endTime - HitObject.StartTime < 1000:
                     addToPattern(pattern, 0, generateHold);
-                else
-                    addToPattern(pattern, getNextRandomColumn(RandomStart), generateHold);
+                    break;
+                case 8:
+                    addToPattern(pattern, FindAvailableColumn(GetRandomColumn(), PreviousPattern), generateHold);
+                    break;
+                default:
+                    if (TotalColumns > 0)
+                        addToPattern(pattern, GetRandomColumn(), generateHold);
+                    break;
             }
-            else if (AvailableColumns > 0)
-                addToPattern(pattern, getNextRandomColumn(0), generateHold);
 
             return pattern;
-        }
-
-        /// <summary>
-        /// Picks a random column after a column.
-        /// </summary>
-        /// <param name="start">The starting column.</param>
-        /// <returns>A random column after <paramref name="start"/>.</returns>
-        private int getNextRandomColumn(int start)
-        {
-            int nextColumn = Random.Next(start, AvailableColumns);
-
-            while (PreviousPattern.ColumnHasObject(nextColumn))
-                nextColumn = Random.Next(start, AvailableColumns);
-
-            return nextColumn;
         }
 
         /// <summary>
@@ -76,10 +69,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                     Duration = endTime - HitObject.StartTime
                 };
 
-                hold.Head.Samples.Add(new SampleInfo
-                {
-                    Name = SampleInfo.HIT_NORMAL
-                });
+                if (hold.Head.Samples == null)
+                    hold.Head.Samples = new List<SampleInfo>();
+
+                hold.Head.Samples.Add(new SampleInfo { Name = SampleInfo.HIT_NORMAL });
 
                 hold.Tail.Samples = HitObject.Samples;
 

@@ -1,7 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,10 +11,9 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
-using OpenTK;
-using osu.Framework.Input;
+using osuTK;
 using osu.Game.Graphics.Containers;
-using System.Linq;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -20,15 +21,30 @@ namespace osu.Game.Screens.Play.HUD
     {
         private const int fade_duration = 1000;
 
-        private readonly Bindable<IEnumerable<Mod>> mods = new Bindable<IEnumerable<Mod>>();
+        public bool DisplayUnrankedText = true;
 
-        public Bindable<IEnumerable<Mod>> Current => mods;
+        private readonly Bindable<IEnumerable<Mod>> current = new Bindable<IEnumerable<Mod>>();
+
+        public Bindable<IEnumerable<Mod>> Current
+        {
+            get => current;
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+
+                current.UnbindBindings();
+                current.BindTo(value);
+            }
+        }
 
         private readonly FillFlowContainer<ModIcon> iconsContainer;
         private readonly OsuSpriteText unrankedText;
 
         public ModDisplay()
         {
+            AutoSizeAxes = Axes.Both;
+
             Children = new Drawable[]
             {
                 iconsContainer = new ReverseChildIDFillFlowContainer<ModIcon>
@@ -41,7 +57,6 @@ namespace osu.Game.Screens.Play.HUD
                 },
                 unrankedText = new OsuSpriteText
                 {
-                    AlwaysPresent = true,
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre,
                     Text = @"/ UNRANKED /",
@@ -50,7 +65,7 @@ namespace osu.Game.Screens.Play.HUD
                 }
             };
 
-            mods.ValueChanged += mods =>
+            Current.ValueChanged += mods =>
             {
                 iconsContainer.Clear();
                 foreach (Mod mod in mods)
@@ -63,6 +78,12 @@ namespace osu.Game.Screens.Play.HUD
             };
         }
 
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            Current.UnbindAll();
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -71,7 +92,7 @@ namespace osu.Game.Screens.Play.HUD
 
         private void appearTransform()
         {
-            if (mods.Value.Any(m => !m.Ranked))
+            if (DisplayUnrankedText && Current.Value.Any(m => !m.Ranked))
                 unrankedText.FadeInFromZero(fade_duration, Easing.OutQuint);
             else
                 unrankedText.Hide();
@@ -87,16 +108,16 @@ namespace osu.Game.Screens.Play.HUD
 
         private void contract() => iconsContainer.TransformSpacingTo(new Vector2(-25, 0), 500, Easing.OutQuint);
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             expand();
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             contract();
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
     }
 }

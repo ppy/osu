@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace osu.Game.Storyboards
 {
@@ -23,6 +24,7 @@ namespace osu.Game.Storyboards
         public CommandTimeline<bool> FlipH = new CommandTimeline<bool>();
         public CommandTimeline<bool> FlipV = new CommandTimeline<bool>();
 
+        [JsonIgnore]
         public IEnumerable<ICommandTimeline> Timelines
         {
             get
@@ -39,14 +41,25 @@ namespace osu.Game.Storyboards
             }
         }
 
+        [JsonIgnore]
         public double CommandsStartTime => Timelines.Where(t => t.HasCommands).Min(t => t.StartTime);
+
+        [JsonIgnore]
         public double CommandsEndTime => Timelines.Where(t => t.HasCommands).Max(t => t.EndTime);
+
+        [JsonIgnore]
         public double CommandsDuration => CommandsEndTime - CommandsStartTime;
 
+        [JsonIgnore]
         public virtual double StartTime => CommandsStartTime;
+
+        [JsonIgnore]
         public virtual double EndTime => CommandsEndTime;
+
+        [JsonIgnore]
         public double Duration => EndTime - StartTime;
 
+        [JsonIgnore]
         public bool HasCommands => Timelines.Any(t => t.HasCommands);
 
         public virtual IEnumerable<CommandTimeline<T>.TypedCommand> GetCommands<T>(CommandTimelineSelector<T> timelineSelector, double offset = 0)

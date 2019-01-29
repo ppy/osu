@@ -1,15 +1,25 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
+using System;
+using System.Linq;
 
 namespace osu.Game.Rulesets.Mods
 {
     public class MultiMod : Mod
     {
         public override string Name => string.Empty;
-        public override string ShortenedName => string.Empty;
+        public override string Acronym => string.Empty;
         public override string Description => string.Empty;
-        public override double ScoreMultiplier => 0.0;
+        public override double ScoreMultiplier => 0;
 
-        public Mod[] Mods;
+        public Mod[] Mods { get; }
+
+        public MultiMod(params Mod[] mods)
+        {
+            Mods = mods;
+        }
+
+        public override Type[] IncompatibleMods => Mods.SelectMany(m => m.IncompatibleMods).ToArray();
     }
 }

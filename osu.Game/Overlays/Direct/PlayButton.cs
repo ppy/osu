@@ -1,26 +1,27 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Audio;
-using osu.Framework.Audio.Track;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
     public class PlayButton : Container
     {
-        public readonly Bindable<bool> Playing = new Bindable<bool>();
-        public Track Preview { get; private set; }
+        public readonly BindableBool Playing = new BindableBool();
+        public PreviewTrack Preview { get; private set; }
 
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
             get { return beatmapSet; }
@@ -29,9 +30,11 @@ namespace osu.Game.Overlays.Direct
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
-                Playing.Value = false;
-                trackLoader = null;
+                Preview?.Stop();
+                Preview?.Expire();
                 Preview = null;
+
+                Playing.Value = false;
             }
         }
 
@@ -47,13 +50,13 @@ namespace osu.Game.Overlays.Direct
             {
                 if (value)
                 {
+                    icon.FadeTo(0.5f, transition_duration, Easing.OutQuint);
                     loadingAnimation.Show();
-                    icon.FadeOut(transition_duration * 5, Easing.OutQuint);
                 }
                 else
                 {
+                    icon.FadeTo(1, transition_duration, Easing.OutQuint);
                     loadingAnimation.Hide();
-                    icon.FadeIn(transition_duration, Easing.OutQuint);
                 }
             }
         }
@@ -71,65 +74,79 @@ namespace osu.Game.Overlays.Direct
                     RelativeSizeAxes = Axes.Both,
                     Icon = FontAwesome.fa_play,
                 },
-                loadingAnimation = new LoadingAnimation(),
+                loadingAnimation = new LoadingAnimation
+                {
+                    Size = new Vector2(15),
+                },
             });
 
-            Playing.ValueChanged += playing =>
-            {
-                icon.Icon = playing ? FontAwesome.fa_pause : FontAwesome.fa_play;
-                icon.FadeColour(playing || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
-                updatePreviewTrack(playing);
-            };
+            Playing.ValueChanged += playingStateChanged;
         }
 
+        private PreviewTrackManager previewTrackManager;
+
         [BackgroundDependencyLoader]
-        private void load(OsuColour colour)
+        private void load(OsuColour colour, PreviewTrackManager previewTrackManager)
         {
+            this.previewTrackManager = previewTrackManager;
+
             hoverColour = colour.Yellow;
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
-            Playing.Value = !Playing.Value;
+            Playing.Toggle();
             return true;
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             icon.FadeColour(hoverColour, 120, Easing.InOutQuint);
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             if (!Playing.Value)
                 icon.FadeColour(Color4.White, 120, Easing.InOutQuint);
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
-        protected override void Update()
+        private void playingStateChanged(bool playing)
         {
-            base.Update();
+            icon.Icon = playing ? FontAwesome.fa_stop : FontAwesome.fa_play;
+            icon.FadeColour(playing || IsHovered ? hoverColour : Color4.White, 120, Easing.InOutQuint);
 
-            if (Preview?.HasCompleted ?? false)
-            {
-                Playing.Value = false;
-                Preview = null;
-            }
-        }
-
-        private void updatePreviewTrack(bool playing)
-        {
             if (playing)
             {
-                if (Preview == null)
+                if (BeatmapSet == null)
                 {
-                    beginAudioLoad();
+                    Playing.Value = false;
                     return;
                 }
 
-                Preview.Seek(0);
-                Preview.Start();
+                if (Preview != null)
+                {
+                    Preview.Start();
+                    return;
+                }
+
+                loading = true;
+
+                LoadComponentAsync(Preview = previewTrackManager.Get(beatmapSet), preview =>
+                {
+                    // beatmapset may have changed.
+                    if (Preview != preview)
+                        return;
+
+                    AddInternal(preview);
+                    loading = false;
+                    preview.Stopped += () => Playing.Value = false;
+
+                    // user may have changed their mind.
+                    if (Playing)
+                        preview.Start();
+                });
             }
             else
             {
@@ -138,48 +155,10 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
-        private TrackLoader trackLoader;
-
-        private void beginAudioLoad()
+        protected override void Dispose(bool isDisposing)
         {
-            if (trackLoader != null) return;
-
-            loading = true;
-
-            Add(new AsyncLoadWrapper(trackLoader = new TrackLoader($"https://b.ppy.sh/preview/{BeatmapSet.OnlineBeatmapSetID}.mp3")
-            {
-                OnLoadComplete = d =>
-                {
-                    // we may have been replaced by another loader
-                    if (trackLoader != d) return;
-
-                    Preview = (d as TrackLoader)?.Preview;
-                    Playing.TriggerChange();
-                    loading = false;
-                },
-            }));
-        }
-
-        private class TrackLoader : Drawable
-        {
-            private readonly string preview;
-
-            public Track Preview;
-
-            public TrackLoader(string preview)
-            {
-                this.preview = preview;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(AudioManager audio)
-            {
-                if (!string.IsNullOrEmpty(preview))
-                {
-                    Preview = audio.Track.Get(preview);
-                    Preview.Volume.Value = 0.5;
-                }
-            }
+            base.Dispose(isDisposing);
+            Playing.Value = false;
         }
     }
 }

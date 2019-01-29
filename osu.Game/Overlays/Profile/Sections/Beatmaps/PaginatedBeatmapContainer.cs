@@ -1,23 +1,21 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using System.Linq;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Users;
-using System.Linq;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 {
     public class PaginatedBeatmapContainer : PaginatedContainer
     {
         private const float panel_padding = 10f;
-
         private readonly BeatmapSetType type;
-
-        private DirectPanel currentlyPlaying;
+        private GetUserBeatmapsRequest request;
 
         public PaginatedBeatmapContainer(BeatmapSetType type, Bindable<User> user, string header, string missing = "None... yet.")
             : base(user, header, missing)
@@ -33,9 +31,8 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
         {
             base.ShowMore();
 
-            var req = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
-
-            req.Success += sets =>
+            request = new GetUserBeatmapsRequest(User.Value.Id, type, VisiblePages++ * ItemsPerPage);
+            request.Success += sets => Schedule(() =>
             {
                 ShowMoreButton.FadeTo(sets.Count == ItemsPerPage ? 1 : 0);
                 ShowMoreLoading.Hide();
@@ -53,20 +50,16 @@ namespace osu.Game.Overlays.Profile.Sections.Beatmaps
 
                     var panel = new DirectGridPanel(s.ToBeatmapSet(Rulesets));
                     ItemsContainer.Add(panel);
-
-                    panel.PreviewPlaying.ValueChanged += isPlaying =>
-                    {
-                        if (!isPlaying) return;
-
-                        if (currentlyPlaying != null && currentlyPlaying != panel)
-                            currentlyPlaying.PreviewPlaying.Value = false;
-
-                        currentlyPlaying = panel;
-                    };
                 }
-            };
+            });
 
-            Api.Queue(req);
+            Api.Queue(request);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            request?.Cancel();
         }
     }
 }

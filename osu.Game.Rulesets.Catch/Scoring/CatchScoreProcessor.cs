@@ -1,46 +1,48 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Game.Beatmaps;
-using osu.Game.Rulesets.Catch.Judgements;
 using osu.Game.Rulesets.Catch.Objects;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 
 namespace osu.Game.Rulesets.Catch.Scoring
 {
-    internal class CatchScoreProcessor : ScoreProcessor<CatchBaseHit>
+    public class CatchScoreProcessor : ScoreProcessor<CatchHitObject>
     {
-        public CatchScoreProcessor(RulesetContainer<CatchBaseHit> rulesetContainer)
+        public CatchScoreProcessor(RulesetContainer<CatchHitObject> rulesetContainer)
             : base(rulesetContainer)
         {
         }
 
-        protected override void SimulateAutoplay(Beatmap<CatchBaseHit> beatmap)
+        private float hpDrainRate;
+
+        protected override void ApplyBeatmap(Beatmap<CatchHitObject> beatmap)
         {
-            foreach (var obj in beatmap.HitObjects)
+            base.ApplyBeatmap(beatmap);
+
+            hpDrainRate = beatmap.BeatmapInfo.BaseDifficulty.DrainRate;
+        }
+
+        private const double harshness = 0.01;
+
+        protected override void ApplyResult(JudgementResult result)
+        {
+            base.ApplyResult(result);
+
+            if (result.Type == HitResult.Miss)
             {
-                var stream = obj as JuiceStream;
-
-                if (stream != null)
-                {
-                    AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-                    AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-
-                    foreach (var unused in stream.Ticks)
-                        AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
-
-                    continue;
-                }
-
-                var fruit = obj as Fruit;
-
-                if (fruit != null)
-                    AddJudgement(new CatchJudgement { Result = HitResult.Perfect });
+                if (!result.Judgement.IsBonus)
+                    Health.Value -= hpDrainRate * (harshness * 2);
+                return;
             }
 
-            base.SimulateAutoplay(beatmap);
+            Health.Value += Math.Max(result.Judgement.HealthIncreaseFor(result) - hpDrainRate, 0) * harshness;
         }
+
+        protected override HitWindows CreateHitWindows() => new CatchHitWindows();
     }
 }

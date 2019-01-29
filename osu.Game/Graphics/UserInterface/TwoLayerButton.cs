@@ -1,12 +1,11 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
@@ -14,6 +13,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Framework.Audio.Track;
 using System;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -56,15 +56,15 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 base.Origin = value;
-                c1.Origin = c1.Anchor = (value & Anchor.x2) > 0 ? Anchor.TopLeft : Anchor.TopRight;
-                c2.Origin = c2.Anchor = (value & Anchor.x2) > 0 ? Anchor.TopRight : Anchor.TopLeft;
+                c1.Origin = c1.Anchor = value.HasFlag(Anchor.x2) ? Anchor.TopLeft : Anchor.TopRight;
+                c2.Origin = c2.Anchor = value.HasFlag(Anchor.x2) ? Anchor.TopRight : Anchor.TopLeft;
 
-                X = (value & Anchor.x2) > 0 ? SIZE_RETRACTED.X * shear * 0.5f : 0;
+                X = value.HasFlag(Anchor.x2) ? SIZE_RETRACTED.X * shear * 0.5f : 0;
 
                 Remove(c1);
                 Remove(c2);
-                c1.Depth = (value & Anchor.x2) > 0 ? 0 : 1;
-                c2.Depth = (value & Anchor.x2) > 0 ? 1 : 0;
+                c1.Depth = value.HasFlag(Anchor.x2) ? 0 : 1;
+                c2.Depth = value.HasFlag(Anchor.x2) ? 1 : 0;
                 Add(c1);
                 Add(c2);
             }
@@ -169,9 +169,9 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => IconLayer.ReceiveMouseInputAt(screenSpacePos) || TextLayer.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => IconLayer.ReceivePositionalInputAt(screenSpacePos) || TextLayer.ReceivePositionalInputAt(screenSpacePos);
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             this.ResizeTo(SIZE_EXTENDED, transform_time, Easing.OutElastic);
             IconLayer.FadeColour(HoverColour, transform_time, Easing.OutElastic);
@@ -181,7 +181,7 @@ namespace osu.Game.Graphics.UserInterface
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             this.ResizeTo(SIZE_RETRACTED, transform_time, Easing.OutElastic);
             IconLayer.FadeColour(TextLayer.Colour, transform_time, Easing.OutElastic);
@@ -189,12 +189,12 @@ namespace osu.Game.Graphics.UserInterface
             bouncingIcon.ScaleTo(1, transform_time, Easing.OutElastic);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             return true;
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             var flash = new Box
             {
@@ -208,7 +208,7 @@ namespace osu.Game.Graphics.UserInterface
             flash.FadeOut(500, Easing.OutQuint);
             flash.Expire();
 
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
         private class BouncingIcon : BeatSyncedContainer

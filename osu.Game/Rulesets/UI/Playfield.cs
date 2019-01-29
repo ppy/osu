@@ -1,115 +1,120 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK;
-using osu.Game.Rulesets.Judgements;
-using osu.Framework.Allocation;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Graphics;
+using osu.Game.Rulesets.Objects.Drawables;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Configuration;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mods;
+using osuTK;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class Playfield : Container
+    public abstract class Playfield : CompositeDrawable
     {
         /// <summary>
-        /// The HitObjects contained in this Playfield.
+        /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
-        public HitObjectContainer HitObjects { get; protected set; }
+        public HitObjectContainer HitObjectContainer => hitObjectContainerLazy.Value;
 
-        public Container<Drawable> ScaledContent;
+        private readonly Lazy<HitObjectContainer> hitObjectContainerLazy;
 
         /// <summary>
-        /// Whether we are currently providing the local user a gameplay cursor.
+        /// A function that converts gamefield coordinates to screen space.
         /// </summary>
-        public virtual bool ProvidingUserCursor => false;
-
-        protected override Container<Drawable> Content => content;
-        private readonly Container<Drawable> content;
+        public Func<Vector2, Vector2> GamefieldToScreenSpace => HitObjectContainer.ToScreenSpace;
 
         /// <summary>
-        /// A container for keeping track of DrawableHitObjects.
+        /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
         /// </summary>
-        /// <param name="customWidth">Whether we want our internal coordinate system to be scaled to a specified width.</param>
-        protected Playfield(float? customWidth = null)
+        public IEnumerable<DrawableHitObject> AllHitObjects => HitObjectContainer?.Objects.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects)) ?? Enumerable.Empty<DrawableHitObject>();
+
+        /// <summary>
+        /// All <see cref="Playfield"/>s nested inside this <see cref="Playfield"/>.
+        /// </summary>
+        public IEnumerable<Playfield> NestedPlayfields => nestedPlayfields.IsValueCreated ? nestedPlayfields.Value : Enumerable.Empty<Playfield>();
+
+        private readonly Lazy<List<Playfield>> nestedPlayfields = new Lazy<List<Playfield>>();
+
+        /// <summary>
+        /// Whether judgements should be displayed by this and and all nested <see cref="Playfield"/>s.
+        /// </summary>
+        public readonly BindableBool DisplayJudgements = new BindableBool(true);
+
+        /// <summary>
+        /// Creates a new <see cref="Playfield"/>.
+        /// </summary>
+        protected Playfield()
         {
-            // Default height since we force relative size axes
-            Size = Vector2.One;
+            RelativeSizeAxes = Axes.Both;
 
-            AddInternal(ScaledContent = new ScaledContainer
-            {
-                CustomWidth = customWidth,
-                RelativeSizeAxes = Axes.Both,
-                Children = new[]
-                {
-                    content = new Container
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    }
-                }
-            });
-
-            HitObjects = new HitObjectContainer
-            {
-                RelativeSizeAxes = Axes.Both,
-            };
+            hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
         }
+
+        private WorkingBeatmap beatmap;
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(IBindableBeatmap beatmap)
         {
-            Add(HitObjects);
-        }
-
-        public override Axes RelativeSizeAxes
-        {
-            get { return Axes.Both; }
-            set { throw new InvalidOperationException($@"{nameof(Playfield)}'s {nameof(RelativeSizeAxes)} should never be changed from {Axes.Both}"); }
+            this.beatmap = beatmap.Value;
         }
 
         /// <summary>
         /// Performs post-processing tasks (if any) after all DrawableHitObjects are loaded into this Playfield.
         /// </summary>
-        public virtual void PostProcess() { }
+        public virtual void PostProcess() => NestedPlayfields.ForEach(p => p.PostProcess());
 
         /// <summary>
         /// Adds a DrawableHitObject to this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to add.</param>
-        public virtual void Add(DrawableHitObject h) => HitObjects.Add(h);
+        public virtual void Add(DrawableHitObject h) => HitObjectContainer.Add(h);
 
         /// <summary>
         /// Remove a DrawableHitObject from this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
-        public virtual void Remove(DrawableHitObject h) => HitObjects.Remove(h);
+        public virtual bool Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
 
         /// <summary>
-        /// Triggered when a new <see cref="Judgement"/> occurs on a <see cref="DrawableHitObject"/>.
+        /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
+        /// This does not add the <see cref="Playfield"/> to the draw hierarchy.
         /// </summary>
-        /// <param name="judgedObject">The object that <paramref name="judgement"/> occured for.</param>
-        /// <param name="judgement">The <see cref="Judgement"/> that occurred.</param>
-        public virtual void OnJudgement(DrawableHitObject judgedObject, Judgement judgement) { }
-
-        public class HitObjectContainer : CompositeDrawable
+        /// <param name="otherPlayfield">The <see cref="Playfield"/> to add.</param>
+        protected void AddNested(Playfield otherPlayfield)
         {
-            public virtual IEnumerable<DrawableHitObject> Objects => InternalChildren.OfType<DrawableHitObject>();
-            public virtual void Add(DrawableHitObject hitObject) => AddInternal(hitObject);
-            public virtual bool Remove(DrawableHitObject hitObject) => RemoveInternal(hitObject);
+            otherPlayfield.DisplayJudgements.BindTo(DisplayJudgements);
+            nestedPlayfields.Value.Add(otherPlayfield);
         }
 
-        private class ScaledContainer : Container
+        protected override void LoadComplete()
         {
-            /// <summary>
-            /// A value (in game pixels that we should scale our content to match).
-            /// </summary>
-            public float? CustomWidth;
+            base.LoadComplete();
 
-            //dividing by the customwidth will effectively scale our content to the required container size.
-            protected override Vector2 DrawScale => CustomWidth.HasValue ? new Vector2(DrawSize.X / CustomWidth.Value) : base.DrawScale;
+            // in the case a consumer forgets to add the HitObjectContainer, we will add it here.
+            if (HitObjectContainer.Parent == null)
+                AddInternal(HitObjectContainer);
         }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (beatmap != null)
+                foreach (var mod in beatmap.Mods.Value)
+                    if (mod is IUpdatableByPlayfield updatable)
+                        updatable.Update(this);
+        }
+
+        /// <summary>
+        /// Creates the container that will be used to contain the <see cref="DrawableHitObject"/>s.
+        /// </summary>
+        protected virtual HitObjectContainer CreateHitObjectContainer() => new HitObjectContainer();
     }
 }

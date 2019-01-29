@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
-using OpenTK.Input;
+using osu.Framework.Input.Events;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -20,7 +20,7 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public double DistanceDecayOnRightMouseScrollbar = 0.02;
 
-        private bool shouldPerformRightMouseScroll(InputState state) => RightMouseScrollbar && state.Mouse.IsPressed(MouseButton.Right);
+        private bool shouldPerformRightMouseScroll(MouseButtonEvent e) => RightMouseScrollbar && e.Button == MouseButton.Right;
 
         private void scrollToRelative(float value) => ScrollTo(Clamp((value - Scrollbar.DrawSize[ScrollDim] / 2) / Scrollbar.Size[ScrollDim]), true, DistanceDecayOnRightMouseScrollbar);
 
@@ -28,40 +28,40 @@ namespace osu.Game.Graphics.Containers
 
         protected override bool IsDragging => base.IsDragging || mouseScrollBarDragging;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (shouldPerformRightMouseScroll(state))
+            if (shouldPerformRightMouseScroll(e))
             {
-                scrollToRelative(state.Mouse.Position[ScrollDim]);
+                scrollToRelative(e.MousePosition[ScrollDim]);
                 return true;
             }
 
-            return base.OnMouseDown(state, args);
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnDrag(InputState state)
+        protected override bool OnDrag(DragEvent e)
         {
             if (mouseScrollBarDragging)
             {
-                scrollToRelative(state.Mouse.Position[ScrollDim]);
+                scrollToRelative(e.MousePosition[ScrollDim]);
                 return true;
             }
 
-            return base.OnDrag(state);
+            return base.OnDrag(e);
         }
 
-        protected override bool OnDragStart(InputState state)
+        protected override bool OnDragStart(DragStartEvent e)
         {
-            if (shouldPerformRightMouseScroll(state))
+            if (shouldPerformRightMouseScroll(e))
             {
                 mouseScrollBarDragging = true;
                 return true;
             }
 
-            return base.OnDragStart(state);
+            return base.OnDragStart(e);
         }
 
-        protected override bool OnDragEnd(InputState state)
+        protected override bool OnDragEnd(DragEndEvent e)
         {
             if (mouseScrollBarDragging)
             {
@@ -69,7 +69,7 @@ namespace osu.Game.Graphics.Containers
                 return true;
             }
 
-            return base.OnDragEnd(state);
+            return base.OnDragEnd(e);
         }
     }
 }

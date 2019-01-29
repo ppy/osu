@@ -1,12 +1,11 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using System.Linq;
@@ -17,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
 {
@@ -119,14 +119,8 @@ namespace osu.Game.Screens.Select
                                         Margin = new MarginPadding { Top = spacing * 2 },
                                         Children = new[]
                                         {
-                                            description = new MetadataSection("Description")
-                                            {
-                                                TextColour = Color4.White.Opacity(0.75f),
-                                            },
-                                            source = new MetadataSection("Source")
-                                            {
-                                                TextColour = Color4.White.Opacity(0.75f),
-                                            },
+                                            description = new MetadataSection("Description"),
+                                            source = new MetadataSection("Source"),
                                             tags = new MetadataSection("Tags"),
                                         },
                                     },
@@ -163,10 +157,9 @@ namespace osu.Game.Screens.Select
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api)
+        private void load(APIAccess api)
         {
             this.api = api;
-            tags.TextColour = colours.Yellow;
         }
 
         protected override void UpdateAfterChildren()
@@ -261,6 +254,7 @@ namespace osu.Game.Screens.Select
             description.Text = null;
             source.Text = null;
             tags.Text = null;
+
             advanced.Beatmap = new BeatmapInfo
             {
                 StarDifficulty = 0,
@@ -306,37 +300,17 @@ namespace osu.Game.Screens.Select
 
         private class MetadataSection : Container
         {
-            private readonly TextFlowContainer textFlow;
-
-            public string Text
-            {
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        this.FadeOut(transition_duration);
-                        return;
-                    }
-
-                    this.FadeIn(transition_duration);
-                    textFlow.Clear();
-                    textFlow.AddText(value, s => s.TextSize = 14);
-                }
-            }
-
-            public Color4 TextColour
-            {
-                get { return textFlow.Colour; }
-                set { textFlow.Colour = value; }
-            }
+            private readonly FillFlowContainer textContainer;
+            private TextFlowContainer textFlow;
 
             public MetadataSection(string title)
             {
                 RelativeSizeAxes = Axes.X;
                 AutoSizeAxes = Axes.Y;
 
-                InternalChild = new FillFlowContainer
+                InternalChild = textContainer = new FillFlowContainer
                 {
+                    Alpha = 0,
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,
                     Spacing = new Vector2(spacing / 2),
@@ -353,13 +327,40 @@ namespace osu.Game.Screens.Select
                                 TextSize = 14,
                             },
                         },
-                        textFlow = new TextFlowContainer
-                        {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                        },
                     },
                 };
+            }
+
+            public string Text
+            {
+                set
+                {
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        textContainer.FadeOut(transition_duration);
+                        return;
+                    }
+
+                    setTextAsync(value);
+                }
+            }
+
+            private void setTextAsync(string text)
+            {
+                LoadComponentAsync(new OsuTextFlowContainer(s => s.TextSize = 14)
+                {
+                    RelativeSizeAxes = Axes.X,
+                    AutoSizeAxes = Axes.Y,
+                    Colour = Color4.White.Opacity(0.75f),
+                    Text = text
+                }, loaded =>
+                {
+                    textFlow?.Expire();
+                    textContainer.Add(textFlow = loaded);
+
+                    // fade in if we haven't yet.
+                    textContainer.FadeIn(transition_duration);
+                });
             }
         }
 

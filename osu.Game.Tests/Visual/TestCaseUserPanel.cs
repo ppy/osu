@@ -1,17 +1,17 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Users;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseUserPanel : OsuTestCase
+    [TestFixture]
+    public class TestCaseUserPanel : OsuTestCase
     {
-        public override string Description => @"Panels for displaying a user's status";
-
         public TestCaseUserPanel()
         {
             UserPanel flyte;

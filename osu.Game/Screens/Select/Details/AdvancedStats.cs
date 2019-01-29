@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -40,10 +40,10 @@ namespace osu.Game.Screens.Select.Details
                     firstValue.Value = Beatmap?.BaseDifficulty?.CircleSize ?? 0;
                 }
 
-                hpDrain.Value = beatmap.BaseDifficulty?.DrainRate ?? 0;
-                accuracy.Value = beatmap.BaseDifficulty?.OverallDifficulty ?? 0;
-                approachRate.Value = beatmap.BaseDifficulty?.ApproachRate ?? 0;
-                starDifficulty.Value = (float)beatmap.StarDifficulty;
+                hpDrain.Value = Beatmap?.BaseDifficulty?.DrainRate ?? 0;
+                accuracy.Value = Beatmap?.BaseDifficulty?.OverallDifficulty ?? 0;
+                approachRate.Value = Beatmap?.BaseDifficulty?.ApproachRate ?? 0;
+                starDifficulty.Value = (float)(Beatmap?.StarDifficulty ?? 0);
             }
         }
 

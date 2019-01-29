@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Mania.Judgements;
 
 namespace osu.Game.Rulesets.Mania.Objects
@@ -12,16 +11,6 @@ namespace osu.Game.Rulesets.Mania.Objects
     /// </summary>
     public class Note : ManiaHitObject
     {
-        /// <summary>
-        /// The key-press hit window for this note.
-        /// </summary>
-        public HitWindows HitWindows { get; protected set; } = new HitWindows();
-
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
-        {
-            base.ApplyDefaults(controlPointInfo, difficulty);
-
-            HitWindows = new HitWindows(difficulty.OverallDifficulty);
-        }
+        public override Judgement CreateJudgement() => new ManiaJudgement();
     }
 }

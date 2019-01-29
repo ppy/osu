@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -15,7 +15,7 @@ namespace osu.Game.Overlays
         protected override Drawable CreateHeader() => new SettingsHeader("key configuration", "Customise your keys!");
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(RulesetStore rulesets, GlobalKeyBindingInputManager global)
+        private void load(RulesetStore rulesets, GlobalActionContainer global)
         {
             AddSection(new GlobalKeyBindingsSection(global));
 

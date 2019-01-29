@@ -1,16 +1,15 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Framework.Timing;
 using osu.Game.Graphics;
-using OpenTK.Graphics;
-using OpenTK.Input;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -20,9 +19,7 @@ namespace osu.Game.Screens.Play
     /// </summary>
     public class PauseContainer : Container
     {
-        public bool IsPaused { get; private set; }
-
-        public bool AllowExit => IsPaused && pauseOverlay.Alpha == 1;
+        public readonly BindableBool IsPaused = new BindableBool();
 
         public Func<bool> CheckCanPause;
 
@@ -38,70 +35,74 @@ namespace osu.Game.Screens.Play
         public int Retries { set { pauseOverlay.Retries = value; } }
 
         public bool CanPause => (CheckCanPause?.Invoke() ?? true) && Time.Current >= lastPauseActionTime + pause_cooldown;
+        public bool IsResuming { get; private set; }
 
         public Action OnRetry;
         public Action OnQuit;
 
-        public Action OnResume;
-        public Action OnPause;
+        private readonly FramedClock framedClock;
+        private readonly DecoupleableInterpolatingFramedClock decoupledClock;
 
-        public IAdjustableClock AudioClock;
-        public FramedClock FramedClock;
-
-        public PauseContainer()
+        /// <summary>
+        /// Creates a new <see cref="PauseContainer"/>.
+        /// </summary>
+        /// <param name="framedClock">The gameplay clock. This is the clock that will process frames.</param>
+        /// <param name="decoupledClock">The seekable clock. This is the clock that will be paused and resumed.</param>
+        public PauseContainer(FramedClock framedClock, DecoupleableInterpolatingFramedClock decoupledClock)
         {
+            this.framedClock = framedClock;
+            this.decoupledClock = decoupledClock;
+
             RelativeSizeAxes = Axes.Both;
 
-            AddInternal(content = new Container { RelativeSizeAxes = Axes.Both });
+            AddInternal(content = new Container
+            {
+                Clock = this.framedClock,
+                ProcessCustomClock = false,
+                RelativeSizeAxes = Axes.Both
+            });
 
             AddInternal(pauseOverlay = new PauseOverlay
             {
-                OnResume = () => this.Delay(400).Schedule(Resume),
+                OnResume = () =>
+                {
+                    IsResuming = true;
+                    this.Delay(400).Schedule(Resume);
+                },
                 OnRetry = () => OnRetry(),
                 OnQuit = () => OnQuit(),
             });
         }
 
-        public void Pause(bool force = false)
+        public void Pause(bool force = false) => Schedule(() => // Scheduled to ensure a stable position in execution order, no matter how it was called.
         {
             if (!CanPause && !force) return;
 
             if (IsPaused) return;
 
-            // stop the decoupled clock (stops the audio eventually)
-            AudioClock.Stop();
+            // stop the seekable clock (stops the audio eventually)
+            decoupledClock.Stop();
+            IsPaused.Value = true;
 
-            // stop processing updatess on the offset clock (instantly freezes time for all our components)
-            FramedClock.ProcessSourceClockFrames = false;
+            pauseOverlay.Show();
 
-            IsPaused = true;
-
-            // we need to do a final check after all of our children have processed up to the paused clock time.
-            // this is to cover cases where, for instance, the player fails in the current processing frame.
-            Schedule(() =>
-            {
-                if (!CanPause) return;
-
-                lastPauseActionTime = Time.Current;
-
-                OnPause?.Invoke();
-                pauseOverlay.Show();
-            });
-        }
+            lastPauseActionTime = Time.Current;
+        });
 
         public void Resume()
         {
             if (!IsPaused) return;
 
-            IsPaused = false;
-            FramedClock.ProcessSourceClockFrames = true;
-
+            IsPaused.Value = false;
+            IsResuming = false;
             lastPauseActionTime = Time.Current;
 
-            OnResume?.Invoke();
+            // Seeking the decoupled clock to its current time ensures that its source clock will be seeked to the same time
+            // This accounts for the audio clock source potentially taking time to enter a completely stopped state
+            decoupledClock.Seek(decoupledClock.CurrentTime);
+            decoupledClock.Start();
 
             pauseOverlay.Hide();
-            AudioClock.Start();
         }
 
         private OsuGameBase game;
@@ -118,33 +119,27 @@ namespace osu.Game.Screens.Play
             if (!game.IsActive && CanPause)
                 Pause();
 
+            if (!IsPaused)
+                framedClock.ProcessFrame();
+
             base.Update();
         }
 
-        public class PauseOverlay : MenuOverlay
+        public class PauseOverlay : GameplayMenuOverlay
         {
             public Action OnResume;
 
             public override string Header => "paused";
             public override string Description => "you're not going to do what i think you're going to do, are ya?";
 
-            protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-            {
-                if (!args.Repeat && args.Key == Key.Escape)
-                {
-                    Buttons.Children.First().TriggerOnClick();
-                    return true;
-                }
-
-                return base.OnKeyDown(state, args);
-            }
+            protected override Action BackAction => () => InternalButtons.Children.First().Click();
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                AddButton("Continue", colours.Green, OnResume);
-                AddButton("Retry", colours.YellowDark, OnRetry);
-                AddButton("Quit", new Color4(170, 27, 39, 255), OnQuit);
+                AddButton("Continue", colours.Green, () => OnResume?.Invoke());
+                AddButton("Retry", colours.YellowDark, () => OnRetry?.Invoke());
+                AddButton("Quit", new Color4(170, 27, 39, 255), () => OnQuit?.Invoke());
             }
         }
     }

@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Game.Online.API.Requests.Responses;
 
 namespace osu.Game.Online.API.Requests
 {
-    public class GetUserScoresRequest : APIRequest<List<OnlineScore>>
+    public class GetUserScoresRequest : APIRequest<List<APIScoreInfo>>
     {
         private readonly long userId;
         private readonly ScoreType type;
@@ -18,7 +19,8 @@ namespace osu.Game.Online.API.Requests
             this.offset = offset;
         }
 
-        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLower()}?offset={offset}";
+        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
+        protected override string Target => $@"users/{userId}/scores/{type.ToString().ToLowerInvariant()}?offset={offset}";
     }
 
     public enum ScoreType

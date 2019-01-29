@@ -1,6 +1,8 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
+
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Game.Configuration;
 
 namespace osu.Game.Overlays.Settings.Sections.Graphics
@@ -12,7 +14,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            Children = new[]
+            Children = new Drawable[]
             {
                 new SettingsCheckbox
                 {
@@ -24,6 +26,16 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     LabelText = "Rotate cursor when dragging",
                     Bindable = config.GetBindable<bool>(OsuSetting.CursorRotation)
                 },
+                new SettingsEnumDropdown<ScreenshotFormat>
+                {
+                    LabelText = "Screenshot format",
+                    Bindable = config.GetBindable<ScreenshotFormat>(OsuSetting.ScreenshotFormat)
+                },
+                new SettingsCheckbox
+                {
+                    LabelText = "Show menu cursor in screenshots",
+                    Bindable = config.GetBindable<bool>(OsuSetting.ScreenshotCaptureMenuCursor)
+                }
             };
         }
     }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -9,7 +9,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -18,6 +18,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Statistic length, bpm, circleCount, sliderCount;
 
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
             get { return beatmapSet; }
@@ -26,11 +27,12 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
-                bpm.Value = BeatmapSet.OnlineInfo.BPM.ToString(@"0.##");
+                updateDisplay();
             }
         }
 
         private BeatmapInfo beatmap;
+
         public BeatmapInfo Beatmap
         {
             get { return beatmap; }
@@ -39,6 +41,22 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmap) return;
                 beatmap = value;
 
+                updateDisplay();
+            }
+        }
+
+        private void updateDisplay()
+        {
+            bpm.Value = BeatmapSet?.OnlineInfo.BPM.ToString(@"0.##") ?? "-";
+
+            if (beatmap == null)
+            {
+                length.Value = string.Empty;
+                circleCount.Value = string.Empty;
+                sliderCount.Value = string.Empty;
+            }
+            else
+            {
                 length.Value = TimeSpan.FromSeconds(beatmap.OnlineInfo.Length).ToString(@"m\:ss");
                 circleCount.Value = beatmap.OnlineInfo.CircleCount.ToString();
                 sliderCount.Value = beatmap.OnlineInfo.SliderCount.ToString();
@@ -62,12 +80,19 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            updateDisplay();
+        }
+
         private class Statistic : Container, IHasTooltip
         {
             private readonly string name;
             private readonly OsuSpriteText value;
 
             public string TooltipText => name;
+
             public string Value
             {
                 get { return value.Text; }

@@ -1,9 +1,12 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System.Collections.Generic;
+using Newtonsoft.Json;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 
 namespace osu.Game.Rulesets.Objects
@@ -17,9 +20,16 @@ namespace osu.Game.Rulesets.Objects
     public class HitObject
     {
         /// <summary>
+        /// A small adjustment to the start time of control points to account for rounding/precision errors.
+        /// </summary>
+        private const double control_point_leniency = 1;
+
+        /// <summary>
         /// The time at which the HitObject starts.
         /// </summary>
         public virtual double StartTime { get; set; }
+
+        private List<SampleInfo> samples;
 
         /// <summary>
         /// The samples to be played when this hit object is hit.
@@ -28,41 +38,86 @@ namespace osu.Game.Rulesets.Objects
         /// and can be treated as the default samples for the hit object.
         /// </para>
         /// </summary>
-        public SampleInfoList Samples = new SampleInfoList();
+        public List<SampleInfo> Samples
+        {
+            get => samples ?? (samples = new List<SampleInfo>());
+            set => samples = value;
+        }
+
+        [JsonIgnore]
+        public SampleControlPoint SampleControlPoint;
 
         /// <summary>
         /// Whether this <see cref="HitObject"/> is in Kiai time.
         /// </summary>
+        [JsonIgnore]
         public bool Kiai { get; private set; }
+
+        private float overallDifficulty = BeatmapDifficulty.DEFAULT_DIFFICULTY;
+
+        /// <summary>
+        /// The hit windows for this <see cref="HitObject"/>.
+        /// </summary>
+        public HitWindows HitWindows { get; set; }
+
+        private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
+
+        [JsonIgnore]
+        public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects;
 
         /// <summary>
         /// Applies default values to this HitObject.
         /// </summary>
         /// <param name="controlPointInfo">The control points.</param>
         /// <param name="difficulty">The difficulty settings to use.</param>
-        public virtual void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        public void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            SoundControlPoint soundPoint = controlPointInfo.SoundPointAt(StartTime);
-            EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
+            ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            Kiai |= effectPoint.KiaiMode;
+            // This is done here since ApplyDefaultsToSelf may be used to determine the end time
+            SampleControlPoint = controlPointInfo.SamplePointAt(((this as IHasEndTime)?.EndTime ?? StartTime) + control_point_leniency);
 
-            // Initialize first sample
-            Samples.ForEach(s => initializeSampleInfo(s, soundPoint));
+            nestedHitObjects.Clear();
 
-            // Initialize any repeat samples
-            var repeatData = this as IHasRepeats;
-            repeatData?.RepeatSamples?.ForEach(r => r.ForEach(s => initializeSampleInfo(s, soundPoint)));
+            CreateNestedHitObjects();
+
+            nestedHitObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
+
+            foreach (var h in nestedHitObjects)
+            {
+                h.HitWindows = HitWindows;
+                h.ApplyDefaults(controlPointInfo, difficulty);
+            }
         }
 
-        private void initializeSampleInfo(SampleInfo sample, SoundControlPoint soundPoint)
+        protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            if (sample.Volume == 0)
-                sample.Volume = soundPoint?.SampleVolume ?? 0;
+            Kiai = controlPointInfo.EffectPointAt(StartTime + control_point_leniency).KiaiMode;
 
-            // If the bank is not assigned a name, assign it from the control point
-            if (string.IsNullOrEmpty(sample.Bank))
-                sample.Bank = soundPoint?.SampleBank ?? @"normal";
+            if (HitWindows == null)
+                HitWindows = CreateHitWindows();
+            HitWindows?.SetDifficulty(difficulty.OverallDifficulty);
         }
+
+        protected virtual void CreateNestedHitObjects()
+        {
+        }
+
+        protected void AddNested(HitObject hitObject) => nestedHitObjects.Add(hitObject);
+
+        /// <summary>
+        /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.
+        /// May be null.
+        /// </summary>
+        public virtual Judgement CreateJudgement() => null;
+
+        /// <summary>
+        /// Creates the <see cref="HitWindows"/> for this <see cref="HitObject"/>.
+        /// This can be null to indicate that the <see cref="HitObject"/> has no <see cref="HitWindows"/>.
+        /// <para>
+        /// This will only be invoked if <see cref="HitWindows"/> hasn't been set externally (e.g. from a <see cref="BeatmapConverter"/>.
+        /// </para>
+        /// </summary>
+        protected virtual HitWindows CreateHitWindows() => new HitWindows();
     }
 }

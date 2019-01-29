@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -10,14 +10,14 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet
 {
@@ -41,10 +41,17 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
-                Beatmap.Value = BeatmapSet.Beatmaps.First();
-                plays.Value = BeatmapSet.OnlineInfo.PlayCount;
-                favourites.Value = BeatmapSet.OnlineInfo.FavouriteCount;
-                difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.Select(b => new DifficultySelectorButton(b)
+                updateDisplay();
+            }
+        }
+
+        private void updateDisplay()
+        {
+            difficulties.Clear();
+
+            if (BeatmapSet != null)
+            {
+                difficulties.ChildrenEnumerable = BeatmapSet.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty).Select(b => new DifficultySelectorButton(b)
                 {
                     State = DifficultySelectorState.NotSelected,
                     OnHovered = beatmap =>
@@ -53,14 +60,16 @@ namespace osu.Game.Overlays.BeatmapSet
                         starRating.Text = beatmap.StarDifficulty.ToString("Star Difficulty 0.##");
                         starRating.FadeIn(100);
                     },
-                    OnClicked = beatmap =>
-                    {
-                        Beatmap.Value = beatmap;
-                    },
+                    OnClicked = beatmap => { Beatmap.Value = beatmap; },
                 });
-
-                updateDifficultyButtons();
             }
+
+            starRating.FadeOut(100);
+            Beatmap.Value = BeatmapSet?.Beatmaps.FirstOrDefault();
+            plays.Value = BeatmapSet?.OnlineInfo.PlayCount ?? 0;
+            favourites.Value = BeatmapSet?.OnlineInfo.FavouriteCount ?? 0;
+
+            updateDifficultyButtons();
         }
 
         public BeatmapPicker()
@@ -140,6 +149,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private void load(OsuColour colours)
         {
             starRating.Colour = colours.Yellow;
+            updateDisplay();
         }
 
         protected override void LoadComplete()
@@ -150,7 +160,10 @@ namespace osu.Game.Overlays.BeatmapSet
             Beatmap.TriggerChange();
         }
 
-        private void showBeatmap(BeatmapInfo beatmap) => version.Text = beatmap.Version;
+        private void showBeatmap(BeatmapInfo beatmap)
+        {
+            version.Text = beatmap?.Version;
+        }
 
         private void updateDifficultyButtons()
         {
@@ -161,9 +174,9 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             public Action OnLostHover;
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
-                base.OnHoverLost(state);
+                base.OnHoverLost(e);
                 OnLostHover?.Invoke();
             }
         }
@@ -228,24 +241,24 @@ namespace osu.Game.Overlays.BeatmapSet
                 };
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 fadeIn();
                 OnHovered?.Invoke(Beatmap);
-                return base.OnHover(state);
+                return base.OnHover(e);
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 if (State == DifficultySelectorState.NotSelected)
                     fadeOut();
-                base.OnHoverLost(state);
+                base.OnHoverLost(e);
             }
 
-            protected override bool OnClick(InputState state)
+            protected override bool OnClick(ClickEvent e)
             {
                 OnClicked?.Invoke(Beatmap);
-                return base.OnClick(state);
+                return base.OnClick(e);
             }
 
             private void fadeIn()

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -7,9 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Allocation;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 
@@ -20,12 +19,10 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float height = 50;
 
         private readonly UpdateableAvatar avatar;
-        private readonly ClickableArea clickableArea;
         private readonly FillFlowContainer fields;
 
-        private UserProfileOverlay profile;
-
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
             get { return beatmapSet; }
@@ -34,28 +31,36 @@ namespace osu.Game.Overlays.BeatmapSet
                 if (value == beatmapSet) return;
                 beatmapSet = value;
 
-                var i = BeatmapSet.OnlineInfo;
+                updateDisplay();
+            }
+        }
 
-                avatar.User = BeatmapSet.Metadata.Author;
-                clickableArea.Action = () => profile?.ShowUser(avatar.User);
+        private void updateDisplay()
+        {
+            avatar.User = BeatmapSet?.Metadata.Author;
 
-                fields.Children = new Drawable[]
-                {
-                    new Field("made by", BeatmapSet.Metadata.Author.Username, @"Exo2.0-RegularItalic"),
-                    new Field("submitted on", i.Submitted.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold")
-                    {
-                        Margin = new MarginPadding { Top = 5 },
-                    },
-                };
+            fields.Clear();
+            if (BeatmapSet == null)
+                return;
 
-                if (i.Ranked.HasValue)
+            var online = BeatmapSet.OnlineInfo;
+
+            fields.Children = new Drawable[]
+            {
+                new Field("mapped by", BeatmapSet.Metadata.Author.Username, @"Exo2.0-RegularItalic"),
+                new Field("submitted on", online.Submitted.ToString(@"MMMM d, yyyy"), @"Exo2.0-Bold")
                 {
-                    fields.Add(new Field("ranked on ", i.Ranked.Value.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold"));
-                }
-                else if (i.LastUpdated.HasValue)
-                {
-                    fields.Add(new Field("last updated on ", i.LastUpdated.Value.ToString(@"MMM d, yyyy"), @"Exo2.0-Bold"));
-                }
+                    Margin = new MarginPadding { Top = 5 },
+                },
+            };
+
+            if (online.Ranked.HasValue)
+            {
+                fields.Add(new Field("ranked on", online.Ranked.Value.ToString(@"MMMM d, yyyy"), @"Exo2.0-Bold"));
+            }
+            else if (online.LastUpdated.HasValue)
+            {
+                fields.Add(new Field("last updated on", online.LastUpdated.Value.ToString(@"MMMM d, yyyy"), @"Exo2.0-Bold"));
             }
         }
 
@@ -66,13 +71,14 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Children = new Drawable[]
             {
-                clickableArea = new ClickableArea
+                new Container
                 {
                     AutoSizeAxes = Axes.Both,
                     CornerRadius = 3,
                     Masking = true,
                     Child = avatar = new UpdateableAvatar
                     {
+                        ShowGuestOnNull = false,
                         Size = new Vector2(height),
                     },
                     EdgeEffect = new EdgeEffectParameters
@@ -92,11 +98,9 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(UserProfileOverlay profile)
+        private void load()
         {
-            this.profile = profile;
-            clickableArea.Action = () => profile?.ShowUser(avatar.User);
+            updateDisplay();
         }
 
         private class Field : FillFlowContainer

@@ -1,17 +1,16 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Mods;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Mods
 {
@@ -27,14 +26,8 @@ namespace osu.Game.Overlays.Mods
 
         public string Header
         {
-            get
-            {
-                return headerLabel.Text;
-            }
-            set
-            {
-                headerLabel.Text = value;
-            }
+            get => headerLabel.Text;
+            set => headerLabel.Text = value;
         }
 
         public IEnumerable<Mod> SelectedMods => buttons.Select(b => b.SelectedMod).Where(m => m != null);
@@ -47,12 +40,11 @@ namespace osu.Game.Overlays.Mods
                 {
                     if (m == null)
                         return new ModButtonEmpty();
-                    else
-                        return new ModButton(m)
-                        {
-                            SelectedColour = selectedColour,
-                            Action = Action,
-                        };
+
+                    return new ModButton(m)
+                    {
+                        SelectionChanged = Action,
+                    };
                 }).ToArray();
 
                 ButtonsContainer.Children = modContainers;
@@ -62,53 +54,67 @@ namespace osu.Game.Overlays.Mods
 
         private ModButton[] buttons = { };
 
-        private Color4 selectedColour = Color4.White;
-        public Color4 SelectedColour
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            get
+            if (ToggleKeys != null)
             {
-                return selectedColour;
+                var index = Array.IndexOf(ToggleKeys, e.Key);
+                if (index > -1 && index < buttons.Length)
+                    buttons[index].SelectNext(e.ShiftPressed ? -1 : 1);
             }
-            set
-            {
-                if (value == selectedColour) return;
-                selectedColour = value;
 
-                foreach (ModButton button in buttons)
-                    button.SelectedColour = value;
-            }
+            return base.OnKeyDown(e);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
-        {
-            var index = Array.IndexOf(ToggleKeys, args.Key);
-            if (index > -1 && index < buttons.Length)
-                buttons[index].SelectNext();
+        public void DeselectAll() => DeselectTypes(buttons.Select(b => b.SelectedMod?.GetType()).Where(t => t != null));
 
-            return base.OnKeyDown(state, args);
-        }
-
-        public void DeselectAll()
+        /// <summary>
+        /// Deselect one or more mods in this section.
+        /// </summary>
+        /// <param name="modTypes">The types of <see cref="Mod"/>s which should be deselected.</param>
+        /// <param name="immediate">Set to true to bypass animations and update selections immediately.</param>
+        public void DeselectTypes(IEnumerable<Type> modTypes, bool immediate = false)
         {
-            foreach (ModButton button in buttons)
-                button.Deselect();
-        }
-
-        public void DeselectTypes(Type[] modTypes)
-        {
+            int delay = 0;
             foreach (var button in buttons)
             {
                 Mod selected = button.SelectedMod;
                 if (selected == null) continue;
-                foreach (Type type in modTypes)
+                foreach (var type in modTypes)
                     if (type.IsInstanceOfType(selected))
-                        button.Deselect();
+                    {
+                        if (immediate)
+                            button.Deselect();
+                        else
+                            Scheduler.AddDelayed(button.Deselect, delay += 50);
+                    }
+            }
+        }
+
+        /// <summary>
+        /// Select one or more mods in this section and deselects all other ones.
+        /// </summary>
+        /// <param name="modTypes">The types of <see cref="Mod"/>s which should be selected.</param>
+        public void SelectTypes(IEnumerable<Type> modTypes)
+        {
+            foreach (var button in buttons)
+            {
+                int i = Array.FindIndex(button.Mods, m => modTypes.Any(t => t.IsInstanceOfType(m)));
+
+                if (i >= 0)
+                    button.SelectAt(i);
+                else
+                    button.Deselect();
             }
         }
 
         protected ModSection()
         {
             AutoSizeAxes = Axes.Y;
+            RelativeSizeAxes = Axes.X;
+
+            Origin = Anchor.TopCentre;
+            Anchor = Anchor.TopCentre;
 
             Children = new Drawable[]
             {

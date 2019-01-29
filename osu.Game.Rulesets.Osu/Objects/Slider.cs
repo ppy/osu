@@ -1,15 +1,19 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using osu.Game.Rulesets.Objects.Types;
 using System;
+using osuTK;
+using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
+using osu.Framework.Caching;
+using osu.Framework.Configuration;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Judgements;
+using osu.Game.Rulesets.Osu.Judgements;
 
 namespace osu.Game.Rulesets.Osu.Objects
 {
@@ -20,51 +24,123 @@ namespace osu.Game.Rulesets.Osu.Objects
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public readonly SliderCurve Curve = new SliderCurve();
-
-        public double EndTime => StartTime + RepeatCount * Curve.Distance / Velocity;
+        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
-        public override Vector2 EndPosition => PositionAt(1);
+        private Cached<Vector2> endPositionCache;
 
-        public List<Vector2> ControlPoints
+        public override Vector2 EndPosition => endPositionCache.IsValid ? endPositionCache.Value : endPositionCache.Value = Position + this.CurvePositionAt(1);
+
+        public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
+
+        public override int ComboIndex
         {
-            get { return Curve.ControlPoints; }
-            set { Curve.ControlPoints = value; }
-        }
-
-        public CurveType CurveType
-        {
-            get { return Curve.CurveType; }
-            set { Curve.CurveType = value; }
-        }
-
-        public double Distance
-        {
-            get { return Curve.Distance; }
-            set { Curve.Distance = value; }
-        }
-
-        public List<SampleInfoList> RepeatSamples { get; set; } = new List<SampleInfoList>();
-        public int RepeatCount { get; set; } = 1;
-
-        private int stackHeight;
-        public override int StackHeight
-        {
-            get { return stackHeight; }
+            get => base.ComboIndex;
             set
             {
-                stackHeight = value;
-                Curve.Offset = StackOffset;
+                base.ComboIndex = value;
+                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
+                    n.ComboIndex = value;
             }
         }
 
-        public double Velocity;
-        public double TickDistance;
-
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        public override int IndexInCurrentCombo
         {
-            base.ApplyDefaults(controlPointInfo, difficulty);
+            get => base.IndexInCurrentCombo;
+            set
+            {
+                base.IndexInCurrentCombo = value;
+                foreach (var n in NestedHitObjects.OfType<IHasComboInformation>())
+                    n.IndexInCurrentCombo = value;
+            }
+        }
+
+        public readonly Bindable<SliderPath> PathBindable = new Bindable<SliderPath>();
+
+        public SliderPath Path
+        {
+            get => PathBindable.Value;
+            set
+            {
+                PathBindable.Value = value;
+                endPositionCache.Invalidate();
+            }
+        }
+
+        public double Distance => Path.Distance;
+
+        public override Vector2 Position
+        {
+            get => base.Position;
+            set
+            {
+                base.Position = value;
+
+                if (HeadCircle != null)
+                    HeadCircle.Position = value;
+
+                if (TailCircle != null)
+                    TailCircle.Position = EndPosition;
+
+                endPositionCache.Invalidate();
+            }
+        }
+
+        public double? LegacyLastTickOffset { get; set; }
+
+        /// <summary>
+        /// The position of the cursor at the point of completion of this <see cref="Slider"/> if it was hit
+        /// with as few movements as possible. This is set and used by difficulty calculation.
+        /// </summary>
+        internal Vector2? LazyEndPosition;
+
+        /// <summary>
+        /// The distance travelled by the cursor upon completion of this <see cref="Slider"/> if it was hit
+        /// with as few movements as possible. This is set and used by difficulty calculation.
+        /// </summary>
+        internal float LazyTravelDistance;
+
+        public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
+
+        private int repeatCount;
+
+        public int RepeatCount
+        {
+            get => repeatCount;
+            set
+            {
+                repeatCount = value;
+                endPositionCache.Invalidate();
+            }
+        }
+
+        /// <summary>
+        /// The length of one span of this <see cref="Slider"/>.
+        /// </summary>
+        public double SpanDuration => Duration / this.SpanCount();
+
+        /// <summary>
+        /// Velocity of this <see cref="Slider"/>.
+        /// </summary>
+        public double Velocity { get; private set; }
+
+        /// <summary>
+        /// Spacing between <see cref="SliderTick"/>s of this <see cref="Slider"/>.
+        /// </summary>
+        public double TickDistance { get; private set; }
+
+        /// <summary>
+        /// An extra multiplier that affects the number of <see cref="SliderTick"/>s generated by this <see cref="Slider"/>.
+        /// An increase in this value increases <see cref="TickDistance"/>, which reduces the number of ticks generated.
+        /// </summary>
+        public double TickDistanceMultiplier = 1;
+
+        public HitCircle HeadCircle;
+        public SliderTailCircle TailCircle;
+
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        {
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
@@ -72,92 +148,123 @@ namespace osu.Game.Rulesets.Osu.Objects
             double scoringDistance = base_scoring_distance * difficulty.SliderMultiplier * difficultyPoint.SpeedMultiplier;
 
             Velocity = scoringDistance / timingPoint.BeatLength;
-            TickDistance = scoringDistance / difficulty.SliderTickRate;
+            TickDistance = scoringDistance / difficulty.SliderTickRate * TickDistanceMultiplier;
         }
 
-        public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
-
-        public double ProgressAt(double progress)
+        protected override void CreateNestedHitObjects()
         {
-            double p = progress * RepeatCount % 1;
-            if (RepeatAt(progress) % 2 == 1)
-                p = 1 - p;
-            return p;
+            base.CreateNestedHitObjects();
+
+            createSliderEnds();
+            createTicks();
+            createRepeatPoints();
+
+            if (LegacyLastTickOffset != null)
+                TailCircle.StartTime = Math.Max(StartTime + Duration / 2, TailCircle.StartTime - LegacyLastTickOffset.Value);
         }
 
-        public int RepeatAt(double progress) => (int)(progress * RepeatCount);
-
-        public IEnumerable<SliderTick> Ticks
+        private void createSliderEnds()
         {
-            get
+            HeadCircle = new SliderCircle
             {
-                if (TickDistance == 0) yield break;
+                StartTime = StartTime,
+                Position = Position,
+                Samples = getNodeSamples(0),
+                SampleControlPoint = SampleControlPoint,
+                IndexInCurrentCombo = IndexInCurrentCombo,
+                ComboIndex = ComboIndex,
+            };
 
-                var length = Curve.Distance;
-                var tickDistance = Math.Min(TickDistance, length);
-                var repeatDuration = length / Velocity;
+            TailCircle = new SliderTailCircle(this)
+            {
+                StartTime = EndTime,
+                Position = EndPosition,
+                IndexInCurrentCombo = IndexInCurrentCombo,
+                ComboIndex = ComboIndex,
+            };
 
-                var minDistanceFromEnd = Velocity * 0.01;
+            AddNested(HeadCircle);
+            AddNested(TailCircle);
+        }
 
-                for (var repeat = 0; repeat < RepeatCount; repeat++)
+        private void createTicks()
+        {
+            // A very lenient maximum length of a slider for ticks to be generated.
+            // This exists for edge cases such as /b/1573664 where the beatmap has been edited by the user, and should never be reached in normal usage.
+            const double max_length = 100000;
+
+            var length = Math.Min(max_length, Path.Distance);
+            var tickDistance = MathHelper.Clamp(TickDistance, 0, length);
+
+            if (tickDistance == 0) return;
+
+            var minDistanceFromEnd = Velocity * 10;
+
+            var spanCount = this.SpanCount();
+
+            for (var span = 0; span < spanCount; span++)
+            {
+                var spanStartTime = StartTime + span * SpanDuration;
+                var reversed = span % 2 == 1;
+
+                for (var d = tickDistance; d <= length; d += tickDistance)
                 {
-                    var repeatStartTime = StartTime + repeat * repeatDuration;
-                    var reversed = repeat % 2 == 1;
+                    if (d > length - minDistanceFromEnd)
+                        break;
 
-                    for (var d = tickDistance; d <= length; d += tickDistance)
-                    {
-                        if (d > length - minDistanceFromEnd)
-                            break;
+                    var distanceProgress = d / length;
+                    var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
 
-                        var distanceProgress = d / length;
-                        var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
+                    var firstSample = Samples.Find(s => s.Name == SampleInfo.HIT_NORMAL)
+                                      ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
+                    var sampleList = new List<SampleInfo>();
 
-                        yield return new SliderTick
+                    if (firstSample != null)
+                        sampleList.Add(new SampleInfo
                         {
-                            RepeatIndex = repeat,
-                            StartTime = repeatStartTime + timeProgress * repeatDuration,
-                            Position = Curve.PositionAt(distanceProgress),
-                            StackHeight = StackHeight,
-                            Scale = Scale,
-                            ComboColour = ComboColour,
-                            Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
-                            {
-                                Bank = s.Bank,
-                                Name = @"slidertick",
-                                Volume = s.Volume
-                            }))
-                        };
-                    }
+                            Bank = firstSample.Bank,
+                            Volume = firstSample.Volume,
+                            Name = @"slidertick",
+                        });
+
+                    AddNested(new SliderTick
+                    {
+                        SpanIndex = span,
+                        SpanStartTime = spanStartTime,
+                        StartTime = spanStartTime + timeProgress * SpanDuration,
+                        Position = Position + Path.PositionAt(distanceProgress),
+                        StackHeight = StackHeight,
+                        Scale = Scale,
+                        Samples = sampleList
+                    });
                 }
             }
         }
-        public IEnumerable<RepeatPoint> RepeatPoints
+
+        private void createRepeatPoints()
         {
-            get
+            for (int repeatIndex = 0, repeat = 1; repeatIndex < RepeatCount; repeatIndex++, repeat++)
             {
-                var length = Curve.Distance;
-                var repeatPointDistance = Math.Min(Distance, length);
-                var repeatDuration = length / Velocity;
-
-                for (var repeat = 1; repeat < RepeatCount; repeat++)
+                AddNested(new RepeatPoint
                 {
-                    for (var d = repeatPointDistance; d <= length; d += repeatPointDistance)
-                    {
-                        var repeatStartTime = StartTime + repeat * repeatDuration;
-                        var distanceProgress = d / length;
-
-                        yield return new RepeatPoint
-                        {
-                            RepeatIndex = repeat,
-                            StartTime = repeatStartTime,
-                            Position = Curve.PositionAt(distanceProgress),
-                            StackHeight = StackHeight,
-                            Scale = Scale,
-                            ComboColour = ComboColour,
-                        };
-                    }
-                }
+                    RepeatIndex = repeatIndex,
+                    SpanDuration = SpanDuration,
+                    StartTime = StartTime + repeat * SpanDuration,
+                    Position = Position + Path.PositionAt(repeat % 2),
+                    StackHeight = StackHeight,
+                    Scale = Scale,
+                    Samples = getNodeSamples(1 + repeatIndex)
+                });
             }
         }
+
+        private List<SampleInfo> getNodeSamples(int nodeIndex)
+        {
+            if (nodeIndex < NodeSamples.Count)
+                return NodeSamples[nodeIndex];
+            return Samples;
+        }
+
+        public override Judgement CreateJudgement() => new OsuJudgement();
     }
 }

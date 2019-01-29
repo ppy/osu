@@ -1,7 +1,7 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Extensions;
+using System.Net.Http;
 using osu.Framework.IO.Network;
 using osu.Game.Online.Chat;
 
@@ -20,15 +20,13 @@ namespace osu.Game.Online.API.Requests
         {
             var req = base.CreateWebRequest();
 
-            req.Method = HttpMethod.POST;
-            req.AddParameter(@"target_type", message.TargetType.GetDescription());
-            req.AddParameter(@"target_id", message.TargetId.ToString());
-            req.AddParameter(@"is_action", message.IsAction.ToString().ToLower());
+            req.Method = HttpMethod.Post;
+            req.AddParameter(@"is_action", message.IsAction.ToString().ToLowerInvariant());
             req.AddParameter(@"message", message.Content);
 
             return req;
         }
 
-        protected override string Target => @"chat/messages";
+        protected override string Target => $@"chat/channels/{message.ChannelId}/messages";
     }
 }

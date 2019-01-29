@@ -1,19 +1,19 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Rulesets.Scoring;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
-    public class DrawablePerformanceScore : DrawableScore
+    public class DrawablePerformanceScore : DrawableProfileScore
     {
         private readonly double? weight;
 
-        public DrawablePerformanceScore(Score score, double? weight = null)
+        public DrawablePerformanceScore(ScoreInfo score, double? weight = null)
             : base(score)
         {
             this.weight = weight;
@@ -23,7 +23,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
         private void load(OsuColour colour)
         {
             double pp = Score.PP ?? 0;
-            Stats.Add(new OsuSpriteText
+            RightFlowContainer.Add(new OsuSpriteText
             {
                 Text = $"{pp:0}pp",
                 Anchor = Anchor.TopRight,
@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
 
             if (weight.HasValue)
             {
-                Stats.Add(new OsuSpriteText
+                RightFlowContainer.Add(new OsuSpriteText
                 {
                     Text = $"weighted: {pp * weight:0}pp ({weight:P0})",
                     Anchor = Anchor.TopRight,

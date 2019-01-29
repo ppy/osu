@@ -1,11 +1,12 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Timing;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary.Parts;
 
@@ -16,32 +17,30 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
     /// </summary>
     public class SummaryTimeline : BottomBarContainer
     {
-        private readonly Drawable timelineBar;
-
-        public SummaryTimeline()
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours, IAdjustableClock adjustableClock)
         {
-            TimelinePart markerPart, controlPointPart, bookmarkPart, breakPart;
-
-            Children = new[]
+            Children = new Drawable[]
             {
-                markerPart = new MarkerPart { RelativeSizeAxes = Axes.Both },
-                controlPointPart = new ControlPointPart
+                new MarkerPart(adjustableClock) { RelativeSizeAxes = Axes.Both },
+                new ControlPointPart
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.BottomCentre,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.35f
                 },
-                bookmarkPart = new BookmarkPart
+                new BookmarkPart
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.Both,
                     Height = 0.35f
                 },
-                timelineBar = new Container
+                new Container
                 {
                     RelativeSizeAxes = Axes.Both,
+                    Colour = colours.Gray5,
                     Children = new Drawable[]
                     {
                         new Circle
@@ -66,7 +65,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                         },
                     }
                 },
-                breakPart = new BreakPart
+                new BreakPart
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -74,17 +73,6 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary
                     Height = 0.25f
                 }
             };
-
-            markerPart.Beatmap.BindTo(Beatmap);
-            controlPointPart.Beatmap.BindTo(Beatmap);
-            bookmarkPart.Beatmap.BindTo(Beatmap);
-            breakPart.Beatmap.BindTo(Beatmap);
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            timelineBar.Colour = colours.Gray5;
         }
     }
 }

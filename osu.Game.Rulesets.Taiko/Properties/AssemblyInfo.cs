@@ -1,28 +1,12 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.Reflection;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
-// General Information about an assembly is controlled through the following
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-[assembly: AssemblyTitle("osu.Game.Rulesets.Taiko")]
-[assembly: AssemblyDescription("bash the drum. to the beat.")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("ppy Pty Ltd")]
-[assembly: AssemblyProduct("osu.Game.Rulesets.Taiko")]
-[assembly: AssemblyCopyright("ppy Pty Ltd 2007-2017")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+// We publish our internal attributes to other sub-projects of the framework.
+// Note, that we omit visual tests as they are meant to test the framework
+// behavior "in the wild".
 
-// Setting ComVisible to false makes the types in this assembly not visible
-// to COM components.  If you need to access a type in this assembly from
-// COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
-
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("f167e17a-7de6-4af5-b920-a5112296c695")]
-
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: InternalsVisibleTo("osu.Game.Rulesets.Taiko.Tests")]
+[assembly: InternalsVisibleTo("osu.Game.Rulesets.Taiko.Tests.Dynamic")]
+[assembly: InternalsVisibleTo("osu.Game.Rulesets.Taiko.Tests.iOS")]

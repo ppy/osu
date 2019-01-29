@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Game.Graphics;
@@ -15,8 +15,8 @@ namespace osu.Game.Overlays.Toolbar
             TooltipSub = "Change your settings";
         }
 
-        [BackgroundDependencyLoader]
-        private void load(SettingsOverlay settings)
+        [BackgroundDependencyLoader(true)]
+        private void load(MainSettings settings)
         {
             StateContainer = settings;
         }

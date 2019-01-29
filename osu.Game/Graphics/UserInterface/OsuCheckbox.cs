@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -8,9 +8,9 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -70,10 +70,21 @@ namespace osu.Game.Graphics.UserInterface
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Margin = new MarginPadding { Right = 5 },
-                }
+                },
+                new HoverClickSounds()
             };
 
             Nub.Current.BindTo(Current);
+
+            Current.DisabledChanged += disabled =>
+            {
+                Alpha = disabled ? 0.3f : 1;
+            };
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
 
             Current.ValueChanged += newValue =>
             {
@@ -82,25 +93,20 @@ namespace osu.Game.Graphics.UserInterface
                 else
                     sampleUnchecked?.Play();
             };
-
-            Current.DisabledChanged += disabled =>
-            {
-                Alpha = disabled ? 0.3f : 1;
-            };
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             Nub.Glowing = true;
             Nub.Expanded = true;
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             Nub.Glowing = false;
             Nub.Expanded = false;
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
         [BackgroundDependencyLoader]

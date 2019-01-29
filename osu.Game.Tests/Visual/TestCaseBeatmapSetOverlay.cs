@@ -1,22 +1,45 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Overlays.BeatmapSet;
+using osu.Game.Overlays.BeatmapSet.Buttons;
+using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseBeatmapSetOverlay : OsuTestCase
+    [TestFixture]
+    public class TestCaseBeatmapSetOverlay : OsuTestCase
     {
-        public override string Description => @"view online beatmap sets";
-
         private readonly BeatmapSetOverlay overlay;
+
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(Header),
+            typeof(ClickableUsername),
+            typeof(DrawableScore),
+            typeof(DrawableTopScore),
+            typeof(ScoresContainer),
+            typeof(AuthorInfo),
+            typeof(BasicStats),
+            typeof(BeatmapPicker),
+            typeof(Details),
+            typeof(DownloadButton),
+            typeof(FavouriteButton),
+            typeof(Header),
+            typeof(HeaderButton),
+            typeof(Info),
+            typeof(PreviewButton),
+            typeof(SuccessRate),
+        };
 
         public TestCaseBeatmapSetOverlay()
         {
@@ -28,6 +51,10 @@ namespace osu.Game.Tests.Visual
         {
             var mania = rulesets.GetRuleset(3);
             var taiko = rulesets.GetRuleset(1);
+
+            AddStep(@"show loading", () => overlay.ShowBeatmapSet(null));
+
+            AddStep(@"show online", () => overlay.FetchAndShowBeatmapSet(55));
 
             AddStep(@"show first", () =>
             {
@@ -52,6 +79,7 @@ namespace osu.Game.Tests.Visual
                         FavouriteCount = 356,
                         Submitted = new DateTime(2016, 2, 10),
                         Ranked = new DateTime(2016, 6, 19),
+                        Status = BeatmapSetOnlineStatus.Ranked,
                         BPM = 236,
                         HasVideo = true,
                         Covers = new BeatmapSetOnlineCovers
@@ -222,6 +250,7 @@ namespace osu.Game.Tests.Visual
                         FavouriteCount = 58,
                         Submitted = new DateTime(2016, 6, 11),
                         Ranked = new DateTime(2016, 7, 12),
+                        Status = BeatmapSetOnlineStatus.Pending,
                         BPM = 160,
                         HasVideo = false,
                         Covers = new BeatmapSetOnlineCovers

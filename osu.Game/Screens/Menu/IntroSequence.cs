@@ -1,10 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -188,7 +187,7 @@ namespace osu.Game.Screens.Menu
             mediumRing.ResizeTo(130, 340, Easing.OutQuad);
             mediumRing.Foreground.ResizeTo(1, 880, Easing.Out);
 
-            Func<double> remainingTime = () => length - TransformDelay;
+            double remainingTime() => length - TransformDelay;
 
             using (BeginDelayedSequence(250, true))
             {

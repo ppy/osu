@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
@@ -9,10 +10,9 @@ using osu.Game.Rulesets;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseDirect : OsuTestCase
     {
-        public override string Description => @"osu!direct overlay";
-
         private DirectOverlay direct;
         private RulesetStore rulesets;
 

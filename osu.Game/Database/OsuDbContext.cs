@@ -1,17 +1,19 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Logging;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Input.Bindings;
+using osu.Game.Configuration;
 using osu.Game.IO;
 using osu.Game.Rulesets;
+using osu.Game.Scoring;
+using DatabasedKeyBinding = osu.Game.Input.Bindings.DatabasedKeyBinding;
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
+using osu.Game.Skinning;
 
 namespace osu.Game.Database
 {
@@ -22,8 +24,11 @@ namespace osu.Game.Database
         public DbSet<BeatmapMetadata> BeatmapMetadata { get; set; }
         public DbSet<BeatmapSetInfo> BeatmapSetInfo { get; set; }
         public DbSet<DatabasedKeyBinding> DatabasedKeyBinding { get; set; }
+        public DbSet<DatabasedSetting> DatabasedSetting { get; set; }
         public DbSet<FileInfo> FileInfo { get; set; }
         public DbSet<RulesetInfo> RulesetInfo { get; set; }
+        public DbSet<SkinInfo> SkinInfo { get; set; }
+        public DbSet<ScoreInfo> ScoreInfo { get; set; }
 
         private readonly string connectionString;
 
@@ -55,12 +60,28 @@ namespace osu.Game.Database
             this.connectionString = connectionString;
 
             var connection = Database.GetDbConnection();
-            connection.Open();
-            using (var cmd = connection.CreateCommand())
+            try
             {
-                cmd.CommandText = "PRAGMA journal_mode=WAL;";
-                cmd.ExecuteNonQuery();
+                connection.Open();
+
+                using (var cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "PRAGMA journal_mode=WAL;";
+                    cmd.ExecuteNonQuery();
+                }
             }
+            catch (Exception e)
+            {
+                connection.Close();
+                throw;
+            }
+        }
+
+        ~OsuDbContext()
+        {
+            // DbContext does not contain a finalizer (https://github.com/aspnet/EntityFrameworkCore/issues/8872)
+            // This is used to clean up previous contexts when fresh contexts are exposed via DatabaseContextFactory
+            Dispose();
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -79,35 +100,30 @@ namespace osu.Game.Database
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.OnlineBeatmapID).IsUnique();
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash).IsUnique();
-            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash).IsUnique();
+            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.MD5Hash);
+            modelBuilder.Entity<BeatmapInfo>().HasIndex(b => b.Hash);
 
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.OnlineBeatmapSetID).IsUnique();
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.DeletePending);
             modelBuilder.Entity<BeatmapSetInfo>().HasIndex(b => b.Hash).IsUnique();
 
-            modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => b.Variant);
+            modelBuilder.Entity<SkinInfo>().HasIndex(b => b.Hash).IsUnique();
+            modelBuilder.Entity<SkinInfo>().HasIndex(b => b.DeletePending);
+
+            modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => new { b.RulesetID, b.Variant });
             modelBuilder.Entity<DatabasedKeyBinding>().HasIndex(b => b.IntAction);
+
+            modelBuilder.Entity<DatabasedSetting>().HasIndex(b => new { b.RulesetID, b.Variant });
 
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.Hash).IsUnique();
             modelBuilder.Entity<FileInfo>().HasIndex(b => b.ReferenceCount);
 
             modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.Available);
+            modelBuilder.Entity<RulesetInfo>().HasIndex(b => b.ShortName).IsUnique();
 
             modelBuilder.Entity<BeatmapInfo>().HasOne(b => b.BaseDifficulty);
-        }
 
-        public IDbContextTransaction BeginTransaction()
-        {
-            // return Database.BeginTransaction();
-            return null;
-        }
-
-        public int SaveChanges(IDbContextTransaction transaction = null)
-        {
-            var ret = base.SaveChanges();
-            transaction?.Commit();
-            return ret;
+            modelBuilder.Entity<ScoreInfo>().HasIndex(b => b.OnlineScoreID).IsUnique();
         }
 
         private class OsuDbLoggerFactory : ILoggerFactory
@@ -179,106 +195,6 @@ namespace osu.Game.Database
             }
         }
 
-        public void Migrate()
-        {
-            migrateFromSqliteNet();
-
-            try
-            {
-                Database.Migrate();
-            }
-            catch (Exception e)
-            {
-                throw new MigrationFailedException(e);
-            }
-        }
-
-        private void migrateFromSqliteNet()
-        {
-            try
-            {
-                // will fail if the database isn't in a sane EF-migrated state.
-                Database.ExecuteSqlCommand("SELECT MetadataID FROM BeatmapSetInfo LIMIT 1");
-            }
-            catch
-            {
-                try
-                {
-                    Database.ExecuteSqlCommand("DROP TABLE IF EXISTS __EFMigrationsHistory");
-
-                    // will fail (intentionally) if we don't have sqlite-net data present.
-                    Database.ExecuteSqlCommand("SELECT OnlineBeatmapSetId FROM BeatmapMetadata LIMIT 1");
-
-                    try
-                    {
-                        Logger.Log("Performing migration from sqlite-net to EF...", LoggingTarget.Database, Framework.Logging.LogLevel.Important);
-
-                        // we are good to perform messy migration of data!.
-                        Database.ExecuteSqlCommand("ALTER TABLE BeatmapDifficulty RENAME TO BeatmapDifficulty_Old");
-                        Database.ExecuteSqlCommand("ALTER TABLE BeatmapMetadata RENAME TO BeatmapMetadata_Old");
-                        Database.ExecuteSqlCommand("ALTER TABLE FileInfo RENAME TO FileInfo_Old");
-                        Database.ExecuteSqlCommand("ALTER TABLE KeyBinding RENAME TO KeyBinding_Old");
-                        Database.ExecuteSqlCommand("ALTER TABLE BeatmapSetInfo RENAME TO BeatmapSetInfo_Old");
-                        Database.ExecuteSqlCommand("ALTER TABLE BeatmapInfo RENAME TO BeatmapInfo_Old");
-                        Database.ExecuteSqlCommand("ALTER TABLE BeatmapSetFileInfo RENAME TO BeatmapSetFileInfo_Old");
-                        Database.ExecuteSqlCommand("ALTER TABLE RulesetInfo RENAME TO RulesetInfo_Old");
-
-                        Database.ExecuteSqlCommand("DROP TABLE StoreVersion");
-
-                        // perform EF migrations to create sane table structure.
-                        Database.Migrate();
-
-                        // copy data table by table to new structure, dropping old tables as we go.
-                        Database.ExecuteSqlCommand("INSERT INTO FileInfo SELECT * FROM FileInfo_Old");
-                        Database.ExecuteSqlCommand("DROP TABLE FileInfo_Old");
-
-                        Database.ExecuteSqlCommand("INSERT INTO KeyBinding SELECT ID, [Action], Keys, RulesetID, Variant FROM KeyBinding_Old");
-                        Database.ExecuteSqlCommand("DROP TABLE KeyBinding_Old");
-
-                        Database.ExecuteSqlCommand(
-                            "INSERT INTO BeatmapMetadata SELECT ID, Artist, ArtistUnicode, AudioFile, Author, BackgroundFile, PreviewTime, Source, Tags, Title, TitleUnicode FROM BeatmapMetadata_Old");
-                        Database.ExecuteSqlCommand("DROP TABLE BeatmapMetadata_Old");
-
-                        Database.ExecuteSqlCommand(
-                            "INSERT INTO BeatmapDifficulty SELECT  `ID`, `ApproachRate`, `CircleSize`, `DrainRate`, `OverallDifficulty`, `SliderMultiplier`, `SliderTickRate` FROM BeatmapDifficulty_Old");
-                        Database.ExecuteSqlCommand("DROP TABLE BeatmapDifficulty_Old");
-
-                        Database.ExecuteSqlCommand("INSERT INTO BeatmapSetInfo SELECT ID, DeletePending, Hash, BeatmapMetadataID, OnlineBeatmapSetID, Protected FROM BeatmapSetInfo_Old");
-                        Database.ExecuteSqlCommand("DROP TABLE BeatmapSetInfo_Old");
-
-                        Database.ExecuteSqlCommand("INSERT INTO BeatmapSetFileInfo SELECT ID, BeatmapSetInfoID, FileInfoID, Filename FROM BeatmapSetFileInfo_Old");
-                        Database.ExecuteSqlCommand("DROP TABLE BeatmapSetFileInfo_Old");
-
-                        Database.ExecuteSqlCommand("INSERT INTO RulesetInfo SELECT ID, Available, InstantiationInfo, Name FROM RulesetInfo_Old");
-                        Database.ExecuteSqlCommand("DROP TABLE RulesetInfo_Old");
-
-                        Database.ExecuteSqlCommand(
-                            "INSERT INTO BeatmapInfo SELECT ID, AudioLeadIn, BaseDifficultyID, BeatDivisor, BeatmapSetInfoID, Countdown, DistanceSpacing, GridSize, Hash, IFNULL(Hidden, 0), LetterboxInBreaks, MD5Hash, NULLIF(BeatmapMetadataID, 0), NULLIF(OnlineBeatmapID, 0), Path, RulesetID, SpecialStyle, StackLeniency, StarDifficulty, StoredBookmarks, TimelineZoom, Version, WidescreenStoryboard FROM BeatmapInfo_Old");
-                        Database.ExecuteSqlCommand("DROP TABLE BeatmapInfo_Old");
-
-                        Logger.Log("Migration complete!", LoggingTarget.Database, Framework.Logging.LogLevel.Important);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new MigrationFailedException(e);
-                    }
-                }
-                catch (MigrationFailedException)
-                {
-                    throw;
-                }
-                catch
-                {
-                }
-            }
-        }
-    }
-
-    public class MigrationFailedException : Exception
-    {
-        public MigrationFailedException(Exception exception)
-            : base("sqlite-net migration failed", exception)
-        {
-        }
+        public void Migrate() => Database.Migrate();
     }
 }

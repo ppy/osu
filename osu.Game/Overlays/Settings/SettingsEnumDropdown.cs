@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Game.Graphics.UserInterface;
@@ -8,10 +8,15 @@ namespace osu.Game.Overlays.Settings
 {
     public class SettingsEnumDropdown<T> : SettingsDropdown<T>
     {
-        protected override Drawable CreateControl() => new OsuEnumDropdown<T>
+        protected override OsuDropdown<T> CreateDropdown() => new DropdownControl();
+
+        protected class DropdownControl : OsuEnumDropdown<T>
         {
-            Margin = new MarginPadding { Top = 5 },
-            RelativeSizeAxes = Axes.X,
-        };
+            public DropdownControl()
+            {
+                Margin = new MarginPadding { Top = 5 };
+                RelativeSizeAxes = Axes.X;
+            }
+        }
     }
 }

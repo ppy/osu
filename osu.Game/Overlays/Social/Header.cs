@@ -1,8 +1,8 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Overlays.SearchableList;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Containers;
@@ -17,8 +17,8 @@ namespace osu.Game.Overlays.Social
         private OsuSpriteText browser;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"38202e");
-        protected override float TabStripWidth => 438;
-        protected override SocialTab DefaultTab => SocialTab.OnlinePlayers;
+
+        protected override SocialTab DefaultTab => SocialTab.AllPlayers;
         protected override FontAwesome Icon => FontAwesome.fa_users;
 
         protected override Drawable CreateHeaderText()
@@ -53,12 +53,12 @@ namespace osu.Game.Overlays.Social
 
     public enum SocialTab
     {
-        [Description("Online Players")]
-        OnlinePlayers,
-        //[Description("Online Friends")]
-        //OnlineFriends,
-        //[Description("Online Team Members")]
-        //OnlineTeamMembers,
+        [Description("All Players")]
+        AllPlayers,
+        [Description("Friends")]
+        Friends,
+        //[Description("Team Members")]
+        //TeamMembers,
         //[Description("Chat Channels")]
         //ChatChannels,
     }

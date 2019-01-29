@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 
@@ -10,16 +10,20 @@ namespace osu.Game.Rulesets.Mania.MathUtils
     /// </summary>
     internal class FastRandom
     {
-        private const double uint_to_real = 1.0 / (uint.MaxValue + 1.0);
+        private const double int_to_real = 1.0 / (int.MaxValue + 1.0);
         private const uint int_mask = 0x7FFFFFFF;
         private const uint y = 842502087;
         private const uint z = 3579807591;
         private const uint w = 273326509;
-        private uint _x, _y = y, _z = z, _w = w;
+
+        internal uint X { get; private set; }
+        internal uint Y { get; private set; } = y;
+        internal uint Z { get; private set; } = z;
+        internal uint W { get; private set; } = w;
 
         public FastRandom(int seed)
         {
-            _x = (uint)seed;
+            X = (uint)seed;
         }
 
         public FastRandom()
@@ -33,11 +37,11 @@ namespace osu.Game.Rulesets.Mania.MathUtils
         /// <returns>The random value.</returns>
         public uint NextUInt()
         {
-            uint t = _x ^ _x << 11;
-            _x = _y;
-            _y = _z;
-            _z = _w;
-            return _w = _w ^ _w >> 19 ^ t ^ t >> 8;
+            uint t = X ^ X << 11;
+            X = Y;
+            Y = Z;
+            Z = W;
+            return W = W ^ W >> 19 ^ t ^ t >> 8;
         }
 
         /// <summary>
@@ -65,7 +69,7 @@ namespace osu.Game.Rulesets.Mania.MathUtils
         /// Generates a random double value within the range [0, 1).
         /// </summary>
         /// <returns>The random value.</returns>
-        public double NextDouble() => uint_to_real * NextUInt();
+        public double NextDouble() => int_to_real * Next();
 
         private uint bitBuffer;
         private int bitIndex = 32;

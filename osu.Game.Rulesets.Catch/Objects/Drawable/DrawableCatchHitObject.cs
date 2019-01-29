@@ -1,15 +1,31 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Objects.Types;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Catch.Objects.Drawable
 {
+    public abstract class PalpableCatchHitObject<TObject> : DrawableCatchHitObject<TObject>
+        where TObject : CatchHitObject
+    {
+        public override bool CanBePlated => true;
+
+        protected PalpableCatchHitObject(TObject hitObject)
+            : base(hitObject)
+        {
+            Scale = new Vector2(HitObject.Scale);
+        }
+    }
+
     public abstract class DrawableCatchHitObject<TObject> : DrawableCatchHitObject
-        where TObject : CatchBaseHit
+        where TObject : CatchHitObject
     {
         public new TObject HitObject;
 
@@ -17,25 +33,39 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
             : base(hitObject)
         {
             HitObject = hitObject;
+            Anchor = Anchor.BottomLeft;
         }
     }
 
-    public abstract class DrawableCatchHitObject : DrawableScrollingHitObject<CatchBaseHit>
+    public abstract class DrawableCatchHitObject : DrawableHitObject<CatchHitObject>
     {
-        protected DrawableCatchHitObject(CatchBaseHit hitObject)
+        public virtual bool CanBePlated => false;
+
+        public virtual bool StaysOnPlate => CanBePlated;
+
+        protected DrawableCatchHitObject(CatchHitObject hitObject)
             : base(hitObject)
         {
-            RelativePositionAxes = Axes.Both;
+            RelativePositionAxes = Axes.X;
             X = hitObject.X;
-            Y = (float)HitObject.StartTime;
         }
 
-        public Func<CatchBaseHit, bool> CheckPosition;
+        public Func<CatchHitObject, bool> CheckPosition;
 
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
-            if (timeOffset > 0)
-                AddJudgement(new Judgement { Result = CheckPosition?.Invoke(HitObject) ?? false ? HitResult.Perfect : HitResult.Miss });
+            if (CheckPosition == null) return;
+
+            if (timeOffset >= 0 && Result != null)
+                ApplyResult(r => r.Type = CheckPosition.Invoke(HitObject) ? HitResult.Perfect : HitResult.Miss);
+        }
+
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            base.SkinChanged(skin, allowFallback);
+
+            if (HitObject is IHasComboInformation combo)
+                AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.ComboColours.Count > 0 ? s.ComboColours[combo.ComboIndex % s.ComboColours.Count] : Color4.White);
         }
 
         private const float preempt = 1000;
@@ -43,17 +73,21 @@ namespace osu.Game.Rulesets.Catch.Objects.Drawable
         protected override void UpdateState(ArmedState state)
         {
             using (BeginAbsoluteSequence(HitObject.StartTime - preempt))
-            {
-                // animation
                 this.FadeIn(200);
-            }
 
-            switch (state)
+            var endTime = (HitObject as IHasEndTime)?.EndTime ?? HitObject.StartTime;
+
+            using (BeginAbsoluteSequence(endTime, true))
             {
-                case ArmedState.Miss:
-                    using (BeginAbsoluteSequence(HitObject.StartTime, true))
-                        this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out);
-                    break;
+                switch (state)
+                {
+                    case ArmedState.Miss:
+                        this.FadeOut(250).RotateTo(Rotation * 2, 250, Easing.Out).Expire();
+                        break;
+                    case ArmedState.Hit:
+                        this.FadeOut().Expire();
+                        break;
+                }
             }
         }
     }

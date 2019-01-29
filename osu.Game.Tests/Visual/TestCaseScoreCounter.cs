@@ -1,19 +1,19 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Play.HUD;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseScoreCounter : OsuTestCase
+    [TestFixture]
+    public class TestCaseScoreCounter : OsuTestCase
     {
-        public override string Description => @"Tests multiple counters";
-
         public TestCaseScoreCounter()
         {
             int numerator = 0, denominator = 0;

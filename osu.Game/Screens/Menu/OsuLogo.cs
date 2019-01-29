@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -11,14 +11,15 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
@@ -48,7 +49,10 @@ namespace osu.Game.Screens.Menu
 
         private readonly Triangles triangles;
 
-        public Action Action;
+        /// <summary>
+        /// Return value decides whether the logo should play its own sample for the click action.
+        /// </summary>
+        public Func<bool> Action;
 
         public float SizeForFlow => logo == null ? 0 : logo.DrawSize.X * logo.Scale.X * logoBounceContainer.Scale.X * logoHoverContainer.Scale.X * 0.74f;
 
@@ -61,7 +65,9 @@ namespace osu.Game.Screens.Menu
             set { colourAndTriangles.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint); }
         }
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => logoContainer.ReceiveMouseInputAt(screenSpacePos);
+        public bool BeatMatching = true;
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => logoContainer.ReceivePositionalInputAt(screenSpacePos);
 
         public bool Ripple
         {
@@ -73,18 +79,13 @@ namespace osu.Game.Screens.Menu
 
         private readonly Container impactContainer;
 
-        private const float default_size = 480;
-
         private const double early_activation = 60;
+
+        public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
 
         public OsuLogo()
         {
-            // Required to make Schedule calls run in OsuScreen even when we are not visible.
-            AlwaysPresent = true;
-
             EarlyActivationMilliseconds = early_activation;
-
-            Size = new Vector2(default_size);
 
             Origin = Anchor.Centre;
 
@@ -140,7 +141,7 @@ namespace osu.Game.Screens.Menu
                                                     Alpha = 0.5f,
                                                     Size = new Vector2(0.96f)
                                                 },
-                                                new BufferedContainer
+                                                new Container
                                                 {
                                                     AutoSizeAxes = Axes.Both,
                                                     Children = new Drawable[]
@@ -228,7 +229,7 @@ namespace osu.Game.Screens.Menu
         /// <param name="waitForPrevious">If true, the new animation is delayed until all previous transforms finish. If false, existing transformed are cleared.</param>
         public void AppendAnimatingAction(Action action, bool waitForPrevious)
         {
-            Action runnableAction = () =>
+            void runnableAction()
             {
                 if (waitForPrevious)
                     this.DelayUntilTransformsFinished().Schedule(action);
@@ -237,19 +238,19 @@ namespace osu.Game.Screens.Menu
                     ClearTransforms();
                     action();
                 }
-            };
+            }
 
             if (IsLoaded)
                 runnableAction();
             else
-                Schedule(() => runnableAction());
+                Schedule(runnableAction);
         }
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, AudioManager audio)
         {
-            sampleClick = audio.Sample.Get(@"Menu/select-2");
-            sampleBeat = audio.Sample.Get(@"Menu/heartbeat");
+            sampleClick = audio.Sample.Get(@"Menu/osu-logo-select");
+            sampleBeat = audio.Sample.Get(@"Menu/osu-logo-heartbeat");
 
             logo.Texture = textures.Get(@"Menu/logo");
             ripple.Texture = textures.Get(@"Menu/logo");
@@ -260,6 +261,8 @@ namespace osu.Game.Screens.Menu
         protected override void OnNewBeat(int beatIndex, TimingControlPoint timingPoint, EffectControlPoint effectPoint, TrackAmplitudes amplitudes)
         {
             base.OnNewBeat(beatIndex, timingPoint, effectPoint, amplitudes);
+
+            if (!BeatMatching) return;
 
             lastBeatIndex = beatIndex;
 
@@ -334,45 +337,42 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        private bool interactive => Action != null && Alpha > 0.2f;
+        public override bool HandlePositionalInput => base.HandlePositionalInput && Action != null && Alpha > 0.2f;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            if (!interactive) return false;
+            if (e.Button != MouseButton.Left) return false;
 
             logoBounceContainer.ScaleTo(0.9f, 1000, Easing.Out);
             return true;
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
+            if (e.Button != MouseButton.Left) return false;
+
             logoBounceContainer.ScaleTo(1f, 500, Easing.OutElastic);
             return true;
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
-            if (!interactive) return false;
-
-            sampleClick.Play();
+            if (Action?.Invoke() ?? true)
+                sampleClick.Play();
 
             flashLayer.ClearTransforms();
             flashLayer.Alpha = 0.4f;
             flashLayer.FadeOut(1500, Easing.OutExpo);
-
-            Action?.Invoke();
             return true;
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
-            if (!interactive) return false;
-
             logoHoverContainer.ScaleTo(1.1f, 500, Easing.OutElastic);
             return true;
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             logoHoverContainer.ScaleTo(1, 500, Easing.OutElastic);
         }

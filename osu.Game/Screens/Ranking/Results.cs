@@ -1,28 +1,29 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Scoring;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics.Containers;
 using osu.Game.Screens.Backgrounds;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Graphics.Sprites;
+using osu.Game.Scoring;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class Results : OsuScreen
+    public abstract class Results : OsuScreen
     {
-        private readonly Score score;
         private Container circleOuterBackground;
         private Container circleOuter;
         private Container circleInner;
@@ -33,19 +34,21 @@ namespace osu.Game.Screens.Ranking
 
         public override bool AllowBeatmapRulesetChange => false;
 
+        protected readonly ScoreInfo Score;
+
         private Container currentPage;
 
         private static readonly Vector2 background_blur = new Vector2(20);
 
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap);
+        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
         private const float overscan = 1.3f;
 
         private const float circle_outer_scale = 0.96f;
 
-        public Results(Score score)
+        protected Results(ScoreInfo score)
         {
-            this.score = score;
+            Score = score;
         }
 
         private const float transition_time = 800;
@@ -56,6 +59,7 @@ namespace osu.Game.Screens.Ranking
         {
             base.OnEntering(last);
             (Background as BackgroundScreenBeatmap)?.BlurTo(background_blur, 2500, Easing.OutQuint);
+            Background.ScaleTo(1.1f, transition_time, Easing.OutQuint);
 
             allCircles.ForEach(c =>
             {
@@ -65,7 +69,7 @@ namespace osu.Game.Screens.Ranking
 
             backgroundParallax.FadeOut();
             modeChangeButtons.FadeOut();
-            currentPage.FadeOut();
+            currentPage?.FadeOut();
 
             circleOuterBackground
                 .FadeIn(transition_time, Easing.OutQuint)
@@ -88,7 +92,7 @@ namespace osu.Game.Screens.Ranking
                     using (BeginDelayedSequence(transition_time * 0.4f, true))
                     {
                         modeChangeButtons.FadeIn(transition_time, Easing.OutQuint);
-                        currentPage.FadeIn(transition_time, Easing.OutQuint);
+                        currentPage?.FadeIn(transition_time, Easing.OutQuint);
                     }
                 }
             }
@@ -100,6 +104,8 @@ namespace osu.Game.Screens.Ranking
             {
                 c.ScaleTo(0, transition_time, Easing.OutSine);
             });
+
+            Background.ScaleTo(1f, transition_time / 4, Easing.OutQuint);
 
             Content.FadeOut(transition_time / 4);
 
@@ -159,7 +165,6 @@ namespace osu.Game.Screens.Ranking
                                 {
                                     RelativeSizeAxes = Axes.Both,
                                     ParallaxAmount = 0.01f,
-                                    Scale = new Vector2(1 / circle_outer_scale / overscan),
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
                                     Children = new Drawable[]
@@ -183,9 +188,9 @@ namespace osu.Game.Screens.Ranking
                                     Height = 50,
                                     Margin = new MarginPadding { Bottom = 110 },
                                 },
-                                new SpriteText
+                                new OsuSpriteText
                                 {
-                                    Text = $"{score.MaxCombo}x",
+                                    Text = $"{Score.MaxCombo}x",
                                     TextSize = 40,
                                     RelativePositionAxes = Axes.X,
                                     Font = @"Exo2.0-Bold",
@@ -194,7 +199,7 @@ namespace osu.Game.Screens.Ranking
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.BottomCentre,
                                 },
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Text = "max combo",
                                     TextSize = 20,
@@ -204,9 +209,9 @@ namespace osu.Game.Screens.Ranking
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.TopCentre,
                                 },
-                                new SpriteText
+                                new OsuSpriteText
                                 {
-                                    Text = $"{score.Accuracy:P2}",
+                                    Text = $"{Score.Accuracy:P2}",
                                     TextSize = 40,
                                     RelativePositionAxes = Axes.X,
                                     Font = @"Exo2.0-Bold",
@@ -215,7 +220,7 @@ namespace osu.Game.Screens.Ranking
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.BottomCentre,
                                 },
-                                new SpriteText
+                                new OsuSpriteText
                                 {
                                     Text = "accuracy",
                                     TextSize = 20,
@@ -259,30 +264,22 @@ namespace osu.Game.Screens.Ranking
                 },
             };
 
-            modeChangeButtons.AddItem(ResultMode.Summary);
-            modeChangeButtons.AddItem(ResultMode.Ranking);
-            //modeChangeButtons.AddItem(ResultMode.Share);
+            foreach (var t in CreateResultPages())
+                modeChangeButtons.AddItem(t);
+            modeChangeButtons.Current.Value = modeChangeButtons.Items.FirstOrDefault();
 
-            modeChangeButtons.Current.ValueChanged += mode =>
+            modeChangeButtons.Current.BindValueChanged(m =>
             {
                 currentPage?.FadeOut();
                 currentPage?.Expire();
 
-                switch (mode)
-                {
-                    case ResultMode.Summary:
-                        currentPage = new ResultsPageScore(score, Beatmap);
-                        break;
-                    case ResultMode.Ranking:
-                        currentPage = new ResultsPageRanking(score, Beatmap);
-                        break;
-                }
+                currentPage = m?.CreatePage();
 
                 if (currentPage != null)
                     circleInner.Add(currentPage);
-            };
-
-            modeChangeButtons.Current.TriggerChange();
+            }, true);
         }
+
+        protected abstract IEnumerable<IResultPageInfo> CreateResultPages();
     }
 }

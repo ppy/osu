@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.IO.Network;
+using osu.Framework.Logging;
 
 namespace osu.Game.Online.API
 {
@@ -14,43 +15,20 @@ namespace osu.Game.Online.API
     {
         protected override WebRequest CreateWebRequest() => new JsonWebRequest<T>(Uri);
 
+        public T Result => ((JsonWebRequest<T>)WebRequest).ResponseObject;
+
         protected APIRequest()
         {
             base.Success += onSuccess;
         }
 
-        private void onSuccess()
-        {
-            Success?.Invoke(((JsonWebRequest<T>)WebRequest).ResponseObject);
-        }
+        private void onSuccess() => Success?.Invoke(Result);
 
+        /// <summary>
+        /// Invoked on successful completion of an API request.
+        /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
+        /// </summary>
         public new event APISuccessHandler<T> Success;
-    }
-
-    public abstract class APIDownloadRequest : APIRequest
-    {
-        protected override WebRequest CreateWebRequest()
-        {
-            var request = new WebRequest(Uri);
-            request.DownloadProgress += request_Progress;
-            return request;
-        }
-
-        private void request_Progress(long current, long total) => API.Scheduler.Add(delegate { Progress?.Invoke(current, total); });
-
-        protected APIDownloadRequest()
-        {
-            base.Success += onSuccess;
-        }
-
-        private void onSuccess()
-        {
-            Success?.Invoke(WebRequest.ResponseData);
-        }
-
-        public event APIProgressHandler Progress;
-
-        public new event APISuccessHandler<byte[]> Success;
     }
 
     /// <summary>
@@ -58,27 +36,25 @@ namespace osu.Game.Online.API
     /// </summary>
     public abstract class APIRequest
     {
-        /// <summary>
-        /// The maximum amount of time before this request will fail.
-        /// </summary>
-        public int Timeout = WebRequest.DEFAULT_TIMEOUT;
-
-        protected virtual string Target => string.Empty;
+        protected abstract string Target { get; }
 
         protected virtual WebRequest CreateWebRequest() => new WebRequest(Uri);
 
         protected virtual string Uri => $@"{API.Endpoint}/api/v2/{Target}";
 
-        private double remainingTime => Math.Max(0, Timeout - (DateTimeOffset.UtcNow - (startTime ?? DateTimeOffset.MinValue)).TotalMilliseconds);
-
-        public bool ExceededTimeout => remainingTime == 0;
-
-        private DateTimeOffset? startTime;
-
         protected APIAccess API;
         protected WebRequest WebRequest;
 
+        /// <summary>
+        /// Invoked on successful completion of an API request.
+        /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
+        /// </summary>
         public event APISuccessHandler Success;
+
+        /// <summary>
+        /// Invoked on failure to complete an API request.
+        /// This will be scheduled to the API's internal scheduler (run on update thread automatically).
+        /// </summary>
         public event APIFailureHandler Failure;
 
         private bool cancelled;
@@ -89,52 +65,56 @@ namespace osu.Game.Online.API
         {
             API = api;
 
-            if (checkAndProcessFailure())
+            if (checkAndScheduleFailure())
                 return;
 
-            if (startTime == null)
-                startTime = DateTimeOffset.UtcNow;
-
-            if (remainingTime <= 0)
-                throw new TimeoutException(@"API request timeout hit");
-
             WebRequest = CreateWebRequest();
+            WebRequest.Failed += Fail;
             WebRequest.AllowRetryOnTimeout = false;
             WebRequest.AddHeader("Authorization", $"Bearer {api.AccessToken}");
 
-            if (checkAndProcessFailure())
+            if (checkAndScheduleFailure())
                 return;
 
             if (!WebRequest.Aborted) //could have been aborted by a Cancel() call
+            {
+                Logger.Log($@"Performing request {this}", LoggingTarget.Network);
                 WebRequest.Perform();
+            }
 
-            if (checkAndProcessFailure())
+            if (checkAndScheduleFailure())
                 return;
 
-            api.Scheduler.Add(delegate { Success?.Invoke(); });
+            api.Schedule(delegate { Success?.Invoke(); });
         }
 
         public void Cancel() => Fail(new OperationCanceledException(@"Request cancelled"));
 
         public void Fail(Exception e)
         {
-            cancelled = true;
+            if (WebRequest?.Completed == true)
+                return;
 
+            if (cancelled)
+                return;
+
+            cancelled = true;
             WebRequest?.Abort();
 
+            Logger.Log($@"Failing request {this} ({e})", LoggingTarget.Network);
             pendingFailure = () => Failure?.Invoke(e);
-            checkAndProcessFailure();
+            checkAndScheduleFailure();
         }
 
         /// <summary>
         /// Checked for cancellation or error. Also queues up the Failed event if we can.
         /// </summary>
         /// <returns>Whether we are in a failed or cancelled state.</returns>
-        private bool checkAndProcessFailure()
+        private bool checkAndScheduleFailure()
         {
             if (API == null || pendingFailure == null) return cancelled;
 
-            API.Scheduler.Add(pendingFailure);
+            API.Schedule(pendingFailure);
             pendingFailure = null;
             return true;
         }

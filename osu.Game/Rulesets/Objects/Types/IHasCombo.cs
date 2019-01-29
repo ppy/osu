@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 namespace osu.Game.Rulesets.Objects.Types
 {
@@ -12,5 +12,10 @@ namespace osu.Game.Rulesets.Objects.Types
         /// Whether the HitObject starts a new combo.
         /// </summary>
         bool NewCombo { get; }
+
+        /// <summary>
+        /// When starting a new combo, the offset of the new combo relative to the current one.
+        /// </summary>
+        int ComboOffset { get; }
     }
 }

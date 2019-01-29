@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
@@ -39,7 +38,7 @@ namespace osu.Game.IO.Legacy
         /// <summary> Reads a string from the buffer.  Overrides the base implementation so it can cope with nulls. </summary>
         public override string ReadString()
         {
-            if (0 == ReadByte()) return null;
+            if (ReadByte() == 0) return null;
             return base.ReadString();
         }
 
@@ -175,7 +174,7 @@ namespace osu.Game.IO.Legacy
                 versionBinder = new VersionConfigToNamespaceAssemblyObjectBinder();
                 formatter = new BinaryFormatter
                 {
-                    AssemblyFormat = FormatterAssemblyStyle.Simple,
+//                    AssemblyFormat = FormatterAssemblyStyle.Simple,
                     Binder = versionBinder
                 };
             }
@@ -187,6 +186,7 @@ namespace osu.Game.IO.Legacy
 
                 Debug.Assert(formatter != null, "formatter != null");
 
+                // ReSharper disable once PossibleNullReferenceException
                 return formatter.Deserialize(stream);
             }
 

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -7,22 +7,27 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Caching;
 
 namespace osu.Game.Graphics
 {
     public class SpriteIcon : CompositeDrawable
     {
-        private readonly Sprite spriteShadow;
-        private readonly Sprite spriteMain;
+        private Sprite spriteShadow;
+        private Sprite spriteMain;
 
         private Cached layout = new Cached();
-        private readonly Container shadowVisibility;
+        private Container shadowVisibility;
 
-        public SpriteIcon()
+        private FontStore store;
+
+        [BackgroundDependencyLoader]
+        private void load(FontStore store)
         {
+            this.store = store;
+
             InternalChildren = new Drawable[]
             {
                 shadowVisibility = new Container
@@ -39,7 +44,7 @@ namespace osu.Game.Graphics
                         Y = 2,
                         Colour = new Color4(0f, 0f, 0f, 0.2f),
                     },
-                    Alpha = 0,
+                    Alpha = shadow ? 1 : 0,
                 },
                 spriteMain = new Sprite
                 {
@@ -49,27 +54,32 @@ namespace osu.Game.Graphics
                     FillMode = FillMode.Fit
                 },
             };
-        }
-
-        private FontStore store;
-
-        [BackgroundDependencyLoader]
-        private void load(FontStore store)
-        {
-            this.store = store;
 
             updateTexture();
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateTexture();
+        }
+
+        private FontAwesome loadedIcon;
         private void updateTexture()
         {
-            var texture = store?.Get(((char)icon).ToString());
+            var loadableIcon = icon;
+
+            if (loadableIcon == loadedIcon) return;
+
+            var texture = store.Get(((char)loadableIcon).ToString());
 
             spriteMain.Texture = texture;
             spriteShadow.Texture = texture;
 
             if (Size == Vector2.Zero)
                 Size = new Vector2(texture?.DisplayWidth ?? 0, texture?.DisplayHeight ?? 0);
+
+            loadedIcon = loadableIcon;
         }
 
         public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
@@ -85,7 +95,7 @@ namespace osu.Game.Graphics
             {
                 //adjust shadow alpha based on highest component intensity to avoid muddy display of darker text.
                 //squared result for quadratic fall-off seems to give the best result.
-                var avgColour = (Color4)DrawInfo.Colour.AverageColour;
+                var avgColour = (Color4)DrawColourInfo.Colour.AverageColour;
 
                 spriteShadow.Alpha = (float)Math.Pow(Math.Max(Math.Max(avgColour.R, avgColour.G), avgColour.B), 2);
 
@@ -93,12 +103,15 @@ namespace osu.Game.Graphics
             }
         }
 
+        private bool shadow;
         public bool Shadow
         {
-            get { return spriteShadow.IsPresent; }
+            get { return shadow; }
             set
             {
-                shadowVisibility.Alpha = value ? 1 : 0;
+                shadow = value;
+                if (shadowVisibility != null)
+                    shadowVisibility.Alpha = value ? 1 : 0;
             }
         }
 
@@ -116,7 +129,7 @@ namespace osu.Game.Graphics
                 if (icon == value) return;
 
                 icon = value;
-                if (IsLoaded)
+                if (LoadState == LoadState.Loaded)
                     updateTexture();
             }
         }
@@ -975,7 +988,7 @@ namespace osu.Game.Graphics
         fa_osu_expert_mania = 0xe028,
 
         // mod icons
-        fa_osu_mod_perfect = 0xe02d,
+        fa_osu_mod_perfect = 0xe049,
         fa_osu_mod_autopilot = 0xe03a,
         fa_osu_mod_auto = 0xe03b,
         fa_osu_mod_cinema = 0xe03c,

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -18,8 +18,8 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Tournament.Components;
 using osu.Game.Screens.Tournament.Teams;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Framework.Graphics.Shapes;
 
@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Tournament
     {
         private const string results_filename = "drawings_results.txt";
 
-        public override bool ShowOverlays => false;
+        protected override bool HideOverlaysOnEnter => true;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
@@ -49,8 +49,8 @@ namespace osu.Game.Screens.Tournament
 
         private DependencyContainer dependencies;
 
-        protected override IReadOnlyDependencyContainer CreateLocalDependencies(IReadOnlyDependencyContainer parent) =>
-            dependencies = new DependencyContainer(base.CreateLocalDependencies(parent));
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) =>
+            dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
         [BackgroundDependencyLoader]
         private void load(TextureStore textures, Storage storage)
@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Tournament
 
             TextureStore flagStore = new TextureStore();
             // Local flag store
-            flagStore.AddStore(new RawTextureLoaderStore(new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), "Drawings")));
+            flagStore.AddStore(new TextureLoaderStore(new NamespacedResourceStore<byte[]>(new StorageBackedResourceStore(storage), "Drawings")));
             // Default texture store
             flagStore.AddStore(textures);
 
@@ -193,21 +193,21 @@ namespace osu.Game.Screens.Tournament
 
                                     Children = new Drawable[]
                                     {
-                                        new OsuButton
+                                        new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Begin random",
                                             Action = teamsContainer.StartScrolling,
                                         },
-                                        new OsuButton
+                                        new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
                                             Text = "Stop random",
                                             Action = teamsContainer.StopScrolling,
                                         },
-                                        new OsuButton
+                                        new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
@@ -232,7 +232,7 @@ namespace osu.Game.Screens.Tournament
 
                                     Children = new Drawable[]
                                     {
-                                        new OsuButton
+                                        new TriangleButton
                                         {
                                             RelativeSizeAxes = Axes.X,
 
@@ -265,7 +265,7 @@ namespace osu.Game.Screens.Tournament
 
         private void writeResults(string text)
         {
-            Action writeAction = () =>
+            void writeAction()
             {
                 try
                 {
@@ -280,9 +280,9 @@ namespace osu.Game.Screens.Tournament
                 {
                     Logger.Error(ex, "Failed to write results.");
                 }
-            };
+            }
 
-            writeOp = writeOp?.ContinueWith(t => { writeAction(); }) ?? Task.Run(writeAction);
+            writeOp = writeOp?.ContinueWith(t => { writeAction(); }) ?? Task.Run((Action)writeAction);
         }
 
         private void reloadTeams()
@@ -323,10 +323,11 @@ namespace osu.Game.Screens.Tournament
                             if (string.IsNullOrEmpty(line))
                                 continue;
 
-                            if (line.ToUpper().StartsWith("GROUP"))
+                            if (line.ToUpperInvariant().StartsWith("GROUP"))
                                 continue;
 
-                            DrawingsTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
+                            // ReSharper disable once AccessToModifiedClosure
+                            DrawingsTeam teamToAdd = allTeams.Find(t => t.FullName == line);
 
                             if (teamToAdd == null)
                                 continue;

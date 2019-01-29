@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Types;
 
@@ -73,7 +73,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                     Vector2 distanceVector = endPosition - startPosition;
                     int distance = (int)distanceVector.Length;
-                    float rotation = (float)Math.Atan2(distanceVector.Y, distanceVector.X);
+                    float rotation = (float)(Math.Atan2(distanceVector.Y, distanceVector.X) * (180 / Math.PI));
                     double duration = endTime - startTime;
 
                     for (int d = (int)(PointDistance * 1.5); d < distance - PointDistance; d += PointDistance)
@@ -96,12 +96,12 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                         using (fp.BeginAbsoluteSequence(fadeInTime))
                         {
-                            fp.FadeIn(DrawableOsuHitObject.TIME_FADEIN);
-                            fp.ScaleTo(1, DrawableOsuHitObject.TIME_FADEIN, Easing.Out);
+                            fp.FadeIn(currHitObject.TimeFadeIn);
+                            fp.ScaleTo(1, currHitObject.TimeFadeIn, Easing.Out);
 
-                            fp.MoveTo(pointEndPosition, DrawableOsuHitObject.TIME_FADEIN, Easing.Out);
+                            fp.MoveTo(pointEndPosition, currHitObject.TimeFadeIn, Easing.Out);
 
-                            fp.Delay(fadeOutTime - fadeInTime).FadeOut(DrawableOsuHitObject.TIME_FADEIN);
+                            fp.Delay(fadeOutTime - fadeInTime).FadeOut(currHitObject.TimeFadeIn);
                         }
 
                         fp.Expire(true);

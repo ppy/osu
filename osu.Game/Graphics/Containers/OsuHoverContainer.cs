@@ -1,33 +1,45 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK.Graphics;
+using System.Collections.Generic;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Input;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.Containers
 {
     public class OsuHoverContainer : OsuClickableContainer
     {
-        private Color4 hoverColour;
+        protected Color4 HoverColour;
 
-        protected override bool OnHover(InputState state)
+        protected Color4 IdleColour = Color4.White;
+
+        protected virtual IEnumerable<Drawable> EffectTargets => new[] { Content };
+
+        protected override bool OnHover(HoverEvent e)
         {
-            this.FadeColour(hoverColour, 500, Easing.OutQuint);
-            return base.OnHover(state);
+            EffectTargets.ForEach(d => d.FadeColour(HoverColour, 500, Easing.OutQuint));
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
-            this.FadeColour(Color4.White, 500, Easing.OutQuint);
-            base.OnHoverLost(state);
+            EffectTargets.ForEach(d => d.FadeColour(IdleColour, 500, Easing.OutQuint));
+            base.OnHoverLost(e);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            hoverColour = colours.Yellow;
+            HoverColour = colours.Yellow;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            EffectTargets.ForEach(d => d.FadeColour(IdleColour));
         }
     }
 }

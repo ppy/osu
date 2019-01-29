@@ -1,18 +1,19 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osu.Framework.Input;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Toolbar
 {
@@ -74,7 +75,7 @@ namespace osu.Game.Overlays.Toolbar
         private readonly SpriteText tooltip2;
         protected FillFlowContainer Flow;
 
-        public ToolbarButton()
+        public ToolbarButton() : base(HoverSampleSet.Loud)
         {
             Width = WIDTH;
             RelativeSizeAxes = Axes.Y;
@@ -117,9 +118,9 @@ namespace osu.Game.Overlays.Toolbar
                 {
                     Direction = FillDirection.Vertical,
                     RelativeSizeAxes = Axes.Both, //stops us being considered in parent's autosize
-                    Anchor = (TooltipAnchor & Anchor.x0) > 0 ? Anchor.BottomLeft : Anchor.BottomRight,
+                    Anchor = TooltipAnchor.HasFlag(Anchor.x0) ? Anchor.BottomLeft : Anchor.BottomRight,
                     Origin = TooltipAnchor,
-                    Position = new Vector2((TooltipAnchor & Anchor.x0) > 0 ? 5 : -5, 5),
+                    Position = new Vector2(TooltipAnchor.HasFlag(Anchor.x0) ? 5 : -5, 5),
                     Alpha = 0,
                     Children = new[]
                     {
@@ -143,22 +144,22 @@ namespace osu.Game.Overlays.Toolbar
             };
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             HoverBackground.FlashColour(Color4.White.Opacity(100), 500, Easing.OutQuint);
-            return base.OnClick(state);
+            return base.OnClick(e);
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             HoverBackground.FadeIn(200);
             tooltipContainer.FadeIn(100);
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             HoverBackground.FadeOut(200);
             tooltipContainer.FadeOut(100);

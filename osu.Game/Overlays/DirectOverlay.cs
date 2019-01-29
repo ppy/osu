@@ -1,15 +1,15 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OpenTK;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Threading;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
@@ -18,31 +18,31 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.Direct;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Rulesets;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
-    public class DirectOverlay : SearchableListOverlay<DirectTab, DirectSortCriteria, RankStatus>
+    public class DirectOverlay : SearchableListOverlay<DirectTab, DirectSortCriteria, BeatmapSearchCategory>
     {
         private const float panel_padding = 10f;
 
         private APIAccess api;
         private RulesetStore rulesets;
-        private BeatmapManager beatmaps;
 
         private readonly FillFlowContainer resultCountsContainer;
         private readonly OsuSpriteText resultCountsText;
         private FillFlowContainer<DirectPanel> panels;
-        private DirectPanel playing;
 
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"485e74");
         protected override Color4 TrianglesColourLight => OsuColour.FromHex(@"465b71");
         protected override Color4 TrianglesColourDark => OsuColour.FromHex(@"3f5265");
 
         protected override SearchableListHeader<DirectTab> CreateHeader() => new Header();
-        protected override SearchableListFilterControl<DirectSortCriteria, RankStatus> CreateFilterControl() => new FilterControl();
+        protected override SearchableListFilterControl<DirectSortCriteria, BeatmapSearchCategory> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<BeatmapSetInfo> beatmapSets;
+
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
             get { return beatmapSets; }
@@ -50,7 +50,7 @@ namespace osu.Game.Overlays
             {
                 if (beatmapSets?.Equals(value) ?? false) return;
 
-                beatmapSets = value;
+                beatmapSets = value?.ToList();
 
                 if (beatmapSets == null) return;
 
@@ -65,12 +65,11 @@ namespace osu.Game.Overlays
                 }
 
                 ResultAmounts = new ResultCounts(distinctCount(artists), distinctCount(songs), distinctCount(tags));
-
-                recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
             }
         }
 
         private ResultCounts resultAmounts;
+
         public ResultCounts ResultAmounts
         {
             get { return resultAmounts; }
@@ -89,10 +88,10 @@ namespace osu.Game.Overlays
 
             // osu!direct colours are not part of the standard palette
 
-            FirstWaveColour = OsuColour.FromHex(@"19b0e2");
-            SecondWaveColour = OsuColour.FromHex(@"2280a2");
-            ThirdWaveColour = OsuColour.FromHex(@"005774");
-            FourthWaveColour = OsuColour.FromHex(@"003a4e");
+            Waves.FirstWaveColour = OsuColour.FromHex(@"19b0e2");
+            Waves.SecondWaveColour = OsuColour.FromHex(@"2280a2");
+            Waves.ThirdWaveColour = OsuColour.FromHex(@"005774");
+            Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
             ScrollFlow.Children = new Drawable[]
             {
@@ -117,7 +116,23 @@ namespace osu.Game.Overlays
                 },
             };
 
-            Filter.Search.Current.ValueChanged += text => { if (text != string.Empty) Header.Tabs.Current.Value = DirectTab.Search; };
+            Filter.Search.Current.ValueChanged += text =>
+            {
+                if (text != string.Empty)
+                {
+                    Header.Tabs.Current.Value = DirectTab.Search;
+
+                    if (Filter.Tabs.Current.Value == DirectSortCriteria.Ranked)
+                        Filter.Tabs.Current.Value = DirectSortCriteria.Relevance;
+                }
+                else
+                {
+                    Header.Tabs.Current.Value = DirectTab.NewestMaps;
+
+                    if (Filter.Tabs.Current.Value == DirectSortCriteria.Relevance)
+                        Filter.Tabs.Current.Value = DirectSortCriteria.Ranked;
+                }
+            };
             ((FilterControl)Filter).Ruleset.ValueChanged += ruleset => Scheduler.AddOnce(updateSearch);
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
             Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += rankStatus => Scheduler.AddOnce(updateSearch);
@@ -161,22 +176,13 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets, BeatmapManager beatmaps)
+        private void load(OsuColour colours, APIAccess api, RulesetStore rulesets, PreviewTrackManager previewTrackManager)
         {
             this.api = api;
             this.rulesets = rulesets;
-            this.beatmaps = beatmaps;
+            this.previewTrackManager = previewTrackManager;
 
             resultCountsContainer.Colour = colours.Yellow;
-
-            beatmaps.BeatmapSetAdded += setAdded;
-        }
-
-        private void setAdded(BeatmapSetInfo set)
-        {
-            // if a new map was imported, we should remove it from search results (download completed etc.)
-            panels?.FirstOrDefault(p => p.SetInfo.OnlineBeatmapSetID == set.OnlineBeatmapSetID)?.FadeOut(400).Expire();
-            BeatmapSets = BeatmapSets?.Where(b => b.OnlineBeatmapSetID != set.OnlineBeatmapSetID);
         }
 
         private void updateResultCounts()
@@ -201,12 +207,6 @@ namespace osu.Game.Overlays
                 panels.FadeOut(200);
                 panels.Expire();
                 panels = null;
-
-                if (playing != null)
-                {
-                    playing.PreviewPlaying.Value = false;
-                    playing = null;
-                }
             }
 
             if (BeatmapSets == null) return;
@@ -222,7 +222,11 @@ namespace osu.Game.Overlays
                     switch (displayStyle)
                     {
                         case PanelDisplayStyle.Grid:
-                            return new DirectGridPanel(b);
+                            return new DirectGridPanel(b)
+                            {
+                                Anchor = Anchor.TopCentre,
+                                Origin = Anchor.TopCentre,
+                            };
                         default:
                             return new DirectListPanel(b);
                     }
@@ -233,18 +237,16 @@ namespace osu.Game.Overlays
             {
                 if (panels != null) ScrollFlow.Remove(panels);
                 ScrollFlow.Add(panels = newPanels);
-
-                foreach (DirectPanel panel in p.Children)
-                    panel.PreviewPlaying.ValueChanged += newValue =>
-                    {
-                        if (newValue)
-                        {
-                            if (playing != null && playing != panel)
-                                playing.PreviewPlaying.Value = false;
-                            playing = panel;
-                        }
-                    };
             });
+        }
+
+        protected override void PopIn()
+        {
+            base.PopIn();
+
+            // Queries are allowed to be run only on the first pop-in
+            if (getSetsRequest == null)
+                Scheduler.AddOnce(updateSearch);
         }
 
         private SearchBeatmapSetsRequest getSetsRequest;
@@ -252,37 +254,48 @@ namespace osu.Game.Overlays
         private readonly Bindable<string> currentQuery = new Bindable<string>();
 
         private ScheduledDelegate queryChangedDebounce;
+        private PreviewTrackManager previewTrackManager;
 
         private void updateSearch()
         {
             queryChangedDebounce?.Cancel();
 
-            if (!IsLoaded) return;
+            if (!IsLoaded)
+                return;
+
+            if (State == Visibility.Hidden)
+                return;
 
             BeatmapSets = null;
             ResultAmounts = null;
 
             getSetsRequest?.Cancel();
 
-            if (api == null) return;
+            if (api == null)
+                return;
 
-            if (Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || currentQuery == string.Empty)) return;
+            if (Header.Tabs.Current.Value == DirectTab.Search && (Filter.Search.Text == string.Empty || currentQuery == string.Empty))
+                return;
+
+            previewTrackManager.StopAnyPlaying(this);
 
             getSetsRequest = new SearchBeatmapSetsRequest(currentQuery.Value ?? string.Empty,
-                                                       ((FilterControl)Filter).Ruleset.Value,
-                                                       Filter.DisplayStyleControl.Dropdown.Current.Value,
-                                                       Filter.Tabs.Current.Value); //todo: sort direction (?)
+                ((FilterControl)Filter).Ruleset.Value,
+                Filter.DisplayStyleControl.Dropdown.Current.Value,
+                Filter.Tabs.Current.Value); //todo: sort direction (?)
 
             getSetsRequest.Success += response =>
             {
                 Task.Run(() =>
                 {
-                    var onlineIds = response.Select(r => r.OnlineBeatmapSetID).ToList();
-                    var presentOnlineIds = beatmaps.QueryBeatmapSets(s => onlineIds.Contains(s.OnlineBeatmapSetID)).Select(r => r.OnlineBeatmapSetID).ToList();
-                    var sets = response.Select(r => r.ToBeatmapSet(rulesets)).Where(b => !presentOnlineIds.Contains(b.OnlineBeatmapSetID)).ToList();
+                    var sets = response.BeatmapSets.Select(r => r.ToBeatmapSet(rulesets)).ToList();
 
                     // may not need scheduling; loads async internally.
-                    Schedule(() => BeatmapSets = sets);
+                    Schedule(() =>
+                    {
+                        BeatmapSets = sets;
+                        recreatePanels(Filter.DisplayStyleControl.DisplayStyle.Value);
+                    });
                 });
             };
 

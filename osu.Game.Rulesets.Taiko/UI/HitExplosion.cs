@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -18,6 +18,8 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     internal class HitExplosion : CircularContainer
     {
+        public override bool RemoveWhenNotAlive => true;
+
         public readonly DrawableHitObject JudgedObject;
 
         private readonly Box innerFill;
@@ -66,7 +68,7 @@ namespace osu.Game.Rulesets.Taiko.UI
             this.ScaleTo(3f, 1000, Easing.OutQuint);
             this.FadeOut(500);
 
-            Expire();
+            Expire(true);
         }
 
         /// <summary>

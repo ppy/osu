@@ -1,22 +1,22 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.UserInterface;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Graphics.Cursor;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseContextMenu : OsuTestCase
+    [TestFixture]
+    public class TestCaseContextMenu : OsuTestCase
     {
-        public override string Description => @"Menu visible on right click";
-
         private const int start_time = 0;
         private const int duration = 1000;
 

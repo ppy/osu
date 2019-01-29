@@ -1,27 +1,25 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
-using OpenTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
+using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using OpenTK.Graphics;
-using osu.Framework.Input;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API;
-using osu.Framework.Logging;
-using osu.Game.Overlays.Notifications;
 using osu.Game.Online.API.Requests;
-using osu.Framework.Configuration;
-using osu.Framework.Audio.Track;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -29,22 +27,20 @@ namespace osu.Game.Overlays.Direct
     {
         public readonly BeatmapSetInfo SetInfo;
 
-        protected Box BlackBackground;
-
         private const double hover_transition_time = 400;
 
         private Container content;
 
-        private APIAccess api;
         private ProgressBar progressBar;
         private BeatmapManager beatmaps;
-        private NotificationOverlay notifications;
         private BeatmapSetOverlay beatmapSetOverlay;
 
-        public Track Preview => PlayButton.Preview;
+        public PreviewTrack Preview => PlayButton.Preview;
         public Bindable<bool> PreviewPlaying => PlayButton.Playing;
         protected abstract PlayButton PlayButton { get; }
         protected abstract Box PreviewBar { get; }
+
+        protected virtual bool FadePlayButton => true;
 
         protected override Container<Drawable> Content => content;
 
@@ -69,14 +65,14 @@ namespace osu.Game.Overlays.Direct
             Colour = Color4.Black.Opacity(0.3f),
         };
 
+        private OsuColour colours;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(APIAccess api, BeatmapManager beatmaps, OsuColour colours, NotificationOverlay notifications, BeatmapSetOverlay beatmapSetOverlay)
+        private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay)
         {
-            this.api = api;
             this.beatmaps = beatmaps;
-            this.notifications = notifications;
             this.beatmapSetOverlay = beatmapSetOverlay;
+            this.colours = colours;
 
             AddInternal(content = new Container
             {
@@ -85,12 +81,6 @@ namespace osu.Game.Overlays.Direct
                 EdgeEffect = edgeEffectNormal,
                 Children = new[]
                 {
-                    // temporary blackness until the actual background loads.
-                    BlackBackground = new Box
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Black,
-                    },
                     CreateBackground(),
                     progressBar = new ProgressBar
                     {
@@ -109,76 +99,61 @@ namespace osu.Game.Overlays.Direct
 
             if (downloadRequest != null)
                 attachDownload(downloadRequest);
+
+            beatmaps.BeatmapDownloadBegan += attachDownload;
+            beatmaps.ItemAdded += setAdded;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+            beatmaps.BeatmapDownloadBegan -= attachDownload;
+            beatmaps.ItemAdded -= setAdded;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (PreviewPlaying && Preview != null)
+            if (PreviewPlaying && Preview != null && Preview.TrackLoaded)
             {
                 PreviewBar.Width = (float)(Preview.CurrentTime / Preview.Length);
             }
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             content.TweenEdgeEffectTo(edgeEffectHovered, hover_transition_time, Easing.OutQuint);
             content.MoveToY(-4, hover_transition_time, Easing.OutQuint);
-            PlayButton.FadeIn(120, Easing.InOutQuint);
+            if (FadePlayButton)
+                PlayButton.FadeIn(120, Easing.InOutQuint);
 
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             content.TweenEdgeEffectTo(edgeEffectNormal, hover_transition_time, Easing.OutQuint);
             content.MoveToY(0, hover_transition_time, Easing.OutQuint);
-            if (!PreviewPlaying)
+            if (FadePlayButton && !PreviewPlaying)
                 PlayButton.FadeOut(120, Easing.InOutQuint);
 
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             ShowInformation();
-            PreviewPlaying.Value = false;
             return true;
         }
 
         protected void ShowInformation() => beatmapSetOverlay?.ShowBeatmapSet(SetInfo);
 
-        protected void StartDownload()
-        {
-            if (!api.LocalUser.Value.IsSupporter)
-            {
-                notifications.Post(new SimpleNotification
-                {
-                    Icon = FontAwesome.fa_superpowers,
-                    Text = "You gotta be a supporter to download for now 'yo"
-                });
-                return;
-            }
-
-            if (beatmaps.GetExistingDownload(SetInfo) != null)
-            {
-                // we already have an active download running.
-                content.MoveToX(-5, 50, Easing.OutSine).Then()
-                       .MoveToX(5, 100, Easing.InOutSine).Then()
-                       .MoveToX(-5, 100, Easing.InOutSine).Then()
-                       .MoveToX(0, 50, Easing.InSine).Then();
-
-                return;
-            }
-
-            var request = beatmaps.Download(SetInfo);
-
-            attachDownload(request);
-        }
-
         private void attachDownload(DownloadBeatmapSetRequest request)
         {
+            if (request.BeatmapSet.OnlineBeatmapSetID != SetInfo.OnlineBeatmapSetID)
+                return;
+
             progressBar.FadeIn(400, Easing.OutQuint);
             progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
 
@@ -188,24 +163,29 @@ namespace osu.Game.Overlays.Direct
             {
                 progressBar.Current.Value = 0;
                 progressBar.FadeOut(500);
-                Logger.Error(e, "Failed to get beatmap download information");
             };
 
-            request.DownloadProgressed += progress => progressBar.Current.Value = progress;
+            request.DownloadProgressed += progress => Schedule(() => progressBar.Current.Value = progress);
 
             request.Success += data =>
             {
                 progressBar.Current.Value = 1;
-                progressBar.FadeOut(500);
+                progressBar.FillColour = colours.Yellow;
             };
         }
+
+        private void setAdded(BeatmapSetInfo s, bool existing, bool silent) => Schedule(() =>
+        {
+            if (s.OnlineBeatmapSetID == SetInfo.OnlineBeatmapSetID)
+                progressBar.FadeOut(500);
+        });
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             this.FadeInFromZero(200, Easing.Out);
 
-            PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered ? 1 : 0, 120, Easing.InOutQuint);
+            PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered || !FadePlayButton ? 1 : 0, 120, Easing.InOutQuint);
             PreviewPlaying.ValueChanged += newValue => PreviewBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
         }
 
@@ -213,27 +193,16 @@ namespace osu.Game.Overlays.Direct
         {
             var icons = new List<DifficultyIcon>();
 
-            foreach (var b in SetInfo.Beatmaps)
+            foreach (var b in SetInfo.Beatmaps.OrderBy(beatmap => beatmap.StarDifficulty))
                 icons.Add(new DifficultyIcon(b));
 
             return icons;
         }
 
-        protected Drawable CreateBackground() => new DelayedLoadWrapper(new BeatmapSetCover(SetInfo)
-        {
-            Anchor = Anchor.Centre,
-            Origin = Anchor.Centre,
-            RelativeSizeAxes = Axes.Both,
-            FillMode = FillMode.Fill,
-            OnLoadComplete = d =>
-            {
-                d.FadeInFromZero(400, Easing.Out);
-                BlackBackground.Delay(400).FadeOut();
-            },
-        })
+        protected Drawable CreateBackground() => new UpdateableBeatmapSetCover
         {
             RelativeSizeAxes = Axes.Both,
-            TimeBeforeLoad = 300
+            BeatmapSet = SetInfo,
         };
 
         public class Statistic : FillFlowContainer

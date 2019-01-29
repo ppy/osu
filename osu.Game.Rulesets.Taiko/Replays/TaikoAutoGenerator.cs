@@ -1,13 +1,14 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Beatmaps;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Taiko.Objects;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Taiko.Replays
 {
@@ -18,13 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Replays
         public TaikoAutoGenerator(Beatmap<TaikoHitObject> beatmap)
             : base(beatmap)
         {
-            Replay = new Replay
-            {
-                User = new User
-                {
-                    Username = @"Autoplay",
-                }
-            };
+            Replay = new Replay();
         }
 
         protected Replay Replay;
@@ -34,14 +29,12 @@ namespace osu.Game.Rulesets.Taiko.Replays
         {
             bool hitButton = true;
 
-            Frames.Add(new ReplayFrame(-100000, null, null, ReplayButtonState.None));
-            Frames.Add(new ReplayFrame(Beatmap.HitObjects[0].StartTime - 1000, null, null, ReplayButtonState.None));
+            Frames.Add(new TaikoReplayFrame(-100000));
+            Frames.Add(new TaikoReplayFrame(Beatmap.HitObjects[0].StartTime - 1000));
 
             for (int i = 0; i < Beatmap.HitObjects.Count; i++)
             {
                 TaikoHitObject h = Beatmap.HitObjects[i];
-
-                ReplayButtonState button;
 
                 IHasEndTime endTimeData = h as IHasEndTime;
                 double endTime = endTimeData?.EndTime ?? h.StartTime;
@@ -58,24 +51,26 @@ namespace osu.Game.Rulesets.Taiko.Replays
                     double hitRate = Math.Min(swell_hit_speed, swell.Duration / req);
                     for (double j = h.StartTime; j < endTime; j += hitRate)
                     {
+                        TaikoAction action;
+
                         switch (d)
                         {
                             default:
                             case 0:
-                                button = ReplayButtonState.Left1;
+                                action = TaikoAction.LeftCentre;
                                 break;
                             case 1:
-                                button = ReplayButtonState.Right1;
+                                action = TaikoAction.LeftRim;
                                 break;
                             case 2:
-                                button = ReplayButtonState.Left2;
+                                action = TaikoAction.RightCentre;
                                 break;
                             case 3:
-                                button = ReplayButtonState.Right2;
+                                action = TaikoAction.RightRim;
                                 break;
                         }
 
-                        Frames.Add(new ReplayFrame(j, null, null, button));
+                        Frames.Add(new TaikoReplayFrame(j, action));
                         d = (d + 1) % 4;
                         if (++count == req)
                             break;
@@ -83,41 +78,41 @@ namespace osu.Game.Rulesets.Taiko.Replays
                 }
                 else if (drumRoll != null)
                 {
-                    foreach (var tick in drumRoll.Ticks)
+                    foreach (var tick in drumRoll.NestedHitObjects.OfType<DrumRollTick>())
                     {
-                        Frames.Add(new ReplayFrame(tick.StartTime, null, null, hitButton ? ReplayButtonState.Left1 : ReplayButtonState.Left2));
+                        Frames.Add(new TaikoReplayFrame(tick.StartTime, hitButton ? TaikoAction.LeftCentre : TaikoAction.RightCentre));
                         hitButton = !hitButton;
                     }
                 }
                 else if (hit != null)
                 {
+                    TaikoAction[] actions;
+
                     if (hit is CentreHit)
                     {
-                        if (h.IsStrong)
-                            button = ReplayButtonState.Right1 | ReplayButtonState.Right2;
-                        else
-                            button = hitButton ? ReplayButtonState.Right1 : ReplayButtonState.Right2;
+                        actions = h.IsStrong
+                            ? new[] { TaikoAction.LeftCentre, TaikoAction.RightCentre }
+                            : new[] { hitButton ? TaikoAction.LeftCentre : TaikoAction.RightCentre };
                     }
                     else
                     {
-                        if (h.IsStrong)
-                            button = ReplayButtonState.Left1 | ReplayButtonState.Left2;
-                        else
-                            button = hitButton ? ReplayButtonState.Left1 : ReplayButtonState.Left2;
+                        actions = h.IsStrong
+                            ? new[] { TaikoAction.LeftRim, TaikoAction.RightRim }
+                            : new[] { hitButton ? TaikoAction.LeftRim : TaikoAction.RightRim };
                     }
 
-                    Frames.Add(new ReplayFrame(h.StartTime, null, null, button));
+                    Frames.Add(new TaikoReplayFrame(h.StartTime, actions));
                 }
                 else
                     throw new InvalidOperationException("Unknown hit object type.");
 
-                Frames.Add(new ReplayFrame(endTime + KEY_UP_DELAY, null, null, ReplayButtonState.None));
+                Frames.Add(new TaikoReplayFrame(endTime + KEY_UP_DELAY));
 
                 if (i < Beatmap.HitObjects.Count - 1)
                 {
                     double waitTime = Beatmap.HitObjects[i + 1].StartTime - 1000;
                     if (waitTime > endTime)
-                        Frames.Add(new ReplayFrame(waitTime, null, null, ReplayButtonState.None));
+                        Frames.Add(new TaikoReplayFrame(waitTime));
                 }
 
                 hitButton = !hitButton;

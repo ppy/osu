@@ -1,7 +1,7 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -25,10 +25,10 @@ namespace osu.Game.Screens.Select.Details
                 if (value == metrics) return;
                 metrics = value;
 
-                var retries = Metrics.Retries;
-                var fails = Metrics.Fails;
+                var retries = Metrics?.Retries ?? new int[0];
+                var fails = Metrics?.Fails ?? new int[0];
 
-                float maxValue = fails.Zip(retries, (fail, retry) => fail + retry).Max();
+                float maxValue = fails.Any() ? fails.Zip(retries, (fail, retry) => fail + retry).Max() : 0;
                 failGraph.MaxValue = maxValue;
                 retryGraph.MaxValue = maxValue;
 

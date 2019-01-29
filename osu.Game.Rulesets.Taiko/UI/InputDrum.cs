@@ -1,15 +1,17 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using OpenTK;
+using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Bindings;
+using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
+using osu.Game.Rulesets.Taiko.Audio;
 
 namespace osu.Game.Rulesets.Taiko.UI
 {
@@ -18,16 +20,26 @@ namespace osu.Game.Rulesets.Taiko.UI
     /// </summary>
     internal class InputDrum : Container
     {
-        public InputDrum()
+        private const float middle_split = 0.025f;
+
+        private readonly ControlPointInfo controlPoints;
+
+        public InputDrum(ControlPointInfo controlPoints)
         {
+            this.controlPoints = controlPoints;
+
             RelativeSizeAxes = Axes.Both;
             FillMode = FillMode.Fit;
+        }
 
-            const float middle_split = 0.025f;
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            var sampleMappings = new DrumSampleMapping(controlPoints);
 
             Children = new Drawable[]
             {
-                new TaikoHalfDrum(false)
+                new TaikoHalfDrum(false, sampleMappings)
                 {
                     Name = "Left Half",
                     Anchor = Anchor.Centre,
@@ -38,7 +50,7 @@ namespace osu.Game.Rulesets.Taiko.UI
                     RimAction = TaikoAction.LeftRim,
                     CentreAction = TaikoAction.LeftCentre
                 },
-                new TaikoHalfDrum(true)
+                new TaikoHalfDrum(true, sampleMappings)
                 {
                     Name = "Right Half",
                     Anchor = Anchor.Centre,
@@ -50,6 +62,8 @@ namespace osu.Game.Rulesets.Taiko.UI
                     CentreAction = TaikoAction.RightCentre
                 }
             };
+
+            AddRangeInternal(sampleMappings.Sounds);
         }
 
         /// <summary>
@@ -72,8 +86,12 @@ namespace osu.Game.Rulesets.Taiko.UI
             private readonly Sprite centre;
             private readonly Sprite centreHit;
 
-            public TaikoHalfDrum(bool flipped)
+            private readonly DrumSampleMapping sampleMappings;
+
+            public TaikoHalfDrum(bool flipped, DrumSampleMapping sampleMappings)
             {
+                this.sampleMappings = sampleMappings;
+
                 Masking = true;
 
                 Children = new Drawable[]
@@ -128,15 +146,21 @@ namespace osu.Game.Rulesets.Taiko.UI
                 Drawable target = null;
                 Drawable back = null;
 
+                var drumSample = sampleMappings.SampleAt(Time.Current);
+
                 if (action == CentreAction)
                 {
                     target = centreHit;
                     back = centre;
+
+                    drumSample.Centre?.Play();
                 }
                 else if (action == RimAction)
                 {
                     target = rimHit;
                     back = rim;
+
+                    drumSample.Rim?.Play();
                 }
 
                 if (target != null)

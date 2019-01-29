@@ -1,125 +1,13 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F167E17A-7DE6-4AF5-B920-A5112296C695}</ProjectGuid>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\osu.Game.props" />
+  <PropertyGroup Label="Project">
+    <TargetFramework>netstandard2.0</TargetFramework>
     <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>osu.Game.Rulesets.Taiko</RootNamespace>
-    <AssemblyName>osu.Game.Rulesets.Taiko</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Description>bash the drum. to the beat.</Description>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <LangVersion>6</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\OpenTK.3.0.0-git00009\lib\net20\OpenTK.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
+  <ItemGroup Label="Project References">
+    <ProjectReference Include="..\osu.Game\osu.Game.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Beatmaps\TaikoBeatmapConverter.cs" />
-    <Compile Include="Judgements\TaikoDrumRollTickJudgement.cs" />
-    <Compile Include="Judgements\TaikoStrongHitJudgement.cs" />
-    <Compile Include="Judgements\TaikoJudgement.cs" />
-    <Compile Include="Objects\BarLine.cs" />
-    <Compile Include="Objects\Drawables\DrawableBarLine.cs" />
-    <Compile Include="Objects\Drawables\DrawableBarLineMajor.cs" />
-    <Compile Include="Objects\CentreHit.cs" />
-    <Compile Include="Objects\Drawables\DrawableRimHit.cs" />
-    <Compile Include="Objects\Drawables\DrawableRimHitStrong.cs" />
-    <Compile Include="Objects\Drawables\DrawableCentreHit.cs" />
-    <Compile Include="Objects\Drawables\DrawableHit.cs" />
-    <Compile Include="Objects\Drawables\DrawableCentreHitStrong.cs" />
-    <Compile Include="Objects\Drawables\DrawableHitStrong.cs" />
-    <Compile Include="Objects\Drawables\Pieces\ElongatedCirclePiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\CentreHitSymbolPiece.cs" />
-    <Compile Include="Objects\Drawables\DrawableDrumRoll.cs" />
-    <Compile Include="Objects\Drawables\DrawableDrumRollTick.cs" />
-    <Compile Include="Objects\Drawables\DrawableSwell.cs" />
-    <Compile Include="Objects\Drawables\DrawableTaikoHitObject.cs" />
-    <Compile Include="Objects\Drawables\Pieces\RimHitSymbolPiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\CirclePiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\SwellSymbolPiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\TaikoPiece.cs" />
-    <Compile Include="Objects\Drawables\Pieces\TickPiece.cs" />
-    <Compile Include="Objects\DrumRoll.cs" />
-    <Compile Include="Objects\DrumRollTick.cs" />
-    <Compile Include="Objects\Hit.cs" />
-    <Compile Include="Objects\RimHit.cs" />
-    <Compile Include="Objects\Swell.cs" />
-    <Compile Include="Replays\TaikoFramedReplayInputHandler.cs" />
-    <Compile Include="Replays\TaikoAutoGenerator.cs" />
-    <Compile Include="Objects\TaikoHitObject.cs" />
-    <Compile Include="Objects\TaikoHitObjectDifficulty.cs" />
-    <Compile Include="TaikoDifficultyCalculator.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scoring\TaikoScoreProcessor.cs" />
-    <Compile Include="TaikoInputManager.cs" />
-    <Compile Include="Tests\TestCaseTaikoPlayfield.cs" />
-    <Compile Include="UI\HitTarget.cs" />
-    <Compile Include="UI\InputDrum.cs" />
-    <Compile Include="UI\KiaiHitExplosion.cs" />
-    <Compile Include="UI\DrawableTaikoJudgement.cs" />
-    <Compile Include="UI\HitExplosion.cs" />
-    <Compile Include="UI\TaikoRulesetContainer.cs" />
-    <Compile Include="UI\TaikoPlayfield.cs" />
-    <Compile Include="TaikoRuleset.cs" />
-    <Compile Include="Mods\TaikoMod.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\osu.licenseheader">
-      <Link>osu.licenseheader</Link>
-    </None>
-    <None Include="app.config" />
-    <None Include="OpenTK.dll.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
-      <Project>{C76BF5B3-985E-4D39-95FE-97C9C879B83A}</Project>
-      <Name>osu.Framework</Name>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
-      <Name>osu.Game</Name>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

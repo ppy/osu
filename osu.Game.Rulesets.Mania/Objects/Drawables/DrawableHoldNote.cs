@@ -1,17 +1,15 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Linq;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
-using OpenTK.Graphics;
-using OpenTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Mania.Judgements;
-using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input.Bindings;
+using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI.Scrolling;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -20,13 +18,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
     /// </summary>
     public class DrawableHoldNote : DrawableManiaHitObject<HoldNote>, IKeyBindingHandler<ManiaAction>
     {
-        private readonly DrawableNote head;
-        private readonly DrawableNote tail;
+        public override bool DisplayResult => false;
 
-        private readonly GlowPiece glowPiece;
+        public readonly DrawableNote Head;
+        public readonly DrawableNote Tail;
+
         private readonly BodyPiece bodyPiece;
-        private readonly Container<DrawableHoldNoteTick> tickContainer;
-        private readonly Container fullHeightContainer;
 
         /// <summary>
         /// Time at which the user started holding this hold note. Null if the user is not holding this hold note.
@@ -38,58 +35,51 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private bool hasBroken;
 
-        public DrawableHoldNote(HoldNote hitObject, ManiaAction action)
-            : base(hitObject, action)
-        {
-            RelativeSizeAxes = Axes.Both;
-            Height = (float)HitObject.Duration;
+        private readonly Container<DrawableHoldNoteTick> tickContainer;
 
-            AddRange(new Drawable[]
+        public DrawableHoldNote(HoldNote hitObject)
+            : base(hitObject)
+        {
+            RelativeSizeAxes = Axes.X;
+
+            InternalChildren = new Drawable[]
             {
-                // The hit object itself cannot be used for various elements because the tail overshoots it
-                // So a specialized container that is updated to contain the tail height is used
-                fullHeightContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.X,
-                    Child = glowPiece = new GlowPiece()
-                },
                 bodyPiece = new BodyPiece
                 {
-                    Anchor = Anchor.TopCentre,
-                    Origin = Anchor.TopCentre,
                     RelativeSizeAxes = Axes.X,
                 },
                 tickContainer = new Container<DrawableHoldNoteTick>
                 {
                     RelativeSizeAxes = Axes.Both,
-                    RelativeChildOffset = new Vector2(0, (float)HitObject.StartTime),
-                    RelativeChildSize = new Vector2(1, (float)HitObject.Duration)
+                    ChildrenEnumerable = HitObject.NestedHitObjects.OfType<HoldNoteTick>().Select(tick => new DrawableHoldNoteTick(tick)
+                    {
+                        HoldStartTime = () => holdStartTime
+                    })
                 },
-                head = new DrawableHeadNote(this, action)
+                Head = new DrawableHeadNote(this)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 },
-                tail = new DrawableTailNote(this, action)
+                Tail = new DrawableTailNote(this)
                 {
-                    Anchor = Anchor.BottomCentre,
+                    Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre
                 }
-            });
+            };
 
-            foreach (var tick in HitObject.Ticks)
-            {
-                var drawableTick = new DrawableHoldNoteTick(tick)
-                {
-                    HoldStartTime = () => holdStartTime
-                };
+            foreach (var tick in tickContainer)
+                AddNested(tick);
 
-                tickContainer.Add(drawableTick);
-                AddNested(drawableTick);
-            }
+            AddNested(Head);
+            AddNested(Tail);
+        }
 
-            AddNested(head);
-            AddNested(tail);
+        protected override void OnDirectionChanged(ScrollingDirection direction)
+        {
+            base.OnDirectionChanged(direction);
+
+            bodyPiece.Anchor = bodyPiece.Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
         }
 
         public override Color4 AccentColour
@@ -97,21 +87,19 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             get { return base.AccentColour; }
             set
             {
-                if (base.AccentColour == value)
-                    return;
                 base.AccentColour = value;
 
-                tickContainer.Children.ForEach(t => t.AccentColour = value);
-
-                glowPiece.AccentColour = value;
                 bodyPiece.AccentColour = value;
-                head.AccentColour = value;
-                tail.AccentColour = value;
+                Head.AccentColour = value;
+                Tail.AccentColour = value;
+                tickContainer.ForEach(t => t.AccentColour = value);
             }
         }
 
-        protected override void UpdateState(ArmedState state)
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
         {
+            if (Tail.AllJudged)
+                ApplyResult(r => r.Type = HitResult.Perfect);
         }
 
         protected override void Update()
@@ -119,12 +107,20 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             base.Update();
 
             // Make the body piece not lie under the head note
-            bodyPiece.Y = head.Height;
-            bodyPiece.Height = DrawHeight - head.Height;
+            bodyPiece.Y = (Direction.Value == ScrollingDirection.Up ? 1 : -1) * Head.Height / 2;
+            bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
+        }
 
-            // Make the fullHeightContainer "contain" the height of the tail note, keeping in mind
-            // that the tail note overshoots the height of this hit object
-            fullHeightContainer.Height = DrawHeight + tail.Height;
+        protected void BeginHold()
+        {
+            holdStartTime = Time.Current;
+            bodyPiece.Hitting = true;
+        }
+
+        protected void EndHold()
+        {
+            holdStartTime = null;
+            bodyPiece.Hitting = false;
         }
 
         public bool OnPressed(ManiaAction action)
@@ -133,14 +129,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (Time.Current < HitObject.StartTime || Time.Current > HitObject.EndTime)
                 return false;
 
-            if (action != Action)
+            if (action != Action.Value)
                 return false;
 
             // The user has pressed during the body of the hold note, after the head note and its hit windows have passed
             // and within the limited range of the above if-statement. This state will be managed by the head note if the
             // user has pressed during the hit windows of the head note.
-            holdStartTime = Time.Current;
-
+            BeginHold();
             return true;
         }
 
@@ -150,13 +145,13 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (!holdStartTime.HasValue)
                 return false;
 
-            if (action != Action)
+            if (action != Action.Value)
                 return false;
 
-            holdStartTime = null;
+            EndHold();
 
             // If the key has been released too early, the user should not receive full score for the release
-            if (!tail.AllJudged)
+            if (!Tail.IsHit)
                 hasBroken = true;
 
             return true;
@@ -169,19 +164,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         {
             private readonly DrawableHoldNote holdNote;
 
-            public DrawableHeadNote(DrawableHoldNote holdNote, ManiaAction action)
-                : base(holdNote.HitObject.Head, action)
+            public DrawableHeadNote(DrawableHoldNote holdNote)
+                : base(holdNote.HitObject.Head)
             {
                 this.holdNote = holdNote;
-
-                RelativePositionAxes = Axes.None;
-                Y = 0;
-
-                // Life time managed by the parent DrawableHoldNote
-                LifetimeStart = double.MinValue;
-                LifetimeEnd = double.MaxValue;
-
-                GlowPiece.Alpha = 0;
             }
 
             public override bool OnPressed(ManiaAction action)
@@ -190,12 +176,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     return false;
 
                 // If the key has been released too early, the user should not receive full score for the release
-                if (Judgements.Any(j => j.Result == HitResult.Miss))
+                if (Result.Type == HitResult.Miss)
                     holdNote.hasBroken = true;
 
                 // The head note also handles early hits before the body, but we want accurate early hits to count as the body being held
                 // The body doesn't handle these early early hits, so we have to explicitly set the holding state here
-                holdNote.holdStartTime = Time.Current;
+                holdNote.BeginHold();
 
                 return true;
             }
@@ -206,48 +192,44 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
         /// </summary>
         private class DrawableTailNote : DrawableNote
         {
+            /// <summary>
+            /// Lenience of release hit windows. This is to make cases where the hold note release
+            /// is timed alongside presses of other hit objects less awkward.
+            /// Todo: This shouldn't exist for non-LegacyBeatmapDecoder beatmaps
+            /// </summary>
+            private const double release_window_lenience = 1.5;
+
             private readonly DrawableHoldNote holdNote;
 
-            public DrawableTailNote(DrawableHoldNote holdNote, ManiaAction action)
-                : base(holdNote.HitObject.Tail, action)
+            public DrawableTailNote(DrawableHoldNote holdNote)
+                : base(holdNote.HitObject.Tail)
             {
                 this.holdNote = holdNote;
-
-                RelativePositionAxes = Axes.None;
-                Y = 0;
-
-                // Life time managed by the parent DrawableHoldNote
-                LifetimeStart = double.MinValue;
-                LifetimeEnd = double.MaxValue;
-
-                GlowPiece.Alpha = 0;
             }
 
-            protected override void CheckForJudgements(bool userTriggered, double timeOffset)
+            protected override void CheckForResult(bool userTriggered, double timeOffset)
             {
+                // Factor in the release lenience
+                timeOffset /= release_window_lenience;
+
                 if (!userTriggered)
                 {
-                    if (timeOffset > HitObject.HitWindows.Bad / 2)
-                    {
-                        AddJudgement(new HoldNoteTailJudgement
-                        {
-                            Result = HitResult.Miss,
-                            HasBroken = holdNote.hasBroken
-                        });
-                    }
+                    if (!HitObject.HitWindows.CanBeHit(timeOffset))
+                        ApplyResult(r => r.Type = HitResult.Miss);
 
                     return;
                 }
 
-                double offset = Math.Abs(timeOffset);
-
-                if (offset > HitObject.HitWindows.Miss / 2)
+                var result = HitObject.HitWindows.ResultFor(timeOffset);
+                if (result == HitResult.None)
                     return;
 
-                AddJudgement(new HoldNoteTailJudgement
+                ApplyResult(r =>
                 {
-                    Result = HitObject.HitWindows.ResultFor(offset) ?? HitResult.Miss,
-                    HasBroken = holdNote.hasBroken
+                    if (holdNote.hasBroken && (result == HitResult.Perfect || result == HitResult.Perfect))
+                        result = HitResult.Good;
+
+                    r.Type = result;
                 });
             }
 
@@ -259,10 +241,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                 if (!holdNote.holdStartTime.HasValue)
                     return false;
 
-                if (action != Action)
+                if (action != Action.Value)
                     return false;
 
-                UpdateJudgement(true);
+                UpdateResult(true);
 
                 // Handled by the hold note, which will set holding = false
                 return false;

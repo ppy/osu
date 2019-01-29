@@ -1,7 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Graphics;
 using osu.Game.Online.API.Requests;
+using osu.Game.Overlays.Profile.Sections.Historical;
 using osu.Game.Overlays.Profile.Sections.Ranks;
 
 namespace osu.Game.Overlays.Profile.Sections
@@ -14,7 +16,11 @@ namespace osu.Game.Overlays.Profile.Sections
 
         public HistoricalSection()
         {
-            Child = new PaginatedScoreContainer(ScoreType.Recent, User, "Recent Plays (24h)", "No performance records. :(");
+            Children = new Drawable[]
+            {
+                new PaginatedMostPlayedBeatmapContainer(User),
+                new PaginatedScoreContainer(ScoreType.Recent, User, "Recent Plays (24h)", "No performance records. :("),
+            };
         }
     }
 }

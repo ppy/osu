@@ -1,8 +1,9 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using OpenTK;
+using osu.Framework.Allocation;
+using osuTK;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,7 +16,7 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
     /// </summary>
     public abstract class TimelinePart : CompositeDrawable
     {
-        public Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        protected readonly IBindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
 
         private readonly Container timeline;
 
@@ -28,6 +29,12 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
                 updateRelativeChildSize();
                 LoadBeatmap(b);
             };
+        }
+
+        [BackgroundDependencyLoader]
+        private void load(IBindableBeatmap beatmap)
+        {
+            Beatmap.BindTo(beatmap);
         }
 
         private void updateRelativeChildSize()

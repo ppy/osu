@@ -1,32 +1,33 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
-using osu.Game.Rulesets.Osu.Judgements;
+using osu.Framework.Configuration;
 using osu.Game.Screens.Ranking;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
     public class DrawableSpinner : DrawableOsuHitObject
     {
-        private readonly Spinner spinner;
+        protected readonly Spinner Spinner;
 
-        private readonly SpinnerDisc disc;
-        private readonly SpinnerTicks ticks;
+        public readonly SpinnerDisc Disc;
+        public readonly SpinnerTicks Ticks;
         private readonly SpinnerSpmCounter spmCounter;
 
         private readonly Container mainContainer;
 
-        private readonly SpinnerBackground background;
+        public readonly SpinnerBackground Background;
         private readonly Container circleContainer;
         private readonly CirclePiece circle;
         private readonly GlowPiece glow;
@@ -35,6 +36,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
         private readonly Color4 baseColour = OsuColour.FromHex(@"002c3c");
         private readonly Color4 fillColour = OsuColour.FromHex(@"005b7c");
+
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
 
         private Color4 normalColour;
         private Color4 completeColour;
@@ -49,9 +52,9 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             // we are slightly bigger than our parent, to clip the top and bottom of the circle
             Height = 1.3f;
 
-            spinner = s;
+            Spinner = s;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 circleContainer = new Container
                 {
@@ -82,22 +85,22 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.Y,
-                    Children = new Drawable[]
+                    Children = new[]
                     {
-                        background = new SpinnerBackground
+                        Background = new SpinnerBackground
                         {
                             Alpha = 0.6f,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
-                        disc = new SpinnerDisc(spinner)
+                        Disc = new SpinnerDisc(Spinner)
                         {
                             Scale = Vector2.Zero,
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                         },
                         circleContainer.CreateProxy(),
-                        ticks = new SpinnerTicks
+                        Ticks = new SpinnerTicks
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
@@ -114,59 +117,65 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             };
         }
 
-        public float Progress => MathHelper.Clamp(disc.RotationAbsolute / 360 / spinner.SpinsRequired, 0, 1);
-
-        protected override void CheckForJudgements(bool userTriggered, double timeOffset)
-        {
-            if (Time.Current < HitObject.StartTime) return;
-
-            if (Progress >= 1 && !disc.Complete)
-            {
-                disc.Complete = true;
-
-                const float duration = 200;
-
-                disc.FadeAccent(completeColour, duration);
-
-                background.FadeAccent(completeColour, duration);
-                background.FadeOut(duration);
-
-                circle.FadeColour(completeColour, duration);
-                glow.FadeColour(completeColour, duration);
-            }
-
-            if (!userTriggered && Time.Current >= spinner.EndTime)
-            {
-                if (Progress >= 1)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Great });
-                else if (Progress > .9)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Good });
-                else if (Progress > .75)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Meh });
-                else if (Time.Current >= spinner.EndTime)
-                    AddJudgement(new OsuJudgement { Result = HitResult.Miss });
-            }
-        }
-
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             normalColour = baseColour;
 
-            background.AccentColour = normalColour;
+            Background.AccentColour = normalColour;
 
             completeColour = colours.YellowLight.Opacity(0.75f);
 
-            disc.AccentColour = fillColour;
+            Disc.AccentColour = fillColour;
             circle.Colour = colours.BlueDark;
             glow.Colour = colours.BlueDark;
+
+            positionBindable.BindValueChanged(v => Position = v);
+            positionBindable.BindTo(HitObject.PositionBindable);
+        }
+
+        public float Progress => MathHelper.Clamp(Disc.RotationAbsolute / 360 / Spinner.SpinsRequired, 0, 1);
+
+        protected override void CheckForResult(bool userTriggered, double timeOffset)
+        {
+            if (Time.Current < HitObject.StartTime) return;
+
+            if (Progress >= 1 && !Disc.Complete)
+            {
+                Disc.Complete = true;
+
+                const float duration = 200;
+
+                Disc.FadeAccent(completeColour, duration);
+
+                Background.FadeAccent(completeColour, duration);
+                Background.FadeOut(duration);
+
+                circle.FadeColour(completeColour, duration);
+                glow.FadeColour(completeColour, duration);
+            }
+
+            if (userTriggered || Time.Current < Spinner.EndTime)
+                return;
+
+            ApplyResult(r =>
+            {
+                if (Progress >= 1)
+                    r.Type = HitResult.Great;
+                else if (Progress > .9)
+                    r.Type = HitResult.Good;
+                else if (Progress > .75)
+                    r.Type = HitResult.Meh;
+                else if (Time.Current >= Spinner.EndTime)
+                    r.Type = HitResult.Miss;
+            });
         }
 
         protected override void Update()
         {
-            disc.Tracking = OsuActionInputManager.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton);
-            if (!spmCounter.IsPresent && disc.Tracking)
-                spmCounter.FadeIn(TIME_FADEIN);
+            Disc.Tracking = OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false;
+            if (!spmCounter.IsPresent && Disc.Tracking)
+                spmCounter.FadeIn(HitObject.TimeFadeIn);
 
             base.Update();
         }
@@ -175,39 +184,42 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             base.UpdateAfterChildren();
 
-            circle.Rotation = disc.Rotation;
-            ticks.Rotation = disc.Rotation;
-            spmCounter.SetRotation(disc.RotationAbsolute);
+            circle.Rotation = Disc.Rotation;
+            Ticks.Rotation = Disc.Rotation;
+            spmCounter.SetRotation(Disc.RotationAbsolute);
 
-            float relativeCircleScale = spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
-            disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
+            float relativeCircleScale = Spinner.Scale * circle.DrawHeight / mainContainer.DrawHeight;
+            Disc.ScaleTo(relativeCircleScale + (1 - relativeCircleScale) * Progress, 200, Easing.OutQuint);
 
-            symbol.RotateTo(disc.Rotation / 2, 500, Easing.OutQuint);
+            symbol.RotateTo(Disc.Rotation / 2, 500, Easing.OutQuint);
         }
 
         protected override void UpdatePreemptState()
         {
             base.UpdatePreemptState();
 
-            circleContainer.ScaleTo(spinner.Scale * 0.3f);
-            circleContainer.ScaleTo(spinner.Scale, TIME_PREEMPT / 1.4f, Easing.OutQuint);
+            circleContainer.ScaleTo(Spinner.Scale * 0.3f);
+            circleContainer.ScaleTo(Spinner.Scale, HitObject.TimePreempt / 1.4f, Easing.OutQuint);
 
-            disc.RotateTo(-720);
+            Disc.RotateTo(-720);
             symbol.RotateTo(-720);
 
             mainContainer
                 .ScaleTo(0)
-                .ScaleTo(spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, TIME_PREEMPT - 150, Easing.OutQuint)
+                .ScaleTo(Spinner.Scale * circle.DrawHeight / DrawHeight * 1.4f, HitObject.TimePreempt - 150, Easing.OutQuint)
                 .Then()
                 .ScaleTo(1, 500, Easing.OutQuint);
         }
 
         protected override void UpdateCurrentState(ArmedState state)
         {
-            var sequence = this.Delay(spinner.Duration).FadeOut(160);
+            var sequence = this.Delay(Spinner.Duration).FadeOut(160);
 
             switch (state)
             {
+                case ArmedState.Idle:
+                    Expire(true);
+                    break;
                 case ArmedState.Hit:
                     sequence.ScaleTo(Scale * 1.2f, 320, Easing.Out);
                     break;

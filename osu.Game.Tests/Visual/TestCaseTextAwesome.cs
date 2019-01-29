@@ -1,19 +1,19 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Game.Graphics;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
-    internal class TestCaseTextAwesome : OsuTestCase
+    [TestFixture]
+    public class TestCaseTextAwesome : OsuTestCase
     {
-        public override string Description => @"Tests display of icons";
-
         public TestCaseTextAwesome()
         {
             FillFlowContainer flow;

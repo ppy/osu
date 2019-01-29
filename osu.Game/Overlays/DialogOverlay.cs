@@ -1,12 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Overlays.Dialog;
-using OpenTK.Graphics;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays
@@ -15,6 +12,20 @@ namespace osu.Game.Overlays
     {
         private readonly Container dialogContainer;
         private PopupDialog currentDialog;
+
+        public DialogOverlay()
+        {
+            RelativeSizeAxes = Axes.Both;
+
+            Child = dialogContainer = new Container
+            {
+                RelativeSizeAxes = Axes.Both,
+            };
+
+            Width = 0.4f;
+            Anchor = Anchor.BottomCentre;
+            Origin = Anchor.BottomCentre;
+        }
 
         public void Push(PopupDialog dialog)
         {
@@ -29,6 +40,10 @@ namespace osu.Game.Overlays
             currentDialog.StateChanged += state => onDialogOnStateChanged(dialog, state);
             State = Visibility.Visible;
         }
+
+        protected override bool PlaySamplesOnStateChange => false;
+
+        protected override bool BlockNonPositionalInput => true;
 
         private void onDialogOnStateChanged(VisibilityContainer dialog, Visibility v)
         {
@@ -50,32 +65,14 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
-            this.FadeOut(PopupDialog.EXIT_DURATION, Easing.InSine);
-        }
 
-        public DialogOverlay()
-        {
-            RelativeSizeAxes = Axes.Both;
-
-            Children = new Drawable[]
+            if (currentDialog?.State == Visibility.Visible)
             {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Black.Opacity(0.5f),
-                        },
-                    },
-                },
-                dialogContainer = new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-            };
+                currentDialog.Hide();
+                return;
+            }
+
+            this.FadeOut(PopupDialog.EXIT_DURATION, Easing.InSine);
         }
     }
 }

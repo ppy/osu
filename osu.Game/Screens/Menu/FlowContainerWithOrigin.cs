@@ -1,11 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using OpenTK;
-using System.Collections.Generic;
-using System.Linq;
+using osuTK;
 
 namespace osu.Game.Screens.Menu
 {
@@ -21,8 +19,6 @@ namespace osu.Game.Screens.Menu
         public Drawable CentreTarget;
 
         protected override int Compare(Drawable x, Drawable y) => CompareReverseChildID(x, y);
-
-        protected override IEnumerable<Drawable> FlowingChildren => base.FlowingChildren.Reverse();
 
         public override Anchor Origin => Anchor.Custom;
 

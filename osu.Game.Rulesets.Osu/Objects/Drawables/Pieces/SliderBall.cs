@@ -1,13 +1,15 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input;
-using OpenTK;
-using OpenTK.Graphics;
+using osu.Framework.Input.Events;
+using osu.Game.Rulesets.Objects.Types;
+using osuTK.Graphics;
+using osu.Game.Skinning;
+using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {
@@ -16,6 +18,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private const float width = 128;
 
         private Color4 accentColour = Color4.Black;
+
         /// <summary>
         /// The colour that is used for the slider ball.
         /// </summary>
@@ -25,35 +28,48 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             set
             {
                 accentColour = value;
-                if (ball != null)
-                    ball.Colour = value;
+                if (drawableBall != null)
+                    drawableBall.Colour = value;
             }
         }
 
         private readonly Slider slider;
-        private readonly Box follow;
-        private readonly Box ball;
+        public readonly Drawable FollowCircle;
+        private Drawable drawableBall;
+        private readonly DrawableSlider drawableSlider;
 
-        public SliderBall(Slider slider)
+        public SliderBall(Slider slider, DrawableSlider drawableSlider = null)
         {
+            this.drawableSlider = drawableSlider;
             this.slider = slider;
             Masking = true;
             AutoSizeAxes = Axes.Both;
             Blending = BlendingMode.Additive;
             Origin = Anchor.Centre;
-            BorderThickness = 10;
-            BorderColour = Color4.Orange;
 
-            Children = new Drawable[]
+            Children = new[]
             {
-                follow = new Box
+                FollowCircle = new Container
                 {
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    Colour = Color4.Orange,
                     Width = width,
                     Height = width,
                     Alpha = 0,
+                    Child = new SkinnableDrawable("Play/osu/sliderfollowcircle", _ => new CircularContainer
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        BorderThickness = 5,
+                        BorderColour = Color4.Orange,
+                        Blending = BlendingMode.Additive,
+                        Child = new Box
+                        {
+                            Colour = Color4.Orange,
+                            RelativeSizeAxes = Axes.Both,
+                            Alpha = 0.2f,
+                        }
+                    }),
                 },
                 new CircularContainer
                 {
@@ -61,54 +77,60 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     AutoSizeAxes = Axes.Both,
                     Origin = Anchor.Centre,
                     Anchor = Anchor.Centre,
-                    BorderThickness = 10,
-                    BorderColour = Color4.White,
                     Alpha = 1,
-                    Children = new[]
+                    Child = new Container
                     {
-                        ball = new Box
+                        Width = width,
+                        Height = width,
+                        // TODO: support skin filename animation (sliderb0, sliderb1...)
+                        Child = new SkinnableDrawable("Play/osu/sliderb", _ => new CircularContainer
                         {
-                            Colour = AccentColour,
-                            Alpha = 0.4f,
-                            Width = width,
-                            Height = width,
-                        },
+                            Masking = true,
+                            RelativeSizeAxes = Axes.Both,
+                            BorderThickness = 10,
+                            BorderColour = Color4.White,
+                            Alpha = 1,
+                            Child = drawableBall = new Box
+                            {
+                                Colour = AccentColour,
+                                RelativeSizeAxes = Axes.Both,
+                                Alpha = 0.4f,
+                            }
+                        }),
                     }
                 }
             };
         }
 
-        private InputState lastState;
+        private Vector2? lastScreenSpaceMousePosition;
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            lastState = state;
-            return base.OnMouseDown(state, args);
+            lastScreenSpaceMousePosition = e.ScreenSpaceMousePosition;
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
-            lastState = state;
-            return base.OnMouseUp(state, args);
+            lastScreenSpaceMousePosition = e.ScreenSpaceMousePosition;
+            return base.OnMouseUp(e);
         }
 
-        protected override bool OnMouseMove(InputState state)
+        protected override bool OnMouseMove(MouseMoveEvent e)
         {
-            lastState = state;
-            return base.OnMouseMove(state);
+            lastScreenSpaceMousePosition = e.ScreenSpaceMousePosition;
+            return base.OnMouseMove(e);
         }
 
-        // If the current time is between the start and end of the slider, we should track mouse input regardless of the cursor position.
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => canCurrentlyTrack || base.ReceiveMouseInputAt(screenSpacePos);
-
-        public override void ClearTransforms(bool propagateChildren = false, string targetMember = null)
+        public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
         {
             // Consider the case of rewinding - children's transforms are handled internally, so propagating down
             // any further will cause weirdness with the Tracking bool below. Let's not propagate further at this point.
-            base.ClearTransforms(false, targetMember);
+            base.ClearTransformsAfter(time, false, targetMember);
         }
 
         private bool tracking;
+
         public bool Tracking
         {
             get { return tracking; }
@@ -118,8 +140,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     return;
                 tracking = value;
 
-                follow.ScaleTo(tracking ? 2.8f : 1, 300, Easing.OutQuint);
-                follow.FadeTo(tracking ? 0.2f : 0, 300, Easing.OutQuint);
+                FollowCircle.ScaleTo(tracking ? 2f : 1, 300, Easing.OutQuint);
+                FollowCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
         }
 
@@ -129,16 +151,19 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         {
             base.Update();
 
-            // Make sure to use the base version of ReceiveMouseInputAt so that we correctly check the position.
-            Tracking = canCurrentlyTrack
-                        && lastState != null
-                        && base.ReceiveMouseInputAt(lastState.Mouse.NativeState.Position)
-                        && ((Parent as DrawableSlider)?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+            if (Time.Current < slider.EndTime)
+            {
+                // Make sure to use the base version of ReceivePositionalInputAt so that we correctly check the position.
+                Tracking = canCurrentlyTrack
+                           && lastScreenSpaceMousePosition.HasValue
+                           && ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value)
+                           && (drawableSlider?.OsuActionInputManager?.PressedActions.Any(x => x == OsuAction.LeftButton || x == OsuAction.RightButton) ?? false);
+            }
         }
 
-        public void UpdateProgress(double progress, int repeat)
+        public void UpdateProgress(double completionProgress)
         {
-            Position = slider.Curve.PositionAt(progress);
+            Position = slider.CurvePositionAt(completionProgress);
         }
     }
 }

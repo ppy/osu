@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -13,8 +13,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
-using osu.Framework.Input;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
+using osu.Game.Configuration;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Select
@@ -28,6 +29,7 @@ namespace osu.Game.Screens.Select
         private readonly TabControl<GroupMode> groupTabs;
 
         private SortMode sort = SortMode.Title;
+
         public SortMode Sort
         {
             get { return sort; }
@@ -42,6 +44,7 @@ namespace osu.Game.Screens.Select
         }
 
         private GroupMode group = GroupMode.All;
+
         public GroupMode Group
         {
             get { return group; }
@@ -60,20 +63,22 @@ namespace osu.Game.Screens.Select
             Group = group,
             Sort = sort,
             SearchText = searchTextBox.Text,
-            Ruleset = ruleset
+            AllowConvertedBeatmaps = showConverted,
+            Ruleset = ruleset.Value
         };
 
         public Action Exit;
 
         private readonly SearchTextBox searchTextBox;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => base.ReceiveMouseInputAt(screenSpacePos) || groupTabs.ReceiveMouseInputAt(screenSpacePos) || sortTabs.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            base.ReceivePositionalInputAt(screenSpacePos) || groupTabs.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
 
         public FilterControl()
         {
             Children = new Drawable[]
             {
-                new Box
+                Background = new Box
                 {
                     Colour = Color4.Black,
                     Alpha = 0.8f,
@@ -161,25 +166,30 @@ namespace osu.Game.Screens.Select
             searchTextBox.HoldFocus = true;
         }
 
-        private readonly Bindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+        private readonly IBindable<RulesetInfo> ruleset = new Bindable<RulesetInfo>();
+
+        private Bindable<bool> showConverted;
+
+        public readonly Box Background;
 
         [BackgroundDependencyLoader(permitNulls: true)]
-        private void load(OsuColour colours, OsuGame osu)
+        private void load(OsuColour colours, IBindable<RulesetInfo> parentRuleset, OsuConfigManager config)
         {
             sortTabs.AccentColour = colours.GreenLight;
 
-            if (osu != null)
-                ruleset.BindTo(osu.Ruleset);
-            ruleset.ValueChanged += val => FilterChanged?.Invoke(CreateCriteria());
-            ruleset.TriggerChange();
+            showConverted = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
+            showConverted.ValueChanged += val => updateCriteria();
+
+            ruleset.BindTo(parentRuleset);
+            ruleset.BindValueChanged(_ => updateCriteria(), true);
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
 
-        protected override bool OnMouseMove(InputState state) => true;
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
 
-        protected override bool OnClick(InputState state) => true;
+        protected override bool OnMouseMove(MouseMoveEvent e) => true;
 
-        protected override bool OnDragStart(InputState state) => true;
+        protected override bool OnClick(ClickEvent e) => true;
     }
 }

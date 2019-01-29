@@ -1,151 +1,21 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{54377672-20B1-40AF-8087-5CF73BF3953A}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>osu.Game.Tests</RootNamespace>
-    <AssemblyName>osu.Game.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\osu.TestProject.props" />
+  <ItemGroup Label="Package References">
+    <PackageReference Include="Appveyor.TestLogger" Version="2.0.0" />
+    <PackageReference Include="DeepEqual" Version="2.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="NUnit" Version="3.11.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="3.12.0" />
+    <PackageReference Update="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.4" />
+  </ItemGroup>
+  <PropertyGroup Label="Project">
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <LangVersion>6</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.8.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\NUnit.3.8.1\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="OpenTK, Version=3.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>$(SolutionDir)\packages\OpenTK.3.0.0-git00009\lib\net20\OpenTK.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51">
-      <HintPath>$(SolutionDir)\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+  <ItemGroup Label="Project References">
+    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj" />
+    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="..\osu.licenseheader">
-      <Link>osu.licenseheader</Link>
-    </None>
-    <None Include="app.config" />
-    <None Include="packages.config" />
-    <None Include="OpenTK.dll.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\osu-framework\osu.Framework\osu.Framework.csproj">
-      <Project>{c76bf5b3-985e-4d39-95fe-97c9c879b83a}</Project>
-      <Name>osu.Framework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Osu\osu.Game.Rulesets.Osu.csproj">
-      <Project>{c92a607b-1fdd-4954-9f92-03ff547d9080}</Project>
-      <Name>osu.Game.Rulesets.Osu</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj">
-      <Project>{58f6c80c-1253-4a0e-a465-b8c85ebeadf3}</Project>
-      <Name>osu.Game.Rulesets.Catch</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Mania\osu.Game.Rulesets.Mania.csproj">
-      <Project>{48f4582b-7687-4621-9cbe-5c24197cb536}</Project>
-      <Name>osu.Game.Rulesets.Mania</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game.Rulesets.Taiko\osu.Game.Rulesets.Taiko.csproj">
-      <Project>{f167e17a-7de6-4af5-b920-a5112296c695}</Project>
-      <Name>osu.Game.Rulesets.Taiko</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu.Game\osu.Game.csproj">
-      <Project>{2a66dd92-adb1-4994-89e2-c94e04acda0d}</Project>
-      <Name>osu.Game</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
-      <Project>{D9A367C9-4C1A-489F-9B05-A0CEA2B53B58}</Project>
-      <Name>osu.Game.Resources</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Beatmaps\IO\OszArchiveReaderTest.cs" />
-    <Compile Include="Beatmaps\IO\ImportBeatmapTest.cs" />
-    <Compile Include="Resources\Resource.cs" />
-    <Compile Include="Beatmaps\Formats\OsuLegacyDecoderTest.cs" />
-    <Compile Include="Visual\TestCaseBeatmapDetailArea.cs" />
-    <Compile Include="Visual\TestCaseBeatmapDetails.cs" />
-    <Compile Include="Visual\TestCaseBeatmapOptionsOverlay.cs" />
-    <Compile Include="Visual\TestCaseBeatmapScoresContainer.cs" />
-    <Compile Include="Visual\TestCaseBeatmapSetOverlay.cs" />
-    <Compile Include="Visual\TestCaseBeatSyncedContainer.cs" />
-    <Compile Include="Visual\TestCaseBreadcrumbs.cs" />
-    <Compile Include="Visual\TestCaseBreakOverlay.cs" />
-    <Compile Include="Visual\TestCaseChatDisplay.cs" />
-    <Compile Include="Visual\TestCaseContextMenu.cs" />
-    <Compile Include="Visual\TestCaseDialogOverlay.cs" />
-    <Compile Include="Visual\TestCaseDirect.cs" />
-    <Compile Include="Visual\TestCaseDrawableRoom.cs" />
-    <Compile Include="Visual\TestCaseDrawings.cs" />
-    <Compile Include="Visual\TestCaseEditor.cs" />
-    <Compile Include="Visual\TestCaseEditorComposeTimeline.cs" />
-    <Compile Include="Visual\TestCaseEditorMenuBar.cs" />
-    <Compile Include="Visual\TestCaseEditorSummaryTimeline.cs" />
-    <Compile Include="Visual\TestCaseGamefield.cs" />
-    <Compile Include="Visual\TestCaseGraph.cs" />
-    <Compile Include="Visual\TestCaseIconButton.cs" />
-    <Compile Include="Visual\TestCaseIntroSequence.cs" />
-    <Compile Include="Visual\TestCaseKeyConfiguration.cs" />
-    <Compile Include="Visual\TestCaseKeyCounter.cs" />
-    <Compile Include="Visual\TestCaseLeaderboard.cs" />
-    <Compile Include="Visual\TestCaseMedalOverlay.cs" />
-    <Compile Include="Visual\TestCaseMenuButtonSystem.cs" />
-    <Compile Include="Visual\TestCaseMenuOverlays.cs" />
-    <Compile Include="Visual\TestCaseMods.cs" />
-    <Compile Include="Visual\TestCaseMusicController.cs" />
-    <Compile Include="Visual\TestCaseNotificationOverlay.cs" />
-    <Compile Include="Visual\TestCaseOnScreenDisplay.cs" />
-    <Compile Include="Visual\TestCaseAllPlayers.cs" />
-    <Compile Include="Visual\TestCaseOsuGame.cs" />
-    <Compile Include="Visual\TestCasePlaySongSelect.cs" />
-    <Compile Include="Visual\TestCaseReplay.cs" />
-    <Compile Include="Visual\TestCaseReplaySettingsOverlay.cs" />
-    <Compile Include="Visual\TestCaseResults.cs" />
-    <Compile Include="Visual\TestCaseRoomInspector.cs" />
-    <Compile Include="Visual\TestCaseScoreCounter.cs" />
-    <Compile Include="Visual\TestCaseScrollingPlayfield.cs" />
-    <Compile Include="Visual\TestCaseSettings.cs" />
-    <Compile Include="Visual\TestCaseSkipButton.cs" />
-    <Compile Include="Visual\TestCaseSocial.cs" />
-    <Compile Include="Visual\TestCaseSongProgress.cs" />
-    <Compile Include="Visual\TestCaseStoryboard.cs" />
-    <Compile Include="Visual\TestCaseTabControl.cs" />
-    <Compile Include="Visual\TestCaseTextAwesome.cs" />
-    <Compile Include="Visual\TestCaseTwoLayerButton.cs" />
-    <Compile Include="Visual\TestCaseUserPanel.cs" />
-    <Compile Include="Visual\TestCaseUserProfile.cs" />
-    <Compile Include="Visual\TestCaseUserRanks.cs" />
-    <Compile Include="Visual\TestCaseWaveform.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\Soleily - Renatus %28Gamu%29 [Insane].osu" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

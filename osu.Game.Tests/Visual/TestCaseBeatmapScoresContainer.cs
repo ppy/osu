@@ -1,29 +1,31 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics;
-using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Users;
 using System.Collections.Generic;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
+using osu.Game.Online.API.Requests.Responses;
+using osu.Game.Rulesets.Osu;
+using osu.Game.Scoring;
 
 namespace osu.Game.Tests.Visual
 {
+    [System.ComponentModel.Description("in BeatmapOverlay")]
     public class TestCaseBeatmapScoresContainer : OsuTestCase
     {
-        public override string Description => "BeatmapOverlay scores container";
-
-        private readonly IEnumerable<OnlineScore> scores;
-        private readonly IEnumerable<OnlineScore> anotherScores;
-        private readonly OnlineScore topScore;
+        private readonly IEnumerable<APIScoreInfo> scores;
+        private readonly IEnumerable<APIScoreInfo> anotherScores;
+        private readonly APIScoreInfo topScoreInfo;
         private readonly Box background;
 
         public TestCaseBeatmapScoresContainer()
@@ -47,16 +49,15 @@ namespace osu.Game.Tests.Visual
 
             AddStep("scores pack 1", () => scoresContainer.Scores = scores);
             AddStep("scores pack 2", () => scoresContainer.Scores = anotherScores);
-            AddStep("only top score", () => scoresContainer.Scores = new[] { topScore });
-            AddStep("remove scores", scoresContainer.CleanAllScores);
-            AddStep("turn on loading", () => scoresContainer.IsLoading = true);
-            AddStep("turn off loading", () => scoresContainer.IsLoading = false);
+            AddStep("only top score", () => scoresContainer.Scores = new[] { topScoreInfo });
+            AddStep("remove scores", () => scoresContainer.Scores = null);
             AddStep("resize to big", () => container.ResizeWidthTo(1, 300));
             AddStep("resize to normal", () => container.ResizeWidthTo(0.8f, 300));
+            AddStep("online scores", () => scoresContainer.Beatmap = new BeatmapInfo { OnlineBeatmapID = 75, Ruleset = new OsuRuleset().RulesetInfo });
 
             scores = new[]
             {
-                new OnlineScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -79,7 +80,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 1234567890,
                     Accuracy = 1,
                 },
-                new OnlineScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -101,7 +102,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 1234789,
                     Accuracy = 0.9997,
                 },
-                new OnlineScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -122,7 +123,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 12345678,
                     Accuracy = 0.9854,
                 },
-                new OnlineScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -142,7 +143,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 1234567,
                     Accuracy = 0.8765,
                 },
-                new OnlineScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -161,14 +162,14 @@ namespace osu.Game.Tests.Visual
             };
             foreach(var s in scores)
             {
-                s.Statistics.Add("300", RNG.Next(2000));
-                s.Statistics.Add("100", RNG.Next(2000));
-                s.Statistics.Add("50", RNG.Next(2000));
+                s.Statistics.Add(HitResult.Great, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Good, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
             }
 
             anotherScores = new[]
             {
-                new OnlineScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -190,7 +191,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 1234789,
                     Accuracy = 0.9997,
                 },
-                new OnlineScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -213,7 +214,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 1234567890,
                     Accuracy = 1,
                 },
-                new OnlineScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -229,7 +230,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 123456,
                     Accuracy = 0.6543,
                 },
-                new OnlineScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -250,7 +251,7 @@ namespace osu.Game.Tests.Visual
                     TotalScore = 12345678,
                     Accuracy = 0.9854,
                 },
-                new OnlineScore
+                new APIScoreInfo
                 {
                     User = new User
                     {
@@ -273,12 +274,12 @@ namespace osu.Game.Tests.Visual
             };
             foreach (var s in anotherScores)
             {
-                s.Statistics.Add("300", RNG.Next(2000));
-                s.Statistics.Add("100", RNG.Next(2000));
-                s.Statistics.Add("50", RNG.Next(2000));
+                s.Statistics.Add(HitResult.Great, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Good, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
             }
 
-            topScore = new OnlineScore
+            topScoreInfo = new APIScoreInfo
             {
                 User = new User
                 {
@@ -300,9 +301,9 @@ namespace osu.Game.Tests.Visual
                 TotalScore = 987654321,
                 Accuracy = 0.8487,
             };
-            topScore.Statistics.Add("300", RNG.Next(2000));
-            topScore.Statistics.Add("100", RNG.Next(2000));
-            topScore.Statistics.Add("50", RNG.Next(2000));
+            topScoreInfo.Statistics.Add(HitResult.Great, RNG.Next(2000));
+            topScoreInfo.Statistics.Add(HitResult.Good, RNG.Next(2000));
+            topScoreInfo.Statistics.Add(HitResult.Meh, RNG.Next(2000));
         }
 
         [BackgroundDependencyLoader]

@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using OpenTK;
+using osuTK;
 using osu.Game.Rulesets.Objects.Drawables;
 
 namespace osu.Game.Rulesets.Taiko.Objects.Drawables
@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
     /// <summary>
     /// A line that scrolls alongside hit objects in the playfield and visualises control points.
     /// </summary>
-    public class DrawableBarLine : DrawableScrollingHitObject<TaikoHitObject>
+    public class DrawableBarLine : DrawableHitObject<TaikoHitObject>
     {
         /// <summary>
         /// The width of the line tracker.
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
             RelativeSizeAxes = Axes.Y;
             Width = tracker_width;
 
-            Children = new[]
+            InternalChildren = new[]
             {
                 Tracker = new Box
                 {

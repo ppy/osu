@@ -1,19 +1,21 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input;
+using osu.Framework.Input.Bindings;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
 using osu.Game.Screens.Ranking;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -96,7 +98,7 @@ namespace osu.Game.Overlays
             });
         }
 
-        private class BackButton : OsuClickableContainer
+        private class BackButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
         {
             private AspectContainer aspect;
 
@@ -135,17 +137,31 @@ namespace osu.Game.Overlays
                 };
             }
 
-            protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+            protected override bool OnMouseDown(MouseDownEvent e)
             {
                 aspect.ScaleTo(0.75f, 2000, Easing.OutQuint);
-                return base.OnMouseDown(state, args);
+                return base.OnMouseDown(e);
             }
 
-            protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+            protected override bool OnMouseUp(MouseUpEvent e)
             {
                 aspect.ScaleTo(1, 1000, Easing.OutElastic);
-                return base.OnMouseUp(state, args);
+                return base.OnMouseUp(e);
             }
+
+            public bool OnPressed(GlobalAction action)
+            {
+                switch (action)
+                {
+                    case GlobalAction.Back:
+                        Click();
+                        return true;
+                }
+
+                return false;
+            }
+
+            public bool OnReleased(GlobalAction action) => false;
         }
     }
 }

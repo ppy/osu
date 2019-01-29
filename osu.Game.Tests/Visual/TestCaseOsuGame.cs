@@ -1,17 +1,18 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Timing;
 using osu.Game.Screens;
 using osu.Game.Screens.Menu;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
+    [TestFixture]
     public class TestCaseOsuGame : OsuTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
@@ -21,19 +22,15 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseOsuGame()
         {
-            var rateAdjustClock = new StopwatchClock(true);
-            var framedClock = new FramedClock(rateAdjustClock);
-            framedClock.ProcessFrame();
-
-            Add(new Box
+            Children = new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
-                Colour = Color4.Black,
-            });
-
-            Add(new Loader());
-
-            AddSliderStep("Playback speed", 0.0, 2.0, 1, v => rateAdjustClock.Rate = v);
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.Black,
+                },
+                new Loader()
+            };
         }
     }
 }

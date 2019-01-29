@@ -1,21 +1,14 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
 using osu.Game.Rulesets.Judgements;
-using osu.Game.Rulesets.Osu.Objects.Drawables;
-using osu.Game.Rulesets.Objects.Drawables;
+using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Osu.Judgements
 {
     public class OsuJudgement : Judgement
     {
         public override HitResult MaxResult => HitResult.Great;
-
-        /// <summary>
-        /// The positional hit offset.
-        /// </summary>
-        public Vector2 PositionOffset;
 
         protected override int NumericResultFor(HitResult result)
         {
@@ -31,7 +24,5 @@ namespace osu.Game.Rulesets.Osu.Judgements
                     return 300;
             }
         }
-
-        public ComboResult Combo;
     }
 }

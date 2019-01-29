@@ -1,10 +1,11 @@
-// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Rulesets.Objects.Drawables;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mania.Objects.Drawables
 {
@@ -28,21 +29,22 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             : base(barLine)
         {
             RelativeSizeAxes = Axes.X;
-            Height = 1;
+            Height = 2f;
 
-            Add(new Box
+            AddInternal(new Box
             {
                 Name = "Bar line",
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
                 RelativeSizeAxes = Axes.Both,
+                Colour = new Color4(255, 204, 33, 255),
             });
 
             bool isMajor = barLine.BeatIndex % (int)barLine.ControlPoint.TimeSignature == 0;
 
             if (isMajor)
             {
-                Add(new EquilateralTriangle
+                AddInternal(new EquilateralTriangle
                 {
                     Name = "Left triangle",
                     Anchor = Anchor.BottomLeft,
@@ -52,7 +54,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
                     Rotation = 90
                 });
 
-                Add(new EquilateralTriangle
+                AddInternal(new EquilateralTriangle
                 {
                     Name = "Right triangle",
                     Anchor = Anchor.BottomRight,

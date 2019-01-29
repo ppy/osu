@@ -1,6 +1,7 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -11,9 +12,14 @@ namespace osu.Game.Users
     /// </summary>
     public class UpdateableAvatar : Container
     {
-        private Container displayedAvatar;
+        private Drawable displayedAvatar;
 
         private User user;
+
+        /// <summary>
+        /// Whether to show a default guest representation on null user (as opposed to nothing).
+        /// </summary>
+        public bool ShowGuestOnNull = true;
 
         public User User
         {
@@ -30,6 +36,11 @@ namespace osu.Game.Users
             }
         }
 
+        /// <summary>
+        /// Whether to open the user's profile when clicked.
+        /// </summary>
+        public readonly BindableBool OpenOnClick = new BindableBool(true);
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -40,11 +51,19 @@ namespace osu.Game.Users
         {
             displayedAvatar?.FadeOut(300);
             displayedAvatar?.Expire();
-            Add(displayedAvatar = new DelayedLoadWrapper(new Avatar(user)
+
+            if (user != null || ShowGuestOnNull)
             {
-                RelativeSizeAxes = Axes.Both,
-                OnLoadComplete = d => d.FadeInFromZero(200),
-            }));
+                var avatar = new Avatar(user)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    OnLoadComplete = d => d.FadeInFromZero(300, Easing.OutQuint),
+                };
+
+                avatar.OpenOnClick.BindTo(OpenOnClick);
+
+                Add(displayedAvatar = new DelayedLoadWrapper(avatar));
+            }
         }
     }
 }

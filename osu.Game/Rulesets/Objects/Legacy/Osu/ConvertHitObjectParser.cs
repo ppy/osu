@@ -1,10 +1,11 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using osu.Game.Audio;
+using System;
+using osuTK;
 using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
+using osu.Game.Audio;
 
 namespace osu.Game.Rulesets.Objects.Legacy.Osu
 {
@@ -13,31 +14,56 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
     /// </summary>
     public class ConvertHitObjectParser : Legacy.ConvertHitObjectParser
     {
-        protected override HitObject CreateHit(Vector2 position, bool newCombo)
+        public ConvertHitObjectParser(double offset, int formatVersion)
+            : base(offset, formatVersion)
         {
+        }
+
+        private bool forceNewCombo;
+        private int extraComboOffset;
+
+        protected override HitObject CreateHit(Vector2 position, bool newCombo, int comboOffset)
+        {
+            newCombo |= forceNewCombo;
+            comboOffset += extraComboOffset;
+
+            forceNewCombo = false;
+            extraComboOffset = 0;
+
             return new ConvertHit
             {
                 Position = position,
-                NewCombo = newCombo,
+                NewCombo = FirstObject || newCombo,
+                ComboOffset = comboOffset
             };
         }
 
-        protected override HitObject CreateSlider(Vector2 position, bool newCombo, List<Vector2> controlPoints, double length, CurveType curveType, int repeatCount, List<SampleInfoList> repeatSamples)
+        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, PathType pathType, int repeatCount, List<List<SampleInfo>> nodeSamples)
         {
+            newCombo |= forceNewCombo;
+            comboOffset += extraComboOffset;
+
+            forceNewCombo = false;
+            extraComboOffset = 0;
+
             return new ConvertSlider
             {
                 Position = position,
-                NewCombo = newCombo,
-                ControlPoints = controlPoints,
-                Distance = length,
-                CurveType = curveType,
-                RepeatSamples = repeatSamples,
+                NewCombo = FirstObject || newCombo,
+                ComboOffset = comboOffset,
+                Path = new SliderPath(pathType, controlPoints, Math.Max(0, length)),
+                NodeSamples = nodeSamples,
                 RepeatCount = repeatCount
             };
         }
 
-        protected override HitObject CreateSpinner(Vector2 position, double endTime)
+        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime)
         {
+            // Convert spinners don't create the new combo themselves, but force the next non-spinner hitobject to create a new combo
+            // Their combo offset is still added to that next hitobject's combo index
+            forceNewCombo |= FormatVersion <= 8 || newCombo;
+            extraComboOffset += comboOffset;
+
             return new ConvertSpinner
             {
                 Position = position,
@@ -45,7 +71,7 @@ namespace osu.Game.Rulesets.Objects.Legacy.Osu
             };
         }
 
-        protected override HitObject CreateHold(Vector2 position, bool newCombo, double endTime)
+        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime)
         {
             return null;
         }

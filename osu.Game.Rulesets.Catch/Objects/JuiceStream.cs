@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2017 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -10,28 +10,24 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
-using OpenTK;
-using osu.Framework.Lists;
 
 namespace osu.Game.Rulesets.Catch.Objects
 {
-    public class JuiceStream : CatchBaseHit, IHasCurve
+    public class JuiceStream : CatchHitObject, IHasCurve
     {
         /// <summary>
         /// Positional distance that results in a duration of one second, before any speed adjustments.
         /// </summary>
         private const float base_scoring_distance = 100;
 
-        public readonly SliderCurve Curve = new SliderCurve();
-
-        public int RepeatCount { get; set; } = 1;
+        public int RepeatCount { get; set; }
 
         public double Velocity;
         public double TickDistance;
 
-        public override void ApplyDefaults(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
+        protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            base.ApplyDefaults(controlPointInfo, difficulty);
+            base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
             TimingControlPoint timingPoint = controlPointInfo.TimingPointAt(StartTime);
             DifficultyControlPoint difficultyPoint = controlPointInfo.DifficultyPointAt(StartTime);
@@ -42,71 +38,64 @@ namespace osu.Game.Rulesets.Catch.Objects
             TickDistance = scoringDistance / difficulty.SliderTickRate;
         }
 
-        public IEnumerable<CatchBaseHit> Ticks
+        protected override void CreateNestedHitObjects()
         {
-            get
+            base.CreateNestedHitObjects();
+            createTicks();
+        }
+
+        private void createTicks()
+        {
+            if (TickDistance == 0)
+                return;
+
+            var length = Path.Distance;
+            var tickDistance = Math.Min(TickDistance, length);
+            var spanDuration = length / Velocity;
+
+            var minDistanceFromEnd = Velocity * 0.01;
+
+            AddNested(new Fruit
             {
-                SortedList<CatchBaseHit> ticks = new SortedList<CatchBaseHit>((a, b) => a.StartTime.CompareTo(b.StartTime));
+                Samples = Samples,
+                StartTime = StartTime,
+                X = X
+            });
 
-                if (TickDistance == 0)
-                    return ticks;
+            double lastDropletTime = StartTime;
 
-                var length = Curve.Distance;
-                var tickDistance = Math.Min(TickDistance, length);
-                var repeatDuration = length / Velocity;
+            for (int span = 0; span < this.SpanCount(); span++)
+            {
+                var spanStartTime = StartTime + span * spanDuration;
+                var reversed = span % 2 == 1;
 
-                var minDistanceFromEnd = Velocity * 0.01;
-
-                ticks.Add(new Fruit
+                for (double d = 0; d <= length; d += tickDistance)
                 {
-                    Samples = Samples,
-                    ComboColour = ComboColour,
-                    StartTime = StartTime,
-                    X = X
-                });
+                    var timeProgress = d / length;
+                    var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
 
-                for (var repeat = 0; repeat < RepeatCount; repeat++)
-                {
-                    var repeatStartTime = StartTime + repeat * repeatDuration;
-                    var reversed = repeat % 2 == 1;
+                    double time = spanStartTime + timeProgress * spanDuration;
 
-                    for (var d = tickDistance; d <= length; d += tickDistance)
+                    if (LegacyLastTickOffset != null)
                     {
-                        if (d > length - minDistanceFromEnd)
-                            break;
-
-                        var timeProgress = d / length;
-                        var distanceProgress = reversed ? 1 - timeProgress : timeProgress;
-
-                        var lastTickTime = repeatStartTime + timeProgress * repeatDuration;
-                        ticks.Add(new Droplet
-                        {
-                            StartTime = lastTickTime,
-                            ComboColour = ComboColour,
-                            X = Curve.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
-                            Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
-                            {
-                                Bank = s.Bank,
-                                Name = @"slidertick",
-                                Volume = s.Volume
-                            }))
-                        });
+                        // If we're the last tick, apply the legacy offset
+                        if (span == this.SpanCount() - 1 && d + tickDistance > length)
+                            time = Math.Max(StartTime + Duration / 2, time - LegacyLastTickOffset.Value);
                     }
 
-                    double tinyTickInterval = tickDistance / length * repeatDuration;
+                    double tinyTickInterval = time - lastDropletTime;
                     while (tinyTickInterval > 100)
                         tinyTickInterval /= 2;
 
-                    for (double t = 0; t < repeatDuration; t += tinyTickInterval)
+                    for (double t = lastDropletTime + tinyTickInterval; t < time; t += tinyTickInterval)
                     {
-                        double progress = reversed ? 1 - t / repeatDuration : t / repeatDuration;
+                        double progress = reversed ? 1 - (t - spanStartTime) / spanDuration : (t - spanStartTime) / spanDuration;
 
-                        ticks.Add(new TinyDroplet
+                        AddNested(new TinyDroplet
                         {
-                            StartTime = repeatStartTime + t,
-                            ComboColour = ComboColour,
-                            X = Curve.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
-                            Samples = new SampleInfoList(Samples.Select(s => new SampleInfo
+                            StartTime = t,
+                            X = X + Path.PositionAt(progress).X / CatchPlayfield.BASE_WIDTH,
+                            Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
                             {
                                 Bank = s.Bank,
                                 Name = @"slidertick",
@@ -115,55 +104,51 @@ namespace osu.Game.Rulesets.Catch.Objects
                         });
                     }
 
-                    ticks.Add(new Fruit
+                    if (d > minDistanceFromEnd && Math.Abs(d - length) > minDistanceFromEnd)
                     {
-                        Samples = Samples,
-                        ComboColour = ComboColour,
-                        StartTime = repeatStartTime + repeatDuration,
-                        X = Curve.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
-                    });
+                        AddNested(new Droplet
+                        {
+                            StartTime = time,
+                            X = X + Path.PositionAt(distanceProgress).X / CatchPlayfield.BASE_WIDTH,
+                            Samples = new List<SampleInfo>(Samples.Select(s => new SampleInfo
+                            {
+                                Bank = s.Bank,
+                                Name = @"slidertick",
+                                Volume = s.Volume
+                            }))
+                        });
+                    }
+
+                    lastDropletTime = time;
                 }
 
-                return ticks;
+                AddNested(new Fruit
+                {
+                    Samples = Samples,
+                    StartTime = spanStartTime + spanDuration,
+                    X = X + Path.PositionAt(reversed ? 0 : 1).X / CatchPlayfield.BASE_WIDTH
+                });
             }
         }
 
-        public double EndTime => StartTime + RepeatCount * Curve.Distance / Velocity;
+        public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
 
-        public float EndX => Curve.PositionAt(ProgressAt(1)).X / CatchPlayfield.BASE_WIDTH;
+        public float EndX => X + this.CurvePositionAt(1).X / CatchPlayfield.BASE_WIDTH;
 
         public double Duration => EndTime - StartTime;
 
-        public double Distance
+        private SliderPath path;
+
+        public SliderPath Path
         {
-            get { return Curve.Distance; }
-            set { Curve.Distance = value; }
+            get => path;
+            set => path = value;
         }
 
-        public List<Vector2> ControlPoints
-        {
-            get { return Curve.ControlPoints; }
-            set { Curve.ControlPoints = value; }
-        }
+        public double Distance => Path.Distance;
 
-        public List<SampleInfoList> RepeatSamples { get; set; } = new List<SampleInfoList>();
+        public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
 
-        public CurveType CurveType
-        {
-            get { return Curve.CurveType; }
-            set { Curve.CurveType = value; }
-        }
-
-        public Vector2 PositionAt(double progress) => Curve.PositionAt(ProgressAt(progress));
-
-        public double ProgressAt(double progress)
-        {
-            double p = progress * RepeatCount % 1;
-            if (RepeatAt(progress) % 2 == 1)
-                p = 1 - p;
-            return p;
-        }
-
-        public int RepeatAt(double progress) => (int)(progress * RepeatCount);
+        public double? LegacyLastTickOffset { get; set; }
     }
 }
