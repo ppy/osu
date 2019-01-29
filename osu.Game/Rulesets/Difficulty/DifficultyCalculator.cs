@@ -25,10 +25,17 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Calculates the difficulty of the beatmap using a specific mod combination.
         /// </summary>
+        /// <param name="mods">The mods that should be applied to the beatmap.</param>
+        /// <returns>A structure describing the difficulty of the beatmap.</returns>
+        public DifficultyAttributes Calculate(params Mod[] mods) => Calculate(Double.PositiveInfinity, mods);
+
+        /// <summary>
+        /// Calculates the difficulty of the beatmap up to a given point using a specific mod combination.
+        /// </summary>
         /// <param name="upTo">The time up to which hit objects should be considered.</param>
         /// <param name="mods">The mods that should be applied to the beatmap.</param>
         /// <returns>A structure describing the difficulty of the beatmap.</returns>
-        public DifficultyAttributes Calculate(double upTo = Double.PositiveInfinity, params Mod[] mods)
+        public DifficultyAttributes Calculate(double upTo, params Mod[] mods)
         {
             beatmap.Mods.Value = mods;
             IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
