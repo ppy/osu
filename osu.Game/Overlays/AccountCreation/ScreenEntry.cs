@@ -10,6 +10,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -38,11 +39,13 @@ namespace osu.Game.Overlays.AccountCreation
 
         private OsuTextBox[] textboxes;
         private ProcessingOverlay processingOverlay;
+        private GameHost host;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api)
+        private void load(OsuColour colours, APIAccess api, GameHost host)
         {
             this.api = api;
+            this.host = host;
 
             Children = new Drawable[]
             {
@@ -139,7 +142,7 @@ namespace osu.Game.Overlays.AccountCreation
         {
             base.Update();
 
-            if (!textboxes.Any(t => t.HasFocus))
+            if (host?.OnScreenKeyboardOverlapsGameWindow != true && !textboxes.Any(t => t.HasFocus))
                 focusNextTextbox();
         }
 
