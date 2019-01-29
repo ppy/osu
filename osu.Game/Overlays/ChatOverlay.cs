@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -302,7 +302,7 @@ namespace osu.Game.Overlays
         protected override void OnFocus(FocusEvent e)
         {
             //this is necessary as textbox is masked away and therefore can't get focus :(
-            GetContainingInputManager().ChangeFocus(textbox);
+            textbox.TakeFocus();
             base.OnFocus(e);
         }
 
