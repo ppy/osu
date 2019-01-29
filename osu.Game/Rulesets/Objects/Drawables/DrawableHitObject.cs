@@ -221,6 +221,16 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
+        /// Should be called at least once after lifetime of this hit object is end.
+        /// </summary>
+        public void OnLifetimeEnd()
+        {
+            foreach (var nested in NestedHitObjects)
+                nested.OnLifetimeEnd();
+            UpdateResult(false);
+        }
+
+        /// <summary>
         /// Processes this <see cref="DrawableHitObject"/>, checking if a scoring result has occurred.
         /// </summary>
         /// <param name="userTriggered">Whether the user triggered this process.</param>
