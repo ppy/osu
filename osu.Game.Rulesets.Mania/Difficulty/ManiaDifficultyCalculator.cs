@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
             // Note: Stable sort is done so that the ordering of hitobjects with equal start times doesn't change
-            difficultyHitObjects.AddRange(beatmap.HitObjects.Select(h => new ManiaHitObjectDifficulty((ManiaHitObject)h, columnCount)).Where(h => h.BaseHitObject.StartTime <= upTo).OrderBy(h => h.BaseHitObject.StartTime));
+            difficultyHitObjects.AddRange(beatmap.HitObjects.Where(h => h.StartTime <= upTo).Select(h => new ManiaHitObjectDifficulty((ManiaHitObject)h, columnCount)).OrderBy(h => h.BaseHitObject.StartTime));
 
             if (!calculateStrainValues(difficultyHitObjects, timeRate))
                 return new DifficultyAttributes(mods, 0);
