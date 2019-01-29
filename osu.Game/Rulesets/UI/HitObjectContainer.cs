@@ -31,5 +31,11 @@ namespace osu.Game.Rulesets.UI
             int i = yObj.HitObject.StartTime.CompareTo(xObj.HitObject.StartTime);
             return i == 0 ? CompareReverseChildID(x, y) : i;
         }
+
+        protected override void OnChildLifetimeBoundaryCrossed(LifetimeBoundaryCrossedEvent e)
+        {
+            if (e.Kind == LifetimeBoundaryKind.End && e.Direction == LifetimeBoundaryCrossingDirection.Forward && e.Child is DrawableHitObject hitObject)
+                hitObject.OnLifetimeEnd();
+        }
     }
 }
