@@ -85,8 +85,8 @@ namespace osu.Game.Screens.Multi.Lounge
             content.Padding = new MarginPadding
             {
                 Top = Filter.DrawHeight,
-                Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH + HORIZONTAL_OVERFLOW_PADDING,
-                Right = SearchableListOverlay.WIDTH_PADDING + HORIZONTAL_OVERFLOW_PADDING,
+                Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
+                Right = SearchableListOverlay.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
             };
         }
 
