@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 }
             }
 
-            return (1 + (speedBonus - 1) * .75) * angleBonus * (0.95 + speedBonus * Math.Pow(distance / SINGLE_SPACING_THRESHOLD, 3.5)) / current.StrainTime;
+            return (1 + (speedBonus - 1) * 0.75) * angleBonus * (0.95 + speedBonus * Math.Pow(distance / SINGLE_SPACING_THRESHOLD, 3.5)) / current.StrainTime;
         }
     }
 }

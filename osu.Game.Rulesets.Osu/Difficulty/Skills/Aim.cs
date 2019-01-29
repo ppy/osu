@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             const double scale = 90;
 
+            double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
+
             if (Previous.Count > 0)
             {
                 if (current.Angle != null && current.Angle.Value > angle_bonus_begin)
@@ -31,20 +33,17 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                         Math.Max(Previous[0].JumpDistance - scale, 0)
                         * Math.Pow(Math.Sin(current.Angle.Value - angle_bonus_begin), 2)
                         * Math.Max(current.JumpDistance - scale, 0));
-                    result = 1.5 * Math.Pow(Math.Max(0, angleBonus), 0.99) / Math.Max(timing_threshold, Previous[0].StrainTime);
+                    result = 1.5 * applyDiminishingExp(Math.Max(0, angleBonus)) / Math.Max(timing_threshold, Previous[0].StrainTime);
                 }
             }
 
+            double jumpDistanceExp = applyDiminishingExp(current.JumpDistance);
+            double travelDistanceExp = applyDiminishingExp(current.TravelDistance);
+
             return Math.Max(
-                result + (
-                    Math.Pow(current.JumpDistance, 0.99)
-                    + Math.Pow(current.TravelDistance, 0.99)
-                    + Math.Sqrt(Math.Pow(current.TravelDistance, 0.99) * Math.Pow(current.JumpDistance, 0.99)))
-                / Math.Max(current.StrainTime, timing_threshold),
-                (Math.Sqrt(Math.Pow(current.TravelDistance, 0.99) * Math.Pow(current.JumpDistance, 0.99))
-                 + Math.Pow(current.JumpDistance, 0.99)
-                 + Math.Pow(current.TravelDistance, 0.99))
-                / current.StrainTime);
+                result + (jumpDistanceExp + travelDistanceExp + Math.Sqrt(travelDistanceExp * jumpDistanceExp)) / Math.Max(current.StrainTime, timing_threshold),
+                (Math.Sqrt(travelDistanceExp * jumpDistanceExp) + jumpDistanceExp + travelDistanceExp) / current.StrainTime
+            );
         }
     }
 }
