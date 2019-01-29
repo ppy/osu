@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osuTK;
@@ -112,6 +112,6 @@ namespace osu.Game.Screens.Play
             handleBase.X = xFill;
         }
 
-        protected override void OnUserChange() => OnSeek?.Invoke(Current);
+        protected override void OnUserChange(double value) => OnSeek?.Invoke(value);
     }
 }

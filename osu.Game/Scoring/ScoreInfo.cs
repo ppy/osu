@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
@@ -19,25 +20,39 @@ namespace osu.Game.Scoring
     {
         public int ID { get; set; }
 
+        [JsonProperty("rank")]
+        [JsonConverter(typeof(StringEnumConverter))]
         public ScoreRank Rank { get; set; }
 
+        [JsonProperty("total_score")]
         public int TotalScore { get; set; }
 
+        [JsonProperty("accuracy")]
         [Column(TypeName="DECIMAL(1,4)")]
         public double Accuracy { get; set; }
 
+        [JsonProperty(@"pp")]
         public double? PP { get; set; }
 
+        [JsonProperty("max_combo")]
         public int MaxCombo { get; set; }
 
-        public int Combo { get; set; }
+        [JsonIgnore]
+        public int Combo { get; set; } // Todo: Shouldn't exist in here
 
+        [JsonIgnore]
         public int RulesetID { get; set; }
 
+        [JsonProperty("passed")]
+        [NotMapped]
+        public bool Passed { get; set; } = true;
+
+        [JsonIgnore]
         public virtual RulesetInfo Ruleset { get; set; }
 
         private Mod[] mods;
 
+        [JsonProperty("mods")]
         [NotMapped]
         public Mod[] Mods
         {
@@ -62,6 +77,7 @@ namespace osu.Game.Scoring
 
         private string modsJson;
 
+        [JsonIgnore]
         [Column("Mods")]
         public string ModsJson
         {
@@ -84,9 +100,11 @@ namespace osu.Game.Scoring
             }
         }
 
-        [JsonIgnore]
-        public User User;
+        [NotMapped]
+        [JsonProperty("user")]
+        public User User { get; set; }
 
+        [JsonIgnore]
         [Column("User")]
         public string UserString
         {
@@ -97,15 +115,19 @@ namespace osu.Game.Scoring
         [JsonIgnore]
         public int BeatmapInfoID { get; set; }
 
+        [JsonIgnore]
         public virtual BeatmapInfo Beatmap { get; set; }
 
+        [JsonIgnore]
         public long? OnlineScoreID { get; set; }
 
+        [JsonIgnore]
         public DateTimeOffset Date { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty("statistics")]
         public Dictionary<HitResult, int> Statistics = new Dictionary<HitResult, int>();
 
+        [JsonIgnore]
         [Column("Statistics")]
         public string StatisticsJson
         {
@@ -125,8 +147,10 @@ namespace osu.Game.Scoring
         [JsonIgnore]
         public List<ScoreFileInfo> Files { get; set; }
 
+        [JsonIgnore]
         public string Hash { get; set; }
 
+        [JsonIgnore]
         public bool DeletePending { get; set; }
 
         [Serializable]

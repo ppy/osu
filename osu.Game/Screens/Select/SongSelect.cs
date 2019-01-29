@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -28,7 +28,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Edit;
 using osu.Game.Screens.Menu;
-using osu.Game.Screens.Ranking;
+using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
 
@@ -123,6 +123,16 @@ namespace osu.Game.Screens.Select
                         Padding = new MarginPadding { Top = 10, Right = 5 },
                     }
                 },
+                beatmapInfoWedge = new BeatmapInfoWedge
+                {
+                    Size = wedged_container_size,
+                    RelativeSizeAxes = Axes.X,
+                    Margin = new MarginPadding
+                    {
+                        Top = left_area_padding,
+                        Right = left_area_padding,
+                    },
+                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -163,16 +173,6 @@ namespace osu.Game.Screens.Select
                         }
                     },
                 },
-                beatmapInfoWedge = new BeatmapInfoWedge
-                {
-                    Size = wedged_container_size,
-                    RelativeSizeAxes = Axes.X,
-                    Margin = new MarginPadding
-                    {
-                        Top = left_area_padding,
-                        Right = left_area_padding,
-                    },
-                },
                 new ResetScrollContainer(() => Carousel.ScrollToSelected())
                 {
                     RelativeSizeAxes = Axes.Y,
@@ -210,7 +210,7 @@ namespace osu.Game.Screens.Select
                 });
             }
 
-            BeatmapDetails.Leaderboard.ScoreSelected += s => Push(new Results(s));
+            BeatmapDetails.Leaderboard.ScoreSelected += s => Push(new SoloResults(s));
         }
 
         [BackgroundDependencyLoader(true)]
@@ -297,13 +297,13 @@ namespace osu.Game.Screens.Select
         /// <param name="performStartAction">Whether to trigger <see cref="OnStart"/>.</param>
         public void FinaliseSelection(BeatmapInfo beatmap = null, bool performStartAction = true)
         {
-            // avoid attempting to continue before a selection has been obtained.
-            // this could happen via a user interaction while the carousel is still in a loading state.
-            if (Carousel.SelectedBeatmap == null) return;
-
             // if we have a pending filter operation, we want to run it now.
             // it could change selection (ie. if the ruleset has been changed).
             Carousel.FlushPendingFilterOperations();
+
+            // avoid attempting to continue before a selection has been obtained.
+            // this could happen via a user interaction while the carousel is still in a loading state.
+            if (Carousel.SelectedBeatmap == null) return;
 
             if (beatmap != null)
                 Carousel.SelectBeatmap(beatmap);
