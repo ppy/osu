@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -54,7 +54,6 @@ namespace osu.Game.Tests.Visual
             AddStep("resize to big", () => container.ResizeWidthTo(1, 300));
             AddStep("resize to normal", () => container.ResizeWidthTo(0.8f, 300));
             AddStep("online scores", () => scoresContainer.Beatmap = new BeatmapInfo { OnlineBeatmapID = 75, Ruleset = new OsuRuleset().RulesetInfo });
-
 
             scores = new[]
             {

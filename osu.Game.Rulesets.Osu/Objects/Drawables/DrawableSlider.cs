@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Graphics;
@@ -14,6 +14,7 @@ using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osuTK.Graphics;
+using osu.Game.Skinning;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -149,6 +150,15 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                     obj.RelativeAnchorPosition = childAnchorPosition;
                 Ball.RelativeAnchorPosition = childAnchorPosition;
             }
+        }
+
+        protected override void SkinChanged(ISkinSource skin, bool allowFallback)
+        {
+            base.SkinChanged(skin, allowFallback);
+
+            Body.AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderTrackOverride") ? s.CustomColours["SliderTrackOverride"] : Body.AccentColour);
+            Body.BorderColour = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderBorder") ? s.CustomColours["SliderBorder"] : Body.BorderColour);
+            Ball.AccentColour = skin.GetValue<SkinConfiguration, Color4>(s => s.CustomColours.ContainsKey("SliderBall") ? s.CustomColours["SliderBall"] : Ball.AccentColour);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -149,8 +149,10 @@ namespace osu.Game.Database
                 try
                 {
                     notification.Text = $"Importing ({++current} of {paths.Length})\n{Path.GetFileName(path)}";
+
+                    TModel import;
                     using (ArchiveReader reader = getReaderFrom(path))
-                        imported.Add(Import(reader));
+                        imported.Add(import = Import(reader));
 
                     notification.Progress = (float)current / paths.Length;
 
@@ -160,7 +162,7 @@ namespace osu.Game.Database
                     // TODO: Add a check to prevent files from storage to be deleted.
                     try
                     {
-                        if (File.Exists(path))
+                        if (import != null && File.Exists(path))
                             File.Delete(path);
                     }
                     catch (Exception e)

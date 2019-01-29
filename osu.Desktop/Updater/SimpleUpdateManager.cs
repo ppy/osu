@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using osu.Framework;
@@ -77,10 +76,10 @@ namespace osu.Desktop.Updater
             switch (RuntimeInfo.OS)
             {
                 case RuntimeInfo.Platform.Windows:
-                    bestAsset = release.Assets?.FirstOrDefault(f => f.Name.EndsWith(".exe"));
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".exe"));
                     break;
                 case RuntimeInfo.Platform.MacOsx:
-                    bestAsset = release.Assets?.FirstOrDefault(f => f.Name.EndsWith(".app.zip"));
+                    bestAsset = release.Assets?.Find(f => f.Name.EndsWith(".app.zip"));
                     break;
             }
 

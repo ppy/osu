@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
@@ -14,7 +14,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Ranking
 {
-    public class ResultsPage : Container
+    public abstract class ResultsPage : Container
     {
         protected readonly ScoreInfo Score;
         protected readonly WorkingBeatmap Beatmap;
@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Ranking
 
         protected override Container<Drawable> Content => content;
 
-        public ResultsPage(ScoreInfo score, WorkingBeatmap beatmap)
+        protected ResultsPage(ScoreInfo score, WorkingBeatmap beatmap)
         {
             Score = score;
             Beatmap = beatmap;

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps;
@@ -14,15 +14,26 @@ namespace osu.Game.Rulesets.Taiko.Objects
         {
             { HitResult.Great, (100, 70, 40) },
             { HitResult.Good, (240, 160, 100) },
-            { HitResult.Meh, (270, 190, 140) },
-            { HitResult.Miss, (400, 400, 400) },
+            { HitResult.Miss, (270, 190, 140) },
         };
+
+        public override bool IsHitResultAllowed(HitResult result)
+        {
+            switch (result)
+            {
+                case HitResult.Great:
+                case HitResult.Good:
+                case HitResult.Miss:
+                    return true;
+                default:
+                    return false;
+            }
+        }
 
         public override void SetDifficulty(double difficulty)
         {
             Great = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Great]);
             Good = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Good]);
-            Meh = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Meh]);
             Miss = BeatmapDifficulty.DifficultyRange(difficulty, base_ranges[HitResult.Miss]);
         }
     }

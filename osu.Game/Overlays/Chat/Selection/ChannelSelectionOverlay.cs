@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,7 @@ using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Overlays.Chat.Selection
 {
-    public class ChannelSelectionOverlay : OsuFocusedOverlayContainer
+    public class ChannelSelectionOverlay : WaveOverlayContainer
     {
         public static readonly float WIDTH_PADDING = 170;
 
@@ -38,6 +38,11 @@ namespace osu.Game.Overlays.Chat.Selection
         public ChannelSelectionOverlay()
         {
             RelativeSizeAxes = Axes.X;
+
+            Waves.FirstWaveColour = OsuColour.FromHex("353535");
+            Waves.SecondWaveColour = OsuColour.FromHex("434343");
+            Waves.ThirdWaveColour = OsuColour.FromHex("515151");
+            Waves.FourthWaveColour = OsuColour.FromHex("595959");
 
             Children = new Drawable[]
             {
@@ -159,7 +164,7 @@ namespace osu.Game.Overlays.Chat.Selection
 
         protected override void OnFocus(FocusEvent e)
         {
-            GetContainingInputManager().ChangeFocus(search);
+            search.TakeFocus();
             base.OnFocus(e);
         }
 
