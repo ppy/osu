@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -32,6 +32,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
@@ -82,7 +83,7 @@ namespace osu.Game.Screens.Play
         protected ScoreProcessor ScoreProcessor;
         protected RulesetContainer RulesetContainer;
 
-        private HUDOverlay hudOverlay;
+        protected HUDOverlay HUDOverlay;
         private FailOverlay failOverlay;
 
         private DrawableStoryboard storyboard;
@@ -199,7 +200,7 @@ namespace osu.Game.Screens.Play
                         {
                             Child = RulesetContainer.Cursor?.CreateProxy() ?? new Container(),
                         },
-                        hudOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
+                        HUDOverlay = new HUDOverlay(ScoreProcessor, RulesetContainer, working, offsetClock, adjustableClock)
                         {
                             Clock = Clock, // hud overlay doesn't want to use the audio clock directly
                             ProcessCustomClock = false,
@@ -232,8 +233,8 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            hudOverlay.HoldToQuit.Action = performUserRequestedExit;
-            hudOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
+            HUDOverlay.HoldToQuit.Action = performUserRequestedExit;
+            HUDOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
             RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
 
@@ -401,6 +402,7 @@ namespace osu.Game.Screens.Play
         {
             float fadeOutDuration = instant ? 0 : 250;
             Content.FadeOut(fadeOutDuration);
+            Background?.FadeColour(Color4.White, fadeOutDuration, Easing.OutQuint);
         }
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
@@ -438,7 +440,7 @@ namespace osu.Game.Screens.Play
                 .FadeTo(storyboardVisible && BackgroundOpacity > 0 ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
             if (storyboardVisible && beatmap.Storyboard.ReplacesBackground)
-                Background?.FadeTo(0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                Background?.FadeColour(Color4.Black, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
         protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);

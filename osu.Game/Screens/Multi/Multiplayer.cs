@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -48,6 +48,8 @@ namespace osu.Game.Screens.Multi
                 RelativeSizeAxes = Axes.Both,
             };
 
+            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
+
             waves.AddRange(new Drawable[]
             {
                 new Container
@@ -86,7 +88,7 @@ namespace osu.Game.Screens.Multi
                     Margin = new MarginPadding
                     {
                         Top = 10,
-                        Right = 10,
+                        Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
                     },
                     Text = "Create room",
                     Action = () => loungeSubScreen.Push(new Room
