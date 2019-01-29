@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -70,13 +70,23 @@ namespace osu.Game.Screens.Multi.Match
                                     {
                                         leaderboard = new MatchLeaderboard
                                         {
-                                            Padding = new MarginPadding(10),
+                                            Padding = new MarginPadding
+                                            {
+                                                Left = 10 + HORIZONTAL_OVERFLOW_PADDING,
+                                                Right = 10,
+                                                Vertical = 10,
+                                            },
                                             RelativeSizeAxes = Axes.Both,
                                             Room = room
                                         },
                                         new Container
                                         {
-                                            Padding = new MarginPadding(10),
+                                            Padding = new MarginPadding
+                                            {
+                                                Left = 10,
+                                                Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
+                                                Vertical = 10,
+                                            },
                                             RelativeSizeAxes = Axes.Both,
                                             Child = chat = new MatchChatDisplay(room)
                                             {
@@ -103,7 +113,12 @@ namespace osu.Game.Screens.Multi.Match
                 },
             };
 
-            header.OnRequestSelectBeatmap = () => this.Push(new MatchSongSelect { Selected = addPlaylistItem });
+            header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect
+            {
+                Selected = addPlaylistItem,
+                Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING }
+            });
+
             header.Tabs.Current.ValueChanged += t =>
             {
                 const float fade_duration = 500;
