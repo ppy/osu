@@ -193,7 +193,10 @@ namespace osu.Game.Screens.Multi
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
             cancelLooping();
-            loungeSubScreen.MakeCurrent();
+
+            if (screenStack.CurrentScreen != null)
+                loungeSubScreen.MakeCurrent();
+
             updatePollingRate(isIdle.Value);
 
             // the wave overlay transition takes longer than expected to run.
