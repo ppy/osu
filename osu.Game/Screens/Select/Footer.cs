@@ -34,19 +34,21 @@ namespace osu.Game.Screens.Select
         private readonly FillFlowContainer<FooterButton> buttons;
 
         /// <param name="text">Text on the button.</param>
+        /// <param name="secondaryText">Text on the button when secondary action is active.</param>
         /// <param name="colour">Colour of the button.</param>
         /// <param name="hotkey">Hotkey of the button.</param>
         /// <param name="action">Action the button does.</param>
+        /// <param name="secondaryAction">Secondary action the button does.</param>
         /// <param name="depth">
         /// <para>Higher depth to be put on the left, and lower to be put on the right.</para>
         /// <para>Notice this is different to <see cref="Options.BeatmapOptionsOverlay"/>!</para>
         /// </param>
-        /// <returns>The <see cref="FooterButton"/> that this method creates.</returns>
-        public FooterButton AddButton(string text, Color4 colour, Action action, Key? hotkey = null, float depth = 0)
+        public void AddButton(string text, string secondaryText, Color4 colour, Action action, Action secondaryAction, Key? hotkey = null, float depth = 0)
         {
-            var button = new FooterButton
+            var button = new FooterButton(action, secondaryAction)
             {
                 Text = text,
+                SecondaryText = secondaryText,
                 Height = play_song_select_button_height,
                 Width = play_song_select_button_width,
                 Depth = depth,
@@ -55,13 +57,21 @@ namespace osu.Game.Screens.Select
                 Hotkey = hotkey,
                 Hovered = updateModeLight,
                 HoverLost = updateModeLight,
-                Action = action,
             };
 
             buttons.Add(button);
             buttons.SetLayoutPosition(button, -depth);
-            return button;
         }
+
+        /// <param name="text">Text on the button.</param>
+        /// <param name="colour">Colour of the button.</param>
+        /// <param name="hotkey">Hotkey of the button.</param>
+        /// <param name="action">Action the button does.</param>
+        /// <param name="depth">
+        /// <para>Higher depth to be put on the left, and lower to be put on the right.</para>
+        /// <para>Notice this is different to <see cref="Options.BeatmapOptionsOverlay"/>!</para>
+        /// </param>
+        public void AddButton(string text, Color4 colour, Action action, Key? hotkey = null, float depth = 0) => AddButton(text, null, colour, action, null, hotkey, depth);
 
         private readonly List<OverlayContainer> overlays = new List<OverlayContainer>();
 
@@ -73,11 +83,10 @@ namespace osu.Game.Screens.Select
         /// <para>Higher depth to be put on the left, and lower to be put on the right.</para>
         /// <para>Notice this is different to <see cref="Options.BeatmapOptionsOverlay"/>!</para>
         /// </param>
-        /// <returns>The <see cref="FooterButton"/> that this method creates.</returns>
-        public FooterButton AddButton(string text, Color4 colour, OverlayContainer overlay, Key? hotkey = null, float depth = 0)
+        public void AddButton(string text, Color4 colour, OverlayContainer overlay, Key? hotkey = null, float depth = 0)
         {
             overlays.Add(overlay);
-            return AddButton(text, colour, () =>
+            AddButton(text, colour, () =>
             {
                 foreach (var o in overlays)
                 {

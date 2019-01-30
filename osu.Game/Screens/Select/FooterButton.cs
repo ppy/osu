@@ -9,8 +9,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.Containers;
+using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Select
 {
@@ -20,11 +20,21 @@ namespace osu.Game.Screens.Select
 
         public string Text
         {
-            get { return spriteText?.Text; }
+            get => spriteText?.Text;
             set
             {
                 if (spriteText != null)
                     spriteText.Text = value;
+            }
+        }
+
+        public string SecondaryText
+        {
+            get => secondarySpriteText?.Text;
+            set
+            {
+                if (secondarySpriteText != null)
+                    secondarySpriteText.Text = value;
             }
         }
 
@@ -51,13 +61,14 @@ namespace osu.Game.Screens.Select
             }
         }
 
-        private SpriteText spriteText;
+        private readonly SpriteText spriteText, secondarySpriteText;
         private readonly Box box;
         private readonly Box light;
+        private bool secondaryActive;
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => box.ReceivePositionalInputAt(screenSpacePos);
 
-        public FooterButton()
+        public FooterButton(Action onClick, Action onSecondaryClick)
         {
             Children = new Drawable[]
             {
@@ -80,7 +91,21 @@ namespace osu.Game.Screens.Select
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
+                },
+                secondarySpriteText = new OsuSpriteText
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    Alpha = 0,
                 }
+            };
+
+            Action = () =>
+            {
+                if (secondaryActive && onSecondaryClick != null)
+                    onSecondaryClick();
+                else
+                    onClick();
             };
         }
 
@@ -125,6 +150,9 @@ namespace osu.Game.Screens.Select
 
         protected override bool OnKeyDown(KeyDownEvent e)
         {
+            secondaryActive = e.ShiftPressed;
+            updateText();
+
             if (!e.Repeat && e.Key == Hotkey)
             {
                 Click();
@@ -134,16 +162,25 @@ namespace osu.Game.Screens.Select
             return base.OnKeyDown(e);
         }
 
-        public void FadeText(string newText, double duration = 0d, Easing easing = Easing.None)
+        protected override bool OnKeyUp(KeyUpEvent e)
         {
-            spriteText?.FadeOut(duration, easing).Expire();
-            Add(spriteText = new OsuSpriteText
+            secondaryActive = e.ShiftPressed;
+            updateText();
+            return base.OnKeyUp(e);
+        }
+
+        private void updateText()
+        {
+            if (secondaryActive && SecondaryText != null)
             {
-                Anchor = Anchor.Centre,
-                Origin = Anchor.Centre,
-                Text = newText,
-            });
-            spriteText.FadeInFromZero(duration, easing);
+                spriteText.FadeOut(120, Easing.InQuad);
+                secondarySpriteText.FadeIn(120, Easing.InQuad);
+            }
+            else
+            {
+                spriteText.FadeIn(120, Easing.InQuad);
+                secondarySpriteText.FadeOut(120, Easing.InQuad);
+            }
         }
     }
 }
