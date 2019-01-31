@@ -190,6 +190,8 @@ namespace osu.Game.Overlays.BeatmapSet
         {
             tabsBg.Colour = colours.Gray3;
 
+            State.BindValueChanged(_ => updateDownloadButtons());
+
             BeatmapSet.BindValueChanged(beatmapSet =>
             {
                 Picker.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = beatmapSet;
@@ -211,9 +213,7 @@ namespace osu.Game.Overlays.BeatmapSet
                 }
 
                 updateDownloadButtons();
-            });
-
-            State.BindValueChanged(_ => updateDownloadButtons(), true);
+            }, true);
         }
 
         private void updateDownloadButtons()
