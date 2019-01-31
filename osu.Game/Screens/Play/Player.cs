@@ -385,6 +385,9 @@ namespace osu.Game.Screens.Play
 
             if ((!AllowPause || HasFailed || !ValidForResume || pauseContainer?.IsPaused != false || RulesetContainer?.HasReplayLoaded != false) && (!pauseContainer?.IsResuming ?? true))
             {
+                // Detaching so seeking in SongSelect while we are fading out doesn't cause noises because we are trying to stay in sync
+                adjustableClock.ChangeSource(new StopwatchClock());
+
                 // In the case of replays, we may have changed the playback rate.
                 applyRateFromMods();
 
