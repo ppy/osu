@@ -41,6 +41,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty);
             float halfCatchWidth = catcher.CatchWidth * 0.5f;
 
+            halfCatchWidth *= 0.8f;
+
             var difficultyHitObjects = new List<CatchDifficultyHitObject>();
 
             foreach (var hitObject in beatmap.HitObjects)
