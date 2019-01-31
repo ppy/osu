@@ -85,12 +85,6 @@ namespace osu.Game.Screens
             sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
 
-        public MarginPadding Padding
-        {
-            get => base.Padding;
-            set => base.Padding = value;
-        }
-
         public virtual bool OnPressed(GlobalAction action)
         {
             if (!this.IsCurrentScreen()) return false;
