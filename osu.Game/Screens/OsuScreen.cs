@@ -64,10 +64,10 @@ namespace osu.Game.Screens
 
         private BackgroundScreen localBackground;
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private BackgroundScreenStack backgroundStack { get; set; }
 
-        [Resolved]
+        [Resolved(canBeNull: true)]
         private OsuLogo logo { get; set; }
 
         protected OsuScreen()
@@ -124,7 +124,7 @@ namespace osu.Game.Screens
         {
             applyArrivingDefaults(false);
 
-            backgroundStack.Push(localBackground = CreateBackground());
+            backgroundStack?.Push(localBackground = CreateBackground());
 
             base.OnEntering(last);
         }
@@ -137,7 +137,7 @@ namespace osu.Game.Screens
             if (base.OnExiting(next))
                 return true;
 
-            backgroundStack.Exit(localBackground);
+            backgroundStack?.Exit(localBackground);
 
             Beatmap.UnbindAll();
             return false;
@@ -153,12 +153,13 @@ namespace osu.Game.Screens
 
         private void applyArrivingDefaults(bool isResuming)
         {
-            logo.AppendAnimatingAction(() =>
+            logo?.AppendAnimatingAction(() =>
             {
                 if (this.IsCurrentScreen()) LogoArriving(logo, isResuming);
             }, true);
 
-            backgroundStack.ParallaxAmount = BackgroundParallaxAmount;
+            if (backgroundStack != null)
+                backgroundStack.ParallaxAmount = BackgroundParallaxAmount;
         }
 
         /// <summary>
@@ -180,7 +181,7 @@ namespace osu.Game.Screens
 
         private void onExitingLogo()
         {
-            logo.AppendAnimatingAction(() => LogoExiting(logo), false);
+            logo?.AppendAnimatingAction(() => LogoExiting(logo), false);
         }
 
         /// <summary>
@@ -192,7 +193,7 @@ namespace osu.Game.Screens
 
         private void onSuspendingLogo()
         {
-            logo.AppendAnimatingAction(() => LogoSuspending(logo), false);
+            logo?.AppendAnimatingAction(() => LogoSuspending(logo), false);
         }
 
         /// <summary>
