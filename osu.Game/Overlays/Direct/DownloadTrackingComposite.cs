@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
-        private void onRequestSuccess(byte[] data)
+        private void onRequestSuccess(string data)
         {
             Schedule(() => State.Value = DownloadState.Downloaded);
             attachDownload(null);
