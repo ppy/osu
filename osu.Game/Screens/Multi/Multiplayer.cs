@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Multi
         [Resolved]
         private APIAccess api { get; set; }
 
-        [Resolved]
+        [Resolved(CanBeNull = true)]
         private OsuLogo logo { get; set; }
 
         public Multiplayer()
