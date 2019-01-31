@@ -15,6 +15,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public abstract class Skill
     {
+        protected const double SINGLE_SPACING_THRESHOLD = 125;
+        protected const double STREAM_SPACING_THRESHOLD = 110;
+
         /// <summary>
         /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
         /// </summary>
