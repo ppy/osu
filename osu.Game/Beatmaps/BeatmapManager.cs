@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,6 @@ using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Database;
-using osu.Game.Graphics;
 using osu.Game.IO.Archives;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -75,15 +74,18 @@ namespace osu.Game.Beatmaps
 
         private readonly AudioManager audioManager;
 
+        private readonly GameHost host;
+
         private readonly List<DownloadBeatmapSetRequest> currentDownloads = new List<DownloadBeatmapSetRequest>();
 
-        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, IIpcHost importHost = null,
+        public BeatmapManager(Storage storage, IDatabaseContextFactory contextFactory, RulesetStore rulesets, APIAccess api, AudioManager audioManager, GameHost host = null,
                               WorkingBeatmap defaultBeatmap = null)
-            : base(storage, contextFactory, new BeatmapStore(contextFactory), importHost)
+            : base(storage, contextFactory, new BeatmapStore(contextFactory), host)
         {
             this.rulesets = rulesets;
             this.api = api;
             this.audioManager = audioManager;
+            this.host = host;
 
             DefaultBeatmap = defaultBeatmap;
 
@@ -147,16 +149,6 @@ namespace osu.Game.Beatmaps
 
             if (existing != null || api == null) return false;
 
-            if (!api.LocalUser.Value.IsSupporter)
-            {
-                PostNotification?.Invoke(new SimpleNotification
-                {
-                    Icon = FontAwesome.fa_superpowers,
-                    Text = "You gotta be an osu!supporter to download for now 'yo"
-                });
-                return false;
-            }
-
             var downloadNotification = new DownloadNotification
             {
                 CompletionText = $"Imported {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}!",
@@ -171,18 +163,14 @@ namespace osu.Game.Beatmaps
                 downloadNotification.Progress = progress;
             };
 
-            request.Success += data =>
+            request.Success += filename =>
             {
                 downloadNotification.Text = $"Importing {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}";
 
                 Task.Factory.StartNew(() =>
                 {
-                    BeatmapSetInfo importedBeatmap;
-
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    using (var stream = new MemoryStream(data))
-                    using (var archive = new ZipArchiveReader(stream, beatmapSetInfo.ToString()))
-                        importedBeatmap = Import(archive);
+                    var importedBeatmap = Import(filename);
 
                     downloadNotification.CompletionClickAction = () =>
                     {
@@ -265,7 +253,7 @@ namespace osu.Game.Beatmaps
             if (beatmapInfo.Metadata == null)
                 beatmapInfo.Metadata = beatmapInfo.BeatmapSet.Metadata;
 
-            WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(Files.Store, beatmapInfo, audioManager);
+            WorkingBeatmap working = new BeatmapManagerWorkingBeatmap(Files.Store, new LargeTextureStore(host?.CreateTextureLoaderStore(Files.Store)), beatmapInfo, audioManager);
 
             previous?.TransferTo(working);
 
