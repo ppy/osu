@@ -447,7 +447,6 @@ namespace osu.Game.Rulesets.Catch.UI
                     Size = new Vector2(CATCHER_SIZE);
 
                     // Sets the origin roughly to the centre of the catcher's plate to allow for correct scaling.
-                    // OriginPosition = new Vector2(-0.02f, 0.06f) * CATCHER_SIZE;
                     OriginPosition = new Vector2(-0.02f, 0.06f) * CATCHER_SIZE;
                 }
 
