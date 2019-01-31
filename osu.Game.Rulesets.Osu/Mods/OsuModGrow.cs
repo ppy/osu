@@ -26,13 +26,12 @@ namespace osu.Game.Rulesets.Osu.Mods
             {
                 if (drawable is DrawableSpinner spinner)
                     return;
-                
                 drawable.ApplyCustomUpdateState += applyCustomState;
             }
         }
 
         protected virtual void applyCustomState(DrawableHitObject drawable, ArmedState state)
-        {   
+        {
             var hitObject = (OsuHitObject) drawable.HitObject;
 
             double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
