@@ -79,10 +79,20 @@ namespace osu.Game.Overlays.Direct
 
             if (attachedRequest != null)
             {
-                State.Value = DownloadState.Downloading;
-                attachedRequest.Failure += onRequestFailure;
-                attachedRequest.DownloadProgressed += onRequestProgress;
-                attachedRequest.Success += onRequestSuccess;
+                if (attachedRequest.Progress == 1)
+                {
+                    State.Value = DownloadState.Downloaded;
+                    Progress.Value = 1;
+                }
+                else
+                {
+                    State.Value = DownloadState.Downloading;
+                    Progress.Value = attachedRequest.Progress;
+
+                    attachedRequest.Failure += onRequestFailure;
+                    attachedRequest.DownloadProgressed += onRequestProgress;
+                    attachedRequest.Success += onRequestSuccess;
+                }
             }
             else
             {
