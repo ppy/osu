@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Edit
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
-        protected override bool HideOverlaysOnEnter => true;
+        public override bool HideOverlaysOnEnter => true;
         public override bool AllowBeatmapRulesetChange => false;
 
         private Box bottomBackground;
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Edit
             SummaryTimeline timeline;
             PlaybackControl playback;
 
-            Children = new[]
+            InternalChildren = new[]
             {
                 new Container
                 {
@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Edit
                                 {
                                     new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap),
                                     new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Exit", MenuItemType.Standard, Exit)
+                                    new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit)
                                 }
                             }
                         }
@@ -194,20 +194,20 @@ namespace osu.Game.Screens.Edit
             return true;
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             Beatmap.Value.Track?.Stop();
             base.OnResuming(last);
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             Background.FadeColour(Color4.DarkGray, 500);
             Beatmap.Value.Track?.Stop();
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
             Background.FadeColour(Color4.White, 500);
             if (Beatmap.Value.Track != null)
