@@ -3,6 +3,8 @@
 
 using System;
 using Humanizer;
+using osu.Framework.Graphics;
+using osu.Framework.Screens;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi;
 
@@ -14,6 +16,11 @@ namespace osu.Game.Screens.Select
 
         public string ShortTitle => "song selection";
         public override string Title => ShortTitle.Humanize();
+
+        public MatchSongSelect()
+        {
+            Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
+        }
 
         protected override bool OnStart()
         {
@@ -28,8 +35,8 @@ namespace osu.Game.Screens.Select
 
             Selected?.Invoke(item);
 
-            if (IsCurrentScreen)
-                Exit();
+            if (this.IsCurrentScreen())
+                this.Exit();
 
             return true;
         }

@@ -88,7 +88,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeAimValue()
         {
-            double aimValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes.AimStrain / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+            double rawAim = Attributes.AimStrain;
+
+            if (mods.Any(m => m is OsuModTouchDevice))
+                rawAim = Math.Pow(rawAim, 0.8);
+
+            double aimValue = Math.Pow(5.0f * Math.Max(1.0f, rawAim / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // Longer maps are worth more
             double lengthBonus = 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
