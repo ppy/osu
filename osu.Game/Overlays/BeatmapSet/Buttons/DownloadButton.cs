@@ -124,6 +124,17 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                         };
                         break;
                     case DownloadState.Downloaded:
+                        textSprites.Children = new Drawable[]
+                        {
+                            new OsuSpriteText
+                            {
+                                Text = "Importing...",
+                                TextSize = 13,
+                                Font = @"Exo2.0-Bold",
+                            },
+                        };
+                        break;
+                    case DownloadState.LocallyAvailable:
                         this.FadeOut(200);
                         break;
                     case DownloadState.NotDownloaded:
