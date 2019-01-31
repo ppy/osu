@@ -50,6 +50,7 @@ namespace osu.Game.Graphics.Cursor
             if (!CanShowCursor)
             {
                 currentTarget?.Cursor?.Hide();
+                currentTarget = null;
                 return;
             }
 
