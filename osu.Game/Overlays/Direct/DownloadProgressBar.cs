@@ -48,6 +48,7 @@ namespace osu.Game.Overlays.Direct
                         progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
                         break;
                     case DownloadState.Downloaded:
+                        progressBar.FadeIn(400, Easing.OutQuint);
                         progressBar.Current.Value = 1;
                         progressBar.FillColour = colours.Yellow;
                         break;
