@@ -57,10 +57,6 @@
       <Project>{2A66DD92-ADB1-4994-89E2-C94E04ACDA0D}</Project>
       <Name>osu.Game</Name>
     </ProjectReference>
-    <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
-      <Project>{D9A367C9-4C1A-489F-9B05-A0CEA2B53B58}</Project>
-      <Name>osu.Game.Resources</Name>
-    </ProjectReference>
     <ProjectReference Include="..\osu.Game.Rulesets.Catch\osu.Game.Rulesets.Catch.csproj">
       <Project>{58F6C80C-1253-4A0E-A465-B8C85EBEADF3}</Project>
       <Name>osu.Game.Rulesets.Catch</Name>
