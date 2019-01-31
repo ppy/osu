@@ -17,7 +17,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadBeatmaps()
         {
-            using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
+            using (var osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
                 string[] expected =
@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadMetadata()
         {
-            using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
+            using (var osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
 
@@ -72,7 +72,7 @@ namespace osu.Game.Tests.Beatmaps.IO
         [Test]
         public void TestReadFile()
         {
-            using (var osz = Resource.OpenResource("Beatmaps.241526 Soleily - Renatus.osz"))
+            using (var osz = TestResources.GetTestBeatmapStream())
             {
                 var reader = new ZipArchiveReader(osz);
                 using (var stream = new StreamReader(
