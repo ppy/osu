@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Online.Chat;
 using System;
@@ -61,21 +61,21 @@ namespace osu.Game.Graphics.Containers
             AddText(text.Substring(previousLinkEnd));
         }
 
-        public void AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action<SpriteText> creationParameters = null)
+        public IEnumerable<Drawable> AddLink(string text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(AddText(text, creationParameters), text, url, linkType, linkArgument, tooltipText);
 
-        public void AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
+        public IEnumerable<Drawable> AddLink(string text, Action action, string tooltipText = null, Action<SpriteText> creationParameters = null)
             => createLink(AddText(text, creationParameters), text, tooltipText: tooltipText, action: action);
 
-        public void AddLink(IEnumerable<SpriteText> text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
+        public IEnumerable<Drawable> AddLink(IEnumerable<SpriteText> text, string url, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null)
         {
             foreach (var t in text)
                 AddArbitraryDrawable(t);
 
-            createLink(text, null, url, linkType, linkArgument, tooltipText);
+            return createLink(text, null, url, linkType, linkArgument, tooltipText);
         }
 
-        private void createLink(IEnumerable<Drawable> drawables, string text, string url = null, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action action = null)
+        private IEnumerable<Drawable> createLink(IEnumerable<Drawable> drawables, string text, string url = null, LinkAction linkType = LinkAction.External, string linkArgument = null, string tooltipText = null, Action action = null)
         {
             AddInternal(new DrawableLinkCompiler(drawables.OfType<SpriteText>().ToList())
             {
@@ -122,6 +122,8 @@ namespace osu.Game.Graphics.Containers
                     }
                 }),
             });
+
+            return drawables;
         }
 
         // We want the compilers to always be visible no matter where they are, so RelativeSizeAxes is used.

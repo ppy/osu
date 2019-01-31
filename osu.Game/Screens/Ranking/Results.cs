@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Ranking
 
         private IEnumerable<Drawable> allCircles => new Drawable[] { circleOuterBackground, circleInner, circleOuter };
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             (Background as BackgroundScreenBeatmap)?.BlurTo(background_blur, 2500, Easing.OutQuint);
@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Ranking
             }
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
             allCircles.ForEach(c =>
             {
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Ranking
 
             Background.ScaleTo(1f, transition_time / 4, Easing.OutQuint);
 
-            Content.FadeOut(transition_time / 4);
+            this.FadeOut(transition_time / 4);
 
             return base.OnExiting(next);
         }
@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Ranking
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new AspectContainer
                 {
@@ -260,7 +260,7 @@ namespace osu.Game.Screens.Ranking
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
-                    Action = Exit
+                    Action = this.Exit
                 },
             };
 
