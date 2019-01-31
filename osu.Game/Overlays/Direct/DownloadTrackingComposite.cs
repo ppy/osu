@@ -58,8 +58,13 @@ namespace osu.Game.Overlays.Direct
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
+
             beatmaps.BeatmapDownloadBegan -= attachDownload;
             beatmaps.ItemAdded -= setAdded;
+
+            State.UnbindAll();
+
+            attachDownload(null);
         }
 
         #endregion
@@ -103,7 +108,6 @@ namespace osu.Game.Overlays.Direct
         private void onRequestSuccess(string data)
         {
             Schedule(() => State.Value = DownloadState.Downloaded);
-            attachDownload(null);
         }
 
         private void onRequestProgress(float progress)
@@ -113,7 +117,7 @@ namespace osu.Game.Overlays.Direct
 
         private void onRequestFailure(Exception e)
         {
-            Schedule(() => State.Value = DownloadState.NotDownloaded);
+            Schedule(() => attachDownload(null));
         }
 
         private void setAdded(BeatmapSetInfo s, bool existing, bool silent)
