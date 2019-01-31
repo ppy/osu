@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Backgrounds
             Background?.FadeOut(800, Easing.InOutSine);
             Background?.Expire();
 
-            Add(Background = newBackground);
+            AddInternal(Background = newBackground);
             currentDisplay++;
         }
 
