@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using Humanizer;
@@ -79,7 +79,11 @@ namespace osu.Game.Screens.Multi.Match.Components
                             {
                                 new ScrollContainer
                                 {
-                                    Padding = new MarginPadding { Vertical = 10 },
+                                    Padding = new MarginPadding
+                                    {
+                                        Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
+                                        Vertical = 10
+                                    },
                                     RelativeSizeAxes = Axes.Both,
                                     Children = new[]
                                     {
@@ -210,6 +214,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                             Direction = FillDirection.Vertical,
                                             Spacing = new Vector2(0, 20),
                                             Margin = new MarginPadding { Vertical = 20 },
+                                            Padding = new MarginPadding { Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                                             Children = new Drawable[]
                                             {
                                                 ApplyButton = new CreateRoomButton
