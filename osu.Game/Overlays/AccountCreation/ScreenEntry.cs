@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.AccountCreation
             this.api = api;
             this.host = host;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new FillFlowContainer
                 {
@@ -146,7 +146,7 @@ namespace osu.Game.Overlays.AccountCreation
                 focusNextTextbox();
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             processingOverlay.Hide();

@@ -23,8 +23,8 @@ namespace osu.Game.Screens.Menu
         private Color4 iconColour;
         private LinkFlowContainer textFlow;
 
-        protected override bool HideOverlaysOnEnter => true;
-        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
+        public override bool HideOverlaysOnEnter => true;
+        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
         public override bool CursorVisible => false;
 
@@ -41,7 +41,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 icon = new SpriteIcon
                 {
@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Menu
             LoadComponentAsync(intro = new Intro());
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
@@ -130,12 +130,12 @@ namespace osu.Game.Screens.Menu
 
             supporterDrawables.ForEach(d => d.FadeOut().Delay(2000).FadeIn(500));
 
-            Content
+            this
                 .FadeInFromZero(500)
                 .Then(5500)
                 .FadeOut(250)
                 .ScaleTo(0.9f, 250, Easing.InQuint)
-                .Finally(d => Push(intro));
+                .Finally(d => this.Push(intro));
 
             heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
         }
