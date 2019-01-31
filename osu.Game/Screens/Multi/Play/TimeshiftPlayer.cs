@@ -1,11 +1,12 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Logging;
+using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
@@ -18,6 +19,8 @@ namespace osu.Game.Screens.Multi.Play
 {
     public class TimeshiftPlayer : Player
     {
+        public Action Exited;
+
         private readonly Room room;
         private readonly int playlistItemId;
 
@@ -50,7 +53,7 @@ namespace osu.Game.Screens.Multi.Play
                 Schedule(() =>
                 {
                     ValidForResume = false;
-                    Exit();
+                    this.Exit();
                 });
             };
 
@@ -58,6 +61,16 @@ namespace osu.Game.Screens.Multi.Play
 
             while (!failed && !token.HasValue)
                 Thread.Sleep(1000);
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            if (base.OnExiting(next))
+                return true;
+
+            Exited?.Invoke();
+
+            return false;
         }
 
         protected override ScoreInfo CreateScore()
@@ -77,6 +90,13 @@ namespace osu.Game.Screens.Multi.Play
             var request = new SubmitRoomScoreRequest(token.Value, room.RoomID.Value ?? 0, playlistItemId, score);
             request.Failure += e => Logger.Error(e, "Failed to submit score");
             api.Queue(request);
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            Exited = null;
         }
 
         protected override Results CreateResults(ScoreInfo score) => new MatchResults(score, room);

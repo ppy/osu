@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -26,12 +26,12 @@ namespace osu.Game.Overlays.AccountCreation
 
         private const string help_centre_url = "/help/wiki/Help_Centre#login";
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             if (string.IsNullOrEmpty(api.ProvidedUsername))
             {
-                Content.FadeOut();
-                Push(new ScreenEntry());
+                this.FadeOut();
+                this.Push(new ScreenEntry());
                 return;
             }
 
@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.AccountCreation
             if (string.IsNullOrEmpty(api.ProvidedUsername))
                 return;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Sprite
                 {
@@ -104,7 +104,7 @@ namespace osu.Game.Overlays.AccountCreation
                         new DangerousSettingsButton
                         {
                             Text = "I understand. This account isn't for me.",
-                            Action = () => Push(new ScreenEntry())
+                            Action = () => this.Push(new ScreenEntry())
                         },
                         furtherAssistance = new LinkFlowContainer(cp => { cp.TextSize = 12; })
                         {

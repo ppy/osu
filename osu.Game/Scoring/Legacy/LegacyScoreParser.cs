@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.IO;
@@ -109,12 +109,12 @@ namespace osu.Game.Scoring.Legacy
                 }
             }
 
-            calculateAccuracy(score.ScoreInfo);
+            CalculateAccuracy(score.ScoreInfo);
 
             return score;
         }
 
-        private void calculateAccuracy(ScoreInfo score)
+        protected void CalculateAccuracy(ScoreInfo score)
         {
             int countMiss = score.Statistics[HitResult.Miss];
             int count50 = score.Statistics[HitResult.Meh];
