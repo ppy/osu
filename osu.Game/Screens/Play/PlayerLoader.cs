@@ -164,11 +164,12 @@ namespace osu.Game.Screens.Play
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (GetContainingInputManager().HoveredDrawables.Contains(visualSettings))
+            if (GetContainingInputManager()?.HoveredDrawables.Contains(visualSettings) == true)
             {
                 // show user setting preview
                 UpdateBackgroundElements();
             }
+
             base.OnHoverLost(e);
         }
 
