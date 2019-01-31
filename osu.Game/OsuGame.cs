@@ -356,17 +356,20 @@ namespace osu.Game
                     ActionRequested = action => volume.Adjust(action),
                     ScrollActionRequested = (action, amount, isPrecise) => volume.Adjust(action, amount, isPrecise),
                 },
-                backgroundParallax = new ParallaxContainer
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Child = backgroundStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
-                },
                 screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Child = screenStack = new ScreenStack { RelativeSizeAxes = Axes.Both }
+                    Children = new Drawable[]
+                    {
+                        backgroundParallax = new ParallaxContainer
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = backgroundStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
+                        },
+                        screenStack = new ScreenStack { RelativeSizeAxes = Axes.Both },
+                        logoContainer = new Container { RelativeSizeAxes = Axes.Both },
+                    }
                 },
-                logoContainer = new Container { RelativeSizeAxes = Axes.Both },
                 overlayContent = new Container
                 {
                     RelativeSizeAxes = Axes.Both,
