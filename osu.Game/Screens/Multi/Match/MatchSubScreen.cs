@@ -116,7 +116,6 @@ namespace osu.Game.Screens.Multi.Match
             header.OnRequestSelectBeatmap = () => this.Push(new MatchSongSelect
             {
                 Selected = addPlaylistItem,
-                Padding = new MarginPadding { Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING }
             });
 
             header.Tabs.Current.ValueChanged += t =>
