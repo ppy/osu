@@ -411,7 +411,7 @@ namespace osu.Game.Screens.Select
                 }
 
                 if (this.IsCurrentScreen())
-                    ensurePlayingSelected(true);
+                    ensurePlayingSelected();
                 UpdateBeatmap(Beatmap.Value);
             }
 
@@ -485,7 +485,7 @@ namespace osu.Game.Screens.Select
             if (Beatmap != null && !Beatmap.Value.BeatmapSetInfo.DeletePending)
             {
                 UpdateBeatmap(Beatmap.Value);
-                ensurePlayingSelected();
+                ensurePlayingSelected(true);
             }
 
             base.OnResuming(last);
@@ -575,17 +575,16 @@ namespace osu.Game.Screens.Select
                 beatmap.Track.Looping = true;
         }
 
-        private void ensurePlayingSelected(bool preview = false)
+        private void ensurePlayingSelected(bool restart = false)
         {
             Track track = Beatmap.Value.Track;
 
-            if (!track.IsRunning)
+            if (!track.IsRunning || restart)
             {
                 // Ensure the track is added to the TrackManager, since it is removed after the player finishes the map.
                 // Using AddItemToList rather than AddItem so that it doesn't attempt to register adjustment dependencies more than once.
                 Game.Audio.Track.AddItemToList(track);
-                if (preview)
-                    track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
+                track.RestartPoint = Beatmap.Value.Metadata.PreviewTime;
                 track.Restart();
             }
         }
