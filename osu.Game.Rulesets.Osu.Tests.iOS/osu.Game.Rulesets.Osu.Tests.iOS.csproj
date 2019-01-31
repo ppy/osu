@@ -39,10 +39,6 @@
       <Project>{C92A607B-1FDD-4954-9F92-03FF547D9080}</Project>
       <Name>osu.Game.Rulesets.Osu</Name>
     </ProjectReference>
-    <ProjectReference Include="..\osu-resources\osu.Game.Resources\osu.Game.Resources.csproj">
-      <Project>{D9A367C9-4C1A-489F-9B05-A0CEA2B53B58}</Project>
-      <Name>osu.Game.Resources</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.0\build\netstandard2.0\NETStandard.Library.targets')" />
