@@ -163,18 +163,14 @@ namespace osu.Game.Beatmaps
                 downloadNotification.Progress = progress;
             };
 
-            request.Success += data =>
+            request.Success += filename =>
             {
                 downloadNotification.Text = $"Importing {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}";
 
                 Task.Factory.StartNew(() =>
                 {
-                    BeatmapSetInfo importedBeatmap;
-
                     // This gets scheduled back to the update thread, but we want the import to run in the background.
-                    using (var stream = new MemoryStream(data))
-                    using (var archive = new ZipArchiveReader(stream, beatmapSetInfo.ToString()))
-                        importedBeatmap = Import(archive);
+                    var importedBeatmap = Import(filename);
 
                     downloadNotification.CompletionClickAction = () =>
                     {
