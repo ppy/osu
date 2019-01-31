@@ -19,10 +19,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private readonly PlayerSliderBar<double> sliderbar;
 
+        private readonly OsuSpriteText multiplierText;
+
         public PlaybackSettings()
         {
-            OsuSpriteText multiplierText;
-
             Children = new Drawable[]
             {
                 new Container
@@ -57,9 +57,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     },
                 }
             };
-
-            sliderbar.Bindable.ValueChanged += rateMultiplier => multiplierText.Text = $"{sliderbar.Bar.TooltipText}x";
-            sliderbar.Bindable.TriggerChange();
         }
 
         protected override void LoadComplete()
@@ -70,7 +67,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 return;
 
             var clockRate = AdjustableClock.Rate;
-            sliderbar.Bindable.ValueChanged += rateMultiplier => AdjustableClock.Rate = clockRate * rateMultiplier;
+
+            // can't trigger this line instantly as the underlying clock may not be ready to accept adjustments yet.
+            sliderbar.Bindable.ValueChanged += multiplier => AdjustableClock.Rate = clockRate * multiplier;
+
+            sliderbar.Bindable.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier:0.0}x", true);
         }
     }
 }
