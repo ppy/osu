@@ -12,14 +12,14 @@ namespace osu.Game.Screens.Backgrounds
     {
         public BackgroundScreenBlack()
         {
-            Child = new Box
+            InternalChild = new Box
             {
                 Colour = Color4.Black,
                 RelativeSizeAxes = Axes.Both,
             };
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             Show();
         }
