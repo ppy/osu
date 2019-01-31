@@ -30,5 +30,10 @@ namespace osu.Game.Screens
         /// Whether overlays should be able to be opened once this screen is entered or resumed.
         /// </summary>
         OverlayActivation InitialOverlayActivationMode { get; }
+
+        /// <summary>
+        /// The amount of parallax to be applied while this screen is displayed.
+        /// </summary>
+        float BackgroundParallaxAmount { get; }
     }
 }

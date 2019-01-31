@@ -60,7 +60,7 @@ namespace osu.Game.Screens
 
         private SampleChannel sampleExit;
 
-        protected BackgroundScreen Background => backgroundStack?.Current;
+        protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;
 
         private BackgroundScreen localBackground;
 
@@ -137,7 +137,8 @@ namespace osu.Game.Screens
             if (base.OnExiting(next))
                 return true;
 
-            backgroundStack?.Exit(localBackground);
+            if (localBackground != null && backgroundStack?.CurrentScreen == localBackground)
+                backgroundStack?.Exit();
 
             Beatmap.UnbindAll();
             return false;
@@ -157,9 +158,6 @@ namespace osu.Game.Screens
             {
                 if (this.IsCurrentScreen()) LogoArriving(logo, isResuming);
             }, true);
-
-            if (backgroundStack != null)
-                backgroundStack.ParallaxAmount = BackgroundParallaxAmount;
         }
 
         /// <summary>

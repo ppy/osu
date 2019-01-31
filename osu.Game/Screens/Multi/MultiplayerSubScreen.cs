@@ -22,6 +22,8 @@ namespace osu.Game.Screens.Multi
         public bool HideOverlaysOnEnter => false;
         public OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
 
+        public float BackgroundParallaxAmount => 1;
+
         public bool ValidForResume { get; set; } = true;
         public bool ValidForPush { get; set; } = true;
 
