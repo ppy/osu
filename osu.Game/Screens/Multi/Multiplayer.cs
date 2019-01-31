@@ -46,8 +46,6 @@ namespace osu.Game.Screens.Multi
         private readonly LoungeSubScreen loungeSubScreen;
         private readonly ScreenStack screenStack;
 
-        private readonly Bindable<OverlayActivation> overlayActivationMode = new Bindable<OverlayActivation>();
-
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
 
@@ -56,9 +54,6 @@ namespace osu.Game.Screens.Multi
 
         [Resolved]
         private OsuGameBase game { get; set; }
-
-        [Resolved]
-        private OsuGame osuGame { get; set; }
 
         [Resolved]
         private APIAccess api { get; set; }
@@ -142,9 +137,6 @@ namespace osu.Game.Screens.Multi
 
             if (idleTracker != null)
                 isIdle.BindTo(idleTracker.IsIdle);
-
-            if (osuGame != null)
-                overlayActivationMode.BindTo(osuGame.OverlayActivationMode);
         }
 
         protected override void LoadComplete()
@@ -181,8 +173,6 @@ namespace osu.Game.Screens.Multi
         {
             this.FadeIn();
 
-            osuGame.Toolbar.State = Visibility.Visible;
-
             waves.Show();
         }
 
@@ -211,9 +201,6 @@ namespace osu.Game.Screens.Multi
             this.ScaleTo(1, 250, Easing.OutSine);
 
             logo?.AppendAnimatingAction(() => OsuScreen.ApplyLogoArrivingDefaults(logo), true);
-
-            overlayActivationMode.Value = OverlayActivation.All;
-            osuGame.Toolbar.State = Visibility.Visible;
 
             updatePollingRate(isIdle.Value);
         }
