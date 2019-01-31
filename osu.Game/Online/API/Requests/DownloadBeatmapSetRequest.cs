@@ -10,6 +10,8 @@ namespace osu.Game.Online.API.Requests
     {
         public readonly BeatmapSetInfo BeatmapSet;
 
+        public float Progress;
+
         public event Action<float> DownloadProgressed;
 
         private readonly bool noVideo;
@@ -19,7 +21,7 @@ namespace osu.Game.Online.API.Requests
             this.noVideo = noVideo;
             BeatmapSet = set;
 
-            Progress += (current, total) => DownloadProgressed?.Invoke((float) current / total);
+            Progressed += (current, total) => DownloadProgressed?.Invoke(Progress = (float)current / total);
         }
 
         protected override string Target => $@"beatmapsets/{BeatmapSet.OnlineBeatmapSetID}/download{(noVideo ? "?noVideo=1" : "")}";
