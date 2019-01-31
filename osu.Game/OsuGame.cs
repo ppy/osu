@@ -86,6 +86,9 @@ namespace osu.Game
         public readonly Bindable<OverlayActivation> OverlayActivationMode = new Bindable<OverlayActivation>();
 
         private BackgroundScreenStack backgroundStack;
+
+        private ParallaxContainer backgroundParallax;
+
         private ScreenStack screenStack;
         private VolumeOverlay volume;
         private OnScreenDisplay onscreenDisplay;
@@ -353,7 +356,11 @@ namespace osu.Game
                     ActionRequested = action => volume.Adjust(action),
                     ScrollActionRequested = (action, amount, isPrecise) => volume.Adjust(action, amount, isPrecise),
                 },
-                backgroundStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
+                backgroundParallax = new ParallaxContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = backgroundStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both },
+                },
                 screenContainer = new ScalingContainer(ScalingMode.ExcludeOverlays)
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -766,6 +773,8 @@ namespace osu.Game
 
             if (newScreen is IOsuScreen newOsuScreen)
             {
+                backgroundParallax.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * newOsuScreen.BackgroundParallaxAmount;
+
                 OverlayActivationMode.Value = newOsuScreen.InitialOverlayActivationMode;
 
                 if (newOsuScreen.HideOverlaysOnEnter)
