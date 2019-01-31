@@ -12,6 +12,7 @@ We are accepting bug reports (please report with as much detail as possible). Fe
 
 - A desktop platform with the [.NET Core SDK 2.2](https://www.microsoft.com/net/learn/get-started) or higher installed.
 - When working with the codebase, we recommend using an IDE with intellisense and syntax highlighting, such as [Visual Studio 2017+](https://visualstudio.microsoft.com/vs/), [Jetbrains Rider](https://www.jetbrains.com/rider/) or [Visual Studio Code](https://code.visualstudio.com/).
+- Note that there are **[additional requirements for Windows 7 and Windows 8.1](https://docs.microsoft.com/en-us/dotnet/core/windows-prerequisites?tabs=netcore2x)** which you may need to manually install if your operating system is not up-to-date.
 
 # Running osu!
 
@@ -30,18 +31,14 @@ If your platform is not listed above, there is still a chance you can manually b
 Clone the repository **including submodules**:
 
 ```shell
-git clone --recurse-submodules https://github.com/ppy/osu
+git clone https://github.com/ppy/osu
 cd osu
 ```
-
-> If you forgot the `--recurse-submodules` option, run this command inside the `osu` directory:
->
-> `git submodule update --init --recursive`
 
 To update the source code to the latest commit, run the following command inside the `osu` directory:
 
 ```shell
-git pull --recurse-submodules
+git pull
 ```
 
 ## Building
@@ -71,6 +68,10 @@ For example, you can run osu! with the following command:
 ```shell
 LD_LIBRARY_PATH="$(pwd)/osu.Desktop/bin/Debug/netcoreapp2.2" dotnet run --project osu.Desktop
 ```
+
+## Testing with resource/framework modifications
+
+Sometimes it may be necessary to cross-test changes in [osu-resources](https://github.com/ppy/osu-resources) or [osu-framework](https://github.com/ppy/osu-framework). This can be achieved by running some commands as documented on the [osu-resources](https://github.com/ppy/osu-resources/wiki/Testing-local-resources-checkout-with-other-projects) and [osu-framework](https://github.com/ppy/osu-framework/wiki/Testing-local-framework-checkout-with-other-projects) wiki pages.
 
 ## Code analysis
 

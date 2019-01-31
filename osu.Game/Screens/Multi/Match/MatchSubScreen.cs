@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -21,6 +21,7 @@ namespace osu.Game.Screens.Multi.Match
     public class MatchSubScreen : MultiplayerSubScreen
     {
         public override bool AllowBeatmapRulesetChange => false;
+
         public override string Title => room.RoomID.Value == null ? "New room" : room.Name.Value;
         public override string ShortTitle => "room";
 
@@ -36,12 +37,6 @@ namespace osu.Game.Screens.Multi.Match
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
-        [Resolved(CanBeNull = true)]
-        private OsuGame game { get; set; }
-
-        [Resolved(CanBeNull = true)]
-        private IRoomManager manager { get; set; }
-
         public MatchSubScreen(Room room, Action<Screen> pushGameplayScreen)
         {
             this.room = room;
@@ -55,7 +50,7 @@ namespace osu.Game.Screens.Multi.Match
             GridContainer bottomRow;
             MatchSettingsOverlay settings;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new GridContainer
                 {
@@ -75,13 +70,23 @@ namespace osu.Game.Screens.Multi.Match
                                     {
                                         leaderboard = new MatchLeaderboard
                                         {
-                                            Padding = new MarginPadding(10),
+                                            Padding = new MarginPadding
+                                            {
+                                                Left = 10 + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
+                                                Right = 10,
+                                                Vertical = 10,
+                                            },
                                             RelativeSizeAxes = Axes.Both,
                                             Room = room
                                         },
                                         new Container
                                         {
-                                            Padding = new MarginPadding(10),
+                                            Padding = new MarginPadding
+                                            {
+                                                Left = 10,
+                                                Right = 10 + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
+                                                Vertical = 10,
+                                            },
                                             RelativeSizeAxes = Axes.Both,
                                             Child = chat = new MatchChatDisplay(room)
                                             {
@@ -108,7 +113,11 @@ namespace osu.Game.Screens.Multi.Match
                 },
             };
 
-            header.OnRequestSelectBeatmap = () => Push(new MatchSongSelect { Selected = addPlaylistItem });
+            header.OnRequestSelectBeatmap = () => this.Push(new MatchSongSelect
+            {
+                Selected = addPlaylistItem,
+            });
+
             header.Tabs.Current.ValueChanged += t =>
             {
                 const float fade_duration = 500;
@@ -126,7 +135,11 @@ namespace osu.Game.Screens.Multi.Match
                 }
             };
 
-            chat.Exit += Exit;
+            chat.Exit += () =>
+            {
+                if (this.IsCurrentScreen())
+                    this.Exit();
+            };
         }
 
         [BackgroundDependencyLoader]
@@ -135,9 +148,9 @@ namespace osu.Game.Screens.Multi.Match
             beatmapManager.ItemAdded += beatmapAdded;
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
-            manager?.PartRoom();
+            Manager?.PartRoom();
             return base.OnExiting(next);
         }
 
@@ -154,7 +167,7 @@ namespace osu.Game.Screens.Multi.Match
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
 
-            game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
+            Game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
         }
 
         private void setRuleset(RulesetInfo ruleset)
@@ -162,7 +175,7 @@ namespace osu.Game.Screens.Multi.Match
             if (ruleset == null)
                 return;
 
-            game?.ForcefullySetRuleset(ruleset);
+            Game?.ForcefullySetRuleset(ruleset);
         }
 
         private void beatmapAdded(BeatmapSetInfo model, bool existing, bool silent) => Schedule(() =>
@@ -177,7 +190,7 @@ namespace osu.Game.Screens.Multi.Match
             var localBeatmap = beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == bindings.CurrentBeatmap.Value.OnlineBeatmapID);
 
             if (localBeatmap != null)
-                game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
+                Game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
         });
 
         private void addPlaylistItem(PlaylistItem item)
@@ -194,11 +207,9 @@ namespace osu.Game.Screens.Multi.Match
             {
                 default:
                 case GameTypeTimeshift _:
-                    pushGameplayScreen?.Invoke(new PlayerLoader(() => {
-                        var player = new TimeshiftPlayer(room, room.Playlist.First().ID);
-                        player.Exited += _ => leaderboard.RefreshScores();
-
-                        return player;
+                    pushGameplayScreen?.Invoke(new PlayerLoader(() => new TimeshiftPlayer(room, room.Playlist.First().ID)
+                    {
+                        Exited = () => leaderboard.RefreshScores()
                     }));
                     break;
             }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -30,10 +30,12 @@ namespace osu.Game.Screens.Play
 
         private Player player;
 
+        private Container content;
+
         private BeatmapMetadataDisplay info;
 
         private bool hideOverlays;
-        protected override bool HideOverlaysOnEnter => hideOverlays;
+        public override bool HideOverlaysOnEnter => hideOverlays;
 
         private Task loadTask;
 
@@ -51,34 +53,42 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(info = new BeatmapMetadataDisplay(Beatmap.Value)
+            InternalChild = content = new Container
             {
-                Alpha = 0,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-            });
-
-            Add(new FillFlowContainer<PlayerSettingsGroup>
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 20),
-                Margin = new MarginPadding(25),
-                Children = new PlayerSettingsGroup[]
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    visualSettings = new VisualSettings(),
-                    new InputSettings()
+                    info = new BeatmapMetadataDisplay(Beatmap.Value)
+                    {
+                        Alpha = 0,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    new FillFlowContainer<PlayerSettingsGroup>
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 20),
+                        Margin = new MarginPadding(25),
+                        Children = new PlayerSettingsGroup[]
+                        {
+                            visualSettings = new VisualSettings(),
+                            new InputSettings()
+                        }
+                    }
                 }
-            });
+            };
 
             loadNewPlayer();
         }
 
         private void playerLoaded(Player player) => info.Loading = false;
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
 
@@ -105,21 +115,21 @@ namespace osu.Game.Screens.Play
 
         private void contentIn()
         {
-            Content.ScaleTo(1, 650, Easing.OutQuint);
-            Content.FadeInFromZero(400);
+            content.ScaleTo(1, 650, Easing.OutQuint);
+            content.FadeInFromZero(400);
         }
 
         private void contentOut()
         {
-            Content.ScaleTo(0.7f, 300, Easing.InQuint);
-            Content.FadeOut(250);
+            content.ScaleTo(0.7f, 300, Easing.InQuint);
+            content.FadeOut(250);
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            Content.ScaleTo(0.7f);
+            content.ScaleTo(0.7f);
 
             contentIn();
 
@@ -154,23 +164,24 @@ namespace osu.Game.Screens.Play
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (GetContainingInputManager().HoveredDrawables.Contains(visualSettings))
+            if (GetContainingInputManager()?.HoveredDrawables.Contains(visualSettings) == true)
             {
                 // show user setting preview
                 UpdateBackgroundElements();
             }
+
             base.OnHoverLost(e);
         }
 
         protected override void InitializeBackgroundElements()
         {
-            Background?.FadeTo(1, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            Background?.FadeColour(Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             Background?.BlurTo(background_blur, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
         private void pushWhenLoaded()
         {
-            if (!IsCurrentScreen) return;
+            if (!this.IsCurrentScreen()) return;
 
             try
             {
@@ -191,7 +202,7 @@ namespace osu.Game.Screens.Play
 
                     this.Delay(250).Schedule(() =>
                     {
-                        if (!IsCurrentScreen) return;
+                        if (!this.IsCurrentScreen()) return;
 
                         loadTask = null;
 
@@ -200,9 +211,9 @@ namespace osu.Game.Screens.Play
                         ValidForResume = false;
 
                         if (player.LoadedBeatmapSuccessfully)
-                            Push(player);
+                            this.Push(player);
                         else
-                            Exit();
+                            this.Exit();
                     });
                 }, 500);
             }
@@ -218,15 +229,15 @@ namespace osu.Game.Screens.Play
             pushDebounce = null;
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
             cancelLoad();
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
-            Content.ScaleTo(0.7f, 150, Easing.InQuint);
+            content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
             cancelLoad();
 
