@@ -95,7 +95,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
             button.Action = () =>
             {
-                if (State.Value == DownloadState.Downloading)
+                if (State.Value != DownloadState.NotDownloaded)
                 {
                     shakeContainer.Shake();
                     return;
