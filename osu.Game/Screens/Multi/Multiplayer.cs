@@ -18,6 +18,7 @@ using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet.Buttons;
+using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Match;
@@ -28,9 +29,9 @@ namespace osu.Game.Screens.Multi
     [Cached]
     public class Multiplayer : CompositeDrawable, IOsuScreen, IOnlineComponent
     {
-        public bool AllowBeatmapRulesetChange => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.AllowBeatmapRulesetChange ?? true;
-        public bool AllowExternalScreenChange => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.AllowExternalScreenChange ?? true;
-        public bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.AllowExternalScreenChange ?? true;
+        public bool DisallowExternalBeatmapRulesetChanges => false;
+
+        public bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.CursorVisible ?? true;
 
         public bool HideOverlaysOnEnter => false;
         public OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
@@ -52,9 +53,6 @@ namespace osu.Game.Screens.Multi
         private RoomManager roomManager;
 
         [Resolved]
-        private IBindableBeatmap beatmap { get; set; }
-
-        [Resolved]
         private OsuGameBase game { get; set; }
 
         [Resolved]
@@ -62,6 +60,14 @@ namespace osu.Game.Screens.Multi
 
         [Resolved(CanBeNull = true)]
         private OsuLogo logo { get; set; }
+
+        public Bindable<WorkingBeatmap> Beatmap => screenDependencies.Beatmap;
+
+        public Bindable<RulesetInfo> Ruleset => screenDependencies.Ruleset;
+
+        private OsuScreenDependencies screenDependencies;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) => screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
 
         public Multiplayer()
         {
@@ -182,6 +188,8 @@ namespace osu.Game.Screens.Multi
         {
             waves.Hide();
 
+            screenDependencies.Dispose();
+
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
             cancelLooping();
@@ -218,7 +226,7 @@ namespace osu.Game.Screens.Multi
 
         private void cancelLooping()
         {
-            var track = beatmap.Value.Track;
+            var track = Beatmap.Value.Track;
             if (track != null)
                 track.Looping = false;
         }
@@ -231,7 +239,7 @@ namespace osu.Game.Screens.Multi
 
             if (screenStack.CurrentScreen is MatchSubScreen)
             {
-                var track = beatmap.Value.Track;
+                var track = Beatmap.Value.Track;
                 if (track != null)
                 {
                     track.Looping = true;
@@ -239,7 +247,7 @@ namespace osu.Game.Screens.Multi
                     if (!track.IsRunning)
                     {
                         game.Audio.AddItemToList(track);
-                        track.Seek(beatmap.Value.Metadata.PreviewTime);
+                        track.Seek(Beatmap.Value.Metadata.PreviewTime);
                         track.Start();
                     }
                 }

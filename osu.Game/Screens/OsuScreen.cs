@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -50,15 +51,23 @@ namespace osu.Game.Screens
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-        public virtual bool AllowBeatmapRulesetChange => true;
 
-        protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        /// <summary>
+        /// Disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
+        /// </summary>
+        public virtual bool DisallowExternalBeatmapRulesetChanges => false;
+
+        private SampleChannel sampleExit;
 
         public virtual float BackgroundParallaxAmount => 1;
 
-        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public Bindable<WorkingBeatmap> Beatmap => screenDependencies.Beatmap;
 
-        private SampleChannel sampleExit;
+        public Bindable<RulesetInfo> Ruleset => screenDependencies.Ruleset;
+
+        private OsuScreenDependencies screenDependencies;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) => screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
 
         protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;
 
@@ -77,11 +86,8 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BindableBeatmap beatmap, OsuGame osu, AudioManager audio, Bindable<RulesetInfo> ruleset)
+        private void load(OsuGame osu, AudioManager audio)
         {
-            Beatmap.BindTo(beatmap);
-            Ruleset.BindTo(ruleset);
-
             sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
 
@@ -134,7 +140,8 @@ namespace osu.Game.Screens
             if (localBackground != null && backgroundStack?.CurrentScreen == localBackground)
                 backgroundStack?.Exit();
 
-            Beatmap.UnbindAll();
+            screenDependencies.Dispose();
+
             return false;
         }
 
@@ -200,5 +207,54 @@ namespace osu.Game.Screens
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
+    }
+
+    public class OsuScreenDependencies : DependencyContainer, IDisposable
+    {
+        private readonly bool leaseOwner;
+
+        public Bindable<WorkingBeatmap> Beatmap { get; private set; }
+
+        public Bindable<RulesetInfo> Ruleset { get; private set; }
+
+        public OsuScreenDependencies(bool requireLease, IReadOnlyDependencyContainer parent)
+            : base(parent)
+        {
+            if (requireLease)
+            {
+                Beatmap = parent.Get<LeasedBindable<WorkingBeatmap>>()?.GetBoundCopy();
+                if (Beatmap == null)
+                {
+                    leaseOwner = true;
+                    Cache(Beatmap = parent.Get<Bindable<WorkingBeatmap>>().BeginLease(true));
+                }
+
+                Ruleset = parent.Get<LeasedBindable<RulesetInfo>>()?.GetBoundCopy();
+                if (Ruleset == null)
+                {
+                    leaseOwner = true;
+                    Cache(Ruleset = parent.Get<Bindable<RulesetInfo>>().BeginLease(true));
+                }
+            }
+            else
+            {
+                Beatmap = (parent.Get<LeasedBindable<WorkingBeatmap>>() ?? parent.Get<Bindable<WorkingBeatmap>>()).GetBoundCopy();
+                Ruleset = (parent.Get<LeasedBindable<RulesetInfo>>() ?? parent.Get<Bindable<RulesetInfo>>()).GetBoundCopy();
+            }
+        }
+
+        public void Dispose()
+        {
+            if (leaseOwner)
+            {
+                ((LeasedBindable<WorkingBeatmap>)Beatmap).Return();
+                ((LeasedBindable<RulesetInfo>)Ruleset).Return();
+            }
+            else
+            {
+                Beatmap.UnbindAll();
+                Ruleset.UnbindAll();
+            }
+        }
     }
 }

@@ -112,7 +112,7 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             }
 
             [BackgroundDependencyLoader]
-            private void load(OsuConfigManager config, IBindableBeatmap beatmap)
+            private void load(OsuConfigManager config, IBindable<WorkingBeatmap> beatmap)
             {
                 InternalChild = expandTarget = new Container
                 {
