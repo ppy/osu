@@ -292,7 +292,7 @@ namespace osu.Game
                 return;
             }
 
-            if ((screenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange != true)
+            if ((screenStack.CurrentScreen as IOsuScreen)?.DisallowExternalBeatmapRulesetChanges != false)
             {
                 notifications.Post(new SimpleNotification
                 {
@@ -723,46 +723,13 @@ namespace osu.Game
         {
             base.UpdateAfterChildren();
 
-            // we only want to apply these restrictions when we are inside a screen stack.
-            // the use case for not applying is in visual/unit tests.
-            bool applyBeatmapRulesetRestrictions = !(screenStack.CurrentScreen as IOsuScreen)?.AllowBeatmapRulesetChange ?? false;
-
-            ruleset.Disabled = applyBeatmapRulesetRestrictions;
-            Beatmap.Disabled = applyBeatmapRulesetRestrictions;
-
             screenContainer.Padding = new MarginPadding { Top = ToolbarOffset };
             overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
             MenuCursorContainer.CanShowCursor = (screenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
 
-        /// <summary>
-        /// Sets <see cref="Beatmap"/> while ignoring any beatmap.
-        /// </summary>
-        /// <param name="beatmap">The beatmap to set.</param>
-        public void ForcefullySetBeatmap(WorkingBeatmap beatmap)
-        {
-            var beatmapDisabled = Beatmap.Disabled;
-
-            Beatmap.Disabled = false;
-            Beatmap.Value = beatmap;
-            Beatmap.Disabled = beatmapDisabled;
-        }
-
-        /// <summary>
-        /// Sets <see cref="Ruleset"/> while ignoring any ruleset restrictions.
-        /// </summary>
-        /// <param name="beatmap">The beatmap to set.</param>
-        public void ForcefullySetRuleset(RulesetInfo ruleset)
-        {
-            var rulesetDisabled = this.ruleset.Disabled;
-
-            this.ruleset.Disabled = false;
-            this.ruleset.Value = ruleset;
-            this.ruleset.Disabled = rulesetDisabled;
-        }
-
-        protected virtual void ScreenChanged(IScreen lastScreen, IScreen newScreen)
+        protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
         {
             switch (newScreen)
             {

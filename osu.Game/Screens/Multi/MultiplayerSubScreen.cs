@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
@@ -10,13 +11,14 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Multi
 {
     public abstract class MultiplayerSubScreen : CompositeDrawable, IMultiplayerSubScreen, IKeyBindingHandler<GlobalAction>
     {
-        public virtual bool AllowBeatmapRulesetChange => true;
-        public bool AllowExternalScreenChange => true;
+        public virtual bool DisallowExternalBeatmapRulesetChanges => false;
+
         public bool CursorVisible => true;
 
         public bool HideOverlaysOnEnter => false;
@@ -32,8 +34,13 @@ namespace osu.Game.Screens.Multi
         public abstract string Title { get; }
         public virtual string ShortTitle => Title;
 
-        [Resolved]
-        protected IBindableBeatmap Beatmap { get; private set; }
+        public Bindable<WorkingBeatmap> Beatmap => screenDependencies.Beatmap;
+
+        public Bindable<RulesetInfo> Ruleset => screenDependencies.Ruleset;
+
+        private OsuScreenDependencies screenDependencies;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) => screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
 
         [Resolved(CanBeNull = true)]
         protected OsuGame Game { get; private set; }
@@ -59,6 +66,8 @@ namespace osu.Game.Screens.Multi
         {
             this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
             this.MoveToX(200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
+
+            screenDependencies.Dispose();
 
             return false;
         }

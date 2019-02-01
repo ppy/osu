@@ -33,7 +33,7 @@ namespace osu.Game.Tests.Visual
             beatmap.Default = new DummyWorkingBeatmap(Dependencies.Get<OsuGameBase>());
 
             Dependencies.CacheAs<BindableBeatmap>(beatmap);
-            Dependencies.CacheAs<IBindableBeatmap>(beatmap);
+            Dependencies.CacheAs<IBindable<WorkingBeatmap>>(beatmap);
 
             Dependencies.CacheAs(Ruleset);
             Dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);

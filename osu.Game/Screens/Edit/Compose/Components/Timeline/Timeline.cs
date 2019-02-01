@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
         private WaveformGraph waveform;
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, IAdjustableClock adjustableClock, OsuColour colours)
+        private void load(IBindable<WorkingBeatmap> beatmap, IAdjustableClock adjustableClock, OsuColour colours)
         {
             this.adjustableClock = adjustableClock;
 
