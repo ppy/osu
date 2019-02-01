@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -22,6 +22,7 @@ using osuTK;
 using osuTK.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Screens;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -29,7 +30,7 @@ namespace osu.Game.Screens.Tournament
     {
         private const string results_filename = "drawings_results.txt";
 
-        protected override bool HideOverlaysOnEnter => true;
+        public override bool HideOverlaysOnEnter => true;
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
@@ -70,13 +71,13 @@ namespace osu.Game.Screens.Tournament
 
             if (!TeamList.Teams.Any())
             {
-                Exit();
+                this.Exit();
                 return;
             }
 
             drawingsConfig = new DrawingsConfigManager(storage);
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -327,7 +328,7 @@ namespace osu.Game.Screens.Tournament
                                 continue;
 
                             // ReSharper disable once AccessToModifiedClosure
-                            DrawingsTeam teamToAdd = allTeams.FirstOrDefault(t => t.FullName == line);
+                            DrawingsTeam teamToAdd = allTeams.Find(t => t.FullName == line);
 
                             if (teamToAdd == null)
                                 continue;

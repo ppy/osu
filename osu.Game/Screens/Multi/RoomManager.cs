@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -21,8 +21,8 @@ namespace osu.Game.Screens.Multi
     {
         public event Action RoomsUpdated;
 
-        private readonly BindableCollection<Room> rooms = new BindableCollection<Room>();
-        public IBindableCollection<Room> Rooms => rooms;
+        private readonly BindableList<Room> rooms = new BindableList<Room>();
+        public IBindableList<Room> Rooms => rooms;
 
         private Room currentRoom;
 

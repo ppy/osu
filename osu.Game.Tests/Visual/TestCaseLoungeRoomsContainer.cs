@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -73,8 +73,8 @@ namespace osu.Game.Tests.Visual
         {
             public event Action RoomsUpdated;
 
-            public readonly BindableCollection<Room> Rooms = new BindableCollection<Room>();
-            IBindableCollection<Room> IRoomManager.Rooms => Rooms;
+            public readonly BindableList<Room> Rooms = new BindableList<Room>();
+            IBindableList<Room> IRoomManager.Rooms => Rooms;
 
             public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => Rooms.Add(room);
 

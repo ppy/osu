@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -82,6 +82,9 @@ namespace osu.Game.Rulesets.Osu
 
             if (mods.HasFlag(LegacyMods.Target))
                 yield return new OsuModTarget();
+
+            if (mods.HasFlag(LegacyMods.TouchDevice))
+                yield return new OsuModTouchDevice();
         }
 
         public override IEnumerable<Mod> GetModsFor(ModType type)

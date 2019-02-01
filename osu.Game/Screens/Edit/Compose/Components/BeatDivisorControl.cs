@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -238,11 +238,11 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 {
                     case Key.Right:
                         beatDivisor.Next();
-                        OnUserChange();
+                        OnUserChange(Current);
                         return true;
                     case Key.Left:
                         beatDivisor.Previous();
-                        OnUserChange();
+                        OnUserChange(Current);
                         return true;
                     default:
                         return false;
@@ -279,7 +279,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                 var xPosition = (ToLocalSpace(screenSpaceMousePosition).X - RangePadding) / UsableWidth;
 
                 CurrentNumber.Value = availableDivisors.OrderBy(d => Math.Abs(getMappedPosition(d) - xPosition)).First();
-                OnUserChange();
+                OnUserChange(Current);
             }
 
             private float getMappedPosition(float divisor) => (float)Math.Pow((divisor - 1) / (availableDivisors.Last() - 1), 0.90f);

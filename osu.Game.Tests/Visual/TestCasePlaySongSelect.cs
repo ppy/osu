@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.MathUtils;
+using osu.Framework.Platform;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
@@ -57,11 +58,19 @@ namespace osu.Game.Tests.Visual
 
         private class TestSongSelect : PlaySongSelect
         {
+            public Action StartRequested;
+
             public new Bindable<RulesetInfo> Ruleset => base.Ruleset;
 
             public WorkingBeatmap CurrentBeatmap => Beatmap.Value;
             public WorkingBeatmap CurrentBeatmapDetailsBeatmap => BeatmapDetails.Beatmap;
             public new BeatmapCarousel Carousel => base.Carousel;
+
+            protected override bool OnStart()
+            {
+                StartRequested?.Invoke();
+                return base.OnStart();
+            }
         }
 
         private TestSongSelect songSelect;
@@ -73,7 +82,7 @@ namespace osu.Game.Tests.Visual
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(GameHost host)
         {
             factory = new DatabaseContextFactory(LocalStorage);
             factory.ResetDatabase();
@@ -87,7 +96,7 @@ namespace osu.Game.Tests.Visual
                 usage.Migrate();
 
             Dependencies.Cache(rulesets = new RulesetStore(factory));
-            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, null, null, defaultBeatmap = Beatmap.Default));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, null, host, defaultBeatmap = Beatmap.Default));
 
             Beatmap.SetDefault();
         }
@@ -180,6 +189,27 @@ namespace osu.Game.Tests.Visual
 
             void onModChange(IEnumerable<Mod> mods) => modChangeIndex = actionIndex++;
             void onRulesetChange(RulesetInfo ruleset) => rulesetChangeIndex = actionIndex--;
+        }
+
+        [Test]
+        public void TestStartAfterUnMatchingFilterDoesNotStart()
+        {
+            addManyTestMaps();
+            AddUntilStep(() => songSelect.Carousel.SelectedBeatmap != null, "has selection");
+
+            bool startRequested = false;
+
+            AddStep("set filter and finalize", () =>
+            {
+                songSelect.StartRequested = () => startRequested = true;
+
+                songSelect.Carousel.Filter(new FilterCriteria { SearchText = "somestringthatshouldn'tbematchable" });
+                songSelect.FinaliseSelection();
+
+                songSelect.StartRequested = null;
+            });
+
+            AddAssert("start not requested", () => !startRequested);
         }
 
         private void importForRuleset(int id) => AddStep($"import test map for ruleset {id}", () => manager.Import(createTestBeatmapSet(getImportId(), rulesets.AvailableRulesets.Where(r => r.ID == id).ToArray())));

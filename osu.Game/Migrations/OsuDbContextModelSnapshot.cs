@@ -14,7 +14,7 @@ namespace osu.Game.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024");
+                .HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity("osu.Game.Beatmaps.BeatmapDifficulty", b =>
                 {
@@ -215,6 +215,25 @@ namespace osu.Game.Migrations
                     b.ToTable("Settings");
                 });
 
+            modelBuilder.Entity("osu.Game.IO.FileInfo", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("Hash");
+
+                    b.Property<int>("ReferenceCount");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("Hash")
+                        .IsUnique();
+
+                    b.HasIndex("ReferenceCount");
+
+                    b.ToTable("FileInfo");
+                });
+
             modelBuilder.Entity("osu.Game.Input.Bindings.DatabasedKeyBinding", b =>
                 {
                     b.Property<int>("ID")
@@ -237,25 +256,6 @@ namespace osu.Game.Migrations
                     b.HasIndex("RulesetID", "Variant");
 
                     b.ToTable("KeyBinding");
-                });
-
-            modelBuilder.Entity("osu.Game.IO.FileInfo", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Hash");
-
-                    b.Property<int>("ReferenceCount");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("Hash")
-                        .IsUnique();
-
-                    b.HasIndex("ReferenceCount");
-
-                    b.ToTable("FileInfo");
                 });
 
             modelBuilder.Entity("osu.Game.Rulesets.RulesetInfo", b =>
@@ -454,7 +454,7 @@ namespace osu.Game.Migrations
             modelBuilder.Entity("osu.Game.Scoring.ScoreInfo", b =>
                 {
                     b.HasOne("osu.Game.Beatmaps.BeatmapInfo", "Beatmap")
-                        .WithMany()
+                        .WithMany("Scores")
                         .HasForeignKey("BeatmapInfoID")
                         .OnDelete(DeleteBehavior.Cascade);
 

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
 using osu.Framework.Graphics;
@@ -100,7 +100,6 @@ namespace osu.Game.Screens.Select
         private Cached scrollPositionCache = new Cached();
 
         private readonly Container<DrawableCarouselItem> scrollableContent;
-
 
         public Bindable<bool> RightClickScrollingEnabled = new Bindable<bool>();
 

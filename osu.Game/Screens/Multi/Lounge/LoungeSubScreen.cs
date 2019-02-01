@@ -1,8 +1,7 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -17,6 +16,8 @@ namespace osu.Game.Screens.Multi.Lounge
 {
     public class LoungeSubScreen : MultiplayerSubScreen
     {
+        public override string Title => "Lounge";
+
         protected readonly FilterControl Filter;
 
         private readonly Container content;
@@ -24,20 +25,13 @@ namespace osu.Game.Screens.Multi.Lounge
         private readonly Action<Screen> pushGameplayScreen;
         private readonly ProcessingOverlay processingOverlay;
 
-        [Resolved(CanBeNull = true)]
-        private IRoomManager roomManager { get; set; }
-
-        public override string Title => "Lounge";
-
-        protected override Drawable TransitionContent => content;
-
         public LoungeSubScreen(Action<Screen> pushGameplayScreen)
         {
             this.pushGameplayScreen = pushGameplayScreen;
 
             RoomInspector inspector;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 Filter = new FilterControl { Depth = -1 },
                 content = new Container
@@ -81,7 +75,7 @@ namespace osu.Game.Screens.Multi.Lounge
 
             Filter.Search.Current.ValueChanged += s => filterRooms();
             Filter.Tabs.Current.ValueChanged += t => filterRooms();
-            Filter.Search.Exit += Exit;
+            Filter.Search.Exit += this.Exit;
         }
 
         protected override void UpdateAfterChildren()
@@ -91,30 +85,29 @@ namespace osu.Game.Screens.Multi.Lounge
             content.Padding = new MarginPadding
             {
                 Top = Filter.DrawHeight,
-                Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH,
-                Right = SearchableListOverlay.WIDTH_PADDING,
+                Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
+                Right = SearchableListOverlay.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
             };
         }
 
         protected override void OnFocus(FocusEvent e)
         {
-            GetContainingInputManager().ChangeFocus(Filter.Search);
+            Filter.Search.TakeFocus();
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             Filter.Search.HoldFocus = true;
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
             Filter.Search.HoldFocus = false;
-            // no base call; don't animate
-            return false;
+            return base.OnExiting(next);
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
             Filter.Search.HoldFocus = false;
@@ -123,13 +116,13 @@ namespace osu.Game.Screens.Multi.Lounge
         private void filterRooms()
         {
             rooms.Filter(Filter.CreateCriteria());
-            roomManager?.Filter(Filter.CreateCriteria());
+            Manager?.Filter(Filter.CreateCriteria());
         }
 
         private void joinRequested(Room room)
         {
             processingOverlay.Show();
-            roomManager?.JoinRoom(room, r =>
+            Manager?.JoinRoom(room, r =>
             {
                 Push(room);
                 processingOverlay.Hide();
@@ -142,10 +135,10 @@ namespace osu.Game.Screens.Multi.Lounge
         public void Push(Room room)
         {
             // Handles the case where a room is clicked 3 times in quick succession
-            if (!IsCurrentScreen)
+            if (!this.IsCurrentScreen())
                 return;
 
-            Push(new MatchSubScreen(room, s => pushGameplayScreen?.Invoke(s)));
+            this.Push(new MatchSubScreen(room, s => pushGameplayScreen?.Invoke(s)));
         }
     }
 }

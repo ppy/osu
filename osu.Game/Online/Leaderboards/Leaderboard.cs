@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -30,6 +31,7 @@ namespace osu.Game.Online.Leaderboards
         private readonly LoadingAnimation loading;
 
         private ScheduledDelegate showScoresDelegate;
+        private CancellationTokenSource showScoresCancellationSource;
 
         private bool scoresLoadedOnce;
 
@@ -49,6 +51,10 @@ namespace osu.Game.Online.Leaderboards
 
                 loading.Hide();
 
+                // schedule because we may not be loaded yet (LoadComponentAsync complains).
+                showScoresDelegate?.Cancel();
+                showScoresCancellationSource?.Cancel();
+
                 if (scores == null || !scores.Any())
                     return;
 
@@ -58,8 +64,6 @@ namespace osu.Game.Online.Leaderboards
                 scrollFlow = CreateScoreFlow();
                 scrollFlow.ChildrenEnumerable = scores.Select((s, index) => CreateDrawableScore(s, index + 1));
 
-                // schedule because we may not be loaded yet (LoadComponentAsync complains).
-                showScoresDelegate?.Cancel();
                 if (!IsLoaded)
                     showScoresDelegate = Schedule(showScores);
                 else
@@ -77,7 +81,7 @@ namespace osu.Game.Online.Leaderboards
                     }
 
                     scrollContainer.ScrollTo(0f, false);
-                });
+                }, (showScoresCancellationSource = new CancellationTokenSource()).Token);
             }
         }
 

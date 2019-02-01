@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Allocation;
@@ -46,7 +46,7 @@ namespace osu.Game.Overlays
                 if (value == beatmapSet)
                     return;
 
-                header.BeatmapSet = info.BeatmapSet = beatmapSet = value;
+                header.BeatmapSet.Value = info.BeatmapSet = beatmapSet = value;
             }
         }
 
@@ -140,7 +140,7 @@ namespace osu.Game.Overlays
             req.Success += res =>
             {
                 BeatmapSet = res.ToBeatmapSet(rulesets);
-                header.Picker.Beatmap.Value = header.BeatmapSet.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
+                header.Picker.Beatmap.Value = header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
             };
             api.Queue(req);
             Show();

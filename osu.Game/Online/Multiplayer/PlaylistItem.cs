@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using Newtonsoft.Json;
@@ -37,10 +37,10 @@ namespace osu.Game.Online.Multiplayer
         public RulesetInfo Ruleset { get; set; }
 
         [JsonIgnore]
-        public readonly BindableCollection<Mod> AllowedMods = new BindableCollection<Mod>();
+        public readonly BindableList<Mod> AllowedMods = new BindableList<Mod>();
 
         [JsonIgnore]
-        public readonly BindableCollection<Mod> RequiredMods = new BindableCollection<Mod>();
+        public readonly BindableList<Mod> RequiredMods = new BindableList<Mod>();
 
         [JsonProperty("beatmap")]
         private APIBeatmap apiBeatmap { get; set; }

@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -10,6 +10,7 @@ using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.MathUtils;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -38,13 +39,15 @@ namespace osu.Game.Overlays.AccountCreation
 
         private OsuTextBox[] textboxes;
         private ProcessingOverlay processingOverlay;
+        private GameHost host;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api)
+        private void load(OsuColour colours, APIAccess api, GameHost host)
         {
             this.api = api;
+            this.host = host;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new FillFlowContainer
                 {
@@ -139,11 +142,11 @@ namespace osu.Game.Overlays.AccountCreation
         {
             base.Update();
 
-            if (!textboxes.Any(t => t.HasFocus))
+            if (host?.OnScreenKeyboardOverlapsGameWindow != true && !textboxes.Any(t => t.HasFocus))
                 focusNextTextbox();
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             processingOverlay.Hide();

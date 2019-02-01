@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
 using osu.Game.Graphics;
@@ -12,6 +12,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     {
         protected override Color4 BackgroundColour => OsuColour.FromHex(@"362e42");
         protected override PrimaryFilter DefaultTab => PrimaryFilter.Open;
+
+        protected override float ContentHorizontalPadding => base.ContentHorizontalPadding + OsuScreen.HORIZONTAL_OVERFLOW_PADDING;
 
         public FilterControl()
         {

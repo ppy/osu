@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -16,17 +16,18 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         public Action<IEnumerable<APIRoomScoreInfo>> ScoresLoaded;
 
-        private readonly Room room;
-
-        public MatchLeaderboard(Room room)
+        public Room Room
         {
-            this.room = room;
+            get => bindings.Room;
+            set => bindings.Room = value;
         }
+
+        private readonly RoomBindings bindings = new RoomBindings();
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            room.RoomID.BindValueChanged(id =>
+            bindings.RoomID.BindValueChanged(id =>
             {
                 if (id == null)
                     return;
@@ -38,10 +39,10 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         protected override APIRequest FetchScores(Action<IEnumerable<APIRoomScoreInfo>> scoresCallback)
         {
-            if (room.RoomID == null)
+            if (bindings.RoomID.Value == null)
                 return null;
 
-            var req = new GetRoomScoresRequest(room.RoomID.Value ?? 0);
+            var req = new GetRoomScoresRequest(bindings.RoomID.Value ?? 0);
 
             req.Success += r =>
             {

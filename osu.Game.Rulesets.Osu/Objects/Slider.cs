@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osuTK;
@@ -198,7 +198,7 @@ namespace osu.Game.Rulesets.Osu.Objects
 
             if (tickDistance == 0) return;
 
-            var minDistanceFromEnd = Velocity * 0.01;
+            var minDistanceFromEnd = Velocity * 10;
 
             var spanCount = this.SpanCount();
 
@@ -215,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                     var distanceProgress = d / length;
                     var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
 
-                    var firstSample = Samples.FirstOrDefault(s => s.Name == SampleInfo.HIT_NORMAL)
+                    var firstSample = Samples.Find(s => s.Name == SampleInfo.HIT_NORMAL)
                                       ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
                     var sampleList = new List<SampleInfo>();
 
