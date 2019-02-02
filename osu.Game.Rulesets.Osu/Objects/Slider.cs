@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osuTK;
@@ -7,6 +7,7 @@ using osu.Game.Rulesets.Objects.Types;
 using System.Collections.Generic;
 using osu.Game.Rulesets.Objects;
 using System.Linq;
+using osu.Framework.Caching;
 using osu.Framework.Configuration;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
@@ -26,8 +27,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         public double EndTime => StartTime + this.SpanCount() * Path.Distance / Velocity;
         public double Duration => EndTime - StartTime;
 
+        private Cached<Vector2> endPositionCache;
+
+        public override Vector2 EndPosition => endPositionCache.IsValid ? endPositionCache.Value : endPositionCache.Value = Position + this.CurvePositionAt(1);
+
         public Vector2 StackedPositionAt(double t) => StackedPosition + this.CurvePositionAt(t);
-        public override Vector2 EndPosition => Position + this.CurvePositionAt(1);
 
         public override int ComboIndex
         {
@@ -56,7 +60,11 @@ namespace osu.Game.Rulesets.Osu.Objects
         public SliderPath Path
         {
             get => PathBindable.Value;
-            set => PathBindable.Value = value;
+            set
+            {
+                PathBindable.Value = value;
+                endPositionCache.Invalidate();
+            }
         }
 
         public double Distance => Path.Distance;
@@ -73,6 +81,8 @@ namespace osu.Game.Rulesets.Osu.Objects
 
                 if (TailCircle != null)
                     TailCircle.Position = EndPosition;
+
+                endPositionCache.Invalidate();
             }
         }
 
@@ -92,7 +102,17 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         public List<List<SampleInfo>> NodeSamples { get; set; } = new List<List<SampleInfo>>();
 
-        public int RepeatCount { get; set; }
+        private int repeatCount;
+
+        public int RepeatCount
+        {
+            get => repeatCount;
+            set
+            {
+                repeatCount = value;
+                endPositionCache.Invalidate();
+            }
+        }
 
         /// <summary>
         /// The length of one span of this <see cref="Slider"/>.
@@ -169,12 +189,16 @@ namespace osu.Game.Rulesets.Osu.Objects
 
         private void createTicks()
         {
-            var length = Path.Distance;
+            // A very lenient maximum length of a slider for ticks to be generated.
+            // This exists for edge cases such as /b/1573664 where the beatmap has been edited by the user, and should never be reached in normal usage.
+            const double max_length = 100000;
+
+            var length = Math.Min(max_length, Path.Distance);
             var tickDistance = MathHelper.Clamp(TickDistance, 0, length);
 
             if (tickDistance == 0) return;
 
-            var minDistanceFromEnd = Velocity * 0.01;
+            var minDistanceFromEnd = Velocity * 10;
 
             var spanCount = this.SpanCount();
 
@@ -191,7 +215,7 @@ namespace osu.Game.Rulesets.Osu.Objects
                     var distanceProgress = d / length;
                     var timeProgress = reversed ? 1 - distanceProgress : distanceProgress;
 
-                    var firstSample = Samples.FirstOrDefault(s => s.Name == SampleInfo.HIT_NORMAL)
+                    var firstSample = Samples.Find(s => s.Name == SampleInfo.HIT_NORMAL)
                                       ?? Samples.FirstOrDefault(); // TODO: remove this when guaranteed sort is present for samples (https://github.com/ppy/osu/issues/1933)
                     var sampleList = new List<SampleInfo>();
 

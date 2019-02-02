@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -28,6 +28,9 @@ namespace osu.Game.Tests.Visual
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             Dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
+
+            // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
+            beatmap.Default = new DummyWorkingBeatmap(Dependencies.Get<OsuGameBase>());
 
             Dependencies.CacheAs<BindableBeatmap>(beatmap);
             Dependencies.CacheAs<IBindableBeatmap>(beatmap);

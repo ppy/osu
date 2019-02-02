@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Game.Beatmaps;
@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Mods
 
         public override bool HasImplementation => GetType().GenericTypeArguments.Length == 0;
 
-        public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer) => rulesetContainer.SetReplay(CreateReplayScore(rulesetContainer.Beatmap)?.Replay);
+        public virtual void ApplyToRulesetContainer(RulesetContainer<T> rulesetContainer) => rulesetContainer.SetReplayScore(CreateReplayScore(rulesetContainer.Beatmap));
     }
 
     public abstract class ModAutoplay : Mod, IApplicableFailOverride

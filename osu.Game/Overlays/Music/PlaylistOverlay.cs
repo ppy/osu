@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -92,7 +92,7 @@ namespace osu.Game.Overlays.Music
         protected override void PopIn()
         {
             filter.Search.HoldFocus = true;
-            Schedule(() => GetContainingInputManager().ChangeFocus(filter.Search));
+            Schedule(() => filter.Search.TakeFocus());
 
             this.ResizeTo(new Vector2(1, playlist_height), transition_duration, Easing.OutQuint);
             this.FadeIn(transition_duration, Easing.OutQuint);

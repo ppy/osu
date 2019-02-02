@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -29,8 +29,8 @@ namespace osu.Game.Online.Chat
             @"#lobby"
         };
 
-        private readonly BindableCollection<Channel> availableChannels = new BindableCollection<Channel>();
-        private readonly BindableCollection<Channel> joinedChannels = new BindableCollection<Channel>();
+        private readonly BindableList<Channel> availableChannels = new BindableList<Channel>();
+        private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
 
         /// <summary>
         /// The currently opened channel
@@ -40,12 +40,12 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// The Channels the player has joined
         /// </summary>
-        public IBindableCollection<Channel> JoinedChannels => joinedChannels;
+        public IBindableList<Channel> JoinedChannels => joinedChannels;
 
         /// <summary>
         /// The channels available for the player to join
         /// </summary>
-        public IBindableCollection<Channel> AvailableChannels => availableChannels;
+        public IBindableList<Channel> AvailableChannels => availableChannels;
 
         private IAPIProvider api;
 
@@ -96,12 +96,14 @@ namespace osu.Game.Online.Chat
         /// </summary>
         /// <param name="text">The message text that is going to be posted</param>
         /// <param name="isAction">Is true if the message is an action, e.g.: user is currently eating </param>
-        public void PostMessage(string text, bool isAction = false)
+        /// <param name="target">An optional target channel. If null, <see cref="CurrentChannel"/> will be used.</param>
+        public void PostMessage(string text, bool isAction = false, Channel target = null)
         {
-            if (CurrentChannel.Value == null)
-                return;
+            if (target == null)
+                target = CurrentChannel.Value;
 
-            var currentChannel = CurrentChannel.Value;
+            if (target == null)
+                return;
 
             void dequeueAndRun()
             {
@@ -113,7 +115,7 @@ namespace osu.Game.Online.Chat
             {
                 if (!api.IsLoggedIn)
                 {
-                    currentChannel.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
+                    target.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
                     return;
                 }
 
@@ -121,29 +123,29 @@ namespace osu.Game.Online.Chat
                 {
                     Sender = api.LocalUser.Value,
                     Timestamp = DateTimeOffset.Now,
-                    ChannelId = CurrentChannel.Value.Id,
+                    ChannelId = target.Id,
                     IsAction = isAction,
                     Content = text
                 };
 
-                currentChannel.AddLocalEcho(message);
+                target.AddLocalEcho(message);
 
                 // if this is a PM and the first message, we need to do a special request to create the PM channel
-                if (currentChannel.Type == ChannelType.PM && !currentChannel.Joined)
+                if (target.Type == ChannelType.PM && !target.Joined)
                 {
-                    var createNewPrivateMessageRequest = new CreateNewPrivateMessageRequest(currentChannel.Users.First(), message);
+                    var createNewPrivateMessageRequest = new CreateNewPrivateMessageRequest(target.Users.First(), message);
 
                     createNewPrivateMessageRequest.Success += createRes =>
                     {
-                        currentChannel.Id = createRes.ChannelID;
-                        currentChannel.ReplaceMessage(message, createRes.Message);
+                        target.Id = createRes.ChannelID;
+                        target.ReplaceMessage(message, createRes.Message);
                         dequeueAndRun();
                     };
 
                     createNewPrivateMessageRequest.Failure += exception =>
                     {
                         Logger.Error(exception, "Posting message failed.");
-                        currentChannel.ReplaceMessage(message, null);
+                        target.ReplaceMessage(message, null);
                         dequeueAndRun();
                     };
 
@@ -155,14 +157,14 @@ namespace osu.Game.Online.Chat
 
                 req.Success += m =>
                 {
-                    currentChannel.ReplaceMessage(message, m);
+                    target.ReplaceMessage(message, m);
                     dequeueAndRun();
                 };
 
                 req.Failure += exception =>
                 {
                     Logger.Error(exception, "Posting message failed.");
-                    currentChannel.ReplaceMessage(message, null);
+                    target.ReplaceMessage(message, null);
                     dequeueAndRun();
                 };
 
@@ -178,9 +180,13 @@ namespace osu.Game.Online.Chat
         /// Posts a command locally. Commands like /help will result in a help message written in the current channel.
         /// </summary>
         /// <param name="text">the text containing the command identifier and command parameters.</param>
-        public void PostCommand(string text)
+        /// <param name="target">An optional target channel. If null, <see cref="CurrentChannel"/> will be used.</param>
+        public void PostCommand(string text, Channel target = null)
         {
-            if (CurrentChannel.Value == null)
+            if (target == null)
+                target = CurrentChannel.Value;
+
+            if (target == null)
                 return;
 
             var parameters = text.Split(new[] { ' ' }, 2);
@@ -192,7 +198,7 @@ namespace osu.Game.Online.Chat
                 case "me":
                     if (string.IsNullOrWhiteSpace(content))
                     {
-                        CurrentChannel.Value.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
+                        target.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
                         break;
                     }
 
@@ -200,11 +206,11 @@ namespace osu.Game.Online.Chat
                     break;
 
                 case "help":
-                    CurrentChannel.Value.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
                     break;
 
                 default:
-                    CurrentChannel.Value.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
+                    target.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
                     break;
             }
         }

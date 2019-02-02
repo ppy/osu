@@ -11,7 +11,7 @@ namespace osu.Game.Tournament.Screens.Showcase
         [BackgroundDependencyLoader]
         private void load(TextureStore textures)
         {
-            Add(new TournamentLogo());
+            AddInternal(new TournamentLogo());
         }
     }
 }

@@ -16,7 +16,7 @@ namespace osu.Game.Tournament.Screens
 
         protected BeatmapInfoScreen()
         {
-            Add(SongBar = new SongBar
+            AddInternal(SongBar = new SongBar
             {
                 Anchor = Anchor.BottomRight,
                 Origin = Anchor.BottomRight,

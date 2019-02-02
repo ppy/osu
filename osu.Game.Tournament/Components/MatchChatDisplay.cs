@@ -4,9 +4,8 @@
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics;
-using osu.Game.Graphics;
 using osu.Game.Online.Chat;
+using osu.Game.Overlays.Chat;
 using osu.Game.Tournament.IPC;
 using osuTK.Graphics;
 
@@ -16,7 +15,7 @@ namespace osu.Game.Tournament.Components
     {
         private readonly Bindable<string> chatChannel = new Bindable<string>();
 
-        protected override Drawable CreateMessage(Message message) => new MatchMessage(message);
+        protected override ChatLine CreateMessage(Message message) => new MatchMessage(message);
 
         private ChannelManager manager;
 
@@ -66,12 +65,12 @@ namespace osu.Game.Tournament.Components
             [BackgroundDependencyLoader]
             private void load(LadderInfo info)
             {
-                if (info.CurrentMatch.Value.Team1.Value.Players.Any(u => u.Id == Message.Sender.Id))
-                    ColourBox.Colour = red;
-                else if (info.CurrentMatch.Value.Team2.Value.Players.Any(u => u.Id == Message.Sender.Id))
-                    ColourBox.Colour = blue;
-                else if (Message.Sender.Colour != null)
-                    SenderText.Colour = ColourBox.Colour = OsuColour.FromHex(Message.Sender.Colour);
+                //if (info.CurrentMatch.Value.Team1.Value.Players.Any(u => u.Id == Message.Sender.Id))
+                //    ColourBox.Colour = red;
+                //else if (info.CurrentMatch.Value.Team2.Value.Players.Any(u => u.Id == Message.Sender.Id))
+                //    ColourBox.Colour = blue;
+                //else if (Message.Sender.Colour != null)
+                //    SenderText.Colour = ColourBox.Colour = OsuColour.FromHex(Message.Sender.Colour);
             }
 
             private readonly Color4 red = new Color4(186, 0, 18, 255);

@@ -49,7 +49,7 @@ namespace osu.Game.Tournament.Screens
         [BackgroundDependencyLoader]
         private void load(LadderInfo ladder, Storage storage)
         {
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Container
                 {
