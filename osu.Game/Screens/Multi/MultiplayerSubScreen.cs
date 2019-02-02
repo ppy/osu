@@ -34,13 +34,19 @@ namespace osu.Game.Screens.Multi
         public abstract string Title { get; }
         public virtual string ShortTitle => Title;
 
-        public Bindable<WorkingBeatmap> Beatmap => screenDependencies.Beatmap;
+        public Bindable<WorkingBeatmap> Beatmap { get; set; }
 
-        public Bindable<RulesetInfo> Ruleset => screenDependencies.Ruleset;
+        public Bindable<RulesetInfo> Ruleset { get; set; }
 
-        private OsuScreenDependencies screenDependencies;
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var deps = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) => screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
+            Beatmap = deps.Beatmap;
+            Ruleset = deps.Ruleset;
+
+            return deps;
+        }
 
         [Resolved(CanBeNull = true)]
         protected OsuGame Game { get; private set; }
@@ -66,8 +72,6 @@ namespace osu.Game.Screens.Multi
         {
             this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
             this.MoveToX(200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
-
-            screenDependencies.Dispose();
 
             return false;
         }
