@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
@@ -51,7 +50,6 @@ namespace osu.Game.Screens
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-
         /// <summary>
         /// Disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
         /// </summary>
@@ -61,13 +59,19 @@ namespace osu.Game.Screens
 
         public virtual float BackgroundParallaxAmount => 1;
 
-        public Bindable<WorkingBeatmap> Beatmap => screenDependencies.Beatmap;
+        public Bindable<WorkingBeatmap> Beatmap { get; set; }
 
-        public Bindable<RulesetInfo> Ruleset => screenDependencies.Ruleset;
+        public Bindable<RulesetInfo> Ruleset { get; set; }
 
-        private OsuScreenDependencies screenDependencies;
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var deps = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) => screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
+            Beatmap = deps.Beatmap;
+            Ruleset = deps.Ruleset;
+
+            return deps;
+        }
 
         protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;
 
@@ -140,8 +144,6 @@ namespace osu.Game.Screens
             if (localBackground != null && backgroundStack?.CurrentScreen == localBackground)
                 backgroundStack?.Exit();
 
-            screenDependencies.Dispose();
-
             return false;
         }
 
@@ -207,54 +209,5 @@ namespace osu.Game.Screens
         /// Note that the instance created may not be the used instance if it matches the BackgroundMode equality clause.
         /// </summary>
         protected virtual BackgroundScreen CreateBackground() => null;
-    }
-
-    public class OsuScreenDependencies : DependencyContainer, IDisposable
-    {
-        private readonly bool leaseOwner;
-
-        public Bindable<WorkingBeatmap> Beatmap { get; private set; }
-
-        public Bindable<RulesetInfo> Ruleset { get; private set; }
-
-        public OsuScreenDependencies(bool requireLease, IReadOnlyDependencyContainer parent)
-            : base(parent)
-        {
-            if (requireLease)
-            {
-                Beatmap = parent.Get<LeasedBindable<WorkingBeatmap>>()?.GetBoundCopy();
-                if (Beatmap == null)
-                {
-                    leaseOwner = true;
-                    Cache(Beatmap = parent.Get<Bindable<WorkingBeatmap>>().BeginLease(true));
-                }
-
-                Ruleset = parent.Get<LeasedBindable<RulesetInfo>>()?.GetBoundCopy();
-                if (Ruleset == null)
-                {
-                    leaseOwner = true;
-                    Cache(Ruleset = parent.Get<Bindable<RulesetInfo>>().BeginLease(true));
-                }
-            }
-            else
-            {
-                Beatmap = (parent.Get<LeasedBindable<WorkingBeatmap>>() ?? parent.Get<Bindable<WorkingBeatmap>>()).GetBoundCopy();
-                Ruleset = (parent.Get<LeasedBindable<RulesetInfo>>() ?? parent.Get<Bindable<RulesetInfo>>()).GetBoundCopy();
-            }
-        }
-
-        public void Dispose()
-        {
-            if (leaseOwner)
-            {
-                ((LeasedBindable<WorkingBeatmap>)Beatmap).Return();
-                ((LeasedBindable<RulesetInfo>)Ruleset).Return();
-            }
-            else
-            {
-                Beatmap.UnbindAll();
-                Ruleset.UnbindAll();
-            }
-        }
     }
 }

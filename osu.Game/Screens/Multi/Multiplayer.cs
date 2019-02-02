@@ -61,13 +61,19 @@ namespace osu.Game.Screens.Multi
         [Resolved(CanBeNull = true)]
         private OsuLogo logo { get; set; }
 
-        public Bindable<WorkingBeatmap> Beatmap => screenDependencies.Beatmap;
+        public Bindable<WorkingBeatmap> Beatmap { get; set; }
 
-        public Bindable<RulesetInfo> Ruleset => screenDependencies.Ruleset;
+        public Bindable<RulesetInfo> Ruleset { get; set; }
 
-        private OsuScreenDependencies screenDependencies;
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var deps = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
 
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent) => screenDependencies = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
+            Beatmap = deps.Beatmap;
+            Ruleset = deps.Ruleset;
+
+            return deps;
+        }
 
         public Multiplayer()
         {
@@ -187,8 +193,6 @@ namespace osu.Game.Screens.Multi
         public bool OnExiting(IScreen next)
         {
             waves.Hide();
-
-            screenDependencies.Dispose();
 
             this.Delay(WaveContainer.DISAPPEAR_DURATION).FadeOut();
 
