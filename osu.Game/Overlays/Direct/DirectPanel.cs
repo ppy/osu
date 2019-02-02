@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +16,6 @@ using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Graphics.UserInterface;
-using osu.Game.Online.API.Requests;
 using osuTK;
 using osuTK.Graphics;
 
@@ -31,8 +29,6 @@ namespace osu.Game.Overlays.Direct
 
         private Container content;
 
-        private ProgressBar progressBar;
-        private BeatmapManager beatmaps;
         private BeatmapSetOverlay beatmapSetOverlay;
 
         public PreviewTrack Preview => PlayButton.Preview;
@@ -65,14 +61,10 @@ namespace osu.Game.Overlays.Direct
             Colour = Color4.Black.Opacity(0.3f),
         };
 
-        private OsuColour colours;
-
         [BackgroundDependencyLoader(permitNulls: true)]
         private void load(BeatmapManager beatmaps, OsuColour colours, BeatmapSetOverlay beatmapSetOverlay)
         {
-            this.beatmaps = beatmaps;
             this.beatmapSetOverlay = beatmapSetOverlay;
-            this.colours = colours;
 
             AddInternal(content = new Container
             {
@@ -82,33 +74,14 @@ namespace osu.Game.Overlays.Direct
                 Children = new[]
                 {
                     CreateBackground(),
-                    progressBar = new ProgressBar
+                    new DownloadProgressBar(SetInfo)
                     {
                         Anchor = Anchor.BottomLeft,
                         Origin = Anchor.BottomLeft,
-                        Height = 0,
-                        Alpha = 0,
-                        BackgroundColour = Color4.Black.Opacity(0.7f),
-                        FillColour = colours.Blue,
                         Depth = -1,
                     },
                 }
             });
-
-            var downloadRequest = beatmaps.GetExistingDownload(SetInfo);
-
-            if (downloadRequest != null)
-                attachDownload(downloadRequest);
-
-            beatmaps.BeatmapDownloadBegan += attachDownload;
-            beatmaps.ItemAdded += setAdded;
-        }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            base.Dispose(isDisposing);
-            beatmaps.BeatmapDownloadBegan -= attachDownload;
-            beatmaps.ItemAdded -= setAdded;
         }
 
         protected override void Update()
@@ -148,37 +121,6 @@ namespace osu.Game.Overlays.Direct
         }
 
         protected void ShowInformation() => beatmapSetOverlay?.ShowBeatmapSet(SetInfo);
-
-        private void attachDownload(DownloadBeatmapSetRequest request)
-        {
-            if (request.BeatmapSet.OnlineBeatmapSetID != SetInfo.OnlineBeatmapSetID)
-                return;
-
-            progressBar.FadeIn(400, Easing.OutQuint);
-            progressBar.ResizeHeightTo(4, 400, Easing.OutQuint);
-
-            progressBar.Current.Value = 0;
-
-            request.Failure += e =>
-            {
-                progressBar.Current.Value = 0;
-                progressBar.FadeOut(500);
-            };
-
-            request.DownloadProgressed += progress => Schedule(() => progressBar.Current.Value = progress);
-
-            request.Success += data =>
-            {
-                progressBar.Current.Value = 1;
-                progressBar.FillColour = colours.Yellow;
-            };
-        }
-
-        private void setAdded(BeatmapSetInfo s, bool existing, bool silent) => Schedule(() =>
-        {
-            if (s.OnlineBeatmapSetID == SetInfo.OnlineBeatmapSetID)
-                progressBar.FadeOut(500);
-        });
 
         protected override void LoadComplete()
         {

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
 using System.Linq;
@@ -146,10 +146,9 @@ namespace osu.Game.Tests.Beatmaps.Formats
         /// <returns>The <see cref="Beatmap"/> after being decoded by an <see cref="LegacyBeatmapDecoder"/>.</returns>
         private Beatmap decode(string filename, out Beatmap jsonDecoded)
         {
-            using (var stream = Resource.OpenResource(filename))
+            using (var stream = TestResources.OpenResource(filename))
             using (var sr = new StreamReader(stream))
             {
-
                 var legacyDecoded = new LegacyBeatmapDecoder { ApplyOffsets = false }.Decode(sr);
                 using (var ms = new MemoryStream())
                 using (var sw = new StreamWriter(ms))

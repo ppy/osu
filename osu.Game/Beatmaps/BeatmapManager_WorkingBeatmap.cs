@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.IO;
@@ -22,10 +22,11 @@ namespace osu.Game.Beatmaps
             private readonly IResourceStore<byte[]> store;
             private readonly AudioManager audioManager;
 
-            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, BeatmapInfo beatmapInfo, AudioManager audioManager)
+            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, TextureStore textureStore, BeatmapInfo beatmapInfo, AudioManager audioManager)
                 : base(beatmapInfo)
             {
                 this.store = store;
+                this.textureStore = textureStore;
                 this.audioManager = audioManager;
             }
 
@@ -44,7 +45,7 @@ namespace osu.Game.Beatmaps
 
             private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
 
-            private LargeTextureStore textureStore;
+            private TextureStore textureStore;
 
             protected override bool BackgroundStillValid(Texture b) => false; // bypass lazy logic. we want to return a new background each time for refcounting purposes.
 
@@ -55,7 +56,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return (textureStore ?? (textureStore = new LargeTextureStore(new TextureLoaderStore(store)))).Get(getPathForFile(Metadata.BackgroundFile));
+                    return textureStore.Get(getPathForFile(Metadata.BackgroundFile));
                 }
                 catch
                 {

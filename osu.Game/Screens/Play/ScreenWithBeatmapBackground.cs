@@ -1,11 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Screens.Backgrounds;
 using osuTK;
 
@@ -15,7 +16,7 @@ namespace osu.Game.Screens.Play
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
-        protected new BackgroundScreenBeatmap Background => (BackgroundScreenBeatmap)base.Background;
+        protected new BackgroundScreenBeatmap Background => base.Background as BackgroundScreenBeatmap;
 
         public override bool AllowBeatmapRulesetChange => false;
 
@@ -39,7 +40,7 @@ namespace osu.Game.Screens.Play
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
             DimLevel.ValueChanged += _ => UpdateBackgroundElements();
@@ -48,7 +49,7 @@ namespace osu.Game.Screens.Play
             InitializeBackgroundElements();
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
             InitializeBackgroundElements();
@@ -60,14 +61,14 @@ namespace osu.Game.Screens.Play
         protected virtual void InitializeBackgroundElements() => UpdateBackgroundElements();
 
         /// <summary>
-        /// Called wen background elements require updates, usually due to a user changing a setting.
+        /// Called when background elements require updates, usually due to a user changing a setting.
         /// </summary>
         /// <param name="userChange"></param>
         protected virtual void UpdateBackgroundElements()
         {
-            if (!IsCurrentScreen) return;
+            if (!this.IsCurrentScreen()) return;
 
-            Background?.FadeTo(BackgroundOpacity, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            Background?.FadeColour(OsuColour.Gray(BackgroundOpacity), BACKGROUND_FADE_DURATION, Easing.OutQuint);
             Background?.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }

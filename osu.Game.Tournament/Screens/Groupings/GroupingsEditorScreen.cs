@@ -21,7 +21,7 @@ namespace osu.Game.Tournament.Screens.Groupings
 
         public GroupingsEditorScreen()
         {
-            AddRange(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new Box
                 {

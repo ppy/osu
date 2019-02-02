@@ -42,7 +42,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
             this.chat = chat;
             this.ipc = ipc;
 
-            AddRange(new Drawable[]
+            AddRangeInternal(new Drawable[]
             {
                 new MatchHeader(),
                 new Container
