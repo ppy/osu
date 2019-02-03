@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework;
@@ -10,7 +10,7 @@ using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Edit
 {
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Edit
         /// <summary>
         /// Invoked when this <see cref="SelectionBlueprint"/> has requested drag.
         /// </summary>
-        public event Action<DragEvent> DragRequested;
+        public event Action<SelectionBlueprint, DragEvent> DragRequested;
 
         /// <summary>
         /// The <see cref="DrawableHitObject"/> which this <see cref="SelectionBlueprint"/> applies to.
@@ -130,11 +130,9 @@ namespace osu.Game.Rulesets.Edit
 
         protected override bool OnDrag(DragEvent e)
         {
-            DragRequested?.Invoke(e);
+            DragRequested?.Invoke(this, e);
             return true;
         }
-
-        public abstract void AdjustPosition(DragEvent dragEvent);
 
         /// <summary>
         /// The screen-space point that causes this <see cref="SelectionBlueprint"/> to be selected.

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Mods;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -80,7 +80,7 @@ namespace osu.Game.Rulesets.UI
         /// Remove a DrawableHitObject from this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
-        public virtual void Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
+        public virtual bool Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.

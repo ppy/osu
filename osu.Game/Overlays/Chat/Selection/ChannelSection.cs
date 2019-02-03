@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -18,7 +19,7 @@ namespace osu.Game.Overlays.Chat.Selection
         public readonly FillFlowContainer<ChannelListItem> ChannelFlow;
 
         public IEnumerable<IFilterable> FilterableChildren => ChannelFlow.Children;
-        public IEnumerable<string> FilterTerms => new[] { Header };
+        public IEnumerable<string> FilterTerms => Array.Empty<string>();
         public bool MatchingFilter
         {
             set

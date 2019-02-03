@@ -1,15 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics;
 using osu.Framework.Logging;
-using osu.Framework.Threading;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Users;
@@ -19,7 +17,7 @@ namespace osu.Game.Online.Chat
     /// <summary>
     /// Manages everything channel related
     /// </summary>
-    public class ChannelManager : Component, IOnlineComponent
+    public class ChannelManager : PollingComponent
     {
         /// <summary>
         /// The channels the player joins on startup
@@ -31,6 +29,9 @@ namespace osu.Game.Online.Chat
             @"#lobby"
         };
 
+        private readonly BindableList<Channel> availableChannels = new BindableList<Channel>();
+        private readonly BindableList<Channel> joinedChannels = new BindableList<Channel>();
+
         /// <summary>
         /// The currently opened channel
         /// </summary>
@@ -39,19 +40,22 @@ namespace osu.Game.Online.Chat
         /// <summary>
         /// The Channels the player has joined
         /// </summary>
-        public ObservableCollection<Channel> JoinedChannels { get; } = new ObservableCollection<Channel>(); //todo: should be publicly readonly
+        public IBindableList<Channel> JoinedChannels => joinedChannels;
 
         /// <summary>
         /// The channels available for the player to join
         /// </summary>
-        public ObservableCollection<Channel> AvailableChannels { get; } = new ObservableCollection<Channel>(); //todo: should be publicly readonly
+        public IBindableList<Channel> AvailableChannels => availableChannels;
 
         private IAPIProvider api;
-        private ScheduledDelegate fetchMessagesScheduleder;
+
+        public readonly BindableBool HighPollRate = new BindableBool();
 
         public ChannelManager()
         {
             CurrentChannel.ValueChanged += currentChannelChanged;
+
+            HighPollRate.BindValueChanged(high => TimeBetweenPolls = high ? 1000 : 6000, true);
         }
 
         /// <summary>
@@ -77,7 +81,7 @@ namespace osu.Game.Online.Chat
                 throw new ArgumentNullException(nameof(user));
 
             CurrentChannel.Value = JoinedChannels.FirstOrDefault(c => c.Type == ChannelType.PM && c.Users.Count == 1 && c.Users.Any(u => u.Id == user.Id))
-                                   ?? new Channel { Name = user.Username, Users = { user } };
+                                   ?? new Channel(user);
         }
 
         private void currentChannelChanged(Channel channel) => JoinChannel(channel);
@@ -92,12 +96,14 @@ namespace osu.Game.Online.Chat
         /// </summary>
         /// <param name="text">The message text that is going to be posted</param>
         /// <param name="isAction">Is true if the message is an action, e.g.: user is currently eating </param>
-        public void PostMessage(string text, bool isAction = false)
+        /// <param name="target">An optional target channel. If null, <see cref="CurrentChannel"/> will be used.</param>
+        public void PostMessage(string text, bool isAction = false, Channel target = null)
         {
-            if (CurrentChannel.Value == null)
-                return;
+            if (target == null)
+                target = CurrentChannel.Value;
 
-            var currentChannel = CurrentChannel.Value;
+            if (target == null)
+                return;
 
             void dequeueAndRun()
             {
@@ -109,7 +115,7 @@ namespace osu.Game.Online.Chat
             {
                 if (!api.IsLoggedIn)
                 {
-                    currentChannel.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
+                    target.AddNewMessages(new ErrorMessage("Please sign in to participate in chat!"));
                     return;
                 }
 
@@ -117,29 +123,29 @@ namespace osu.Game.Online.Chat
                 {
                     Sender = api.LocalUser.Value,
                     Timestamp = DateTimeOffset.Now,
-                    ChannelId = CurrentChannel.Value.Id,
+                    ChannelId = target.Id,
                     IsAction = isAction,
                     Content = text
                 };
 
-                currentChannel.AddLocalEcho(message);
+                target.AddLocalEcho(message);
 
                 // if this is a PM and the first message, we need to do a special request to create the PM channel
-                if (currentChannel.Type == ChannelType.PM && !currentChannel.Joined)
+                if (target.Type == ChannelType.PM && !target.Joined)
                 {
-                    var createNewPrivateMessageRequest = new CreateNewPrivateMessageRequest(currentChannel.Users.First(), message);
+                    var createNewPrivateMessageRequest = new CreateNewPrivateMessageRequest(target.Users.First(), message);
 
                     createNewPrivateMessageRequest.Success += createRes =>
                     {
-                        currentChannel.Id = createRes.ChannelID;
-                        currentChannel.ReplaceMessage(message, createRes.Message);
+                        target.Id = createRes.ChannelID;
+                        target.ReplaceMessage(message, createRes.Message);
                         dequeueAndRun();
                     };
 
                     createNewPrivateMessageRequest.Failure += exception =>
                     {
                         Logger.Error(exception, "Posting message failed.");
-                        currentChannel.ReplaceMessage(message, null);
+                        target.ReplaceMessage(message, null);
                         dequeueAndRun();
                     };
 
@@ -151,14 +157,14 @@ namespace osu.Game.Online.Chat
 
                 req.Success += m =>
                 {
-                    currentChannel.ReplaceMessage(message, m);
+                    target.ReplaceMessage(message, m);
                     dequeueAndRun();
                 };
 
                 req.Failure += exception =>
                 {
                     Logger.Error(exception, "Posting message failed.");
-                    currentChannel.ReplaceMessage(message, null);
+                    target.ReplaceMessage(message, null);
                     dequeueAndRun();
                 };
 
@@ -174,9 +180,13 @@ namespace osu.Game.Online.Chat
         /// Posts a command locally. Commands like /help will result in a help message written in the current channel.
         /// </summary>
         /// <param name="text">the text containing the command identifier and command parameters.</param>
-        public void PostCommand(string text)
+        /// <param name="target">An optional target channel. If null, <see cref="CurrentChannel"/> will be used.</param>
+        public void PostCommand(string text, Channel target = null)
         {
-            if (CurrentChannel.Value == null)
+            if (target == null)
+                target = CurrentChannel.Value;
+
+            if (target == null)
                 return;
 
             var parameters = text.Split(new[] { ' ' }, 2);
@@ -188,7 +198,7 @@ namespace osu.Game.Online.Chat
                 case "me":
                     if (string.IsNullOrWhiteSpace(content))
                     {
-                        CurrentChannel.Value.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
+                        target.AddNewMessages(new ErrorMessage("Usage: /me [action]"));
                         break;
                     }
 
@@ -196,11 +206,11 @@ namespace osu.Game.Online.Chat
                     break;
 
                 case "help":
-                    CurrentChannel.Value.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
+                    target.AddNewMessages(new InfoMessage("Supported commands: /help, /me [action]"));
                     break;
 
                 default:
-                    CurrentChannel.Value.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
+                    target.AddNewMessages(new ErrorMessage($@"""/{command}"" is not supported! For a list of supported commands see /help"));
                     break;
             }
         }
@@ -223,13 +233,11 @@ namespace osu.Game.Online.Chat
             {
                 foreach (var channel in channels)
                 {
-                    // add as available if not already
-                    if (AvailableChannels.All(c => c.Id != channel.Id))
-                        AvailableChannels.Add(channel);
+                    var ch = getChannel(channel, addToAvailable: true);
 
                     // join any channels classified as "defaults"
                     if (joinDefaults && defaultChannels.Any(c => c.Equals(channel.Name, StringComparison.OrdinalIgnoreCase)))
-                        JoinChannel(channel);
+                        JoinChannel(ch);
                 }
             };
             req.Failure += error =>
@@ -262,37 +270,73 @@ namespace osu.Game.Online.Chat
             api.Queue(fetchInitialMsgReq);
         }
 
-        public void JoinChannel(Channel channel)
+        /// <summary>
+        /// Find an existing channel instance for the provided channel. Lookup is performed basd on ID.
+        /// The provided channel may be used if an existing instance is not found.
+        /// </summary>
+        /// <param name="lookup">A candidate channel to be used for lookup or permanently on lookup failure.</param>
+        /// <param name="addToAvailable">Whether the channel should be added to <see cref="AvailableChannels"/> if not already.</param>
+        /// <param name="addToJoined">Whether the channel should be added to <see cref="JoinedChannels"/> if not already.</param>
+        /// <returns>The found channel.</returns>
+        private Channel getChannel(Channel lookup, bool addToAvailable = false, bool addToJoined = false)
         {
-            if (channel == null) return;
+            Channel found = null;
 
-            // ReSharper disable once AccessToModifiedClosure
-            var existing = JoinedChannels.FirstOrDefault(c => c.Id == channel.Id);
+            bool lookupCondition(Channel ch) => lookup.Id > 0 ? ch.Id == lookup.Id : lookup.Name == ch.Name;
 
-            if (existing != null)
+            var available = AvailableChannels.FirstOrDefault(lookupCondition);
+            if (available != null)
+                found = available;
+
+            var joined = JoinedChannels.FirstOrDefault(lookupCondition);
+            if (found == null && joined != null)
+                found = joined;
+
+            if (found == null)
             {
-                // if we already have this channel loaded, we don't want to make a second one.
-                channel = existing;
-            }
-            else
-            {
-                var foundSelf = channel.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
+                found = lookup;
+
+                // if we're using a channel object from the server, we want to remove ourselves from the users list.
+                // this is because we check the first user in the channel to display a name/icon on tabs for now.
+                var foundSelf = found.Users.FirstOrDefault(u => u.Id == api.LocalUser.Value.Id);
                 if (foundSelf != null)
-                    channel.Users.Remove(foundSelf);
+                    found.Users.Remove(foundSelf);
+            }
 
-                JoinedChannels.Add(channel);
+            if (joined == null && addToJoined) joinedChannels.Add(found);
+            if (available == null && addToAvailable) availableChannels.Add(found);
 
-                if (channel.Type == ChannelType.Public && !channel.Joined)
+            return found;
+        }
+
+        /// <summary>
+        /// Joins a channel if it has not already been joined.
+        /// </summary>
+        /// <param name="channel">The channel to join.</param>
+        /// <param name="alreadyJoined">Whether the channel has already been joined server-side. Will skip a join request.</param>
+        /// <returns>The joined channel. Note that this may not match the parameter channel as it is a backed object.</returns>
+        public Channel JoinChannel(Channel channel, bool alreadyJoined = false)
+        {
+            if (channel == null) return null;
+
+            channel = getChannel(channel, addToJoined: true);
+
+            // ensure we are joined to the channel
+            if (!channel.Joined.Value)
+            {
+                if (alreadyJoined)
+                    channel.Joined.Value = true;
+                else
                 {
-                    var req = new JoinChannelRequest(channel, api.LocalUser);
-                    req.Success += () =>
+                    switch (channel.Type)
                     {
-                        channel.Joined.Value = true;
-                        JoinChannel(channel);
-                    };
-                    req.Failure += ex => LeaveChannel(channel);
-                    api.Queue(req);
-                    return;
+                        case ChannelType.Public:
+                            var req = new JoinChannelRequest(channel, api.LocalUser);
+                            req.Success += () => JoinChannel(channel, true);
+                            req.Failure += ex => LeaveChannel(channel);
+                            api.Queue(req);
+                            return channel;
+                    }
                 }
             }
 
@@ -304,15 +348,18 @@ namespace osu.Game.Online.Chat
                 // let's fetch a small number of messages to bring us up-to-date with the backlog.
                 fetchInitalMessages(channel);
             }
+
+            return channel;
         }
 
         public void LeaveChannel(Channel channel)
         {
             if (channel == null) return;
 
-            if (channel == CurrentChannel.Value) CurrentChannel.Value = null;
+            if (channel == CurrentChannel.Value)
+                CurrentChannel.Value = null;
 
-            JoinedChannels.Remove(channel);
+            joinedChannels.Remove(channel);
 
             if (channel.Joined.Value)
             {
@@ -321,78 +368,60 @@ namespace osu.Game.Online.Chat
             }
         }
 
-        public void APIStateChanged(APIAccess api, APIState state)
-        {
-            switch (state)
-            {
-                case APIState.Online:
-                    fetchUpdates();
-                    break;
-                default:
-                    fetchMessagesScheduleder?.Cancel();
-                    fetchMessagesScheduleder = null;
-                    break;
-            }
-        }
-
         private long lastMessageId;
-        private const int update_poll_interval = 1000;
 
         private bool channelsInitialised;
 
-        private void fetchUpdates()
+        protected override Task Poll()
         {
-            fetchMessagesScheduleder?.Cancel();
-            fetchMessagesScheduleder = Scheduler.AddDelayed(() =>
+            if (!api.IsLoggedIn)
+                return base.Poll();
+
+            var fetchReq = new GetUpdatesRequest(lastMessageId);
+
+            var tcs = new TaskCompletionSource<bool>();
+
+            fetchReq.Success += updates =>
             {
-                var fetchReq = new GetUpdatesRequest(lastMessageId);
-
-                fetchReq.Success += updates =>
+                if (updates?.Presence != null)
                 {
-                    if (updates?.Presence != null)
+                    foreach (var channel in updates.Presence)
                     {
-                        foreach (var channel in updates.Presence)
-                        {
-                            if (!channel.Joined.Value)
-                            {
-                                // we received this from the server so should mark the channel already joined.
-                                channel.Joined.Value = true;
-
-                                JoinChannel(channel);
-                            }
-                        }
-
-                        if (!channelsInitialised)
-                        {
-                            channelsInitialised = true;
-                            // we want this to run after the first presence so we can see if the user is in any channels already.
-                            initializeChannels();
-                        }
-
-                        //todo: handle left channels
-
-                        handleChannelMessages(updates.Messages);
-
-                        foreach (var group in updates.Messages.GroupBy(m => m.ChannelId))
-                            JoinedChannels.FirstOrDefault(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
-
-                        lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
+                        // we received this from the server so should mark the channel already joined.
+                        JoinChannel(channel, true);
                     }
 
-                    fetchUpdates();
-                };
+                    //todo: handle left channels
 
-                fetchReq.Failure += delegate { fetchUpdates(); };
+                    handleChannelMessages(updates.Messages);
 
-                api.Queue(fetchReq);
-            }, update_poll_interval);
+                    foreach (var group in updates.Messages.GroupBy(m => m.ChannelId))
+                        JoinedChannels.FirstOrDefault(c => c.Id == group.Key)?.AddNewMessages(group.ToArray());
+
+                    lastMessageId = updates.Messages.LastOrDefault()?.Id ?? lastMessageId;
+                }
+
+                if (!channelsInitialised)
+                {
+                    channelsInitialised = true;
+                    // we want this to run after the first presence so we can see if the user is in any channels already.
+                    initializeChannels();
+                }
+
+                tcs.SetResult(true);
+            };
+
+            fetchReq.Failure += _ => tcs.SetResult(false);
+
+            api.Queue(fetchReq);
+
+            return tcs.Task;
         }
 
         [BackgroundDependencyLoader]
         private void load(IAPIProvider api)
         {
             this.api = api;
-            api.Register(this);
         }
     }
 

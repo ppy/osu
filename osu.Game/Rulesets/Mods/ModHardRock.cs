@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Game.Beatmaps;
@@ -10,7 +10,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModHardRock : Mod, IApplicableToDifficulty
     {
         public override string Name => "Hard Rock";
-        public override string ShortenedName => "HR";
+        public override string Acronym => "HR";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_hardrock;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Everything just got a bit harder...";

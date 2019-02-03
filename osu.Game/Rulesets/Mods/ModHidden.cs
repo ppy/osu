@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Configuration;
 using osu.Game.Configuration;
@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mods
     public abstract class ModHidden : Mod, IReadFromConfig, IApplicableToDrawableHitObjects
     {
         public override string Name => "Hidden";
-        public override string ShortenedName => "HD";
+        public override string Acronym => "HD";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_hidden;
         public override ModType Type => ModType.DifficultyIncrease;
         public override bool Ranked => true;

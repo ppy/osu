@@ -1,7 +1,7 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,6 +16,7 @@ using NUnit.Framework;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
+using osu.Framework.Configuration;
 
 namespace osu.Game.Tests.Visual
 {
@@ -23,6 +24,7 @@ namespace osu.Game.Tests.Visual
     public class TestCaseChatLink : OsuTestCase
     {
         private readonly TestChatLineContainer textContainer;
+        private readonly DialogOverlay dialogOverlay;
         private Color4 linkColour;
 
         public override IReadOnlyList<Type> RequiredTypes => new[]
@@ -37,6 +39,7 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseChatLink()
         {
+            Add(dialogOverlay = new DialogOverlay { Depth = float.MinValue });
             Add(textContainer = new TestChatLineContainer
             {
                 Padding = new MarginPadding { Left = 20, Right = 20 },
@@ -52,11 +55,13 @@ namespace osu.Game.Tests.Visual
             linkColour = colours.Blue;
 
             var chatManager = new ChannelManager();
-            chatManager.AvailableChannels.Add(new Channel { Name = "#english"});
-            chatManager.AvailableChannels.Add(new Channel { Name = "#japanese" });
+            BindableList<Channel> availableChannels = (BindableList<Channel>)chatManager.AvailableChannels;
+            availableChannels.Add(new Channel { Name = "#english"});
+            availableChannels.Add(new Channel { Name = "#japanese" });
             Dependencies.Cache(chatManager);
 
             Dependencies.Cache(new ChatOverlay());
+            Dependencies.Cache(dialogOverlay);
 
             testLinksGeneral();
             testEcho();

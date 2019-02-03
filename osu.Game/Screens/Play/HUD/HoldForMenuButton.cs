@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -15,7 +15,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Input.Bindings;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Play.HUD
                 Alpha = 1;
             else
                 Alpha = Interpolation.ValueAt(
-                    MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000),
+                    MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 200),
                     Alpha, MathHelper.Clamp(1 - positionalAdjust, 0.04f, 1), 0, 200, Easing.OutQuint);
         }
 

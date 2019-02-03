@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using NUnit.Framework;
@@ -11,7 +11,7 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
@@ -19,16 +19,18 @@ namespace osu.Game.Tests.Visual
     public class TestCaseScreenBreadcrumbControl : OsuTestCase
     {
         private readonly ScreenBreadcrumbControl breadcrumbs;
-        private Screen currentScreen, changedScreen;
+        private readonly ScreenStack screenStack;
 
         public TestCaseScreenBreadcrumbControl()
         {
-            TestScreen startScreen;
             OsuSpriteText titleText;
+
+            IScreen startScreen = new TestScreenOne();
+            screenStack = new ScreenStack(startScreen) { RelativeSizeAxes = Axes.Both };
 
             Children = new Drawable[]
             {
-                currentScreen = startScreen = new TestScreenOne(),
+                screenStack,
                 new FillFlowContainer
                 {
                     RelativeSizeAxes = Axes.X,
@@ -37,7 +39,7 @@ namespace osu.Game.Tests.Visual
                     Spacing = new Vector2(10),
                     Children = new Drawable[]
                     {
-                        breadcrumbs = new ScreenBreadcrumbControl(startScreen)
+                        breadcrumbs = new ScreenBreadcrumbControl(screenStack)
                         {
                             RelativeSizeAxes = Axes.X,
                         },
@@ -46,12 +48,7 @@ namespace osu.Game.Tests.Visual
                 },
             };
 
-            breadcrumbs.Current.ValueChanged += s =>
-            {
-                titleText.Text = $"Changed to {s.ToString()}";
-                changedScreen = s;
-            };
-
+            breadcrumbs.Current.ValueChanged += s => titleText.Text = $"Changed to {s.ToString()}";
             breadcrumbs.Current.TriggerChange();
 
             waitForCurrent();
@@ -60,18 +57,14 @@ namespace osu.Game.Tests.Visual
             pushNext();
             waitForCurrent();
 
-            AddStep(@"make start current", () =>
-            {
-                startScreen.MakeCurrent();
-                currentScreen = startScreen;
-            });
+            AddStep(@"make start current", () => startScreen.MakeCurrent());
 
             waitForCurrent();
             pushNext();
             waitForCurrent();
             AddAssert(@"only 2 items", () => breadcrumbs.Items.Count() == 2);
-            AddStep(@"exit current", () => changedScreen.Exit());
-            AddAssert(@"current screen is first", () => startScreen == changedScreen);
+            AddStep(@"exit current", () => screenStack.CurrentScreen.Exit());
+            AddAssert(@"current screen is first", () => startScreen == screenStack.CurrentScreen);
         }
 
         [BackgroundDependencyLoader]
@@ -80,8 +73,8 @@ namespace osu.Game.Tests.Visual
             breadcrumbs.StripColour = colours.Blue;
         }
 
-        private void pushNext() => AddStep(@"push next screen", () => currentScreen = ((TestScreen)currentScreen).PushNext());
-        private void waitForCurrent() => AddUntilStep(() => currentScreen.IsCurrentScreen, "current screen");
+        private void pushNext() => AddStep(@"push next screen", () => ((TestScreen)screenStack.CurrentScreen).PushNext());
+        private void waitForCurrent() => AddUntilStep(() => screenStack.CurrentScreen.IsCurrentScreen(), "current screen");
 
         private abstract class TestScreen : OsuScreen
         {
@@ -91,14 +84,14 @@ namespace osu.Game.Tests.Visual
             public TestScreen PushNext()
             {
                 TestScreen screen = CreateNextScreen();
-                Push(screen);
+               this.Push(screen);
 
                 return screen;
             }
 
             protected TestScreen()
             {
-                Child = new FillFlowContainer
+                InternalChild = new FillFlowContainer
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

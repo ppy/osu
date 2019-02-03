@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.IO;
@@ -10,17 +10,20 @@ using osu.Desktop.Overlays;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Game;
-using OpenTK.Input;
+using osuTK.Input;
 using Microsoft.Win32;
 using osu.Desktop.Updater;
 using osu.Framework;
 using osu.Framework.Platform.Windows;
+using osu.Framework.Screens;
+using osu.Game.Screens.Menu;
 
 namespace osu.Desktop
 {
     internal class OsuGameDesktop : OsuGame
     {
         private readonly bool noVersionOverlay;
+        private VersionManager versionManager;
 
         public OsuGameDesktop(string[] args = null)
             : base(args)
@@ -46,7 +49,7 @@ namespace osu.Desktop
 
             if (!noVersionOverlay)
             {
-                LoadComponentAsync(new VersionManager { Depth = int.MinValue }, v =>
+                LoadComponentAsync(versionManager = new VersionManager { Depth = int.MinValue }, v =>
                 {
                     Add(v);
                     v.State = Visibility.Visible;
@@ -56,6 +59,24 @@ namespace osu.Desktop
                     Add(new SquirrelUpdateManager());
                 else
                     Add(new SimpleUpdateManager());
+            }
+        }
+
+        protected override void ScreenChanged(IScreen lastScreen, IScreen newScreen)
+        {
+            base.ScreenChanged(lastScreen, newScreen);
+
+            switch (newScreen)
+            {
+                case Intro _:
+                case MainMenu _:
+                    if (versionManager != null)
+                        versionManager.State = Visibility.Visible;
+                    break;
+                default:
+                    if (versionManager != null)
+                        versionManager.State = Visibility.Hidden;
+                    break;
             }
         }
 
@@ -76,7 +97,7 @@ namespace osu.Desktop
 
         private void fileDrop(object sender, FileDropEventArgs e)
         {
-            var filePaths = new[] { e.FileName };
+            var filePaths = e.FileNames;
 
             var firstExtension = Path.GetExtension(filePaths.First());
 

@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
-using OpenTK;
+using osuTK;
 using osu.Framework.Configuration;
 using System;
 using System.Linq;
@@ -56,12 +56,10 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             switch (value.Type)
             {
-                case ChannelType.Public:
+                default:
                     return new ChannelTabItem(value) { OnRequestClose = tabCloseRequested };
                 case ChannelType.PM:
                     return new PrivateChannelTabItem(value) { OnRequestClose = tabCloseRequested };
-                default:
-                    throw new InvalidOperationException("Only TargetType User and Channel are supported.");
             }
         }
 
@@ -96,13 +94,12 @@ namespace osu.Game.Overlays.Chat.Tabs
         {
             if (tab is ChannelSelectorTabItem)
             {
-                tab.Active.Toggle();
+                tab.Active.Value = true;
                 return;
             }
 
-            selectorTab.Active.Value = false;
-
             base.SelectTab(tab);
+            selectorTab.Active.Value = false;
         }
 
         private void tabCloseRequested(TabItem<Channel> tab)

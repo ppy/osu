@@ -1,7 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK.Graphics;
+using System;
+using osuTK.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Framework.Graphics;
@@ -19,6 +20,7 @@ using osu.Game.Screens.Edit.Components;
 using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Edit
 {
@@ -26,7 +28,7 @@ namespace osu.Game.Screens.Edit
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
-        protected override bool HideOverlaysOnEnter => true;
+        public override bool HideOverlaysOnEnter => true;
         public override bool AllowBeatmapRulesetChange => false;
 
         private Box bottomBackground;
@@ -63,7 +65,7 @@ namespace osu.Game.Screens.Edit
             SummaryTimeline timeline;
             PlaybackControl playback;
 
-            Children = new[]
+            InternalChildren = new[]
             {
                 new Container
                 {
@@ -94,7 +96,7 @@ namespace osu.Game.Screens.Edit
                                 {
                                     new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap),
                                     new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Exit", MenuItemType.Standard, Exit)
+                                    new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit)
                                 }
                             }
                         }
@@ -156,10 +158,68 @@ namespace osu.Game.Screens.Edit
             bottomBackground.Colour = colours.Gray2;
         }
 
-        private void exportBeatmap()
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            host.OpenFileExternally(Beatmap.Value.Save());
+            switch (e.Key)
+            {
+                case Key.Left:
+                    seek(e, -1);
+                    return true;
+                case Key.Right:
+                    seek(e, 1);
+                    return true;
+            }
+
+            return base.OnKeyDown(e);
         }
+
+        private double scrollAccumulation;
+
+        protected override bool OnScroll(ScrollEvent e)
+        {
+            scrollAccumulation += (e.ScrollDelta.X + e.ScrollDelta.Y) * (e.IsPrecise ? 0.1 : 1);
+
+            const int precision = 1;
+
+            while (Math.Abs(scrollAccumulation) > precision)
+            {
+                if (scrollAccumulation > 0)
+                    seek(e, -1);
+                else
+                    seek(e, 1);
+
+                scrollAccumulation = scrollAccumulation < 0 ? Math.Min(0, scrollAccumulation + precision) : Math.Max(0, scrollAccumulation - precision);
+            }
+
+            return true;
+        }
+
+        public override void OnResuming(IScreen last)
+        {
+            Beatmap.Value.Track?.Stop();
+            base.OnResuming(last);
+        }
+
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+            Background.FadeColour(Color4.DarkGray, 500);
+            Beatmap.Value.Track?.Stop();
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            Background.FadeColour(Color4.White, 500);
+            if (Beatmap.Value.Track != null)
+            {
+                Beatmap.Value.Track.Tempo.Value = 1;
+                Beatmap.Value.Track.Start();
+            }
+
+            return base.OnExiting(next);
+        }
+
+        private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());
 
         private void onModeChanged(EditorScreenMode mode)
         {
@@ -181,37 +241,14 @@ namespace osu.Game.Screens.Edit
             LoadComponentAsync(currentScreen, screenContainer.Add);
         }
 
-        protected override bool OnScroll(ScrollEvent e)
+        private void seek(UIEvent e, int direction)
         {
-            if (e.ScrollDelta.X + e.ScrollDelta.Y > 0)
-                clock.SeekBackward(!clock.IsRunning);
+            double amount = e.ShiftPressed ? 2 : 1;
+
+            if (direction < 1)
+                clock.SeekBackward(!clock.IsRunning, amount);
             else
-                clock.SeekForward(!clock.IsRunning);
-            return true;
-        }
-
-        protected override void OnResuming(Screen last)
-        {
-            Beatmap.Value.Track?.Stop();
-            base.OnResuming(last);
-        }
-
-        protected override void OnEntering(Screen last)
-        {
-            base.OnEntering(last);
-            Background.FadeColour(Color4.DarkGray, 500);
-            Beatmap.Value.Track?.Stop();
-        }
-
-        protected override bool OnExiting(Screen next)
-        {
-            Background.FadeColour(Color4.White, 500);
-            if (Beatmap.Value.Track != null)
-            {
-                Beatmap.Value.Track.Tempo.Value = 1;
-                Beatmap.Value.Track.Start();
-            }
-            return base.OnExiting(next);
+                clock.SeekForward(!clock.IsRunning, amount);
         }
     }
 }
