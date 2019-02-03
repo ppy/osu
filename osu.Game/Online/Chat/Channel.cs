@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -40,7 +40,6 @@ namespace osu.Game.Online.Chat
         /// Contains all the messages that are still pending for submission to the server.
         /// </summary>
         private readonly List<LocalEchoMessage> pendingMessages = new List<LocalEchoMessage>();
-
 
         /// <summary>
         /// An event that fires when new messages arrived.
@@ -86,6 +85,17 @@ namespace osu.Game.Online.Chat
         [JsonConstructor]
         public Channel()
         {
+        }
+
+        /// <summary>
+        /// Create a private messaging channel with the specified user.
+        /// </summary>
+        /// <param name="user">The user to create the private conversation with.</param>
+        public Channel(User user)
+        {
+            Type = ChannelType.PM;
+            Users.Add(user);
+            Name = user.Username;
         }
 
         /// <summary>

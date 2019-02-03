@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
@@ -23,6 +23,8 @@ namespace osu.Game.Tests.Visual
         public ScrollVisualisationMethod ScrollAlgorithm { set => scrollingInfo.Algorithm.Algorithm = value; }
 
         public double TimeRange { set => scrollingInfo.TimeRange.Value = value; }
+
+        public IScrollingInfo ScrollingInfo => scrollingInfo;
 
         [Cached(Type = typeof(IScrollingInfo))]
         private readonly TestScrollingInfo scrollingInfo = new TestScrollingInfo();

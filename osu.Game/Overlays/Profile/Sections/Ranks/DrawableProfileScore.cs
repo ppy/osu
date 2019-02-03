@@ -1,24 +1,24 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
+using osu.Game.Online.Leaderboards;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Screens.Select.Leaderboards;
-using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osu.Game.Scoring;
 
 namespace osu.Game.Overlays.Profile.Sections.Ranks
 {
     public abstract class DrawableProfileScore : DrawableProfileRow
     {
         private readonly ScoreModsContainer modsContainer;
-        protected readonly Score Score;
+        protected readonly ScoreInfo Score;
 
-        protected DrawableProfileScore(Score score)
+        protected DrawableProfileScore(ScoreInfo score)
         {
             Score = score;
 

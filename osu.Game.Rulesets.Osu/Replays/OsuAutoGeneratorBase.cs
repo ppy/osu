@@ -1,14 +1,14 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Osu.Objects;
 using System;
 using System.Collections.Generic;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Osu.UI;
 using osu.Game.Rulesets.Replays;
-using osu.Game.Users;
 
 namespace osu.Game.Rulesets.Osu.Replays
 {
@@ -37,13 +37,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         protected OsuAutoGeneratorBase(Beatmap<OsuHitObject> beatmap)
             : base(beatmap)
         {
-            Replay = new Replay
-            {
-                User = new User
-                {
-                    Username = @"Autoplay",
-                }
-            };
+            Replay = new Replay();
 
             // We are using ApplyModsToRate and not ApplyModsToTime to counteract the speed up / slow down from HalfTime / DoubleTime so that we remain at a constant framerate of 60 fps.
             FrameDelay = ApplyModsToRate(1000.0 / 60.0);

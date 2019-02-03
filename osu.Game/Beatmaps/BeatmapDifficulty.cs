@@ -1,20 +1,17 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.ComponentModel.DataAnnotations.Schema;
-using Newtonsoft.Json;
+using osu.Game.Database;
 
 namespace osu.Game.Beatmaps
 {
-    public class BeatmapDifficulty
+    public class BeatmapDifficulty : IHasPrimaryKey
     {
         /// <summary>
         /// The default value used for all difficulty settings except <see cref="SliderMultiplier"/> and <see cref="SliderTickRate"/>.
         /// </summary>
         public const float DEFAULT_DIFFICULTY = 5;
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        [JsonIgnore]
         public int ID { get; set; }
 
         public float DrainRate { get; set; } = DEFAULT_DIFFICULTY;

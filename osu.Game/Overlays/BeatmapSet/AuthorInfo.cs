@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -7,9 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
-using OpenTK;
-using OpenTK.Graphics;
-using osu.Framework.Allocation;
+using osuTK;
+using osuTK.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 
@@ -20,7 +19,6 @@ namespace osu.Game.Overlays.BeatmapSet
         private const float height = 50;
 
         private readonly UpdateableAvatar avatar;
-        private readonly ClickableArea clickableArea;
         private readonly FillFlowContainer fields;
 
         private BeatmapSetInfo beatmapSet;
@@ -73,7 +71,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             Children = new Drawable[]
             {
-                clickableArea = new ClickableArea
+                new Container
                 {
                     AutoSizeAxes = Axes.Both,
                     CornerRadius = 3,
@@ -100,14 +98,8 @@ namespace osu.Game.Overlays.BeatmapSet
             };
         }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(UserProfileOverlay profile)
+        private void load()
         {
-            clickableArea.Action = () =>
-            {
-                if (avatar.User != null) profile?.ShowUser(avatar.User);
-            };
-
             updateDisplay();
         }
 

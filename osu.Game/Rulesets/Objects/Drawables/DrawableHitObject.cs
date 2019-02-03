@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Objects.Drawables
 {
@@ -84,6 +84,8 @@ namespace osu.Game.Rulesets.Objects.Drawables
         public override bool RemoveCompletedTransforms => false;
         protected override bool RequiresChildrenUpdate => true;
 
+        public override bool IsPresent => base.IsPresent || State.Value == ArmedState.Idle && Clock?.CurrentTime >= LifetimeStart;
+
         public readonly Bindable<ArmedState> State = new Bindable<ArmedState>();
 
         protected DrawableHitObject(HitObject hitObject)
@@ -145,6 +147,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
 
         /// <summary>
         /// Plays all the hit sounds for this <see cref="DrawableHitObject"/>.
+        /// This is invoked automatically when this <see cref="DrawableHitObject"/> is hit.
         /// </summary>
         public void PlaySamples() => Samples?.Play();
 

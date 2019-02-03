@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -19,7 +19,7 @@ using osu.Game.Rulesets.Taiko.Objects.Drawables;
 using osu.Game.Rulesets.Taiko.UI;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Tests.Visual;
-using OpenTK;
+using osuTK;
 using osu.Game.Rulesets.Scoring;
 
 namespace osu.Game.Rulesets.Taiko.Tests

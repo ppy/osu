@@ -1,9 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
-using OpenTK.Graphics;
+using System.Linq;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +14,7 @@ using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Music
 {
@@ -26,7 +27,7 @@ namespace osu.Game.Overlays.Music
 
         private SpriteIcon handle;
         private TextFlowContainer text;
-        private IEnumerable<SpriteText> titleSprites;
+        private IEnumerable<Drawable> titleSprites;
         private ILocalisedBindableString titleBind;
         private ILocalisedBindableString artistBind;
 
@@ -58,7 +59,7 @@ namespace osu.Game.Overlays.Music
                 selected = value;
 
                 FinishTransforms(true);
-                foreach (SpriteText s in titleSprites)
+                foreach (Drawable s in titleSprites)
                     s.FadeColour(Selected ? hoverColour : Color4.White, fade_duration);
             }
         }
@@ -111,7 +112,7 @@ namespace osu.Game.Overlays.Music
             {
                 sprite.TextSize = 16;
                 sprite.Font = @"Exo2.0-Regular";
-            });
+            }).OfType<SpriteText>();
 
             text.AddText(artistBind.Value, sprite =>
             {

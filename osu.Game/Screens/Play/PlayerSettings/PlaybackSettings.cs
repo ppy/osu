@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -19,10 +19,10 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         private readonly PlayerSliderBar<double> sliderbar;
 
+        private readonly OsuSpriteText multiplierText;
+
         public PlaybackSettings()
         {
-            OsuSpriteText multiplierText;
-
             Children = new Drawable[]
             {
                 new Container
@@ -57,9 +57,6 @@ namespace osu.Game.Screens.Play.PlayerSettings
                     },
                 }
             };
-
-            sliderbar.Bindable.ValueChanged += rateMultiplier => multiplierText.Text = $"{sliderbar.Bar.TooltipText}x";
-            sliderbar.Bindable.TriggerChange();
         }
 
         protected override void LoadComplete()
@@ -70,7 +67,11 @@ namespace osu.Game.Screens.Play.PlayerSettings
                 return;
 
             var clockRate = AdjustableClock.Rate;
-            sliderbar.Bindable.ValueChanged += rateMultiplier => AdjustableClock.Rate = clockRate * rateMultiplier;
+
+            // can't trigger this line instantly as the underlying clock may not be ready to accept adjustments yet.
+            sliderbar.Bindable.ValueChanged += multiplier => AdjustableClock.Rate = clockRate * multiplier;
+
+            sliderbar.Bindable.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier:0.0}x", true);
         }
     }
 }

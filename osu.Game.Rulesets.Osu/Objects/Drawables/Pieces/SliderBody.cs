@@ -1,14 +1,14 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Lines;
 using osu.Framework.Graphics.Primitives;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.ES30;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 {

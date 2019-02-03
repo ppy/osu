@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
 using osu.Game.Rulesets.Objects.Drawables;
-using OpenTK;
+using osuTK;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -100,7 +100,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                 aimRotationVector = curve[i];
                 break;
             }
-
 
             float aimRotation = MathHelper.RadiansToDegrees((float)Math.Atan2(aimRotationVector.Y - Position.Y, aimRotationVector.X - Position.X));
             while (Math.Abs(aimRotation - Rotation) > 180)

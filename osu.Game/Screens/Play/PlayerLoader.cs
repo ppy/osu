@@ -1,6 +1,7 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
@@ -17,66 +18,77 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play.PlayerSettings;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
     public class PlayerLoader : ScreenWithBeatmapBackground
     {
+        private readonly Func<Player> createPlayer;
         private static readonly Vector2 background_blur = new Vector2(15);
 
         private Player player;
 
+        private Container content;
+
         private BeatmapMetadataDisplay info;
 
         private bool hideOverlays;
-        protected override bool HideOverlaysOnEnter => hideOverlays;
+        public override bool HideOverlaysOnEnter => hideOverlays;
 
         private Task loadTask;
 
-        public PlayerLoader(Player player)
+        public PlayerLoader(Func<Player> createPlayer)
         {
-            this.player = player;
+            this.createPlayer = createPlayer;
+        }
 
-            player.RestartRequested = () =>
-            {
-                hideOverlays = true;
-                ValidForResume = true;
-            };
+        private void restartRequested()
+        {
+            hideOverlays = true;
+            ValidForResume = true;
         }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            Add(info = new BeatmapMetadataDisplay(Beatmap.Value)
+            InternalChild = content = new Container
             {
-                Alpha = 0,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-            });
-
-            Add(new FillFlowContainer<PlayerSettingsGroup>
-            {
-                Anchor = Anchor.TopRight,
-                Origin = Anchor.TopRight,
-                AutoSizeAxes = Axes.Both,
-                Direction = FillDirection.Vertical,
-                Spacing = new Vector2(0, 20),
-                Margin = new MarginPadding(25),
-                Children = new PlayerSettingsGroup[]
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    visualSettings = new VisualSettings(),
-                    new InputSettings()
+                    info = new BeatmapMetadataDisplay(Beatmap.Value)
+                    {
+                        Alpha = 0,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                    },
+                    new FillFlowContainer<PlayerSettingsGroup>
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        AutoSizeAxes = Axes.Both,
+                        Direction = FillDirection.Vertical,
+                        Spacing = new Vector2(0, 20),
+                        Margin = new MarginPadding(25),
+                        Children = new PlayerSettingsGroup[]
+                        {
+                            visualSettings = new VisualSettings(),
+                            new InputSettings()
+                        }
+                    }
                 }
-            });
+            };
 
-            loadTask = LoadComponentAsync(player, playerLoaded);
+            loadNewPlayer();
         }
 
         private void playerLoaded(Player player) => info.Loading = false;
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
             base.OnResuming(last);
 
@@ -85,32 +97,39 @@ namespace osu.Game.Screens.Play
             info.Loading = true;
 
             //we will only be resumed if the player has requested a re-run (see ValidForResume setting above)
-            loadTask = LoadComponentAsync(player = new Player
-            {
-                RestartCount = player.RestartCount + 1,
-                RestartRequested = player.RestartRequested,
-            }, playerLoaded);
+            loadNewPlayer();
 
             this.Delay(400).Schedule(pushWhenLoaded);
         }
 
+        private void loadNewPlayer()
+        {
+            var restartCount = player?.RestartCount + 1 ?? 0;
+
+            player = createPlayer();
+            player.RestartCount = restartCount;
+            player.RestartRequested = restartRequested;
+
+            loadTask = LoadComponentAsync(player, playerLoaded);
+        }
+
         private void contentIn()
         {
-            Content.ScaleTo(1, 650, Easing.OutQuint);
-            Content.FadeInFromZero(400);
+            content.ScaleTo(1, 650, Easing.OutQuint);
+            content.FadeInFromZero(400);
         }
 
         private void contentOut()
         {
-            Content.ScaleTo(0.7f, 300, Easing.InQuint);
-            Content.FadeOut(250);
+            content.ScaleTo(0.7f, 300, Easing.InQuint);
+            content.FadeOut(250);
         }
 
-        protected override void OnEntering(Screen last)
+        public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
 
-            Content.ScaleTo(0.7f);
+            content.ScaleTo(0.7f);
 
             contentIn();
 
@@ -145,23 +164,24 @@ namespace osu.Game.Screens.Play
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (GetContainingInputManager().HoveredDrawables.Contains(visualSettings))
+            if (GetContainingInputManager()?.HoveredDrawables.Contains(visualSettings) == true)
             {
                 // show user setting preview
                 UpdateBackgroundElements();
             }
+
             base.OnHoverLost(e);
         }
 
         protected override void InitializeBackgroundElements()
         {
-            Background?.FadeTo(1, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            Background?.FadeColour(Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
             Background?.BlurTo(background_blur, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
         private void pushWhenLoaded()
         {
-            if (!IsCurrentScreen) return;
+            if (!this.IsCurrentScreen()) return;
 
             try
             {
@@ -182,7 +202,7 @@ namespace osu.Game.Screens.Play
 
                     this.Delay(250).Schedule(() =>
                     {
-                        if (!IsCurrentScreen) return;
+                        if (!this.IsCurrentScreen()) return;
 
                         loadTask = null;
 
@@ -191,9 +211,9 @@ namespace osu.Game.Screens.Play
                         ValidForResume = false;
 
                         if (player.LoadedBeatmapSuccessfully)
-                            Push(player);
+                            this.Push(player);
                         else
-                            Exit();
+                            this.Exit();
                     });
                 }, 500);
             }
@@ -209,15 +229,15 @@ namespace osu.Game.Screens.Play
             pushDebounce = null;
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
             base.OnSuspending(next);
             cancelLoad();
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
-            Content.ScaleTo(0.7f, 150, Easing.InQuint);
+            content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
             cancelLoad();
 

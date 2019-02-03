@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using System;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -99,7 +100,20 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        public Bindable<bool> Current { get; } = new Bindable<bool>();
+        private readonly Bindable<bool> current = new Bindable<bool>();
+
+        public Bindable<bool> Current
+        {
+            get => current;
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+
+                current.UnbindBindings();
+                current.BindTo(value);
+            }
+        }
 
         private Color4 accentColour;
         public Color4 AccentColour

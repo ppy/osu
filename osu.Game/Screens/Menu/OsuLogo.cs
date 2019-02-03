@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -17,9 +17,9 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Menu
 {
@@ -79,8 +79,6 @@ namespace osu.Game.Screens.Menu
 
         private readonly Container impactContainer;
 
-        private const float default_size = 480;
-
         private const double early_activation = 60;
 
         public override bool IsPresent => base.IsPresent || Scheduler.HasPendingTasks;
@@ -88,8 +86,6 @@ namespace osu.Game.Screens.Menu
         public OsuLogo()
         {
             EarlyActivationMilliseconds = early_activation;
-
-            Size = new Vector2(default_size);
 
             Origin = Anchor.Centre;
 

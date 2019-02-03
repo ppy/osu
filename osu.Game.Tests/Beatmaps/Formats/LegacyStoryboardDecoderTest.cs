@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.Storyboards;
@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestDecodeStoryboardEvents()
         {
             var decoder = new LegacyStoryboardDecoder();
-            using (var resStream = Resource.OpenResource("Himeringo - Yotsuya-san ni Yoroshiku (RLC) [Winber1's Extreme].osu"))
+            using (var resStream = TestResources.OpenResource("Himeringo - Yotsuya-san ni Yoroshiku (RLC) [Winber1's Extreme].osu"))
             using (var stream = new StreamReader(resStream))
             {
                 var storyboard = decoder.Decode(stream);
@@ -91,7 +91,7 @@ namespace osu.Game.Tests.Beatmaps.Formats
         public void TestDecodeVariableWithSuffix()
         {
             var decoder = new LegacyStoryboardDecoder();
-            using (var resStream = Resource.OpenResource("variable-with-suffix.osb"))
+            using (var resStream = TestResources.OpenResource("variable-with-suffix.osb"))
             using (var stream = new StreamReader(resStream))
             {
                 var storyboard = decoder.Decode(stream);

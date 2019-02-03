@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -22,8 +22,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Music;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -214,8 +214,15 @@ namespace osu.Game.Overlays
             beatmapSets.Insert(index, beatmapSetInfo);
         }
 
-        private void handleBeatmapAdded(BeatmapSetInfo obj) => beatmapSets.Add(obj);
-        private void handleBeatmapRemoved(BeatmapSetInfo obj) => beatmapSets.RemoveAll(s => s.ID == obj.ID);
+        private void handleBeatmapAdded(BeatmapSetInfo obj, bool existing, bool silent)
+        {
+            if (existing)
+                return;
+
+            Schedule(() => beatmapSets.Add(obj));
+        }
+
+        private void handleBeatmapRemoved(BeatmapSetInfo obj) => Schedule(() => beatmapSets.RemoveAll(s => s.ID == obj.ID));
 
         protected override void LoadComplete()
         {
@@ -412,6 +419,10 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
+
+            // This is here mostly as a performance fix.
+            // If the playlist is not hidden it will update children even when the music controller is hidden (due to AlwaysPresent).
+            playlist.State = Visibility.Hidden;
 
             this.FadeOut(transition_length, Easing.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);

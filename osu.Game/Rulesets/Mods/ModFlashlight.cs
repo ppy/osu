@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -15,21 +15,28 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Mods
 {
-    public abstract class ModFlashlight<T> : Mod, IApplicableToRulesetContainer<T>, IApplicableToScoreProcessor
-        where T : HitObject
+    public abstract class ModFlashlight : Mod
     {
         public override string Name => "Flashlight";
-        public override string ShortenedName => "FL";
+        public override string Acronym => "FL";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_flashlight;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => "Restricted view area.";
         public override bool Ranked => true;
 
+        internal ModFlashlight()
+        {
+        }
+    }
+
+    public abstract class ModFlashlight<T> : ModFlashlight, IApplicableToRulesetContainer<T>, IApplicableToScoreProcessor
+        where T : HitObject
+    {
         public const double FLASHLIGHT_FADE_DURATION = 800;
         protected readonly BindableInt Combo = new BindableInt();
 

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Game.Graphics;
@@ -11,7 +11,7 @@ namespace osu.Game.Rulesets.Mania.Mods
     public class ManiaModFadeIn : Mod
     {
         public override string Name => "Fade In";
-        public override string ShortenedName => "FI";
+        public override string Acronym => "FI";
         public override FontAwesome Icon => FontAwesome.fa_osu_mod_hidden;
         public override ModType Type => ModType.DifficultyIncrease;
         public override string Description => @"Keys appear out of nowhere!";

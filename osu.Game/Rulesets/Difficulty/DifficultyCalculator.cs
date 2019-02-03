@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -66,7 +66,7 @@ namespace osu.Game.Rulesets.Difficulty
                 {
                     case 0:
                         // Initial-case: Empty current set
-                        yield return new NoModMod();
+                        yield return new ModNoMod();
                         break;
                     case 1:
                         yield return currentSet.Single();

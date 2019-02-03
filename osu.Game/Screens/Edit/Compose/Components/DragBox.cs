@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Edit.Compose.Components
 {
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
             {
                 Masking = true,
                 BorderColour = Color4.White,
-                BorderThickness = SelectionBox.BORDER_RADIUS,
+                BorderThickness = SelectionHandler.BORDER_RADIUS,
                 Child = new Box
                 {
                     RelativeSizeAxes = Axes.Both,

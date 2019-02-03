@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Diagnostics;
@@ -14,9 +14,9 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Timing;
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Graphics.ES30;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Graphics.ES30;
 
 namespace osu.Game.Rulesets.Osu.UI.Cursor
 {

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +12,7 @@ using osu.Framework.MathUtils;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Input.Handlers;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Mania.Beatmaps;
 using osu.Game.Rulesets.Mania.Configuration;
 using osu.Game.Rulesets.Mania.Mods;
@@ -21,10 +22,10 @@ using osu.Game.Rulesets.Mania.Replays;
 using osu.Game.Rulesets.Mania.Scoring;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Objects.Types;
-using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 
 namespace osu.Game.Rulesets.Mania.UI
 {
@@ -79,6 +80,13 @@ namespace osu.Game.Rulesets.Mania.UI
 
             Config.BindWith(ManiaSetting.ScrollTime, TimeRange);
         }
+
+        /// <summary>
+        /// Retrieves the column that intersects a screen-space position.
+        /// </summary>
+        /// <param name="screenSpacePosition">The screen-space position.</param>
+        /// <returns>The column which intersects with <paramref name="screenSpacePosition"/>.</returns>
+        public Column GetColumnByPosition(Vector2 screenSpacePosition) => Playfield.GetColumnByPosition(screenSpacePosition);
 
         protected override Playfield CreatePlayfield() => new ManiaPlayfield(Beatmap.Stages)
         {
