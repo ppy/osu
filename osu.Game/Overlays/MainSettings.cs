@@ -1,21 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.Bindings;
-using osu.Framework.Input.Events;
-using osu.Game.Graphics;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
-using osu.Game.Input.Bindings;
 using osu.Game.Overlays.Settings;
 using osu.Game.Overlays.Settings.Sections;
-using osu.Game.Screens.Ranking;
-using osuTK;
 using osuTK.Graphics;
+using System.Collections.Generic;
 
 namespace osu.Game.Overlays
 {
@@ -79,6 +71,6 @@ namespace osu.Game.Overlays
         private void load()
         {
             ContentContainer.Add(keyBindingOverlay);
-        }        
+        }
     }
 }
