@@ -22,7 +22,6 @@ namespace osu.Game.Overlays
     public class MainSettings : SettingsOverlay
     {
         private readonly KeyBindingOverlay keyBindingOverlay;
-        private BackButton backButton;
 
         protected override IEnumerable<SettingsSection> CreateSections() => new SettingsSection[]
         {
@@ -53,8 +52,6 @@ namespace osu.Game.Overlays
 
         public override bool AcceptsFocus => keyBindingOverlay.State != Visibility.Visible;
 
-        private const float hidden_width = 120;
-
         private void keyBindingOverlay_StateChanged(Visibility visibility)
         {
             switch (visibility)
@@ -64,9 +61,7 @@ namespace osu.Game.Overlays
                     Sidebar?.FadeColour(Color4.DarkGray, 300, Easing.OutQuint);
 
                     SectionsContainer.FadeOut(300, Easing.OutQuint);
-                    ContentContainer.MoveToX(hidden_width - WIDTH, 500, Easing.OutQuint);
-
-                    backButton.Delay(100).FadeIn(100);
+                    ContentContainer.MoveToX(-WIDTH, 500, Easing.OutQuint);
                     break;
                 case Visibility.Hidden:
                     Background.FadeTo(0.6f, 500, Easing.OutQuint);
@@ -74,94 +69,16 @@ namespace osu.Game.Overlays
 
                     SectionsContainer.FadeIn(500, Easing.OutQuint);
                     ContentContainer.MoveToX(0, 500, Easing.OutQuint);
-
-                    backButton.FadeOut(100);
                     break;
             }
         }
 
-        protected override float ExpandedPosition => keyBindingOverlay.State == Visibility.Visible ? hidden_width - WIDTH : base.ExpandedPosition;
+        protected override float ExpandedPosition => keyBindingOverlay.State == Visibility.Visible ? -WIDTH : base.ExpandedPosition;
 
         [BackgroundDependencyLoader]
         private void load()
         {
             ContentContainer.Add(keyBindingOverlay);
-
-            ContentContainer.Add(backButton = new BackButton
-            {
-                Alpha = 0,
-                Width = hidden_width,
-                RelativeSizeAxes = Axes.Y,
-                Anchor = Anchor.CentreRight,
-                Origin = Anchor.CentreRight,
-                Action = () => keyBindingOverlay.Hide()
-            });
-        }
-
-        private class BackButton : OsuClickableContainer, IKeyBindingHandler<GlobalAction>
-        {
-            private AspectContainer aspect;
-
-            [BackgroundDependencyLoader]
-            private void load()
-            {
-                Children = new Drawable[]
-                {
-                    aspect = new AspectContainer
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Y,
-                        Children = new Drawable[]
-                        {
-                            new SpriteIcon
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Y = -15,
-                                Size = new Vector2(15),
-                                Shadow = true,
-                                Icon = FontAwesome.fa_chevron_left
-                            },
-                            new OsuSpriteText
-                            {
-                                Anchor = Anchor.Centre,
-                                Origin = Anchor.Centre,
-                                Y = 15,
-                                TextSize = 12,
-                                Font = @"Exo2.0-Bold",
-                                Text = @"back",
-                            },
-                        }
-                    }
-                };
-            }
-
-            protected override bool OnMouseDown(MouseDownEvent e)
-            {
-                aspect.ScaleTo(0.75f, 2000, Easing.OutQuint);
-                return base.OnMouseDown(e);
-            }
-
-            protected override bool OnMouseUp(MouseUpEvent e)
-            {
-                aspect.ScaleTo(1, 1000, Easing.OutElastic);
-                return base.OnMouseUp(e);
-            }
-
-            public bool OnPressed(GlobalAction action)
-            {
-                switch (action)
-                {
-                    case GlobalAction.Back:
-                        Click();
-                        return true;
-                }
-
-                return false;
-            }
-
-            public bool OnReleased(GlobalAction action) => false;
-        }
+        }        
     }
 }
