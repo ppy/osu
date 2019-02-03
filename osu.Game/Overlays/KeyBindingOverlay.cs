@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
             {
                 Anchor = Anchor.BottomLeft,
                 Origin = Anchor.BottomLeft,
-                Action = () => Hide()
+                Action = Hide
             });
         }
 

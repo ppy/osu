@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.KeyBinding
 {
     public class RulesetBindingsSection : SettingsSection
     {
-        public override FontAwesome Icon => (ruleset.CreateInstance().CreateIcon() as SpriteIcon).Icon;
+        public override FontAwesome Icon => (ruleset?.CreateInstance().CreateIcon() as SpriteIcon)?.Icon ?? FontAwesome.fa_osu_hot;
         public override string Header => ruleset.Name;
 
         private readonly RulesetInfo ruleset;
