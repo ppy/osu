@@ -190,7 +190,12 @@ namespace osu.Game.Tournament.Components
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.TopLeft
                 },
-                new DiffPiece(("CS", $"{beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"), ("AR", $"{ar:0.#}{srExtra}"), ("OD", $"{beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"))
+                new DiffPiece(
+                    //("CS", $"{beatmap.BaseDifficulty.CircleSize:0.#}{hardRockExtra}"),
+                    //("AR", $"{ar:0.#}{srExtra}"),
+                    ("OD", $"{beatmap.BaseDifficulty.OverallDifficulty:0.#}{hardRockExtra}"),
+                    ("HP", $"{beatmap.BaseDifficulty.DrainRate:0.#}{hardRockExtra}")
+                )
                 {
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.BottomRight
