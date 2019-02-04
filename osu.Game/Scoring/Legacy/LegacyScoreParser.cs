@@ -59,18 +59,32 @@ namespace osu.Game.Scoring.Legacy
 
                 var windows = currentRuleset.CreateRulesetContainerWith(workingBeatmap).CreateScoreProcessor().CreateHitWindows();
 
-                if (windows.IsHitResultAllowed(HitResult.Great))
-                    score.ScoreInfo.Statistics[HitResult.Great] = count300;
-                if (windows.IsHitResultAllowed(HitResult.Good))
-                    score.ScoreInfo.Statistics[HitResult.Good] = count100;
-                if (windows.IsHitResultAllowed(HitResult.Meh))
-                    score.ScoreInfo.Statistics[HitResult.Meh] = count50;
-                if (windows.IsHitResultAllowed(HitResult.Perfect))
-                    score.ScoreInfo.Statistics[HitResult.Perfect] = countGeki;
-                if (windows.IsHitResultAllowed(HitResult.Ok))
-                    score.ScoreInfo.Statistics[HitResult.Ok] = countKatu;
-                if (windows.IsHitResultAllowed(HitResult.Miss))
-                    score.ScoreInfo.Statistics[HitResult.Miss] = countMiss;
+                switch (currentRuleset.LegacyID)
+                {
+                    case 0:
+                        score.ScoreInfo.Statistics[HitResult.Great] = count300;
+                        score.ScoreInfo.Statistics[HitResult.Good] = count100;
+                        score.ScoreInfo.Statistics[HitResult.Meh] = count50;
+                        score.ScoreInfo.Statistics[HitResult.Miss] = countMiss;
+                        break;
+                    case 1:
+                        score.ScoreInfo.Statistics[HitResult.Great] = count300;
+                        score.ScoreInfo.Statistics[HitResult.Good] = count100;
+                        score.ScoreInfo.Statistics[HitResult.Miss] = countMiss;
+                        break;
+                    case 2:
+                        score.ScoreInfo.Statistics[HitResult.Perfect] = count300;
+                        score.ScoreInfo.Statistics[HitResult.Miss] = countMiss;
+                        break;
+                    case 3:
+                        score.ScoreInfo.Statistics[HitResult.Perfect] = countGeki;
+                        score.ScoreInfo.Statistics[HitResult.Great] = count300;
+                        score.ScoreInfo.Statistics[HitResult.Good] = countKatu;
+                        score.ScoreInfo.Statistics[HitResult.Ok] = count100;
+                        score.ScoreInfo.Statistics[HitResult.Meh] = count50;
+                        score.ScoreInfo.Statistics[HitResult.Miss] = countMiss;
+                        break;
+                }
 
                 score.ScoreInfo.TotalScore = sr.ReadInt32();
                 score.ScoreInfo.MaxCombo = sr.ReadUInt16();
