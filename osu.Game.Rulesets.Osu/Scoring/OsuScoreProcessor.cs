@@ -74,6 +74,6 @@ namespace osu.Game.Rulesets.Osu.Scoring
 
         protected override JudgementResult CreateResult(Judgement judgement) => new OsuJudgementResult(judgement);
 
-        protected override HitWindows CreateHitWindows() => new OsuHitWindows();
+        public override HitWindows CreateHitWindows() => new OsuHitWindows();
     }
 }
