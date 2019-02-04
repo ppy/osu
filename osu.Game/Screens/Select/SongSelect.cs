@@ -31,6 +31,7 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Select.Options;
 using osu.Game.Skinning;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Select
 {
@@ -564,7 +565,7 @@ namespace osu.Game.Screens.Select
             {
                 backgroundModeBeatmap.Beatmap = beatmap;
                 backgroundModeBeatmap.BlurTo(background_blur, 750, Easing.OutQuint);
-                backgroundModeBeatmap.FadeTo(1, 250);
+                backgroundModeBeatmap.FadeColour(Color4.White, 250);
             }
 
             beatmapInfoWedge.Beatmap = beatmap;
