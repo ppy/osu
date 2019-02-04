@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -150,25 +150,9 @@ namespace osu.Game.Database
                 {
                     notification.Text = $"Importing ({++current} of {paths.Length})\n{Path.GetFileName(path)}";
 
-                    TModel import;
-                    using (ArchiveReader reader = getReaderFrom(path))
-                        imported.Add(import = Import(reader));
+                    imported.Add(Import(path));
 
                     notification.Progress = (float)current / paths.Length;
-
-                    // We may or may not want to delete the file depending on where it is stored.
-                    //  e.g. reconstructing/repairing database with items from default storage.
-                    // Also, not always a single file, i.e. for LegacyFilesystemReader
-                    // TODO: Add a check to prevent files from storage to be deleted.
-                    try
-                    {
-                        if (import != null && File.Exists(path))
-                            File.Delete(path);
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error(e, $@"Could not delete original file after import ({Path.GetFileName(path)})");
-                    }
                 }
                 catch (Exception e)
                 {
@@ -193,6 +177,34 @@ namespace osu.Game.Database
                 };
                 notification.State = ProgressNotificationState.Completed;
             }
+        }
+
+        /// <summary>
+        /// Import one <see cref="TModel"/> from the filesystem and delete the file on success.
+        /// </summary>
+        /// <param name="path">The archive location on disk.</param>
+        /// <returns>The imported model, if successful.</returns>
+        public TModel Import(string path)
+        {
+            TModel import;
+            using (ArchiveReader reader = getReaderFrom(path))
+                import = Import(reader);
+
+            // We may or may not want to delete the file depending on where it is stored.
+            //  e.g. reconstructing/repairing database with items from default storage.
+            // Also, not always a single file, i.e. for LegacyFilesystemReader
+            // TODO: Add a check to prevent files from storage to be deleted.
+            try
+            {
+                if (import != null && File.Exists(path))
+                    File.Delete(path);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, $@"Could not delete original file after import ({Path.GetFileName(path)})");
+            }
+
+            return import;
         }
 
         protected virtual void PresentCompletedImport(IEnumerable<TModel> imported)

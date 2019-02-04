@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
 using System.Linq;
@@ -8,7 +8,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
 using osu.Game.IO.Archives;
-using osu.Game.Tests.Beatmaps.IO;
+using osu.Game.Tests.Resources;
 
 namespace osu.Game.Tests
 {
@@ -18,12 +18,12 @@ namespace osu.Game.Tests
     public class WaveformTestBeatmap : WorkingBeatmap
     {
         private readonly ZipArchiveReader reader;
-        private readonly FileStream stream;
+        private readonly Stream stream;
 
         public WaveformTestBeatmap()
             : base(new BeatmapInfo())
         {
-            stream = File.OpenRead(ImportBeatmapTest.TEST_OSZ_PATH);
+            stream = TestResources.GetTestBeatmapStream();
             reader = new ZipArchiveReader(stream);
         }
 
