@@ -731,6 +731,7 @@ namespace osu.Game
             Beatmap.Disabled = applyBeatmapRulesetRestrictions;
 
             screenContainer.Padding = new MarginPadding { Top = ToolbarOffset };
+            backgroundParallax.Padding = new MarginPadding { Top = -Toolbar.HEIGHT };
             overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
             MenuCursorContainer.CanShowCursor = (screenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
