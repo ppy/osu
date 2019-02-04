@@ -57,8 +57,6 @@ namespace osu.Game.Scoring.Legacy
                 var countKatu = (int)sr.ReadUInt16();
                 var countMiss = (int)sr.ReadUInt16();
 
-                var windows = currentRuleset.CreateRulesetContainerWith(workingBeatmap).CreateScoreProcessor().CreateHitWindows();
-
                 switch (currentRuleset.LegacyID)
                 {
                     case 0:
