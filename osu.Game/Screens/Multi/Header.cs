@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Multi
         private readonly OsuSpriteText screenType;
         private readonly HeaderBreadcrumbControl breadcrumbs;
 
-        public Header(Screen initialScreen)
+        public Header(ScreenStack stack)
         {
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
@@ -75,7 +75,7 @@ namespace osu.Game.Screens.Multi
                                 },
                             },
                         },
-                        breadcrumbs = new HeaderBreadcrumbControl(initialScreen)
+                        breadcrumbs = new HeaderBreadcrumbControl(stack)
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
@@ -103,8 +103,8 @@ namespace osu.Game.Screens.Multi
 
         private class HeaderBreadcrumbControl : ScreenBreadcrumbControl
         {
-            public HeaderBreadcrumbControl(Screen initialScreen)
-                : base(initialScreen)
+            public HeaderBreadcrumbControl(ScreenStack stack)
+                : base(stack)
             {
             }
 

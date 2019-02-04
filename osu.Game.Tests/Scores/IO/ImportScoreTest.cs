@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,14 +15,13 @@ using osu.Game.Rulesets.Osu;
 using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Scoring;
+using osu.Game.Tests.Resources;
 using osu.Game.Users;
 
 namespace osu.Game.Tests.Scores.IO
 {
     public class ImportScoreTest
     {
-        public const string TEST_OSZ_PATH = @"../../../../osu-resources/osu.Game.Resources/Beatmaps/241526 Soleily - Renatus.osz";
-
         [Test]
         public void TestBasicImport()
         {
@@ -132,21 +130,13 @@ namespace osu.Game.Tests.Scores.IO
             return scoreManager.GetAllUsableScores().First();
         }
 
-        private string createTemporaryBeatmap()
-        {
-            var temp = Path.GetTempFileName() + ".osz";
-            File.Copy(TEST_OSZ_PATH, temp, true);
-            Assert.IsTrue(File.Exists(temp));
-            return temp;
-        }
-
         private OsuGameBase loadOsu(GameHost host)
         {
             var osu = new OsuGameBase();
             Task.Run(() => host.Run(osu));
             waitForOrAssert(() => osu.IsLoaded, @"osu! failed to start in a reasonable amount of time");
 
-            var beatmapFile = createTemporaryBeatmap();
+            var beatmapFile = TestResources.GetTestBeatmapForImport();
             var beatmapManager = osu.Dependencies.Get<BeatmapManager>();
             beatmapManager.Import(beatmapFile);
 
