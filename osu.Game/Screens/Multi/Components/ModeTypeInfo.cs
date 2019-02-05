@@ -46,8 +46,8 @@ namespace osu.Game.Screens.Multi.Components
             };
 
             CurrentBeatmap.BindValueChanged(_ => updateBeatmap());
-            CurrentRuleset.BindValueChanged(_ => updateBeatmap());
-            Type.BindValueChanged(v => gameTypeContainer.Child = new DrawableGameType(v) { Size = new Vector2(height) });
+            CurrentRuleset.BindValueChanged(_ => updateBeatmap(), true);
+            Type.BindValueChanged(v => gameTypeContainer.Child = new DrawableGameType(v) { Size = new Vector2(height) }, true);
         }
 
         private void updateBeatmap()

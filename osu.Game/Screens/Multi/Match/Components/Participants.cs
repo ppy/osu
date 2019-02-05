@@ -59,7 +59,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                     Width = 300,
                     OnLoadComplete = d => d.FadeInFromZero(60),
                 }).ToList();
-            });
+            }, true);
         }
     }
 }

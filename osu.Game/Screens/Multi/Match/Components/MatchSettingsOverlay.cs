@@ -260,8 +260,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                     processingOverlay = new ProcessingOverlay { Alpha = 0 }
                 };
 
-                TypePicker.Current.ValueChanged += t => typeLabel.Text = t.Name;
-
+                TypePicker.Current.BindValueChanged(t => typeLabel.Text = t?.Name ?? string.Empty, true);
                 Name.BindValueChanged(n => NameField.Text = n, true);
                 Availability.BindValueChanged(a => AvailabilityPicker.Current.Value = a, true);
                 Type.BindValueChanged(t => TypePicker.Current.Value = t, true);
