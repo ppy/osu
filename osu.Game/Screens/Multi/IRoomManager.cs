@@ -20,6 +20,11 @@ namespace osu.Game.Screens.Multi
         IBindableList<Room> Rooms { get; }
 
         /// <summary>
+        /// The currently-active <see cref="Room"/>.
+        /// </summary>
+        Bindable<Room> CurrentRoom { get; }
+
+        /// <summary>
         /// Creates a new <see cref="Room"/>.
         /// </summary>
         /// <param name="room">The <see cref="Room"/> to create.</param>

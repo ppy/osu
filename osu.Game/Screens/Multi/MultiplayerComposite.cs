@@ -18,52 +18,52 @@ namespace osu.Game.Screens.Multi
     public class MultiplayerComposite : CompositeDrawable
     {
         [Resolved]
-        public Room Room { get; private set; }
+        protected Room Room { get; private set; }
 
         [Resolved(typeof(Room))]
-        public Bindable<int?> RoomID { get; private set; }
+        protected Bindable<int?> RoomID { get; private set; }
 
         [Resolved(typeof(Room))]
-        public Bindable<string> Name { get; private set; }
+        protected Bindable<string> Name { get; private set; }
 
         [Resolved(typeof(Room))]
-        public Bindable<User> Host { get; private set; }
+        protected Bindable<User> Host { get; private set; }
 
         [Resolved(typeof(Room))]
-        public Bindable<RoomStatus> Status { get; private set; }
+        protected Bindable<RoomStatus> Status { get; private set; }
 
         [Resolved(typeof(Room))]
-        public Bindable<GameType> Type { get; private set; }
+        protected Bindable<GameType> Type { get; private set; }
 
         [Resolved(typeof(Room))]
-        public BindableList<PlaylistItem> Playlist { get; private set; }
+        protected BindableList<PlaylistItem> Playlist { get; private set; }
 
         [Resolved(typeof(Room))]
-        public Bindable<IEnumerable<User>> Participants { get; private set; }
+        protected Bindable<IEnumerable<User>> Participants { get; private set; }
 
         [Resolved(typeof(Room))]
-        public Bindable<int> ParticipantCount { get; private set; }
+        protected Bindable<int> ParticipantCount { get; private set; }
 
         [Resolved(typeof(Room))]
-        public Bindable<int?> MaxParticipants { get; private set; }
+        protected Bindable<int?> MaxParticipants { get; private set; }
 
         [Resolved(typeof(Room))]
-        public Bindable<DateTimeOffset> EndDate { get; private set; }
+        protected Bindable<DateTimeOffset> EndDate { get; private set; }
 
         [Resolved(typeof(Room))]
-        public Bindable<RoomAvailability> Availability { get; private set; }
+        protected Bindable<RoomAvailability> Availability { get; private set; }
 
         [Resolved(typeof(Room))]
-        public Bindable<TimeSpan> Duration { get; private set; }
+        protected Bindable<TimeSpan> Duration { get; private set; }
 
         private readonly Bindable<BeatmapInfo> currentBeatmap = new Bindable<BeatmapInfo>();
-        public IBindable<BeatmapInfo> CurrentBeatmap => currentBeatmap;
+        protected IBindable<BeatmapInfo> CurrentBeatmap => currentBeatmap;
 
         private readonly Bindable<IEnumerable<Mod>> currentMods = new Bindable<IEnumerable<Mod>>();
-        public IBindable<IEnumerable<Mod>> CurrentMods => currentMods;
+        protected IBindable<IEnumerable<Mod>> CurrentMods => currentMods;
 
         private readonly Bindable<RulesetInfo> currentRuleset = new Bindable<RulesetInfo>();
-        public IBindable<RulesetInfo> CurrentRuleset => currentRuleset;
+        protected IBindable<RulesetInfo> CurrentRuleset => currentRuleset;
 
         protected override void LoadComplete()
         {

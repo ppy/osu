@@ -19,8 +19,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     {
         public Action<Room> JoinRequested;
 
-        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
-        public IBindable<Room> SelectedRoom => selectedRoom;
+        private readonly Bindable<Room> currentRoom = new Bindable<Room>();
 
         private readonly IBindableList<Room> rooms = new BindableList<Room>();
 
@@ -47,6 +46,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [BackgroundDependencyLoader]
         private void load()
         {
+            currentRoom.BindTo(roomManager.CurrentRoom);
             rooms.BindTo(roomManager.Rooms);
 
             rooms.ItemsAdded += addRooms;
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             else
                 roomFlow.Children.ForEach(r => r.State = r.Room == room ? SelectionState.Selected : SelectionState.NotSelected);
 
-            selectedRoom.Value = room;
+            currentRoom.Value = room;
         }
 
         protected override void Dispose(bool isDisposing)

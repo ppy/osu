@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Multi
         private readonly BindableList<Room> rooms = new BindableList<Room>();
         public IBindableList<Room> Rooms => rooms;
 
-        public readonly Bindable<Room> CurrentRoom = new Bindable<Room>();
+        public Bindable<Room> CurrentRoom { get; } = new Bindable<Room>();
 
         [Resolved]
         private APIAccess api { get; set; }
@@ -50,6 +50,8 @@ namespace osu.Game.Screens.Multi
             {
                 update(room, result);
                 addRoom(room);
+
+                CurrentRoom.Value = room;
 
                 RoomsUpdated?.Invoke();
 

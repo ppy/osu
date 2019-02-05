@@ -16,7 +16,8 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
-        private readonly Room room;
+        [Resolved(typeof(Room), nameof(Room.EndDate))]
+        private Bindable<DateTimeOffset> endDate { get; set; }
 
         [Resolved]
         private IBindableBeatmap gameBeatmap { get; set; }
@@ -26,9 +27,8 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private bool hasBeatmap;
 
-        public ReadyButton(Room room)
+        public ReadyButton()
         {
-            this.room = room;
             RelativeSizeAxes = Axes.Y;
             Size = new Vector2(200, 1);
 
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 return;
             }
 
-            bool hasEnoughTime = DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(gameBeatmap.Value.Track.Length) < room.EndDate;
+            bool hasEnoughTime = DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(gameBeatmap.Value.Track.Length) < endDate;
 
             Enabled.Value = hasBeatmap && hasEnoughTime;
         }
