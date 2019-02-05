@@ -163,10 +163,9 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 }
             };
 
-            Status.BindValueChanged(displayStatus);
-            Name.BindValueChanged(n => name.Text = n);
-
-            RoomID.BindValueChanged(updateRoom);
+            Status.BindValueChanged(displayStatus, true);
+            Name.BindValueChanged(n => name.Text = n, true);
+            RoomID.BindValueChanged(updateRoom, true);
         }
 
         private void updateRoom(int? roomId)

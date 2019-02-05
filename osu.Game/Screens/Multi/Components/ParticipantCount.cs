@@ -52,9 +52,8 @@ namespace osu.Game.Screens.Multi.Components
                 }
             };
 
-            Participants.BindValueChanged(v => count.Text = v.Count().ToString());
             MaxParticipants.BindValueChanged(_ => updateMax(), true);
-            ParticipantCount.BindValueChanged(v => count.Text = v.ToString("#,0"));
+            ParticipantCount.BindValueChanged(v => count.Text = v.ToString("#,0"), true);
         }
 
         private void updateMax()

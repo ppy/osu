@@ -60,7 +60,7 @@ namespace osu.Game.Screens.Multi.Components
                     beatmapAuthor.AddText("mapped by ", s => s.Colour = OsuColour.Gray(0.8f));
                     beatmapAuthor.AddLink(v.Metadata.Author.Username, null, LinkAction.OpenUserProfile, v.Metadata.Author.Id.ToString(), "View Profile");
                 }
-            });
+            }, true);
         }
     }
 }
