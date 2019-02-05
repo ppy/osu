@@ -149,6 +149,15 @@ namespace osu.Game.Screens.Multi
                 isIdle.BindTo(idleTracker.IsIdle);
         }
 
+        private CachedModelDependencyContainer<Room> dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
+            dependencies.Model.BindTo(roomManager.CurrentRoom);
+            return dependencies;
+        }
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
