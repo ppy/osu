@@ -11,7 +11,7 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Skins
 {
     [TestFixture]
-    public class SkinFallbackTest
+    public class LegacySkinDecoderTest
     {
         [TestCase(true)]
         [TestCase(false)]
