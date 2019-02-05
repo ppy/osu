@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Containers;
@@ -12,11 +13,8 @@ using System.Collections.Generic;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ClickableUsername : OsuHoverContainer
+    public abstract class ClickableUserContainer : Container
     {
-        private readonly SpriteText text;
-        protected override IEnumerable<Drawable> EffectTargets => new[] { text };
-
         private UserProfileOverlay profile;
 
         private User user;
@@ -28,33 +26,16 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 if (user == value) return;
                 user = value;
 
-                OnUserUpdate(user);
+                OnUserChange(user);
             }
         }
 
-        public float TextSize
-        {
-            set
-            {
-                if (text.TextSize == value) return;
-                text.TextSize = value;
-            }
-            get { return text.TextSize; }
-        }
-
-        public ClickableUsername()
+        public ClickableUserContainer()
         {
             AutoSizeAxes = Axes.Both;
-            Child = text = new SpriteText
-            {
-                Font = @"Exo2.0-BoldItalic",
-            };
         }
 
-        protected virtual void OnUserUpdate(User user)
-        {
-            text.Text = user.Username;
-        }
+        protected abstract void OnUserChange(User user);
 
         [BackgroundDependencyLoader(true)]
         private void load(UserProfileOverlay profile)
