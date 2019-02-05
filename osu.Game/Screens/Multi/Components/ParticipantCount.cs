@@ -1,31 +1,29 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Multi.Components
 {
-    public class ParticipantCountDisplay : CompositeDrawable
+    public class ParticipantCountDisplay : MultiplayerComposite
     {
         private const float text_size = 30;
         private const float transition_duration = 100;
 
-        private readonly OsuSpriteText slash, maxText;
-
-        public readonly IBindable<IEnumerable<User>> Participants = new Bindable<IEnumerable<User>>();
-        public readonly IBindable<int> ParticipantCount = new Bindable<int>();
-        public readonly IBindable<int?> MaxParticipants = new Bindable<int?>();
+        private OsuSpriteText slash, maxText;
 
         public ParticipantCountDisplay()
         {
             AutoSizeAxes = Axes.Both;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             OsuSpriteText count;
 
             InternalChild = new FillFlowContainer

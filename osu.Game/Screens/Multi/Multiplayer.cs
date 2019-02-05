@@ -123,7 +123,7 @@ namespace osu.Game.Screens.Multi
                         Right = 10 + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
                     },
                     Text = "Create room",
-                    Action = () => loungeSubScreen.Push(new Room
+                    Action = () => loungeSubScreen.Open(new Room
                     {
                         Name = { Value = $"{api.LocalUser}'s awesome room" }
                     }),

@@ -20,31 +20,27 @@ using osuTK.Graphics;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class Header : Container
+    public class Header : MultiplayerComposite
     {
         public const float HEIGHT = 200;
 
-        private readonly RoomBindings bindings = new RoomBindings();
+        public MatchTabControl Tabs;
 
-        private readonly Box tabStrip;
+        public Action RequestBeatmapSelection;
 
-        public readonly MatchTabControl Tabs;
-
-        public Action OnRequestSelectBeatmap;
-
-        public Header(Room room)
+        public Header()
         {
             RelativeSizeAxes = Axes.X;
             Height = HEIGHT;
+        }
 
-            bindings.Room = room;
-
-            BeatmapTypeInfo beatmapTypeInfo;
+        [BackgroundDependencyLoader]
+        private void load(OsuColour colours)
+        {
             BeatmapSelectButton beatmapButton;
-            UpdateableBeatmapBackgroundSprite background;
             ModDisplay modDisplay;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Container
                 {
@@ -52,7 +48,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                     Masking = true,
                     Children = new Drawable[]
                     {
-                        background = new HeaderBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both },
+                        new HeaderBackgroundSprite { RelativeSizeAxes = Axes.Both },
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
@@ -60,12 +56,13 @@ namespace osu.Game.Screens.Multi.Match.Components
                         },
                     }
                 },
-                tabStrip = new Box
+                new Box
                 {
                     Anchor = Anchor.BottomLeft,
                     Origin = Anchor.BottomLeft,
                     RelativeSizeAxes = Axes.X,
                     Height = 1,
+                    Colour = colours.Yellow
                 },
                 new Container
                 {
@@ -80,7 +77,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                             Direction = FillDirection.Vertical,
                             Children = new Drawable[]
                             {
-                                beatmapTypeInfo = new BeatmapTypeInfo(),
+                                new BeatmapTypeInfo(),
                                 modDisplay = new ModDisplay
                                 {
                                     Scale = new Vector2(0.75f),
@@ -95,13 +92,13 @@ namespace osu.Game.Screens.Multi.Match.Components
                             RelativeSizeAxes = Axes.Y,
                             Width = 200,
                             Padding = new MarginPadding { Vertical = 10 },
-                            Child = beatmapButton = new BeatmapSelectButton(room)
+                            Child = beatmapButton = new BeatmapSelectButton
                             {
                                 RelativeSizeAxes = Axes.Both,
                                 Height = 1,
                             },
                         },
-                        Tabs = new MatchTabControl(room)
+                        Tabs = new MatchTabControl
                         {
                             Anchor = Anchor.BottomLeft,
                             Origin = Anchor.BottomLeft,
@@ -111,37 +108,36 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            beatmapTypeInfo.Beatmap.BindTo(bindings.CurrentBeatmap);
-            beatmapTypeInfo.Ruleset.BindTo(bindings.CurrentRuleset);
-            beatmapTypeInfo.Type.BindTo(bindings.Type);
-            background.Beatmap.BindTo(bindings.CurrentBeatmap);
-            bindings.CurrentMods.BindValueChanged(m => modDisplay.Current.Value = m, true);
+            CurrentMods.BindValueChanged(m => modDisplay.Current.Value = m, true);
 
-            beatmapButton.Action = () => OnRequestSelectBeatmap?.Invoke();
-        }
-
-        [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
-        {
-            tabStrip.Colour = colours.Yellow;
+            beatmapButton.Action = () => RequestBeatmapSelection?.Invoke();
         }
 
         private class BeatmapSelectButton : HeaderButton
         {
-            private readonly IBindable<int?> roomIDBind = new Bindable<int?>();
+            [Resolved(typeof(Room), nameof(Online.Multiplayer.Room.RoomID))]
+            private Bindable<int?> roomId { get; set; }
 
-            public BeatmapSelectButton(Room room)
+            public BeatmapSelectButton()
             {
                 Text = "Select beatmap";
+            }
 
-                roomIDBind.BindTo(room.RoomID);
-                roomIDBind.BindValueChanged(v => this.FadeTo(v.HasValue ? 0 : 1), true);
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                roomId.BindValueChanged(v => this.FadeTo(v.HasValue ? 0 : 1), true);
             }
         }
 
-        private class HeaderBeatmapBackgroundSprite : UpdateableBeatmapBackgroundSprite
+        private class HeaderBackgroundSprite : MultiplayerBackgroundSprite
         {
-            protected override double FadeDuration => 200;
+            protected override UpdateableBeatmapBackgroundSprite CreateBackgroundSprite() => new BackgroundSprite { RelativeSizeAxes = Axes.Both };
+
+            private class BackgroundSprite : UpdateableBeatmapBackgroundSprite
+            {
+                protected override double FadeDuration => 200;
+            }
         }
     }
 }

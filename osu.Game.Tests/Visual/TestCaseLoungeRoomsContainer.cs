@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
 
             AddStep("select first room", () => container.Rooms.First().Action?.Invoke());
-            AddAssert("first room selected", () => container.SelectedRoom.Value == roomManager.Rooms.First());
+            AddAssert("first room selected", () => roomManager.CurrentRoom.Value == roomManager.Rooms.First());
 
             AddStep("join first room", () => container.Rooms.First().Action?.Invoke());
             AddAssert("first room joined", () => roomManager.Rooms.First().Status.Value is JoinedRoomStatus);
@@ -75,6 +75,8 @@ namespace osu.Game.Tests.Visual
 
             public readonly BindableList<Room> Rooms = new BindableList<Room>();
             IBindableList<Room> IRoomManager.Rooms => Rooms;
+
+            public Bindable<Room> CurrentRoom { get; } = new Bindable<Room>();
 
             public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => Rooms.Add(room);
 
