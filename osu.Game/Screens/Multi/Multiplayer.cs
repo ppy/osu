@@ -20,6 +20,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Multi.Lounge;
+using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
 using osuTK;
 
@@ -47,6 +48,10 @@ namespace osu.Game.Screens.Multi
         private readonly OsuButton createButton;
         private readonly LoungeSubScreen loungeSubScreen;
         private readonly ScreenStack screenStack;
+        private readonly RoomPollingComponent pollingComponent;
+
+        [Cached]
+        private readonly Bindable<FilterCriteria> filter = new Bindable<FilterCriteria>();
 
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
@@ -99,7 +104,7 @@ namespace osu.Game.Screens.Multi
                         },
                     },
                 },
-                new Container
+                roomManager = new RoomManager
                 {
                     RelativeSizeAxes = Axes.Both,
                     Padding = new MarginPadding { Top = Header.HEIGHT },
@@ -123,8 +128,11 @@ namespace osu.Game.Screens.Multi
                         Name = { Value = $"{api.LocalUser}'s awesome room" }
                     }),
                 },
-                roomManager = new RoomManager()
+                pollingComponent = new RoomPollingComponent()
             });
+
+            pollingComponent.Filter.BindTo(filter);
+            pollingComponent.RoomsRetrieved += roomManager.UpdateRooms;
 
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
@@ -149,8 +157,8 @@ namespace osu.Game.Screens.Multi
 
         private void updatePollingRate(bool idle)
         {
-            roomManager.TimeBetweenPolls = !this.IsCurrentScreen() || !(screenStack.CurrentScreen is LoungeSubScreen) ? 0 : (idle ? 120000 : 15000);
-            Logger.Log($"Polling adjusted to {roomManager.TimeBetweenPolls}");
+            pollingComponent.TimeBetweenPolls = !this.IsCurrentScreen() || !(screenStack.CurrentScreen is LoungeSubScreen) ? 0 : (idle ? 120000 : 15000);
+            Logger.Log($"Polling adjusted to {pollingComponent.TimeBetweenPolls}");
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
@@ -213,7 +221,7 @@ namespace osu.Game.Screens.Multi
             this.FadeOut(250);
 
             cancelLooping();
-            roomManager.TimeBetweenPolls = 0;
+            pollingComponent.TimeBetweenPolls = 0;
         }
 
         private void cancelLooping()
