@@ -21,7 +21,6 @@ namespace osu.Game.Screens.Multi.Lounge
         protected readonly FilterControl Filter;
 
         private readonly Container content;
-        private readonly RoomsContainer rooms;
         private readonly Action<Screen> pushGameplayScreen;
         private readonly ProcessingOverlay processingOverlay;
 
@@ -30,6 +29,7 @@ namespace osu.Game.Screens.Multi.Lounge
             this.pushGameplayScreen = pushGameplayScreen;
 
             RoomInspector inspector;
+            RoomsContainer rooms;
 
             InternalChildren = new Drawable[]
             {
@@ -73,8 +73,6 @@ namespace osu.Game.Screens.Multi.Lounge
 
             inspector.Room.BindTo(rooms.SelectedRoom);
 
-            Filter.Search.Current.ValueChanged += s => filterRooms();
-            Filter.Tabs.Current.ValueChanged += t => filterRooms();
             Filter.Search.Exit += this.Exit;
         }
 
@@ -111,12 +109,6 @@ namespace osu.Game.Screens.Multi.Lounge
         {
             base.OnSuspending(next);
             Filter.Search.HoldFocus = false;
-        }
-
-        private void filterRooms()
-        {
-            rooms.Filter(Filter.CreateCriteria());
-            Manager?.Filter(Filter.CreateCriteria());
         }
 
         private void joinRequested(Room room)

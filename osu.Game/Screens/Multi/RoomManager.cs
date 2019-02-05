@@ -2,22 +2,21 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
-using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
-using osu.Game.Screens.Multi.Lounge.Components;
 
 namespace osu.Game.Screens.Multi
 {
-    public class RoomManager : PollingComponent, IRoomManager
+    public class RoomManager : Container, IRoomManager
     {
         public event Action RoomsUpdated;
 
@@ -25,8 +24,6 @@ namespace osu.Game.Screens.Multi
         public IBindableList<Room> Rooms => rooms;
 
         private Room currentRoom;
-
-        private FilterCriteria currentFilter = new FilterCriteria();
 
         [Resolved]
         private APIAccess api { get; set; }
@@ -102,52 +99,25 @@ namespace osu.Game.Screens.Multi
             currentRoom = null;
         }
 
-        public void Filter(FilterCriteria criteria)
+        public void UpdateRooms(List<Room> newRooms)
         {
-            currentFilter = criteria;
-            PollImmediately();
-        }
-
-        private GetRoomsRequest pollReq;
-
-        protected override Task Poll()
-        {
-            if (!api.IsLoggedIn)
-                return base.Poll();
-
-            var tcs = new TaskCompletionSource<bool>();
-
-            pollReq?.Cancel();
-            pollReq = new GetRoomsRequest(currentFilter.PrimaryFilter);
-
-            pollReq.Success += result =>
+            // Remove past matches
+            foreach (var r in rooms.ToList())
             {
-                // Remove past matches
-                foreach (var r in rooms.ToList())
-                {
-                    if (result.All(e => e.RoomID.Value != r.RoomID.Value))
-                        rooms.Remove(r);
-                }
+                if (newRooms.All(e => e.RoomID.Value != r.RoomID.Value))
+                    rooms.Remove(r);
+            }
 
-                for (int i = 0; i < result.Count; i++)
-                {
-                    var r = result[i];
-                    r.Position = i;
+            for (int i = 0; i < newRooms.Count; i++)
+            {
+                var r = newRooms[i];
+                r.Position = i;
 
-                    update(r, r);
-                    addRoom(r);
-                }
+                update(r, r);
+                addRoom(r);
+            }
 
-                RoomsUpdated?.Invoke();
-
-                tcs.SetResult(true);
-            };
-
-            pollReq.Failure += _ => tcs.SetResult(false);
-
-            api.Queue(pollReq);
-
-            return tcs.Task;
+            RoomsUpdated?.Invoke();
         }
 
         /// <summary>
