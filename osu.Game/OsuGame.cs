@@ -732,7 +732,6 @@ namespace osu.Game
 
             screenContainer.Padding = new MarginPadding { Top = ToolbarOffset };
             overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
-            backgroundParallax.Margin = new MarginPadding { Top = -Toolbar.HEIGHT };
 
             MenuCursorContainer.CanShowCursor = (screenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
