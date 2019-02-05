@@ -83,7 +83,7 @@ namespace osu.Game.Online.Multiplayer
         /// The position of this <see cref="Room"/> in the list. This is not read from or written to the API.
         /// </summary>
         [JsonIgnore]
-        public int Position = -1;
+        public Bindable<int> Position { get; private set; } = new Bindable<int>(-1);
 
         public void CopyFrom(Room other)
         {
