@@ -193,23 +193,49 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         {
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreRight,
-                            AutoSizeAxes = Axes.Both,
+                            RelativeSizeAxes = Axes.X,
+                            AutoSizeAxes = Axes.Y,
+                            Width = 0.7f,
                             Child = new FillFlowContainer
                             {
-                                AutoSizeAxes = Axes.Both,
-                                Direction = FillDirection.Horizontal,
-                                Spacing = new Vector2(margin, 0),
+                                AutoSizeAxes = Axes.Y,
+                                RelativeSizeAxes = Axes.X,
+                                Anchor = Anchor.CentreRight,
+                                Origin = Anchor.CentreRight,
+                                Spacing = new Vector2(margin),
                                 Children = new Drawable[]
                                 {
-                                    totalScore = new AutoSizeInfoColumn("Total Score"),
-                                    accuracy = new MediumInfoColumn("Accuracy"),
-                                    maxCombo = new MediumInfoColumn("Max Combo"),
-                                    hitGreat = new SmallInfoColumn("300", 20),
-                                    hitGood = new SmallInfoColumn("100", 20),
-                                    hitMeh = new SmallInfoColumn("50", 20),
-                                    hitMiss = new SmallInfoColumn("miss", 20),
-                                    pp = new SmallInfoColumn("pp", 20),
-                                    modsInfo = new ModsInfoColumn("mods"),
+                                    new FillFlowContainer
+                                    {
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(margin, 0),
+                                        Children = new Drawable[]
+                                        {
+                                            hitGreat = new SmallInfoColumn("300", 20),
+                                            hitGood = new SmallInfoColumn("100", 20),
+                                            hitMeh = new SmallInfoColumn("50", 20),
+                                            hitMiss = new SmallInfoColumn("miss", 20),
+                                            pp = new SmallInfoColumn("pp", 20),
+                                            modsInfo = new ModsInfoColumn("mods"),
+                                        }
+                                    },
+                                    new FillFlowContainer
+                                    {
+                                        Anchor = Anchor.CentreRight,
+                                        Origin = Anchor.CentreRight,
+                                        AutoSizeAxes = Axes.Both,
+                                        Direction = FillDirection.Horizontal,
+                                        Spacing = new Vector2(margin, 0),
+                                        Children = new Drawable[]
+                                        {
+                                            totalScore = new AutoSizeInfoColumn("Total Score"),
+                                            accuracy = new MediumInfoColumn("Accuracy"),
+                                            maxCombo = new MediumInfoColumn("Max Combo"),
+                                        }
+                                    },
                                 }
                             }
                         }
@@ -248,7 +274,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
                     Height = 1,
-                    Position = new Vector2(0, TextSize / 2 + 1.5f),
+                    Position = new Vector2(0, TextSize / 2 - 1),
                     Depth = 1,
                     Child = underscore = new Box
                     {
