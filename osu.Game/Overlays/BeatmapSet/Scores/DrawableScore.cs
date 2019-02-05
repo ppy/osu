@@ -8,17 +8,14 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
-using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Users;
 using osuTK;
 using osuTK.Graphics;
-using System.Collections.Generic;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -27,7 +24,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private const int fade_duration = 100;
         private const float text_size = 14;
 
-        private readonly Box background;
         private readonly Box hoveredBackground;
         private readonly SpriteText rank;
         private readonly SpriteText scoreText;
@@ -42,11 +38,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly ClickableScoreUsername username;
 
         private readonly APIScoreInfo score;
-        private Color4 backgroundColor;
 
         public DrawableScore(int index, APIScoreInfo score)
         {
             FillFlowContainer modsContainer;
+            Box background;
 
             this.score = score;
 
@@ -196,8 +192,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             hitMeh.Colour = (score.Statistics[HitResult.Meh] == 0) ? Color4.Gray : Color4.Black;
             hitMiss.Colour = (score.Statistics[HitResult.Miss] == 0) ? Color4.Gray : Color4.Black;
 
-            background.Colour = backgroundColor = (index % 2 == 0) ? Color4.WhiteSmoke : Color4.White;
-
+            background.Colour = (index % 2 == 0) ? Color4.WhiteSmoke : Color4.White;
 
             foreach (Mod mod in score.Mods)
                 modsContainer.Add(new ModIcon(mod)

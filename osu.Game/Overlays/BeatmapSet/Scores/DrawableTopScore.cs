@@ -10,10 +10,8 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Online.Leaderboards;
-using osu.Game.Overlays.Profile.Sections.Ranks;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
@@ -264,7 +262,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private class ClickableTopScoreUsername : ClickableUserContainer
         {
-            private const float fade_duration = 500;
+            private const float username_fade_duration = 500;
 
             private readonly Box underscore;
             private readonly Container underscoreContainer;
@@ -317,15 +315,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             protected override bool OnHover(HoverEvent e)
             {
-                text.FadeColour(hoverColour, fade_duration, Easing.OutQuint);
-                underscore.FadeIn(fade_duration, Easing.OutQuint);
+                text.FadeColour(hoverColour, username_fade_duration, Easing.OutQuint);
+                underscore.FadeIn(username_fade_duration, Easing.OutQuint);
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                text.FadeColour(Color4.Black, fade_duration, Easing.OutQuint);
-                underscore.FadeOut(fade_duration, Easing.OutQuint);
+                text.FadeColour(Color4.Black, username_fade_duration, Easing.OutQuint);
+                underscore.FadeOut(username_fade_duration, Easing.OutQuint);
                 base.OnHoverLost(e);
             }
         }
