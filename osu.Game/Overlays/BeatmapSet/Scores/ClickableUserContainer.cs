@@ -4,12 +4,8 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osu.Game.Graphics.Containers;
-using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
-using System.Collections.Generic;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -30,7 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             }
         }
 
-        public ClickableUserContainer()
+        protected ClickableUserContainer()
         {
             AutoSizeAxes = Axes.Both;
         }
