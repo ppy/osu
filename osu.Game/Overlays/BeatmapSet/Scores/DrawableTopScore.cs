@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly Box background;
         private readonly UpdateableAvatar avatar;
         private readonly DrawableFlag flag;
-        private readonly ClickableUsername username;
+        private readonly ClickableTopScoreUsername username;
         private readonly SpriteText rankText;
         private readonly SpriteText date;
         private readonly DrawableRank rank;
@@ -262,44 +262,70 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             base.OnHoverLost(e);
         }
 
-        private class ClickableTopScoreUsername : ClickableUsername
+        private class ClickableTopScoreUsername : ClickableUserContainer
         {
-            private Box underscore;
+            private const float fade_duration = 500;
+
+            private readonly Box underscore;
+            private readonly Container underscoreContainer;
+            private readonly SpriteText text;
+
+            private Color4 hoverColour;
+
+            public float TextSize
+            {
+                set
+                {
+                    if (text.TextSize == value) return;
+                    text.TextSize = value;
+                }
+                get { return text.TextSize; }
+            }
 
             public ClickableTopScoreUsername()
             {
-                Add(new Container
+                Add(underscoreContainer = new Container
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     RelativeSizeAxes = Axes.X,
                     Height = 1,
-                    Position = new Vector2(0, TextSize / 2 - 1),
-                    Depth = 1,
                     Child = underscore = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0,
                     }
                 });
+                Add(text = new SpriteText
+                {
+                    Font = @"Exo2.0-BoldItalic",
+                    Colour = Color4.Black,
+                });
             }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
             {
-                IdleColour = colours.ContextMenuGray;
-                HoverColour = underscore.Colour = colours.Blue;
+                hoverColour = underscore.Colour = colours.Blue;
+                underscoreContainer.Position = new Vector2(0, TextSize / 2 - 1);
+            }
+
+            protected override void OnUserChange(User user)
+            {
+                text.Text = user.Username;
             }
 
             protected override bool OnHover(HoverEvent e)
             {
-                underscore.FadeIn(FADE_DURATION, Easing.OutQuint);
+                text.FadeColour(hoverColour, fade_duration, Easing.OutQuint);
+                underscore.FadeIn(fade_duration, Easing.OutQuint);
                 return base.OnHover(e);
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                underscore.FadeOut(FADE_DURATION, Easing.OutQuint);
+                text.FadeColour(Color4.Black, fade_duration, Easing.OutQuint);
+                underscore.FadeOut(fade_duration, Easing.OutQuint);
                 base.OnHoverLost(e);
             }
         }
