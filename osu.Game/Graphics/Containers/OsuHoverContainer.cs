@@ -1,12 +1,12 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osuTK.Graphics;
+using System.Collections.Generic;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -16,17 +16,19 @@ namespace osu.Game.Graphics.Containers
 
         protected Color4 IdleColour = Color4.White;
 
+        protected const float FADE_DURATION = 500;
+
         protected virtual IEnumerable<Drawable> EffectTargets => new[] { Content };
 
         protected override bool OnHover(HoverEvent e)
         {
-            EffectTargets.ForEach(d => d.FadeColour(HoverColour, 500, Easing.OutQuint));
+            EffectTargets.ForEach(d => d.FadeColour(HoverColour, FADE_DURATION, Easing.OutQuint));
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            EffectTargets.ForEach(d => d.FadeColour(IdleColour, 500, Easing.OutQuint));
+            EffectTargets.ForEach(d => d.FadeColour(IdleColour, FADE_DURATION, Easing.OutQuint));
             base.OnHoverLost(e);
         }
 

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,6 +15,7 @@ using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
 using osu.Game.Users;
+using osuTK;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -56,13 +56,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Size = new Vector2(30, 20),
                     Margin = new MarginPadding { Left = 60 }
                 },
-                new ClickableUsername
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    User = score.User,
-                    Margin = new MarginPadding { Left = 100 }
-                },
+                //new ClickableUsername
+                //{
+                //    Anchor = Anchor.CentreLeft,
+                //    Origin = Anchor.CentreLeft,
+                //    User = score.User,
+                //    Margin = new MarginPadding { Left = 100 }
+                //},
                 modsContainer = new ScoreModsContainer
                 {
                     Anchor = Anchor.CentreLeft,

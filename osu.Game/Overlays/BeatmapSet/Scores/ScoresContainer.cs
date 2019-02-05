@@ -12,6 +12,8 @@ using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
+using osu.Framework.Graphics.Shapes;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -98,6 +100,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
+                new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Colour = Color4.White,
+                },
                 new FillFlowContainer
                 {
                     Anchor = Anchor.TopCentre,
