@@ -164,7 +164,7 @@ namespace osu.Game.Screens.Multi.Match
                     },
                 };
 
-                header.Tabs.Current.ValueChanged += t =>
+                header.Tabs.Current.BindValueChanged(t =>
                 {
                     const float fade_duration = 500;
                     if (t is SettingsMatchPage)
@@ -179,7 +179,7 @@ namespace osu.Game.Screens.Multi.Match
                         info.FadeIn(fade_duration, Easing.OutQuint);
                         bottomRow.FadeIn(fade_duration, Easing.OutQuint);
                     }
-                };
+                }, true);
 
                 chat.Exit += () => RequestExit?.Invoke();
 
