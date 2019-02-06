@@ -77,6 +77,11 @@ namespace osu.Game.Tournament.Screens.Ladder
                         var pos = PairingsContainer.ToLocalSpace(GetContainingInputManager().CurrentState.Mouse.Position);
                         AddPairing(new MatchPairing { Position = { Value = new Point((int)pos.X, (int)pos.Y) } });
                     }),
+                    new OsuMenuItem("Reset teams", MenuItemType.Destructive, () =>
+                    {
+                        foreach (var p in PairingsContainer)
+                            p.Pairing.Reset();
+                    })
                 };
             }
         }

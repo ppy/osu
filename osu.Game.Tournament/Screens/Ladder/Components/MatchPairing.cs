@@ -110,5 +110,14 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
             Team1Score.Value = 0;
             Team2Score.Value = 0;
         }
+
+        public void Reset()
+        {
+            CancelMatchStart();
+            Team1.Value = null;
+            Team2.Value = null;
+            Completed.Value = false;
+            PicksBans.Clear();
+        }
     }
 }
