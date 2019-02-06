@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -92,12 +93,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Box sideStrip;
-            OsuSpriteText name;
-
             Children = new Drawable[]
             {
-                selectionBox,
+                new StatusColouredContainer
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = selectionBox
+                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -120,10 +122,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = OsuColour.FromHex(@"212121"),
                             },
-                            sideStrip = new Box
+                            new StatusColouredContainer
                             {
                                 RelativeSizeAxes = Axes.Y,
                                 Width = side_strip_width,
+                                Child = new Box { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
                             {
@@ -152,9 +155,10 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                         Spacing = new Vector2(5f),
                                         Children = new Drawable[]
                                         {
-                                            name = new OsuSpriteText
+                                            new StatusColouredContainer
                                             {
-                                                TextSize = 18
+                                                AutoSizeAxes = Axes.Both,
+                                                Child = new RoomName { TextSize = 18 }
                                             },
                                             new ParticipantInfo(),
                                         },
@@ -184,13 +188,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     },
                 },
             };
-
-            dependencies.ShadowModel.Name.BindValueChanged(n => name.Text = n, true);
-            dependencies.ShadowModel.Status.BindValueChanged(s =>
-            {
-                foreach (Drawable d in new Drawable[] { selectionBox, sideStrip })
-                    d.FadeColour(s.GetAppropriateColour(colours), transition_duration);
-            }, true);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -204,6 +201,30 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         {
             base.LoadComplete();
             this.FadeInFromZero(transition_duration);
+        }
+
+        private class RoomName : OsuSpriteText
+        {
+            [Resolved(typeof(Room), nameof(Online.Multiplayer.Room.Name))]
+            private Bindable<string> name { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Current = name;
+            }
+        }
+
+        private class StatusColouredContainer : Container
+        {
+            [Resolved(typeof(Room), nameof(Online.Multiplayer.Room.Status))]
+            private Bindable<RoomStatus> status { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                status.BindValueChanged(s => this.FadeColour(s.GetAppropriateColour(colours), transition_duration), true);
+            }
         }
     }
 }
