@@ -25,6 +25,8 @@ namespace osu.Game.Screens.Multi
 
         public Bindable<Room> CurrentRoom { get; } = new Bindable<Room>();
 
+        private Room joinedRoom;
+
         [Resolved]
         private APIAccess api { get; set; }
 
@@ -50,8 +52,7 @@ namespace osu.Game.Screens.Multi
             {
                 update(room, result);
                 addRoom(room);
-
-                CurrentRoom.Value = room;
+                joinRoom(room);
 
                 RoomsUpdated?.Invoke();
 
@@ -79,7 +80,7 @@ namespace osu.Game.Screens.Multi
             currentJoinRoomRequest = new JoinRoomRequest(room, api.LocalUser.Value);
             currentJoinRoomRequest.Success += () =>
             {
-                CurrentRoom.Value = room;
+                joinRoom(room);
                 onSuccess?.Invoke(room);
             };
 
@@ -92,13 +93,19 @@ namespace osu.Game.Screens.Multi
             api.Queue(currentJoinRoomRequest);
         }
 
+        private void joinRoom(Room room)
+        {
+            CurrentRoom.Value = room;
+            joinedRoom = room;
+        }
+
         public void PartRoom()
         {
-            if (CurrentRoom.Value == null)
+            if (joinedRoom == null)
                 return;
 
-            api.Queue(new PartRoomRequest(CurrentRoom.Value, api.LocalUser.Value));
-            CurrentRoom.Value = null;
+            api.Queue(new PartRoomRequest(joinedRoom, api.LocalUser.Value));
+            joinedRoom = null;
         }
 
         public void UpdateRooms(List<Room> newRooms)
