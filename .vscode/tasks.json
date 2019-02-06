@@ -70,7 +70,8 @@
             "type": "shell",
             "command": "dotnet",
             "args": [
-                "restore"
+                "restore",
+                "osu.sln"
             ],
             "problemMatcher": []
         }
