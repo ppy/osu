@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             difficultyHitObjects.AddRange(beatmap.HitObjects.Where(h => h.StartTime <= upTo).Select(h => new ManiaHitObjectDifficulty((ManiaHitObject)h, columnCount)).OrderBy(h => h.BaseHitObject.StartTime));
 
             if (!calculateStrainValues(difficultyHitObjects, timeRate))
-                return new DifficultyAttributes(mods, 0);
+                return new ManiaDifficultyAttributes(mods, 0);
 
             double starRating = calculateDifficulty(difficultyHitObjects, timeRate) * star_scaling_factor;
 
