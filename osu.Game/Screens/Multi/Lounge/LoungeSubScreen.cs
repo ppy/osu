@@ -137,7 +137,7 @@ namespace osu.Game.Screens.Multi.Lounge
 
             currentRoom.Value = room;
 
-            this.Push(new MatchSubScreen(s => pushGameplayScreen?.Invoke(s)));
+            this.Push(new MatchSubScreen(room, s => pushGameplayScreen?.Invoke(s)));
         }
     }
 }
