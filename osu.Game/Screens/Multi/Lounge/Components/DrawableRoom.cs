@@ -155,11 +155,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                         Spacing = new Vector2(5f),
                                         Children = new Drawable[]
                                         {
-                                            new StatusColouredContainer
-                                            {
-                                                AutoSizeAxes = Axes.Both,
-                                                Child = new RoomName { TextSize = 18 }
-                                            },
+                                            new RoomName { TextSize = 18 },
                                             new ParticipantInfo(),
                                         },
                                     },
