@@ -4,6 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
@@ -24,6 +25,8 @@ namespace osu.Game.Screens.Multi.Match
 
         public override string Title => room.RoomID.Value == null ? "New room" : room.Name.Value;
         public override string ShortTitle => "room";
+
+        private readonly Bindable<WorkingBeatmap> currentlyWorkingBeatmap = new Bindable<WorkingBeatmap>();
 
         private readonly RoomBindings bindings = new RoomBindings();
 
@@ -143,8 +146,10 @@ namespace osu.Game.Screens.Multi.Match
         }
 
         [BackgroundDependencyLoader]
-        private void load()
+        private void load(BindableBeatmap beatmap)
         {
+            currentlyWorkingBeatmap.BindTo(beatmap);
+
             beatmapManager.ItemAdded += beatmapAdded;
         }
 
@@ -164,9 +169,12 @@ namespace osu.Game.Screens.Multi.Match
 
         private void setBeatmap(BeatmapInfo beatmap)
         {
+            //return if beatmaps are the same
+            if (currentlyWorkingBeatmap.Value.BeatmapInfo.OnlineBeatmapID == beatmap.OnlineBeatmapID)
+                return;
+
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
             var localBeatmap = beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == beatmap.OnlineBeatmapID);
-
             Game?.ForcefullySetBeatmap(beatmapManager.GetWorkingBeatmap(localBeatmap));
         }
 
