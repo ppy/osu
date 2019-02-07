@@ -23,7 +23,7 @@ namespace osu.Game.Screens.Multi.Match
     {
         public override bool AllowBeatmapRulesetChange => false;
 
-        public override string Title => roomId?.Value == null ? "New room" : name.Value;
+        public override string Title { get; }
 
         public override string ShortTitle => "room";
 
@@ -36,8 +36,10 @@ namespace osu.Game.Screens.Multi.Match
         [Resolved(typeof(Room), nameof(Room.Playlist))]
         private BindableList<PlaylistItem> playlist { get; set; }
 
-        public MatchSubScreen(Action<Screen> pushGameplayScreen)
+        public MatchSubScreen(Room room, Action<Screen> pushGameplayScreen)
         {
+            Title = room.RoomID.Value == null ? "New room" : room.Name;
+
             InternalChild = new Match(pushGameplayScreen)
             {
                 RelativeSizeAxes = Axes.Both,
