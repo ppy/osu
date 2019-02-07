@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         {
             Children = new Drawable[]
             {
-                new StatusColouredContainer
+                new StatusColouredContainer(transition_duration)
                 {
                     RelativeSizeAxes = Axes.Both,
                     Child = selectionBox
@@ -122,7 +122,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = OsuColour.FromHex(@"212121"),
                             },
-                            new StatusColouredContainer
+                            new StatusColouredContainer(transition_duration)
                             {
                                 RelativeSizeAxes = Axes.Y,
                                 Width = side_strip_width,
@@ -208,18 +208,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             private void load()
             {
                 Current = name;
-            }
-        }
-
-        private class StatusColouredContainer : Container
-        {
-            [Resolved(typeof(Room), nameof(Online.Multiplayer.Room.Status))]
-            private Bindable<RoomStatus> status { get; set; }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                status.BindValueChanged(s => this.FadeColour(s.GetAppropriateColour(colours), transition_duration), true);
             }
         }
     }
