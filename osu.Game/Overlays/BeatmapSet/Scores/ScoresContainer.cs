@@ -4,14 +4,12 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
-using osuTK.Graphics;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -102,11 +100,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
-                new Box
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
-                },
                 new FillFlowContainer
                 {
                     Anchor = Anchor.TopCentre,
