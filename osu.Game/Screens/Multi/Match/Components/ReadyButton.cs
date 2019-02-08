@@ -55,6 +55,9 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private void beatmapAdded(BeatmapSetInfo model, bool existing, bool silent)
         {
+            if (Beatmap.Value == null)
+                return;
+
             if (model.Beatmaps.Any(b => b.OnlineBeatmapID == Beatmap.Value.OnlineBeatmapID))
                 Schedule(() => hasBeatmap = true);
         }
