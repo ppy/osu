@@ -30,6 +30,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private const float avatar_size = 80;
         private const float margin = 10;
 
+        private OsuColour colours;
+
+        private Color4 backgroundIdleColour => colours.Gray3;
+        private Color4 backgroundHoveredColour => colours.Gray4;
+
         private readonly Box background;
         private readonly UpdateableAvatar avatar;
         private readonly DrawableFlag flag;
@@ -38,8 +43,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly SpriteText date;
         private readonly DrawableRank rank;
 
-        private readonly AutoSizeInfoColumn totalScore;
-        private readonly MediumInfoColumn accuracy;
+        private readonly AutoSizedInfoColumn totalScore;
+        private readonly AutoSizedInfoColumn accuracy;
         private readonly MediumInfoColumn maxCombo;
 
         private readonly SmallInfoColumn hitGreat;
@@ -56,7 +61,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             get { return score; }
             set
             {
-                if (score == value) return;
+                if (score == value)
+                    return;
                 score = value;
 
                 avatar.User = username.User = score.User;
@@ -83,7 +89,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
-            CornerRadius = 3;
+            CornerRadius = 10;
             Masking = true;
             EdgeEffect = new EdgeEffectParameters
             {
@@ -97,7 +103,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 background = new Box
                 {
                     RelativeSizeAxes = Axes.Both,
-                    Colour = Color4.White,
                 },
                 new Container
                 {
@@ -115,31 +120,20 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             Spacing = new Vector2(margin, 0),
                             Children = new Drawable[]
                             {
-                                new FillFlowContainer
+                                rankText = new SpriteText
                                 {
                                     Anchor = Anchor.Centre,
                                     Origin = Anchor.Centre,
-                                    AutoSizeAxes = Axes.Both,
-                                    Direction = FillDirection.Vertical,
-                                    Spacing = new Vector2(0, 2),
-                                    Children = new Drawable[]
-                                    {
-                                        rankText = new SpriteText
-                                        {
-                                            Anchor = Anchor.CentreRight,
-                                            Origin = Anchor.CentreRight,
-                                            Text = "#1",
-                                            TextSize = 20,
-                                            Font = @"Exo2.0-BoldItalic",
-                                        },
-                                        rank = new DrawableRank(ScoreRank.F)
-                                        {
-                                            Anchor = Anchor.CentreRight,
-                                            Origin = Anchor.CentreRight,
-                                            Size = new Vector2(30),
-                                            FillMode = FillMode.Fit,
-                                        },
-                                    }
+                                    Text = "#1",
+                                    TextSize = 30,
+                                    Font = @"Exo2.0-BoldItalic",
+                                },
+                                rank = new DrawableRank(ScoreRank.F)
+                                {
+                                    Anchor = Anchor.Centre,
+                                    Origin = Anchor.Centre,
+                                    Size = new Vector2(40),
+                                    FillMode = FillMode.Fit,
                                 },
                                 avatar = new UpdateableAvatar
                                 {
@@ -229,8 +223,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         Spacing = new Vector2(margin, 0),
                                         Children = new Drawable[]
                                         {
-                                            totalScore = new AutoSizeInfoColumn("Total Score"),
-                                            accuracy = new MediumInfoColumn("Accuracy"),
+                                            totalScore = new AutoSizedInfoColumn("Total Score"),
+                                            accuracy = new AutoSizedInfoColumn("Accuracy"),
                                             maxCombo = new MediumInfoColumn("Max Combo"),
                                         }
                                     },
@@ -245,18 +239,21 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            date.Colour = rankText.Colour = colours.ContextMenuGray;
+            this.colours = colours;
+
+            rankText.Colour = colours.Yellow;
+            background.Colour = backgroundIdleColour;
         }
 
         protected override bool OnHover(HoverEvent e)
         {
-            background.FadeColour(Color4.WhiteSmoke, fade_duration, Easing.OutQuint);
+            background.FadeColour(backgroundHoveredColour, fade_duration, Easing.OutQuint);
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            background.FadeColour(Color4.White, fade_duration, Easing.OutQuint);
+            background.FadeColour(backgroundIdleColour, fade_duration, Easing.OutQuint);
             base.OnHoverLost(e);
         }
 
@@ -274,7 +271,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             {
                 set
                 {
-                    if (text.TextSize == value) return;
+                    if (text.TextSize == value)
+                        return;
                     text.TextSize = value;
                 }
                 get { return text.TextSize; }
@@ -297,7 +295,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Add(text = new SpriteText
                 {
                     Font = @"Exo2.0-BoldItalic",
-                    Colour = Color4.Black,
                 });
             }
 
@@ -322,7 +319,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                text.FadeColour(Color4.Black, username_fade_duration, Easing.OutQuint);
+                text.FadeColour(Color4.White, username_fade_duration, Easing.OutQuint);
                 underscore.FadeOut(username_fade_duration, Easing.OutQuint);
                 base.OnHoverLost(e);
             }
@@ -348,6 +345,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         {
                             TextSize = 12,
                             Text = header.ToUpper(),
+                            Font = @"Exo2.0-Bold",
                         }
                     },
                     new Container
@@ -361,12 +359,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         }
                     }
                 };
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                headerText.Colour = colours.ContextMenuGray;
             }
         }
 
@@ -420,20 +412,13 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 Add(valueText = new SpriteText
                 {
                     TextSize = valueTextSize,
-                    Font = @"Exo2.0-Light",
                 });
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                valueText.Colour = colours.ContextMenuGray;
             }
         }
 
-        private class AutoSizeInfoColumn : TextInfoColumn
+        private class AutoSizedInfoColumn : TextInfoColumn
         {
-            public AutoSizeInfoColumn(string header, float valueTextSize = 25) : base(header, valueTextSize)
+            public AutoSizedInfoColumn(string header, float valueTextSize = 25) : base(header, valueTextSize)
             {
                 AutoSizeAxes = Axes.Both;
             }
