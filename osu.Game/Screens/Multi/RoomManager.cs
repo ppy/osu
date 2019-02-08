@@ -2,26 +2,32 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps;
+using osu.Game.Online;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Rulesets;
+using osu.Game.Screens.Multi.Lounge.Components;
 
 namespace osu.Game.Screens.Multi
 {
-    public class RoomManager : Container, IRoomManager
+    public class RoomManager : PollingComponent, IRoomManager
     {
         public event Action RoomsUpdated;
 
         private readonly BindableList<Room> rooms = new BindableList<Room>();
         public IBindableList<Room> Rooms => rooms;
+
+        /// <summary>
+        /// The <see cref="FilterCriteria"/> to use when polling for <see cref="Room"/>s.
+        /// </summary>
+        public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>();
 
         public Bindable<Room> CurrentRoom { get; } = new Bindable<Room>();
 
@@ -36,6 +42,16 @@ namespace osu.Game.Screens.Multi
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
+        public RoomManager()
+        {
+            Filter.BindValueChanged(_ =>
+            {
+                if (IsLoaded)
+                    PollImmediately();
+            });
+        }
+
+
         protected override void Dispose(bool isDisposing)
         {
             base.Dispose(isDisposing);
@@ -46,17 +62,20 @@ namespace osu.Game.Screens.Multi
         {
             room.Host.Value = api.LocalUser;
 
+            addRoom(room);
+            joinRoom(room);
+
+            RoomsUpdated?.Invoke();
+
+            onSuccess?.Invoke(room);
+
+            return;
+
             var req = new CreateRoomRequest(room);
 
             req.Success += result =>
             {
-                update(room, result);
-                addRoom(room);
-                joinRoom(room);
 
-                RoomsUpdated?.Invoke();
-
-                onSuccess?.Invoke(room);
             };
 
             req.Failure += exception =>
@@ -108,25 +127,45 @@ namespace osu.Game.Screens.Multi
             joinedRoom = null;
         }
 
-        public void UpdateRooms(List<Room> newRooms)
+        private GetRoomsRequest pollReq;
+
+        protected override Task Poll()
         {
-            // Remove past matches
-            foreach (var r in rooms.ToList())
+            if (!api.IsLoggedIn)
+                return base.Poll();
+
+            var tcs = new TaskCompletionSource<bool>();
+
+            pollReq?.Cancel();
+            pollReq = new GetRoomsRequest(Filter.Value.PrimaryFilter);
+
+            pollReq.Success += result =>
             {
-                if (newRooms.All(e => e.RoomID.Value != r.RoomID.Value))
-                    rooms.Remove(r);
-            }
+                // Remove past matches
+                foreach (var r in rooms.ToList())
+                {
+                    if (result.All(e => e.RoomID.Value != r.RoomID.Value))
+                        rooms.Remove(r);
+                }
 
-            for (int i = 0; i < newRooms.Count; i++)
-            {
-                var r = newRooms[i];
-                r.Position.Value = i;
+                for (int i = 0; i < result.Count; i++)
+                {
+                    var r = result[i];
+                    r.Position.Value = i;
 
-                update(r, r);
-                addRoom(r);
-            }
+                    update(r, r);
+                    addRoom(r);
+                }
 
-            RoomsUpdated?.Invoke();
+                RoomsUpdated?.Invoke();
+                tcs.SetResult(true);
+            };
+
+            pollReq.Failure += _ => tcs.SetResult(false);
+
+            api.Queue(pollReq);
+
+            return tcs.Task;
         }
 
         /// <summary>
