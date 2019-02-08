@@ -49,6 +49,8 @@ namespace osu.Game.Screens.Multi
         private readonly LoungeSubScreen loungeSubScreen;
         private readonly ScreenStack screenStack;
 
+        private readonly IBindable<bool> isIdle = new BindableBool();
+
         [Cached]
         private readonly Bindable<Room> currentRoom = new Bindable<Room>();
 
@@ -137,8 +139,6 @@ namespace osu.Game.Screens.Multi
             screenStack.ScreenExited += screenExited;
         }
 
-        private readonly IBindable<bool> isIdle = new BindableBool();
-
         [BackgroundDependencyLoader(true)]
         private void load(IdleTracker idleTracker)
         {
@@ -148,6 +148,12 @@ namespace osu.Game.Screens.Multi
                 isIdle.BindTo(idleTracker.IsIdle);
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            isIdle.BindValueChanged(updatePollingRate, true);
+        }
+
         private CachedModelDependencyContainer<Room> dependencies;
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
@@ -155,12 +161,6 @@ namespace osu.Game.Screens.Multi
             dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
             dependencies.Model.BindTo(currentRoom);
             return dependencies;
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            isIdle.BindValueChanged(updatePollingRate, true);
         }
 
         private void updatePollingRate(bool idle)
