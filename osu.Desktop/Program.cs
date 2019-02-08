@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.IO;
@@ -63,7 +63,7 @@ namespace osu.Desktop
         {
             bool continueExecution = Interlocked.Decrement(ref allowableExceptions) >= 0;
 
-            Logger.Log($"Unhandled exception has been {(continueExecution ? "allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
+            Logger.Log($"Unhandled exception has been {(continueExecution ? $"allowed with {allowableExceptions} more allowable exceptions" : "denied")} .");
 
             // restore the stock of allowable exceptions after a short delay.
             Task.Delay(1000).ContinueWith(_ => Interlocked.Increment(ref allowableExceptions));

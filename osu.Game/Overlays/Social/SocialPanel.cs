@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Users;
 
 namespace osu.Game.Overlays.Social
@@ -35,20 +35,20 @@ namespace osu.Game.Overlays.Social
             Colour = Color4.Black.Opacity(0.3f),
         };
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             Content.TweenEdgeEffectTo(edgeEffectHovered, hover_transition_time, Easing.OutQuint);
             Content.MoveToY(-4, hover_transition_time, Easing.OutQuint);
 
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             Content.TweenEdgeEffectTo(edgeEffectNormal, hover_transition_time, Easing.OutQuint);
             Content.MoveToY(0, hover_transition_time, Easing.OutQuint);
 
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
         protected override void LoadComplete()

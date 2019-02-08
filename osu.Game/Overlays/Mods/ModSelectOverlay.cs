@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
@@ -22,16 +22,12 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Mods.Sections;
+using osu.Game.Screens;
 
 namespace osu.Game.Overlays.Mods
 {
     public class ModSelectOverlay : WaveOverlayContainer
     {
-        /// <summary>
-        /// How much this container should overflow the sides of the screen to account for parallax shifting.
-        /// </summary>
-        private const float overflow_padding = 50;
-
         private const float content_width = 0.8f;
 
         protected Color4 LowMultiplierColour, HighMultiplierColour;
@@ -40,7 +36,7 @@ namespace osu.Game.Overlays.Mods
         protected readonly OsuSpriteText MultiplierLabel, UnrankedLabel;
         private readonly FillFlowContainer footerContainer;
 
-        protected override bool BlockPassThroughKeyboard => false;
+        protected override bool BlockNonPositionalInput => false;
 
         protected readonly FillFlowContainer<ModSection> ModSectionsContainer;
 
@@ -176,7 +172,6 @@ namespace osu.Game.Overlays.Mods
                 section.DeselectTypes(modTypes, immediate);
         }
 
-
         private SampleChannel sampleOn, sampleOff;
 
         private void modButtonPressed(Mod selectedMod)
@@ -204,11 +199,7 @@ namespace osu.Game.Overlays.Mods
             Waves.FourthWaveColour = OsuColour.FromHex(@"003a4e");
 
             Height = 510;
-            Padding = new MarginPadding
-            {
-                Left = -overflow_padding,
-                Right = -overflow_padding
-            };
+            Padding = new MarginPadding { Horizontal = -OsuScreen.HORIZONTAL_OVERFLOW_PADDING };
 
             Children = new Drawable[]
             {
@@ -268,11 +259,7 @@ namespace osu.Game.Overlays.Mods
                                         AutoSizeAxes = Axes.Y,
                                         Direction = FillDirection.Vertical,
                                         Width = content_width,
-                                        Padding = new MarginPadding
-                                        {
-                                            Left = overflow_padding,
-                                            Right = overflow_padding
-                                        },
+                                        Padding = new MarginPadding { Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING },
                                         Children = new Drawable[]
                                         {
                                             new OsuSpriteText
@@ -313,8 +300,7 @@ namespace osu.Game.Overlays.Mods
                                 Padding = new MarginPadding
                                 {
                                     Vertical = 10,
-                                    Left = overflow_padding,
-                                    Right = overflow_padding
+                                    Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING
                                 },
                                 Child = ModSectionsContainer = new FillFlowContainer<ModSection>
                                 {
@@ -362,8 +348,7 @@ namespace osu.Game.Overlays.Mods
                                         Padding = new MarginPadding
                                         {
                                             Vertical = 15,
-                                            Left = overflow_padding,
-                                            Right = overflow_padding
+                                            Horizontal = OsuScreen.HORIZONTAL_OVERFLOW_PADDING
                                         },
                                         Children = new Drawable[]
                                         {

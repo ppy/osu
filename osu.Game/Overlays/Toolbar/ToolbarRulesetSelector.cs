@@ -1,18 +1,17 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Caching;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using OpenTK;
-using OpenTK.Input;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Input;
+using osuTK.Graphics;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Rulesets;
 
 namespace osu.Game.Overlays.Toolbar
@@ -86,13 +85,13 @@ namespace osu.Game.Overlays.Toolbar
             ruleset.BindTo(parentRuleset);
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            base.OnKeyDown(state, args);
+            base.OnKeyDown(e);
 
-            if (state.Keyboard.ControlPressed && !args.Repeat && args.Key >= Key.Number1 && args.Key <= Key.Number9)
+            if (e.ControlPressed && !e.Repeat && e.Key >= Key.Number1 && e.Key <= Key.Number9)
             {
-                int requested = args.Key - Key.Number1;
+                int requested = e.Key - Key.Number1;
 
                 RulesetInfo found = rulesets.AvailableRulesets.Skip(requested).FirstOrDefault();
                 if (found != null)
@@ -103,8 +102,10 @@ namespace osu.Game.Overlays.Toolbar
             return false;
         }
 
-        public override bool HandleKeyboardInput => !ruleset.Disabled && base.HandleKeyboardInput;
-        public override bool HandleMouseInput => !ruleset.Disabled && base.HandleMouseInput;
+        public override bool HandleNonPositionalInput => !ruleset.Disabled && base.HandleNonPositionalInput;
+        public override bool HandlePositionalInput => !ruleset.Disabled && base.HandlePositionalInput;
+
+        public override bool PropagatePositionalInputSubTree => !ruleset.Disabled && base.PropagatePositionalInputSubTree;
 
         private void disabledChanged(bool isDisabled) => this.FadeColour(isDisabled ? Color4.Gray : Color4.White, 300);
 

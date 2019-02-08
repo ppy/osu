@@ -1,11 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Lists;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -22,6 +19,11 @@ namespace osu.Game.Rulesets.Objects
     /// </summary>
     public class HitObject
     {
+        /// <summary>
+        /// A small adjustment to the start time of control points to account for rounding/precision errors.
+        /// </summary>
+        private const double control_point_leniency = 1;
+
         /// <summary>
         /// The time at which the HitObject starts.
         /// </summary>
@@ -58,10 +60,10 @@ namespace osu.Game.Rulesets.Objects
         /// </summary>
         public HitWindows HitWindows { get; set; }
 
-        private readonly Lazy<SortedList<HitObject>> nestedHitObjects = new Lazy<SortedList<HitObject>>(() => new SortedList<HitObject>((h1, h2) => h1.StartTime.CompareTo(h2.StartTime)));
+        private readonly List<HitObject> nestedHitObjects = new List<HitObject>();
 
         [JsonIgnore]
-        public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects.Value;
+        public IReadOnlyList<HitObject> NestedHitObjects => nestedHitObjects;
 
         /// <summary>
         /// Applies default values to this HitObject.
@@ -72,28 +74,25 @@ namespace osu.Game.Rulesets.Objects
         {
             ApplyDefaultsToSelf(controlPointInfo, difficulty);
 
-            if (nestedHitObjects.IsValueCreated)
-                nestedHitObjects.Value.Clear();
+            // This is done here since ApplyDefaultsToSelf may be used to determine the end time
+            SampleControlPoint = controlPointInfo.SamplePointAt(((this as IHasEndTime)?.EndTime ?? StartTime) + control_point_leniency);
+
+            nestedHitObjects.Clear();
 
             CreateNestedHitObjects();
 
-            if (nestedHitObjects.IsValueCreated)
+            nestedHitObjects.Sort((h1, h2) => h1.StartTime.CompareTo(h2.StartTime));
+
+            foreach (var h in nestedHitObjects)
             {
-                nestedHitObjects.Value.ForEach(h =>
-                {
-                    h.HitWindows = HitWindows;
-                    h.ApplyDefaults(controlPointInfo, difficulty);
-                });
+                h.HitWindows = HitWindows;
+                h.ApplyDefaults(controlPointInfo, difficulty);
             }
         }
 
         protected virtual void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
-            SampleControlPoint samplePoint = controlPointInfo.SamplePointAt(StartTime);
-            EffectControlPoint effectPoint = controlPointInfo.EffectPointAt(StartTime);
-
-            Kiai = effectPoint.KiaiMode;
-            SampleControlPoint = samplePoint;
+            Kiai = controlPointInfo.EffectPointAt(StartTime + control_point_leniency).KiaiMode;
 
             if (HitWindows == null)
                 HitWindows = CreateHitWindows();
@@ -104,7 +103,7 @@ namespace osu.Game.Rulesets.Objects
         {
         }
 
-        protected void AddNested(HitObject hitObject) => nestedHitObjects.Value.Add(hitObject);
+        protected void AddNested(HitObject hitObject) => nestedHitObjects.Add(hitObject);
 
         /// <summary>
         /// Creates the <see cref="Judgement"/> that represents the scoring information for this <see cref="HitObject"/>.

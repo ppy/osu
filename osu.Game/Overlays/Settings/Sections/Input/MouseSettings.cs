@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
-using osu.Framework.Input.States;
 using osu.Game.Configuration;
 using osu.Game.Graphics.UserInterface;
 
@@ -26,12 +25,12 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             {
                 new SettingsCheckbox
                 {
-                    LabelText = "Raw Input",
+                    LabelText = "Raw input",
                     Bindable = rawInputToggle
                 },
                 sensitivity = new SensitivitySetting
                 {
-                    LabelText = "Cursor Sensitivity",
+                    LabelText = "Cursor sensitivity",
                     Bindable = config.GetBindable<double>(FrameworkSetting.CursorSensitivity)
                 },
                 new SettingsCheckbox
@@ -59,8 +58,8 @@ namespace osu.Game.Overlays.Settings.Sections.Input
             rawInputToggle.ValueChanged += enabled =>
             {
                 // this is temporary until we support per-handler settings.
-                const string raw_mouse_handler = @"OpenTKRawMouseHandler";
-                const string standard_mouse_handler = @"OpenTKMouseHandler";
+                const string raw_mouse_handler = @"OsuTKRawMouseHandler";
+                const string standard_mouse_handler = @"OsuTKMouseHandler";
 
                 ignoredInputHandler.Value = enabled ? standard_mouse_handler : raw_mouse_handler;
             };
@@ -78,67 +77,16 @@ namespace osu.Game.Overlays.Settings.Sections.Input
 
         private class SensitivitySetting : SettingsSlider<double, SensitivitySlider>
         {
-            public override Bindable<double> Bindable
-            {
-                get { return ((SensitivitySlider)Control).Sensitivity; }
-
-                set
-                {
-                    BindableDouble doubleValue = (BindableDouble)value;
-
-                    // create a second layer of bindable so we can only handle state changes when not being dragged.
-                    ((SensitivitySlider)Control).Sensitivity = doubleValue;
-
-                    // this bindable will still act as the "interactive" bindable displayed during a drag.
-                    base.Bindable = new BindableDouble(doubleValue.Value)
-                    {
-                        Default = doubleValue.Default,
-                        MinValue = doubleValue.MinValue,
-                        MaxValue = doubleValue.MaxValue
-                    };
-
-                    // one-way binding to update the sliderbar with changes from external actions.
-                    doubleValue.DisabledChanged += disabled => base.Bindable.Disabled = disabled;
-                    doubleValue.ValueChanged += newValue => base.Bindable.Value = newValue;
-                }
-            }
-
             public SensitivitySetting()
             {
                 KeyboardStep = 0.01f;
+                TransferValueOnCommit = true;
             }
         }
 
         private class SensitivitySlider : OsuSliderBar<double>
         {
-            public Bindable<double> Sensitivity;
-
-            public SensitivitySlider()
-            {
-                Current.ValueChanged += newValue =>
-                {
-                    if (!isDragging && Sensitivity != null)
-                        Sensitivity.Value = newValue;
-                };
-            }
-
-            private bool isDragging;
-
-            protected override bool OnDragStart(InputState state)
-            {
-                isDragging = true;
-                return base.OnDragStart(state);
-            }
-
-            protected override bool OnDragEnd(InputState state)
-            {
-                isDragging = false;
-                Current.TriggerChange();
-
-                return base.OnDragEnd(state);
-            }
-
-            public override string TooltipText => Current.Disabled ? "Enable raw input to adjust sensitivity" : Current.Value.ToString(@"0.##x");
+            public override string TooltipText => Current.Disabled ? "Enable raw input to adjust sensitivity" : $"{base.TooltipText}x";
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -55,39 +55,40 @@ namespace osu.Game.Beatmaps
 
             beatmap.BeatmapInfo = original.BeatmapInfo;
             beatmap.ControlPointInfo = original.ControlPointInfo;
-            beatmap.HitObjects = original.HitObjects.SelectMany(h => convert(h, original)).ToList();
+            beatmap.HitObjects = convertHitObjects(original.HitObjects, original);
             beatmap.Breaks = original.Breaks;
 
             return beatmap;
         }
 
-        /// <summary>
-        /// Converts a hit object.
-        /// </summary>
-        /// <param name="original">The hit object to convert.</param>
-        /// <param name="beatmap">The un-converted Beatmap.</param>
-        /// <returns>The converted hit object.</returns>
-        private IEnumerable<T> convert(HitObject original, IBeatmap beatmap)
+        private List<T> convertHitObjects(IReadOnlyList<HitObject> hitObjects, IBeatmap beatmap)
         {
-            // Check if the hitobject is already the converted type
-            T tObject = original as T;
-            if (tObject != null)
-            {
-                yield return tObject;
-                yield break;
-            }
+            var result = new List<T>(hitObjects.Count);
 
-            var converted = ConvertHitObject(original, beatmap).ToList();
-            ObjectConverted?.Invoke(original, converted);
-
-            // Convert the hit object
-            foreach (var obj in converted)
+            foreach (var obj in hitObjects)
             {
-                if (obj == null)
+                if (obj is T tObj)
+                {
+                    result.Add(tObj);
                     continue;
+                }
 
-                yield return obj;
+                var converted = ConvertHitObject(obj, beatmap);
+
+                if (ObjectConverted != null)
+                {
+                    converted = converted.ToList();
+                    ObjectConverted.Invoke(obj, converted);
+                }
+
+                foreach (var c in converted)
+                {
+                    if (c != null)
+                        result.Add(c);
+                }
             }
+
+            return result;
         }
 
         /// <summary>

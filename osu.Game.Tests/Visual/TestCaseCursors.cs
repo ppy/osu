@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -7,12 +7,12 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
@@ -184,7 +184,7 @@ namespace osu.Game.Tests.Visual
         /// </summary>
         /// <param name="cursorContainer">The cursor to check.</param>
         private bool checkAtMouse(CursorContainer cursorContainer)
-            => Precision.AlmostEquals(InputManager.CurrentState.Mouse.NativeState.Position, cursorContainer.ToScreenSpace(cursorContainer.ActiveCursor.DrawPosition));
+            => Precision.AlmostEquals(InputManager.CurrentState.Mouse.Position, cursorContainer.ToScreenSpace(cursorContainer.ActiveCursor.DrawPosition));
 
         private class CustomCursorBox : Container, IProvideCursor
         {
@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual
             public CursorContainer Cursor { get; }
             public bool ProvidingUserCursor { get; }
 
-            public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => base.ReceiveMouseInputAt(screenSpacePos) || SmoothTransition && !ProvidingUserCursor;
+            public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => base.ReceivePositionalInputAt(screenSpacePos) || SmoothTransition && !ProvidingUserCursor;
 
             private readonly Box background;
 
@@ -224,16 +224,16 @@ namespace osu.Game.Tests.Visual
                 };
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 background.FadeTo(0.4f, 250, Easing.OutQuint);
                 return false;
             }
 
-            protected override void OnHoverLost(InputState state)
+            protected override void OnHoverLost(HoverLostEvent e)
             {
                 background.FadeTo(0.1f, 250);
-                base.OnHoverLost(state);
+                base.OnHoverLost(e);
             }
         }
 

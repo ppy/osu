@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Skinning
 {
@@ -18,6 +18,11 @@ namespace osu.Game.Skinning
     public class SkinnableDrawable<T> : SkinReloadableDrawable
         where T : Drawable
     {
+        /// <summary>
+        /// The displayed component. May or may not be a type-<typeparamref name="T"/> member.
+        /// </summary>
+        protected Drawable Drawable { get; private set; }
+
         private readonly Func<string, T> createDefault;
 
         private readonly string componentName;
@@ -31,7 +36,8 @@ namespace osu.Game.Skinning
         /// <param name="defaultImplementation">A function to create the default skin implementation of this element.</param>
         /// <param name="allowFallback">A conditional to decide whether to allow fallback to the default implementation if a skinned element is not present.</param>
         /// <param name="restrictSize">Whether a user-skin drawable should be limited to the size of our parent.</param>
-        public SkinnableDrawable(string name, Func<string, T> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true) : base(allowFallback)
+        public SkinnableDrawable(string name, Func<string, T> defaultImplementation, Func<ISkinSource, bool> allowFallback = null, bool restrictSize = true)
+            : base(allowFallback)
         {
             componentName = name;
             createDefault = defaultImplementation;
@@ -42,26 +48,27 @@ namespace osu.Game.Skinning
 
         protected override void SkinChanged(ISkinSource skin, bool allowFallback)
         {
-            var drawable = skin.GetDrawableComponent(componentName);
-            if (drawable != null)
+            Drawable = skin.GetDrawableComponent(componentName);
+
+            if (Drawable != null)
             {
                 if (restrictSize)
                 {
-                    drawable.RelativeSizeAxes = Axes.Both;
-                    drawable.Size = Vector2.One;
-                    drawable.Scale = Vector2.One;
-                    drawable.FillMode = FillMode.Fit;
+                    Drawable.RelativeSizeAxes = Axes.Both;
+                    Drawable.Size = Vector2.One;
+                    Drawable.Scale = Vector2.One;
+                    Drawable.FillMode = FillMode.Fit;
                 }
             }
             else if (allowFallback)
-                drawable = createDefault(componentName);
+                Drawable = createDefault(componentName);
 
-            if (drawable != null)
+            if (Drawable != null)
             {
-                drawable.Origin = Anchor.Centre;
-                drawable.Anchor = Anchor.Centre;
+                Drawable.Origin = Anchor.Centre;
+                Drawable.Anchor = Anchor.Centre;
 
-                InternalChild = drawable;
+                InternalChild = Drawable;
             }
             else
                 ClearInternal();

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -23,6 +23,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         public TaikoAction? HitAction { get; private set; }
 
         private bool validActionPressed;
+
+        private bool pressHandledThisFrame;
 
         protected DrawableHit(Hit hit)
             : base(hit)
@@ -51,6 +53,9 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
         public override bool OnPressed(TaikoAction action)
         {
+            if (pressHandledThisFrame)
+                return true;
+
             if (Judged)
                 return false;
 
@@ -61,6 +66,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
             if (IsHit)
                 HitAction = action;
+
+            // Regardless of whether we've hit or not, any secondary key presses in the same frame should be discarded
+            // E.g. hitting a non-strong centre as a strong should not fall through and perform a hit on the next note
+            pressHandledThisFrame = true;
 
             return result;
         }
@@ -75,6 +84,10 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
         protected override void Update()
         {
             base.Update();
+
+            // The input manager processes all input prior to us updating, so this is the perfect time
+            // for us to remove the extra press blocking, before input is handled in the next frame
+            pressHandledThisFrame = false;
 
             Size = BaseSize * Parent.RelativeChildSize;
         }
@@ -160,13 +173,13 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables
 
                 if (!userTriggered)
                 {
-                    if (timeOffset > second_hit_window)
+                    if (timeOffset - MainObject.Result.TimeOffset > second_hit_window)
                         ApplyResult(r => r.Type = HitResult.Miss);
                     return;
                 }
 
-                if (Math.Abs(MainObject.Result.TimeOffset - timeOffset) < second_hit_window)
-                    ApplyResult(r => r.Type = HitResult.Great);
+                if (Math.Abs(timeOffset - MainObject.Result.TimeOffset) <= second_hit_window)
+                    ApplyResult(r => r.Type = MainObject.Result.Type);
             }
 
             public override bool OnPressed(TaikoAction action)

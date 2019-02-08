@@ -1,17 +1,17 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Localisation;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
 
@@ -44,7 +44,7 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, LocalisationEngine localisation)
+        private void load(OsuColour colours)
         {
             Content.CornerRadius = 4;
 
@@ -74,13 +74,13 @@ namespace osu.Game.Overlays.Direct
                             {
                                 new OsuSpriteText
                                 {
-                                    Text = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
+                                    Text = new LocalisedString((SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title)),
                                     TextSize = 18,
                                     Font = @"Exo2.0-BoldItalic",
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
+                                    Text = new LocalisedString((SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist)),
                                     Font = @"Exo2.0-BoldItalic",
                                 },
                             },
@@ -217,23 +217,25 @@ namespace osu.Game.Overlays.Direct
                 statusContainer.Add(new IconPill(FontAwesome.fa_image));
             }
 
-            statusContainer.Add(new BeatmapSetOnlineStatusPill(12, new MarginPadding { Horizontal = 10, Vertical = 5 })
+            statusContainer.Add(new BeatmapSetOnlineStatusPill
             {
+                TextSize = 12,
+                TextPadding = new MarginPadding { Horizontal = 10, Vertical = 5 },
                 Status = SetInfo.OnlineInfo?.Status ?? BeatmapSetOnlineStatus.None,
             });
 
             PreviewPlaying.ValueChanged += _ => updateStatusContainer();
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             updateStatusContainer();
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
             updateStatusContainer();
         }
 

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -19,10 +19,10 @@ using osu.Framework.Input;
 using osu.Game.Configuration;
 using osu.Game.Input.Handlers;
 using osu.Game.Overlays;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Configuration;
-using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
-using OpenTK;
+using osu.Game.Scoring;
 
 namespace osu.Game.Rulesets.UI
 {
@@ -70,11 +70,16 @@ namespace osu.Game.Rulesets.UI
         public Playfield Playfield => playfield.Value;
 
         /// <summary>
+        /// Place to put drawables above hit objects but below UI.
+        /// </summary>
+        public Container Overlays { get; protected set; }
+
+        /// <summary>
         /// The cursor provided by this <see cref="RulesetContainer"/>. May be null if no cursor is provided.
         /// </summary>
         public readonly CursorContainer Cursor;
 
-        protected readonly Ruleset Ruleset;
+        public readonly Ruleset Ruleset;
 
         protected IRulesetConfigManager Config { get; private set; }
 
@@ -126,7 +131,7 @@ namespace osu.Game.Rulesets.UI
 
         protected virtual ReplayInputHandler CreateReplayInputHandler(Replay replay) => null;
 
-        public Replay Replay { get; private set; }
+        public Score ReplayScore { get; private set; }
 
         /// <summary>
         /// Whether the game is paused. Used to block user input.
@@ -136,14 +141,14 @@ namespace osu.Game.Rulesets.UI
         /// <summary>
         /// Sets a replay to be used, overriding local input.
         /// </summary>
-        /// <param name="replay">The replay, null for local input.</param>
-        public virtual void SetReplay(Replay replay)
+        /// <param name="replayScore">The replay, null for local input.</param>
+        public virtual void SetReplayScore(Score replayScore)
         {
             if (ReplayInputManager == null)
                 throw new InvalidOperationException($"A {nameof(KeyBindingInputManager)} which supports replay loading is not available");
 
-            Replay = replay;
-            ReplayInputManager.ReplayInputHandler = replay != null ? CreateReplayInputHandler(replay) : null;
+            ReplayScore = replayScore;
+            ReplayInputManager.ReplayInputHandler = replayScore != null ? CreateReplayInputHandler(replayScore.Replay) : null;
 
             HasReplayLoaded.Value = ReplayInputManager.ReplayInputHandler != null;
         }
@@ -216,7 +221,6 @@ namespace osu.Game.Rulesets.UI
 
         protected override Container<Drawable> Content => content;
         private Container content;
-        private IEnumerable<Mod> mods;
 
         /// <summary>
         /// Whether to assume the beatmap passed into this <see cref="RulesetContainer{TObject}"/> is for the current ruleset.
@@ -239,33 +243,55 @@ namespace osu.Game.Rulesets.UI
 
             KeyBindingInputManager = CreateInputManager();
             KeyBindingInputManager.RelativeSizeAxes = Axes.Both;
+
+            applyBeatmapMods(Mods);
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            KeyBindingInputManager.Add(content = new Container
+            KeyBindingInputManager.AddRange(new Drawable[]
             {
-                RelativeSizeAxes = Axes.Both,
+                content = new Container
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
+                Playfield
             });
-
-            AddInternal(KeyBindingInputManager);
-            KeyBindingInputManager.Add(Playfield);
 
             if (Cursor != null)
                 KeyBindingInputManager.Add(Cursor);
 
+            InternalChildren = new Drawable[]
+            {
+                KeyBindingInputManager,
+                Overlays = new Container { RelativeSizeAxes = Axes.Both }
+            };
+
             // Apply mods
-            applyMods(Mods, config);
+            applyRulesetMods(Mods, config);
 
             loadObjects();
+        }
+
+        /// <summary>
+        /// Applies the active mods to the Beatmap.
+        /// </summary>
+        /// <param name="mods"></param>
+        private void applyBeatmapMods(IEnumerable<Mod> mods)
+        {
+            if (mods == null)
+                return;
+
+            foreach (var mod in mods.OfType<IApplicableToBeatmap<TObject>>())
+                mod.ApplyToBeatmap(Beatmap);
         }
 
         /// <summary>
         /// Applies the active mods to this RulesetContainer.
         /// </summary>
         /// <param name="mods"></param>
-        private void applyMods(IEnumerable<Mod> mods, OsuConfigManager config)
+        private void applyRulesetMods(IEnumerable<Mod> mods, OsuConfigManager config)
         {
             if (mods == null)
                 return;
@@ -277,9 +303,9 @@ namespace osu.Game.Rulesets.UI
                 mod.ReadFromConfig(config);
         }
 
-        public override void SetReplay(Replay replay)
+        public override void SetReplayScore(Score replayScore)
         {
-            base.SetReplay(replay);
+            base.SetReplayScore(replayScore);
 
             if (ReplayInputManager?.ReplayInputHandler != null)
                 ReplayInputManager.ReplayInputHandler.GamefieldToScreenSpace = Playfield.GamefieldToScreenSpace;
@@ -291,50 +317,37 @@ namespace osu.Game.Rulesets.UI
         private void loadObjects()
         {
             foreach (TObject h in Beatmap.HitObjects)
-            {
-                var drawableObject = GetVisualRepresentation(h);
-
-                if (drawableObject == null)
-                    continue;
-
-                drawableObject.OnNewResult += (_, r) => OnNewResult?.Invoke(r);
-                drawableObject.OnRevertResult += (_, r) => OnRevertResult?.Invoke(r);
-
-                Playfield.Add(drawableObject);
-            }
+                AddRepresentation(h);
 
             Playfield.PostProcess();
 
             foreach (var mod in Mods.OfType<IApplicableToDrawableHitObjects>())
-                mod.ApplyToDrawableHitObjects(Playfield.HitObjects.Objects);
+                mod.ApplyToDrawableHitObjects(Playfield.HitObjectContainer.Objects);
         }
 
-        protected override void Update()
+        /// <summary>
+        /// Creates and adds the visual representation of a <see cref="TObject"/> to this <see cref="RulesetContainer{TObject}"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="TObject"/> to add the visual representation for.</param>
+        internal void AddRepresentation(TObject hitObject)
         {
-            base.Update();
+            var drawableObject = GetVisualRepresentation(hitObject);
 
-            Playfield.Size = GetAspectAdjustedSize() * PlayfieldArea;
+            if (drawableObject == null)
+                return;
+
+            drawableObject.OnNewResult += (_, r) => OnNewResult?.Invoke(r);
+            drawableObject.OnRevertResult += (_, r) => OnRevertResult?.Invoke(r);
+
+            Playfield.Add(drawableObject);
         }
-
-        /// <summary>
-        /// Computes the size of the <see cref="Playfield"/> in relative coordinate space after aspect adjustments.
-        /// </summary>
-        /// <returns>The aspect-adjusted size.</returns>
-        protected virtual Vector2 GetAspectAdjustedSize() => Vector2.One;
-
-        /// <summary>
-        /// The area of this <see cref="RulesetContainer"/> that is available for the <see cref="Playfield"/> to use.
-        /// Must be specified in relative coordinate space to this <see cref="RulesetContainer"/>.
-        /// This affects the final size of the <see cref="Playfield"/> but does not affect the <see cref="Playfield"/>'s scale.
-        /// </summary>
-        protected virtual Vector2 PlayfieldArea => new Vector2(0.75f); // A sane default
 
         /// <summary>
         /// Creates a DrawableHitObject from a HitObject.
         /// </summary>
         /// <param name="h">The HitObject to make drawable.</param>
         /// <returns>The DrawableHitObject.</returns>
-        protected abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
+        public abstract DrawableHitObject<TObject> GetVisualRepresentation(TObject h);
     }
 
     /// <summary>

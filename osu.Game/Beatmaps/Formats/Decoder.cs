@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -55,11 +55,11 @@ namespace osu.Game.Beatmaps.Formats
             } while (line != null && line.Length == 0);
 
             if (line == null)
-                throw new IOException(@"Unknown file format");
+                throw new IOException(@"Unknown file format (null)");
 
-            var decoder = typedDecoders.Select(d => line.StartsWith(d.Key) ? d.Value : null).FirstOrDefault();
+            var decoder = typedDecoders.Select(d => line.StartsWith(d.Key, StringComparison.InvariantCulture) ? d.Value : null).FirstOrDefault();
             if (decoder == null)
-                throw new IOException(@"Unknown file format");
+                throw new IOException($@"Unknown file format ({line})");
 
             return (Decoder<T>)decoder.Invoke(line);
         }

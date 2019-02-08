@@ -1,9 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
-using OpenTK.Input;
+using osu.Framework.Input.Events;
+using osuTK.Input;
 
 namespace osu.Game.Screens.Play
 {
@@ -15,16 +14,16 @@ namespace osu.Game.Screens.Play
             Key = key;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
-            if (args.Key == Key) IsLit = true;
-            return base.OnKeyDown(state, args);
+            if (e.Key == Key) IsLit = true;
+            return base.OnKeyDown(e);
         }
 
-        protected override bool OnKeyUp(InputState state, KeyUpEventArgs args)
+        protected override bool OnKeyUp(KeyUpEvent e)
         {
-            if (args.Key == Key) IsLit = false;
-            return base.OnKeyUp(state, args);
+            if (e.Key == Key) IsLit = false;
+            return base.OnKeyUp(e);
         }
     }
 }

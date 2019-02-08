@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -9,11 +9,11 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Overlays.Profile.Header
 {
@@ -153,13 +153,13 @@ namespace osu.Game.Overlays.Profile.Header
                 this.hoverLostAction = hoverLostAction;
             }
 
-            protected override bool OnHover(InputState state)
+            protected override bool OnHover(HoverEvent e)
             {
                 hoverAction();
                 return true;
             }
 
-            protected override void OnHoverLost(InputState state) => hoverLostAction();
+            protected override void OnHoverLost(HoverLostEvent e) => hoverLostAction();
         }
 
         private class DrawableBadge : Container, IHasTooltip
@@ -176,7 +176,7 @@ namespace osu.Game.Overlays.Profile.Header
             }
 
             [BackgroundDependencyLoader]
-            private void load(TextureStore textures)
+            private void load(LargeTextureStore textures)
             {
                 Child = new Sprite
                 {

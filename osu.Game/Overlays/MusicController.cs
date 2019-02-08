@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -13,7 +13,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
 using osu.Framework.Threading;
 using osu.Game.Beatmaps;
@@ -22,8 +22,8 @@ using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays.Music;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -47,7 +47,6 @@ namespace osu.Game.Overlays
         private PlaylistOverlay playlist;
 
         private BeatmapManager beatmaps;
-        private LocalisationEngine localisation;
 
         private List<BeatmapSetInfo> beatmapSets;
         private BeatmapSetInfo currentSet;
@@ -67,11 +66,10 @@ namespace osu.Game.Overlays
         }
 
         [BackgroundDependencyLoader]
-        private void load(BindableBeatmap beatmap, BeatmapManager beatmaps, OsuColour colours, LocalisationEngine localisation)
+        private void load(BindableBeatmap beatmap, BeatmapManager beatmaps, OsuColour colours)
         {
             this.beatmap.BindTo(beatmap);
             this.beatmaps = beatmaps;
-            this.localisation = localisation;
 
             Children = new Drawable[]
             {
@@ -198,10 +196,16 @@ namespace osu.Game.Overlays
             playlist.StateChanged += s => playlistButton.FadeColour(s == Visibility.Visible ? colours.Yellow : Color4.White, 200, Easing.OutQuint);
         }
 
+        private ScheduledDelegate seekDelegate;
+
         private void attemptSeek(double progress)
         {
-            if (!beatmap.Disabled)
-                current?.Track.Seek(progress);
+            seekDelegate?.Cancel();
+            seekDelegate = Schedule(() =>
+            {
+                if (!beatmap.Disabled)
+                    current?.Track.Seek(progress);
+            });
         }
 
         private void playlistOrderChanged(BeatmapSetInfo beatmapSetInfo, int index)
@@ -210,8 +214,15 @@ namespace osu.Game.Overlays
             beatmapSets.Insert(index, beatmapSetInfo);
         }
 
-        private void handleBeatmapAdded(BeatmapSetInfo obj) => beatmapSets.Add(obj);
-        private void handleBeatmapRemoved(BeatmapSetInfo obj) => beatmapSets.RemoveAll(s => s.ID == obj.ID);
+        private void handleBeatmapAdded(BeatmapSetInfo obj, bool existing, bool silent)
+        {
+            if (existing)
+                return;
+
+            Schedule(() => beatmapSets.Add(obj));
+        }
+
+        private void handleBeatmapRemoved(BeatmapSetInfo obj) => Schedule(() => beatmapSets.RemoveAll(s => s.ID == obj.ID));
 
         protected override void LoadComplete()
         {
@@ -241,10 +252,10 @@ namespace osu.Game.Overlays
         {
             base.Update();
 
-            if (current?.TrackLoaded ?? false)
-            {
-                var track = current.Track;
+            var track = current?.TrackLoaded ?? false ? current.Track : null;
 
+            if (track?.IsDummyDevice == false)
+            {
                 progressBar.EndTime = track.Length;
                 progressBar.CurrentTime = track.CurrentTime;
 
@@ -254,7 +265,11 @@ namespace osu.Game.Overlays
                     next();
             }
             else
+            {
+                progressBar.CurrentTime = 0;
+                progressBar.EndTime = 1;
                 playButton.Icon = FontAwesome.fa_play_circle_o;
+            }
         }
 
         private void play()
@@ -351,17 +366,14 @@ namespace osu.Game.Overlays
                 {
                     if (beatmap?.Beatmap == null) //this is not needed if a placeholder exists
                     {
-                        title.Current = null;
                         title.Text = @"Nothing to play";
-
-                        artist.Current = null;
                         artist.Text = @"Nothing to play";
                     }
                     else
                     {
                         BeatmapMetadata metadata = beatmap.Metadata;
-                        title.Current = localisation.GetUnicodePreference(metadata.TitleUnicode, metadata.Title);
-                        artist.Current = localisation.GetUnicodePreference(metadata.ArtistUnicode, metadata.Artist);
+                        title.Text = new LocalisedString((metadata.TitleUnicode, metadata.Title));
+                        artist.Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist));
                     }
                 });
 
@@ -400,6 +412,10 @@ namespace osu.Game.Overlays
         protected override void PopOut()
         {
             base.PopOut();
+
+            // This is here mostly as a performance fix.
+            // If the playlist is not hidden it will update children even when the music controller is hidden (due to AlwaysPresent).
+            playlist.State = Visibility.Hidden;
 
             this.FadeOut(transition_length, Easing.OutQuint);
             dragContainer.ScaleTo(0.9f, transition_length, Easing.OutQuint);
@@ -462,20 +478,14 @@ namespace osu.Game.Overlays
 
         private class DragContainer : Container
         {
-            private Vector2 dragStart;
-
-            protected override bool OnDragStart(InputState state)
+            protected override bool OnDragStart(DragStartEvent e)
             {
-                base.OnDragStart(state);
-                dragStart = state.Mouse.Position;
                 return true;
             }
 
-            protected override bool OnDrag(InputState state)
+            protected override bool OnDrag(DragEvent e)
             {
-                if (base.OnDrag(state)) return true;
-
-                Vector2 change = state.Mouse.Position - dragStart;
+                Vector2 change = e.MousePosition - e.MouseDownPosition;
 
                 // Diminish the drag distance as we go further to simulate "rubber band" feeling.
                 change *= change.Length <= 0 ? 0 : (float)Math.Pow(change.Length, 0.7f) / change.Length;
@@ -484,10 +494,10 @@ namespace osu.Game.Overlays
                 return true;
             }
 
-            protected override bool OnDragEnd(InputState state)
+            protected override bool OnDragEnd(DragEndEvent e)
             {
                 this.MoveTo(Vector2.Zero, 800, Easing.OutElastic);
-                return base.OnDragEnd(state);
+                return base.OnDragEnd(e);
             }
         }
     }

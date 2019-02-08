@@ -1,7 +1,7 @@
 <!-- Contains required properties for osu!framework projects. -->
 <Project>
   <PropertyGroup Label="C#">
-    <LangVersion>7</LangVersion>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>..\app.manifest</ApplicationManifest>
@@ -16,7 +16,7 @@
   </ItemGroup>
   <PropertyGroup Label="Project">
     <Company>ppy Pty Ltd</Company>
-    <Copyright>ppy Pty Ltd 2007-2018</Copyright>
+    <Copyright>Copyright (c) 2019 ppy Pty Ltd</Copyright>
     <!-- DeepEqual is not netstandard-compatible. This is fine since we run tests with .NET Framework anyway.
     This is required due to https://github.com/NuGet/Home/issues/5740 -->
     <NoWarn>NU1701</NoWarn>

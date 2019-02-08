@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -15,8 +15,8 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osu.Game.Overlays.Notifications;
 using osu.Game.Utils;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Desktop.Overlays
 {
@@ -26,9 +26,6 @@ namespace osu.Desktop.Overlays
         private OsuGameBase game;
         private NotificationOverlay notificationOverlay;
         private GameHost host;
-
-        public override bool HandleKeyboardInput => false;
-        public override bool HandleMouseInput => false;
 
         [BackgroundDependencyLoader]
         private void load(NotificationOverlay notification, OsuColour colours, TextureStore textures, OsuGameBase game, OsuConfigManager config, GameHost host)
@@ -131,11 +128,12 @@ namespace osu.Desktop.Overlays
 
         protected override void PopIn()
         {
-            this.FadeIn(1000);
+            this.FadeIn(1400, Easing.OutQuint);
         }
 
         protected override void PopOut()
         {
+            this.FadeOut(500, Easing.OutQuint);
         }
     }
 }

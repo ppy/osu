@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Caching;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -15,12 +15,12 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
     /// <summary>
     /// Represents length-wise portion of a hold note.
     /// </summary>
-    internal class BodyPiece : Container, IHasAccentColour
+    public class BodyPiece : Container, IHasAccentColour
     {
         private readonly Container subtractionLayer;
 
-        private readonly Drawable background;
-        private readonly BufferedContainer foreground;
+        protected readonly Drawable Background;
+        protected readonly BufferedContainer Foreground;
         private readonly BufferedContainer subtractionContainer;
 
         public BodyPiece()
@@ -29,9 +29,10 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
 
             Children = new[]
             {
-                background = new Box { RelativeSizeAxes = Axes.Both },
-                foreground = new BufferedContainer
+                Background = new Box { RelativeSizeAxes = Axes.Both },
+                Foreground = new BufferedContainer
                 {
+                    Blending = BlendingMode.Additive,
                     RelativeSizeAxes = Axes.Both,
                     CacheDrawnFrameBuffer = true,
                     Children = new Drawable[]
@@ -73,6 +74,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
             get { return accentColour; }
@@ -82,6 +84,16 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                     return;
                 accentColour = value;
 
+                updateAccentColour();
+            }
+        }
+
+        public bool Hitting
+        {
+            get { return hitting; }
+            set
+            {
+                hitting = value;
                 updateAccentColour();
             }
         }
@@ -111,20 +123,33 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
                     Radius = DrawWidth
                 };
 
-                foreground.ForceRedraw();
+                Foreground.ForceRedraw();
                 subtractionContainer.ForceRedraw();
 
                 subtractionCache.Validate();
             }
         }
 
+        private bool hitting;
+
         private void updateAccentColour()
         {
             if (!IsLoaded)
                 return;
 
-            foreground.Colour = AccentColour.Opacity(0.9f);
-            background.Colour = AccentColour.Opacity(0.6f);
+            Foreground.Colour = AccentColour.Opacity(0.5f);
+            Background.Colour = AccentColour.Opacity(0.7f);
+
+            const float animation_length = 50;
+
+            Foreground.ClearTransforms(false, nameof(Foreground.Colour));
+            if (hitting)
+            {
+                // wait for the next sync point
+                double synchronisedOffset = animation_length * 2 - Time.Current % (animation_length * 2);
+                using (Foreground.BeginDelayedSequence(synchronisedOffset))
+                    Foreground.FadeColour(AccentColour.Lighten(0.2f), animation_length).Then().FadeColour(Foreground.Colour, animation_length).Loop();
+            }
 
             subtractionCache.Invalidate();
         }

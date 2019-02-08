@@ -1,8 +1,8 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -10,7 +10,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -30,7 +30,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            if (accentColour == default(Color4))
+            if (accentColour == default)
                 accentColour = colours.PinkDarker;
             updateAccentColour();
         }
@@ -51,6 +51,8 @@ namespace osu.Game.Graphics.UserInterface
         #region OsuDropdownMenu
         protected class OsuDropdownMenu : DropdownMenu, IHasAccentColour
         {
+            public override bool HandleNonPositionalInput => State == MenuState.Open;
+
             // todo: this uses the same styling as OsuMenu. hopefully we can just use OsuMenu in the future with some refactoring
             public OsuDropdownMenu()
             {
@@ -97,6 +99,9 @@ namespace osu.Game.Graphics.UserInterface
             #region DrawableOsuDropdownMenuItem
             public class DrawableOsuDropdownMenuItem : DrawableDropdownMenuItem, IHasAccentColour
             {
+                // IsHovered is used
+                public override bool HandlePositionalInput => true;
+
                 private Color4? accentColour;
                 public Color4 AccentColour
                 {

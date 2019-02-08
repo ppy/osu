@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel.DataAnnotations.Schema;
 using osu.Framework.Input.Bindings;
@@ -10,7 +10,6 @@ namespace osu.Game.Input.Bindings
     [Table("KeyBinding")]
     public class DatabasedKeyBinding : KeyBinding, IHasPrimaryKey
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
 
         public int? RulesetID { get; set; }

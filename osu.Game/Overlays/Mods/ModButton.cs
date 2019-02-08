@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
-using OpenTK.Input;
+using osuTK;
+using osuTK.Graphics;
+using osuTK.Input;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -13,8 +13,7 @@ using osu.Game.Rulesets.UI;
 using System;
 using System.Linq;
 using osu.Framework.Graphics.Cursor;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.Mods
@@ -149,20 +148,20 @@ namespace osu.Game.Overlays.Mods
 
         public virtual Mod SelectedMod => Mods.ElementAtOrDefault(selectedIndex);
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
             scaleContainer.ScaleTo(0.9f, 800, Easing.Out);
-            return base.OnMouseDown(state, args);
+            return base.OnMouseDown(e);
         }
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
+        protected override bool OnMouseUp(MouseUpEvent e)
         {
             scaleContainer.ScaleTo(1, 500, Easing.OutElastic);
 
             // only trigger the event if we are inside the area of the button
-            if (Contains(ToScreenSpace(state.Mouse.Position - Position)))
+            if (Contains(e.ScreenSpaceMousePosition))
             {
-                switch (args.Button)
+                switch (e.Button)
                 {
                     case MouseButton.Left:
                         SelectNext(1);

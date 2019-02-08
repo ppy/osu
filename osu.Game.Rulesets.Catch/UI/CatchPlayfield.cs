@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Graphics;
@@ -10,6 +10,7 @@ using osu.Game.Rulesets.Catch.Objects.Drawable;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI.Scrolling;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
@@ -17,45 +18,39 @@ namespace osu.Game.Rulesets.Catch.UI
     {
         public const float BASE_WIDTH = 512;
 
-        protected override Container<Drawable> Content => content;
-        private readonly Container<Drawable> content;
-
-        private readonly CatcherArea catcherArea;
+        internal readonly CatcherArea CatcherArea;
 
         public CatchPlayfield(BeatmapDifficulty difficulty, Func<CatchHitObject, DrawableHitObject<CatchHitObject>> getVisualRepresentation)
-            : base(BASE_WIDTH)
         {
-            Direction.Value = ScrollingDirection.Down;
-
             Container explodingFruitContainer;
 
             Anchor = Anchor.TopCentre;
             Origin = Anchor.TopCentre;
 
-            base.Content.Anchor = Anchor.BottomLeft;
-            base.Content.Origin = Anchor.BottomLeft;
+            Size = new Vector2(0.86f); // matches stable's vertical offset for catcher plate
 
-            base.Content.AddRange(new Drawable[]
+            InternalChild = new PlayfieldAdjustmentContainer
             {
-                explodingFruitContainer = new Container
+                RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                },
-                catcherArea = new CatcherArea(difficulty)
-                {
-                    GetVisualRepresentation = getVisualRepresentation,
-                    ExplodingFruitTarget = explodingFruitContainer,
-                    Anchor = Anchor.BottomLeft,
-                    Origin = Anchor.TopLeft,
-                },
-                content = new Container<Drawable>
-                {
-                    RelativeSizeAxes = Axes.Both,
-                },
-            });
+                    explodingFruitContainer = new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                    },
+                    CatcherArea = new CatcherArea(difficulty)
+                    {
+                        GetVisualRepresentation = getVisualRepresentation,
+                        ExplodingFruitTarget = explodingFruitContainer,
+                        Anchor = Anchor.BottomLeft,
+                        Origin = Anchor.TopLeft,
+                    },
+                    HitObjectContainer
+                }
+            };
         }
 
-        public bool CheckIfWeCanCatch(CatchHitObject obj) => catcherArea.AttemptCatch(obj);
+        public bool CheckIfWeCanCatch(CatchHitObject obj) => CatcherArea.AttemptCatch(obj);
 
         public override void Add(DrawableHitObject h)
         {
@@ -68,6 +63,6 @@ namespace osu.Game.Rulesets.Catch.UI
         }
 
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
-            => catcherArea.OnResult((DrawableCatchHitObject)judgedObject, result);
+            => CatcherArea.OnResult((DrawableCatchHitObject)judgedObject, result);
     }
 }

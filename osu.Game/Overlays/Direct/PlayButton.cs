@@ -1,17 +1,17 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays.Direct
 {
@@ -93,23 +93,23 @@ namespace osu.Game.Overlays.Direct
             hoverColour = colour.Yellow;
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             Playing.Toggle();
             return true;
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             icon.FadeColour(hoverColour, 120, Easing.InOutQuint);
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             if (!Playing.Value)
                 icon.FadeColour(Color4.White, 120, Easing.InOutQuint);
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
         private void playingStateChanged(bool playing)

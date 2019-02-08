@@ -1,13 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
-using OpenTK;
+using osuTK;
 using osu.Game.Rulesets.Scoring;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Osu.Objects.Drawables
 {
@@ -20,6 +22,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly ExplodePiece explode;
         private readonly NumberPiece number;
         private readonly GlowPiece glow;
+
+        private readonly IBindable<Vector2> positionBindable = new Bindable<Vector2>();
+        private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
+        private readonly IBindable<float> scaleBindable = new Bindable<float>();
 
         public DrawableHitCircle(HitCircle h)
             : base(h)
@@ -59,8 +65,18 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             //may not be so correct
             Size = circle.DrawSize;
+        }
 
-            HitObject.PositionChanged += _ => Position = HitObject.StackedPosition;
+        [BackgroundDependencyLoader]
+        private void load()
+        {
+            positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            stackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
+            scaleBindable.BindValueChanged(v => Scale = new Vector2(v));
+
+            positionBindable.BindTo(HitObject.PositionBindable);
+            stackHeightBindable.BindTo(HitObject.StackHeightBindable);
+            scaleBindable.BindTo(HitObject.ScaleBindable);
         }
 
         public override Color4 AccentColour
@@ -88,7 +104,10 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
 
             var result = HitObject.HitWindows.ResultFor(timeOffset);
             if (result == HitResult.None)
+            {
+                Shake(Math.Abs(timeOffset) - HitObject.HitWindows.HalfWindowFor(HitResult.Miss));
                 return;
+            }
 
             ApplyResult(r => r.Type = result);
         }

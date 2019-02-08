@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double sectionLength = section_length * timeRate;
 
             // The first object doesn't generate a strain, so we begin with an incremented section end
-            double currentSectionEnd = 2 * sectionLength;
+            double currentSectionEnd = Math.Ceiling(beatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
 
             foreach (OsuDifficultyHitObject h in difficultyBeatmap)
             {
@@ -57,6 +57,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     s.Process(h);
             }
 
+            // The peak strain will not be saved for the last section in the above loop
+            foreach (Skill s in skills)
+                s.SaveCurrentPeak();
+
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
@@ -65,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
             double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
 
-            int maxCombo = beatmap.HitObjects.Count();
+            int maxCombo = beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
             maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
 

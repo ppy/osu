@@ -1,13 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Screens.Edit.Screens.Setup.Components.LabelledComponents;
 using System;
 using System.Collections.Generic;
+using osu.Game.Screens.Edit.Setup.Components.LabelledComponents;
 
 namespace osu.Game.Tests.Visual
 {

@@ -1,20 +1,18 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Globalization;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -34,38 +32,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly Box leftBox;
         private readonly Box rightBox;
 
-        public virtual string TooltipText
-        {
-            get
-            {
-                var bindableDouble = CurrentNumber as BindableNumber<double>;
-                var bindableFloat = CurrentNumber as BindableNumber<float>;
-                var floatValue = bindableDouble?.Value ?? bindableFloat?.Value;
-                var floatPrecision = bindableDouble?.Precision ?? bindableFloat?.Precision;
-
-                if (floatValue != null)
-                {
-                    var floatMinValue = bindableDouble?.MinValue ?? bindableFloat.MinValue;
-                    var floatMaxValue = bindableDouble?.MaxValue ?? bindableFloat.MaxValue;
-
-                    if (floatMaxValue == 1 && (floatMinValue == 0 || floatMinValue == -1))
-                        return floatValue.Value.ToString("P0");
-
-                    var decimalPrecision = normalise((decimal)floatPrecision, max_decimal_digits);
-
-                    // Find the number of significant digits (we could have less than 5 after normalize())
-                    var significantDigits = findPrecision(decimalPrecision);
-
-                    return floatValue.Value.ToString($"N{significantDigits}");
-                }
-
-                var bindableInt = CurrentNumber as BindableNumber<int>;
-                if (bindableInt != null)
-                    return bindableInt.Value.ToString("N0");
-
-                return Current.Value.ToString(CultureInfo.InvariantCulture);
-            }
-        }
+        public virtual string TooltipText { get; private set; }
 
         private Color4 accentColour;
         public Color4 AccentColour
@@ -125,33 +92,52 @@ namespace osu.Game.Graphics.UserInterface
             AccentColour = colours.Pink;
         }
 
-        protected override bool OnHover(InputState state)
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            CurrentNumber.BindValueChanged(updateTooltipText, true);
+        }
+
+        protected override bool OnHover(HoverEvent e)
         {
             Nub.Glowing = true;
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             Nub.Glowing = false;
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
-        protected override void OnUserChange()
+        protected override bool OnMouseDown(MouseDownEvent e)
         {
-            base.OnUserChange();
-            playSample();
+            Nub.Current.Value = true;
+            return base.OnMouseDown(e);
         }
 
-        private void playSample()
+        protected override bool OnMouseUp(MouseUpEvent e)
+        {
+            Nub.Current.Value = false;
+            return base.OnMouseUp(e);
+        }
+
+        protected override void OnUserChange(T value)
+        {
+            base.OnUserChange(value);
+            playSample(value);
+            updateTooltipText(value);
+        }
+
+        private void playSample(T value)
         {
             if (Clock == null || Clock.CurrentTime - lastSampleTime <= 50)
                 return;
 
-            if (Current.Value.Equals(lastSampleValue))
+            if (value.Equals(lastSampleValue))
                 return;
 
-            lastSampleValue = Current.Value;
+            lastSampleValue = value;
 
             lastSampleTime = Clock.CurrentTime;
             sample.Frequency.Value = 1 + NormalizedValue * 0.2f;
@@ -164,16 +150,28 @@ namespace osu.Game.Graphics.UserInterface
             sample.Play();
         }
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args)
+        private void updateTooltipText(T value)
         {
-            Nub.Current.Value = true;
-            return base.OnMouseDown(state, args);
-        }
+            if (CurrentNumber.IsInteger)
+                TooltipText = ((int)Convert.ChangeType(value, typeof(int))).ToString("N0");
+            else
+            {
+                double floatValue = (double)Convert.ChangeType(value, typeof(double));
+                double floatMinValue = (double)Convert.ChangeType(CurrentNumber.MinValue, typeof(double));
+                double floatMaxValue = (double)Convert.ChangeType(CurrentNumber.MaxValue, typeof(double));
 
-        protected override bool OnMouseUp(InputState state, MouseUpEventArgs args)
-        {
-            Nub.Current.Value = false;
-            return base.OnMouseUp(state, args);
+                if (floatMaxValue == 1 && floatMinValue >= -1)
+                    TooltipText = floatValue.ToString("P0");
+                else
+                {
+                    var decimalPrecision = normalise((decimal)Convert.ChangeType(CurrentNumber.Precision, typeof(decimal)), max_decimal_digits);
+
+                    // Find the number of significant digits (we could have less than 5 after normalize())
+                    var significantDigits = findPrecision(decimalPrecision);
+
+                    TooltipText = floatValue.ToString($"N{significantDigits}");
+                }
+            }
         }
 
         protected override void UpdateAfterChildren()

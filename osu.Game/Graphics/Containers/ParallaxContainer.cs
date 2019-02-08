@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
-using OpenTK;
+using osuTK;
 using osu.Framework.Allocation;
 using osu.Game.Configuration;
 using osu.Framework.Configuration;
@@ -67,7 +67,7 @@ namespace osu.Game.Graphics.Containers
 
             if (parallaxEnabled)
             {
-                Vector2 offset = (input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.NativeState.Position) - DrawSize / 2) * ParallaxAmount;
+                Vector2 offset = (input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.Position) - DrawSize / 2) * ParallaxAmount;
 
                 double elapsed = MathHelper.Clamp(Clock.ElapsedFrameTime, 0, 1000);
 

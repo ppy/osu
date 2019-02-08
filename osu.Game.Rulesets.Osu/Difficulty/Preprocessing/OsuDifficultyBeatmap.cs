@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
@@ -23,8 +24,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
         {
             // Sort OsuHitObjects by StartTime - they are not correctly ordered in some cases.
             // This should probably happen before the objects reach the difficulty calculator.
-            objects.Sort((a, b) => a.StartTime.CompareTo(b.StartTime));
-            difficultyObjects = createDifficultyObjectEnumerator(objects, timeRate);
+            difficultyObjects = createDifficultyObjectEnumerator(objects.OrderBy(h => h.StartTime).ToList(), timeRate);
         }
 
         /// <summary>
@@ -38,7 +38,13 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             // The first jump is formed by the first two hitobjects of the map.
             // If the map has less than two OsuHitObjects, the enumerator will not return anything.
             for (int i = 1; i < objects.Count; i++)
-                yield return new OsuDifficultyHitObject(objects[i], objects[i - 1], timeRate);
+            {
+                var lastLast = i > 1 ? objects[i - 2] : null;
+                var last = objects[i - 1];
+                var current = objects[i];
+
+                yield return new OsuDifficultyHitObject(lastLast, last, current, timeRate);
+            }
         }
     }
 }

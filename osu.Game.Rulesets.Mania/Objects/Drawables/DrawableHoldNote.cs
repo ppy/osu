@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Game.Rulesets.Scoring;
@@ -111,6 +111,18 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             bodyPiece.Height = DrawHeight - Head.Height / 2 + Tail.Height / 2;
         }
 
+        protected void BeginHold()
+        {
+            holdStartTime = Time.Current;
+            bodyPiece.Hitting = true;
+        }
+
+        protected void EndHold()
+        {
+            holdStartTime = null;
+            bodyPiece.Hitting = false;
+        }
+
         public bool OnPressed(ManiaAction action)
         {
             // Make sure the action happened within the body of the hold note
@@ -123,8 +135,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             // The user has pressed during the body of the hold note, after the head note and its hit windows have passed
             // and within the limited range of the above if-statement. This state will be managed by the head note if the
             // user has pressed during the hit windows of the head note.
-            holdStartTime = Time.Current;
-
+            BeginHold();
             return true;
         }
 
@@ -137,7 +148,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             if (action != Action.Value)
                 return false;
 
-            holdStartTime = null;
+            EndHold();
 
             // If the key has been released too early, the user should not receive full score for the release
             if (!Tail.IsHit)
@@ -170,7 +181,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
 
                 // The head note also handles early hits before the body, but we want accurate early hits to count as the body being held
                 // The body doesn't handle these early early hits, so we have to explicitly set the holding state here
-                holdNote.holdStartTime = Time.Current;
+                holdNote.BeginHold();
 
                 return true;
             }

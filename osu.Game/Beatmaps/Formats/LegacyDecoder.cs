@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.IO;
 using osu.Framework.Logging;
 using osu.Game.Audio;
 using osu.Game.Beatmaps.ControlPoints;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Beatmaps.Formats
 {
@@ -31,7 +31,7 @@ namespace osu.Game.Beatmaps.Formats
                 if (ShouldSkipLine(line))
                     continue;
 
-                if (line.StartsWith(@"[") && line.EndsWith(@"]"))
+                if (line.StartsWith(@"[", StringComparison.Ordinal) && line.EndsWith(@"]", StringComparison.Ordinal))
                 {
                     if (!Enum.TryParse(line.Substring(1, line.Length - 2), out section))
                     {
@@ -53,7 +53,7 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//");
+        protected virtual bool ShouldSkipLine(string line) => string.IsNullOrWhiteSpace(line) || line.StartsWith("//", StringComparison.Ordinal);
 
         protected virtual void ParseLine(T output, Section section, string line)
         {
@@ -69,7 +69,7 @@ namespace osu.Game.Beatmaps.Formats
 
         protected string StripComments(string line)
         {
-            var index = line.IndexOf("//", StringComparison.Ordinal);
+            var index = line.AsSpan().IndexOf("//".AsSpan());
             if (index > 0)
                 return line.Substring(0, index);
             return line;
@@ -85,13 +85,19 @@ namespace osu.Game.Beatmaps.Formats
 
             string[] split = pair.Value.Split(',');
 
-            if (split.Length != 3)
-                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B): {pair.Value}");
+            if (split.Length != 3 && split.Length != 4)
+                throw new InvalidOperationException($@"Color specified in incorrect format (should be R,G,B or R,G,B,A): {pair.Value}");
 
-            if (!byte.TryParse(split[0], out var r) || !byte.TryParse(split[1], out var g) || !byte.TryParse(split[2], out var b))
+            Color4 colour;
+
+            try
+            {
+                colour = new Color4(byte.Parse(split[0]), byte.Parse(split[1]), byte.Parse(split[2]), split.Length == 4 ? byte.Parse(split[3]) : (byte)255);
+            }
+            catch (Exception e)
+            {
                 throw new InvalidOperationException(@"Color must be specified with 8-bit integer components");
-
-            Color4 colour = new Color4(r, g, b, 255);
+            }
 
             if (isCombo)
             {

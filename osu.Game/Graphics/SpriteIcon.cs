@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using osu.Framework.Allocation;
@@ -7,8 +7,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics;
 using osu.Framework.IO.Stores;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Caching;
 
 namespace osu.Game.Graphics
@@ -71,7 +71,7 @@ namespace osu.Game.Graphics
 
             if (loadableIcon == loadedIcon) return;
 
-            var texture = store?.Get(((char)loadableIcon).ToString());
+            var texture = store.Get(((char)loadableIcon).ToString());
 
             spriteMain.Texture = texture;
             spriteShadow.Texture = texture;
@@ -95,7 +95,7 @@ namespace osu.Game.Graphics
             {
                 //adjust shadow alpha based on highest component intensity to avoid muddy display of darker text.
                 //squared result for quadratic fall-off seems to give the best result.
-                var avgColour = (Color4)DrawInfo.Colour.AverageColour;
+                var avgColour = (Color4)DrawColourInfo.Colour.AverageColour;
 
                 spriteShadow.Alpha = (float)Math.Pow(Math.Max(Math.Max(avgColour.R, avgColour.G), avgColour.B), 2);
 
@@ -129,7 +129,7 @@ namespace osu.Game.Graphics
                 if (icon == value) return;
 
                 icon = value;
-                if (IsLoaded)
+                if (LoadState == LoadState.Loaded)
                     updateTexture();
             }
         }

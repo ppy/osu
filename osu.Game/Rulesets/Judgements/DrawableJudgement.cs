@@ -1,7 +1,7 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
@@ -12,14 +12,14 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Judgements
 {
     /// <summary>
     /// A drawable object which visualises the hit result of a <see cref="Judgements.Judgement"/>.
     /// </summary>
-    public class DrawableJudgement : Container
+    public class DrawableJudgement : CompositeDrawable
     {
         private const float judgement_size = 80;
 
@@ -29,6 +29,7 @@ namespace osu.Game.Rulesets.Judgements
 
         public readonly DrawableHitObject JudgedObject;
 
+        protected Container JudgementBody;
         protected SpriteText JudgementText;
 
         /// <summary>
@@ -49,14 +50,20 @@ namespace osu.Game.Rulesets.Judgements
         {
             this.colours = colours;
 
-            Child = new SkinnableDrawable($"Play/{Result.Type}", _ => JudgementText = new OsuSpriteText
+            InternalChild = JudgementBody = new Container
             {
-                Text = Result.Type.GetDescription().ToUpperInvariant(),
-                Font = @"Venera",
-                Colour = judgementColour(Result.Type),
-                Scale = new Vector2(0.85f, 1),
-                TextSize = 12
-            }, restrictSize: false);
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                RelativeSizeAxes = Axes.Both,
+                Child = new SkinnableDrawable($"Play/{Result.Type}", _ => JudgementText = new OsuSpriteText
+                {
+                    Text = Result.Type.GetDescription().ToUpperInvariant(),
+                    Font = @"Venera",
+                    Colour = judgementColour(Result.Type),
+                    Scale = new Vector2(0.85f, 1),
+                    TextSize = 12
+                }, restrictSize: false)
+            };
         }
 
         protected override void LoadComplete()
@@ -70,17 +77,17 @@ namespace osu.Game.Rulesets.Judgements
                 case HitResult.None:
                     break;
                 case HitResult.Miss:
-                    this.ScaleTo(1.6f);
-                    this.ScaleTo(1, 100, Easing.In);
+                    JudgementBody.ScaleTo(1.6f);
+                    JudgementBody.ScaleTo(1, 100, Easing.In);
 
-                    this.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
-                    this.RotateTo(40, 800, Easing.InQuint);
+                    JudgementBody.MoveToOffset(new Vector2(0, 100), 800, Easing.InQuint);
+                    JudgementBody.RotateTo(40, 800, Easing.InQuint);
 
                     this.Delay(600).FadeOut(200);
                     break;
                 default:
-                    this.ScaleTo(0.9f);
-                    this.ScaleTo(1, 500, Easing.OutElastic);
+                    JudgementBody.ScaleTo(0.9f);
+                    JudgementBody.ScaleTo(1, 500, Easing.OutElastic);
 
                     this.Delay(100).FadeOut(400);
                     break;
@@ -103,9 +110,9 @@ namespace osu.Game.Rulesets.Judgements
                     return colours.Yellow;
                 case HitResult.Miss:
                     return colours.Red;
+                default:
+                    return Color4.White;
             }
-
-            return Color4.White;
         }
     }
 }

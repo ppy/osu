@@ -1,12 +1,13 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using System;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Allocation;
+using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Game.Input.Bindings;
-using OpenTK.Input;
+using osuTK.Input;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -22,9 +23,16 @@ namespace osu.Game.Graphics.UserInterface
 
         private bool focus;
 
+        private bool allowImmediateFocus => host?.OnScreenKeyboardOverlapsGameWindow != true;
+
+        public void TakeFocus()
+        {
+            if (allowImmediateFocus) GetContainingInputManager().ChangeFocus(this);
+        }
+
         public bool HoldFocus
         {
-            get { return focus; }
+            get => allowImmediateFocus && focus;
             set
             {
                 focus = value;
@@ -33,23 +41,31 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        // We may not be focused yet, but we need to handle keyboard input to be able to request focus
-        public override bool HandleKeyboardInput => HoldFocus || base.HandleKeyboardInput;
+        private GameHost host;
 
-        protected override void OnFocus(InputState state)
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
         {
-            base.OnFocus(state);
+            this.host = host;
+        }
+
+        // We may not be focused yet, but we need to handle keyboard input to be able to request focus
+        public override bool HandleNonPositionalInput => HoldFocus || base.HandleNonPositionalInput;
+
+        protected override void OnFocus(FocusEvent e)
+        {
+            base.OnFocus(e);
             BorderThickness = 0;
         }
 
-        protected override bool OnKeyDown(InputState state, KeyDownEventArgs args)
+        protected override bool OnKeyDown(KeyDownEvent e)
         {
             if (!HasFocus) return false;
 
-            if (args.Key == Key.Escape)
+            if (e.Key == Key.Escape)
                 return false; // disable the framework-level handling of escape key for confority (we use GlobalAction.Back).
 
-            return base.OnKeyDown(state, args);
+            return base.OnKeyDown(e);
         }
 
         public override bool OnPressed(GlobalAction action)

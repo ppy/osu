@@ -1,5 +1,5 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -30,10 +30,11 @@ namespace osu.Game.Rulesets.Mania.UI
 
             if (Result.IsHit)
             {
-                this.ScaleTo(0.8f);
-                this.ScaleTo(1, 250, Easing.OutElastic);
+                JudgementBody.ScaleTo(0.8f);
+                JudgementBody.ScaleTo(1, 250, Easing.OutElastic);
 
-                this.Delay(50).FadeOut(200).ScaleTo(0.75f, 250);
+                JudgementBody.Delay(50).ScaleTo(0.75f, 250);
+                this.Delay(50).FadeOut(200);
             }
 
             Expire();

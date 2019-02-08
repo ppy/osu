@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
-using OpenTK;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
+using osu.Game.Replays;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
@@ -15,7 +15,6 @@ using osu.Game.Rulesets.Osu.Scoring;
 using osu.Game.Rulesets.Osu.UI.Cursor;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
-using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Osu.UI
 {
@@ -32,7 +31,7 @@ namespace osu.Game.Rulesets.Osu.UI
 
         public override PassThroughInputManager CreateInputManager() => new OsuInputManager(Ruleset.RulesetInfo);
 
-        protected override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
+        public override DrawableHitObject<OsuHitObject> GetVisualRepresentation(OsuHitObject h)
         {
             switch (h)
             {
@@ -56,12 +55,6 @@ namespace osu.Game.Rulesets.Osu.UI
                 var first = (OsuHitObject)Objects.First();
                 return first.StartTime - first.TimePreempt;
             }
-        }
-
-        protected override Vector2 GetAspectAdjustedSize()
-        {
-            var aspectSize = DrawSize.X * 0.75f < DrawSize.Y ? new Vector2(DrawSize.X, DrawSize.X * 0.75f) : new Vector2(DrawSize.Y * 4f / 3f, DrawSize.Y);
-            return new Vector2(aspectSize.X / DrawSize.X, aspectSize.Y / DrawSize.Y);
         }
 
         protected override CursorContainer CreateCursor() => new GameplayCursor();

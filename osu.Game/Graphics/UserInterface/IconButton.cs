@@ -1,10 +1,10 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface
 {
@@ -84,16 +84,16 @@ namespace osu.Game.Graphics.UserInterface
             });
         }
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             icon.FadeColour(IconHoverColour, 500, Easing.OutQuint);
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             icon.FadeColour(IconColour, 500, Easing.OutQuint);
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
     }
 }

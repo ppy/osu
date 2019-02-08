@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.IO;
@@ -10,7 +10,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.IO.Stores;
 using osu.Framework.Logging;
 using osu.Game.Beatmaps.Formats;
-using osu.Game.Graphics.Textures;
 using osu.Game.Skinning;
 using osu.Game.Storyboards;
 
@@ -23,10 +22,11 @@ namespace osu.Game.Beatmaps
             private readonly IResourceStore<byte[]> store;
             private readonly AudioManager audioManager;
 
-            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, BeatmapInfo beatmapInfo, AudioManager audioManager)
+            public BeatmapManagerWorkingBeatmap(IResourceStore<byte[]> store, TextureStore textureStore, BeatmapInfo beatmapInfo, AudioManager audioManager)
                 : base(beatmapInfo)
             {
                 this.store = store;
+                this.textureStore = textureStore;
                 this.audioManager = audioManager;
             }
 
@@ -45,6 +45,10 @@ namespace osu.Game.Beatmaps
 
             private string getPathForFile(string filename) => BeatmapSetInfo.Files.First(f => string.Equals(f.Filename, filename, StringComparison.InvariantCultureIgnoreCase)).FileInfo.StoragePath;
 
+            private TextureStore textureStore;
+
+            protected override bool BackgroundStillValid(Texture b) => false; // bypass lazy logic. we want to return a new background each time for refcounting purposes.
+
             protected override Texture GetBackground()
             {
                 if (Metadata?.BackgroundFile == null)
@@ -52,7 +56,7 @@ namespace osu.Game.Beatmaps
 
                 try
                 {
-                    return new LargeTextureStore(new RawTextureLoaderStore(store)).Get(getPathForFile(Metadata.BackgroundFile));
+                    return textureStore.Get(getPathForFile(Metadata.BackgroundFile));
                 }
                 catch
                 {
@@ -71,6 +75,14 @@ namespace osu.Game.Beatmaps
                 {
                     return null;
                 }
+            }
+
+            public override void TransferTo(WorkingBeatmap other)
+            {
+                base.TransferTo(other);
+
+                if (other is BeatmapManagerWorkingBeatmap owb && textureStore != null && BeatmapInfo.BackgroundEquals(other.BeatmapInfo))
+                    owb.textureStore = textureStore;
             }
 
             protected override Waveform GetWaveform()

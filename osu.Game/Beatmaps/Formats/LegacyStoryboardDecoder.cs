@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Graphics;
 using osu.Framework.IO.File;
 using osu.Game.Storyboards;
@@ -60,7 +60,7 @@ namespace osu.Game.Beatmaps.Formats
         private void handleEvents(string line)
         {
             var depth = 0;
-            while (line.StartsWith(" ") || line.StartsWith("_"))
+            while (line.StartsWith(" ", StringComparison.Ordinal) || line.StartsWith("_", StringComparison.Ordinal))
             {
                 ++depth;
                 line = line.Substring(1);
@@ -269,9 +269,9 @@ namespace osu.Game.Beatmaps.Formats
                     return Anchor.BottomCentre;
                 case LegacyOrigins.BottomRight:
                     return Anchor.BottomRight;
+                default:
+                    return Anchor.TopLeft;
             }
-
-            throw new InvalidDataException($@"Unknown origin: {value}");
         }
 
         private void handleVariables(string line)
@@ -298,6 +298,6 @@ namespace osu.Game.Beatmaps.Formats
             }
         }
 
-        private string cleanFilename(string path) => FileSafety.PathStandardise(FileSafety.PathSanitise(path.Trim('\"')));
+        private string cleanFilename(string path) => FileSafety.PathStandardise(path.Trim('"'));
     }
 }

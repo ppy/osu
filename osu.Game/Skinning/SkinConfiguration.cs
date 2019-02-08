@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using osu.Game.Beatmaps.Formats;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 
 namespace osu.Game.Skinning
 {
@@ -11,8 +11,18 @@ namespace osu.Game.Skinning
     {
         public readonly SkinInfo SkinInfo = new SkinInfo();
 
-        public List<Color4> ComboColours { get; set; } = new List<Color4>();
+        public List<Color4> ComboColours { get; set; } = new List<Color4>
+        {
+            new Color4(17, 136, 170, 255),
+            new Color4(102, 136, 0, 255),
+            new Color4(204, 102, 0, 255),
+            new Color4(121, 9, 13, 255)
+        };
 
         public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
+
+        public string HitCircleFont { get; set; } = "default";
+
+        public bool? CursorExpand { get; set; } = true;
     }
 }

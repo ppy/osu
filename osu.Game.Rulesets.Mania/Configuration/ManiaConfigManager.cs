@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Configuration.Tracking;
 using osu.Game.Configuration;
@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.Configuration
         {
             base.InitialiseDefaults();
 
-            Set(ManiaSetting.ScrollTime, 1500.0, 50.0, 10000.0, 50.0);
+            Set(ManiaSetting.ScrollTime, 2250.0, 50.0, 10000.0, 50.0);
             Set(ManiaSetting.ScrollDirection, ManiaScrollingDirection.Down);
         }
 

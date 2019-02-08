@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
@@ -31,10 +31,10 @@ namespace osu.Game.Rulesets.Taiko.UI
             switch (Result.Type)
             {
                 case HitResult.Good:
-                    Colour = colours.GreenLight;
+                    JudgementBody.Colour = colours.GreenLight;
                     break;
                 case HitResult.Great:
-                    Colour = colours.BlueLight;
+                    JudgementBody.Colour = colours.BlueLight;
                     break;
             }
         }

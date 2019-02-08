@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -9,20 +9,31 @@ using osu.Game.Rulesets.Objects.Drawables;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Mods;
+using osuTK;
 
 namespace osu.Game.Rulesets.UI
 {
-    public abstract class Playfield : ScalableContainer
+    public abstract class Playfield : CompositeDrawable
     {
         /// <summary>
         /// The <see cref="DrawableHitObject"/> contained in this Playfield.
         /// </summary>
-        public HitObjectContainer HitObjects { get; private set; }
+        public HitObjectContainer HitObjectContainer => hitObjectContainerLazy.Value;
+
+        private readonly Lazy<HitObjectContainer> hitObjectContainerLazy;
+
+        /// <summary>
+        /// A function that converts gamefield coordinates to screen space.
+        /// </summary>
+        public Func<Vector2, Vector2> GamefieldToScreenSpace => HitObjectContainer.ToScreenSpace;
 
         /// <summary>
         /// All the <see cref="DrawableHitObject"/>s contained in this <see cref="Playfield"/> and all <see cref="NestedPlayfields"/>.
         /// </summary>
-        public IEnumerable<DrawableHitObject> AllHitObjects => HitObjects?.Objects.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects)) ?? Enumerable.Empty<DrawableHitObject>();
+        public IEnumerable<DrawableHitObject> AllHitObjects => HitObjectContainer?.Objects.Concat(NestedPlayfields.SelectMany(p => p.AllHitObjects)) ?? Enumerable.Empty<DrawableHitObject>();
 
         /// <summary>
         /// All <see cref="Playfield"/>s nested inside this <see cref="Playfield"/>.
@@ -37,27 +48,21 @@ namespace osu.Game.Rulesets.UI
         public readonly BindableBool DisplayJudgements = new BindableBool(true);
 
         /// <summary>
-        /// A container for keeping track of DrawableHitObjects.
+        /// Creates a new <see cref="Playfield"/>.
         /// </summary>
-        /// <param name="customWidth">The width to scale the internal coordinate space to.
-        /// May be null if scaling based on <paramref name="customHeight"/> is desired. If <paramref name="customHeight"/> is also null, no scaling will occur.
-        /// </param>
-        /// <param name="customHeight">The height to scale the internal coordinate space to.
-        /// May be null if scaling based on <paramref name="customWidth"/> is desired. If <paramref name="customWidth"/> is also null, no scaling will occur.
-        /// </param>
-        protected Playfield(float? customWidth = null, float? customHeight = null)
-            : base(customWidth, customHeight)
+        protected Playfield()
         {
             RelativeSizeAxes = Axes.Both;
+
+            hitObjectContainerLazy = new Lazy<HitObjectContainer>(CreateHitObjectContainer);
         }
 
-        [BackgroundDependencyLoader]
-        private void load()
-        {
-            HitObjects = CreateHitObjectContainer();
-            HitObjects.RelativeSizeAxes = Axes.Both;
+        private WorkingBeatmap beatmap;
 
-            Add(HitObjects);
+        [BackgroundDependencyLoader]
+        private void load(IBindableBeatmap beatmap)
+        {
+            this.beatmap = beatmap.Value;
         }
 
         /// <summary>
@@ -69,13 +74,13 @@ namespace osu.Game.Rulesets.UI
         /// Adds a DrawableHitObject to this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to add.</param>
-        public virtual void Add(DrawableHitObject h) => HitObjects.Add(h);
+        public virtual void Add(DrawableHitObject h) => HitObjectContainer.Add(h);
 
         /// <summary>
         /// Remove a DrawableHitObject from this Playfield.
         /// </summary>
         /// <param name="h">The DrawableHitObject to remove.</param>
-        public virtual void Remove(DrawableHitObject h) => HitObjects.Remove(h);
+        public virtual bool Remove(DrawableHitObject h) => HitObjectContainer.Remove(h);
 
         /// <summary>
         /// Registers a <see cref="Playfield"/> as a nested <see cref="Playfield"/>.
@@ -86,6 +91,25 @@ namespace osu.Game.Rulesets.UI
         {
             otherPlayfield.DisplayJudgements.BindTo(DisplayJudgements);
             nestedPlayfields.Value.Add(otherPlayfield);
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            // in the case a consumer forgets to add the HitObjectContainer, we will add it here.
+            if (HitObjectContainer.Parent == null)
+                AddInternal(HitObjectContainer);
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (beatmap != null)
+                foreach (var mod in beatmap.Mods.Value)
+                    if (mod is IUpdatableByPlayfield updatable)
+                        updatable.Update(this);
         }
 
         /// <summary>

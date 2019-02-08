@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -82,6 +82,7 @@ namespace osu.Game.Overlays.Profile
                                     Origin = Anchor.BottomLeft,
                                     Masking = true,
                                     CornerRadius = 5,
+                                    OpenOnClick = { Value = false },
                                     EdgeEffect = new EdgeEffectParameters
                                     {
                                         Type = EdgeEffectType.Shadow,
@@ -114,7 +115,7 @@ namespace osu.Game.Overlays.Profile
                                             Y = -48,
                                             Children = new Drawable[]
                                             {
-                                                new OsuSpriteText
+                                                usernameText = new OsuSpriteText
                                                 {
                                                     Text = user.Username,
                                                     Font = @"Exo2.0-RegularItalic",
@@ -316,6 +317,8 @@ namespace osu.Game.Overlays.Profile
             levelBadge.Texture = textures.Get(@"Profile/levelbadge");
         }
 
+        private readonly OsuSpriteText usernameText;
+
         private User user;
 
         public User User
@@ -342,6 +345,8 @@ namespace osu.Game.Overlays.Profile
 
             if (user.IsSupporter)
                 SupporterTag.Show();
+
+            usernameText.Text = user.Username;
 
             if (!string.IsNullOrEmpty(user.Colour))
             {
@@ -386,13 +391,16 @@ namespace osu.Game.Overlays.Profile
                 infoTextLeft.AddText(new DrawableJoinDate(user.JoinDate), boldItalic);
             }
 
-            infoTextLeft.NewLine();
-            infoTextLeft.AddText("Last seen ", lightText);
-            infoTextLeft.AddText(new DrawableDate(user.LastVisit), boldItalic);
-            infoTextLeft.NewParagraph();
+            if (user.LastVisit.HasValue)
+            {
+                infoTextLeft.NewLine();
+                infoTextLeft.AddText("Last seen ", lightText);
+                infoTextLeft.AddText(new DrawableDate(user.LastVisit.Value), boldItalic);
+            }
 
             if (user.PlayStyle?.Length > 0)
             {
+                infoTextLeft.NewParagraph();
                 infoTextLeft.AddText("Plays with ", lightText);
                 infoTextLeft.AddText(string.Join(", ", user.PlayStyle), boldItalic);
             }

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -10,16 +10,17 @@ namespace osu.Game.Beatmaps
 {
     public class BeatmapSetInfo : IHasPrimaryKey, IHasFiles<BeatmapSetFileInfo>, ISoftDelete
     {
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
 
         private int? onlineBeatmapSetID;
 
         public int? OnlineBeatmapSetID
         {
-            get { return onlineBeatmapSetID; }
-            set { onlineBeatmapSetID = value > 0 ? value : null; }
+            get => onlineBeatmapSetID;
+            set => onlineBeatmapSetID = value > 0 ? value : null;
         }
+
+        public BeatmapSetOnlineStatus Status { get; set; } = BeatmapSetOnlineStatus.None;
 
         public BeatmapMetadata Metadata { get; set; }
 
@@ -35,7 +36,7 @@ namespace osu.Game.Beatmaps
 
         public string Hash { get; set; }
 
-        public string StoryboardFile => Files?.FirstOrDefault(f => f.Filename.EndsWith(".osb"))?.Filename;
+        public string StoryboardFile => Files?.Find(f => f.Filename.EndsWith(".osb"))?.Filename;
 
         public List<BeatmapSetFileInfo> Files { get; set; }
 

@@ -1,15 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Types;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Visual;
-using OpenTK;
+using osuTK;
 
 namespace osu.Game.Rulesets.Catch.Tests
 {
@@ -38,13 +38,11 @@ namespace osu.Game.Rulesets.Catch.Tests
                 beatmap.HitObjects.Add(new JuiceStream
                 {
                     X = 0.5f - width / 2,
-                    ControlPoints = new List<Vector2>
+                    Path = new SliderPath(PathType.Linear, new[]
                     {
                         Vector2.Zero,
                         new Vector2(width * CatchPlayfield.BASE_WIDTH, 0)
-                    },
-                    CurveType = CurveType.Linear,
-                    Distance = width * CatchPlayfield.BASE_WIDTH,
+                    }),
                     StartTime = i * 2000,
                     NewCombo = i % 8 == 0
                 });

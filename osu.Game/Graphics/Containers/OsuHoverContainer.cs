@@ -1,12 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using OpenTK.Graphics;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.Containers
 {
@@ -18,16 +18,16 @@ namespace osu.Game.Graphics.Containers
 
         protected virtual IEnumerable<Drawable> EffectTargets => new[] { Content };
 
-        protected override bool OnHover(InputState state)
+        protected override bool OnHover(HoverEvent e)
         {
             EffectTargets.ForEach(d => d.FadeColour(HoverColour, 500, Easing.OutQuint));
-            return base.OnHover(state);
+            return base.OnHover(e);
         }
 
-        protected override void OnHoverLost(InputState state)
+        protected override void OnHoverLost(HoverLostEvent e)
         {
             EffectTargets.ForEach(d => d.FadeColour(IdleColour, 500, Easing.OutQuint));
-            base.OnHoverLost(state);
+            base.OnHoverLost(e);
         }
 
         [BackgroundDependencyLoader]

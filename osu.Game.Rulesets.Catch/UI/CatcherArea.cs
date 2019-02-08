@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Linq;
@@ -18,16 +18,16 @@ using osu.Game.Rulesets.Catch.Replays;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Catch.UI
 {
     public class CatcherArea : Container
     {
-        public const float CATCHER_SIZE = 84;
+        public const float CATCHER_SIZE = 100;
 
-        protected readonly Catcher MovableCatcher;
+        protected internal readonly Catcher MovableCatcher;
 
         public Func<CatchHitObject, DrawableHitObject<CatchHitObject>> GetVisualRepresentation;
 
@@ -106,6 +106,11 @@ namespace osu.Game.Rulesets.Catch.UI
         public bool OnReleased(CatchAction action) => false;
 
         public bool AttemptCatch(CatchHitObject obj) => MovableCatcher.AttemptCatch(obj);
+
+        public static float GetCatcherSize(BeatmapDifficulty difficulty)
+        {
+            return CATCHER_SIZE / CatchPlayfield.BASE_WIDTH * (1.0f - 0.7f * (difficulty.CircleSize - 5) / 5);
+        }
 
         public class Catcher : Container, IKeyBindingHandler<CatchAction>
         {
@@ -407,9 +412,7 @@ namespace osu.Game.Rulesets.Catch.UI
             /// </summary>
             public void Explode()
             {
-                var fruit = caughtFruit.ToArray();
-
-                foreach (var f in fruit)
+                foreach (var f in caughtFruit.ToArray())
                     Explode(f);
             }
 
@@ -422,15 +425,15 @@ namespace osu.Game.Rulesets.Catch.UI
                     fruit.Anchor = Anchor.TopLeft;
                     fruit.Position = caughtFruit.ToSpaceOfOtherDrawable(fruit.DrawPosition, ExplodingFruitTarget);
 
-                    caughtFruit.Remove(fruit);
+                    if (!caughtFruit.Remove(fruit))
+                        // we may have already been removed by a previous operation (due to the weird OnLoadComplete scheduling).
+                        // this avoids a crash on potentially attempting to Add a fruit to ExplodingFruitTarget twice.
+                        return;
 
                     ExplodingFruitTarget.Add(fruit);
                 }
 
-                fruit.MoveToY(fruit.Y - 50, 250, Easing.OutSine)
-                 .Then()
-                 .MoveToY(fruit.Y + 50, 500, Easing.InSine);
-
+                fruit.MoveToY(fruit.Y - 50, 250, Easing.OutSine).Then().MoveToY(fruit.Y + 50, 500, Easing.InSine);
                 fruit.MoveToX(fruit.X + originalX * 6, 1000);
                 fruit.FadeOut(750);
 

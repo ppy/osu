@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -8,7 +8,7 @@ using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Rulesets.Osu.Objects.Drawables;
 using osu.Game.Tests.Visual;
-using OpenTK;
+using osuTK;
 using System.Collections.Generic;
 using System;
 using osu.Game.Rulesets.Mods;
@@ -85,7 +85,7 @@ namespace osu.Game.Rulesets.Osu.Tests
             }
         }
 
-        private class TestDrawableHitCircle : DrawableHitCircle
+        protected class TestDrawableHitCircle : DrawableHitCircle
         {
             private readonly bool auto;
 
@@ -93,6 +93,8 @@ namespace osu.Game.Rulesets.Osu.Tests
             {
                 this.auto = auto;
             }
+
+            public void TriggerJudgement() => UpdateResult(true);
 
             protected override void CheckForResult(bool userTriggered, double timeOffset)
             {

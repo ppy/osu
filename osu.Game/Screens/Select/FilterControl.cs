@@ -1,9 +1,9 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -14,8 +14,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Screens.Select.Filter;
 using Container = osu.Framework.Graphics.Containers.Container;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.EventArgs;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Configuration;
 using osu.Game.Rulesets;
 
@@ -72,8 +71,8 @@ namespace osu.Game.Screens.Select
 
         private readonly SearchTextBox searchTextBox;
 
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) =>
-            base.ReceiveMouseInputAt(screenSpacePos) || groupTabs.ReceiveMouseInputAt(screenSpacePos) || sortTabs.ReceiveMouseInputAt(screenSpacePos);
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) =>
+            base.ReceivePositionalInputAt(screenSpacePos) || groupTabs.ReceivePositionalInputAt(screenSpacePos) || sortTabs.ReceivePositionalInputAt(screenSpacePos);
 
         public FilterControl()
         {
@@ -187,10 +186,10 @@ namespace osu.Game.Screens.Select
 
         private void updateCriteria() => FilterChanged?.Invoke(CreateCriteria());
 
-        protected override bool OnMouseDown(InputState state, MouseDownEventArgs args) => true;
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
 
-        protected override bool OnMouseMove(InputState state) => true;
+        protected override bool OnMouseMove(MouseMoveEvent e) => true;
 
-        protected override bool OnClick(InputState state) => true;
+        protected override bool OnClick(ClickEvent e) => true;
     }
 }

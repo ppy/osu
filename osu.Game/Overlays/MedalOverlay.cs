@@ -1,8 +1,8 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -16,11 +16,10 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio;
 using osu.Framework.Graphics.Textures;
-using OpenTK.Input;
+using osuTK.Input;
 using osu.Framework.Graphics.Shapes;
 using System;
-using System.Linq;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.MathUtils;
 
 namespace osu.Game.Overlays
@@ -176,15 +175,15 @@ namespace osu.Game.Overlays
             particleContainer.Add(new MedalParticle(RNG.Next(0, 359)));
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             dismiss();
             return true;
         }
 
-        protected override void OnFocusLost(InputState state)
+        protected override void OnFocusLost(FocusLostEvent e)
         {
-            if (state.Keyboard.Keys.Contains(Key.Escape)) dismiss();
+            if (e.CurrentState.Keyboard.Keys.IsPressed(Key.Escape)) dismiss();
         }
 
         private const double initial_duration = 400;

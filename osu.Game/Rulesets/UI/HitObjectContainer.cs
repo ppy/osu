@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +13,11 @@ namespace osu.Game.Rulesets.UI
     {
         public IEnumerable<DrawableHitObject> Objects => InternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
         public IEnumerable<DrawableHitObject> AliveObjects => AliveInternalChildren.Cast<DrawableHitObject>().OrderBy(h => h.HitObject.StartTime);
+
+        public HitObjectContainer()
+        {
+            RelativeSizeAxes = Axes.Both;
+        }
 
         public virtual void Add(DrawableHitObject hitObject) => AddInternal(hitObject);
         public virtual bool Remove(DrawableHitObject hitObject) => RemoveInternal(hitObject);

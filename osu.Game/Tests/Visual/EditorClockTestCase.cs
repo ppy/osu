@@ -1,13 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Screens.Edit;
-using osu.Game.Screens.Edit.Screens.Compose;
 
 namespace osu.Game.Tests.Visual
 {
@@ -56,9 +55,9 @@ namespace osu.Game.Tests.Visual
             Clock.ProcessFrame();
         }
 
-        protected override bool OnScroll(InputState state)
+        protected override bool OnScroll(ScrollEvent e)
         {
-            if (state.Mouse.ScrollDelta.Y > 0)
+            if (e.ScrollDelta.Y > 0)
                 Clock.SeekBackward(true);
             else
                 Clock.SeekForward(true);

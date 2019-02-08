@@ -1,14 +1,12 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using System.Collections.Generic;
-using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using System;
 
 namespace osu.Game.Overlays.Music
@@ -37,7 +35,7 @@ namespace osu.Game.Overlays.Music
                         new CollectionsDropdown<PlaylistCollection>
                         {
                             RelativeSizeAxes = Axes.X,
-                            Items = new[] { new KeyValuePair<string, PlaylistCollection>(@"All", PlaylistCollection.All) },
+                            Items = new[] { PlaylistCollection.All },
                         }
                     },
                 },
@@ -54,22 +52,15 @@ namespace osu.Game.Overlays.Music
 
         public class FilterTextBox : SearchTextBox
         {
-            private Color4 backgroundColour;
+            protected override Color4 BackgroundUnfocused => OsuColour.Gray(0.06f);
+            protected override Color4 BackgroundFocused => OsuColour.Gray(0.12f);
 
-            protected override Color4 BackgroundUnfocused => backgroundColour;
-            protected override Color4 BackgroundFocused => backgroundColour;
             protected override bool AllowCommit => true;
 
             public FilterTextBox()
             {
                 Masking = true;
                 CornerRadius = 5;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                backgroundColour = colours.Gray2;
             }
         }
     }

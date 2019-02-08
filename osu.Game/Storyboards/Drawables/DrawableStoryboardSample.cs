@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.IO;
 using osu.Framework.Allocation;
@@ -41,7 +41,7 @@ namespace osu.Game.Storyboards.Drawables
         {
             base.Update();
 
-            // TODO: this logic will need to be consolidated with other game samples like hitsounds.
+            // TODO: this logic will need to be consolidated with other game samples like hit sounds.
             if (Time.Current < sample.Time)
             {
                 // We've rewound before the start time of the sample

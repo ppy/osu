@@ -1,14 +1,15 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Extensions.IEnumerableExtensions;
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Game.Configuration;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Timing;
@@ -22,6 +23,7 @@ namespace osu.Game.Tests.Visual
     {
         public override IReadOnlyList<Type> RequiredTypes => new[] { typeof(Playfield) };
 
+        private readonly ScrollingTestContainer[] scrollContainers = new ScrollingTestContainer[4];
         private readonly TestPlayfield[] playfields = new TestPlayfield[4];
 
         public TestCaseScrollingHitObjects()
@@ -33,18 +35,38 @@ namespace osu.Game.Tests.Visual
                 {
                     new Drawable[]
                     {
-                        playfields[0] = new TestPlayfield(ScrollingDirection.Up),
-                        playfields[1] = new TestPlayfield(ScrollingDirection.Down)
+                        scrollContainers[0] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = playfields[0] = new TestPlayfield()
+                        },
+                        scrollContainers[1] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = playfields[1] = new TestPlayfield()
+                        },
                     },
                     new Drawable[]
                     {
-                        playfields[2] = new TestPlayfield(ScrollingDirection.Left),
-                        playfields[3] = new TestPlayfield(ScrollingDirection.Right)
+                        scrollContainers[2] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = playfields[2] = new TestPlayfield()
+                        },
+                        scrollContainers[3] = new ScrollingTestContainer(ScrollingDirection.Up)
+                        {
+                            RelativeSizeAxes = Axes.Both,
+                            Child = playfields[3] = new TestPlayfield()
+                        }
                     }
                 }
             });
 
-            AddSliderStep("Time range", 100, 10000, 5000, v => playfields.ForEach(p => p.VisibleTimeRange.Value = v));
+            AddStep("Constant scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Constant));
+            AddStep("Overlapping scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Overlapping));
+            AddStep("Sequential scroll", () => setScrollAlgorithm(ScrollVisualisationMethod.Sequential));
+
+            AddSliderStep("Time range", 100, 10000, 5000, v => scrollContainers.ForEach(c => c.TimeRange = v));
             AddStep("Add control point", () => addControlPoint(Time.Current + 5000));
         }
 
@@ -52,7 +74,7 @@ namespace osu.Game.Tests.Visual
         {
             base.LoadComplete();
 
-            playfields.ForEach(p => p.HitObjects.AddControlPoint(new MultiplierControlPoint(0)));
+            scrollContainers.ForEach(c => c.ControlPoints.Add(new MultiplierControlPoint(0)));
 
             for (int i = 0; i <= 5000; i += 1000)
                 addHitObject(Time.Current + i);
@@ -73,12 +95,15 @@ namespace osu.Game.Tests.Visual
 
         private void addControlPoint(double time)
         {
+            scrollContainers.ForEach(c =>
+            {
+                c.ControlPoints.Add(new MultiplierControlPoint(time) { DifficultyPoint = { SpeedMultiplier = 3 } });
+                c.ControlPoints.Add(new MultiplierControlPoint(time + 2000) { DifficultyPoint = { SpeedMultiplier = 2 } });
+                c.ControlPoints.Add(new MultiplierControlPoint(time + 3000) { DifficultyPoint = { SpeedMultiplier = 1 } });
+            });
+
             playfields.ForEach(p =>
             {
-                p.HitObjects.AddControlPoint(new MultiplierControlPoint(time) { DifficultyPoint = { SpeedMultiplier = 3 } });
-                p.HitObjects.AddControlPoint(new MultiplierControlPoint(time + 2000) { DifficultyPoint = { SpeedMultiplier = 2 } });
-                p.HitObjects.AddControlPoint(new MultiplierControlPoint(time + 3000) { DifficultyPoint = { SpeedMultiplier = 1 } });
-
                 TestDrawableControlPoint createDrawablePoint(double t)
                 {
                     var obj = new TestDrawableControlPoint(p.Direction, t);
@@ -111,24 +136,30 @@ namespace osu.Game.Tests.Visual
             }
         }
 
+        private void setScrollAlgorithm(ScrollVisualisationMethod algorithm) => scrollContainers.ForEach(c => c.ScrollAlgorithm = algorithm);
 
         private class TestPlayfield : ScrollingPlayfield
         {
-            public new readonly ScrollingDirection Direction;
+            public new ScrollingDirection Direction => base.Direction.Value;
 
-            public TestPlayfield(ScrollingDirection direction)
+            public TestPlayfield()
             {
-                Direction = direction;
-
                 Padding = new MarginPadding(2);
-                Content.Masking = true;
 
-                AddInternal(new Box
+                InternalChildren = new Drawable[]
                 {
-                    RelativeSizeAxes = Axes.Both,
-                    Alpha = 0.5f,
-                    Depth = float.MaxValue
-                });
+                    new Box
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Alpha = 0.5f,
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        Child = HitObjectContainer
+                    }
+                };
             }
         }
 

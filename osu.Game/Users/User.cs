@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using Newtonsoft.Json;
@@ -83,8 +83,8 @@ namespace osu.Game.Users
         [JsonProperty(@"location")]
         public string Location;
 
-        [JsonProperty(@"lastvisit")]
-        public DateTimeOffset LastVisit;
+        [JsonProperty(@"last_visit")]
+        public DateTimeOffset? LastVisit;
 
         [JsonProperty(@"twitter")]
         public string Twitter;
@@ -144,5 +144,14 @@ namespace osu.Game.Users
         public Badge[] Badges;
 
         public override string ToString() => Username;
+
+        /// <summary>
+        /// A user instance for displaying locally created system messages.
+        /// </summary>
+        public static readonly User SYSTEM_USER = new User
+        {
+            Username = "system",
+            Id = 0
+        };
     }
 }

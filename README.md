@@ -10,23 +10,72 @@ We are accepting bug reports (please report with as much detail as possible). Fe
 
 # Requirements
 
-- A desktop platform with the [.NET Core SDK 2.1](https://www.microsoft.com/net/learn/get-started) or higher installed.
-- When working with the codebase, we recommend using an IDE with intellisense and syntax highlighting, such as [Visual Studio Community Edition](https://www.visualstudio.com/) (Windows), [Visual Studio Code](https://code.visualstudio.com/) (with the C# plugin installed) or [Jetbrains Rider](https://www.jetbrains.com/rider/) (commercial).
+- A desktop platform with the [.NET Core SDK 2.2](https://www.microsoft.com/net/learn/get-started) or higher installed.
+- When working with the codebase, we recommend using an IDE with intellisense and syntax highlighting, such as [Visual Studio 2017+](https://visualstudio.microsoft.com/vs/), [Jetbrains Rider](https://www.jetbrains.com/rider/) or [Visual Studio Code](https://code.visualstudio.com/).
+- Note that there are **[additional requirements for Windows 7 and Windows 8.1](https://docs.microsoft.com/en-us/dotnet/core/windows-prerequisites?tabs=netcore2x)** which you may need to manually install if your operating system is not up-to-date.
 
-# Building and running
+# Running osu!
 
-If you are not interested in developing the game, please head over to the [releases](https://github.com/ppy/osu/releases) to download a precompiled build with automatic updating enabled (download and run the install executable for your platform).
+## Releases
 
-Clone the repository including submodules
+If you are not interested in developing the game, please head over to the [releases](https://github.com/ppy/osu/releases) to download a precompiled build with automatic updating enabled.
 
-`git clone --recurse-submodules https://github.com/ppy/osu`
+- Windows (x64) users should download and run `install.exe`.
+- macOS users (10.12 "Sierra" and higher) should download and run `osu.app.zip`.
+- iOS users can join the [TestFlight beta program](https://t.co/xQJmHkfC18).
 
-Build and run
+If your platform is not listed above, there is still a chance you can manually build it by following the instructions below.
 
-- Using Visual Studio 2017, Rider or Visual Studio Code (configurations are included)
-- From command line using `dotnet run --project osu.Desktop`
+## Downloading the source code
 
-If you run into issues building you may need to restore nuget packages (commonly via `dotnet restore`). Visual Studio Code users must run `Restore` task from debug tab before attempt to build.
+Clone the repository **including submodules**:
+
+```shell
+git clone https://github.com/ppy/osu
+cd osu
+```
+
+To update the source code to the latest commit, run the following command inside the `osu` directory:
+
+```shell
+git pull
+```
+
+## Building
+
+Build configurations for the recommended IDEs (listed above) are included. You should use the provided Build/Run functionality of your IDE to get things going. When testing or building new components, it's highly encouraged you use the `VisualTests` project/configuration. More information on this provided below.
+
+> Visual Studio Code users must run the `Restore` task before any build attempt.
+
+You can also build and run osu! from the command-line with a single command:
+
+```shell
+dotnet run --project osu.Desktop
+```
+
+If you are not interested in debugging osu!, you can add `-c Release` to gain performance. In this case, you must replace `Debug` with `Release` in any commands mentioned in this document.
+
+If the build fails, try to restore nuget packages with `dotnet restore`.
+
+### A note for Linux users
+
+On Linux, the environment variable `LD_LIBRARY_PATH` must point to the build directory, located at `osu.Desktop/bin/Debug/$NETCORE_VERSION`.
+
+`$NETCORE_VERSION` is the version of .NET Core SDK. You can have it with `grep TargetFramework osu.Desktop/osu.Desktop.csproj | sed -r 's/.*>(.*)<\/.*/\1/'`.
+
+For example, you can run osu! with the following command:
+
+```shell
+LD_LIBRARY_PATH="$(pwd)/osu.Desktop/bin/Debug/netcoreapp2.2" dotnet run --project osu.Desktop
+```
+
+## Testing with resource/framework modifications
+
+Sometimes it may be necessary to cross-test changes in [osu-resources](https://github.com/ppy/osu-resources) or [osu-framework](https://github.com/ppy/osu-framework). This can be achieved by running some commands as documented on the [osu-resources](https://github.com/ppy/osu-resources/wiki/Testing-local-resources-checkout-with-other-projects) and [osu-framework](https://github.com/ppy/osu-framework/wiki/Testing-local-framework-checkout-with-other-projects) wiki pages.
+
+## Code analysis
+
+Code analysis can be run with `powershell ./build.ps1` or `build.sh`. This is currently only supported under windows due to [resharper cli shortcomings](https://youtrack.jetbrains.com/issue/RSRP-410004). Alternatively, you can install resharper or use rider to get inline support in your IDE of choice.
 
 # Contributing
 

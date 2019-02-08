@@ -1,7 +1,7 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
+using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using System;
@@ -21,7 +21,7 @@ namespace osu.Game.Screens.Play
     {
         private const int bottom_bar_height = 5;
 
-        private static readonly Vector2 handle_size = new Vector2(14, 25);
+        private static readonly Vector2 handle_size = new Vector2(10, 18);
 
         private const float transition_duration = 200;
 
@@ -31,8 +31,8 @@ namespace osu.Game.Screens.Play
 
         public Action<double> OnSeek;
 
-        public override bool HandleKeyboardInput => AllowSeeking;
-        public override bool HandleMouseInput => AllowSeeking;
+        public override bool HandleNonPositionalInput => AllowSeeking;
+        public override bool HandlePositionalInput => AllowSeeking;
 
         private IClock audioClock;
         public IClock AudioClock { set { audioClock = info.AudioClock = value; } }
@@ -135,6 +135,8 @@ namespace osu.Game.Screens.Play
         {
             bar.FadeTo(allowSeeking ? 1 : 0, transition_duration, Easing.In);
             this.MoveTo(new Vector2(0, allowSeeking ? 0 : bottom_bar_height), transition_duration, Easing.In);
+
+            info.Margin = new MarginPadding { Bottom = Height - (allowSeeking ? 0 : handle_size.Y) };
         }
 
         protected override void PopIn()

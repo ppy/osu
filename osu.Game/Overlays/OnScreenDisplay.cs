@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
@@ -11,8 +11,8 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Threading;
@@ -24,9 +24,6 @@ namespace osu.Game.Overlays
     public class OnScreenDisplay : Container
     {
         private readonly Container box;
-
-        public override bool HandleKeyboardInput => false;
-        public override bool HandleMouseInput => false;
 
         private readonly SpriteText textLine1;
         private readonly SpriteText textLine2;
@@ -164,7 +161,7 @@ namespace osu.Game.Overlays
             if (configManager == null) throw new ArgumentNullException(nameof(configManager));
 
             if (!trackedConfigManagers.TryGetValue((source, configManager), out var existing))
-                throw new InvalidOperationException($"{nameof(configManager)} is not registered.");
+                return;
 
             existing.Unload();
             existing.SettingChanged -= display;

@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
 using osu.Framework.Allocation;
@@ -7,7 +7,7 @@ using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.States;
+using osu.Framework.Input.Events;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
@@ -16,8 +16,8 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.BeatmapSet;
 using osu.Game.Overlays.BeatmapSet.Scores;
 using osu.Game.Rulesets;
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Overlays
 {
@@ -46,12 +46,12 @@ namespace osu.Game.Overlays
                 if (value == beatmapSet)
                     return;
 
-                header.BeatmapSet = info.BeatmapSet = beatmapSet = value;
+                header.BeatmapSet.Value = info.BeatmapSet = beatmapSet = value;
             }
         }
 
         // receive input outside our bounds so we can trigger a close event on ourselves.
-        public override bool ReceiveMouseInputAt(Vector2 screenSpacePos) => true;
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
 
         public BeatmapSetOverlay()
         {
@@ -127,7 +127,7 @@ namespace osu.Game.Overlays
             FadeEdgeEffectTo(0, WaveContainer.DISAPPEAR_DURATION, Easing.Out).OnComplete(_ => BeatmapSet = null);
         }
 
-        protected override bool OnClick(InputState state)
+        protected override bool OnClick(ClickEvent e)
         {
             State = Visibility.Hidden;
             return true;
@@ -139,8 +139,8 @@ namespace osu.Game.Overlays
             var req = new GetBeatmapSetRequest(beatmapId, BeatmapSetLookupType.BeatmapId);
             req.Success += res =>
             {
-                ShowBeatmapSet(res.ToBeatmapSet(rulesets));
-                header.Picker.Beatmap.Value = header.BeatmapSet.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
+                BeatmapSet = res.ToBeatmapSet(rulesets);
+                header.Picker.Beatmap.Value = header.BeatmapSet.Value.Beatmaps.First(b => b.OnlineBeatmapID == beatmapId);
             };
             api.Queue(req);
             Show();
@@ -150,7 +150,7 @@ namespace osu.Game.Overlays
         {
             BeatmapSet = null;
             var req = new GetBeatmapSetRequest(beatmapSetId);
-            req.Success += res => ShowBeatmapSet(res.ToBeatmapSet(rulesets));
+            req.Success += res => BeatmapSet = res.ToBeatmapSet(rulesets);
             api.Queue(req);
             Show();
         }

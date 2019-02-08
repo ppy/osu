@@ -1,8 +1,8 @@
-﻿// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
-using OpenTK;
-using OpenTK.Graphics;
+using osuTK;
+using osuTK.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -10,8 +10,8 @@ using osu.Framework.Graphics.Colour;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Allocation;
-using osu.Framework.Localisation;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 
 namespace osu.Game.Overlays.Direct
@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Direct
         }
 
         [BackgroundDependencyLoader]
-        private void load(LocalisationEngine localisation, OsuColour colours)
+        private void load(OsuColour colours)
         {
             Content.CornerRadius = 5;
 
@@ -94,13 +94,13 @@ namespace osu.Game.Overlays.Direct
                                                     {
                                                         new OsuSpriteText
                                                         {
-                                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title),
+                                                            Text = new LocalisedString((SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title)),
                                                             TextSize = 18,
                                                             Font = @"Exo2.0-BoldItalic",
                                                         },
                                                         new OsuSpriteText
                                                         {
-                                                            Current = localisation.GetUnicodePreference(SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist),
+                                                            Text = new LocalisedString((SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist)),
                                                             Font = @"Exo2.0-BoldItalic",
                                                         },
                                                     }

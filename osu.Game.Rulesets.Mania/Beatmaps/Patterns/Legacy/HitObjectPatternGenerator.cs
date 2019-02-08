@@ -1,10 +1,10 @@
-// Copyright (c) 2007-2018 ppy Pty Ltd <contact@ppy.sh>.
-// Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using OpenTK;
+using osuTK;
 using osu.Game.Audio;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
@@ -25,9 +25,6 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                                          PatternType lastStair, IBeatmap originalBeatmap)
             : base(random, hitObject, beatmap, previousPattern, originalBeatmap)
         {
-            if (previousTime > hitObject.StartTime) throw new ArgumentOutOfRangeException(nameof(previousTime));
-            if (density < 0) throw new ArgumentOutOfRangeException(nameof(density));
-
             StairType = lastStair;
 
             TimingControlPoint timingPoint = beatmap.ControlPointInfo.TimingPointAt(hitObject.StartTime);
@@ -234,22 +231,27 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int nextColumn = GetColumn((HitObject as IHasXPosition)?.X ?? 0, true);
             for (int i = 0; i < noteCount; i++)
             {
-                RunWhile(() => pattern.ColumnHasObject(nextColumn) || PreviousPattern.ColumnHasObject(nextColumn) && !allowStacking, () =>
-                {
-                    if (convertType.HasFlag(PatternType.Gathered))
-                    {
-                        nextColumn++;
-                        if (nextColumn == TotalColumns)
-                            nextColumn = RandomStart;
-                    }
-                    else
-                        nextColumn = Random.Next(RandomStart, TotalColumns);
-                });
+                nextColumn = allowStacking
+                    ? FindAvailableColumn(nextColumn, nextColumn: getNextColumn, patterns: pattern)
+                    : FindAvailableColumn(nextColumn, nextColumn: getNextColumn, patterns: new[] { pattern, PreviousPattern });
 
                 addToPattern(pattern, nextColumn);
             }
 
             return pattern;
+
+            int getNextColumn(int last)
+            {
+                if (convertType.HasFlag(PatternType.Gathered))
+                {
+                    last++;
+                    if (last == TotalColumns)
+                        last = RandomStart;
+                }
+                else
+                    last = GetRandomColumn();
+                return last;
+            }
         }
 
         /// <summary>
@@ -295,13 +297,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
             int noteCount = getRandomNoteCountMirrored(centreProbability, p2, p3, out addToCentre);
 
             int columnLimit = (TotalColumns % 2 == 0 ? TotalColumns : TotalColumns - 1) / 2;
-            int nextColumn = Random.Next(RandomStart, columnLimit);
+            int nextColumn = GetRandomColumn(upperBound: columnLimit);
             for (int i = 0; i < noteCount; i++)
             {
-                RunWhile(() => pattern.ColumnHasObject(nextColumn), () =>
-                {
-                    nextColumn = Random.Next(RandomStart, columnLimit);
-                });
+                nextColumn = FindAvailableColumn(nextColumn, upperBound: columnLimit, patterns: pattern);
 
                 // Add normal note
                 addToPattern(pattern, nextColumn);
