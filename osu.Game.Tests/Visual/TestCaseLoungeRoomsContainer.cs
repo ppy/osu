@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseLoungeRoomsContainer : OsuTestCase
+    public class TestCaseLoungeRoomsContainer : MultiplayerTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -61,7 +61,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("first room removed", () => container.Rooms.All(r => r.Room.RoomID.Value != 0));
 
             AddStep("select first room", () => container.Rooms.First().Action?.Invoke());
-            AddAssert("first room selected", () => roomManager.CurrentRoom.Value == roomManager.Rooms.First());
+            AddAssert("first room selected", () => Room == roomManager.Rooms.First());
 
             AddStep("join first room", () => container.Rooms.First().Action?.Invoke());
             AddAssert("first room joined", () => roomManager.Rooms.First().Status.Value is JoinedRoomStatus);
@@ -73,14 +73,12 @@ namespace osu.Game.Tests.Visual
         {
             public event Action RoomsUpdated
             {
-                add => throw new NotImplementedException();
-                remove => throw new NotImplementedException();
+                add { }
+                remove { }
             }
 
             public readonly BindableList<Room> Rooms = new BindableList<Room>();
             IBindableList<Room> IRoomManager.Rooms => Rooms;
-
-            public Bindable<Room> CurrentRoom { get; } = new Bindable<Room>();
 
             public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => Rooms.Add(room);
 
@@ -89,10 +87,6 @@ namespace osu.Game.Tests.Visual
             }
 
             public void PartRoom()
-            {
-            }
-
-            public void Filter(FilterCriteria criteria)
             {
             }
         }
