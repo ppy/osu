@@ -25,14 +25,14 @@ namespace osu.Game.Screens.Multi.Play
         [Resolved(typeof(Room), nameof(Room.RoomID))]
         private Bindable<int?> roomId { get; set; }
 
-        private readonly int playlistItemId;
+        private readonly PlaylistItem playlistItem;
 
         [Resolved]
         private APIAccess api { get; set; }
 
-        public TimeshiftPlayer(int playlistItemId)
+        public TimeshiftPlayer(PlaylistItem playlistItem)
         {
-            this.playlistItemId = playlistItemId;
+            this.playlistItem = playlistItem;
         }
 
         private int? token;
@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Multi.Play
 
             bool failed = false;
 
-            var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItemId);
+            var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID);
             req.Success += r => token = r.ID;
             req.Failure += e =>
             {
@@ -89,7 +89,7 @@ namespace osu.Game.Screens.Multi.Play
 
             Debug.Assert(token != null);
 
-            var request = new SubmitRoomScoreRequest(token.Value, roomId.Value ?? 0, playlistItemId, score);
+            var request = new SubmitRoomScoreRequest(token.Value, roomId.Value ?? 0, playlistItem.ID, score);
             request.Failure += e => Logger.Error(e, "Failed to submit score");
             api.Queue(request);
         }
