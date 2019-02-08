@@ -75,7 +75,51 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         protected override IEnumerable<TimedDifficultyAttributes> CalculateTimed(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
-            throw new NotImplementedException();
+            if (!beatmap.HitObjects.Any())
+            {
+                yield return new TimedDifficultyAttributes(0, new CatchDifficultyAttributes(mods, 0));
+                yield break;
+            }
+
+            var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty);
+            float halfCatchWidth = catcher.CatchWidth * 0.5f;
+
+            var difficultyHitObjects = new List<CatchDifficultyHitObject>();
+
+            foreach (var hitObject in beatmap.HitObjects)
+            {
+                switch (hitObject)
+                {
+                    // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
+                    case Fruit fruit:
+                        difficultyHitObjects.Add(new CatchDifficultyHitObject(fruit, halfCatchWidth));
+                        break;
+                    case JuiceStream _:
+                        difficultyHitObjects.AddRange(hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)).Select(o => new CatchDifficultyHitObject(o, halfCatchWidth)));
+                        break;
+                }
+            }
+
+            difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
+
+            if (!calculateStrainValues(difficultyHitObjects, timeRate))
+            {
+                yield return new TimedDifficultyAttributes(0, new CatchDifficultyAttributes(mods, 0));
+                yield break;
+            }
+
+            // this is the same as osu!, so there's potential to share the implementation... maybe
+            double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
+            double approachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0;
+
+            foreach ((double time, double starRating, int maxCombo) difficultyPoint in calculateDifficultyTimed(difficultyHitObjects, timeRate))
+            {
+                yield return new TimedDifficultyAttributes(difficultyPoint.time, new CatchDifficultyAttributes(mods, Math.Sqrt(difficultyPoint.starRating) * star_scaling_factor)
+                {
+                    ApproachRate = approachRate,
+                    MaxCombo = difficultyPoint.maxCombo
+                });
+            }
         }
 
         private bool calculateStrainValues(List<CatchDifficultyHitObject> objects, double timeRate)
@@ -148,6 +192,64 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             }
 
             return difficulty;
+        }
+
+        private IEnumerable<(double time, double starRating, int maxCombo)> calculateDifficultyTimed(List<CatchDifficultyHitObject> objects, double timeRate)
+        {
+            // The strain step needs to be adjusted for the algorithm to be considered equal with speed changing mods
+            double actualStrainStep = strain_step * timeRate;
+
+            // Find the highest strain value within each strain step
+            var highestStrains = new List<double>();
+            double intervalEndTime = actualStrainStep;
+            double maximumStrain = 0; // We need to keep track of the maximum strain in the current interval
+
+            int maxCombo = 0;
+
+            CatchDifficultyHitObject previousHitObject = null;
+            foreach (CatchDifficultyHitObject hitObject in objects)
+            {
+                // While we are beyond the current interval push the currently available maximum to our strain list
+                while (hitObject.BaseHitObject.StartTime > intervalEndTime)
+                {
+                    // Build the weighted sum over the highest strains for each interval
+                    double difficulty = 0;
+                    double weight = 1;
+                    highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
+
+                    foreach (double strain in highestStrains)
+                    {
+                        difficulty += weight * strain;
+                        weight *= decay_weight;
+                    }
+
+                    yield return (intervalEndTime, difficulty, maxCombo);
+
+                    highestStrains.Add(maximumStrain);
+
+                    // The maximum strain of the next interval is not zero by default! We need to take the last hitObject we encountered, take its strain and apply the decay
+                    // until the beginning of the next interval.
+                    if (previousHitObject == null)
+                    {
+                        maximumStrain = 0;
+                    }
+                    else
+                    {
+                        double decay = Math.Pow(CatchDifficultyHitObject.DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
+                        maximumStrain = previousHitObject.Strain * decay;
+                    }
+
+                    maxCombo++;
+
+                    // Go to the next time interval
+                    intervalEndTime += actualStrainStep;
+                }
+
+                // Obtain maximum strain
+                maximumStrain = Math.Max(hitObject.Strain, maximumStrain);
+
+                previousHitObject = hitObject;
+            }
         }
     }
 }
