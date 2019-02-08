@@ -235,7 +235,7 @@ namespace osu.Game.Screens.Multi.Match
                 {
                     default:
                     case GameTypeTimeshift _:
-                        pushGameplayScreen?.Invoke(new PlayerLoader(() => new TimeshiftPlayer(Playlist.First().ID)
+                        pushGameplayScreen?.Invoke(new PlayerLoader(() => new TimeshiftPlayer(Playlist.First())
                         {
                             Exited = () => leaderboard.RefreshScores()
                         }));
