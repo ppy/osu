@@ -13,7 +13,6 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match.Components;
 
 namespace osu.Game.Tests.Visual
@@ -133,13 +132,11 @@ namespace osu.Game.Tests.Visual
 
             public event Action RoomsUpdated
             {
-                add => throw new NotImplementedException();
-                remove => throw new NotImplementedException();
+                add { }
+                remove { }
             }
 
             public IBindableList<Room> Rooms { get; } = null;
-
-            public Bindable<Room> CurrentRoom { get; } = new Bindable<Room>();
 
             public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
             {
@@ -155,8 +152,6 @@ namespace osu.Game.Tests.Visual
             public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => throw new NotImplementedException();
 
             public void PartRoom() => throw new NotImplementedException();
-
-            public void Filter(FilterCriteria criteria) => throw new NotImplementedException();
         }
     }
 }
