@@ -281,7 +281,6 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             private bool hasValidSettings => RoomID.Value == null && NameField.Text.Length > 0 && Playlist.Count > 0;
 
-
             private void apply()
             {
                 hideError();
