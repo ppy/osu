@@ -4,6 +4,7 @@
 using System;
 using Humanizer;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -64,6 +65,9 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             [Resolved(CanBeNull = true)]
             private IRoomManager manager { get; set; }
+
+            [Resolved]
+            private Bindable<Room> currentRoom { get; set; }
 
             [BackgroundDependencyLoader]
             private void load(OsuColour colours)
@@ -293,7 +297,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
                 Duration.Value = DurationField.Current.Value;
 
-                manager?.CreateRoom(Room, onSuccess, onError);
+                manager?.CreateRoom(currentRoom, onSuccess, onError);
 
                 processingOverlay.Show();
             }

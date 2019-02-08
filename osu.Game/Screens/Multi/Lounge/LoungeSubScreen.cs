@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -23,6 +25,9 @@ namespace osu.Game.Screens.Multi.Lounge
         private readonly Container content;
         private readonly Action<Screen> pushGameplayScreen;
         private readonly ProcessingOverlay processingOverlay;
+
+        [Resolved]
+        private Bindable<Room> currentRoom { get; set; }
 
         public LoungeSubScreen(Action<Screen> pushGameplayScreen)
         {
@@ -124,6 +129,8 @@ namespace osu.Game.Screens.Multi.Lounge
             // Handles the case where a room is clicked 3 times in quick succession
             if (!this.IsCurrentScreen())
                 return;
+
+            currentRoom.Value = room;
 
             this.Push(new MatchSubScreen(room, s => pushGameplayScreen?.Invoke(s)));
         }
