@@ -61,7 +61,38 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         protected override IEnumerable<TimedDifficultyAttributes> CalculateTimed(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
-            throw new NotImplementedException();
+            if (!beatmap.HitObjects.Any())
+            {
+                yield return new TimedDifficultyAttributes(0, new TaikoDifficultyAttributes(mods, 0));
+                yield break;
+            }
+
+            var difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
+
+            foreach (var hitObject in beatmap.HitObjects)
+                difficultyHitObjects.Add(new TaikoHitObjectDifficulty((TaikoHitObject)hitObject));
+
+            // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
+            difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
+
+            if (!calculateStrainValues(difficultyHitObjects, timeRate))
+            {
+                yield return new TimedDifficultyAttributes(0, new TaikoDifficultyAttributes(mods, 0));
+                yield break;
+            }
+
+            // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
+            double greatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
+            int maxCombo = beatmap.HitObjects.Count(h => h is Hit);
+
+            foreach ((double time, double starRating) difficultyPoint in calculateDifficultyTimed(difficultyHitObjects, timeRate))
+            {
+                yield return new TimedDifficultyAttributes(difficultyPoint.time, new TaikoDifficultyAttributes(mods, difficultyPoint.starRating * star_scaling_factor)
+                {
+                    GreatHitWindow = greatHitWindow,
+                    MaxCombo = maxCombo
+                });
+            }
         }
 
         private bool calculateStrainValues(List<TaikoHitObjectDifficulty> objects, double timeRate)
@@ -136,6 +167,59 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             }
 
             return difficulty;
+        }
+
+        private IEnumerable<(double time, double starRating)> calculateDifficultyTimed(List<TaikoHitObjectDifficulty> objects, double timeRate)
+        {
+            double actualStrainStep = strain_step * timeRate;
+
+            // Find the highest strain value within each strain step
+            List<double> highestStrains = new List<double>();
+            double intervalEndTime = actualStrainStep;
+            double maximumStrain = 0; // We need to keep track of the maximum strain in the current interval
+
+            TaikoHitObjectDifficulty previousHitObject = null;
+            foreach (var hitObject in objects)
+            {
+                // While we are beyond the current interval push the currently available maximum to our strain list
+                while (hitObject.BaseHitObject.StartTime > intervalEndTime)
+                {
+                    // Build the weighted sum over the highest strains for each interval
+                    double difficulty = 0;
+                    double weight = 1;
+                    highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
+
+                    foreach (double strain in highestStrains)
+                    {
+                        difficulty += weight * strain;
+                        weight *= decay_weight;
+                    }
+
+                    yield return (intervalEndTime, difficulty);
+
+                    highestStrains.Add(maximumStrain);
+
+                    // The maximum strain of the next interval is not zero by default! We need to take the last hitObject we encountered, take its strain and apply the decay
+                    // until the beginning of the next interval.
+                    if (previousHitObject == null)
+                    {
+                        maximumStrain = 0;
+                    }
+                    else
+                    {
+                        double decay = Math.Pow(TaikoHitObjectDifficulty.DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
+                        maximumStrain = previousHitObject.Strain * decay;
+                    }
+
+                    // Go to the next time interval
+                    intervalEndTime += actualStrainStep;
+                }
+
+                // Obtain maximum strain
+                maximumStrain = Math.Max(hitObject.Strain, maximumStrain);
+
+                previousHitObject = hitObject;
+            }
         }
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
