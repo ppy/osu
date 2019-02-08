@@ -27,25 +27,16 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly Box hoveredBackground;
         private readonly Box background;
 
-        private readonly SpriteText rank;
-        private readonly SpriteText scoreText;
-        private readonly SpriteText accuracy;
-        private readonly SpriteText maxCombo;
-        private readonly SpriteText hitGreat;
-        private readonly SpriteText hitGood;
-        private readonly SpriteText hitMeh;
-        private readonly SpriteText hitMiss;
-        private readonly SpriteText pp;
-
-        private readonly ClickableScoreUsername username;
-
-        private readonly APIScoreInfo score;
-
         public DrawableScore(int index, APIScoreInfo score, int maxModsAmount)
         {
-            FillFlowContainer modsContainer;
+            SpriteText accuracy;
+            SpriteText scoreText;
+            SpriteText hitGreat;
+            SpriteText hitGood;
+            SpriteText hitMeh;
+            SpriteText hitMiss;
 
-            this.score = score;
+            FillFlowContainer modsContainer;
 
             RelativeSizeAxes = Axes.X;
             Height = 25;
@@ -62,7 +53,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
                 },
-                rank = new SpriteText
+                new SpriteText
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
@@ -102,14 +93,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Size = new Vector2(20, 13),
                     X = 230,
                 },
-                username = new ClickableScoreUsername
+                new ClickableScoreUsername
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
                     User = score.User,
                     X = ScoreTextLine.PLAYER_POSITION,
                 },
-                maxCombo = new SpriteText
+                new SpriteText
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
@@ -154,7 +145,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     X = ScoreTextLine.HIT_MISS_POSITION,
                     TextSize = text_size,
                 },
-                pp = new SpriteText
+                new SpriteText
                 {
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft,
