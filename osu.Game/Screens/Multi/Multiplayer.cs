@@ -130,8 +130,6 @@ namespace osu.Game.Screens.Multi
                 roomManager = new RoomManager()
             });
 
-            roomManager.Filter.BindTo(filter);
-
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
         }
