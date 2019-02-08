@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Multi
                 RelativeSizeAxes = Axes.Both,
             };
 
-            screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen(this.Push)) { RelativeSizeAxes = Axes.Both };
+            screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen(pushGameplayScreen)) { RelativeSizeAxes = Axes.Both };
             Padding = new MarginPadding { Horizontal = -OsuScreen.HORIZONTAL_OVERFLOW_PADDING };
 
             waves.AddRange(new Drawable[]
@@ -167,6 +167,14 @@ namespace osu.Game.Screens.Multi
         {
             roomManager.TimeBetweenPolls = !this.IsCurrentScreen() || !(screenStack.CurrentScreen is LoungeSubScreen) ? 0 : (idle ? 120000 : 15000);
             Logger.Log($"Polling adjusted to {roomManager.TimeBetweenPolls}");
+        }
+
+        private void pushGameplayScreen(IScreen gameplayScreen)
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
+            this.Push(gameplayScreen);
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
