@@ -169,7 +169,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                         {
                                             Anchor = Anchor.CentreLeft,
                                             Origin = Anchor.CentreLeft,
-                                            TextSize = 10,
+                                            TextSize = 15,
+                                            Font = @"Exo2.0-Bold",
                                         },
                                         flag = new DrawableFlag
                                         {
@@ -327,8 +328,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private class DrawableInfoColumn : FillFlowContainer
         {
-            private readonly SpriteText headerText;
             private const float header_text_size = 12;
+
+            private readonly SpriteText headerText;
+            private readonly Box line;
 
             public DrawableInfoColumn(string header)
             {
@@ -351,14 +354,19 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     new Container
                     {
                         RelativeSizeAxes = Axes.X,
-                        Height = 3,
-                        Child = new Box
+                        Height = 2,
+                        Child = line = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.LightGray,
                         }
                     }
                 };
+            }
+
+            [BackgroundDependencyLoader]
+            private void load(OsuColour colours)
+            {
+                line.Colour = colours.Gray5;
             }
         }
 

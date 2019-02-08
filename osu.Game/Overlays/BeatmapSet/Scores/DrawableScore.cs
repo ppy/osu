@@ -176,7 +176,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             if (index == 0)
                 scoreText.Font = @"Exo2.0-Bold";
 
-            accuracy.Colour = (score.Accuracy == 1) ? Color4.LightGreen : Color4.White;
+            accuracy.Colour = (score.Accuracy == 1) ? Color4.GreenYellow : Color4.White;
 
             hitGreat.Colour = (score.Statistics[HitResult.Great] == 0) ? Color4.Gray : Color4.White;
             hitGood.Colour = (score.Statistics[HitResult.Good] == 0) ? Color4.Gray : Color4.White;
