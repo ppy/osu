@@ -112,12 +112,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
             double approachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0;
 
-            foreach ((double time, double starRating, int maxCombo) difficultyPoint in calculateDifficultyTimed(difficultyHitObjects, timeRate))
+            foreach ((double time, double starRating, int maxCombo) in calculateDifficultyTimed(difficultyHitObjects, timeRate))
             {
-                yield return new TimedDifficultyAttributes(difficultyPoint.time, new CatchDifficultyAttributes(mods, Math.Sqrt(difficultyPoint.starRating) * star_scaling_factor)
+                yield return new TimedDifficultyAttributes(time, new CatchDifficultyAttributes(mods, Math.Sqrt(starRating) * star_scaling_factor)
                 {
                     ApproachRate = approachRate,
-                    MaxCombo = difficultyPoint.maxCombo
+                    MaxCombo = maxCombo
                 });
             }
         }

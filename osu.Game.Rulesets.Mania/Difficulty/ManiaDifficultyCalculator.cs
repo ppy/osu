@@ -86,9 +86,9 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             double greatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
 
-            foreach ((double time, double starRating) difficultyPoint in calculateDifficultyTimed(difficultyHitObjects, timeRate))
+            foreach ((double time, double starRating) in calculateDifficultyTimed(difficultyHitObjects, timeRate))
             {
-                yield return new TimedDifficultyAttributes(difficultyPoint.time, new ManiaDifficultyAttributes(mods, difficultyPoint.starRating * star_scaling_factor)
+                yield return new TimedDifficultyAttributes(time, new ManiaDifficultyAttributes(mods, starRating * star_scaling_factor)
                 {
                     GreatHitWindow = greatHitWindow
                 });
