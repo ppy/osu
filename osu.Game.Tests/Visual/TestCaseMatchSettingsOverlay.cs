@@ -131,7 +131,11 @@ namespace osu.Game.Tests.Visual
 
             public Func<Room, bool> CreateRequested;
 
-            public event Action RoomsUpdated;
+            public event Action RoomsUpdated
+            {
+                add => throw new NotImplementedException();
+                remove => throw new NotImplementedException();
+            }
 
             public IBindableList<Room> Rooms { get; } = null;
 

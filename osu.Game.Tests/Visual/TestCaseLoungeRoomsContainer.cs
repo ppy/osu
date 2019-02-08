@@ -71,7 +71,11 @@ namespace osu.Game.Tests.Visual
 
         private class TestRoomManager : IRoomManager
         {
-            public event Action RoomsUpdated;
+            public event Action RoomsUpdated
+            {
+                add => throw new NotImplementedException();
+                remove => throw new NotImplementedException();
+            }
 
             public readonly BindableList<Room> Rooms = new BindableList<Room>();
             IBindableList<Room> IRoomManager.Rooms => Rooms;
