@@ -27,9 +27,6 @@ namespace osu.Game.Screens.Multi
         private Room joinedRoom;
 
         [Resolved]
-        private Bindable<Room> currentRoom { get; set; }
-
-        [Resolved]
         private Bindable<FilterCriteria> currentFilter { get; set; }
 
         [Resolved]
