@@ -24,14 +24,12 @@ namespace osu.Game.Screens.Multi
         private readonly BindableList<Room> rooms = new BindableList<Room>();
         public IBindableList<Room> Rooms => rooms;
 
-        /// <summary>
-        /// The <see cref="FilterCriteria"/> to use when polling for <see cref="Room"/>s.
-        /// </summary>
-        public readonly Bindable<FilterCriteria> Filter = new Bindable<FilterCriteria>();
-
         public Bindable<Room> CurrentRoom { get; } = new Bindable<Room>();
 
         private Room joinedRoom;
+
+        [Resolved]
+        private Bindable<FilterCriteria> filter { get; set; }
 
         [Resolved]
         private APIAccess api { get; set; }
@@ -44,13 +42,12 @@ namespace osu.Game.Screens.Multi
 
         public RoomManager()
         {
-            Filter.BindValueChanged(_ =>
+            filter.BindValueChanged(_ =>
             {
                 if (IsLoaded)
                     PollImmediately();
             });
         }
-
 
         protected override void Dispose(bool isDisposing)
         {
@@ -137,7 +134,7 @@ namespace osu.Game.Screens.Multi
             var tcs = new TaskCompletionSource<bool>();
 
             pollReq?.Cancel();
-            pollReq = new GetRoomsRequest(Filter.Value.PrimaryFilter);
+            pollReq = new GetRoomsRequest(filter.Value.PrimaryFilter);
 
             pollReq.Success += result =>
             {
