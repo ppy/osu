@@ -218,7 +218,7 @@ namespace osu.Game.Screens.Multi
 
         private void cancelLooping()
         {
-            var track = beatmap.Value.Track;
+            var track = beatmap?.Value?.Track;
             if (track != null)
                 track.Looping = false;
         }
