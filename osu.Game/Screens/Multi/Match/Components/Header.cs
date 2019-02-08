@@ -115,7 +115,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         private class BeatmapSelectButton : HeaderButton
         {
-            [Resolved(typeof(Room), nameof(Online.Multiplayer.Room.RoomID))]
+            [Resolved(typeof(Room), nameof(Room.RoomID))]
             private Bindable<int?> roomId { get; set; }
 
             public BeatmapSelectButton()
