@@ -23,9 +23,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         public const float HIT_MEH_POSITION = 0.7f;
         public const float HIT_MISS_POSITION = 0.75f;
         public const float PP_POSITION = 0.8f;
-        public const float MODS_POSITION = 0.9f;
 
-        public ScoreTextLine()
+        public ScoreTextLine(int maxModsAmount)
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
@@ -91,11 +90,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 },
                 new ScoreText
                 {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.Centre,
+                    Anchor = Anchor.CentreRight,
+                    Origin = Anchor.CentreLeft,
                     Text = "mods".ToUpper(),
-                    X = MODS_POSITION,
-                    RelativePositionAxes = Axes.X,
+                    X = -30 * maxModsAmount,
                 },
             };
         }
@@ -105,12 +103,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             public ScoreText()
             {
                 TextSize = text_size;
-            }
-
-            [BackgroundDependencyLoader]
-            private void load(OsuColour colours)
-            {
-                Colour = colours.ContextMenuGray;
             }
         }
     }
