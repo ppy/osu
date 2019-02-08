@@ -20,7 +20,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private const int spacing = 15;
         private const int fade_duration = 200;
 
-        private readonly FillFlowContainer flow;
+        private readonly ScoreTable scoreTable;
+
         private readonly DrawableTopScore topScore;
         private readonly LoadingAnimation loadingAnimation;
 
@@ -76,22 +77,19 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             if (scoreCount == 0)
             {
                 topScore.Hide();
-                flow.Clear();
+                scoreTable.ClearScores();
                 return;
             }
 
             topScore.Score = scores.FirstOrDefault();
             topScore.Show();
 
-            flow.Clear();
+            scoreTable.ClearScores();
 
             if (scoreCount < 2)
                 return;
 
-            flow.Add(new ScoreTextLine());
-
-            for (int i = 0; i < scoreCount; i++)
-                flow.Add(new DrawableScore(i, scores.ElementAt(i)));
+            scoreTable.Scores = scores;
         }
 
         public ScoresContainer()
@@ -113,13 +111,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Children = new Drawable[]
                     {
                         topScore = new DrawableTopScore(),
-                        flow = new FillFlowContainer
+                        scoreTable = new ScoreTable
                         {
-                            RelativeSizeAxes = Axes.X,
-                            AutoSizeAxes = Axes.Y,
-                            Direction = FillDirection.Vertical,
-                            Spacing = new Vector2(0, 1),
-                        },
+                            Anchor = Anchor.TopCentre,
+                            Origin = Anchor.TopCentre,
+                        }
                     }
                 },
                 loadingAnimation = new LoadingAnimation
