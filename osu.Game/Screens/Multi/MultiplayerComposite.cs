@@ -17,9 +17,6 @@ namespace osu.Game.Screens.Multi
 {
     public class MultiplayerComposite : CompositeDrawable
     {
-        [Resolved]
-        protected Room Room { get; private set; }
-
         [Resolved(typeof(Room))]
         protected Bindable<int?> RoomID { get; private set; }
 

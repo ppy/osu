@@ -61,20 +61,17 @@ namespace osu.Game.Screens.Multi
         {
             room.Host.Value = api.LocalUser;
 
-            addRoom(room);
-            joinRoom(room);
-
-            RoomsUpdated?.Invoke();
-
-            onSuccess?.Invoke(room);
-
-            return;
-
             var req = new CreateRoomRequest(room);
 
             req.Success += result =>
             {
+                joinedRoom = room;
 
+                update(room, result);
+                addRoom(room);
+
+                RoomsUpdated?.Invoke();
+                onSuccess?.Invoke(room);
             };
 
             req.Failure += exception =>
@@ -98,7 +95,7 @@ namespace osu.Game.Screens.Multi
             currentJoinRoomRequest = new JoinRoomRequest(room, api.LocalUser.Value);
             currentJoinRoomRequest.Success += () =>
             {
-                joinRoom(room);
+                joinedRoom = room;
                 onSuccess?.Invoke(room);
             };
 
@@ -109,12 +106,6 @@ namespace osu.Game.Screens.Multi
             };
 
             api.Queue(currentJoinRoomRequest);
-        }
-
-        private void joinRoom(Room room)
-        {
-            currentRoom.Value = room;
-            joinedRoom = room;
         }
 
         public void PartRoom()
