@@ -64,7 +64,35 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         protected override IEnumerable<TimedDifficultyAttributes> CalculateTimed(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
-            throw new NotImplementedException();
+            if (!beatmap.HitObjects.Any())
+            {
+                yield return new TimedDifficultyAttributes(0, new ManiaDifficultyAttributes(mods, 0));
+                yield break;
+            }
+
+            var difficultyHitObjects = new List<ManiaHitObjectDifficulty>();
+
+            int columnCount = ((ManiaBeatmap)beatmap).TotalColumns;
+
+            // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
+            // Note: Stable sort is done so that the ordering of hitobjects with equal start times doesn't change
+            difficultyHitObjects.AddRange(beatmap.HitObjects.Select(h => new ManiaHitObjectDifficulty((ManiaHitObject)h, columnCount)).OrderBy(h => h.BaseHitObject.StartTime));
+
+            if (!calculateStrainValues(difficultyHitObjects, timeRate))
+            {
+                yield return new TimedDifficultyAttributes(0, new ManiaDifficultyAttributes(mods, 0));
+                yield break;
+            }
+
+            double greatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
+
+            foreach ((double time, double starRating) difficultyPoint in calculateDifficultyTimed(difficultyHitObjects, timeRate))
+            {
+                yield return new TimedDifficultyAttributes(difficultyPoint.time, new ManiaDifficultyAttributes(mods, difficultyPoint.starRating * star_scaling_factor)
+                {
+                    GreatHitWindow = greatHitWindow
+                });
+            }
         }
 
         private bool calculateStrainValues(List<ManiaHitObjectDifficulty> objects, double timeRate)
@@ -142,6 +170,59 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             }
 
             return difficulty;
+        }
+
+        private IEnumerable<(double time, double starRating)> calculateDifficultyTimed(List<ManiaHitObjectDifficulty> objects, double timeRate)
+        {
+            double actualStrainStep = strain_step * timeRate;
+
+            // Find the highest strain value within each strain step
+            List<double> highestStrains = new List<double>();
+            double intervalEndTime = actualStrainStep;
+            double maximumStrain = 0; // We need to keep track of the maximum strain in the current interval
+
+            ManiaHitObjectDifficulty previousHitObject = null;
+            foreach (var hitObject in objects)
+            {
+                // While we are beyond the current interval push the currently available maximum to our strain list
+                while (hitObject.BaseHitObject.StartTime > intervalEndTime)
+                {
+                    // Build the weighted sum over the highest strains for each interval
+                    double difficulty = 0;
+                    double weight = 1;
+                    highestStrains.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
+
+                    foreach (double strain in highestStrains)
+                    {
+                        difficulty += weight * strain;
+                        weight *= decay_weight;
+                    }
+
+                    yield return (intervalEndTime, difficulty);
+
+                    highestStrains.Add(maximumStrain);
+
+                    // The maximum strain of the next interval is not zero by default! We need to take the last hitObject we encountered, take its strain and apply the decay
+                    // until the beginning of the next interval.
+                    if (previousHitObject == null)
+                    {
+                        maximumStrain = 0;
+                    }
+                    else
+                    {
+                        double individualDecay = Math.Pow(ManiaHitObjectDifficulty.INDIVIDUAL_DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
+                        double overallDecay = Math.Pow(ManiaHitObjectDifficulty.OVERALL_DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
+                        maximumStrain = previousHitObject.IndividualStrain * individualDecay + previousHitObject.OverallStrain * overallDecay;
+                    }
+
+                    // Go to the next time interval
+                    intervalEndTime += actualStrainStep;
+                }
+
+                maximumStrain = Math.Max(hitObject.IndividualStrain + hitObject.OverallStrain, maximumStrain);
+
+                previousHitObject = hitObject;
+            }
         }
 
         protected override Mod[] DifficultyAdjustmentMods
