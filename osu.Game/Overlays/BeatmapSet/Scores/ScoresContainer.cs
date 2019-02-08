@@ -12,7 +12,6 @@ using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
-using osuTK.Graphics;
 using System.Collections.Generic;
 using System.Linq;
 

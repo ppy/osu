@@ -330,10 +330,9 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         {
             private const float header_text_size = 12;
 
-            private readonly SpriteText headerText;
             private readonly Box line;
 
-            public DrawableInfoColumn(string header)
+            protected DrawableInfoColumn(string header)
             {
                 AutoSizeAxes = Axes.Y;
                 Direction = FillDirection.Vertical;
@@ -344,7 +343,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     {
                         AutoSizeAxes = Axes.X,
                         Height = header_text_size,
-                        Child = headerText = new SpriteText
+                        Child = new SpriteText
                         {
                             TextSize = 12,
                             Text = header.ToUpper(),
@@ -415,7 +414,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 get { return valueText.Text; }
             }
 
-            public TextInfoColumn(string header, float valueTextSize = 25) : base(header)
+            protected TextInfoColumn(string header, float valueTextSize = 25) : base(header)
             {
                 Add(valueText = new SpriteText
                 {

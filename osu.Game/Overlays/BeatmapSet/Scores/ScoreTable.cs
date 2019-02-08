@@ -5,7 +5,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -27,7 +26,6 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 }
 
                 Add(new ScoreTextLine(maxModsAmount));
-
 
                 int index = 0;
                 foreach (var s in scores)
