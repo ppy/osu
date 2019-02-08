@@ -4,12 +4,15 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
 using osuTK;
+using osuTK.Graphics;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,6 +23,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private const int spacing = 15;
         private const int fade_duration = 200;
 
+        private readonly Box background;
         private readonly ScoreTable scoreTable;
 
         private readonly DrawableTopScore topScore;
@@ -98,6 +102,10 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             AutoSizeAxes = Axes.Y;
             Children = new Drawable[]
             {
+                background = new Box
+                {
+                    RelativeSizeAxes = Axes.Both,
+                },
                 new FillFlowContainer
                 {
                     Anchor = Anchor.TopCentre,
@@ -127,9 +135,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         }
 
         [BackgroundDependencyLoader]
-        private void load(APIAccess api)
+        private void load(APIAccess api, OsuColour colours)
         {
             this.api = api;
+
+            background.Colour = colours.Gray2;
             updateDisplay();
         }
 

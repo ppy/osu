@@ -5,6 +5,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Online.API.Requests.Responses;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
@@ -48,11 +49,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         public void ClearScores()
         {
             scores = null;
-            foreach (var s in this)
-            {
-                if (s is DrawableScore)
-                    Remove(s);
-            }
+            Clear();
         }
     }
 }
