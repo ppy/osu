@@ -19,12 +19,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     {
         public Action<Room> JoinRequested;
 
-        private readonly Bindable<Room> currentRoom = new Bindable<Room>();
-
         private readonly IBindableList<Room> rooms = new BindableList<Room>();
 
         private readonly FillFlowContainer<DrawableRoom> roomFlow;
         public IReadOnlyList<DrawableRoom> Rooms => roomFlow;
+
+        [Resolved]
+        private Bindable<Room> currentRoom { get; set; }
 
         [Resolved]
         private IRoomManager roomManager { get; set; }
@@ -46,7 +47,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            currentRoom.BindTo(roomManager.CurrentRoom);
             rooms.BindTo(roomManager.Rooms);
 
             rooms.ItemsAdded += addRooms;

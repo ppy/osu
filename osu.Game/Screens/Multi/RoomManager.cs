@@ -24,12 +24,13 @@ namespace osu.Game.Screens.Multi
         private readonly BindableList<Room> rooms = new BindableList<Room>();
         public IBindableList<Room> Rooms => rooms;
 
-        public Bindable<Room> CurrentRoom { get; } = new Bindable<Room>();
-
         private Room joinedRoom;
 
         [Resolved]
-        private Bindable<FilterCriteria> filter { get; set; }
+        private Bindable<Room> currentRoom { get; set; }
+
+        [Resolved]
+        private Bindable<FilterCriteria> currentFilter { get; set; }
 
         [Resolved]
         private APIAccess api { get; set; }
@@ -40,9 +41,10 @@ namespace osu.Game.Screens.Multi
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
 
-        public RoomManager()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            filter.BindValueChanged(_ =>
+            currentFilter.BindValueChanged(_ =>
             {
                 if (IsLoaded)
                     PollImmediately();
@@ -111,7 +113,7 @@ namespace osu.Game.Screens.Multi
 
         private void joinRoom(Room room)
         {
-            CurrentRoom.Value = room;
+            currentRoom.Value = room;
             joinedRoom = room;
         }
 
@@ -134,7 +136,7 @@ namespace osu.Game.Screens.Multi
             var tcs = new TaskCompletionSource<bool>();
 
             pollReq?.Cancel();
-            pollReq = new GetRoomsRequest(filter.Value.PrimaryFilter);
+            pollReq = new GetRoomsRequest(currentFilter.Value.PrimaryFilter);
 
             pollReq.Success += result =>
             {

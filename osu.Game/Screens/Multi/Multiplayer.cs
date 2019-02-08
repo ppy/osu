@@ -50,7 +50,10 @@ namespace osu.Game.Screens.Multi
         private readonly ScreenStack screenStack;
 
         [Cached]
-        private readonly Bindable<FilterCriteria> filter = new Bindable<FilterCriteria>();
+        private readonly Bindable<Room> currentRoom = new Bindable<Room>();
+
+        [Cached]
+        private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>();
 
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
@@ -150,7 +153,7 @@ namespace osu.Game.Screens.Multi
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
-            dependencies.Model.BindTo(roomManager.CurrentRoom);
+            dependencies.Model.BindTo(currentRoom);
             return dependencies;
         }
 
