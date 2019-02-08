@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
-            dependencies.CacheAs(status, new CacheInfo(nameof(Online.Multiplayer.Room.Status), typeof(Room)));
+            dependencies.CacheAs(status, new CacheInfo(nameof(Room.Status), typeof(Room)));
             return dependencies;
         }
 
@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         private class StatusText : OsuSpriteText
         {
-            [Resolved(typeof(Room), nameof(Online.Multiplayer.Room.Status))]
+            [Resolved(typeof(Room), nameof(Room.Status))]
             private Bindable<RoomStatus> status { get; set; }
 
             [BackgroundDependencyLoader]
