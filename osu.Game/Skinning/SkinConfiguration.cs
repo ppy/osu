@@ -11,7 +11,13 @@ namespace osu.Game.Skinning
     {
         public readonly SkinInfo SkinInfo = new SkinInfo();
 
-        public List<Color4> ComboColours { get; set; } = new List<Color4>();
+        public List<Color4> ComboColours { get; set; } = new List<Color4>
+        {
+            new Color4(17, 136, 170, 255),
+            new Color4(102, 136, 0, 255),
+            new Color4(204, 102, 0, 255),
+            new Color4(121, 9, 13, 255)
+        };
 
         public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
 
