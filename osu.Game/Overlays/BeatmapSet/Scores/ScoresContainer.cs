@@ -73,6 +73,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         private void updateDisplay()
         {
+            scoreTable.ClearScores();
+
             loading = false;
 
             var scoreCount = scores?.Count() ?? 0;
@@ -80,14 +82,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
             if (scoreCount == 0)
             {
                 topScore.Hide();
-                scoreTable.ClearScores();
                 return;
             }
 
             topScore.Score = scores.FirstOrDefault();
             topScore.Show();
-
-            scoreTable.ClearScores();
 
             if (scoreCount < 2)
                 return;

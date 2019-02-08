@@ -17,10 +17,11 @@ using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests.Responses;
 using osu.Game.Rulesets.Osu;
 using osu.Game.Scoring;
+using NUnit.Framework;
 
 namespace osu.Game.Tests.Visual
 {
-    [System.ComponentModel.Description("in BeatmapOverlay")]
+    [Description("in BeatmapOverlay")]
     public class TestCaseBeatmapScoresContainer : OsuTestCase
     {
         private readonly IEnumerable<APIScoreInfo> scores;
@@ -160,11 +161,12 @@ namespace osu.Game.Tests.Visual
                     Accuracy = 0.6543,
                 },
             };
-            foreach(var s in scores)
+            foreach (var s in scores)
             {
                 s.Statistics.Add(HitResult.Great, RNG.Next(2000));
                 s.Statistics.Add(HitResult.Good, RNG.Next(2000));
                 s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Miss, RNG.Next(2000));
             }
 
             anotherScores = new[]
@@ -277,6 +279,7 @@ namespace osu.Game.Tests.Visual
                 s.Statistics.Add(HitResult.Great, RNG.Next(2000));
                 s.Statistics.Add(HitResult.Good, RNG.Next(2000));
                 s.Statistics.Add(HitResult.Meh, RNG.Next(2000));
+                s.Statistics.Add(HitResult.Miss, RNG.Next(2000));
             }
 
             topScoreInfo = new APIScoreInfo
@@ -304,6 +307,7 @@ namespace osu.Game.Tests.Visual
             topScoreInfo.Statistics.Add(HitResult.Great, RNG.Next(2000));
             topScoreInfo.Statistics.Add(HitResult.Good, RNG.Next(2000));
             topScoreInfo.Statistics.Add(HitResult.Meh, RNG.Next(2000));
+            topScoreInfo.Statistics.Add(HitResult.Miss, RNG.Next(2000));
         }
 
         [BackgroundDependencyLoader]
