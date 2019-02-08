@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
@@ -146,7 +147,8 @@ namespace osu.Game.Tests.NonVisual
 
             protected override Mod[] DifficultyAdjustmentMods { get; }
 
-            protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate, double upTo = Double.PositiveInfinity) => throw new NotImplementedException();
+            protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate) => throw new NotImplementedException();
+            protected override IEnumerable<TimedDifficultyAttributes> CalculateTimed(IBeatmap beatmap, Mod[] mods, double timeRate) => throw new NotImplementedException();
         }
     }
 }

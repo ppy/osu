@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaPerformanceCalculator : PerformanceCalculator
     {
-        protected ManiaDifficultyAttributes Attributes;
+        protected new ManiaDifficultyAttributes Attributes => (ManiaDifficultyAttributes)base.Attributes;
 
         private Mod[] mods;
 
@@ -33,10 +33,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null, double upTo = Double.PositiveInfinity)
+        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
         {
-            Attributes = (ManiaDifficultyAttributes)Ruleset.CreateDifficultyCalculator(Working).Calculate(upTo, Score.Mods);
-
             mods = Score.Mods;
             scaledScore = Score.TotalScore;
             countPerfect = Convert.ToInt32(Score.Statistics[HitResult.Perfect]);

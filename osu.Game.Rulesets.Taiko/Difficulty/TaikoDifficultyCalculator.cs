@@ -33,14 +33,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate, double upTo = Double.PositiveInfinity)
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
                 return new TaikoDifficultyAttributes(mods, 0);
 
             var difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
 
-            foreach (var hitObject in beatmap.HitObjects.Where(b => b.StartTime <= upTo))
+            foreach (var hitObject in beatmap.HitObjects)
                 difficultyHitObjects.Add(new TaikoHitObjectDifficulty((TaikoHitObject)hitObject));
 
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
@@ -57,6 +57,11 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit)
             };
+        }
+
+        protected override IEnumerable<TimedDifficultyAttributes> CalculateTimed(IBeatmap beatmap, Mod[] mods, double timeRate)
+        {
+            throw new NotImplementedException();
         }
 
         private bool calculateStrainValues(List<TaikoHitObjectDifficulty> objects, double timeRate)

@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate, double upTo = Double.PositiveInfinity)
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
                 return new ManiaDifficultyAttributes(mods, 0);
@@ -48,7 +48,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
             // Note: Stable sort is done so that the ordering of hitobjects with equal start times doesn't change
-            difficultyHitObjects.AddRange(beatmap.HitObjects.Where(h => h.StartTime <= upTo).Select(h => new ManiaHitObjectDifficulty((ManiaHitObject)h, columnCount)).OrderBy(h => h.BaseHitObject.StartTime));
+            difficultyHitObjects.AddRange(beatmap.HitObjects.Select(h => new ManiaHitObjectDifficulty((ManiaHitObject)h, columnCount)).OrderBy(h => h.BaseHitObject.StartTime));
 
             if (!calculateStrainValues(difficultyHitObjects, timeRate))
                 return new ManiaDifficultyAttributes(mods, 0);
@@ -60,6 +60,11 @@ namespace osu.Game.Rulesets.Mania.Difficulty
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
                 GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate
             };
+        }
+
+        protected override IEnumerable<TimedDifficultyAttributes> CalculateTimed(IBeatmap beatmap, Mod[] mods, double timeRate)
+        {
+            throw new NotImplementedException();
         }
 
         private bool calculateStrainValues(List<ManiaHitObjectDifficulty> objects, double timeRate)

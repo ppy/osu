@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate, double upTo = Double.PositiveInfinity)
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
                 return new CatchDifficultyAttributes(mods, 0);
@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             var difficultyHitObjects = new List<CatchDifficultyHitObject>();
 
-            foreach (var hitObject in beatmap.HitObjects.Where(b => b.StartTime <= upTo))
+            foreach (var hitObject in beatmap.HitObjects)
             {
                 switch (hitObject)
                 {
@@ -71,6 +71,11 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                 ApproachRate = preempt > 1200.0 ? -(preempt - 1800.0) / 120.0 : -(preempt - 1200.0) / 150.0 + 5.0,
                 MaxCombo = difficultyHitObjects.Count
             };
+        }
+
+        protected override IEnumerable<TimedDifficultyAttributes> CalculateTimed(IBeatmap beatmap, Mod[] mods, double timeRate)
+        {
+            throw new NotImplementedException();
         }
 
         private bool calculateStrainValues(List<CatchDifficultyHitObject> objects, double timeRate)

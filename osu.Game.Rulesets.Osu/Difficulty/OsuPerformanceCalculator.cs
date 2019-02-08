@@ -16,10 +16,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 {
     public class OsuPerformanceCalculator : PerformanceCalculator
     {
-        protected OsuDifficultyAttributes Attributes;
+        public new OsuDifficultyAttributes Attributes => (OsuDifficultyAttributes)base.Attributes;
 
-        private int countHitCircles;
-        private int beatmapMaxCombo;
+        private readonly int countHitCircles;
+        private readonly int beatmapMaxCombo;
 
         private Mod[] mods;
 
@@ -33,20 +33,14 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public OsuPerformanceCalculator(Ruleset ruleset, WorkingBeatmap beatmap, ScoreInfo score)
             : base(ruleset, beatmap, score)
         {
+            countHitCircles = Beatmap.HitObjects.Count(h => h is HitCircle);
+            beatmapMaxCombo = Beatmap.HitObjects.Count;
+            // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
+            beatmapMaxCombo += Beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
         }
 
-        public override double Calculate(Dictionary<string, double> categoryRatings = null, double upTo = Double.PositiveInfinity)
+        public override double Calculate(Dictionary<string, double> categoryRatings = null)
         {
-            Attributes = (OsuDifficultyAttributes)Ruleset.CreateDifficultyCalculator(Working).Calculate(upTo, Score.Mods);
-
-            var consideredHitObjects = Beatmap.HitObjects.Where(b => b.StartTime <= upTo);
-
-            countHitCircles = consideredHitObjects.Count(h => h is HitCircle);
-
-            beatmapMaxCombo = consideredHitObjects.Count();
-            // Add the ticks + tail of the slider. 1 is subtracted because the "headcircle" would be counted twice (once for the slider itself in the line above)
-            beatmapMaxCombo += consideredHitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
-
             mods = Score.Mods;
             accuracy = Score.Accuracy;
             scoreMaxCombo = Score.MaxCombo;

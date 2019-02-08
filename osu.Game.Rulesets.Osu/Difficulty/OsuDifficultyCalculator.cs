@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
@@ -23,12 +24,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate, double upTo = Double.PositiveInfinity)
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
                 return new OsuDifficultyAttributes(mods, 0);
 
-            OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().Where(b => b.StartTime <= upTo).ToList(), timeRate);
+            OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
             Skill[] skills =
             {
                 new Aim(),
@@ -81,6 +82,68 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
                 MaxCombo = maxCombo
             };
+        }
+
+        protected override IEnumerable<TimedDifficultyAttributes> CalculateTimed(IBeatmap beatmap, Mod[] mods, double timeRate)
+        {
+            if (!beatmap.HitObjects.Any())
+            {
+                yield return new TimedDifficultyAttributes(0, new OsuDifficultyAttributes(mods, 0));
+                yield break;
+            }
+
+            // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
+            double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
+            double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
+
+            int maxCombo = 0;
+
+            OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
+            Skill[] skills =
+            {
+                new Aim(),
+                new Speed()
+            };
+
+            double sectionLength = section_length * timeRate;
+
+            // The first object doesn't generate a strain, so we begin with an incremented section end
+            double currentSectionEnd = Math.Ceiling(beatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
+
+            foreach (OsuDifficultyHitObject h in difficultyBeatmap)
+            {
+                while (h.BaseObject.StartTime > currentSectionEnd)
+                {
+                    foreach (Skill s in skills)
+                    {
+                        s.SaveCurrentPeak();
+                        s.StartNewSectionFrom(currentSectionEnd);
+                    }
+
+                    double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
+                    double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
+                    double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
+
+                    yield return new TimedDifficultyAttributes(currentSectionEnd, new OsuDifficultyAttributes(mods, starRating)
+                    {
+                        AimStrain = aimRating,
+                        SpeedStrain = speedRating,
+                        ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
+                        OverallDifficulty = (80 - hitWindowGreat) / 6,
+                        MaxCombo = maxCombo
+                    });
+
+                    currentSectionEnd += sectionLength;
+                }
+
+                maxCombo++;
+                // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
+                if (h.BaseObject is Slider slider)
+                    maxCombo += slider.NestedHitObjects.Count - 1;
+
+                foreach (Skill s in skills)
+                    s.Process(h);
+            }
         }
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
