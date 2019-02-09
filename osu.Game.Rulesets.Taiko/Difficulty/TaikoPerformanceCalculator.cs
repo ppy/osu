@@ -15,8 +15,6 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoPerformanceCalculator : PerformanceCalculator
     {
-        protected new TaikoDifficultyAttributes Attributes => (TaikoDifficultyAttributes)base.Attributes;
-
         private Mod[] mods;
         private int countGreat;
         private int countGood;
@@ -28,8 +26,10 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        protected override double Calculate(DifficultyAttributes difficultyAttributes, Dictionary<string, double> categoryDifficulty = null)
         {
+            TaikoDifficultyAttributes attributes = (TaikoDifficultyAttributes)difficultyAttributes;
+
             mods = Score.Mods;
             countGreat = Convert.ToInt32(Score.Statistics[HitResult.Great]);
             countGood = Convert.ToInt32(Score.Statistics[HitResult.Good]);
@@ -49,8 +49,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             if (mods.Any(m => m is ModHidden))
                 multiplier *= 1.10;
 
-            double strainValue = computeStrainValue();
-            double accuracyValue = computeAccuracyValue();
+            double strainValue = computeStrainValue(attributes);
+            double accuracyValue = computeAccuracyValue(attributes);
             double totalValue =
                 Math.Pow(
                     Math.Pow(strainValue, 1.1) +
@@ -66,9 +66,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return totalValue;
         }
 
-        private double computeStrainValue()
+        private double computeStrainValue(TaikoDifficultyAttributes attributes)
         {
-            double strainValue = Math.Pow(5.0 * Math.Max(1.0, Attributes.StarRating / 0.0075) - 4.0, 2.0) / 100000.0;
+            double strainValue = Math.Pow(5.0 * Math.Max(1.0, attributes.StarRating / 0.0075) - 4.0, 2.0) / 100000.0;
 
             // Longer maps are worth more
             double lengthBonus = 1 + 0.1f * Math.Min(1.0, totalHits / 1500.0);
@@ -78,8 +78,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             strainValue *= Math.Pow(0.985, countMiss);
 
             // Combo scaling
-            if (Attributes.MaxCombo > 0)
-                strainValue *= Math.Min(Math.Pow(Score.MaxCombo, 0.5) / Math.Pow(Attributes.MaxCombo, 0.5), 1.0);
+            if (attributes.MaxCombo > 0)
+                strainValue *= Math.Min(Math.Pow(Score.MaxCombo, 0.5) / Math.Pow(attributes.MaxCombo, 0.5), 1.0);
 
             if (mods.Any(m => m is ModHidden))
                 strainValue *= 1.025;
@@ -92,14 +92,14 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return strainValue * Score.Accuracy;
         }
 
-        private double computeAccuracyValue()
+        private double computeAccuracyValue(TaikoDifficultyAttributes attributes)
         {
-            if (Attributes.GreatHitWindow <= 0)
+            if (attributes.GreatHitWindow <= 0)
                 return 0;
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accValue = Math.Pow(150.0 / Attributes.GreatHitWindow, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
+            double accValue = Math.Pow(150.0 / attributes.GreatHitWindow, 1.1) * Math.Pow(Score.Accuracy, 15) * 22.0;
 
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             return accValue * Math.Min(1.15, Math.Pow(totalHits / 1500.0, 0.3));
