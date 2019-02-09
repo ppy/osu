@@ -74,12 +74,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
             maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
 
+            int hitCircles = beatmap.HitObjects.OfType<HitCircle>().Count();
+
             return new OsuDifficultyAttributes(mods, starRating)
             {
                 AimStrain = aimRating,
                 SpeedStrain = speedRating,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                 OverallDifficulty = (80 - hitWindowGreat) / 6,
+                CountHitCircles = hitCircles,
                 MaxCombo = maxCombo
             };
         }
@@ -97,6 +100,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
 
             int maxCombo = 0;
+            int hitCircles = 0;
 
             OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
             Skill[] skills =
@@ -130,6 +134,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                         SpeedStrain = speedRating,
                         ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
                         OverallDifficulty = (80 - hitWindowGreat) / 6,
+                        CountHitCircles = hitCircles,
                         MaxCombo = maxCombo
                     });
 
@@ -140,6 +145,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
                 if (h.BaseObject is Slider slider)
                     maxCombo += slider.NestedHitObjects.Count - 1;
+
+                if (h.BaseObject is HitCircle)
+                    hitCircles++;
 
                 foreach (Skill s in skills)
                     s.Process(h);
