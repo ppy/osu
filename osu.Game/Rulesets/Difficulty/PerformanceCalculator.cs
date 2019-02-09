@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Difficulty
 {
     public abstract class PerformanceCalculator
     {
-        protected readonly DifficultyAttributes Attributes;
+        protected readonly IEnumerable<TimedDifficultyAttributes> TimedAttributes;
 
         protected readonly Ruleset Ruleset;
         protected readonly IBeatmap Beatmap;
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Difficulty
             beatmap.Mods.Value = score.Mods;
             Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
 
-            Attributes = ruleset.CreateDifficultyCalculator(beatmap).Calculate(score.Mods);
+            TimedAttributes = ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(score.Mods);
 
             ApplyMods(score.Mods);
         }
@@ -44,6 +44,14 @@ namespace osu.Game.Rulesets.Difficulty
             TimeRate = clock.Rate;
         }
 
-        public abstract double Calculate(Dictionary<string, double> categoryDifficulty = null);
+        public double Calculate(Dictionary<string, double> categoryDifficulty = null) => Calculate(Double.PositiveInfinity, categoryDifficulty);
+
+        public double Calculate(double time, Dictionary<string, double> categoryDifficulty = null)
+        {
+            TimedDifficultyAttributes attributes = TimedAttributes.LastOrDefault(a => time >= a.Time) ?? TimedAttributes.First();
+            return Calculate(attributes.Attributes, categoryDifficulty);
+        }
+
+        protected abstract double Calculate(DifficultyAttributes attributes, Dictionary<string, double> categoryDifficulty = null);
     }
 }
