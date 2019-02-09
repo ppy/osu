@@ -14,8 +14,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 {
     public class ManiaPerformanceCalculator : PerformanceCalculator
     {
-        protected new ManiaDifficultyAttributes Attributes => (ManiaDifficultyAttributes)base.Attributes;
-
         private Mod[] mods;
 
         // Score after being scaled by non-difficulty-increasing mods
@@ -33,8 +31,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
         }
 
-        public override double Calculate(Dictionary<string, double> categoryDifficulty = null)
+        protected override double Calculate(DifficultyAttributes difficultyAttributes, Dictionary<string, double> categoryDifficulty = null)
         {
+            ManiaDifficultyAttributes attributes = (ManiaDifficultyAttributes)difficultyAttributes;
+
             mods = Score.Mods;
             scaledScore = Score.TotalScore;
             countPerfect = Convert.ToInt32(Score.Statistics[HitResult.Perfect]);
@@ -65,8 +65,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             if (mods.Any(m => m is ModEasy))
                 multiplier *= 0.5;
 
-            double strainValue = computeStrainValue();
-            double accValue = computeAccuracyValue(strainValue);
+            double strainValue = computeStrainValue(attributes);
+            double accValue = computeAccuracyValue(attributes, strainValue);
             double totalValue =
                 Math.Pow(
                     Math.Pow(strainValue, 1.1) +
@@ -82,10 +82,10 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return totalValue;
         }
 
-        private double computeStrainValue()
+        private double computeStrainValue(ManiaDifficultyAttributes attributes)
         {
             // Obtain strain difficulty
-            double strainValue = Math.Pow(5 * Math.Max(1, Attributes.StarRating / 0.2) - 4.0, 2.2) / 135.0;
+            double strainValue = Math.Pow(5 * Math.Max(1, attributes.StarRating / 0.2) - 4.0, 2.2) / 135.0;
 
             // Longer maps are worth more
             strainValue *= 1.0 + 0.1 * Math.Min(1.0, totalHits / 1500.0);
@@ -106,14 +106,14 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return strainValue;
         }
 
-        private double computeAccuracyValue(double strainValue)
+        private double computeAccuracyValue(ManiaDifficultyAttributes attributes, double strainValue)
         {
-            if (Attributes.GreatHitWindow <= 0)
+            if (attributes.GreatHitWindow <= 0)
                 return 0;
 
             // Lots of arbitrary values from testing.
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
-            double accuracyValue = Math.Max(0.0, 0.2 - (Attributes.GreatHitWindow - 34) * 0.006667)
+            double accuracyValue = Math.Max(0.0, 0.2 - (attributes.GreatHitWindow - 34) * 0.006667)
                                        * strainValue
                                        * Math.Pow(Math.Max(0.0, scaledScore - 960000) / 40000, 1.1);
 
