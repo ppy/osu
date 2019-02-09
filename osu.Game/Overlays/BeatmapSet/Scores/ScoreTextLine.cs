@@ -1,107 +1,71 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 
 namespace osu.Game.Overlays.BeatmapSet.Scores
 {
-    public class ScoreTextLine : Container
+    public class ScoreTextLine : ScoreTableLine
     {
         private const float text_size = 12;
 
-        public const float RANK_POSITION = 30;
-        public const float SCORE_POSITION = 90;
-        public const float ACCURACY_POSITION = 170;
-        public const float PLAYER_POSITION = 270;
-        public const float MAX_COMBO_POSITION = 0.5f;
-        public const float HIT_GREAT_POSITION = 0.6f;
-        public const float HIT_GOOD_POSITION = 0.65f;
-        public const float HIT_MEH_POSITION = 0.7f;
-        public const float HIT_MISS_POSITION = 0.75f;
-        public const float PP_POSITION = 0.8f;
-
-        public ScoreTextLine(int maxModsAmount)
+        public ScoreTextLine(int maxModsAmount) : base(maxModsAmount)
         {
-            RelativeSizeAxes = Axes.X;
-            AutoSizeAxes = Axes.Y;
-            Children = new Drawable[]
+            RankContainer.Add(new SpriteText
             {
-                new ScoreText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreRight,
-                    Text = "rank".ToUpper(),
-                    X = RANK_POSITION,
-                },
-                new ScoreText
-                {
-                    Text = "score".ToUpper(),
-                    X = SCORE_POSITION,
-                },
-                new ScoreText
-                {
-                    Text = "accuracy".ToUpper(),
-                    X = ACCURACY_POSITION,
-                },
-                new ScoreText
-                {
-                    Text = "player".ToUpper(),
-                    X = PLAYER_POSITION,
-                },
-                new ScoreText
-                {
-                    Text = "max combo".ToUpper(),
-                    X = MAX_COMBO_POSITION,
-                    RelativePositionAxes = Axes.X,
-                },
-                new ScoreText
-                {
-                    Text = "300",
-                    RelativePositionAxes = Axes.X,
-                    X = HIT_GREAT_POSITION,
-                },
-                new ScoreText
-                {
-                    Text = "100".ToUpper(),
-                    RelativePositionAxes = Axes.X,
-                    X = HIT_GOOD_POSITION,
-                },
-                new ScoreText
-                {
-                    Text = "50".ToUpper(),
-                    RelativePositionAxes = Axes.X,
-                    X = HIT_MEH_POSITION,
-                },
-                new ScoreText
-                {
-                    Text = "miss".ToUpper(),
-                    RelativePositionAxes = Axes.X,
-                    X = HIT_MISS_POSITION,
-                },
-                new ScoreText
-                {
-                    Text = "pp".ToUpper(),
-                    RelativePositionAxes = Axes.X,
-                    X = PP_POSITION,
-                },
-                new ScoreText
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreLeft,
-                    Text = "mods".ToUpper(),
-                    X = -30 * maxModsAmount,
-                },
-            };
-        }
-
-        private class ScoreText : SpriteText
-        {
-            public ScoreText()
+                Text = @"rank".ToUpper(),
+                TextSize = text_size,
+            });
+            ScoreContainer.Add(new SpriteText
             {
-                TextSize = text_size;
-            }
+                Text = @"score".ToUpper(),
+                TextSize = text_size,
+            });
+            AccuracyContainer.Add(new SpriteText
+            {
+                Text = @"accuracy".ToUpper(),
+                TextSize = text_size,
+            });
+            PlayerContainer.Add(new SpriteText
+            {
+                Text = @"player".ToUpper(),
+                TextSize = text_size,
+            });
+            MaxComboContainer.Add(new SpriteText
+            {
+                Text = @"max combo".ToUpper(),
+                TextSize = text_size,
+            });
+            HitGreatContainer.Add(new SpriteText
+            {
+                Text = "300".ToUpper(),
+                TextSize = text_size,
+            });
+            HitGoodContainer.Add(new SpriteText
+            {
+                Text = "100".ToUpper(),
+                TextSize = text_size,
+            });
+            HitMehContainer.Add(new SpriteText
+            {
+                Text = "50".ToUpper(),
+                TextSize = text_size,
+            });
+            HitMissContainer.Add(new SpriteText
+            {
+                Text = @"miss".ToUpper(),
+                TextSize = text_size,
+            });
+            PPContainer.Add(new SpriteText
+            {
+                Text = @"pp".ToUpper(),
+                TextSize = text_size,
+            });
+            ModsContainer.Add(new SpriteText
+            {
+                Text = @"mods".ToUpper(),
+                TextSize = text_size,
+            });
         }
     }
 }
