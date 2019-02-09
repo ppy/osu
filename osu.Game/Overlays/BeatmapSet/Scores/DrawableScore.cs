@@ -22,24 +22,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
     public class DrawableScore : Container
     {
         private const int fade_duration = 100;
-        private const float text_size = 14;
+        private const int text_size = 14;
 
         private readonly Box hoveredBackground;
         private readonly Box background;
 
         public DrawableScore(int index, APIScoreInfo score, int maxModsAmount)
         {
-            SpriteText accuracy;
-            SpriteText scoreText;
-            SpriteText hitGreat;
-            SpriteText hitGood;
-            SpriteText hitMeh;
-            SpriteText hitMiss;
-
-            FillFlowContainer modsContainer;
-
             RelativeSizeAxes = Axes.X;
-            Height = 25;
+            AutoSizeAxes = Axes.Y;
             CornerRadius = 3;
             Masking = true;
             Children = new Drawable[]
@@ -53,138 +44,11 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     RelativeSizeAxes = Axes.Both,
                     Alpha = 0,
                 },
-                new SpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreRight,
-                    Text = $"#{index + 1}",
-                    TextSize = text_size,
-                    X = ScoreTextLine.RANK_POSITION,
-                    Font = @"Exo2.0-Bold",
-                },
-                new DrawableRank(score.Rank)
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Size = new Vector2(30, 20),
-                    FillMode = FillMode.Fit,
-                    X = 45
-                },
-                scoreText = new SpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Text = $@"{score.TotalScore:N0}",
-                    X = ScoreTextLine.SCORE_POSITION,
-                    TextSize = text_size,
-                },
-                accuracy = new SpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Text = $@"{score.Accuracy:P2}",
-                    X = ScoreTextLine.ACCURACY_POSITION,
-                    TextSize = text_size,
-                },
-                new DrawableFlag(score.User.Country)
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Size = new Vector2(20, 13),
-                    X = 230,
-                },
-                new ClickableScoreUsername
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    User = score.User,
-                    X = ScoreTextLine.PLAYER_POSITION,
-                },
-                new SpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Text = $@"{score.MaxCombo:N0}x",
-                    RelativePositionAxes = Axes.X,
-                    X = ScoreTextLine.MAX_COMBO_POSITION,
-                    TextSize = text_size,
-                },
-                hitGreat = new SpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Text = $"{score.Statistics[HitResult.Great]}",
-                    RelativePositionAxes = Axes.X,
-                    X = ScoreTextLine.HIT_GREAT_POSITION,
-                    TextSize = text_size,
-                },
-                hitGood = new SpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Text = $"{score.Statistics[HitResult.Good]}",
-                    RelativePositionAxes = Axes.X,
-                    X = ScoreTextLine.HIT_GOOD_POSITION,
-                    TextSize = text_size,
-                },
-                hitMeh = new SpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Text = $"{score.Statistics[HitResult.Meh]}",
-                    RelativePositionAxes = Axes.X,
-                    X = ScoreTextLine.HIT_MEH_POSITION,
-                    TextSize = text_size,
-                },
-                hitMiss = new SpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Text = $"{score.Statistics[HitResult.Miss]}",
-                    RelativePositionAxes = Axes.X,
-                    X = ScoreTextLine.HIT_MISS_POSITION,
-                    TextSize = text_size,
-                },
-                new SpriteText
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    Text = $@"{score.PP:N0}",
-                    RelativePositionAxes = Axes.X,
-                    X = ScoreTextLine.PP_POSITION,
-                    TextSize = text_size,
-                },
-                modsContainer = new FillFlowContainer
-                {
-                    Anchor = Anchor.CentreRight,
-                    Origin = Anchor.CentreLeft,
-                    Direction = FillDirection.Horizontal,
-                    AutoSizeAxes = Axes.Both,
-                    X = -30 * maxModsAmount,
-                },
+                new DrawableScoreData(index, score, maxModsAmount),
             };
 
-            if (index == 0)
-                scoreText.Font = @"Exo2.0-Bold";
-
-            accuracy.Colour = (score.Accuracy == 1) ? Color4.GreenYellow : Color4.White;
-
-            hitGreat.Colour = (score.Statistics[HitResult.Great] == 0) ? Color4.Gray : Color4.White;
-            hitGood.Colour = (score.Statistics[HitResult.Good] == 0) ? Color4.Gray : Color4.White;
-            hitMeh.Colour = (score.Statistics[HitResult.Meh] == 0) ? Color4.Gray : Color4.White;
-            hitMiss.Colour = (score.Statistics[HitResult.Miss] == 0) ? Color4.Gray : Color4.White;
-
-            if (index % 2 == 0)
+            if (index % 2 != 0)
                 background.Alpha = 0;
-
-            foreach (Mod mod in score.Mods)
-                modsContainer.Add(new ModIcon(mod)
-                {
-                    Anchor = Anchor.CentreLeft,
-                    Origin = Anchor.CentreLeft,
-                    AutoSizeAxes = Axes.Both,
-                    Scale = new Vector2(0.3f),
-                });
         }
 
         [BackgroundDependencyLoader]
@@ -249,6 +113,104 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 textBold.FadeOut(fade_duration, Easing.OutQuint);
                 text.FadeIn(fade_duration, Easing.OutQuint);
                 base.OnHoverLost(e);
+            }
+        }
+
+        private class DrawableScoreData : ScoreTableLine
+        {
+            public DrawableScoreData(int index, APIScoreInfo score, int maxModsAmount) : base(maxModsAmount)
+            {
+                SpriteText scoreText;
+                SpriteText accuracy;
+                SpriteText hitGreat;
+                SpriteText hitGood;
+                SpriteText hitMeh;
+                SpriteText hitMiss;
+
+                FillFlowContainer modsContainer;
+
+                RankContainer.Add(new SpriteText
+                {
+                    Text = $"#{index + 1}",
+                    Font = @"Exo2.0-Bold",
+                    TextSize = text_size,
+                });
+                DrawableRankContainer.Add(new DrawableRank(score.Rank)
+                {
+                    Size = new Vector2(30, 20),
+                    FillMode = FillMode.Fit,
+                });
+                ScoreContainer.Add(scoreText = new SpriteText
+                {
+                    Text = $@"{score.TotalScore:N0}",
+                    TextSize = text_size,
+                });
+                AccuracyContainer.Add(accuracy = new SpriteText
+                {
+                    Text = $@"{score.Accuracy:P2}",
+                    TextSize = text_size,
+                });
+                FlagContainer.Add(new DrawableFlag(score.User.Country)
+                {
+                    Size = new Vector2(20, 13),
+                });
+                PlayerContainer.Add(new ClickableScoreUsername
+                {
+                    User = score.User,
+                });
+                MaxComboContainer.Add(new SpriteText
+                {
+                    Text = $@"{score.MaxCombo:N0}x",
+                    TextSize = text_size,
+                });
+                HitGreatContainer.Add(hitGreat = new SpriteText
+                {
+                    Text = $"{score.Statistics[HitResult.Great]}",
+                    TextSize = text_size,
+                });
+                HitGoodContainer.Add(hitGood = new SpriteText
+                {
+                    Text = $"{score.Statistics[HitResult.Good]}",
+                    TextSize = text_size,
+                });
+                HitMehContainer.Add(hitMeh = new SpriteText
+                {
+                    Text = $"{score.Statistics[HitResult.Meh]}",
+                    TextSize = text_size,
+                });
+                HitMissContainer.Add(hitMiss = new SpriteText
+                {
+                    Text = $"{score.Statistics[HitResult.Miss]}",
+                    TextSize = text_size,
+                });
+                PPContainer.Add(new SpriteText
+                {
+                    Text = $@"{score.PP:N0}",
+                    TextSize = text_size,
+                });
+                ModsContainer.Add(modsContainer = new FillFlowContainer
+                {
+                    Direction = FillDirection.Horizontal,
+                    AutoSizeAxes = Axes.Both,
+                });
+
+                if (index == 0)
+                    scoreText.Font = @"Exo2.0-Bold";
+
+                accuracy.Colour = (score.Accuracy == 1) ? Color4.GreenYellow : Color4.White;
+                hitGreat.Colour = (score.Statistics[HitResult.Great] == 0) ? Color4.Gray : Color4.White;
+                hitGood.Colour = (score.Statistics[HitResult.Good] == 0) ? Color4.Gray : Color4.White;
+                hitMeh.Colour = (score.Statistics[HitResult.Meh] == 0) ? Color4.Gray : Color4.White;
+                hitMiss.Colour = (score.Statistics[HitResult.Miss] == 0) ? Color4.Gray : Color4.White;
+
+                foreach (Mod mod in score.Mods)
+                    modsContainer.Add(new ModIcon(mod)
+                    {
+                        Anchor = Anchor.CentreLeft,
+                        Origin = Anchor.CentreLeft,
+                        AutoSizeAxes = Axes.Both,
+                        Scale = new Vector2(0.3f),
+                    });
             }
         }
     }

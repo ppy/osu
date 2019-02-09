@@ -188,7 +188,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             Origin = Anchor.CentreRight,
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,
-                            Width = 0.7f,
+                            Width = 0.65f,
                             Child = new FillFlowContainer
                             {
                                 AutoSizeAxes = Axes.Y,
