@@ -7,65 +7,63 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 {
     public class ScoreTextLine : ScoreTableLine
     {
-        private const float text_size = 12;
-
         public ScoreTextLine(int maxModsAmount) : base(maxModsAmount)
         {
-            RankContainer.Add(new SpriteText
+            RankContainer.Add(new ScoreText
             {
                 Text = @"rank".ToUpper(),
-                TextSize = text_size,
             });
-            ScoreContainer.Add(new SpriteText
+            ScoreContainer.Add(new ScoreText
             {
                 Text = @"score".ToUpper(),
-                TextSize = text_size,
             });
-            AccuracyContainer.Add(new SpriteText
+            AccuracyContainer.Add(new ScoreText
             {
                 Text = @"accuracy".ToUpper(),
-                TextSize = text_size,
             });
-            PlayerContainer.Add(new SpriteText
+            PlayerContainer.Add(new ScoreText
             {
                 Text = @"player".ToUpper(),
-                TextSize = text_size,
             });
-            MaxComboContainer.Add(new SpriteText
+            MaxComboContainer.Add(new ScoreText
             {
                 Text = @"max combo".ToUpper(),
-                TextSize = text_size,
             });
-            HitGreatContainer.Add(new SpriteText
+            HitGreatContainer.Add(new ScoreText
             {
                 Text = "300".ToUpper(),
-                TextSize = text_size,
             });
-            HitGoodContainer.Add(new SpriteText
+            HitGoodContainer.Add(new ScoreText
             {
                 Text = "100".ToUpper(),
-                TextSize = text_size,
             });
-            HitMehContainer.Add(new SpriteText
+            HitMehContainer.Add(new ScoreText
             {
                 Text = "50".ToUpper(),
-                TextSize = text_size,
             });
-            HitMissContainer.Add(new SpriteText
+            HitMissContainer.Add(new ScoreText
             {
-                Text = @"miss".ToUpper(),
-                TextSize = text_size,
+                Text = @"misses".ToUpper(),
             });
-            PPContainer.Add(new SpriteText
+            PPContainer.Add(new ScoreText
             {
                 Text = @"pp".ToUpper(),
-                TextSize = text_size,
             });
-            ModsContainer.Add(new SpriteText
+            ModsContainer.Add(new ScoreText
             {
                 Text = @"mods".ToUpper(),
-                TextSize = text_size,
             });
+        }
+
+        private class ScoreText : SpriteText
+        {
+            private const float text_size = 12;
+
+            public ScoreText()
+            {
+                TextSize = text_size;
+                Font = @"Exo2.0-Black";
+            }
         }
     }
 }

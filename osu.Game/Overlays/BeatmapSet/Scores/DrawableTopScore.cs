@@ -200,8 +200,8 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                 {
                                     new FillFlowContainer
                                     {
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
                                         AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Horizontal,
                                         Spacing = new Vector2(margin, 0),
@@ -210,15 +210,15 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                                             hitGreat = new SmallInfoColumn("300", 20),
                                             hitGood = new SmallInfoColumn("100", 20),
                                             hitMeh = new SmallInfoColumn("50", 20),
-                                            hitMiss = new SmallInfoColumn("miss", 20),
+                                            hitMiss = new SmallInfoColumn("misses", 20),
                                             pp = new SmallInfoColumn("pp", 20),
                                             modsInfo = new ModsInfoColumn("mods"),
                                         }
                                     },
                                     new FillFlowContainer
                                     {
-                                        Anchor = Anchor.CentreRight,
-                                        Origin = Anchor.CentreRight,
+                                        Anchor = Anchor.TopRight,
+                                        Origin = Anchor.TopRight,
                                         AutoSizeAxes = Axes.Both,
                                         Direction = FillDirection.Horizontal,
                                         Spacing = new Vector2(margin, 0),
@@ -347,7 +347,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         {
                             TextSize = 12,
                             Text = header.ToUpper(),
-                            Font = @"Exo2.0-Bold",
+                            Font = @"Exo2.0-Black",
                         }
                     },
                     new Container
