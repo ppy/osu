@@ -173,7 +173,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                             Anchor = Anchor.CentreRight,
                             Origin = Anchor.CentreLeft,
                             AutoSizeAxes = Axes.Both,
-                            X = -30 * maxModsAmount,
+                            X = -30 * ((maxModsAmount == 0) ? 1 : maxModsAmount),
                         }
                     }
                 }
