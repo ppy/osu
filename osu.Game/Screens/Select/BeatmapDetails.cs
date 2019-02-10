@@ -181,8 +181,11 @@ namespace osu.Game.Screens.Select
             ratingsContainer.FadeIn(transition_duration);
             advanced.Beatmap = Beatmap;
             description.Text = Beatmap.Version;
+            //source.Text = string.IsNullOrEmpty(Beatmap.Metadata.Source) ? "Unknown source" : Beatmap.Metadata.Source;
             source.Text = Beatmap.Metadata.Source;
             tags.Text = Beatmap.Metadata.Tags;
+
+            tags.Margin = new MarginPadding { Top = string.IsNullOrEmpty(Beatmap.Metadata.Source) ? -2 * spacing : 0 };
 
             var requestedBeatmap = Beatmap;
             if (requestedBeatmap.Metrics == null)
@@ -331,6 +334,11 @@ namespace osu.Game.Screens.Select
                 };
             }
 
+            public MarginPadding Margin
+            {
+                set => textContainer.Margin = value;
+            }
+
             public string Text
             {
                 set
@@ -340,7 +348,6 @@ namespace osu.Game.Screens.Select
                         textContainer.FadeOut(transition_duration);
                         return;
                     }
-
                     setTextAsync(value);
                 }
             }
