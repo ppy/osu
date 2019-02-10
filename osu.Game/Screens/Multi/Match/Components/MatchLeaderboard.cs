@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.API.Requests.Responses;
@@ -16,18 +17,13 @@ namespace osu.Game.Screens.Multi.Match.Components
     {
         public Action<IEnumerable<APIRoomScoreInfo>> ScoresLoaded;
 
-        public Room Room
-        {
-            get => bindings.Room;
-            set => bindings.Room = value;
-        }
-
-        private readonly RoomBindings bindings = new RoomBindings();
+        [Resolved(typeof(Room), nameof(Room.RoomID))]
+        private Bindable<int?> roomId { get; set; }
 
         [BackgroundDependencyLoader]
         private void load()
         {
-            bindings.RoomID.BindValueChanged(id =>
+            roomId.BindValueChanged(id =>
             {
                 if (id == null)
                     return;
@@ -39,10 +35,10 @@ namespace osu.Game.Screens.Multi.Match.Components
 
         protected override APIRequest FetchScores(Action<IEnumerable<APIRoomScoreInfo>> scoresCallback)
         {
-            if (bindings.RoomID.Value == null)
+            if (roomId.Value == null)
                 return null;
 
-            var req = new GetRoomScoresRequest(bindings.RoomID.Value ?? 0);
+            var req = new GetRoomScoresRequest(roomId.Value ?? 0);
 
             req.Success += r =>
             {
