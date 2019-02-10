@@ -2,35 +2,37 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Screens.Multi.Components;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Match.Components
 {
-    public class Info : Container
+    public class Info : MultiplayerComposite
     {
         public Action OnStart;
 
-        private readonly RoomBindings bindings = new RoomBindings();
-
-        public Info(Room room)
+        public Info()
         {
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
+        }
 
+        [BackgroundDependencyLoader]
+        private void load()
+        {
             ReadyButton readyButton;
             ViewBeatmapButton viewBeatmapButton;
             HostInfo hostInfo;
             RoomStatusInfo statusInfo;
 
-            Children = new Drawable[]
+            InternalChildren = new Drawable[]
             {
                 new Box
                 {
@@ -61,9 +63,9 @@ namespace osu.Game.Screens.Multi.Match.Components
                                         new OsuSpriteText
                                         {
                                             TextSize = 30,
-                                            Current = bindings.Name
+                                            Current = Name
                                         },
-                                        new RoomStatusInfo(room),
+                                        new RoomStatusInfo(),
                                     }
                                 },
                                 hostInfo = new HostInfo(),
@@ -80,7 +82,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                             Children = new Drawable[]
                             {
                                 viewBeatmapButton = new ViewBeatmapButton(),
-                                readyButton = new ReadyButton(room)
+                                readyButton = new ReadyButton
                                 {
                                     Action = () => OnStart?.Invoke()
                                 }
@@ -90,11 +92,9 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            viewBeatmapButton.Beatmap.BindTo(bindings.CurrentBeatmap);
-            readyButton.Beatmap.BindTo(bindings.CurrentBeatmap);
-            hostInfo.Host.BindTo(bindings.Host);
-
-            bindings.Room = room;
+            viewBeatmapButton.Beatmap.BindTo(CurrentBeatmap);
+            readyButton.Beatmap.BindTo(CurrentBeatmap);
+            hostInfo.Host.BindTo(Host);
         }
     }
 }
