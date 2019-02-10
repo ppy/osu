@@ -12,7 +12,7 @@ using osu.Game.Screens.Multi.Match.Components;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseMatchHeader : OsuTestCase
+    public class TestCaseMatchHeader : MultiplayerTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -21,11 +21,7 @@ namespace osu.Game.Tests.Visual
 
         public TestCaseMatchHeader()
         {
-            var room = new Room();
-
-            var header = new Header(room);
-
-            room.Playlist.Add(new PlaylistItem
+            Room.Playlist.Add(new PlaylistItem
             {
                 Beatmap = new BeatmapInfo
                 {
@@ -46,9 +42,9 @@ namespace osu.Game.Tests.Visual
                 }
             });
 
-            room.Type.Value = new GameTypeTimeshift();
+            Room.Type.Value = new GameTypeTimeshift();
 
-            Child = header;
+            Child = new Header();
         }
     }
 }
