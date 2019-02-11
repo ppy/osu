@@ -14,7 +14,7 @@ namespace osu.Game.Rulesets.Difficulty
 {
     public abstract class PerformanceCalculator
     {
-        protected readonly IEnumerable<TimedDifficultyAttributes> TimedAttributes;
+        protected readonly IList<TimedDifficultyAttributes> TimedAttributes;
 
         protected readonly Ruleset Ruleset;
         protected readonly IBeatmap Beatmap;
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Difficulty
             beatmap.Mods.Value = score.Mods;
             Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
 
-            TimedAttributes = ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(score.Mods);
+            TimedAttributes = (IList<TimedDifficultyAttributes>)ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(score.Mods);
 
             ApplyMods(score.Mods);
         }
