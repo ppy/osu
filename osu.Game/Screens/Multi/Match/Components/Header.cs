@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            CurrentMods.BindValueChanged(m => modDisplay.Current.Value = m, true);
+            CurrentItem.BindValueChanged(i => modDisplay.Current.Value = i?.RequiredMods, true);
 
             beatmapButton.Action = () => RequestBeatmapSelection?.Invoke();
         }

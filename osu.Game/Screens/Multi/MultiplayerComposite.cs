@@ -3,14 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Rulesets;
-using osu.Game.Rulesets.Mods;
 using osu.Game.Users;
 
 namespace osu.Game.Screens.Multi
@@ -36,6 +32,9 @@ namespace osu.Game.Screens.Multi
         protected BindableList<PlaylistItem> Playlist { get; private set; }
 
         [Resolved(typeof(Room))]
+        protected Bindable<PlaylistItem> CurrentItem { get; private set; }
+
+        [Resolved(typeof(Room))]
         protected Bindable<IEnumerable<User>> Participants { get; private set; }
 
         [Resolved(typeof(Room))]
@@ -52,35 +51,5 @@ namespace osu.Game.Screens.Multi
 
         [Resolved(typeof(Room))]
         protected Bindable<TimeSpan> Duration { get; private set; }
-
-        private readonly Bindable<BeatmapInfo> currentBeatmap = new Bindable<BeatmapInfo>();
-        protected IBindable<BeatmapInfo> CurrentBeatmap => currentBeatmap;
-
-        private readonly Bindable<IEnumerable<Mod>> currentMods = new Bindable<IEnumerable<Mod>>();
-        protected IBindable<IEnumerable<Mod>> CurrentMods => currentMods;
-
-        private readonly Bindable<RulesetInfo> currentRuleset = new Bindable<RulesetInfo>();
-        protected IBindable<RulesetInfo> CurrentRuleset => currentRuleset;
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            Playlist.ItemsAdded += _ => updatePlaylist();
-            Playlist.ItemsRemoved += _ => updatePlaylist();
-
-            updatePlaylist();
-        }
-
-        private void updatePlaylist()
-        {
-            // Todo: We only ever have one playlist item for now. In the future, this will be user-settable
-
-            var playlistItem = Playlist.FirstOrDefault();
-
-            currentBeatmap.Value = playlistItem?.Beatmap;
-            currentMods.Value = playlistItem?.RequiredMods ?? Enumerable.Empty<Mod>();
-            currentRuleset.Value = playlistItem?.Ruleset;
-        }
     }
 }

@@ -2,57 +2,27 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics.Containers;
 using osu.Game.Input.Bindings;
-using osu.Game.Overlays;
-using osu.Game.Rulesets;
 
 namespace osu.Game.Screens.Multi
 {
-    public abstract class MultiplayerSubScreen : CompositeDrawable, IMultiplayerSubScreen, IKeyBindingHandler<GlobalAction>
+    public abstract class MultiplayerSubScreen : OsuScreen, IMultiplayerSubScreen, IKeyBindingHandler<GlobalAction>
     {
-        public virtual bool DisallowExternalBeatmapRulesetChanges => false;
-
-        public bool CursorVisible => true;
-
-        public bool HideOverlaysOnEnter => false;
-        public OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
-
-        public float BackgroundParallaxAmount => 1;
-
-        public bool ValidForResume { get; set; } = true;
-        public bool ValidForPush { get; set; } = true;
+        public override bool DisallowExternalBeatmapRulesetChanges => false;
 
         public override bool RemoveWhenNotAlive => false;
 
-        public abstract string Title { get; }
         public virtual string ShortTitle => Title;
-
-        public Bindable<WorkingBeatmap> Beatmap { get; set; }
-
-        public Bindable<RulesetInfo> Ruleset { get; set; }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var deps = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
-
-            Beatmap = deps.Beatmap;
-            Ruleset = deps.Ruleset;
-
-            return deps;
-        }
 
         [Resolved(CanBeNull = true)]
         protected OsuGame Game { get; private set; }
 
         [Resolved(CanBeNull = true)]
-        protected IRoomManager Manager { get; private set; }
+        protected IRoomManager RoomManager { get; private set; }
 
         protected MultiplayerSubScreen()
         {
@@ -61,14 +31,14 @@ namespace osu.Game.Screens.Multi
             RelativeSizeAxes = Axes.Both;
         }
 
-        public virtual void OnEntering(IScreen last)
+        public override void OnEntering(IScreen last)
         {
             this.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
             this.FadeInFromZero(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
             this.MoveToX(200).MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
         }
 
-        public virtual bool OnExiting(IScreen next)
+        public override bool OnExiting(IScreen next)
         {
             this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
             this.MoveToX(200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
@@ -76,19 +46,19 @@ namespace osu.Game.Screens.Multi
             return false;
         }
 
-        public virtual void OnResuming(IScreen last)
+        public override void OnResuming(IScreen last)
         {
             this.FadeIn(WaveContainer.APPEAR_DURATION, Easing.OutQuint);
             this.MoveToX(0, WaveContainer.APPEAR_DURATION, Easing.OutQuint);
         }
 
-        public virtual void OnSuspending(IScreen next)
+        public override void OnSuspending(IScreen next)
         {
             this.FadeOut(WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
             this.MoveToX(-200, WaveContainer.DISAPPEAR_DURATION, Easing.OutQuint);
         }
 
-        public virtual bool OnPressed(GlobalAction action)
+        public override bool OnPressed(GlobalAction action)
         {
             if (!this.IsCurrentScreen()) return false;
 
