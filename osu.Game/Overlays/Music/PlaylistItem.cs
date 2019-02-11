@@ -169,6 +169,8 @@ namespace osu.Game.Overlays.Music
                 Alpha = 0f;
                 Margin = new MarginPadding { Left = 5, Top = 2 };
             }
+
+            public override bool HandlePositionalInput => IsPresent;
         }
     }
 

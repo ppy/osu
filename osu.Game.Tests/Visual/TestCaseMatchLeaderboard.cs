@@ -6,24 +6,24 @@ using Newtonsoft.Json;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Online.API;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Users;
 using osuTK;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseMatchLeaderboard : OsuTestCase
+    public class TestCaseMatchLeaderboard : MultiplayerTestCase
     {
         public TestCaseMatchLeaderboard()
         {
+            Room.RoomID.Value = 3;
+
             Add(new MatchLeaderboard
             {
                 Origin = Anchor.Centre,
                 Anchor = Anchor.Centre,
                 Size = new Vector2(550f, 450f),
                 Scope = MatchLeaderboardScope.Overall,
-                Room = new Room { RoomID = { Value = 3 } }
             });
         }
 

@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Ranking.Types;
 using osu.Game.Screens.Ranking;
@@ -12,19 +11,16 @@ namespace osu.Game.Screens.Multi.Ranking
 {
     public class MatchResults : Results
     {
-        private readonly Room room;
-
-        public MatchResults(ScoreInfo score, Room room)
+        public MatchResults(ScoreInfo score)
             : base(score)
         {
-            this.room = room;
         }
 
         protected override IEnumerable<IResultPageInfo> CreateResultPages() => new IResultPageInfo[]
         {
-            new ScoreOverviewPageInfo(Score, Beatmap.Value),
-            new LocalLeaderboardPageInfo(Score, Beatmap.Value),
-            new RoomLeaderboardPageInfo(Score, Beatmap.Value, room),
+            new ScoreOverviewPageInfo(Score, Beatmap),
+            new LocalLeaderboardPageInfo(Score, Beatmap),
+            new RoomLeaderboardPageInfo(Score, Beatmap),
         };
     }
 }
