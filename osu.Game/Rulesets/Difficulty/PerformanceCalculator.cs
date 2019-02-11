@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Difficulty
             beatmap.Mods.Value = score.Mods;
             Beatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
 
-            TimedAttributes = (IList<TimedDifficultyAttributes>)ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(score.Mods);
+            TimedAttributes = ruleset.CreateDifficultyCalculator(beatmap).CalculateTimed(score.Mods).ToList();
 
             ApplyMods(score.Mods);
         }
