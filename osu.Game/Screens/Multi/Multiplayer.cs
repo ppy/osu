@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -16,9 +15,7 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet.Buttons;
-using osu.Game.Rulesets;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
@@ -28,19 +25,9 @@ using osuTK;
 namespace osu.Game.Screens.Multi
 {
     [Cached]
-    public class Multiplayer : CompositeDrawable, IOsuScreen, IOnlineComponent
+    public class Multiplayer : OsuScreen, IOnlineComponent
     {
-        public bool DisallowExternalBeatmapRulesetChanges => false;
-
-        public bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.CursorVisible ?? true;
-
-        public bool HideOverlaysOnEnter => false;
-        public OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
-
-        public float BackgroundParallaxAmount => 1;
-
-        public bool ValidForResume { get; set; } = true;
-        public bool ValidForPush { get; set; } = true;
+        public override bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.CursorVisible ?? true;
 
         public override bool RemoveWhenNotAlive => false;
 
@@ -70,20 +57,6 @@ namespace osu.Game.Screens.Multi
         [Resolved(CanBeNull = true)]
         private OsuLogo logo { get; set; }
 
-        public Bindable<WorkingBeatmap> Beatmap { get; set; }
-
-        public Bindable<RulesetInfo> Ruleset { get; set; }
-
-        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
-        {
-            var deps = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
-
-            Beatmap = deps.Beatmap;
-            Ruleset = deps.Ruleset;
-
-            return deps;
-        }
-
         public Multiplayer()
         {
             Anchor = Anchor.Centre;
@@ -95,8 +68,8 @@ namespace osu.Game.Screens.Multi
                 RelativeSizeAxes = Axes.Both,
             };
 
-            screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen(pushGameplayScreen)) { RelativeSizeAxes = Axes.Both };
-            Padding = new MarginPadding { Horizontal = -OsuScreen.HORIZONTAL_OVERFLOW_PADDING };
+            screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both };
+            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
 
             waves.AddRange(new Drawable[]
             {
@@ -136,7 +109,7 @@ namespace osu.Game.Screens.Multi
                     Margin = new MarginPadding
                     {
                         Top = 10,
-                        Right = 10 + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
+                        Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
                     },
                     Text = "Create room",
                     Action = () => loungeSubScreen.Open(new Room
@@ -207,14 +180,14 @@ namespace osu.Game.Screens.Multi
             }
         }
 
-        public void OnEntering(IScreen last)
+        public override void OnEntering(IScreen last)
         {
             this.FadeIn();
 
             waves.Show();
         }
 
-        public bool OnExiting(IScreen next)
+        public override bool OnExiting(IScreen next)
         {
             waves.Hide();
 
@@ -233,17 +206,17 @@ namespace osu.Game.Screens.Multi
             return false;
         }
 
-        public void OnResuming(IScreen last)
+        public override void OnResuming(IScreen last)
         {
             this.FadeIn(250);
             this.ScaleTo(1, 250, Easing.OutSine);
 
-            logo?.AppendAnimatingAction(() => OsuScreen.ApplyLogoArrivingDefaults(logo), true);
+            logo?.AppendAnimatingAction(() => ApplyLogoArrivingDefaults(logo), true);
 
             updatePollingRate(isIdle.Value);
         }
 
-        public void OnSuspending(IScreen next)
+        public override void OnSuspending(IScreen next)
         {
             this.ScaleTo(1.1f, 250, Easing.InSine);
             this.FadeOut(250);
@@ -254,7 +227,7 @@ namespace osu.Game.Screens.Multi
 
         private void cancelLooping()
         {
-            var track = beatmap?.Value?.Track;
+            var track = Beatmap?.Value?.Track;
 
             if (track != null)
                 track.Looping = false;
