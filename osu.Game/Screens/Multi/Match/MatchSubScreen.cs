@@ -217,13 +217,14 @@ namespace osu.Game.Screens.Multi.Match
 
         private void onStart()
         {
-            //Beatmap.Value.Mods.Value = CurrentMods.Value.ToArray();
+            // todo: is this required?
+            Beatmap.Value.Mods.Value = CurrentMods.Value.ToArray();
 
             switch (type.Value)
             {
                 default:
                 case GameTypeTimeshift _:
-                    pushGameplayScreen?.Invoke(new PlayerLoader(() => new TimeshiftPlayer(CurrentItem)
+                    this.Push(new PlayerLoader(() => new TimeshiftPlayer(CurrentItem)
                     {
                         Exited = () => leaderboard.RefreshScores()
                     }));
