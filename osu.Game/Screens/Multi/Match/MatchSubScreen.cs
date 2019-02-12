@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
@@ -15,7 +14,6 @@ using osu.Game.Online.Multiplayer.GameTypes;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Play;
-using osu.Game.Screens.Play;
 using osu.Game.Screens.Select;
 using PlaylistItem = osu.Game.Online.Multiplayer.PlaylistItem;
 
@@ -51,8 +49,6 @@ namespace osu.Game.Screens.Multi.Match
         {
             Title = room.RoomID.Value == null ? "New room" : room.Name;
         }
-
-        private readonly Action<Screen> pushGameplayScreen;
 
         private MatchLeaderboard leaderboard;
 
@@ -200,6 +196,9 @@ namespace osu.Game.Screens.Multi.Match
             beatmapManager.ItemAdded += beatmapAdded;
         }
 
+        /// <summary>
+        /// Handle the case where a beatmap is imported (and can be used by this match).
+        /// </summary>
         private void beatmapAdded(BeatmapSetInfo model, bool existing, bool silent) => Schedule(() =>
         {
             if (Beatmap.Value != beatmapManager.DefaultBeatmap)
@@ -215,19 +214,21 @@ namespace osu.Game.Screens.Multi.Match
                 Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
         });
 
+        [Resolved(canBeNull: true)]
+        private Multiplayer multiplayer { get; set; }
+
         private void onStart()
         {
-            // todo: is this required?
             Beatmap.Value.Mods.Value = CurrentMods.Value.ToArray();
 
             switch (type.Value)
             {
                 default:
                 case GameTypeTimeshift _:
-                    this.Push(new PlayerLoader(() => new TimeshiftPlayer(CurrentItem)
+                    multiplayer?.Start(() => new TimeshiftPlayer(CurrentItem)
                     {
                         Exited = () => leaderboard.RefreshScores()
-                    }));
+                    });
                     break;
             }
         }

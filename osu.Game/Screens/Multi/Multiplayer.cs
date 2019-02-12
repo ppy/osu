@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -20,6 +21,7 @@ using osu.Game.Screens.Menu;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Screens.Multi
@@ -29,7 +31,7 @@ namespace osu.Game.Screens.Multi
     {
         public override bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.CursorVisible ?? true;
 
-        public override bool RemoveWhenNotAlive => false;
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         private readonly MultiplayerWaveContainer waves;
 
@@ -291,6 +293,15 @@ namespace osu.Game.Screens.Multi
                 ThirdWaveColour = OsuColour.FromHex(@"44325e");
                 FourthWaveColour = OsuColour.FromHex(@"392850");
             }
+        }
+
+        /// <summary>
+        /// Push a <see cref="Player"/> to the main screen stack to begin gameplay.
+        /// Generally called from a <see cref="MatchSubScreen"/> via DI resolution.
+        /// </summary>
+        public void Start(Func<Player> player)
+        {
+            this.Push(new PlayerLoader(player));
         }
     }
 }
