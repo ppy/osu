@@ -179,6 +179,15 @@ namespace osu.Game.Screens.Multi.Match
             CurrentItem.BindValueChanged(currentItemChanged, true);
         }
 
+        public override bool OnExiting(IScreen next)
+        {
+            RoomManager?.PartRoom();
+            return base.OnExiting(next);
+        }
+
+        /// <summary>
+        /// Handles propagation of the current playlist item's content to game-wide mechanisms.
+        /// </summary>
         private void currentItemChanged(PlaylistItem item)
         {
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
@@ -188,12 +197,6 @@ namespace osu.Game.Screens.Multi.Match
             CurrentMods.Value = item?.RequiredMods ?? Enumerable.Empty<Mod>();
             if (item?.Ruleset != null)
                 Ruleset.Value = item.Ruleset;
-        }
-
-        public override bool OnExiting(IScreen next)
-        {
-            RoomManager?.PartRoom();
-            return base.OnExiting(next);
         }
 
         /// <summary>

@@ -184,7 +184,6 @@ namespace osu.Game.Screens.Multi
         public override void OnEntering(IScreen last)
         {
             this.FadeIn();
-
             waves.Show();
         }
 
@@ -201,10 +200,16 @@ namespace osu.Game.Screens.Multi
 
             updatePollingRate(isIdle.Value);
 
-            // the wave overlay transition takes longer than expected to run.
-            logo?.AppendAnimatingAction(() => logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut(), false);
-
+            base.OnExiting(next);
             return false;
+        }
+
+        protected override void LogoExiting(OsuLogo logo)
+        {
+            base.LogoExiting(logo);
+
+            // the wave overlay transition takes longer than expected to run.
+            logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut();
         }
 
         public override void OnResuming(IScreen last)
@@ -212,7 +217,7 @@ namespace osu.Game.Screens.Multi
             this.FadeIn(250);
             this.ScaleTo(1, 250, Easing.OutSine);
 
-            logo?.AppendAnimatingAction(() => ApplyLogoArrivingDefaults(logo), true);
+            base.OnResuming(last);
 
             updatePollingRate(isIdle.Value);
         }
