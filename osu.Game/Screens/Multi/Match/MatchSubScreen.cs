@@ -45,41 +45,17 @@ namespace osu.Game.Screens.Multi.Match
         [Resolved]
         protected Bindable<IEnumerable<Mod>> CurrentMods { get; private set; }
 
-        public MatchSubScreen(Room room)
-        {
-            Title = room.RoomID.Value == null ? "New room" : room.Name;
-        }
-
-        private MatchLeaderboard leaderboard;
-
         [Resolved]
         private BeatmapManager beatmapManager { get; set; }
 
         [Resolved(CanBeNull = true)]
         private OsuGame game { get; set; }
 
-        protected override void LoadComplete()
+        private MatchLeaderboard leaderboard;
+
+        public MatchSubScreen(Room room)
         {
-            base.LoadComplete();
-
-            CurrentItem.BindValueChanged(currentItemChanged, true);
-        }
-
-        private void currentItemChanged(PlaylistItem item)
-        {
-            // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            var localBeatmap = item?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == item.Beatmap.OnlineBeatmapID);
-
-            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            CurrentMods.Value = item?.RequiredMods ?? Enumerable.Empty<Mod>();
-            if (item?.Ruleset != null)
-                Ruleset.Value = item.Ruleset;
-        }
-
-        public override bool OnExiting(IScreen next)
-        {
-            RoomManager?.PartRoom();
-            return base.OnExiting(next);
+            Title = room.RoomID.Value == null ? "New room" : room.Name;
         }
 
         [BackgroundDependencyLoader]
@@ -194,6 +170,30 @@ namespace osu.Game.Screens.Multi.Match
             };
 
             beatmapManager.ItemAdded += beatmapAdded;
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            CurrentItem.BindValueChanged(currentItemChanged, true);
+        }
+
+        private void currentItemChanged(PlaylistItem item)
+        {
+            // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
+            var localBeatmap = item?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == item.Beatmap.OnlineBeatmapID);
+
+            Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
+            CurrentMods.Value = item?.RequiredMods ?? Enumerable.Empty<Mod>();
+            if (item?.Ruleset != null)
+                Ruleset.Value = item.Ruleset;
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            RoomManager?.PartRoom();
+            return base.OnExiting(next);
         }
 
         /// <summary>

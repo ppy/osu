@@ -64,63 +64,60 @@ namespace osu.Game.Screens.Multi
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
+            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
 
             InternalChild = waves = new MultiplayerWaveContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = OsuColour.FromHex(@"3e3a44"),
+                            },
+                            new Triangles
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColourLight = OsuColour.FromHex(@"3c3842"),
+                                ColourDark = OsuColour.FromHex(@"393540"),
+                                TriangleScale = 5,
+                            },
+                        },
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Top = Header.HEIGHT },
+                        Child = screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both }
+                    },
+                    new Header(screenStack),
+                    createButton = new HeaderButton
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        RelativeSizeAxes = Axes.None,
+                        Size = new Vector2(150, Header.HEIGHT - 20),
+                        Margin = new MarginPadding
+                        {
+                            Top = 10,
+                            Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
+                        },
+                        Text = "Create room",
+                        Action = () => loungeSubScreen.Open(new Room
+                        {
+                            Name = { Value = $"{api.LocalUser}'s awesome room" }
+                        }),
+                    },
+                    roomManager = new RoomManager()
+                }
             };
-
-            screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both };
-            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
-
-            waves.AddRange(new Drawable[]
-            {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.FromHex(@"3e3a44"),
-                        },
-                        new Triangles
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            ColourLight = OsuColour.FromHex(@"3c3842"),
-                            ColourDark = OsuColour.FromHex(@"393540"),
-                            TriangleScale = 5,
-                        },
-                    },
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = Header.HEIGHT },
-                    Child = screenStack
-                },
-                new Header(screenStack),
-                createButton = new HeaderButton
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    RelativeSizeAxes = Axes.None,
-                    Size = new Vector2(150, Header.HEIGHT - 20),
-                    Margin = new MarginPadding
-                    {
-                        Top = 10,
-                        Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
-                    },
-                    Text = "Create room",
-                    Action = () => loungeSubScreen.Open(new Room
-                    {
-                        Name = { Value = $"{api.LocalUser}'s awesome room" }
-                    }),
-                },
-                roomManager = new RoomManager()
-            });
 
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
@@ -141,11 +138,9 @@ namespace osu.Game.Screens.Multi
             isIdle.BindValueChanged(updatePollingRate, true);
         }
 
-        private CachedModelDependencyContainer<Room> dependencies;
-
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
+            var dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
             dependencies.Model.BindTo(currentRoom);
             return dependencies;
         }
@@ -156,12 +151,16 @@ namespace osu.Game.Screens.Multi
             Logger.Log($"Polling adjusted to {roomManager.TimeBetweenPolls}");
         }
 
-        private void pushGameplayScreen(IScreen gameplayScreen)
+        /// <summary>
+        /// Push a <see cref="Player"/> to the main screen stack to begin gameplay.
+        /// Generally called from a <see cref="MatchSubScreen"/> via DI resolution.
+        /// </summary>
+        public void Start(Func<Player> player)
         {
             if (!this.IsCurrentScreen())
                 return;
 
-            this.Push(gameplayScreen);
+            this.Push(new PlayerLoader(player));
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
@@ -293,15 +292,6 @@ namespace osu.Game.Screens.Multi
                 ThirdWaveColour = OsuColour.FromHex(@"44325e");
                 FourthWaveColour = OsuColour.FromHex(@"392850");
             }
-        }
-
-        /// <summary>
-        /// Push a <see cref="Player"/> to the main screen stack to begin gameplay.
-        /// Generally called from a <see cref="MatchSubScreen"/> via DI resolution.
-        /// </summary>
-        public void Start(Func<Player> player)
-        {
-            this.Push(new PlayerLoader(player));
         }
     }
 }
