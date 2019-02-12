@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_osu_o };
 
-        public override LegacyDifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuLegacyDifficultyCalculator(this, beatmap);
+        public override LegacyDifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuDifficultyCalculator(this, beatmap);
 
         public override PerformanceCalculator CreatePerformanceCalculator(WorkingBeatmap beatmap, ScoreInfo score) => new OsuPerformanceCalculator(this, beatmap, score);
 
