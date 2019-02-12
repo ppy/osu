@@ -76,6 +76,9 @@ namespace osu.Game.Overlays.Direct
         {
             this.colours = colours;
 
+            beatmaps.ItemAdded += (set, existing, silent) => updateState(BeatmapSet.Value);
+            beatmaps.ItemRemoved += set => updateState(BeatmapSet.Value);
+
             button.Action = () =>
             {
                 switch (State.Value)
@@ -92,6 +95,12 @@ namespace osu.Game.Overlays.Direct
                         break;
                 }
             };
+        }
+
+        private void updateState(BeatmapSetInfo set)
+        {
+            if (set.OnlineBeatmapSetID == BeatmapSet.Value.OnlineBeatmapSetID)
+                UpdateState(BeatmapSet.Value);
         }
 
         private void updateState(DownloadState state)
