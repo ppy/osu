@@ -13,12 +13,12 @@ using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty
 {
-    public class OsuDifficultyCalculator : DifficultyCalculator
+    public class OsuLegacyDifficultyCalculator : LegacyDifficultyCalculator
     {
         private const int section_length = 400;
         private const double difficulty_multiplier = 0.0675;
 
-        public OsuDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
+        public OsuLegacyDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }

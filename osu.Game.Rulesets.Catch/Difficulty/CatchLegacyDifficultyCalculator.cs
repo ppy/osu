@@ -12,7 +12,7 @@ using osu.Game.Rulesets.Catch.UI;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
-    public class CatchDifficultyCalculator : DifficultyCalculator
+    public class CatchLegacyDifficultyCalculator : LegacyDifficultyCalculator
     {
         /// <summary>
         /// In milliseconds. For difficulty calculation we will only look at the highest strain value in each time interval of size STRAIN_STEP.
@@ -28,7 +28,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
         private const double star_scaling_factor = 0.145;
 
-        public CatchDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
+        public CatchLegacyDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
         }
