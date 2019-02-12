@@ -6,18 +6,19 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Mania.Beatmaps;
+using osu.Game.Rulesets.Mania.Mods;
+using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
-using osu.Game.Rulesets.Taiko.Mods;
-using osu.Game.Rulesets.Taiko.Objects;
 
-namespace osu.Game.Rulesets.Taiko.Difficulty
+namespace osu.Game.Rulesets.Mania.Difficulty
 {
-    internal class TaikoDifficultyCalculator : DifficultyCalculator
+    internal class ManiaLegacyDifficultyCalculator : LegacyDifficultyCalculator
     {
-        private const double star_scaling_factor = 0.04125;
+        private const double star_scaling_factor = 0.018;
 
         /// <summary>
-        /// In milliseconds. For difficulty calculation we will only look at the highest strain value in each time interval of size STRAIN_STEP.
+        /// In milliseconds. For difficulty calculation we will only look at the highest strain value in each time interval of size strain_step.
         /// This is to eliminate higher influence of stream over aim by simply having more HitObjects with high strain.
         /// The higher this value, the less strains there will be, indirectly giving long beatmaps an advantage.
         /// </summary>
@@ -28,45 +29,48 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         /// </summary>
         private const double decay_weight = 0.9;
 
-        public TaikoDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
+        private readonly bool isForCurrentRuleset;
+
+        public ManiaLegacyDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
         {
+            isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
         }
 
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
             if (!beatmap.HitObjects.Any())
-                return new TaikoDifficultyAttributes(mods, 0);
+                return new ManiaDifficultyAttributes(mods, 0);
 
-            var difficultyHitObjects = new List<TaikoHitObjectDifficulty>();
+            var difficultyHitObjects = new List<ManiaHitObjectDifficulty>();
 
-            foreach (var hitObject in beatmap.HitObjects)
-                difficultyHitObjects.Add(new TaikoHitObjectDifficulty((TaikoHitObject)hitObject));
+            int columnCount = ((ManiaBeatmap)beatmap).TotalColumns;
 
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
-            difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
+            // Note: Stable sort is done so that the ordering of hitobjects with equal start times doesn't change
+            difficultyHitObjects.AddRange(beatmap.HitObjects.Select(h => new ManiaHitObjectDifficulty((ManiaHitObject)h, columnCount)).OrderBy(h => h.BaseHitObject.StartTime));
 
             if (!calculateStrainValues(difficultyHitObjects, timeRate))
-                return new TaikoDifficultyAttributes(mods, 0);
+                return new ManiaDifficultyAttributes(mods, 0);
 
             double starRating = calculateDifficulty(difficultyHitObjects, timeRate) * star_scaling_factor;
 
-            return new TaikoDifficultyAttributes(mods, starRating)
+            return new ManiaDifficultyAttributes(mods, starRating)
             {
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate,
-                MaxCombo = beatmap.HitObjects.Count(h => h is Hit)
+                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate
             };
         }
 
-        private bool calculateStrainValues(List<TaikoHitObjectDifficulty> objects, double timeRate)
+        private bool calculateStrainValues(List<ManiaHitObjectDifficulty> objects, double timeRate)
         {
             // Traverse hitObjects in pairs to calculate the strain value of NextHitObject from the strain value of CurrentHitObject and environment.
             using (var hitObjectsEnumerator = objects.GetEnumerator())
             {
-                if (!hitObjectsEnumerator.MoveNext()) return false;
+                if (!hitObjectsEnumerator.MoveNext())
+                    return false;
 
-                TaikoHitObjectDifficulty current = hitObjectsEnumerator.Current;
+                ManiaHitObjectDifficulty current = hitObjectsEnumerator.Current;
 
                 // First hitObject starts at strain 1. 1 is the default for strain values, so we don't need to set it here. See DifficultyHitObject.
                 while (hitObjectsEnumerator.MoveNext())
@@ -80,7 +84,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             }
         }
 
-        private double calculateDifficulty(List<TaikoHitObjectDifficulty> objects, double timeRate)
+        private double calculateDifficulty(List<ManiaHitObjectDifficulty> objects, double timeRate)
         {
             double actualStrainStep = strain_step * timeRate;
 
@@ -89,7 +93,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             double intervalEndTime = actualStrainStep;
             double maximumStrain = 0; // We need to keep track of the maximum strain in the current interval
 
-            TaikoHitObjectDifficulty previousHitObject = null;
+            ManiaHitObjectDifficulty previousHitObject = null;
             foreach (var hitObject in objects)
             {
                 // While we are beyond the current interval push the currently available maximum to our strain list
@@ -105,8 +109,9 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                     }
                     else
                     {
-                        double decay = Math.Pow(TaikoHitObjectDifficulty.DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
-                        maximumStrain = previousHitObject.Strain * decay;
+                        double individualDecay = Math.Pow(ManiaHitObjectDifficulty.INDIVIDUAL_DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
+                        double overallDecay = Math.Pow(ManiaHitObjectDifficulty.OVERALL_DECAY_BASE, (intervalEndTime - previousHitObject.BaseHitObject.StartTime) / 1000);
+                        maximumStrain = previousHitObject.IndividualStrain * individualDecay + previousHitObject.OverallStrain * overallDecay;
                     }
 
                     // Go to the next time interval
@@ -114,7 +119,8 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 }
 
                 // Obtain maximum strain
-                maximumStrain = Math.Max(hitObject.Strain, maximumStrain);
+                double strain = hitObject.IndividualStrain + hitObject.OverallStrain;
+                maximumStrain = Math.Max(strain, maximumStrain);
 
                 previousHitObject = hitObject;
             }
@@ -133,12 +139,35 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             return difficulty;
         }
 
-        protected override Mod[] DifficultyAdjustmentMods => new Mod[]
+        protected override Mod[] DifficultyAdjustmentMods
         {
-            new TaikoModDoubleTime(),
-            new TaikoModHalfTime(),
-            new TaikoModEasy(),
-            new TaikoModHardRock(),
-        };
+            get
+            {
+                var mods = new Mod[]
+                {
+                    new ManiaModDoubleTime(),
+                    new ManiaModHalfTime(),
+                    new ManiaModEasy(),
+                    new ManiaModHardRock(),
+                };
+
+                if (isForCurrentRuleset)
+                    return mods;
+
+                // if we are a convert, we can be played in any key mod.
+                return mods.Concat(new Mod[]
+                {
+                    new ManiaModKey1(),
+                    new ManiaModKey2(),
+                    new ManiaModKey3(),
+                    new ManiaModKey4(),
+                    new ManiaModKey5(),
+                    new ManiaModKey6(),
+                    new ManiaModKey7(),
+                    new ManiaModKey8(),
+                    new ManiaModKey9(),
+                }).ToArray();
+            }
+        }
     }
 }
