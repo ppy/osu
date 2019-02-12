@@ -14,8 +14,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         public double OverallDifficulty;
         public int MaxCombo;
 
-        public OsuDifficultyAttributes(Mod[] mods, double starRating)
-            : base(mods, starRating)
+        public OsuDifficultyAttributes(Mod[] mods)
+            : base(mods)
         {
         }
     }
