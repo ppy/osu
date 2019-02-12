@@ -3,6 +3,7 @@
 
 using osuTK.Graphics;
 using osu.Framework.Graphics.UserInterface;
+using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 
 namespace osu.Game.Overlays.SearchableList
@@ -21,7 +22,7 @@ namespace osu.Game.Overlays.SearchableList
         {
             public HeaderTabItem(T value) : base(value)
             {
-                Text.TextSize = 16;
+                Text.Font = OsuFont.GetFont(Text.Font, size: 16);
             }
         }
     }

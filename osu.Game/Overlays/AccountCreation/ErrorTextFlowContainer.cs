@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osuTK.Graphics;
 
@@ -13,7 +14,7 @@ namespace osu.Game.Overlays.AccountCreation
         private readonly List<Drawable> errorDrawables = new List<Drawable>();
 
         public ErrorTextFlowContainer()
-            : base(cp => { cp.TextSize = 12; })
+            : base(cp => cp.Font = OsuFont.GetFont(cp.Font, size: 12))
         {
         }
 

@@ -34,7 +34,7 @@ namespace osu.Game.Screens.Play.Break
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreRight,
                     Text = name,
-                    TextSize = 17,
+                    Font = OsuFont.GetFont(size: 17),
                     Margin = new MarginPadding { Right = margin }
                 },
                 valueText = new OsuSpriteText
@@ -42,8 +42,7 @@ namespace osu.Game.Screens.Play.Break
                     Anchor = Anchor.Centre,
                     Origin = Anchor.CentreLeft,
                     Text = prefix + @"-",
-                    TextSize = 17,
-                    Font = "Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                     Margin = new MarginPadding { Left = margin }
                 }
             };

@@ -107,21 +107,19 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     Text = header + ":",
-                                    TextSize = 20,
-                                    Font = @"Exo2.0-RegularItalic",
+                                    Font = OsuFont.GetFont(size: 20, italics: true)
                                 },
                                 valueText = new OsuSpriteText
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     Text = "0",
-                                    TextSize = 40,
+                                    Font = OsuFont.GetFont(size: 40, italics: true),
                                     UseFullGlyphHeight = false,
-                                    Font = @"Exo2.0-RegularItalic"
                                 }
                             }
                         },
-                        new OsuTextFlowContainer(t => { t.TextSize = 19; })
+                        new OsuTextFlowContainer(t => t.Font = OsuFont.GetFont(t.Font, size: 19))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,

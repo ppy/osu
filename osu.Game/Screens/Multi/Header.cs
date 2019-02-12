@@ -64,12 +64,11 @@ namespace osu.Game.Screens.Multi
                                         new OsuSpriteText
                                         {
                                             Text = "multiplayer ",
-                                            TextSize = 25,
+                                            Font = OsuFont.GetFont(size: 25)
                                         },
                                         screenType = new OsuSpriteText
                                         {
-                                            TextSize = 25,
-                                            Font = @"Exo2.0-Light",
+                                            Font = OsuFont.GetFont(weight: FontWeight.Light, size: 25)
                                         },
                                     },
                                 },

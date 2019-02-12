@@ -118,7 +118,7 @@ namespace osu.Game.Screens.Edit.Compose.Components
                         },
                         new Drawable[]
                         {
-                            new TextFlowContainer(s => s.TextSize = 14)
+                            new TextFlowContainer(s => s.Font = OsuFont.GetFont(s.Font, size: 14))
                             {
                                 Padding = new MarginPadding { Horizontal = 15 },
                                 Text = "beat snap divisor",

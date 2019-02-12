@@ -5,6 +5,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Screens.Play.HUD
@@ -99,8 +100,9 @@ namespace osu.Game.Screens.Play.HUD
             set
             {
                 textSize = value;
-                DisplayedCountSpriteText.TextSize = TextSize;
-                PopOutCount.TextSize = TextSize;
+
+                DisplayedCountSpriteText.Font = OsuFont.GetFont(DisplayedCountSpriteText.Font, size: TextSize);
+                PopOutCount.Font = OsuFont.GetFont(PopOutCount.Font, size: TextSize);
             }
         }
 

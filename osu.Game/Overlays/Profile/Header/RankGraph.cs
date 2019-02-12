@@ -44,30 +44,26 @@ namespace osu.Game.Overlays.Profile.Header
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     Text = "No recent plays",
-                    TextSize = 14,
-                    Font = @"Exo2.0-RegularItalic",
+                    Font = OsuFont.GetFont(size: 14, italics: true)
                 },
                 rankText = new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Font = @"Exo2.0-RegularItalic",
-                    TextSize = primary_textsize
+                    Font = OsuFont.GetFont(size: primary_textsize, italics: true),
                 },
                 relativeText = new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
-                    Font = @"Exo2.0-RegularItalic",
+                    Font = OsuFont.GetFont(size: secondary_textsize, italics: true),
                     Y = 25,
-                    TextSize = secondary_textsize
                 },
                 performanceText = new OsuSpriteText
                 {
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.BottomCentre,
-                    Font = @"Exo2.0-RegularItalic",
-                    TextSize = secondary_textsize
+                    Font = OsuFont.GetFont(size: secondary_textsize, italics: true)
                 },
                 graph = new RankChartLineGraph
                 {

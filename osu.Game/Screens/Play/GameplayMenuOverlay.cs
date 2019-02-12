@@ -88,11 +88,10 @@ namespace osu.Game.Screens.Play
                                 new OsuSpriteText
                                 {
                                     Text = Header,
-                                    Font = @"Exo2.0-Medium",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 30),
                                     Spacing = new Vector2(5, 0),
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
-                                    TextSize = 30,
                                     Colour = colours.Yellow,
                                     Shadow = true,
                                     ShadowColour = new Color4(0, 0, 0, 0.25f)
@@ -260,22 +259,21 @@ namespace osu.Game.Screens.Play
                     Text = "You've retried ",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    TextSize = 18
+                    Font = OsuFont.GetFont(size: 18),
                 },
                 new OsuSpriteText
                 {
                     Text = $"{retries:n0}",
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    TextSize = 18
                 },
                 new OsuSpriteText
                 {
                     Text = $" time{(retries == 1 ? "" : "s")} in this session",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
-                    TextSize = 18
+                    Font = OsuFont.GetFont(size: 18),
                 }
             };
         }

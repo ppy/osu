@@ -107,20 +107,18 @@ namespace osu.Game.Overlays
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.TopCentre,
                                     Position = new Vector2(0, 40),
-                                    TextSize = 25,
+                                    Font = OsuFont.GetFont(size: 25, weight: FontWeight.Medium, italics: true),
                                     Colour = Color4.White,
                                     Text = @"Nothing to play",
-                                    Font = @"Exo2.0-MediumItalic"
                                 },
                                 artist = new OsuSpriteText
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Position = new Vector2(0, 45),
-                                    TextSize = 15,
+                                    Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold, italics: true),
                                     Colour = Color4.White,
                                     Text = @"Nothing to play",
-                                    Font = @"Exo2.0-BoldItalic"
                                 },
                                 new Container
                                 {

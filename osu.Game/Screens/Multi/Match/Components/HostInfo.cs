@@ -4,6 +4,7 @@
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Online.Chat;
 using osu.Game.Users;
@@ -53,7 +54,8 @@ namespace osu.Game.Screens.Multi.Match.Components
             {
                 linkContainer.AddText("hosted by");
                 linkContainer.NewLine();
-                linkContainer.AddLink(host.Username, null, LinkAction.OpenUserProfile, host.Id.ToString(), "View Profile", s => s.Font = "Exo2.0-BoldItalic");
+                linkContainer.AddLink(host.Username, null, LinkAction.OpenUserProfile, host.Id.ToString(), "View Profile",
+                    s => s.Font = OsuFont.GetFont(Typeface.Exo, weight: FontWeight.Bold, italics: true));
             }
         }
     }

@@ -173,10 +173,7 @@ namespace osu.Game.Overlays.Direct
 
                 Children = new Drawable[]
                 {
-                    text = new OsuSpriteText
-                    {
-                        Font = @"Exo2.0-SemiBoldItalic",
-                    },
+                    text = new OsuSpriteText { Font = OsuFont.GetFont(weight: FontWeight.SemiBold, italics: true) },
                     new SpriteIcon
                     {
                         Icon = icon,

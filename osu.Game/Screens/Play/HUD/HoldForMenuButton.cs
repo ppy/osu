@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play.HUD
                 text = new OsuSpriteText
                 {
                     Text = "hold for menu",
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },

@@ -15,6 +15,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Overlays;
@@ -63,16 +64,14 @@ namespace osu.Game.Screens.Select.Carousel
                     {
                         new OsuSpriteText
                         {
-                            Font = @"Exo2.0-BoldItalic",
                             Text = new LocalisedString((beatmapSet.Metadata.TitleUnicode, beatmapSet.Metadata.Title)),
-                            TextSize = 22,
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22, italics: true),
                             Shadow = true,
                         },
                         new OsuSpriteText
                         {
-                            Font = @"Exo2.0-SemiBoldItalic",
                             Text = new LocalisedString((beatmapSet.Metadata.ArtistUnicode, beatmapSet.Metadata.Artist)),
-                            TextSize = 17,
+                            Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 17, italics: true),
                             Shadow = true,
                         },
                         new FillFlowContainer

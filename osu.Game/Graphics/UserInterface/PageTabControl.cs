@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.UserInterface
                         Origin = Anchor.BottomLeft,
                         Anchor = Anchor.BottomLeft,
                         Text = (value as Enum)?.GetDescription() ?? value.ToString(),
-                        TextSize = 14,
+                        Font = OsuFont.GetFont(size: 14)
                     },
                     box = new Box
                     {
@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.UserInterface
                     new HoverClickSounds()
                 };
 
-                Active.BindValueChanged(val => Text.Font = val ? @"Exo2.0-Bold" : @"Exo2.0", true);
+                Active.BindValueChanged(val => Text.Font = OsuFont.GetFont(Text.Font, weight: val ? FontWeight.Bold : FontWeight.Regular), true);
             }
 
             [BackgroundDependencyLoader]

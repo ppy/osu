@@ -115,8 +115,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                         {
                                             title = new OsuSpriteText
                                             {
-                                                Font = @"Exo2.0-BoldItalic",
-                                                TextSize = 37,
+                                                Font = OsuFont.GetFont(size: 37, weight: FontWeight.Bold, italics: true)
                                             },
                                             externalLink = new ExternalLinkButton
                                             {
@@ -126,11 +125,7 @@ namespace osu.Game.Overlays.BeatmapSet
                                             },
                                         }
                                     },
-                                    artist = new OsuSpriteText
-                                    {
-                                        Font = @"Exo2.0-SemiBoldItalic",
-                                        TextSize = 25,
-                                    },
+                                    artist = new OsuSpriteText { Font = OsuFont.GetFont(size: 25, weight: FontWeight.SemiBold, italics: true) },
                                     new Container
                                     {
                                         RelativeSizeAxes = Axes.X,
