@@ -181,7 +181,6 @@ namespace osu.Game.Screens.Select
             ratingsContainer.FadeIn(transition_duration);
             advanced.Beatmap = Beatmap;
             description.Text = Beatmap.Version;
-            //source.Text = string.IsNullOrEmpty(Beatmap.Metadata.Source) ? "Unknown source" : Beatmap.Metadata.Source;
             source.Text = Beatmap.Metadata.Source;
             tags.Text = Beatmap.Metadata.Tags;
 
