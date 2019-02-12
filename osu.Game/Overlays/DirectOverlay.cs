@@ -105,12 +105,11 @@ namespace osu.Game.Overlays
                         new OsuSpriteText
                         {
                             Text = "Found ",
-                            TextSize = 15,
+                            Font = OsuFont.GetFont(size: 15)
                         },
                         resultCountsText = new OsuSpriteText
                         {
-                            TextSize = 15,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold)
                         },
                     }
                 },

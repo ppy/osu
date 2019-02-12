@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Graphics;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Online.Leaderboards
@@ -12,7 +13,7 @@ namespace osu.Game.Online.Leaderboards
         protected const float TEXT_SIZE = 22;
 
         protected Placeholder()
-            : base(cp => cp.TextSize = TEXT_SIZE)
+            : base(cp => cp.Font = OsuFont.GetFont(cp.Font, size: TEXT_SIZE))
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;

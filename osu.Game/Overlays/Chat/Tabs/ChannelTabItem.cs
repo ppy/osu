@@ -90,7 +90,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Text = value.ToString(),
-                            TextSize = 18,
+                            Font = OsuFont.GetFont(size: 18)
                         },
                         TextBold = new OsuSpriteText
                         {
@@ -99,8 +99,7 @@ namespace osu.Game.Overlays.Chat.Tabs
                             Origin = Anchor.CentreLeft,
                             Anchor = Anchor.CentreLeft,
                             Text = value.ToString(),
-                            Font = @"Exo2.0-Bold",
-                            TextSize = 18,
+                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold)
                         },
                         CloseButton = new TabCloseButton
                         {

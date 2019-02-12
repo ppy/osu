@@ -115,10 +115,7 @@ namespace osu.Game.Overlays.Notifications
                 RelativeSizeAxes = Axes.Both,
             });
 
-            Content.Add(textDrawable = new OsuTextFlowContainer(t =>
-            {
-                t.TextSize = 16;
-            })
+            Content.Add(textDrawable = new OsuTextFlowContainer(t => t.Font = OsuFont.Default)
             {
                 Colour = OsuColour.Gray(128),
                 AutoSizeAxes = Axes.Y,

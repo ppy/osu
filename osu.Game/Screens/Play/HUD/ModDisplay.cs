@@ -14,6 +14,7 @@ using osu.Game.Rulesets.UI;
 using osuTK;
 using osu.Game.Graphics.Containers;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Play.HUD
 {
@@ -60,8 +61,7 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre,
                     Text = @"/ UNRANKED /",
-                    Font = @"Venera",
-                    TextSize = 12,
+                    Font = OsuFont.GetFont(Typeface.Venera, 12),
                 }
             };
 

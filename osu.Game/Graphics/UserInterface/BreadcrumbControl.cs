@@ -82,7 +82,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public BreadcrumbTabItem(T value) : base(value)
             {
-                Text.TextSize = 18;
+                Text.Font = OsuFont.GetFont(Text.Font, size: 18);
                 Text.Margin = new MarginPadding { Vertical = 8 };
                 Padding = new MarginPadding { Right = padding + item_chevron_size };
                 Add(Chevron = new SpriteIcon

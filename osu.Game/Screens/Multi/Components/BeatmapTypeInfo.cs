@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Multi.Components
                         Children = new Drawable[]
                         {
                             new BeatmapTitle(),
-                            beatmapAuthor = new LinkFlowContainer(s => s.TextSize = 14)
+                            beatmapAuthor = new LinkFlowContainer(s => s.Font = OsuFont.GetFont(s.Font, size: 14))
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,

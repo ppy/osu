@@ -81,7 +81,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                         summary = new OsuSpriteText
                         {
                             Text = "0 participants",
-                            TextSize = 14,
+                            Font = OsuFont.GetFont(size: 14)
                         }
                     },
                 },
@@ -95,7 +95,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 if (v != null)
                 {
                     hostText.AddText("hosted by ");
-                    hostText.AddLink(v.Username, null, LinkAction.OpenUserProfile, v.Id.ToString(), "Open profile", s => s.Font = "Exo2.0-BoldItalic");
+                    hostText.AddLink(v.Username, null, LinkAction.OpenUserProfile, v.Id.ToString(), "Open profile",
+                        s => s.Font = OsuFont.GetFont(Typeface.Exo, weight: FontWeight.Medium, italics: true));
                     flagContainer.Child = new DrawableFlag(v.Country) { RelativeSizeAxes = Axes.Both };
                 }
             }, true);

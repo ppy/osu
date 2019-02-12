@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomLeft,
                     Anchor = Anchor.BottomLeft,
                     Colour = colours.BlueLighter,
-                    Font = @"Venera",
+                    Font = OsuFont.GetFont(Typeface.Venera),
                     Margin = new MarginPadding
                     {
                         Left = margin,
@@ -53,14 +53,14 @@ namespace osu.Game.Screens.Play
                     Origin = Anchor.BottomCentre,
                     Anchor = Anchor.BottomCentre,
                     Colour = colours.BlueLighter,
-                    Font = @"Venera",
+                    Font = OsuFont.GetFont(Typeface.Venera),
                 },
                 timeLeft = new OsuSpriteText
                 {
                     Origin = Anchor.BottomRight,
                     Anchor = Anchor.BottomRight,
                     Colour = colours.BlueLighter,
-                    Font = @"Venera",
+                    Font = OsuFont.GetFont(Typeface.Venera),
                     Margin = new MarginPadding
                     {
                         Right = margin,

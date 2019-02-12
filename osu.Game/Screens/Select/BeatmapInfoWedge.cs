@@ -203,9 +203,8 @@ namespace osu.Game.Screens.Select
                         {
                             VersionLabel = new OsuSpriteText
                             {
-                                Font = @"Exo2.0-MediumItalic",
                                 Text = beatmapInfo.Version,
-                                TextSize = 24,
+                                Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 24, italics: true),
                             },
                         }
                     },
@@ -240,13 +239,11 @@ namespace osu.Game.Screens.Select
                         {
                             TitleLabel = new OsuSpriteText
                             {
-                                Font = @"Exo2.0-MediumItalic",
-                                TextSize = 28,
+                                Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 28, italics: true),
                             },
                             ArtistLabel = new OsuSpriteText
                             {
-                                Font = @"Exo2.0-MediumItalic",
-                                TextSize = 17,
+                                Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 17, italics: true),
                             },
                             MapperContainer = new FillFlowContainer
                             {
@@ -345,16 +342,13 @@ namespace osu.Game.Screens.Select
                 {
                     new OsuSpriteText
                     {
-                        Font = @"Exo2.0-Medium",
                         Text = "mapped by ",
-                        TextSize = 15,
+                        Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 15),
                     },
                     new OsuSpriteText
                     {
-                        Font = @"Exo2.0-Bold",
-                        // ReSharper disable once PossibleNullReferenceException (resharper broken?)
                         Text = metadata.Author.Username,
-                        TextSize = 15,
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 15),
                     }
                 };
             }
@@ -402,10 +396,9 @@ namespace osu.Game.Screens.Select
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Colour = new Color4(255, 221, 85, 255),
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 17),
                             Margin = new MarginPadding { Left = 30 },
                             Text = statistic.Content,
-                            TextSize = 17,
                         }
                     };
                 }
