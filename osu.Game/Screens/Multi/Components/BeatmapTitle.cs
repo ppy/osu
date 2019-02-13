@@ -48,7 +48,7 @@ namespace osu.Game.Screens.Multi.Components
 
         private void updateText()
         {
-            if (!IsLoaded)
+            if (LoadState < LoadState.Loading)
                 return;
 
             textFlow.Clear();
