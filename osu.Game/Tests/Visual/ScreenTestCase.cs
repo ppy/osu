@@ -33,11 +33,5 @@ namespace osu.Game.Tests.Visual
                 stack.Exit();
             stack.Push(screen);
         }
-
-        protected override void Dispose(bool isDisposing)
-        {
-            stack.Dispose();
-            base.Dispose(isDisposing);
-        }
     }
 }
