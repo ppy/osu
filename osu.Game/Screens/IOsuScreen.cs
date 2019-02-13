@@ -18,6 +18,12 @@ namespace osu.Game.Screens
         bool DisallowExternalBeatmapRulesetChanges { get; }
 
         /// <summary>
+        /// Whether a top-level component should be allowed to exit the current screen to, for example,
+        /// complete an import.
+        /// </summary>
+        bool AllowExternalScreenChange { get; }
+
+        /// <summary>
         /// Whether this <see cref="OsuScreen"/> allows the cursor to be displayed.
         /// </summary>
         bool CursorVisible { get; }
