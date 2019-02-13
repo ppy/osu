@@ -10,8 +10,8 @@ namespace osu.Game.Rulesets.Mania.Difficulty
     {
         public double GreatHitWindow;
 
-        public ManiaDifficultyAttributes(Mod[] mods, double starRating)
-            : base(mods, starRating)
+        public ManiaDifficultyAttributes(Mod[] mods)
+            : base(mods)
         {
         }
     }
