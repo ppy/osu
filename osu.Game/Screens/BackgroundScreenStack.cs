@@ -14,6 +14,8 @@ namespace osu.Game.Screens
         {
             Scale = new Vector2(1.06f);
             RelativeSizeAxes = Axes.Both;
+            Anchor = Anchor.Centre;
+            Origin = Anchor.Centre;
         }
 
         //public float ParallaxAmount { set => parallax.ParallaxAmount = ParallaxContainer.DEFAULT_PARALLAX_AMOUNT * value; }

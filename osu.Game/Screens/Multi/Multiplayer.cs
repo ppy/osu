@@ -20,6 +20,7 @@ using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Multi.Lounge;
+using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
 using osuTK;
 
@@ -48,6 +49,14 @@ namespace osu.Game.Screens.Multi
         private readonly LoungeSubScreen loungeSubScreen;
         private readonly ScreenStack screenStack;
 
+        private readonly IBindable<bool> isIdle = new BindableBool();
+
+        [Cached]
+        private readonly Bindable<Room> currentRoom = new Bindable<Room>();
+
+        [Cached]
+        private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>();
+
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
 
@@ -74,7 +83,7 @@ namespace osu.Game.Screens.Multi
                 RelativeSizeAxes = Axes.Both,
             };
 
-            screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen(this.Push)) { RelativeSizeAxes = Axes.Both };
+            screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen(pushGameplayScreen)) { RelativeSizeAxes = Axes.Both };
             Padding = new MarginPadding { Horizontal = -OsuScreen.HORIZONTAL_OVERFLOW_PADDING };
 
             waves.AddRange(new Drawable[]
@@ -118,7 +127,7 @@ namespace osu.Game.Screens.Multi
                         Right = 10 + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
                     },
                     Text = "Create room",
-                    Action = () => loungeSubScreen.Push(new Room
+                    Action = () => loungeSubScreen.Open(new Room
                     {
                         Name = { Value = $"{api.LocalUser}'s awesome room" }
                     }),
@@ -129,8 +138,6 @@ namespace osu.Game.Screens.Multi
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
         }
-
-        private readonly IBindable<bool> isIdle = new BindableBool();
 
         [BackgroundDependencyLoader(true)]
         private void load(IdleTracker idleTracker)
@@ -147,10 +154,27 @@ namespace osu.Game.Screens.Multi
             isIdle.BindValueChanged(updatePollingRate, true);
         }
 
+        private CachedModelDependencyContainer<Room> dependencies;
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
+            dependencies.Model.BindTo(currentRoom);
+            return dependencies;
+        }
+
         private void updatePollingRate(bool idle)
         {
             roomManager.TimeBetweenPolls = !this.IsCurrentScreen() || !(screenStack.CurrentScreen is LoungeSubScreen) ? 0 : (idle ? 120000 : 15000);
             Logger.Log($"Polling adjusted to {roomManager.TimeBetweenPolls}");
+        }
+
+        private void pushGameplayScreen(IScreen gameplayScreen)
+        {
+            if (!this.IsCurrentScreen())
+                return;
+
+            this.Push(gameplayScreen);
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
@@ -218,7 +242,7 @@ namespace osu.Game.Screens.Multi
 
         private void cancelLooping()
         {
-            var track = beatmap.Value.Track;
+            var track = beatmap?.Value?.Track;
             if (track != null)
                 track.Looping = false;
         }
