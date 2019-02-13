@@ -51,7 +51,7 @@ namespace osu.Game.Screens
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
         /// <summary>
-        /// Disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
+        /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
         /// </summary>
         public virtual bool DisallowExternalBeatmapRulesetChanges => false;
 
