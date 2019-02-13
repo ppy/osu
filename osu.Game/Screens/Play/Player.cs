@@ -383,7 +383,7 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            if ((!AllowPause || HasFailed || !ValidForResume || pauseContainer?.IsPaused.Value != false || RulesetContainer?.HasReplayLoaded?.Value != false) && (!pauseContainer?.IsResuming ?? true))
+            if ((!AllowPause || HasFailed || !ValidForResume || pauseContainer?.IsPaused.Value != false || RulesetContainer?.HasReplayLoaded.Value != false) && (!pauseContainer?.IsResuming ?? true))
             {
                 // In the case of replays, we may have changed the playback rate.
                 applyRateFromMods();
