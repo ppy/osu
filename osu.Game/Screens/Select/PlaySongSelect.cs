@@ -58,7 +58,6 @@ namespace osu.Game.Screens.Select
             }
 
             Beatmap.Value.Track.Looping = false;
-            Beatmap.Disabled = true;
 
             SampleConfirm?.Play();
 
