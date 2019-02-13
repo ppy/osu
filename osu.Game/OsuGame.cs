@@ -311,7 +311,7 @@ namespace osu.Game
 
             void loadScore()
             {
-                if (!menuScreen.IsCurrentScreen())
+                if (!menuScreen.IsCurrentScreen() || Beatmap.Disabled)
                 {
                     menuScreen.MakeCurrent();
                     this.Delay(500).Schedule(loadScore, out scoreLoad);
