@@ -51,6 +51,7 @@ namespace osu.Game.Overlays.Direct
             };
 
             beatmaps.ItemAdded += setAdded;
+            beatmaps.ItemRemoved += setRemoved;
         }
 
         #region Disposal
@@ -120,12 +121,16 @@ namespace osu.Game.Overlays.Direct
             Schedule(() => attachDownload(null));
         }
 
-        private void setAdded(BeatmapSetInfo s, bool existing, bool silent)
+        private void setAdded(BeatmapSetInfo s, bool existing, bool silent) => setDownloadState(s, DownloadState.Downloaded);
+
+        private void setRemoved(BeatmapSetInfo s) => setDownloadState(s, DownloadState.NotDownloaded);
+
+        private void setDownloadState(BeatmapSetInfo s, DownloadState state)
         {
             if (s.OnlineBeatmapSetID != BeatmapSet.Value?.OnlineBeatmapSetID)
                 return;
 
-            Schedule(() => State.Value = DownloadState.LocallyAvailable);
+            Schedule(() => State.Value = state);
         }
     }
 }
