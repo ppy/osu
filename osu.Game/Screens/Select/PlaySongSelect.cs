@@ -15,6 +15,8 @@ namespace osu.Game.Screens.Select
         private bool removeAutoModOnResume;
         private OsuScreen player;
 
+        public override bool AllowExternalScreenChange => true;
+
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
