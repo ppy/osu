@@ -22,7 +22,7 @@ namespace osu.Game.Screens
                 Beatmap = parent.Get<LeasedBindable<WorkingBeatmap>>()?.GetBoundCopy();
                 if (Beatmap == null)
                 {
-                    Cache(Beatmap = parent.Get<Bindable<WorkingBeatmap>>().BeginLease(true));
+                    Cache(Beatmap = parent.Get<Bindable<WorkingBeatmap>>().BeginLease(false));
                 }
 
                 Ruleset = parent.Get<LeasedBindable<RulesetInfo>>()?.GetBoundCopy();
