@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -8,7 +9,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
@@ -16,32 +16,22 @@ using osu.Game.Graphics.UserInterface;
 using osu.Game.Input;
 using osu.Game.Online.API;
 using osu.Game.Online.Multiplayer;
-using osu.Game.Overlays;
 using osu.Game.Overlays.BeatmapSet.Buttons;
 using osu.Game.Screens.Menu;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match;
+using osu.Game.Screens.Play;
 using osuTK;
 
 namespace osu.Game.Screens.Multi
 {
     [Cached]
-    public class Multiplayer : CompositeDrawable, IOsuScreen, IOnlineComponent
+    public class Multiplayer : OsuScreen, IOnlineComponent
     {
-        public bool AllowBeatmapRulesetChange => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.AllowBeatmapRulesetChange ?? true;
-        public bool AllowExternalScreenChange => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.AllowExternalScreenChange ?? true;
-        public bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.AllowExternalScreenChange ?? true;
+        public override bool CursorVisible => (screenStack.CurrentScreen as IMultiplayerSubScreen)?.CursorVisible ?? true;
 
-        public bool HideOverlaysOnEnter => false;
-        public OverlayActivation InitialOverlayActivationMode => OverlayActivation.All;
-
-        public float BackgroundParallaxAmount => 1;
-
-        public bool ValidForResume { get; set; } = true;
-        public bool ValidForPush { get; set; } = true;
-
-        public override bool RemoveWhenNotAlive => false;
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         private readonly MultiplayerWaveContainer waves;
 
@@ -61,9 +51,6 @@ namespace osu.Game.Screens.Multi
         private RoomManager roomManager;
 
         [Resolved]
-        private IBindableBeatmap beatmap { get; set; }
-
-        [Resolved]
         private OsuGameBase game { get; set; }
 
         [Resolved]
@@ -77,63 +64,60 @@ namespace osu.Game.Screens.Multi
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;
             RelativeSizeAxes = Axes.Both;
+            Padding = new MarginPadding { Horizontal = -HORIZONTAL_OVERFLOW_PADDING };
 
             InternalChild = waves = new MultiplayerWaveContainer
             {
                 RelativeSizeAxes = Axes.Both,
+                Children = new Drawable[]
+                {
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Masking = true,
+                        Children = new Drawable[]
+                        {
+                            new Box
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                Colour = OsuColour.FromHex(@"3e3a44"),
+                            },
+                            new Triangles
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                                ColourLight = OsuColour.FromHex(@"3c3842"),
+                                ColourDark = OsuColour.FromHex(@"393540"),
+                                TriangleScale = 5,
+                            },
+                        },
+                    },
+                    new Container
+                    {
+                        RelativeSizeAxes = Axes.Both,
+                        Padding = new MarginPadding { Top = Header.HEIGHT },
+                        Child = screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen()) { RelativeSizeAxes = Axes.Both }
+                    },
+                    new Header(screenStack),
+                    createButton = new HeaderButton
+                    {
+                        Anchor = Anchor.TopRight,
+                        Origin = Anchor.TopRight,
+                        RelativeSizeAxes = Axes.None,
+                        Size = new Vector2(150, Header.HEIGHT - 20),
+                        Margin = new MarginPadding
+                        {
+                            Top = 10,
+                            Right = 10 + HORIZONTAL_OVERFLOW_PADDING,
+                        },
+                        Text = "Create room",
+                        Action = () => loungeSubScreen.Open(new Room
+                        {
+                            Name = { Value = $"{api.LocalUser}'s awesome room" }
+                        }),
+                    },
+                    roomManager = new RoomManager()
+                }
             };
-
-            screenStack = new ScreenStack(loungeSubScreen = new LoungeSubScreen(pushGameplayScreen)) { RelativeSizeAxes = Axes.Both };
-            Padding = new MarginPadding { Horizontal = -OsuScreen.HORIZONTAL_OVERFLOW_PADDING };
-
-            waves.AddRange(new Drawable[]
-            {
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Masking = true,
-                    Children = new Drawable[]
-                    {
-                        new Box
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Colour = OsuColour.FromHex(@"3e3a44"),
-                        },
-                        new Triangles
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            ColourLight = OsuColour.FromHex(@"3c3842"),
-                            ColourDark = OsuColour.FromHex(@"393540"),
-                            TriangleScale = 5,
-                        },
-                    },
-                },
-                new Container
-                {
-                    RelativeSizeAxes = Axes.Both,
-                    Padding = new MarginPadding { Top = Header.HEIGHT },
-                    Child = screenStack
-                },
-                new Header(screenStack),
-                createButton = new HeaderButton
-                {
-                    Anchor = Anchor.TopRight,
-                    Origin = Anchor.TopRight,
-                    RelativeSizeAxes = Axes.None,
-                    Size = new Vector2(150, Header.HEIGHT - 20),
-                    Margin = new MarginPadding
-                    {
-                        Top = 10,
-                        Right = 10 + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
-                    },
-                    Text = "Create room",
-                    Action = () => loungeSubScreen.Open(new Room
-                    {
-                        Name = { Value = $"{api.LocalUser}'s awesome room" }
-                    }),
-                },
-                roomManager = new RoomManager()
-            });
 
             screenStack.ScreenPushed += screenPushed;
             screenStack.ScreenExited += screenExited;
@@ -154,11 +138,9 @@ namespace osu.Game.Screens.Multi
             isIdle.BindValueChanged(updatePollingRate, true);
         }
 
-        private CachedModelDependencyContainer<Room> dependencies;
-
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
         {
-            dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
+            var dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
             dependencies.Model.BindTo(currentRoom);
             return dependencies;
         }
@@ -169,12 +151,16 @@ namespace osu.Game.Screens.Multi
             Logger.Log($"Polling adjusted to {roomManager.TimeBetweenPolls}");
         }
 
-        private void pushGameplayScreen(IScreen gameplayScreen)
+        /// <summary>
+        /// Push a <see cref="Player"/> to the main screen stack to begin gameplay.
+        /// Generally called from a <see cref="MatchSubScreen"/> via DI resolution.
+        /// </summary>
+        public void Start(Func<Player> player)
         {
             if (!this.IsCurrentScreen())
                 return;
 
-            this.Push(gameplayScreen);
+            this.Push(new PlayerLoader(player));
         }
 
         public void APIStateChanged(APIAccess api, APIState state)
@@ -195,14 +181,13 @@ namespace osu.Game.Screens.Multi
             }
         }
 
-        public void OnEntering(IScreen last)
+        public override void OnEntering(IScreen last)
         {
             this.FadeIn();
-
             waves.Show();
         }
 
-        public bool OnExiting(IScreen next)
+        public override bool OnExiting(IScreen next)
         {
             waves.Hide();
 
@@ -215,23 +200,29 @@ namespace osu.Game.Screens.Multi
 
             updatePollingRate(isIdle.Value);
 
-            // the wave overlay transition takes longer than expected to run.
-            logo?.AppendAnimatingAction(() => logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut(), false);
-
+            base.OnExiting(next);
             return false;
         }
 
-        public void OnResuming(IScreen last)
+        protected override void LogoExiting(OsuLogo logo)
+        {
+            base.LogoExiting(logo);
+
+            // the wave overlay transition takes longer than expected to run.
+            logo.Delay(WaveContainer.DISAPPEAR_DURATION / 2).FadeOut();
+        }
+
+        public override void OnResuming(IScreen last)
         {
             this.FadeIn(250);
             this.ScaleTo(1, 250, Easing.OutSine);
 
-            logo?.AppendAnimatingAction(() => OsuScreen.ApplyLogoArrivingDefaults(logo), true);
+            base.OnResuming(last);
 
             updatePollingRate(isIdle.Value);
         }
 
-        public void OnSuspending(IScreen next)
+        public override void OnSuspending(IScreen next)
         {
             this.ScaleTo(1.1f, 250, Easing.InSine);
             this.FadeOut(250);
@@ -242,7 +233,8 @@ namespace osu.Game.Screens.Multi
 
         private void cancelLooping()
         {
-            var track = beatmap?.Value?.Track;
+            var track = Beatmap?.Value?.Track;
+
             if (track != null)
                 track.Looping = false;
         }
@@ -255,7 +247,7 @@ namespace osu.Game.Screens.Multi
 
             if (screenStack.CurrentScreen is MatchSubScreen)
             {
-                var track = beatmap.Value.Track;
+                var track = Beatmap.Value.Track;
                 if (track != null)
                 {
                     track.Looping = true;
@@ -263,7 +255,7 @@ namespace osu.Game.Screens.Multi
                     if (!track.IsRunning)
                     {
                         game.Audio.AddItemToList(track);
-                        track.Seek(beatmap.Value.Metadata.PreviewTime);
+                        track.Seek(Beatmap.Value.Metadata.PreviewTime);
                         track.Start();
                     }
                 }

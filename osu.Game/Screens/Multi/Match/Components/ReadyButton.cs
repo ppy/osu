@@ -14,13 +14,13 @@ namespace osu.Game.Screens.Multi.Match.Components
 {
     public class ReadyButton : HeaderButton
     {
-        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         [Resolved(typeof(Room), nameof(Room.EndDate))]
         private Bindable<DateTimeOffset> endDate { get; set; }
 
         [Resolved]
-        private IBindableBeatmap gameBeatmap { get; set; }
+        private IBindable<WorkingBeatmap> gameBeatmap { get; set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }

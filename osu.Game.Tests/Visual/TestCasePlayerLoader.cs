@@ -3,6 +3,7 @@
 
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Screens.Play;
@@ -12,28 +13,37 @@ namespace osu.Game.Tests.Visual
     public class TestCasePlayerLoader : ManualInputManagerTestCase
     {
         private PlayerLoader loader;
+        private ScreenStack stack;
 
         [BackgroundDependencyLoader]
         private void load(OsuGameBase game)
         {
             Beatmap.Value = new DummyWorkingBeatmap(game);
 
-            AddStep("load dummy beatmap", () => Add(loader = new PlayerLoader(() => new Player
+            InputManager.Add(stack = new ScreenStack { RelativeSizeAxes = Axes.Both });
+
+            AddStep("load dummy beatmap", () => stack.Push(loader = new PlayerLoader(() => new Player
             {
                 AllowPause = false,
                 AllowLeadIn = false,
                 AllowResults = false,
             })));
 
+            AddUntilStep(() => loader.IsCurrentScreen(), "wait for current");
+
             AddStep("mouse in centre", () => InputManager.MoveMouseTo(loader.ScreenSpaceDrawQuad.Centre));
 
             AddUntilStep(() => !loader.IsCurrentScreen(), "wait for no longer current");
+
+            AddStep("exit loader", () => loader.Exit());
+
+            AddUntilStep(() => !loader.IsAlive, "wait for no longer alive");
 
             AddStep("load slow dummy beatmap", () =>
             {
                 SlowLoadPlayer slow = null;
 
-                Add(loader = new PlayerLoader(() => slow = new SlowLoadPlayer
+                stack.Push(loader = new PlayerLoader(() => slow = new SlowLoadPlayer
                 {
                     AllowPause = false,
                     AllowLeadIn = false,

@@ -50,15 +50,28 @@ namespace osu.Game.Screens
 
         protected new OsuGameBase Game => base.Game as OsuGameBase;
 
-        public virtual bool AllowBeatmapRulesetChange => true;
+        /// <summary>
+        /// Whether to disallow changes to game-wise Beatmap/Ruleset bindables for this screen (and all children).
+        /// </summary>
+        public virtual bool DisallowExternalBeatmapRulesetChanges => false;
 
-        protected readonly Bindable<WorkingBeatmap> Beatmap = new Bindable<WorkingBeatmap>();
+        private SampleChannel sampleExit;
 
         public virtual float BackgroundParallaxAmount => 1;
 
-        protected readonly Bindable<RulesetInfo> Ruleset = new Bindable<RulesetInfo>();
+        public Bindable<WorkingBeatmap> Beatmap { get; set; }
 
-        private SampleChannel sampleExit;
+        public Bindable<RulesetInfo> Ruleset { get; set; }
+
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            var deps = new OsuScreenDependencies(DisallowExternalBeatmapRulesetChanges, base.CreateChildDependencies(parent));
+
+            Beatmap = deps.Beatmap;
+            Ruleset = deps.Ruleset;
+
+            return deps;
+        }
 
         protected BackgroundScreen Background => backgroundStack?.CurrentScreen as BackgroundScreen;
 
@@ -77,11 +90,8 @@ namespace osu.Game.Screens
         }
 
         [BackgroundDependencyLoader(true)]
-        private void load(BindableBeatmap beatmap, OsuGame osu, AudioManager audio, Bindable<RulesetInfo> ruleset)
+        private void load(OsuGame osu, AudioManager audio)
         {
-            Beatmap.BindTo(beatmap);
-            Ruleset.BindTo(ruleset);
-
             sampleExit = audio.Sample.Get(@"UI/screen-back");
         }
 
@@ -134,7 +144,6 @@ namespace osu.Game.Screens
             if (localBackground != null && backgroundStack?.CurrentScreen == localBackground)
                 backgroundStack?.Exit();
 
-            Beatmap.UnbindAll();
             return false;
         }
 

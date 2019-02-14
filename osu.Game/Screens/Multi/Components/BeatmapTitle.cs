@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Multi.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            CurrentBeatmap.BindValueChanged(v => updateText(), true);
+            CurrentItem.BindValueChanged(v => updateText(), true);
         }
 
         private float textSize = OsuSpriteText.FONT_SIZE;
@@ -48,12 +48,14 @@ namespace osu.Game.Screens.Multi.Components
 
         private void updateText()
         {
-            if (!IsLoaded)
+            if (LoadState < LoadState.Loading)
                 return;
 
             textFlow.Clear();
 
-            if (CurrentBeatmap.Value == null)
+            var beatmap = CurrentItem.Value?.Beatmap;
+
+            if (beatmap == null)
                 textFlow.AddText("No beatmap selected", s =>
                 {
                     s.TextSize = TextSize;
@@ -65,7 +67,7 @@ namespace osu.Game.Screens.Multi.Components
                 {
                     new OsuSpriteText
                     {
-                        Text = new LocalisedString((CurrentBeatmap.Value.Metadata.ArtistUnicode, CurrentBeatmap.Value.Metadata.Artist)),
+                        Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
                         TextSize = TextSize,
                     },
                     new OsuSpriteText
@@ -75,10 +77,10 @@ namespace osu.Game.Screens.Multi.Components
                     },
                     new OsuSpriteText
                     {
-                        Text = new LocalisedString((CurrentBeatmap.Value.Metadata.TitleUnicode, CurrentBeatmap.Value.Metadata.Title)),
+                        Text = new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title)),
                         TextSize = TextSize,
                     }
-                }, null, LinkAction.OpenBeatmap, CurrentBeatmap.Value.OnlineBeatmapID.ToString(), "Open beatmap");
+                }, null, LinkAction.OpenBeatmap, beatmap.OnlineBeatmapID.ToString(), "Open beatmap");
             }
         }
     }
