@@ -14,9 +14,9 @@ namespace osu.Game.Screens.Play
 {
     public abstract class ScreenWithBeatmapBackground : OsuScreen
     {
-        protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
+        protected override BackgroundScreen CreateBackground() => new UserDimmableBackgroundScreenBeatmap(Beatmap.Value);
 
-        protected new BackgroundScreenBeatmap Background => base.Background as BackgroundScreenBeatmap;
+        protected new UserDimmableBackgroundScreenBeatmap Background => base.Background as UserDimmableBackgroundScreenBeatmap;
 
         public override bool AllowBeatmapRulesetChange => false;
 
@@ -43,7 +43,6 @@ namespace osu.Game.Screens.Play
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
-            DimLevel.ValueChanged += _ => UpdateBackgroundElements();
             BlurLevel.ValueChanged += _ => UpdateBackgroundElements();
             ShowStoryboard.ValueChanged += _ => UpdateBackgroundElements();
             InitializeBackgroundElements();
@@ -68,7 +67,6 @@ namespace osu.Game.Screens.Play
         {
             if (!this.IsCurrentScreen()) return;
 
-            Background?.FadeColour(OsuColour.Gray(BackgroundOpacity), BACKGROUND_FADE_DURATION, Easing.OutQuint);
             Background?.BlurTo(new Vector2((float)BlurLevel.Value * 25), BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
     }
