@@ -14,38 +14,50 @@ namespace osu.Game.Rulesets.Osu.Mods
     internal class OsuModGrow : Mod, IApplicableToDrawableHitObjects
     {
         public override string Name => "Grow";
+
         public override string Acronym => "GR";
+
         public override FontAwesome Icon => FontAwesome.fa_arrows_v;
+
         public override ModType Type => ModType.Fun;
+
         public override string Description => "Hit them at the right size!";
+
         public override double ScoreMultiplier => 1;
 
         public void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
             foreach (var drawable in drawables)
             {
-                if (drawable is DrawableSpinner spinner)
-                    return;
-                drawable.ApplyCustomUpdateState += applyCustomState;
+                switch (drawable)
+                {
+                    case DrawableSpinner _:
+                        continue;
+                    default:
+                        drawable.ApplyCustomUpdateState += ApplyCustomState;
+                        break;
+                }
             }
         }
 
-        protected virtual void applyCustomState(DrawableHitObject drawable, ArmedState state)
+        protected virtual void ApplyCustomState(DrawableHitObject drawable, ArmedState state)
         {
-            var hitObject = (OsuHitObject) drawable.HitObject;
+            var h = (OsuHitObject)drawable.HitObject;
 
-            double appearTime = hitObject.StartTime - hitObject.TimePreempt - 1;
-            double scaleDuration = hitObject.TimePreempt + 1;
+            var scale = drawable.Scale;
+            using (drawable.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                drawable.ScaleTo(scale / 2).Then().ScaleTo(scale, h.TimePreempt, Easing.OutSine);
 
-            var originalScale = drawable.Scale;
-            drawable.Scale /= 2;
-
-            using (drawable.BeginAbsoluteSequence(appearTime, true))
-                    drawable.ScaleTo(originalScale, scaleDuration, Easing.OutSine);
-
-            if (drawable is DrawableHitCircle circle)
-                using (circle.BeginAbsoluteSequence(hitObject.StartTime - hitObject.TimePreempt))
-                    circle.ApproachCircle.Hide();
+            switch (drawable)
+            {
+                case DrawableHitCircle circle:
+                {
+                    // we don't want to see the approach circle
+                    using (circle.BeginAbsoluteSequence(h.StartTime - h.TimePreempt, true))
+                        circle.ApproachCircle.Hide();
+                    break;
+                }
+            }
         }
     }
 }
