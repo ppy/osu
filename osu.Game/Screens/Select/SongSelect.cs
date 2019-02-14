@@ -45,8 +45,6 @@ namespace osu.Game.Screens.Select
 
         protected virtual bool ShowFooter => true;
 
-        public override bool AllowExternalScreenChange => true;
-
         /// <summary>
         /// Can be null if <see cref="ShowFooter"/> is false.
         /// </summary>

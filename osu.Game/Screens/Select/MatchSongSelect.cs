@@ -17,8 +17,6 @@ namespace osu.Game.Screens.Select
         public string ShortTitle => "song selection";
         public override string Title => ShortTitle.Humanize();
 
-        public override bool AllowExternalScreenChange => false;
-
         public MatchSongSelect()
         {
             Padding = new MarginPadding { Horizontal = HORIZONTAL_OVERFLOW_PADDING };
