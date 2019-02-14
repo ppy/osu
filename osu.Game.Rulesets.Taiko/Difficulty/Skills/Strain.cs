@@ -26,7 +26,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             double addition = 1;
 
             // We get an extra addition if we are not a slider or spinner
-            if (Previous[0].BaseObject is Hit && current.BaseObject is Hit && current.BaseObject.StartTime - Previous[0].BaseObject.StartTime < 1000)
+            if (current.LastObject is Hit && current.BaseObject is Hit && current.DeltaTime < 1000)
             {
                 if (hasRhythmChange(current))
                     addition += 1;
@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
         private bool hasRhythmChange(DifficultyHitObject current)
         {
             // We don't want a division by zero if some random mapper decides to put two HitObjects at the same time.
-            if (current.DeltaTime == 0 || Previous[0].DeltaTime == 0)
+            if (current.DeltaTime == 0 || Previous.Count == 0 || Previous[0].DeltaTime == 0)
                 return false;
 
             double timeElapsedRatio = Math.Max(Previous[0].DeltaTime / current.DeltaTime, current.DeltaTime / Previous[0].DeltaTime);
