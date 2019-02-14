@@ -1,7 +1,8 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -21,16 +22,13 @@ namespace osu.Game.Screens.Multi.Lounge
         protected readonly FilterControl Filter;
 
         private readonly Container content;
-        private readonly RoomsContainer rooms;
-        private readonly Action<Screen> pushGameplayScreen;
         private readonly ProcessingOverlay processingOverlay;
 
-        public LoungeSubScreen(Action<Screen> pushGameplayScreen)
+        [Resolved]
+        private Bindable<Room> currentRoom { get; set; }
+
+        public LoungeSubScreen()
         {
-            this.pushGameplayScreen = pushGameplayScreen;
-
-            RoomInspector inspector;
-
             InternalChildren = new Drawable[]
             {
                 Filter = new FilterControl { Depth = -1 },
@@ -54,13 +52,13 @@ namespace osu.Game.Screens.Multi.Lounge
                                     {
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
-                                        Child = rooms = new RoomsContainer { JoinRequested = joinRequested }
+                                        Child = new RoomsContainer { JoinRequested = joinRequested }
                                     },
                                 },
                                 processingOverlay = new ProcessingOverlay { Alpha = 0 }
                             }
                         },
-                        inspector = new RoomInspector
+                        new RoomInspector
                         {
                             Anchor = Anchor.TopRight,
                             Origin = Anchor.TopRight,
@@ -71,10 +69,6 @@ namespace osu.Game.Screens.Multi.Lounge
                 },
             };
 
-            inspector.Room.BindTo(rooms.SelectedRoom);
-
-            Filter.Search.Current.ValueChanged += s => filterRooms();
-            Filter.Tabs.Current.ValueChanged += t => filterRooms();
             Filter.Search.Exit += this.Exit;
         }
 
@@ -85,8 +79,8 @@ namespace osu.Game.Screens.Multi.Lounge
             content.Padding = new MarginPadding
             {
                 Top = Filter.DrawHeight,
-                Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
-                Right = SearchableListOverlay.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
+                Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH + HORIZONTAL_OVERFLOW_PADDING,
+                Right = SearchableListOverlay.WIDTH_PADDING + HORIZONTAL_OVERFLOW_PADDING,
             };
         }
 
@@ -113,18 +107,12 @@ namespace osu.Game.Screens.Multi.Lounge
             Filter.Search.HoldFocus = false;
         }
 
-        private void filterRooms()
-        {
-            rooms.Filter(Filter.CreateCriteria());
-            Manager?.Filter(Filter.CreateCriteria());
-        }
-
         private void joinRequested(Room room)
         {
             processingOverlay.Show();
-            Manager?.JoinRoom(room, r =>
+            RoomManager?.JoinRoom(room, r =>
             {
-                Push(room);
+                Open(room);
                 processingOverlay.Hide();
             }, _ => processingOverlay.Hide());
         }
@@ -132,13 +120,15 @@ namespace osu.Game.Screens.Multi.Lounge
         /// <summary>
         /// Push a room as a new subscreen.
         /// </summary>
-        public void Push(Room room)
+        public void Open(Room room)
         {
             // Handles the case where a room is clicked 3 times in quick succession
             if (!this.IsCurrentScreen())
                 return;
 
-            this.Push(new MatchSubScreen(room, s => pushGameplayScreen?.Invoke(s)));
+            currentRoom.Value = room;
+
+            this.Push(new MatchSubScreen(room));
         }
     }
 }

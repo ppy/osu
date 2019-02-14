@@ -37,6 +37,8 @@ namespace osu.Game.Screens.Play
         private bool hideOverlays;
         public override bool HideOverlaysOnEnter => hideOverlays;
 
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
+
         private Task loadTask;
 
         public PlayerLoader(Func<Player> createPlayer)

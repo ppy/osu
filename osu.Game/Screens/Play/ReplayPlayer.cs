@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            RulesetContainer.SetReplayScore(score);
+            RulesetContainer?.SetReplayScore(score);
         }
 
         protected override ScoreInfo CreateScore() => score.ScoreInfo;

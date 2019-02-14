@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Edit.Components
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, OsuColour colours)
+        private void load(IBindable<WorkingBeatmap> beatmap, OsuColour colours)
         {
             Beatmap.BindTo(beatmap);
             background.Colour = colours.Gray1;

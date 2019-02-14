@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual
             }
 
             [BackgroundDependencyLoader]
-            private void load(IAdjustableClock adjustableClock, IBindableBeatmap beatmap)
+            private void load(IAdjustableClock adjustableClock, IBindable<WorkingBeatmap> beatmap)
             {
                 this.adjustableClock = adjustableClock;
                 this.beatmap.BindTo(beatmap);

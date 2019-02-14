@@ -8,7 +8,6 @@ using osu.Framework.Allocation;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests.Responses;
-using osu.Game.Online.Multiplayer;
 using osu.Game.Scoring;
 using osu.Game.Screens.Multi.Match.Components;
 using osu.Game.Screens.Multi.Ranking;
@@ -19,7 +18,7 @@ using osu.Game.Users;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseMatchResults : OsuTestCase
+    public class TestCaseMatchResults : MultiplayerTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -38,6 +37,9 @@ namespace osu.Game.Tests.Visual
             if (beatmapInfo != null)
                 Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmapInfo);
 
+            Room.RoomID.Value = 1;
+            Room.Name.Value = "an awesome room";
+
             Child = new TestMatchResults(new ScoreInfo
             {
                 User = new User { Id = 10 },
@@ -46,60 +48,41 @@ namespace osu.Game.Tests.Visual
 
         private class TestMatchResults : MatchResults
         {
-            private readonly Room room;
-
             public TestMatchResults(ScoreInfo score)
-                : this(score, new Room
-                {
-                    RoomID = { Value = 1 },
-                    Name = { Value = "an awesome room" }
-                })
+                : base(score)
             {
             }
 
-            public TestMatchResults(ScoreInfo score, Room room)
-                : base(score, room)
-            {
-                this.room = room;
-            }
-
-            protected override IEnumerable<IResultPageInfo> CreateResultPages() => new[] { new TestRoomLeaderboardPageInfo(Score, Beatmap, room) };
+            protected override IEnumerable<IResultPageInfo> CreateResultPages() => new[] { new TestRoomLeaderboardPageInfo(Score, Beatmap.Value) };
         }
 
         private class TestRoomLeaderboardPageInfo : RoomLeaderboardPageInfo
         {
             private readonly ScoreInfo score;
             private readonly WorkingBeatmap beatmap;
-            private readonly Room room;
 
-            public TestRoomLeaderboardPageInfo(ScoreInfo score, WorkingBeatmap beatmap, Room room)
-                : base(score, beatmap, room)
+            public TestRoomLeaderboardPageInfo(ScoreInfo score, WorkingBeatmap beatmap)
+                : base(score, beatmap)
             {
                 this.score = score;
                 this.beatmap = beatmap;
-                this.room = room;
             }
 
-            public override ResultsPage CreatePage() => new TestRoomLeaderboardPage(score, beatmap, room);
+            public override ResultsPage CreatePage() => new TestRoomLeaderboardPage(score, beatmap);
         }
 
         private class TestRoomLeaderboardPage : RoomLeaderboardPage
         {
-            public TestRoomLeaderboardPage(ScoreInfo score, WorkingBeatmap beatmap, Room room)
-                : base(score, beatmap, room)
+            public TestRoomLeaderboardPage(ScoreInfo score, WorkingBeatmap beatmap)
+                : base(score, beatmap)
             {
             }
 
-            protected override MatchLeaderboard CreateLeaderboard(Room room) => new TestMatchLeaderboard(room);
+            protected override MatchLeaderboard CreateLeaderboard() => new TestMatchLeaderboard();
         }
 
         private class TestMatchLeaderboard : RoomLeaderboardPage.ResultsMatchLeaderboard
         {
-            public TestMatchLeaderboard(Room room)
-                : base(room)
-            {
-            }
-
             protected override APIRequest FetchScores(Action<IEnumerable<APIRoomScoreInfo>> scoresCallback)
             {
                 var scores = Enumerable.Range(0, 50).Select(createRoomScore).ToArray();

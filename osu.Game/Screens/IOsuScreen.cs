@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Configuration;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Rulesets;
 
 namespace osu.Game.Screens
 {
@@ -12,8 +15,12 @@ namespace osu.Game.Screens
         /// Whether the beatmap or ruleset should be allowed to be changed by the user or game.
         /// Used to mark exclusive areas where this is strongly prohibited, like gameplay.
         /// </summary>
-        bool AllowBeatmapRulesetChange { get; }
+        bool DisallowExternalBeatmapRulesetChanges { get; }
 
+        /// <summary>
+        /// Whether a top-level component should be allowed to exit the current screen to, for example,
+        /// complete an import.
+        /// </summary>
         bool AllowExternalScreenChange { get; }
 
         /// <summary>
@@ -35,5 +42,9 @@ namespace osu.Game.Screens
         /// The amount of parallax to be applied while this screen is displayed.
         /// </summary>
         float BackgroundParallaxAmount { get; }
+
+        Bindable<WorkingBeatmap> Beatmap { get; }
+
+        Bindable<RulesetInfo> Ruleset { get; }
     }
 }
