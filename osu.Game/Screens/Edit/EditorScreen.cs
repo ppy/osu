@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Edit
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap)
+        private void load(IBindable<WorkingBeatmap> beatmap)
         {
             Beatmap.BindTo(beatmap);
         }
