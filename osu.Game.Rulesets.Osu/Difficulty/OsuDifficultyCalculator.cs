@@ -59,7 +59,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 var last = beatmap.HitObjects[i - 1];
                 var current = beatmap.HitObjects[i];
 
-                yield return new OsuDifficultyHitObject(lastLast, last, current, timeRate);
+                yield return new OsuDifficultyHitObject(current, lastLast, last, timeRate);
             }
         }
 
