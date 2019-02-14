@@ -5,6 +5,7 @@ using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osuTK;
@@ -27,40 +28,58 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private readonly IBindable<int> stackHeightBindable = new Bindable<int>();
         private readonly IBindable<float> scaleBindable = new Bindable<float>();
 
+        private readonly Container explodeContainer;
+
+        private readonly Container scaleContainer;
+
         public DrawableHitCircle(HitCircle h)
             : base(h)
         {
             Origin = Anchor.Centre;
 
             Position = HitObject.StackedPosition;
-            Scale = new Vector2(h.Scale);
 
             InternalChildren = new Drawable[]
             {
-                glow = new GlowPiece(),
-                circle = new CirclePiece
+                scaleContainer = new Container
                 {
-                    Hit = () =>
+                    RelativeSizeAxes = Axes.Both,
+                    Origin = Anchor.Centre,
+                    Anchor = Anchor.Centre,
+                    Child = explodeContainer = new Container
                     {
-                        if (AllJudged)
-                            return false;
+                        RelativeSizeAxes = Axes.Both,
+                        Origin = Anchor.Centre,
+                        Anchor = Anchor.Centre,
+                        Children = new Drawable[]
+                        {
+                            glow = new GlowPiece(),
+                            circle = new CirclePiece
+                            {
+                                Hit = () =>
+                                {
+                                    if (AllJudged)
+                                        return false;
 
-                        UpdateResult(true);
-                        return true;
-                    },
+                                    UpdateResult(true);
+                                    return true;
+                                },
+                            },
+                            number = new NumberPiece
+                            {
+                                Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
+                            },
+                            ring = new RingPiece(),
+                            flash = new FlashPiece(),
+                            explode = new ExplodePiece(),
+                            ApproachCircle = new ApproachCircle
+                            {
+                                Alpha = 0,
+                                Scale = new Vector2(4),
+                            }
+                        }
+                    }
                 },
-                number = new NumberPiece
-                {
-                    Text = (HitObject.IndexInCurrentCombo + 1).ToString(),
-                },
-                ring = new RingPiece(),
-                flash = new FlashPiece(),
-                explode = new ExplodePiece(),
-                ApproachCircle = new ApproachCircle
-                {
-                    Alpha = 0,
-                    Scale = new Vector2(4),
-                }
             };
 
             //may not be so correct
@@ -72,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             stackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            scaleBindable.BindValueChanged(v => Scale = new Vector2(v));
+            scaleBindable.BindValueChanged(v => scaleContainer.Scale = new Vector2(v), true);
 
             positionBindable.BindTo(HitObject.PositionBindable);
             stackHeightBindable.BindTo(HitObject.StackHeightBindable);
@@ -156,8 +175,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
                         circle.FadeOut();
                         number.FadeOut();
 
-                        this.FadeOut(800)
-                            .ScaleTo(Scale * 1.5f, 400, Easing.OutQuad);
+                        this.FadeOut(800);
+                        explodeContainer.ScaleTo(1.5f, 400, Easing.OutQuad);
                     }
 
                     Expire();
