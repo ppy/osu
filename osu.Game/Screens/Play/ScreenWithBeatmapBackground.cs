@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using FFmpeg.AutoGen;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -43,6 +44,7 @@ namespace osu.Game.Screens.Play
         public override void OnEntering(IScreen last)
         {
             base.OnEntering(last);
+            DimLevel.ValueChanged += _ => UpdateBackgroundElements();
             BlurLevel.ValueChanged += _ => UpdateBackgroundElements();
             ShowStoryboard.ValueChanged += _ => UpdateBackgroundElements();
             InitializeBackgroundElements();
