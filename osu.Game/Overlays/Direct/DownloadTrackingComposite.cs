@@ -11,6 +11,9 @@ using osu.Game.Online.API.Requests;
 
 namespace osu.Game.Overlays.Direct
 {
+    /// <summary>
+    /// A component which tracks a beatmap through potential download/import/deletion.
+    /// </summary>
     public abstract class DownloadTrackingComposite : CompositeDrawable
     {
         public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
@@ -106,31 +109,22 @@ namespace osu.Game.Overlays.Direct
             }
         }
 
-        private void onRequestSuccess(string data)
-        {
-            Schedule(() => State.Value = DownloadState.Downloaded);
-        }
+        private void onRequestSuccess(string _) => Schedule(() => State.Value = DownloadState.Downloaded);
 
-        private void onRequestProgress(float progress)
-        {
-            Schedule(() => Progress.Value = progress);
-        }
+        private void onRequestProgress(float progress) => Schedule(() => Progress.Value = progress);
 
-        private void onRequestFailure(Exception e)
-        {
-            Schedule(() => attachDownload(null));
-        }
+        private void onRequestFailure(Exception e) => Schedule(() => attachDownload(null));
 
-        private void setAdded(BeatmapSetInfo s, bool existing, bool silent) => setDownloadState(s, DownloadState.Downloaded);
+        private void setAdded(BeatmapSetInfo s, bool existing, bool silent) => setDownloadStateFromManager(s, DownloadState.LocallyAvailable);
 
-        private void setRemoved(BeatmapSetInfo s) => setDownloadState(s, DownloadState.NotDownloaded);
+        private void setRemoved(BeatmapSetInfo s) => setDownloadStateFromManager(s, DownloadState.NotDownloaded);
 
-        private void setDownloadState(BeatmapSetInfo s, DownloadState state)
+        private void setDownloadStateFromManager(BeatmapSetInfo s, DownloadState state) => Schedule(() =>
         {
             if (s.OnlineBeatmapSetID != BeatmapSet.Value?.OnlineBeatmapSetID)
                 return;
 
-            Schedule(() => State.Value = state);
-        }
+            State.Value = state;
+        });
     }
 }
