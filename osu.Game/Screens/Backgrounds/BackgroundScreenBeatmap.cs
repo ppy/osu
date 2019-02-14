@@ -2,18 +2,24 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Textures;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osuTK;
 
 namespace osu.Game.Screens.Backgrounds
 {
     public class BackgroundScreenBeatmap : BlurrableBackgroundScreen
     {
-        private WorkingBeatmap beatmap;
+        protected WorkingBeatmap beatmap;
 
-        public WorkingBeatmap Beatmap
+        public virtual WorkingBeatmap Beatmap
         {
             get { return beatmap; }
             set
@@ -37,11 +43,16 @@ namespace osu.Game.Screens.Backgrounds
                         }
 
                         b.Depth = newDepth;
-                        AddInternal(Background = b);
+                        AddBackground(Background = b);
                         Background.BlurSigma = BlurTarget;
                     }));
                 });
             }
+        }
+
+        protected virtual void AddBackground(Drawable d)
+        {
+            AddInternal(d);
         }
 
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
@@ -57,7 +68,7 @@ namespace osu.Game.Screens.Backgrounds
             return base.Equals(other) && beatmap == otherBeatmapBackground.Beatmap;
         }
 
-        private class BeatmapBackground : Background
+        protected class BeatmapBackground : Background
         {
             private readonly WorkingBeatmap beatmap;
 
