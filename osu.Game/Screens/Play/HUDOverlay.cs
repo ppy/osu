@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play
 
             Progress.Objects = rulesetContainer.Objects;
             Progress.AudioClock = offsetClock;
-            Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
+            Progress.AllowSeeking = rulesetContainer.HasReplayLoaded.Value;
             Progress.OnSeek = pos => adjustableClock.Seek(pos);
 
             ModDisplay.Current.BindTo(working.Mods);
@@ -107,7 +107,7 @@ namespace osu.Game.Screens.Play
             showHud.ValueChanged += hudVisibility => visibilityContainer.FadeTo(hudVisibility ? 1 : 0, duration);
             showHud.TriggerChange();
 
-            if (!showHud && !hasShownNotificationOnce)
+            if (!showHud.Value && !hasShownNotificationOnce)
             {
                 hasShownNotificationOnce = true;
 

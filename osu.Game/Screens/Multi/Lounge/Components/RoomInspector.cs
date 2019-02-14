@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             }
             else
             {
-                status.Value = Status;
+                status.Value = Status.Value;
 
                 participantCount.FadeIn(transition_duration);
                 beatmapTypeInfo.FadeIn(transition_duration);

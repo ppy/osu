@@ -131,7 +131,7 @@ namespace osu.Game.Online.Chat
                 target.AddLocalEcho(message);
 
                 // if this is a PM and the first message, we need to do a special request to create the PM channel
-                if (target.Type == ChannelType.PM && !target.Joined)
+                if (target.Type == ChannelType.PM && !target.Joined.Value)
                 {
                     var createNewPrivateMessageRequest = new CreateNewPrivateMessageRequest(target.Users.First(), message);
 
@@ -331,7 +331,7 @@ namespace osu.Game.Online.Chat
                     switch (channel.Type)
                     {
                         case ChannelType.Public:
-                            var req = new JoinChannelRequest(channel, api.LocalUser);
+                            var req = new JoinChannelRequest(channel, api.LocalUser.Value);
                             req.Success += () => JoinChannel(channel, true);
                             req.Failure += ex => LeaveChannel(channel);
                             api.Queue(req);
@@ -363,7 +363,7 @@ namespace osu.Game.Online.Chat
 
             if (channel.Joined.Value)
             {
-                api.Queue(new LeaveChannelRequest(channel, api.LocalUser));
+                api.Queue(new LeaveChannelRequest(channel, api.LocalUser.Value));
                 channel.Joined.Value = false;
             }
         }

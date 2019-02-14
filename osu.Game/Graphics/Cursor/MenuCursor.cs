@@ -80,7 +80,7 @@ namespace osu.Game.Graphics.Cursor
                 activeCursor.AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
             }
 
-            if (e.Button == MouseButton.Left && cursorRotate)
+            if (e.Button == MouseButton.Left && cursorRotate.Value)
             {
                 dragRotationState = DragRotationState.DragStarted;
                 positionMouseDown = e.MousePosition;

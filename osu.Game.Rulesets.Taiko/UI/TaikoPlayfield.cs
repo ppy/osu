@@ -225,7 +225,7 @@ namespace osu.Game.Rulesets.Taiko.UI
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!DisplayJudgements)
+            if (!DisplayJudgements.Value)
                 return;
 
             if (!judgedObject.DisplayResult)

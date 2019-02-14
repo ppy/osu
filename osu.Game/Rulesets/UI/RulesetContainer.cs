@@ -96,7 +96,7 @@ namespace osu.Game.Rulesets.UI
 
             IsPaused.ValueChanged += paused =>
             {
-                if (HasReplayLoaded)
+                if (HasReplayLoaded.Value)
                     return;
 
                 KeyBindingInputManager.UseParentInput = !paused;

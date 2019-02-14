@@ -95,7 +95,7 @@ namespace osu.Game.Graphics.UserInterface
             TextSize = 40;
             AutoSizeAxes = Axes.Both;
 
-            DisplayedCount = Current;
+            DisplayedCount = Current.Value;
 
             Current.ValueChanged += newValue =>
             {
@@ -107,7 +107,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            DisplayedCountSpriteText.Text = FormatCount(Current);
+            DisplayedCountSpriteText.Text = FormatCount(Current.Value);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace osu.Game.Graphics.UserInterface
         public virtual void StopRolling()
         {
             FinishTransforms(false, nameof(DisplayedCount));
-            DisplayedCount = Current;
+            DisplayedCount = Current.Value;
         }
 
         /// <summary>

@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Direct
         {
             base.Update();
 
-            if (PreviewPlaying && Preview != null && Preview.TrackLoaded)
+            if (PreviewPlaying.Value && Preview != null && Preview.TrackLoaded)
             {
                 PreviewBar.Width = (float)(Preview.CurrentTime / Preview.Length);
             }
@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Direct
         {
             content.TweenEdgeEffectTo(edgeEffectNormal, hover_transition_time, Easing.OutQuint);
             content.MoveToY(0, hover_transition_time, Easing.OutQuint);
-            if (FadePlayButton && !PreviewPlaying)
+            if (FadePlayButton && !PreviewPlaying.Value)
                 PlayButton.FadeOut(120, Easing.InOutQuint);
 
             base.OnHoverLost(e);

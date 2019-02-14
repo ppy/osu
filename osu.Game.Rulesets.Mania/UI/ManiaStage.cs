@@ -185,7 +185,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!judgedObject.DisplayResult || !DisplayJudgements)
+            if (!judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
             judgements.Clear();

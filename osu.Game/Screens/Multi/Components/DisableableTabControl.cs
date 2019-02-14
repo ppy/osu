@@ -29,7 +29,7 @@ namespace osu.Game.Screens.Multi.Components
 
             protected override bool OnClick(ClickEvent e)
             {
-                if (!Enabled)
+                if (!Enabled.Value)
                     return true;
                 return base.OnClick(e);
             }

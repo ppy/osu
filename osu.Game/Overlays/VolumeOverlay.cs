@@ -113,7 +113,7 @@ namespace osu.Game.Overlays
                     return true;
                 case GlobalAction.ToggleMute:
                     Show();
-                    muteButton.Current.Value = !muteButton.Current;
+                    muteButton.Current.Value = !muteButton.Current.Value;
                     return true;
             }
 

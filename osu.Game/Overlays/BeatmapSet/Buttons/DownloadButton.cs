@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
     {
         private readonly bool noVideo;
 
-        public string TooltipText => button.Enabled ? "Download this beatmap" : "Login to download";
+        public string TooltipText => button.Enabled.Value ? "Download this beatmap" : "Login to download";
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                                 },
                             }
                         },
-                        new DownloadProgressBar(BeatmapSet)
+                        new DownloadProgressBar(BeatmapSet.Value)
                         {
                             Depth = -2,
                             Anchor = Anchor.BottomLeft,
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     return;
                 }
 
-                beatmaps.Download(BeatmapSet, noVideo);
+                beatmaps.Download(BeatmapSet.Value, noVideo);
             };
 
             localUser.BindTo(api.LocalUser);

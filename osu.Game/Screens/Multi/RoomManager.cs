@@ -56,7 +56,7 @@ namespace osu.Game.Screens.Multi
 
         public void CreateRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null)
         {
-            room.Host.Value = api.LocalUser;
+            room.Host.Value = api.LocalUser.Value;
 
             var req = new CreateRoomRequest(room);
 

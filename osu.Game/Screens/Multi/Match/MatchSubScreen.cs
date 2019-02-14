@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Multi.Match
 
         public MatchSubScreen(Room room)
         {
-            Title = room.RoomID.Value == null ? "New room" : room.Name;
+            Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
         }
 
         [BackgroundDependencyLoader]
@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Multi.Match
             {
                 default:
                 case GameTypeTimeshift _:
-                    multiplayer?.Start(() => new TimeshiftPlayer(CurrentItem)
+                    multiplayer?.Start(() => new TimeshiftPlayer(CurrentItem.Value)
                     {
                         Exited = () => leaderboard.RefreshScores()
                     });

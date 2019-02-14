@@ -223,7 +223,7 @@ namespace osu.Game.Overlays.BeatmapSet
             {
                 case DownloadState.LocallyAvailable:
                     // temporary for UX until new design is implemented.
-                    downloadButtonsContainer.Child = new osu.Game.Overlays.Direct.DownloadButton(BeatmapSet)
+                    downloadButtonsContainer.Child = new osu.Game.Overlays.Direct.DownloadButton(BeatmapSet.Value)
                     {
                         Width = 50,
                         RelativeSizeAxes = Axes.Y
@@ -232,12 +232,12 @@ namespace osu.Game.Overlays.BeatmapSet
                 case DownloadState.Downloading:
                 case DownloadState.Downloaded:
                     // temporary to avoid showing two buttons for maps with novideo. will be fixed in new beatmap overlay design.
-                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet);
+                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
                     break;
                 default:
-                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet);
+                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
                     if (BeatmapSet.Value.OnlineInfo.HasVideo)
-                        downloadButtonsContainer.Add(new DownloadButton(BeatmapSet, true));
+                        downloadButtonsContainer.Add(new DownloadButton(BeatmapSet.Value, true));
                     break;
             }
         }

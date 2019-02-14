@@ -107,7 +107,7 @@ namespace osu.Game.Graphics.UserInterface
                 set
                 {
                     accentColour = value;
-                    if (!Active)
+                    if (!Active.Value)
                         Text.Colour = value;
                 }
             }
@@ -128,14 +128,14 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override bool OnHover(HoverEvent e)
             {
-                if (!Active)
+                if (!Active.Value)
                     fadeActive();
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                if (!Active)
+                if (!Active.Value)
                     fadeInactive();
             }
 

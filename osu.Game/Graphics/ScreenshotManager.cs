@@ -127,7 +127,7 @@ namespace osu.Game.Graphics
         {
             base.Update();
 
-            if (cursorVisibility == false && Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
+            if (cursorVisibility.Value == false && Interlocked.CompareExchange(ref screenShotTasks, 0, 0) == 0)
                 cursorVisibility.Value = true;
         }
 

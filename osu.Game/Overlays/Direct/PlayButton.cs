@@ -144,7 +144,7 @@ namespace osu.Game.Overlays.Direct
                     preview.Stopped += () => Playing.Value = false;
 
                     // user may have changed their mind.
-                    if (Playing)
+                    if (Playing.Value)
                         preview.Start();
                 });
             }

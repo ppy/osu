@@ -173,7 +173,7 @@ namespace osu.Game.Screens.Play
                     Retries = RestartCount,
                     OnRetry = Restart,
                     OnQuit = performUserRequestedExit,
-                    CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
+                    CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded.Value,
                     Children = new[]
                     {
                         storyboardContainer = new Container
@@ -238,7 +238,7 @@ namespace osu.Game.Screens.Play
 
             RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
 
-            if (ShowStoryboard)
+            if (ShowStoryboard.Value)
                 initializeStoryboard(false);
 
             // Bind ScoreProcessor to ourselves
@@ -356,7 +356,7 @@ namespace osu.Game.Screens.Play
 
                     this.Delay(750).Schedule(() =>
                     {
-                        if (!pauseContainer.IsPaused)
+                        if (!pauseContainer.IsPaused.Value)
                         {
                             adjustableClock.Start();
                         }
@@ -405,7 +405,7 @@ namespace osu.Game.Screens.Play
             Background?.FadeColour(Color4.White, fadeOutDuration, Easing.OutQuint);
         }
 
-        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
+        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !pauseContainer.IsPaused.Value;
 
         private void initializeStoryboard(bool asyncLoad)
         {
@@ -429,11 +429,11 @@ namespace osu.Game.Screens.Play
 
             base.UpdateBackgroundElements();
 
-            if (ShowStoryboard && storyboard == null)
+            if (ShowStoryboard.Value && storyboard == null)
                 initializeStoryboard(true);
 
             var beatmap = Beatmap.Value;
-            var storyboardVisible = ShowStoryboard && beatmap.Storyboard.HasDrawable;
+            var storyboardVisible = ShowStoryboard.Value && beatmap.Storyboard.HasDrawable;
 
             storyboardContainer?
                 .FadeColour(OsuColour.Gray(BackgroundOpacity), BACKGROUND_FADE_DURATION, Easing.OutQuint)

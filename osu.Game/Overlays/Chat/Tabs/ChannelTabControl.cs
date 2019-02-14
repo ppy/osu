@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             if (tab == SelectedTab && totalTabs > 1)
                 // Select the tab after tab-to-be-removed's index, or the tab before if current == last
                 SelectTab(TabContainer[currentIndex == totalTabs ? currentIndex - 1 : currentIndex + 1]);
-            else if (totalTabs == 1 && !selectorTab.Active)
+            else if (totalTabs == 1 && !selectorTab.Active.Value)
                 // Open channel selection overlay if all channel tabs will be closed after removing this tab
                 SelectTab(selectorTab);
 

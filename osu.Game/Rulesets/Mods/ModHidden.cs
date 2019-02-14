@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (var d in drawables.Skip(IncreaseFirstObjectVisibility ? 1 : 0))
+            foreach (var d in drawables.Skip(IncreaseFirstObjectVisibility.Value ? 1 : 0))
                 d.ApplyCustomUpdateState += ApplyHiddenState;
         }
 

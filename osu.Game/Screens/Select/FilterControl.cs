@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Select
             Group = group,
             Sort = sort,
             SearchText = searchTextBox.Text,
-            AllowConvertedBeatmaps = showConverted,
+            AllowConvertedBeatmaps = showConverted.Value,
             Ruleset = ruleset.Value
         };
 

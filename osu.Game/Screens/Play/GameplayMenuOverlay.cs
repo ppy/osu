@@ -292,7 +292,7 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnKeyDown(KeyDownEvent e)
             {
-                if (e.Repeat || e.Key != Key.Enter || !Selected)
+                if (e.Repeat || e.Key != Key.Enter || !Selected.Value)
                     return false;
 
                 Click();

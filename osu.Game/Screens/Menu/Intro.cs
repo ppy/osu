@@ -52,7 +52,7 @@ namespace osu.Game.Screens.Menu
 
             BeatmapSetInfo setInfo = null;
 
-            if (!menuMusic)
+            if (!menuMusic.Value)
             {
                 var sets = beatmaps.GetAllUsableBeatmapSets();
                 if (sets.Count > 0)
@@ -93,13 +93,13 @@ namespace osu.Game.Screens.Menu
             {
                 Beatmap.Value = introBeatmap;
 
-                if (menuVoice)
+                if (menuVoice.Value)
                     welcome.Play();
 
                 Scheduler.AddDelayed(delegate
                 {
                     // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
-                    if (menuMusic)
+                    if (menuMusic.Value)
                         track.Start();
 
                     LoadComponentAsync(mainMenu = new MainMenu());
@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Menu
 
             double fadeOutTime = EXIT_DELAY;
             //we also handle the exit transition.
-            if (menuVoice)
+            if (menuVoice.Value)
                 seeya.Play();
             else
                 fadeOutTime = 500;

@@ -296,7 +296,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 
                 Duration.Value = DurationField.Current.Value;
 
-                manager?.CreateRoom(currentRoom, onSuccess, onError);
+                manager?.CreateRoom(currentRoom.Value, onSuccess, onError);
 
                 processingOverlay.Show();
             }

@@ -131,7 +131,7 @@ namespace osu.Game.Rulesets.Objects.Drawables
                 // apply any custom state overrides
                 ApplyCustomUpdateState?.Invoke(this, state);
 
-                if (State == ArmedState.Hit)
+                if (State.Value == ArmedState.Hit)
                     PlaySamples();
             };
 

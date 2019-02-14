@@ -66,7 +66,7 @@ namespace osu.Game.Tests.Visual
             var track = Beatmap.Value.Track;
 
             track.Reset();
-            loadStoryboard(Beatmap);
+            loadStoryboard(Beatmap.Value);
             track.Start();
         }
 
@@ -78,7 +78,7 @@ namespace osu.Game.Tests.Visual
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
             storyboardContainer.Clock = decoupledClock;
 
-            storyboard = working.Storyboard.CreateDrawable(Beatmap);
+            storyboard = working.Storyboard.CreateDrawable(Beatmap.Value);
             storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);

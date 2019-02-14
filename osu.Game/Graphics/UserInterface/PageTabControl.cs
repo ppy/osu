@@ -70,14 +70,14 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override bool OnHover(HoverEvent e)
             {
-                if (!Active)
+                if (!Active.Value)
                     slideActive();
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                if (!Active)
+                if (!Active.Value)
                     slideInactive();
             }
 

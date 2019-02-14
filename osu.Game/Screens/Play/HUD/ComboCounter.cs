@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Play.HUD
         {
             base.LoadComplete();
 
-            DisplayedCountSpriteText.Text = FormatCount(Current);
+            DisplayedCountSpriteText.Text = FormatCount(Current.Value);
             DisplayedCountSpriteText.Anchor = Anchor;
             DisplayedCountSpriteText.Origin = Origin;
 
@@ -110,7 +110,7 @@ namespace osu.Game.Screens.Play.HUD
         /// <param name="amount"></param>
         public void Increment(int amount = 1)
         {
-            Current.Value = Current + amount;
+            Current.Value = Current.Value + amount;
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace osu.Game.Screens.Play.HUD
         private void updateCount(bool rolling)
         {
             int prev = previousValue;
-            previousValue = Current;
+            previousValue = Current.Value;
 
             if (!IsLoaded)
                 return;
@@ -172,14 +172,14 @@ namespace osu.Game.Screens.Play.HUD
                 IsRolling = false;
                 DisplayedCount = prev;
 
-                if (prev + 1 == Current)
-                    OnCountIncrement(prev, Current);
+                if (prev + 1 == Current.Value)
+                    OnCountIncrement(prev, Current.Value);
                 else
-                    OnCountChange(prev, Current);
+                    OnCountChange(prev, Current.Value);
             }
             else
             {
-                OnCountRolling(displayedCount, Current);
+                OnCountRolling(displayedCount, Current.Value);
                 IsRolling = true;
             }
         }

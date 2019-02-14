@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements)
+            if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
             explosionContainer.Add(new HitExplosion(judgedObject)
@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public bool OnPressed(ManiaAction action)
         {
-            if (action != Action)
+            if (action != Action.Value)
                 return false;
 
             var nextObject =

@@ -69,7 +69,7 @@ namespace osu.Game.Screens.Select.Carousel
                     case CarouselItemState.Selected:
                         InternalChildren.ForEach(c =>
                         {
-                            if (c.State == CarouselItemState.Collapsed) c.State.Value = CarouselItemState.NotSelected;
+                            if (c.State.Value == CarouselItemState.Collapsed) c.State.Value = CarouselItemState.NotSelected;
                         });
                         break;
                 }
