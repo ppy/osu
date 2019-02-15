@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Online.Multiplayer;
 using osuTK;
 
 namespace osu.Game.Screens.Multi.Components
@@ -45,17 +46,17 @@ namespace osu.Game.Screens.Multi.Components
                 },
             };
 
-            CurrentBeatmap.BindValueChanged(_ => updateBeatmap());
-            CurrentRuleset.BindValueChanged(_ => updateBeatmap(), true);
+            CurrentItem.BindValueChanged(updateBeatmap, true);
+
             Type.BindValueChanged(v => gameTypeContainer.Child = new DrawableGameType(v) { Size = new Vector2(height) }, true);
         }
 
-        private void updateBeatmap()
+        private void updateBeatmap(PlaylistItem item)
         {
-            if (CurrentBeatmap.Value != null)
+            if (item?.Beatmap != null)
             {
                 rulesetContainer.FadeIn(transition_duration);
-                rulesetContainer.Child = new DifficultyIcon(CurrentBeatmap.Value, CurrentRuleset.Value) { Size = new Vector2(height) };
+                rulesetContainer.Child = new DifficultyIcon(item.Beatmap, item.Ruleset) { Size = new Vector2(height) };
             }
             else
                 rulesetContainer.FadeOut(transition_duration);
