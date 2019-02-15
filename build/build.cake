@@ -53,7 +53,7 @@ Task("InspectCode")
 Task("CodeFileSanity")
     .Does(() => {
         ValidateCodeSanity(new ValidateCodeSanitySettings {
-            RootDirectory = ".",
+            RootDirectory = rootDirectory.FullPath,
             IsAppveyorBuild = AppVeyor.IsRunningOnAppVeyor
         });
     });
