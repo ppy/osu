@@ -247,6 +247,8 @@ namespace osu.Game.Screens.Play
 
             foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
+
+            Background?.EnableUserDim();
         }
 
         private void applyRateFromMods()
@@ -394,6 +396,8 @@ namespace osu.Game.Screens.Play
 
             if (LoadedBeatmapSuccessfully)
                 pauseContainer?.Pause();
+
+            Background.UpdateDim.Value = false;
 
             return true;
         }
