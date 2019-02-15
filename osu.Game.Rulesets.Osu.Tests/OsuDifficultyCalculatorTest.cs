@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         [Test]
         public new void Test()
         {
-            base.Test(6.9311449688341344, "diffcalc-test");
+            base.Test(6.931145117263422d, "diffcalc-test");
         }
 
         private void openUsingShellExecute(string path) => Process.Start(new ProcessStartInfo
