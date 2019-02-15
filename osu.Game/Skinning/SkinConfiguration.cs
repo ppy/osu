@@ -22,6 +22,7 @@ namespace osu.Game.Skinning
         public Dictionary<string, Color4> CustomColours { get; set; } = new Dictionary<string, Color4>();
 
         public string HitCircleFont { get; set; } = "default";
+
         public int HitCircleOverlap { get; set; }
 
         public bool? CursorExpand { get; set; } = true;
