@@ -11,8 +11,9 @@
 *.userprefs
 
 ### Cake ###
-tools/*
-!tools/cakebuild.csproj
+tools/**
+build/tools/**
+
 
 # Build results
 bin/[Dd]ebug/
