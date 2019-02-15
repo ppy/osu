@@ -170,6 +170,6 @@ namespace osu.Game.Configuration
         ScalingPositionY,
         ScalingSizeX,
         ScalingSizeY,
-        UIScale,
+        UIScale
     }
 }
