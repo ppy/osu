@@ -16,9 +16,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         [TestCase(2.9811336589467095, "diffcalc-test")]
         [TestCase(2.9811336589467095, "diffcalc-test-strong")]
         public void Test(double expected, string name)
-        {
-            base.Test(expected, name);
-        }
+            => base.Test(expected, name);
 
         protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new TaikoDifficultyCalculator(new TaikoRuleset(), beatmap);
 
