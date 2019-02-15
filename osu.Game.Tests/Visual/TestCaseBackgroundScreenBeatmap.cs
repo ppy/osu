@@ -1,10 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using NUnit.Framework;
-using osu.Framework.Allocation;
-using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Screens;
@@ -16,6 +13,9 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseBackgroundScreenBeatmap : TestCasePlayer
     {
+        /// <summary>
+        /// Check if the fade container is properly being faded when screen dim is enabled.
+        /// </summary>
         [Test]
         public void EnableUserDimTest()
         {
@@ -24,6 +24,9 @@ namespace osu.Game.Tests.Visual
             AddAssert("Check screen dim", () => ((DimAccessiblePlayer)Player).AssertDimState());
         }
 
+        /// <summary>
+        /// Check if the fade container is properly being reset when screen dim is disabled.
+        /// </summary>
         [Test]
         public void DisableUserDimTest()
         {

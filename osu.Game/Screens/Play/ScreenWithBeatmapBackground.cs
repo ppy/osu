@@ -41,6 +41,7 @@ namespace osu.Game.Screens.Play
 
         public override void OnEntering(IScreen last)
         {
+            // We need to update on dim here because player still needs to know if it needs to dim the storyboard
             base.OnEntering(last);
             DimLevel.ValueChanged += _ => UpdateBackgroundElements();
             BlurLevel.ValueChanged += _ => UpdateBackgroundElements();
