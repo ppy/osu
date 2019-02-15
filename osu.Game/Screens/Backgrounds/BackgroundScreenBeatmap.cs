@@ -11,13 +11,12 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
-using osuTK;
 
 namespace osu.Game.Screens.Backgrounds
 {
     public class BackgroundScreenBeatmap : BlurrableBackgroundScreen
     {
-        protected WorkingBeatmap beatmap;
+        private WorkingBeatmap beatmap;
         protected Bindable<double> DimLevel;
         public Bindable<bool> UpdateDim;
 
