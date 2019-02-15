@@ -28,5 +28,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         });
 
         protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuDifficultyCalculator(new OsuRuleset(), beatmap);
+
+        protected override Ruleset CreateRuleset() => new OsuRuleset();
     }
 }
