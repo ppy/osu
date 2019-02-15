@@ -18,6 +18,17 @@ namespace osu.Game.Screens.Backgrounds
     public class BackgroundScreenBeatmap : BlurrableBackgroundScreen
     {
         protected WorkingBeatmap beatmap;
+        protected Bindable<double> DimLevel;
+        public Bindable<bool> UpdateDim;
+
+        protected float BackgroundOpacity => 1 - (float)DimLevel;
+        protected Container FadeContainer;
+
+        [BackgroundDependencyLoader]
+        private void load(OsuConfigManager config)
+        {
+            DimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+        }
 
         public virtual WorkingBeatmap Beatmap
         {
@@ -31,6 +42,7 @@ namespace osu.Game.Screens.Backgrounds
 
                 Schedule(() =>
                 {
+                    FadeContainer = new Container { RelativeSizeAxes = Axes.Both };
                     LoadComponentAsync(new BeatmapBackground(beatmap), b => Schedule(() =>
                     {
                         float newDepth = 0;
@@ -41,23 +53,51 @@ namespace osu.Game.Screens.Backgrounds
                             Background.FadeOut(250);
                             Background.Expire();
                         }
-
                         b.Depth = newDepth;
-                        AddBackground(Background = b);
+                        FadeContainer.Child = Background = b;
+                        InternalChild = FadeContainer;
                         Background.BlurSigma = BlurTarget;
                     }));
                 });
             }
         }
 
-        protected virtual void AddBackground(Drawable d)
+        public override void OnEntering(IScreen last)
         {
-            AddInternal(d);
+            base.OnEntering(last);
+            DimLevel.ValueChanged += _ => updateBackgroundDim();
+            UpdateDim.ValueChanged += _ => updateBackgroundDim();
+            updateBackgroundDim();
+        }
+        public override void OnResuming(IScreen last)
+        {
+            base.OnResuming(last);
+            updateBackgroundDim();
+        }
+
+        public override bool OnExiting(IScreen last)
+        {
+            UpdateDim.Value = false;
+            return base.OnExiting(last);
+        }
+
+        private void updateBackgroundDim()
+        {
+            if (UpdateDim)
+                FadeContainer?.FadeColour(OsuColour.Gray(BackgroundOpacity), 800, Easing.OutQuint);
+            else
+                FadeContainer?.FadeColour(OsuColour.Gray(1.0f), 800, Easing.InQuint);
         }
 
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
         {
             Beatmap = beatmap;
+            UpdateDim = new Bindable<bool>();
+        }
+
+        public void EnableUserDim()
+        {
+            UpdateDim.Value = true;
         }
 
         public override bool Equals(BackgroundScreen other)
