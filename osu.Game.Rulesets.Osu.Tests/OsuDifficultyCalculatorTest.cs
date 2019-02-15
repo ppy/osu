@@ -16,9 +16,7 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         [TestCase(6.931145117263422, "diffcalc-test")]
         public void Test(double expected, string name)
-        {
-            base.Test(expected, name);
-        }
+            => base.Test(expected, name);
 
         protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuDifficultyCalculator(new OsuRuleset(), beatmap);
 
