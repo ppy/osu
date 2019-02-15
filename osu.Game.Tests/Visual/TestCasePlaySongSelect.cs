@@ -12,6 +12,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Extensions;
 using osu.Framework.MathUtils;
 using osu.Framework.Platform;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Database;
 using osu.Game.Rulesets;
@@ -25,7 +26,7 @@ using osu.Game.Screens.Select.Filter;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCasePlaySongSelect : OsuTestCase
+    public class TestCasePlaySongSelect : ScreenTestCase
     {
         private BeatmapManager manager;
 
@@ -107,7 +108,8 @@ namespace osu.Game.Tests.Visual
             Schedule(() =>
             {
                 manager?.Delete(manager.GetAllUsableBeatmapSets());
-                Child = songSelect = new TestSongSelect();
+                LoadScreen(songSelect = new TestSongSelect());
+                AddUntilStep(() => songSelect.IsPresent, "wait for present");
             });
         }
 
