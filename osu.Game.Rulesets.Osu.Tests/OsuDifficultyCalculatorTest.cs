@@ -1,7 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System.Diagnostics;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
@@ -15,17 +14,11 @@ namespace osu.Game.Rulesets.Osu.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Osu";
 
-        [Test]
-        public new void Test()
+        [TestCase(6.931145117263422, "diffcalc-test")]
+        public void Test(double expected, string name)
         {
-            base.Test(6.931145117263422d, "diffcalc-test");
+            base.Test(expected, name);
         }
-
-        private void openUsingShellExecute(string path) => Process.Start(new ProcessStartInfo
-        {
-            FileName = path,
-            UseShellExecute = true //see https://github.com/dotnet/corefx/issues/10361
-        });
 
         protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuDifficultyCalculator(new OsuRuleset(), beatmap);
 
