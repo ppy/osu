@@ -7,6 +7,7 @@ using System.Reflection;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Formats;
+using osu.Game.Rulesets;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Mods;
 
@@ -29,7 +30,11 @@ namespace osu.Game.Tests.Beatmaps
             {
                 var decoder = Decoder.GetDecoder<Beatmap>(stream);
                 ((LegacyBeatmapDecoder)decoder).ApplyOffsets = false;
-                return new TestWorkingBeatmap(decoder.Decode(stream));
+
+                var working = new TestWorkingBeatmap(decoder.Decode(stream));
+                working.BeatmapInfo.Ruleset = CreateRuleset().RulesetInfo;
+
+                return working;
             }
         }
 
@@ -40,5 +45,7 @@ namespace osu.Game.Tests.Beatmaps
         }
 
         protected abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
+
+        protected abstract Ruleset CreateRuleset();
     }
 }
