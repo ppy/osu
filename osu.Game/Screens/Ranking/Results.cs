@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Ranking
 
         private ResultModeTabControl modeChangeButtons;
 
-        public override bool AllowBeatmapRulesetChange => false;
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         protected readonly ScoreInfo Score;
 

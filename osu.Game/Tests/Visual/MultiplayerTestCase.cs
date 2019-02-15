@@ -7,7 +7,7 @@ using osu.Game.Online.Multiplayer;
 
 namespace osu.Game.Tests.Visual
 {
-    public class MultiplayerTestCase : OsuTestCase
+    public abstract class MultiplayerTestCase : OsuTestCase
     {
         [Cached]
         private readonly Bindable<Room> currentRoom = new Bindable<Room>(new Room());

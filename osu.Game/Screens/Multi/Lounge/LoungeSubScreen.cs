@@ -1,7 +1,6 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using System;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -23,16 +22,13 @@ namespace osu.Game.Screens.Multi.Lounge
         protected readonly FilterControl Filter;
 
         private readonly Container content;
-        private readonly Action<Screen> pushGameplayScreen;
         private readonly ProcessingOverlay processingOverlay;
 
         [Resolved]
         private Bindable<Room> currentRoom { get; set; }
 
-        public LoungeSubScreen(Action<Screen> pushGameplayScreen)
+        public LoungeSubScreen()
         {
-            this.pushGameplayScreen = pushGameplayScreen;
-
             InternalChildren = new Drawable[]
             {
                 Filter = new FilterControl { Depth = -1 },
@@ -83,8 +79,8 @@ namespace osu.Game.Screens.Multi.Lounge
             content.Padding = new MarginPadding
             {
                 Top = Filter.DrawHeight,
-                Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
-                Right = SearchableListOverlay.WIDTH_PADDING + OsuScreen.HORIZONTAL_OVERFLOW_PADDING,
+                Left = SearchableListOverlay.WIDTH_PADDING - DrawableRoom.SELECTION_BORDER_WIDTH + HORIZONTAL_OVERFLOW_PADDING,
+                Right = SearchableListOverlay.WIDTH_PADDING + HORIZONTAL_OVERFLOW_PADDING,
             };
         }
 
@@ -114,7 +110,7 @@ namespace osu.Game.Screens.Multi.Lounge
         private void joinRequested(Room room)
         {
             processingOverlay.Show();
-            Manager?.JoinRoom(room, r =>
+            RoomManager?.JoinRoom(room, r =>
             {
                 Open(room);
                 processingOverlay.Hide();
@@ -132,7 +128,7 @@ namespace osu.Game.Screens.Multi.Lounge
 
             currentRoom.Value = room;
 
-            this.Push(new MatchSubScreen(room, s => pushGameplayScreen?.Invoke(s)));
+            this.Push(new MatchSubScreen(room));
         }
     }
 }
