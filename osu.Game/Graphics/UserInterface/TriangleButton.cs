@@ -27,7 +27,7 @@ namespace osu.Game.Graphics.UserInterface
             });
         }
 
-        public IEnumerable<string> FilterTerms => new[] { Text };
+        public virtual IEnumerable<string> FilterTerms => new[] { Text };
 
         public bool MatchingFilter
         {
