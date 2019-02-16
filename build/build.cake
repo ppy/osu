@@ -11,7 +11,6 @@ var target = Argument("target", "Build");
 var configuration = Argument("configuration", "Release");
 
 var rootDirectory = new DirectoryPath("..");
-var desktopProject = rootDirectory.CombineWithFilePath("osu.Desktop/osu.Desktop.csproj");
 var solution = rootDirectory.CombineWithFilePath("osu.sln");
 
 ///////////////////////////////////////////////////////////////////////////////
