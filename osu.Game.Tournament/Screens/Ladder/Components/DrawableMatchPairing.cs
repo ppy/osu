@@ -18,6 +18,7 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
     public class DrawableMatchPairing : CompositeDrawable
     {
         public readonly MatchPairing Pairing;
+        private readonly bool editor;
         protected readonly FillFlowContainer<DrawableMatchTeam> Flow;
         private readonly Drawable selectionBox;
         private readonly Drawable currentMatchSelectionBox;
@@ -26,9 +27,14 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
         [Resolved(CanBeNull = true)]
         private LadderEditorInfo editorInfo { get; set; }
 
-        public DrawableMatchPairing(MatchPairing pairing)
+        [Resolved(CanBeNull = true)]
+        private LadderInfo ladderInfo { get; set; }
+
+
+        public DrawableMatchPairing(MatchPairing pairing, bool editor = false)
         {
             Pairing = pairing;
+            this.editor = editor;
 
             AutoSizeAxes = Axes.Both;
 
@@ -109,7 +115,10 @@ namespace osu.Game.Tournament.Screens.Ladder.Components
                 if (selected)
                 {
                     selectionBox.Show();
-                    editorInfo.Selected.Value = Pairing;
+                    if (editor)
+                        editorInfo.Selected.Value = Pairing;
+                    else
+                        ladderInfo.CurrentMatch.Value = Pairing;
                 }
                 else
                     selectionBox.Hide();

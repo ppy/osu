@@ -2,14 +2,13 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics.Textures;
 
 namespace osu.Game.Tournament.Screens.Showcase
 {
     public class ShowcaseScreen : BeatmapInfoScreen
     {
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures)
+        private void load()
         {
             AddInternal(new TournamentLogo());
         }

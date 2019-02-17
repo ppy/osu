@@ -5,7 +5,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
 using osu.Framework.Platform;
 using osu.Game.Graphics;
@@ -29,7 +28,7 @@ namespace osu.Game.Tournament.Screens.TeamWin
         private VideoSprite redWinVideo;
 
         [BackgroundDependencyLoader]
-        private void load(TextureStore textures, LadderInfo ladder, Storage storage)
+        private void load(LadderInfo ladder, Storage storage)
         {
             RelativeSizeAxes = Axes.Both;
 
