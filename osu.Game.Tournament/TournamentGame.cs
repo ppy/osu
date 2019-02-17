@@ -2,6 +2,7 @@
 // Licensed under the MIT Licence - https://raw.githubusercontent.com/ppy/osu/master/LICENCE
 
 using osu.Framework.Graphics;
+using osu.Framework.Screens;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Tournament.Screens;
 
@@ -16,7 +17,7 @@ namespace osu.Game.Tournament
             Add(new OsuContextMenuContainer
             {
                 RelativeSizeAxes = Axes.Both,
-                Child = new TournamentSceneManager()
+                Child = new ScreenStack(new TournamentSceneManager()) { RelativeSizeAxes = Axes.Both }
             });
 
             MenuCursorContainer.Cursor.Alpha = 0;

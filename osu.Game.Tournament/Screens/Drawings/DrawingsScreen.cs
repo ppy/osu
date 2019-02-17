@@ -13,11 +13,9 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
-using osu.Game.Screens;
 using osu.Game.Tournament.Components;
 using osu.Game.Tournament.Screens.Drawings.Components;
 using osuTK;
@@ -25,13 +23,9 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tournament.Screens.Drawings
 {
-    public class DrawingsScreen : OsuScreen
+    public class DrawingsScreen : CompositeDrawable
     {
         private const string results_filename = "drawings_results.txt";
-
-        public override bool HideOverlaysOnEnter => true;
-
-        protected override BackgroundScreen CreateBackground() => null;
 
         private ScrollingTeamContainer teamsContainer;
         private GroupContainer groupsContainer;
@@ -59,7 +53,6 @@ namespace osu.Game.Tournament.Screens.Drawings
 
             if (!TeamList.Teams.Any())
             {
-                this.Exit();
                 return;
             }
 
