@@ -3,14 +3,19 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Screens;
+using osu.Framework.Graphics.Containers;
 
 namespace osu.Game.Tournament.Screens
 {
-    public class TournamentScreen : OsuScreen
+    public class TournamentScreen : CompositeDrawable
     {
         [Resolved]
         protected LadderInfo LadderInfo { get; private set; }
+
+        public TournamentScreen()
+        {
+            RelativeSizeAxes = Axes.Both;
+        }
 
         public override void Hide()
         {
