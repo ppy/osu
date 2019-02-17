@@ -140,7 +140,7 @@ namespace osu.Game.Tournament.Components
             if (!string.IsNullOrEmpty(mods))
                 AddInternal(new Sprite
                 {
-                    Texture = new TextureStore(new TextureLoaderStore(new StorageBackedResourceStore(storage))).Get($"mods/{mods}"),
+                    Texture = new LargeTextureStore(new TextureLoaderStore(new StorageBackedResourceStore(storage))).Get($"mods/{mods}"),
                     Anchor = Anchor.CentreRight,
                     Origin = Anchor.CentreRight,
                     Margin = new MarginPadding(20),

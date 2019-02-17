@@ -6,7 +6,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Threading;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Tournament.Components;
@@ -37,7 +36,7 @@ namespace osu.Game.Tournament.Screens.Gameplay
         private TournamentSceneManager sceneManager { get; set; }
 
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, TextureStore textures, MatchIPCInfo ipc, MatchChatDisplay chat)
+        private void load(LadderInfo ladder, MatchIPCInfo ipc, MatchChatDisplay chat)
         {
             this.chat = chat;
             this.ipc = ipc;

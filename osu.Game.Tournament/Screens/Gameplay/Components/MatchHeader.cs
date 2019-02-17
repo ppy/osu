@@ -6,7 +6,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Graphics.Textures;
 using osu.Framework.Input.Events;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
@@ -22,7 +21,7 @@ namespace osu.Game.Tournament.Screens.Gameplay.Components
     public class MatchHeader : Container
     {
         [BackgroundDependencyLoader]
-        private void load(LadderInfo ladder, TextureStore textures)
+        private void load(LadderInfo ladder)
         {
             RelativeSizeAxes = Axes.X;
             Height = 95;
