@@ -12,7 +12,7 @@ TOOLS_DIR=$SCRIPT_DIR/tools
 CAKE_BINARY_PATH=$TOOLS_DIR/"cake.coreclr"
 
 SCRIPT="build.cake"
-CAKE_CSPROJ=$TOOLS_DIR/"cakebuild.csproj"
+CAKE_CSPROJ=$SCRIPT_DIR/"cakebuild.csproj"
 
 # Parse arguments.
 CAKE_ARGUMENTS=()
