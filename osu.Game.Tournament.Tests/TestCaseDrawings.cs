@@ -13,7 +13,7 @@ namespace osu.Game.Tournament.Tests
     {
         public TestCaseDrawings()
         {
-            LoadScreen(new DrawingsScreen
+            Add(new DrawingsScreen
             {
                 TeamList = new TestTeamList(),
             });
