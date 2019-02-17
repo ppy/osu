@@ -12,7 +12,7 @@ using osu.Game.Screens.Multi.Lounge.Components;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseMultiScreen : OsuTestCase
+    public class TestCaseMultiScreen : ScreenTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -25,7 +25,7 @@ namespace osu.Game.Tests.Visual
         {
             Multiplayer multi = new Multiplayer();
 
-            AddStep(@"show", () => Add(multi));
+            AddStep(@"show", () => LoadScreen(multi));
             AddWaitStep(5);
             AddStep(@"exit", multi.Exit);
         }
