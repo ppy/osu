@@ -17,8 +17,8 @@ namespace osu.Game.Screens.Play
 
         protected override IEnumerable<IResultPageInfo> CreateResultPages() => new IResultPageInfo[]
         {
-            new ScoreOverviewPageInfo(Score, Beatmap),
-            new LocalLeaderboardPageInfo(Score, Beatmap)
+            new ScoreOverviewPageInfo(Score, Beatmap.Value),
+            new LocalLeaderboardPageInfo(Score, Beatmap.Value)
         };
     }
 }

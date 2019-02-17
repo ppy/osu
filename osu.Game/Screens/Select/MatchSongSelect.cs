@@ -40,5 +40,21 @@ namespace osu.Game.Screens.Select
 
             return true;
         }
+
+        public override bool OnExiting(IScreen next)
+        {
+            Beatmap.Disabled = true;
+            Ruleset.Disabled = true;
+
+            return base.OnExiting(next);
+        }
+
+        public override void OnEntering(IScreen last)
+        {
+            base.OnEntering(last);
+
+            Beatmap.Disabled = false;
+            Ruleset.Disabled = false;
+        }
     }
 }

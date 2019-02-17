@@ -32,8 +32,8 @@ namespace osu.Game.Tests.Visual
             // This is the earliest we can get OsuGameBase, which is used by the dummy working beatmap to find textures
             beatmap.Default = new DummyWorkingBeatmap(Dependencies.Get<OsuGameBase>());
 
-            Dependencies.CacheAs<BindableBeatmap>(beatmap);
-            Dependencies.CacheAs<IBindableBeatmap>(beatmap);
+            Dependencies.CacheAs<Bindable<WorkingBeatmap>>(beatmap);
+            Dependencies.CacheAs<IBindable<WorkingBeatmap>>(beatmap);
 
             Dependencies.CacheAs(Ruleset);
             Dependencies.CacheAs<IBindable<RulesetInfo>>(Ruleset);
@@ -58,11 +58,7 @@ namespace osu.Game.Tests.Visual
         {
             base.Dispose(isDisposing);
 
-            if (beatmap != null)
-            {
-                beatmap.Disabled = true;
-                beatmap.Value.Track.Stop();
-            }
+            beatmap?.Value.Track.Stop();
 
             if (localStorage.IsValueCreated)
             {
