@@ -64,7 +64,7 @@ namespace osu.Game.Tournament.Screens.Ladder
 
         protected virtual void AddPairing(MatchPairing pairing)
         {
-            PairingsContainer.Add(new DrawableMatchPairing(pairing));
+            PairingsContainer.Add(new DrawableMatchPairing(pairing, this is LadderEditorScreen));
         }
 
         private Cached layout = new Cached();
