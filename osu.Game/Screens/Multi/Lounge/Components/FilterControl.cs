@@ -2,6 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.ComponentModel;
+using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;
@@ -15,17 +17,38 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         protected override float ContentHorizontalPadding => base.ContentHorizontalPadding + OsuScreen.HORIZONTAL_OVERFLOW_PADDING;
 
+        [Resolved(CanBeNull = true)]
+        private Bindable<FilterCriteria> filter { get; set; }
+
         public FilterControl()
         {
             DisplayStyleControl.Hide();
         }
 
-        public FilterCriteria CreateCriteria() => new FilterCriteria
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            SearchString = Search.Current.Value ?? string.Empty,
-            PrimaryFilter = Tabs.Current,
-            SecondaryFilter = DisplayStyleControl.Dropdown.Current
-        };
+            if (filter == null)
+                filter = new Bindable<FilterCriteria>();
+        }
+
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+
+            Search.Current.BindValueChanged(_ => updateFilter());
+            Tabs.Current.BindValueChanged(_ => updateFilter(), true);
+        }
+
+        private void updateFilter()
+        {
+            filter.Value = new FilterCriteria
+            {
+                SearchString = Search.Current.Value ?? string.Empty,
+                PrimaryFilter = Tabs.Current,
+                SecondaryFilter = DisplayStyleControl.Dropdown.Current
+            };
+        }
     }
 
     public enum PrimaryFilter

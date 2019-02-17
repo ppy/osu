@@ -5,12 +5,12 @@ using System;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Beatmaps;
-using osu.Game.Beatmaps.Drawables;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -34,12 +34,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
 
         public event Action<SelectionState> StateChanged;
 
-        private readonly RoomBindings bindings = new RoomBindings();
-
         private readonly Box selectionBox;
-        private UpdateableBeatmapBackgroundSprite background;
-        private BeatmapTitle beatmapTitle;
-        private ModeTypeInfo modeTypeInfo;
+        private CachedModelDependencyContainer<Room> dependencies;
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -80,7 +76,6 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         public DrawableRoom(Room room)
         {
             Room = room;
-            bindings.Room = room;
 
             RelativeSizeAxes = Axes.X;
             Height = height + SELECTION_BORDER_WIDTH * 2;
@@ -98,13 +93,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Box sideStrip;
-            ParticipantInfo participantInfo;
-            OsuSpriteText name;
-
             Children = new Drawable[]
             {
-                selectionBox,
+                new StatusColouredContainer(transition_duration)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Child = selectionBox
+                },
                 new Container
                 {
                     RelativeSizeAxes = Axes.Both,
@@ -127,10 +122,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                 RelativeSizeAxes = Axes.Both,
                                 Colour = OsuColour.FromHex(@"212121"),
                             },
-                            sideStrip = new Box
+                            new StatusColouredContainer(transition_duration)
                             {
                                 RelativeSizeAxes = Axes.Y,
                                 Width = side_strip_width,
+                                Child = new Box { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
                             {
@@ -138,7 +134,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                 Width = cover_width,
                                 Masking = true,
                                 Margin = new MarginPadding { Left = side_strip_width },
-                                Child = background = new UpdateableBeatmapBackgroundSprite { RelativeSizeAxes = Axes.Both }
+                                Child = new MultiplayerBackgroundSprite { RelativeSizeAxes = Axes.Both }
                             },
                             new Container
                             {
@@ -159,8 +155,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                         Spacing = new Vector2(5f),
                                         Children = new Drawable[]
                                         {
-                                            name = new OsuSpriteText { TextSize = 18 },
-                                            participantInfo = new ParticipantInfo(),
+                                            new RoomName { TextSize = 18 },
+                                            new ParticipantInfo(),
                                         },
                                     },
                                     new FillFlowContainer
@@ -173,11 +169,11 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                         Spacing = new Vector2(0, 5),
                                         Children = new Drawable[]
                                         {
-                                            new RoomStatusInfo(Room),
-                                            beatmapTitle = new BeatmapTitle { TextSize = 14 },
+                                            new RoomStatusInfo(),
+                                            new BeatmapTitle { TextSize = 14 },
                                         },
                                     },
-                                    modeTypeInfo = new ModeTypeInfo
+                                    new ModeTypeInfo
                                     {
                                         Anchor = Anchor.BottomRight,
                                         Origin = Anchor.BottomRight,
@@ -188,28 +184,31 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                     },
                 },
             };
+        }
 
-            background.Beatmap.BindTo(bindings.CurrentBeatmap);
-            modeTypeInfo.Beatmap.BindTo(bindings.CurrentBeatmap);
-            modeTypeInfo.Ruleset.BindTo(bindings.CurrentRuleset);
-            modeTypeInfo.Type.BindTo(bindings.Type);
-            beatmapTitle.Beatmap.BindTo(bindings.CurrentBeatmap);
-            participantInfo.Host.BindTo(bindings.Host);
-            participantInfo.Participants.BindTo(bindings.Participants);
-            participantInfo.ParticipantCount.BindTo(bindings.ParticipantCount);
-
-            bindings.Name.BindValueChanged(n => name.Text = n, true);
-            bindings.Status.BindValueChanged(s =>
-            {
-                foreach (Drawable d in new Drawable[] { selectionBox, sideStrip })
-                    d.FadeColour(s.GetAppropriateColour(colours), transition_duration);
-            }, true);
+        protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)
+        {
+            dependencies = new CachedModelDependencyContainer<Room>(base.CreateChildDependencies(parent));
+            dependencies.Model.Value = Room;
+            return dependencies;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
             this.FadeInFromZero(transition_duration);
+        }
+
+        private class RoomName : OsuSpriteText
+        {
+            [Resolved(typeof(Room), nameof(Online.Multiplayer.Room.Name))]
+            private Bindable<string> name { get; set; }
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                Current = name;
+            }
         }
     }
 }

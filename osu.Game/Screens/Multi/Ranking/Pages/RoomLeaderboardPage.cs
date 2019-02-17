@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -23,16 +24,15 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
 {
     public class RoomLeaderboardPage : ResultsPage
     {
-        private readonly Room room;
-
         private OsuColour colours;
-
         private TextFlowContainer rankText;
 
-        public RoomLeaderboardPage(ScoreInfo score, WorkingBeatmap beatmap, Room room)
+        [Resolved(typeof(Room), nameof(Room.Name))]
+        private Bindable<string> name { get; set; }
+
+        public RoomLeaderboardPage(ScoreInfo score, WorkingBeatmap beatmap)
             : base(score, beatmap)
         {
-            this.room = room;
         }
 
         [BackgroundDependencyLoader]
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
                 {
                     RelativeSizeAxes = Axes.Both,
                     BackgroundColour = colours.Gray6,
-                    Child = leaderboard = CreateLeaderboard(room)
+                    Child = leaderboard = CreateLeaderboard()
                 },
                 rankText = new TextFlowContainer
                 {
@@ -84,7 +84,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
                 s.Colour = colours.GrayF;
             };
 
-            rankText.AddText(room.Name + "\n", white);
+            rankText.AddText(name + "\n", white);
             rankText.AddText("You are placed ", gray);
 
             int index = scores.IndexOf(new APIRoomScoreInfo { User = Score.User }, new FuncEqualityComparer<APIRoomScoreInfo>((s1, s2) => s1.User.Id.Equals(s2.User.Id)));
@@ -98,15 +98,10 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
             rankText.AddText("in the room!", gray);
         }
 
-        protected virtual MatchLeaderboard CreateLeaderboard(Room room) => new ResultsMatchLeaderboard(room);
+        protected virtual MatchLeaderboard CreateLeaderboard() => new ResultsMatchLeaderboard();
 
         public class ResultsMatchLeaderboard : MatchLeaderboard
         {
-            public ResultsMatchLeaderboard(Room room)
-            {
-                Room = room;
-            }
-
             protected override bool FadeTop => true;
 
             protected override LeaderboardScore CreateDrawableScore(APIRoomScoreInfo model, int index)

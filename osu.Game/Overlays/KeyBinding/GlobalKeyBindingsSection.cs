@@ -9,7 +9,7 @@ namespace osu.Game.Overlays.KeyBinding
 {
     public class GlobalKeyBindingsSection : SettingsSection
     {
-        public override FontAwesome Icon => FontAwesome.fa_osu_hot;
+        public override FontAwesome Icon => FontAwesome.fa_globe;
         public override string Header => "Global";
 
         public GlobalKeyBindingsSection(GlobalActionContainer manager)
