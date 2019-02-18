@@ -169,7 +169,7 @@ namespace osu.Game
             dependencies.CacheAs(ruleset);
             dependencies.CacheAs<IBindable<RulesetInfo>>(ruleset);
 
-            dependencies.Cache(osuLogo = new OsuLogo());
+            dependencies.Cache(osuLogo = new OsuLogo { Alpha = 0 });
 
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
@@ -292,7 +292,7 @@ namespace osu.Game
                 return;
             }
 
-            if ((screenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange != true)
+            if ((screenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange == false)
             {
                 notifications.Post(new SimpleNotification
                 {
@@ -311,7 +311,7 @@ namespace osu.Game
 
             void loadScore()
             {
-                if (!menuScreen.IsCurrentScreen())
+                if (!menuScreen.IsCurrentScreen() || Beatmap.Disabled)
                 {
                     menuScreen.MakeCurrent();
                     this.Delay(500).Schedule(loadScore, out scoreLoad);
@@ -336,6 +336,11 @@ namespace osu.Game
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
+            // in the cursor being shown for a few frames during the intro.
+            // This prevents the cursor from showing until we have a screen with CursorVisible = true
+            MenuCursorContainer.CanShowCursor = menuScreen?.CursorVisible ?? false;
 
             // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => notifications?.Post(n);
@@ -723,46 +728,13 @@ namespace osu.Game
         {
             base.UpdateAfterChildren();
 
-            // we only want to apply these restrictions when we are inside a screen stack.
-            // the use case for not applying is in visual/unit tests.
-            bool applyBeatmapRulesetRestrictions = !(screenStack.CurrentScreen as IOsuScreen)?.AllowBeatmapRulesetChange ?? false;
-
-            ruleset.Disabled = applyBeatmapRulesetRestrictions;
-            Beatmap.Disabled = applyBeatmapRulesetRestrictions;
-
             screenContainer.Padding = new MarginPadding { Top = ToolbarOffset };
             overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
             MenuCursorContainer.CanShowCursor = (screenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
 
-        /// <summary>
-        /// Sets <see cref="Beatmap"/> while ignoring any beatmap.
-        /// </summary>
-        /// <param name="beatmap">The beatmap to set.</param>
-        public void ForcefullySetBeatmap(WorkingBeatmap beatmap)
-        {
-            var beatmapDisabled = Beatmap.Disabled;
-
-            Beatmap.Disabled = false;
-            Beatmap.Value = beatmap;
-            Beatmap.Disabled = beatmapDisabled;
-        }
-
-        /// <summary>
-        /// Sets <see cref="Ruleset"/> while ignoring any ruleset restrictions.
-        /// </summary>
-        /// <param name="beatmap">The beatmap to set.</param>
-        public void ForcefullySetRuleset(RulesetInfo ruleset)
-        {
-            var rulesetDisabled = this.ruleset.Disabled;
-
-            this.ruleset.Disabled = false;
-            this.ruleset.Value = ruleset;
-            this.ruleset.Disabled = rulesetDisabled;
-        }
-
-        protected virtual void ScreenChanged(IScreen lastScreen, IScreen newScreen)
+        protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
         {
             switch (newScreen)
             {
