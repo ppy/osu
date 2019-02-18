@@ -249,7 +249,8 @@ namespace osu.Game.Screens.Play
             foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
 
-            Background.UpdateDim.Value = true;
+            if (Background != null)
+                Background.UpdateDim.Value = true;
         }
 
         private void applyRateFromMods()
