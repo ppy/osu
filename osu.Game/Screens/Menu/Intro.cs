@@ -28,14 +28,12 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         public bool DidLoadMenu;
 
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
-
         private MainMenu mainMenu;
         private SampleChannel welcome;
         private SampleChannel seeya;
 
-        protected override bool HideOverlaysOnEnter => true;
-        protected override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
+        public override bool HideOverlaysOnEnter => true;
+        public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
         public override bool CursorVisible => false;
 
@@ -47,10 +45,8 @@ namespace osu.Game.Screens.Menu
         private WorkingBeatmap introBeatmap;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game, BindableBeatmap beatmap)
+        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
         {
-            this.beatmap.BindTo(beatmap);
-
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
@@ -95,7 +91,7 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                beatmap.Value = introBeatmap;
+                Beatmap.Value = introBeatmap;
 
                 if (menuVoice)
                     welcome.Play();
@@ -111,7 +107,7 @@ namespace osu.Game.Screens.Menu
                     Scheduler.AddDelayed(delegate
                     {
                         DidLoadMenu = true;
-                        Push(mainMenu);
+                        this.Push(mainMenu);
                     }, delay_step_one);
                 }, delay_step_two);
             }
@@ -145,22 +141,21 @@ namespace osu.Game.Screens.Menu
             }
         }
 
-        protected override void OnSuspending(Screen next)
+        public override void OnSuspending(IScreen next)
         {
-            Content.FadeOut(300);
+            this.FadeOut(300);
             base.OnSuspending(next);
         }
 
-        protected override bool OnExiting(Screen next)
+        public override bool OnExiting(IScreen next)
         {
             //cancel exiting if we haven't loaded the menu yet.
             return !DidLoadMenu;
         }
 
-        protected override void OnResuming(Screen last)
+        public override void OnResuming(IScreen last)
         {
-            if (!(last is MainMenu))
-                Content.FadeIn(300);
+            this.FadeIn(300);
 
             double fadeOutTime = EXIT_DELAY;
             //we also handle the exit transition.
@@ -169,7 +164,7 @@ namespace osu.Game.Screens.Menu
             else
                 fadeOutTime = 500;
 
-            Scheduler.AddDelayed(Exit, fadeOutTime);
+            Scheduler.AddDelayed(this.Exit, fadeOutTime);
 
             //don't want to fade out completely else we will stop running updates and shit will hit the fan.
             Game.FadeTo(0.01f, fadeOutTime);

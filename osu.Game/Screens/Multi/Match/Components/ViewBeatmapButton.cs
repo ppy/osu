@@ -11,7 +11,7 @@ namespace osu.Game.Screens.Multi.Match.Components
 {
     public class ViewBeatmapButton : HeaderButton
     {
-        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         [Resolved(CanBeNull = true)]
         private OsuGame osuGame { get; set; }

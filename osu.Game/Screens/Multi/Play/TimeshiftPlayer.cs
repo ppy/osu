@@ -5,7 +5,9 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Logging;
+using osu.Framework.Screens;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
 using osu.Game.Online.Multiplayer;
@@ -18,16 +20,19 @@ namespace osu.Game.Screens.Multi.Play
 {
     public class TimeshiftPlayer : Player
     {
-        private readonly Room room;
-        private readonly int playlistItemId;
+        public Action Exited;
+
+        [Resolved(typeof(Room), nameof(Room.RoomID))]
+        private Bindable<int?> roomId { get; set; }
+
+        private readonly PlaylistItem playlistItem;
 
         [Resolved]
         private APIAccess api { get; set; }
 
-        public TimeshiftPlayer(Room room, int playlistItemId)
+        public TimeshiftPlayer(PlaylistItem playlistItem)
         {
-            this.room = room;
-            this.playlistItemId = playlistItemId;
+            this.playlistItem = playlistItem;
         }
 
         private int? token;
@@ -39,7 +44,7 @@ namespace osu.Game.Screens.Multi.Play
 
             bool failed = false;
 
-            var req = new CreateRoomScoreRequest(room.RoomID.Value ?? 0, playlistItemId);
+            var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID);
             req.Success += r => token = r.ID;
             req.Failure += e =>
             {
@@ -50,7 +55,7 @@ namespace osu.Game.Screens.Multi.Play
                 Schedule(() =>
                 {
                     ValidForResume = false;
-                    Exit();
+                    this.Exit();
                 });
             };
 
@@ -58,6 +63,16 @@ namespace osu.Game.Screens.Multi.Play
 
             while (!failed && !token.HasValue)
                 Thread.Sleep(1000);
+        }
+
+        public override bool OnExiting(IScreen next)
+        {
+            if (base.OnExiting(next))
+                return true;
+
+            Exited?.Invoke();
+
+            return false;
         }
 
         protected override ScoreInfo CreateScore()
@@ -74,11 +89,18 @@ namespace osu.Game.Screens.Multi.Play
 
             Debug.Assert(token != null);
 
-            var request = new SubmitRoomScoreRequest(token.Value, room.RoomID.Value ?? 0, playlistItemId, score);
+            var request = new SubmitRoomScoreRequest(token.Value, roomId.Value ?? 0, playlistItem.ID, score);
             request.Failure += e => Logger.Error(e, "Failed to submit score");
             api.Queue(request);
         }
 
-        protected override Results CreateResults(ScoreInfo score) => new MatchResults(score, room);
+        protected override void Dispose(bool isDisposing)
+        {
+            base.Dispose(isDisposing);
+
+            Exited = null;
+        }
+
+        protected override Results CreateResults(ScoreInfo score) => new MatchResults(score);
     }
 }
