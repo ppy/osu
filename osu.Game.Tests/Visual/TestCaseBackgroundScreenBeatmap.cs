@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using NUnit.Framework;
+using osu.Framework.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Osu;
+using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
@@ -18,13 +20,19 @@ namespace osu.Game.Tests.Visual
         {
         }
 
+        [SetUp]
+        public void Setup()
+        {
+            ((DimAccessiblePlayer)Player).UpdateBindables();
+        }
+
         /// <summary>
         /// Check if the fade container is properly being faded when screen dim is enabled.
         /// </summary>
         [Test]
         public void EnableUserDimTest()
         {
-            AddStep("Test User Dimming", () => ((DimAccessiblePlayer)Player).EnableScreenDim());
+            AddStep("Test User Dimming", () => ((DimAccessiblePlayer)Player).DimEnabled.Value = true);
             AddWaitStep(5, "Wait for dim");
             AddAssert("Check screen dim", () => ((DimAccessiblePlayer)Player).AssertDimState());
         }
@@ -35,7 +43,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void DisableUserDimTest()
         {
-            AddStep("Test User Dimming", () => ((DimAccessiblePlayer)Player).DisableScreenDim());
+            AddStep("Test User Undimming", () => ((DimAccessiblePlayer)Player).DimEnabled.Value = false);
             AddWaitStep(5, "Wait for dim");
             AddAssert("Check screen dim", () => ((DimAccessiblePlayer)Player).AssertUndimmed());
         }
@@ -44,16 +52,13 @@ namespace osu.Game.Tests.Visual
 
         private class DimAccessiblePlayer : Player
         {
+            public Bindable<bool> DimEnabled;
+
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
 
-            public void EnableScreenDim()
+            public void UpdateBindables()
             {
-                Background.UpdateDim.Value = true;
-            }
-
-            public void DisableScreenDim()
-            {
-                Background.UpdateDim.Value = false;
+                DimEnabled = Background.UpdateDim;
             }
 
             public bool AssertDimState()
