@@ -161,8 +161,6 @@ namespace osu.Game.Screens.Menu
         {
             if (!this.IsCurrentScreen())
                 return;
-
-            ((BackgroundScreenDefault)Background).Next();
         }
 
         public override void OnSuspending(IScreen next)
