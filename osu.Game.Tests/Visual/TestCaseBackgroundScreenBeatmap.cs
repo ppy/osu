@@ -65,7 +65,7 @@ namespace osu.Game.Tests.Visual
             {
                 public bool AssertDimState()
                 {
-                    return FadeContainer.Colour == OsuColour.Gray(BackgroundOpacity);
+                    return FadeContainer.Colour == OsuColour.Gray(1 - (float)DimLevel);
                 }
 
                 public bool AssertUndimmed()
