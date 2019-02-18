@@ -33,13 +33,42 @@ namespace osu.Game.Rulesets.Mania.Difficulty
         {
             var maniaAttributes = (ManiaDifficultyAttributes)attributes;
 
-            var overallStrain = skills.OfType<Overall>().Single().DifficultyValue();
-            var highestIndividual = skills.OfType<Individual>().Max(s => s.DifficultyValue());
-
-            maniaAttributes.StarRating = (overallStrain + highestIndividual) * star_scaling_factor;
+            maniaAttributes.StarRating = difficultyValue(skills) * star_scaling_factor;
 
             // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
             maniaAttributes.GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
+        }
+
+        private double difficultyValue(Skill[] skills)
+        {
+            // Preprocess the strains to find the maximum overall + individual (aggregate) strain from each section
+            var overall = skills.OfType<Overall>().Single();
+            var aggregatePeaks = new List<double>(Enumerable.Repeat(0.0, overall.StrainPeaks.Count));
+
+            foreach (var individual in skills.OfType<Individual>())
+            {
+                for (int i = 0; i < individual.StrainPeaks.Count; i++)
+                {
+                    double aggregate = individual.StrainPeaks[i] + overall.StrainPeaks[i];
+
+                    if (aggregate > aggregatePeaks[i])
+                        aggregatePeaks[i] = aggregate;
+                }
+            }
+
+            aggregatePeaks.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
+
+            double difficulty = 0;
+            double weight = 1;
+
+            // Difficulty is the weighted sum of the highest strains from every section.
+            foreach (double strain in aggregatePeaks)
+            {
+                difficulty += strain * weight;
+                weight *= 0.9;
+            }
+
+            return difficulty;
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double timeRate)
