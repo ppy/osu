@@ -3,6 +3,7 @@
 
 using System;
 using osu.Game.Rulesets.Catch.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Catch.Objects;
 using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
@@ -23,7 +24,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             var catchCurrent = (CatchDifficultyHitObject)current;
-            var catchPrevious = (CatchDifficultyHitObject)Previous[0];
+            var catchPrevious = Previous.Count > 0 ? (CatchDifficultyHitObject)Previous[0] : null;
 
             var sqrtStrain = Math.Sqrt(catchCurrent.StrainTime);
 
@@ -33,7 +34,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
             if (Math.Abs(catchCurrent.MovementDistance) > 0.1)
             {
-                if (catchPrevious.MovementDistance > 0.1 && Math.Sign(catchCurrent.MovementDistance) != Math.Sign(catchPrevious.MovementDistance))
+                if (catchPrevious != null && catchPrevious.MovementDistance > 0.1 && Math.Sign(catchCurrent.MovementDistance) != Math.Sign(catchPrevious.MovementDistance))
                 {
                     double bonusFactor = Math.Min(absolute_player_positioning_error, Math.Abs(catchCurrent.MovementDistance)) / absolute_player_positioning_error;
 
@@ -49,7 +50,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
             }
 
             // Bonus for "almost" hyperdashes at corner points
-            if (catchPrevious.BaseObject.DistanceToHyperDash <= 10.0f / CatchPlayfield.BASE_WIDTH)
+            if (catchPrevious?.BaseObject is Fruit && catchPrevious.BaseObject.DistanceToHyperDash <= 10.0f / CatchPlayfield.BASE_WIDTH)
             {
                 if (!catchPrevious.BaseObject.HyperDash)
                     bonus += 1.0;
