@@ -248,9 +248,6 @@ namespace osu.Game.Screens.Play
 
             foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
-
-            if (Background != null)
-                Background.UpdateDim.Value = true;
         }
 
         private void applyRateFromMods()
@@ -302,6 +299,8 @@ namespace osu.Game.Screens.Play
 
                     this.Push(CreateResults(score));
 
+                    Background.UpdateDim.Value = false;
+
                     onCompletionEvent = null;
                 });
             }
@@ -349,6 +348,8 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
+            Background.UpdateDim.Value = true;
+
             Task.Run(() =>
             {
                 sourceClock.Reset();
@@ -391,7 +392,6 @@ namespace osu.Game.Screens.Play
             {
                 // In the case of replays, we may have changed the playback rate.
                 applyRateFromMods();
-                Background.UpdateDim.Value = false;
                 fadeOut();
                 return base.OnExiting(next);
             }
@@ -409,7 +409,7 @@ namespace osu.Game.Screens.Play
         {
             float fadeOutDuration = instant ? 0 : 250;
             this.FadeOut(fadeOutDuration);
-            Background?.FadeColour(Color4.White, fadeOutDuration, Easing.OutQuint);
+            Background.UpdateDim.Value = false;
         }
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
