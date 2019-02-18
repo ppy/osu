@@ -248,7 +248,7 @@ namespace osu.Game.Screens.Play
             foreach (var mod in Beatmap.Value.Mods.Value.OfType<IApplicableToScoreProcessor>())
                 mod.ApplyToScoreProcessor(ScoreProcessor);
 
-            Background?.EnableUserDim();
+            Background.UpdateDim.Value = true;
         }
 
         private void applyRateFromMods()
@@ -298,7 +298,7 @@ namespace osu.Game.Screens.Play
                     if (RulesetContainer.ReplayScore == null)
                         scoreManager.Import(score, true);
 
-                   this.Push(CreateResults(score));
+                    this.Push(CreateResults(score));
 
                     onCompletionEvent = null;
                 });
@@ -389,15 +389,16 @@ namespace osu.Game.Screens.Play
             {
                 // In the case of replays, we may have changed the playback rate.
                 applyRateFromMods();
-
+                Background.UpdateDim.Value = false;
                 fadeOut();
                 return base.OnExiting(next);
             }
 
             if (LoadedBeatmapSuccessfully)
+            {
                 pauseContainer?.Pause();
-
-            Background.UpdateDim.Value = false;
+                return true;
+            }
 
             return true;
         }

@@ -11,6 +11,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Backgrounds;
+using osuTK.Graphics;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -20,7 +21,6 @@ namespace osu.Game.Screens.Backgrounds
         protected Bindable<double> DimLevel;
         public Bindable<bool> UpdateDim;
 
-        protected float BackgroundOpacity => 1 - (float)DimLevel;
         protected Container FadeContainer;
 
         [BackgroundDependencyLoader]
@@ -76,27 +76,21 @@ namespace osu.Game.Screens.Backgrounds
 
         public override bool OnExiting(IScreen last)
         {
-            UpdateDim.Value = false;
             return base.OnExiting(last);
         }
 
         private void updateBackgroundDim()
         {
             if (UpdateDim)
-                FadeContainer?.FadeColour(OsuColour.Gray(BackgroundOpacity), 800, Easing.OutQuint);
+                FadeContainer?.FadeColour(OsuColour.Gray(1 - (float)DimLevel), 800, Easing.OutQuint);
             else
-                FadeContainer?.FadeColour(OsuColour.Gray(1.0f), 800, Easing.OutQuint);
+                FadeContainer?.FadeColour(Color4.White, 800, Easing.OutQuint);
         }
 
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
         {
             Beatmap = beatmap;
             UpdateDim = new Bindable<bool>();
-        }
-
-        public void EnableUserDim()
-        {
-            UpdateDim.Value = true;
         }
 
         public override bool Equals(BackgroundScreen other)

@@ -40,6 +40,7 @@ namespace osu.Game.Tests.Visual
         private class DimAccessiblePlayer : Player
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
+
             public void EnableScreenDim()
             {
                 Background.UpdateDim.Value = true;
