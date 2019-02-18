@@ -61,6 +61,7 @@ namespace osu.Game.Screens.Play
 
         public CursorContainer Cursor => RulesetContainer.Cursor;
         public bool ProvidingUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded.Value;
+        protected float BackgroundOpacity => 1 - (float)DimLevel;
 
         private IAdjustableClock sourceClock;
 
