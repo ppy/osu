@@ -11,8 +11,8 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         public double ApproachRate;
         public int MaxCombo;
 
-        public CatchDifficultyAttributes(Mod[] mods, double starRating)
-            : base(mods, starRating)
+        public CatchDifficultyAttributes(Mod[] mods)
+            : base(mods)
         {
         }
     }
