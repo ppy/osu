@@ -299,8 +299,6 @@ namespace osu.Game.Screens.Play
 
                     this.Push(CreateResults(score));
 
-                    Background.UpdateDim.Value = false;
-
                     onCompletionEvent = null;
                 });
             }
