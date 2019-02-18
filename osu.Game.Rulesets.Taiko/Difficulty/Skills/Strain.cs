@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         private ColourSwitch lastColourSwitch = ColourSwitch.None;
 
-        private int sameTypeCount;
+        private int sameTypeCount = 1;
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
@@ -28,11 +28,16 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             // We get an extra addition if we are not a slider or spinner
             if (current.LastObject is Hit && current.BaseObject is Hit && current.DeltaTime < 1000)
             {
-                if (hasRhythmChange(current))
-                    addition += 1;
-
                 if (hasColourChange(current))
                     addition += 0.75;
+
+                if (hasRhythmChange(current))
+                    addition += 1;
+            }
+            else
+            {
+                lastColourSwitch = ColourSwitch.None;
+                sameTypeCount = 1;
             }
 
             double additionFactor = 1;

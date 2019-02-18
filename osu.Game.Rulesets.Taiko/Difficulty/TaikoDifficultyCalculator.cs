@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 {
     public class TaikoDifficultyCalculator : DifficultyCalculator
     {
-        private const double star_scaling_factor = 0.018;
+        private const double star_scaling_factor = 0.04125;
 
         public TaikoDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
             : base(ruleset, beatmap)
