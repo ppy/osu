@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Catch.Tests
         public void Test(double expected, string name)
             => base.Test(expected, name);
 
-        protected override LegacyDifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchLegacyDifficultyCalculator(new CatchRuleset(), beatmap);
+        protected override LegacyDifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchDifficultyCalculator(new CatchRuleset(), beatmap);
 
         protected override Ruleset CreateRuleset() => new CatchRuleset();
     }
