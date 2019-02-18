@@ -50,11 +50,6 @@ namespace osu.Game.Rulesets.Catch.Objects
         /// </summary>
         public CatchHitObject HyperDashTarget;
 
-        /// <summary>
-        /// The minimum distance to be moved from the last <see cref="CatchHitObject"/> to hit this <see cref="CatchHitObject"/>.
-        /// </summary>
-        internal float? LazyMovementDistance;
-
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, BeatmapDifficulty difficulty)
         {
             base.ApplyDefaultsToSelf(controlPointInfo, difficulty);
