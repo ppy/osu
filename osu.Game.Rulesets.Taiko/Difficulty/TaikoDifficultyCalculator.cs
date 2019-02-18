@@ -47,7 +47,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
 
             if (!calculateStrainValues(difficultyHitObjects, timeRate))
-                return new DifficultyAttributes(mods, 0);
+                return new TaikoDifficultyAttributes(mods, 0);
 
             double starRating = calculateDifficulty(difficultyHitObjects, timeRate) * star_scaling_factor;
 

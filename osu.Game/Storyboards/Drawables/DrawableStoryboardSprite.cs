@@ -3,6 +3,7 @@
 
 using osuTK;
 using osu.Framework.Allocation;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
@@ -62,7 +63,7 @@ namespace osu.Game.Storyboards.Drawables
         }
 
         [BackgroundDependencyLoader]
-        private void load(IBindableBeatmap beatmap, TextureStore textureStore)
+        private void load(IBindable<WorkingBeatmap> beatmap, TextureStore textureStore)
         {
             var spritePath = Sprite.Path.ToLowerInvariant();
             var path = beatmap.Value.BeatmapSetInfo.Files.Find(f => f.Filename.ToLowerInvariant() == spritePath)?.FileInfo.StoragePath;

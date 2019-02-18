@@ -143,7 +143,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Preprocessing
             var scoringTimes = slider.NestedHitObjects.Skip(1).Select(t => t.StartTime);
             foreach (var time in scoringTimes)
                 computeVertex(time);
-            computeVertex(slider.EndTime);
         }
 
         private Vector2 getEndCursorPosition(OsuHitObject hitObject)

@@ -13,12 +13,11 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi;
-using osu.Game.Screens.Multi.Lounge.Components;
 using osu.Game.Screens.Multi.Match.Components;
 
 namespace osu.Game.Tests.Visual
 {
-    public class TestCaseMatchSettingsOverlay : OsuTestCase
+    public class TestCaseMatchSettingsOverlay : MultiplayerTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
@@ -28,14 +27,14 @@ namespace osu.Game.Tests.Visual
         [Cached(Type = typeof(IRoomManager))]
         private TestRoomManager roomManager = new TestRoomManager();
 
-        private Room room;
         private TestRoomSettings settings;
 
         [SetUp]
         public void Setup() => Schedule(() =>
         {
-            room = new Room();
-            settings = new TestRoomSettings(room)
+            Room = new Room();
+
+            settings = new TestRoomSettings
             {
                 RelativeSizeAxes = Axes.Both,
                 State = Visibility.Visible
@@ -49,19 +48,19 @@ namespace osu.Game.Tests.Visual
         {
             AddStep("clear name and beatmap", () =>
             {
-                room.Name.Value = "";
-                room.Playlist.Clear();
+                Room.Name.Value = "";
+                Room.Playlist.Clear();
             });
 
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled);
 
-            AddStep("set name", () => room.Name.Value = "Room name");
+            AddStep("set name", () => Room.Name.Value = "Room name");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled);
 
-            AddStep("set beatmap", () => room.Playlist.Add(new PlaylistItem { Beatmap = new DummyWorkingBeatmap().BeatmapInfo }));
+            AddStep("set beatmap", () => Room.Playlist.Add(new PlaylistItem { Beatmap = new DummyWorkingBeatmap().BeatmapInfo }));
             AddAssert("button enabled", () => settings.ApplyButton.Enabled);
 
-            AddStep("clear name", () => room.Name.Value = "");
+            AddStep("clear name", () => Room.Name.Value = "");
             AddAssert("button disabled", () => !settings.ApplyButton.Enabled);
         }
 
@@ -117,17 +116,12 @@ namespace osu.Game.Tests.Visual
 
         private class TestRoomSettings : MatchSettingsOverlay
         {
-            public new TriangleButton ApplyButton => base.ApplyButton;
+            public TriangleButton ApplyButton => Settings.ApplyButton;
 
-            public new OsuTextBox NameField => base.NameField;
-            public new OsuDropdown<TimeSpan> DurationField => base.DurationField;
+            public OsuTextBox NameField => Settings.NameField;
+            public OsuDropdown<TimeSpan> DurationField => Settings.DurationField;
 
-            public new OsuSpriteText ErrorText => base.ErrorText;
-
-            public TestRoomSettings(Room room)
-                : base(room)
-            {
-            }
+            public OsuSpriteText ErrorText => Settings.ErrorText;
         }
 
         private class TestRoomManager : IRoomManager
@@ -136,7 +130,11 @@ namespace osu.Game.Tests.Visual
 
             public Func<Room, bool> CreateRequested;
 
-            public event Action RoomsUpdated;
+            public event Action RoomsUpdated
+            {
+                add { }
+                remove { }
+            }
 
             public IBindableList<Room> Rooms { get; } = null;
 
@@ -154,8 +152,6 @@ namespace osu.Game.Tests.Visual
             public void JoinRoom(Room room, Action<Room> onSuccess = null, Action<string> onError = null) => throw new NotImplementedException();
 
             public void PartRoom() => throw new NotImplementedException();
-
-            public void Filter(FilterCriteria criteria) => throw new NotImplementedException();
         }
     }
 }

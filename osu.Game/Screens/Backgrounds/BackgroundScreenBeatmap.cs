@@ -37,7 +37,7 @@ namespace osu.Game.Screens.Backgrounds
                         }
 
                         b.Depth = newDepth;
-                        Add(Background = b);
+                        AddInternal(Background = b);
                         Background.BlurSigma = BlurTarget;
                     }));
                 });
