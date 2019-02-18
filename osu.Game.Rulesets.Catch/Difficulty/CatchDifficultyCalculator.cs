@@ -60,14 +60,16 @@ namespace osu.Game.Rulesets.Catch.Difficulty
                     // We want to only consider fruits that contribute to the combo. Droplets are addressed as accuracy and spinners are not relevant for "skill" calculations.
                     case Fruit fruit:
                         yield return new CatchDifficultyHitObject(fruit, lastObject, timeRate, halfCatchWidth);
+                        lastObject = hitObject;
                         break;
                     case JuiceStream _:
                         foreach (var nested in hitObject.NestedHitObjects.OfType<CatchHitObject>().Where(o => !(o is TinyDroplet)))
+                        {
                             yield return new CatchDifficultyHitObject(nested, lastObject, timeRate, halfCatchWidth);
+                            lastObject = nested;
+                        }
                         break;
                 }
-
-                lastObject = hitObject;
             }
         }
 
