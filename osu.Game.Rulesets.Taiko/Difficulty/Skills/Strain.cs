@@ -19,7 +19,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
         private ColourSwitch lastColourSwitch = ColourSwitch.None;
 
-        private int sameTypeCount = 1;
+        private int sameColourCount = 1;
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
             else
             {
                 lastColourSwitch = ColourSwitch.None;
-                sameTypeCount = 1;
+                sameColourCount = 1;
             }
 
             double additionFactor = 1;
@@ -71,15 +71,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty.Skills
 
             if (!taikoCurrent.HasTypeChange)
             {
-                sameTypeCount++;
+                sameColourCount++;
                 return false;
             }
 
             var oldColourSwitch = lastColourSwitch;
-            var newColourSwitch = sameTypeCount % 2 == 0 ? ColourSwitch.Even : ColourSwitch.Odd;
+            var newColourSwitch = sameColourCount % 2 == 0 ? ColourSwitch.Even : ColourSwitch.Odd;
 
             lastColourSwitch = newColourSwitch;
-            sameTypeCount = 1;
+            sameColourCount = 1;
 
             // We only want a bonus if the parity of the color switch changes
             return oldColourSwitch != ColourSwitch.None && oldColourSwitch != newColourSwitch;
