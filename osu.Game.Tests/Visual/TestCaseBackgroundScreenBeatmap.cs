@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using osu.Game.Graphics;
 using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
@@ -13,6 +14,10 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseBackgroundScreenBeatmap : TestCasePlayer
     {
+        public TestCaseBackgroundScreenBeatmap() : base(new OsuRuleset())
+        {
+        }
+
         /// <summary>
         /// Check if the fade container is properly being faded when screen dim is enabled.
         /// </summary>
