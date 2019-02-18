@@ -34,7 +34,7 @@ namespace osu.Game.Overlays.Music
         private PlaylistList list;
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, BindableBeatmap beatmap, BeatmapManager beatmaps)
+        private void load(OsuColour colours, Bindable<WorkingBeatmap> beatmap, BeatmapManager beatmaps)
         {
             this.beatmap.BindTo(beatmap);
             this.beatmaps = beatmaps;

@@ -355,11 +355,7 @@ namespace osu.Game.Online.API
             State = APIState.Offline;
         }
 
-        private static User createGuestUser() => new User
-        {
-            Username = @"Guest",
-            Id = 1,
-        };
+        private static User createGuestUser() => new GuestUser();
 
         protected override void Dispose(bool isDisposing)
         {
@@ -367,6 +363,15 @@ namespace osu.Game.Online.API
 
             flushQueue();
             cancellationToken.Cancel();
+        }
+    }
+
+    internal class GuestUser : User
+    {
+        public GuestUser()
+        {
+            Username = @"Guest";
+            Id = 1;
         }
     }
 
