@@ -81,10 +81,7 @@ namespace osu.Game.Screens.Backgrounds
 
         private void updateBackgroundDim()
         {
-            if (UpdateDim)
-                FadeContainer?.FadeColour(OsuColour.Gray(1 - (float)DimLevel), 800, Easing.OutQuint);
-            else
-                FadeContainer?.FadeColour(Color4.White, 800, Easing.OutQuint);
+            FadeContainer?.FadeColour(UpdateDim ? OsuColour.Gray(1 - (float)DimLevel) : Color4.White, 800, Easing.OutQuint);
         }
 
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)

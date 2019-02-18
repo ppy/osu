@@ -19,8 +19,6 @@ namespace osu.Game.Screens.Play
 
         protected const float BACKGROUND_FADE_DURATION = 800;
 
-        protected float BackgroundOpacity => 1 - (float)DimLevel;
-
         #region User Settings
 
         protected Bindable<double> DimLevel;
