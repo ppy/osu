@@ -56,7 +56,8 @@ namespace osu.Game.Screens.Backgrounds
                         FadeContainer.Child = Background = b;
                         Background.BlurSigma = BlurTarget;
                     }));
-                    AddInternal(FadeContainer);
+                    InternalChild = FadeContainer;
+                    updateBackgroundDim();
                 });
             }
         }
