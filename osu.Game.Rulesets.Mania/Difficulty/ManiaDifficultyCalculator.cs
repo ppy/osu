@@ -29,14 +29,18 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
         }
 
-        protected override void PopulateAttributes(DifficultyAttributes attributes, IBeatmap beatmap, Skill[] skills, double timeRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
-            var maniaAttributes = (ManiaDifficultyAttributes)attributes;
+            if (beatmap.HitObjects.Count == 0)
+                return new ManiaDifficultyAttributes { Mods = mods };
 
-            maniaAttributes.StarRating = difficultyValue(skills) * star_scaling_factor;
-
-            // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-            maniaAttributes.GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
+            return new ManiaDifficultyAttributes
+            {
+                StarRating = difficultyValue(skills) * star_scaling_factor,
+                Mods = mods,
+                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
+                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate,
+            };
         }
 
         private double difficultyValue(Skill[] skills)
@@ -71,12 +75,12 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return difficulty;
         }
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double timeRate)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             columnCount = ((ManiaBeatmap)beatmap).TotalColumns;
 
             for (int i = 1; i < beatmap.HitObjects.Count; i++)
-                yield return new ManiaDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], timeRate);
+                yield return new ManiaDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], clockRate);
         }
 
         protected override Skill[] CreateSkills()
@@ -88,8 +92,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
             return skills.ToArray();
         }
-
-        protected override DifficultyAttributes CreateDifficultyAttributes() => new ManiaDifficultyAttributes();
 
         protected override Mod[] DifficultyAdjustmentMods
         {
