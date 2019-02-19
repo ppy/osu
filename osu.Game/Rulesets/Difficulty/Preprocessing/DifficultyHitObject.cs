@@ -22,11 +22,11 @@ namespace osu.Game.Rulesets.Difficulty.Preprocessing
         /// </summary>
         public readonly HitObject LastObject;
 
-        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, double timeRate)
+        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate)
         {
             BaseObject = hitObject;
             LastObject = lastObject;
-            DeltaTime = (hitObject.StartTime - lastObject.StartTime) / timeRate;
+            DeltaTime = (hitObject.StartTime - lastObject.StartTime) / clockRate;
         }
     }
 }
