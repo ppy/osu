@@ -18,6 +18,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected const double SINGLE_SPACING_THRESHOLD = 125;
         protected const double STREAM_SPACING_THRESHOLD = 110;
 
+        private const double section_length = 400;
+        private const double difficulty_multiplier = 0.0675;
+
+        // Repeating any section adds this many stars to its rating
+        private const double star_bonus_per_length_double = 0.22;
+        private readonly double star_bonus_k = Math.Log(2) / star_bonus_per_length_double;
+
+        // Constant difficulty sections of this length match previous star rating
+        private const double star_bonus_base_time = (15.0 * 1000.0);
+        private const double time_multiplier = section_length / star_bonus_base_time;
+
+        // probability formula assumes zero skill is at -infinity not zero, so stretch out range between 0 and star_easy_zone to  (-infinity, star_easy_zone)
+        private const double star_easy_zone = 1.5;
+
+
         /// <summary>
         /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
         /// </summary>
@@ -78,19 +93,21 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         /// </summary>
         public double DifficultyValue()
         {
-            strainPeaks.Sort((a, b) => b.CompareTo(a)); // Sort from highest to lowest strain.
-
             double difficulty = 0;
-            double weight = 1;
 
-            // Difficulty is the weighted sum of the highest strains from every section.
+            // previously returned sum of 0.9^n * strain, which converges to 10*strain for constant strain.
+            double legacyScalingFactor = 10;
+
+            // Difficulty calculated according to probability of FC
             foreach (double strain in strainPeaks)
             {
-                difficulty += strain * weight;
-                weight *= 0.9;
+                double stars = Math.Sqrt(strain * legacyScalingFactor) * difficulty_multiplier;
+                difficulty += Math.Exp(star_bonus_k * starsToDifficulty(stars)) * time_multiplier;
             }
 
-            return difficulty;
+            difficulty = Math.Log(difficulty) / star_bonus_k;
+
+            return difficultyToStars(difficulty);
         }
 
         /// <summary>
@@ -99,5 +116,20 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected abstract double StrainValueOf(OsuDifficultyHitObject current);
 
         private double strainDecay(double ms) => Math.Pow(StrainDecayBase, ms / 1000);
+
+        private double starsToDifficulty(double val)
+        {
+            if (val >= star_easy_zone)
+                return val;
+            else if (val > 0)
+                return star_easy_zone * (Math.Log(val / star_easy_zone) + 1);
+
+            return -1e10;
+        }
+
+        private double difficultyToStars(double val)
+        {
+            return (val >= star_easy_zone) ? val : Math.Exp(val / star_easy_zone - 1) * star_easy_zone;
+        }
     }
 }

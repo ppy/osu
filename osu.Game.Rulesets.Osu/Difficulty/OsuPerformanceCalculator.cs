@@ -95,12 +95,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             double aimValue = Math.Pow(5.0f * Math.Max(1.0f, rawAim / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
-            // Longer maps are worth more
-            double lengthBonus = 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
-                (totalHits > 2000 ? Math.Log10(totalHits / 2000.0f) * 0.5f : 0.0f);
-
-            aimValue *= lengthBonus;
-
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             aimValue *= Math.Pow(0.97f, countMiss);
 
@@ -141,10 +135,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double computeSpeedValue()
         {
             double speedValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes.SpeedStrain / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
-
-            // Longer maps are worth more
-            speedValue *= 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
-                (totalHits > 2000 ? Math.Log10(totalHits / 2000.0f) * 0.5f : 0.0f);
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             speedValue *= Math.Pow(0.97f, countMiss);
