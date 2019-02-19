@@ -43,63 +43,63 @@ namespace osu.Game.Tests.Beatmaps
         protected override IBeatmap GetBeatmap() => beatmap;
         protected override Texture GetBackground() => null;
         protected override Track GetTrack() => track;
-    }
 
-    /// <summary>
-    /// A virtual track which tracks a reference clock.
-    /// </summary>
-    public class TrackVirtualManual : Track
-    {
-        private readonly IFrameBasedClock referenceClock;
-        private readonly ManualClock clock;
-
-        private bool running;
-        private double offset;
-
-        public TrackVirtualManual(IFrameBasedClock referenceClock)
+        /// <summary>
+        /// A virtual track which tracks a reference clock.
+        /// </summary>
+        public class TrackVirtualManual : Track
         {
-            this.referenceClock = referenceClock;
-            Length = double.PositiveInfinity;
-            clock = new ManualClock();
-        }
+            private readonly IFrameBasedClock referenceClock;
+            private readonly ManualClock clock;
 
-        public override bool Seek(double seek)
-        {
-            offset = MathHelper.Clamp(seek, 0, Length) - referenceClock.CurrentTime;
-            return true;
-        }
+            private bool running;
+            private double offset;
 
-        public override void Start()
-        {
-            running = true;
-            Seek(0);
-        }
-
-        public override void Reset()
-        {
-            Seek(0);
-            base.Reset();
-        }
-
-        public override void Stop()
-        {
-            running = false;
-        }
-
-        public override bool IsRunning => running;
-
-        public override double CurrentTime => running ? clock.CurrentTime : 0;
-
-        protected override void UpdateState()
-        {
-            base.UpdateState();
-
-            clock.CurrentTime = Math.Min(referenceClock.CurrentTime + offset, Length);
-
-            if (CurrentTime >= Length)
+            public TrackVirtualManual(IFrameBasedClock referenceClock)
             {
-                Stop();
-                RaiseCompleted();
+                this.referenceClock = referenceClock;
+                Length = double.PositiveInfinity;
+                clock = new ManualClock();
+            }
+
+            public override bool Seek(double seek)
+            {
+                offset = MathHelper.Clamp(seek, 0, Length) - referenceClock.CurrentTime;
+                return true;
+            }
+
+            public override void Start()
+            {
+                running = true;
+                Seek(0);
+            }
+
+            public override void Reset()
+            {
+                Seek(0);
+                base.Reset();
+            }
+
+            public override void Stop()
+            {
+                running = false;
+            }
+
+            public override bool IsRunning => running;
+
+            public override double CurrentTime => running ? clock.CurrentTime : 0;
+
+            protected override void UpdateState()
+            {
+                base.UpdateState();
+
+                clock.CurrentTime = Math.Min(referenceClock.CurrentTime + offset, Length);
+
+                if (CurrentTime >= Length)
+                {
+                    Stop();
+                    RaiseCompleted();
+                }
             }
         }
     }
