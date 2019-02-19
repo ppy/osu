@@ -89,7 +89,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             return skills.ToArray();
         }
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(Mod[] mods) => new ManiaDifficultyAttributes(mods);
+        protected override DifficultyAttributes CreateDifficultyAttributes() => new ManiaDifficultyAttributes();
 
         protected override Mod[] DifficultyAdjustmentMods
         {
