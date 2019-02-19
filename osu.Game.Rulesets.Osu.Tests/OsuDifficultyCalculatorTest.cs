@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         public void Test(double expected, string name)
             => base.Test(expected, name);
 
-        protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuDifficultyCalculator(new OsuRuleset(), beatmap);
+        protected override LegacyDifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new OsuLegacyDifficultyCalculator(new OsuRuleset(), beatmap);
 
         protected override Ruleset CreateRuleset() => new OsuRuleset();
     }
