@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             new Speed()
         };
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(Mod[] mods) => new OsuDifficultyAttributes(mods);
+        protected override DifficultyAttributes CreateDifficultyAttributes() => new OsuDifficultyAttributes();
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
