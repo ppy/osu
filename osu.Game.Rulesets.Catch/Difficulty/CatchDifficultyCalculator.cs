@@ -12,7 +12,6 @@ using osu.Game.Rulesets.Catch.UI;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
@@ -78,6 +77,6 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             new Movement(),
         };
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(Mod[] mods) => new CatchDifficultyAttributes(mods);
+        protected override DifficultyAttributes CreateDifficultyAttributes() => new CatchDifficultyAttributes();
     }
 }
