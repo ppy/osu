@@ -26,7 +26,7 @@ namespace osu.Game.Tests.Visual
             Multiplayer multi = new Multiplayer();
 
             AddStep(@"show", () => LoadScreen(multi));
-            AddWaitStep(5);
+            AddUntilStep(() => multi.IsCurrentScreen(), "wait until current");
             AddStep(@"exit", multi.Exit);
         }
     }
