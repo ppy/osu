@@ -5,28 +5,37 @@ using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Difficulty.Preprocessing
 {
+    /// <summary>
+    /// Wraps a <see cref="HitObject"/> and provides additional information to be used for difficulty calculation.
+    /// </summary>
     public class DifficultyHitObject
     {
         /// <summary>
-        /// Milliseconds elapsed since the <see cref="HitObject.StartTime"/> of the previous <see cref="DifficultyHitObject"/>.
-        /// </summary>
-        public double DeltaTime { get; private set; }
-
-        /// <summary>
-        /// The <see cref="HitObject"/> this <see cref="DifficultyHitObject"/> refers to.
+        /// The <see cref="HitObject"/> this <see cref="DifficultyHitObject"/> wraps.
         /// </summary>
         public readonly HitObject BaseObject;
 
         /// <summary>
-        /// The previous <see cref="HitObject"/> to <see cref="BaseObject"/>.
+        /// The last <see cref="HitObject"/> which occurs before <see cref="BaseObject"/>.
         /// </summary>
         public readonly HitObject LastObject;
 
-        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, double timeRate)
+        /// <summary>
+        /// Amount of time elapsed between <see cref="BaseObject"/> and <see cref="LastObject"/>.
+        /// </summary>
+        public readonly double DeltaTime;
+
+        /// <summary>
+        /// Creates a new <see cref="DifficultyHitObject"/>.
+        /// </summary>
+        /// <param name="hitObject">The <see cref="HitObject"/> which this <see cref="DifficultyHitObject"/> wraps.</param>
+        /// <param name="lastObject">The last <see cref="HitObject"/> which occurs before <paramref name="hitObject"/> in the beatmap.</param>
+        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+        public DifficultyHitObject(HitObject hitObject, HitObject lastObject, double clockRate)
         {
             BaseObject = hitObject;
             LastObject = lastObject;
-            DeltaTime = (hitObject.StartTime - lastObject.StartTime) / timeRate;
+            DeltaTime = (hitObject.StartTime - lastObject.StartTime) / clockRate;
         }
     }
 }

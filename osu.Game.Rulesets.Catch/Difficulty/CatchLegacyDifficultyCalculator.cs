@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             if (!beatmap.HitObjects.Any())
                 return new CatchDifficultyAttributes(mods, 0);
@@ -59,12 +59,12 @@ namespace osu.Game.Rulesets.Catch.Difficulty
 
             difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
 
-            if (!calculateStrainValues(difficultyHitObjects, timeRate))
+            if (!calculateStrainValues(difficultyHitObjects, clockRate))
                 return new CatchDifficultyAttributes(mods, 0);
 
             // this is the same as osu!, so there's potential to share the implementation... maybe
-            double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
-            double starRating = Math.Sqrt(calculateDifficulty(difficultyHitObjects, timeRate)) * star_scaling_factor;
+            double preempt = BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
+            double starRating = Math.Sqrt(calculateDifficulty(difficultyHitObjects, clockRate)) * star_scaling_factor;
 
             return new CatchDifficultyAttributes(mods, starRating)
             {

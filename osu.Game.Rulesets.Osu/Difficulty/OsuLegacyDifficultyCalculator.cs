@@ -23,19 +23,19 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             if (!beatmap.HitObjects.Any())
                 return new OsuDifficultyAttributes(mods, 0);
 
-            OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), timeRate);
+            OsuDifficultyBeatmap difficultyBeatmap = new OsuDifficultyBeatmap(beatmap.HitObjects.Cast<OsuHitObject>().ToList(), clockRate);
             Skill[] skills =
             {
                 new Aim(),
                 new Speed()
             };
 
-            double sectionLength = section_length * timeRate;
+            double sectionLength = section_length * clockRate;
 
             // The first object doesn't generate a strain, so we begin with an incremented section end
             double currentSectionEnd = Math.Ceiling(beatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
@@ -66,8 +66,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-            double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
-            double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
+            double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate;
+            double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
             int maxCombo = beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
