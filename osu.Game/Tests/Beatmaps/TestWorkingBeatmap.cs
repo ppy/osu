@@ -20,7 +20,7 @@ namespace osu.Game.Tests.Beatmaps
         /// Create an instance which creates a <see cref="TestBeatmap"/> for the provided ruleset when requested.
         /// </summary>
         /// <param name="ruleset">The target ruleset.</param>
-        /// <param name="referenceClock">An optional clock which should be used instead of a stopwatch for virtual time progression.</param>
+        /// <param name="referenceClock">A clock which should be used instead of a stopwatch for virtual time progression.</param>
         public TestWorkingBeatmap(RulesetInfo ruleset, IFrameBasedClock referenceClock)
             : this(new TestBeatmap(ruleset), referenceClock)
         {
