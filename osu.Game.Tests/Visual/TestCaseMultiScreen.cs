@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.Screens;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Multi.Lounge;
 using osu.Game.Screens.Multi.Lounge.Components;
@@ -26,8 +25,6 @@ namespace osu.Game.Tests.Visual
             Multiplayer multi = new Multiplayer();
 
             AddStep(@"show", () => LoadScreen(multi));
-            AddWaitStep(5);
-            AddStep(@"exit", multi.Exit);
         }
     }
 }
