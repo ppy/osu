@@ -308,6 +308,8 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private bool assertMidSliderJudgementFail() => judgementResults[judgementResults.Count - 2].Type == HitResult.Miss;
 
+        private ScoreAccessibleReplayPlayer currentPlayer;
+
         private void performTest(List<ReplayFrame> frames)
         {
             // Empty frame to be added as a workaround for first frame behavior.
@@ -324,17 +326,23 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             p.OnLoadComplete += _ =>
             {
-                p.ScoreProcessor.NewJudgement += result => judgementResults.Add(result);
-                p.ScoreProcessor.AllJudged += () => { allJudgedFired = true; };
+                p.ScoreProcessor.NewJudgement += result =>
+                {
+                    if (currentPlayer == p) judgementResults.Add(result);
+                };
+                p.ScoreProcessor.AllJudged += () =>
+                {
+                    if (currentPlayer == p) allJudgedFired = true;
+                };
             };
 
-            AddStep("load player", () => LoadScreen(p));
-            AddUntilStep(() => p.IsLoaded, "Wait until player is loaded");
-            AddStep("reset counts", () =>
+            AddStep("load player", () =>
             {
+                LoadScreen(currentPlayer = p);
                 allJudgedFired = false;
                 judgementResults = new List<JudgementResult>();
             });
+            AddUntilStep(() => p.IsLoaded, "Wait until player is loaded");
             AddUntilStep(() => allJudgedFired, "Wait for all judged");
         }
 
