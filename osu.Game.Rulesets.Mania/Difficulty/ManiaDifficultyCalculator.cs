@@ -19,8 +19,6 @@ namespace osu.Game.Rulesets.Mania.Difficulty
     {
         private const double star_scaling_factor = 0.018;
 
-        private int columnCount;
-
         private readonly bool isForCurrentRuleset;
 
         public ManiaDifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
@@ -77,14 +75,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
-            columnCount = ((ManiaBeatmap)beatmap).TotalColumns;
 
             for (int i = 1; i < beatmap.HitObjects.Count; i++)
                 yield return new ManiaDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], clockRate);
         }
 
-        protected override Skill[] CreateSkills()
+        protected override Skill[] CreateSkills(IBeatmap beatmap)
         {
+            int columnCount = ((ManiaBeatmap)beatmap).TotalColumns;
+
             var skills = new List<Skill> { new Overall(columnCount) };
 
             for (int i = 0; i < columnCount; i++)
