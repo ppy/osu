@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
 
         protected override Skill[] CreateSkills() => new Skill[] { new Strain() };
 
-        protected override DifficultyAttributes CreateDifficultyAttributes(Mod[] mods) => new TaikoDifficultyAttributes(mods);
+        protected override DifficultyAttributes CreateDifficultyAttributes() => new TaikoDifficultyAttributes();
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
