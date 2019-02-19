@@ -120,8 +120,6 @@ namespace osu.Game
             forwardLoggedErrorsToNotifications();
 
             RavenLogger = new RavenLogger(this);
-
-            IsActive.BindValueChanged(updateActiveState);
         }
 
         public void ToggleSettings() => settings.ToggleVisibility();
@@ -185,6 +183,8 @@ namespace osu.Game
             configSkin.TriggerChange();
 
             LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
+
+            IsActive.BindValueChanged(updateActiveState, true);
         }
 
         private ExternalLinkOpener externalLinkOpener;
