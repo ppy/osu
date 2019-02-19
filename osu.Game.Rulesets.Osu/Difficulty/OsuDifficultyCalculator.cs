@@ -54,7 +54,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             };
         }
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double timeRate)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             // The first jump is formed by the first two hitobjects of the map.
             // If the map has less than two OsuHitObjects, the enumerator will not return anything.
@@ -64,7 +64,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 var last = beatmap.HitObjects[i - 1];
                 var current = beatmap.HitObjects[i];
 
-                yield return new OsuDifficultyHitObject(current, lastLast, last, timeRate);
+                yield return new OsuDifficultyHitObject(current, lastLast, last, clockRate);
             }
         }
 
