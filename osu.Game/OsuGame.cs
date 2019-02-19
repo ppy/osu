@@ -120,6 +120,8 @@ namespace osu.Game
             forwardLoggedErrorsToNotifications();
 
             RavenLogger = new RavenLogger(this);
+
+            IsActive.BindValueChanged(updateActiveState);
         }
 
         public void ToggleSettings() => settings.ToggleVisibility();
@@ -674,16 +676,12 @@ namespace osu.Game
 
         private readonly BindableDouble inactiveVolumeAdjust = new BindableDouble();
 
-        protected override void OnDeactivated()
+        private void updateActiveState(bool isActive)
         {
-            base.OnDeactivated();
-            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
-        }
-
-        protected override void OnActivated()
-        {
-            base.OnActivated();
-            Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+            if (isActive)
+                Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+            else
+                Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
         }
 
         public bool OnReleased(GlobalAction action) => false;
