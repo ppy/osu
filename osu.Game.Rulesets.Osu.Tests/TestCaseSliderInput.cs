@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         private const double time_during_slide_1 = 2500;
         private const double time_during_slide_2 = 3000;
         private const double time_during_slide_3 = 3500;
-        private const double time_during_slide_4 = 4000;
+        private const double time_during_slide_4 = 3800;
 
         private List<JudgementResult> judgementResults;
         private bool allJudgedFired;
