@@ -33,7 +33,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             if (!beatmap.HitObjects.Any())
                 return new TaikoDifficultyAttributes(mods, 0);
@@ -46,15 +46,15 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
             // Sort DifficultyHitObjects by StartTime of the HitObjects - just to make sure.
             difficultyHitObjects.Sort((a, b) => a.BaseHitObject.StartTime.CompareTo(b.BaseHitObject.StartTime));
 
-            if (!calculateStrainValues(difficultyHitObjects, timeRate))
+            if (!calculateStrainValues(difficultyHitObjects, clockRate))
                 return new TaikoDifficultyAttributes(mods, 0);
 
-            double starRating = calculateDifficulty(difficultyHitObjects, timeRate) * star_scaling_factor;
+            double starRating = calculateDifficulty(difficultyHitObjects, clockRate) * star_scaling_factor;
 
             return new TaikoDifficultyAttributes(mods, starRating)
             {
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate,
+                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate,
                 MaxCombo = beatmap.HitObjects.Count(h => h is Hit)
             };
         }

@@ -38,7 +38,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         /// <summary>
         /// <see cref="DifficultyHitObject"/>s that were processed previously. They can affect the strain values of the following objects.
         /// </summary>
-        protected readonly History<DifficultyHitObject> Previous = new History<DifficultyHitObject>(2); // Contained objects not used yet
+        protected readonly LimitedCapacityStack<DifficultyHitObject> Previous = new LimitedCapacityStack<DifficultyHitObject>(2); // Contained objects not used yet
 
         private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
         private double currentSectionPeak = 1; // We also keep track of the peak strain level in the current section.
