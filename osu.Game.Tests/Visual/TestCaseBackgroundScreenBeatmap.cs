@@ -40,12 +40,12 @@ namespace osu.Game.Tests.Visual
                 {
                     HitObjects =
                     {
-                        new HitCircle()
+                        new HitCircle
                         {
                             StartTime = 3000,
                             Position = new Vector2(0, 0),
                         },
-                        new HitCircle()
+                        new HitCircle
                         {
                             StartTime = 15000,
                             Position = new Vector2(0, 0),
