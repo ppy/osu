@@ -11,9 +11,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
     /// </summary>
     public class Speed : Skill
     {
-        private const double angle_bonus_begin = 5 * Math.PI / 6;
-        private const double pi_over_4 = Math.PI / 4;
-        private const double pi_over_2 = Math.PI / 2;
+        
 
         protected override double SkillMultiplier => 1400;
         protected override double StrainDecayBase => 0.3;
@@ -30,22 +28,28 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double speedBonus = 1.0;
             if (deltaTime < min_speed_bonus)
                 speedBonus = 1 + Math.Pow((min_speed_bonus - deltaTime) / speed_balancing_factor, 2);
+                
+            double touchBonus = ((Math.Max(0, Math.Min(0.012 * distance, 1.8) - 0.7)) // Distance Bonus
+            * Math.Min(1, (Math.Max(2.1, 0.01 * current.Angle.Value * (180 / 3.14) + 1.5) - 2)) // Angle Bonus
+            * (2.4 / (1 + Math.Pow(1.065, Math.Min(131, deltaTime) - 70)))); // Speed Bonus
+            
+            touchBonus = touchBonus * Math.Max(0,Math.Min(1,(-1 * Previous[0].StrainTime / 50 + 4))); 
+            //Indirectly lower stream bonus depending on time between last two objects
 
-            double angleBonus = 1.0;
-            if (current.Angle != null && current.Angle.Value < angle_bonus_begin)
-            {
-                angleBonus = 1 + Math.Pow(Math.Sin(1.5 * (angle_bonus_begin - current.Angle.Value)), 2) / 3.57;
-                if (current.Angle.Value < pi_over_2)
-                {
-                    angleBonus = 1.28;
-                    if (distance < 90 && current.Angle.Value < pi_over_4)
-                        angleBonus += (1 - angleBonus) * Math.Min((90 - distance) / 10, 1);
-                    else if (distance < 90)
-                        angleBonus += (1 - angleBonus) * Math.Min((90 - distance) / 10, 1) * Math.Sin((pi_over_2 - current.Angle.Value) / pi_over_4);
-                }
-            }
+            double speedValue;
+            if (distance > 125)
+                speedValue = 2.5;
+            else if (distance > 110)
+                speedValue = 1.6 + 0.9 * (distance - 110) / (15);
+            else if (distance > 90)
+                speedValue = 1.2 + 0.4 * (distance - 90) / (20);
+            else if (distance > 45)
+                speedValue = 0.95 + 0.25 * (distance - 45) / (45);
+            else
+                speedValue = 0.95;
 
-            return (1 + (speedBonus - 1) * 0.75) * angleBonus * (0.95 + speedBonus * Math.Pow(distance / SINGLE_SPACING_THRESHOLD, 3.5)) / current.StrainTime;
+            return touchBonus * speedBonus * speedValue / current.StrainTime;
+
         }
     }
 }
