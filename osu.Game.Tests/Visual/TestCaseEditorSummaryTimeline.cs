@@ -21,7 +21,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo, Clock);
+            Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo, null);
 
             Add(new SummaryTimeline
             {
