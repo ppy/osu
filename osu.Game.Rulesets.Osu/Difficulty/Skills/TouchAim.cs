@@ -30,8 +30,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     //Indirectly lower angle bonus depending on time between last two objects
                     
                     var angleBonus = ((2 / (1 + Math.Pow(3, -1 * current.Angle.Value)))-0.25)
-                    * Math.Min(Math.Max(Previous[0].JumpDistance / 30 - 1, 0),1)
-                    * Math.Min(Math.Max(current.JumpDistance / 30 - 1, 0),1);
+                    * Math.Min(Math.Max(Previous[0].JumpDistance / 30 - 1, 0),1) //Lower angle bonus depending on distance to next object
+                    * Math.Min(Math.Max(current.JumpDistance / 30 - 1, 0),1); //Lower angle bonus depending on distance from previous object
                     
                     result = angleBonus;
                 
