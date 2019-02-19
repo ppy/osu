@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
                 yield return new TaikoDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], clockRate);
         }
 
-        protected override Skill[] CreateSkills() => new Skill[] { new Strain() };
+        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[] { new Strain() };
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
