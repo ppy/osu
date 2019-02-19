@@ -23,7 +23,7 @@ namespace osu.Game.Rulesets.Difficulty
         {
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             var attributes = CreateDifficultyAttributes();
             attributes.Mods = mods;
@@ -31,10 +31,10 @@ namespace osu.Game.Rulesets.Difficulty
             if (!beatmap.HitObjects.Any())
                 return attributes;
 
-            var difficultyHitObjects = CreateDifficultyHitObjects(beatmap, timeRate).OrderBy(h => h.BaseObject.StartTime).ToList();
+            var difficultyHitObjects = CreateDifficultyHitObjects(beatmap, clockRate).OrderBy(h => h.BaseObject.StartTime).ToList();
             var skills = CreateSkills();
 
-            double sectionLength = SectionLength * timeRate;
+            double sectionLength = SectionLength * clockRate;
 
             // The first object doesn't generate a strain, so we begin with an incremented section end
             double currentSectionEnd = Math.Ceiling(beatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
@@ -60,7 +60,7 @@ namespace osu.Game.Rulesets.Difficulty
             foreach (Skill s in skills)
                 s.SaveCurrentPeak();
 
-            PopulateAttributes(attributes, beatmap, skills, timeRate);
+            PopulateAttributes(attributes, beatmap, skills, clockRate);
 
             return attributes;
         }
@@ -113,16 +113,16 @@ namespace osu.Game.Rulesets.Difficulty
         /// <param name="attributes">The <see cref="DifficultyAttributes"/> to populate with information about the difficulty of <paramref name="beatmap"/>.</param>
         /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was processed.</param>
         /// <param name="skills">The skills which processed the difficulty.</param>
-        /// <param name="timeRate">The rate of time in <paramref name="beatmap"/>.</param>
-        protected abstract void PopulateAttributes(DifficultyAttributes attributes, IBeatmap beatmap, Skill[] skills, double timeRate);
+        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+        protected abstract void PopulateAttributes(DifficultyAttributes attributes, IBeatmap beatmap, Skill[] skills, double clockRate);
 
         /// <summary>
         /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> providing the <see cref="HitObject"/>s to enumerate.</param>
-        /// <param name="timeRate">The rate of time in <paramref name="beatmap"/>.</param>
+        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         /// <returns>The enumerated <see cref="DifficultyHitObject"/>s.</returns>
-        protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double timeRate);
+        protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate);
 
         /// <summary>
         /// Creates the <see cref="Skill"/>s to calculate the difficulty of <see cref="DifficultyHitObject"/>s.

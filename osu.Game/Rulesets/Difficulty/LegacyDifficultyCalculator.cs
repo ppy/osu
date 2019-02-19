@@ -100,8 +100,8 @@ namespace osu.Game.Rulesets.Difficulty
         /// </summary>
         /// <param name="beatmap">The <see cref="IBeatmap"/> to compute the difficulty for.</param>
         /// <param name="mods">The <see cref="Mod"/>s that should be applied.</param>
-        /// <param name="timeRate">The rate of time in <paramref name="beatmap"/>.</param>
+        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         /// <returns>A structure containing the difficulty attributes.</returns>
-        protected abstract DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate);
+        protected abstract DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate);
     }
 }

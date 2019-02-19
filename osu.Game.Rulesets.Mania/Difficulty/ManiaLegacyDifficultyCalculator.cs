@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             isForCurrentRuleset = beatmap.BeatmapInfo.Ruleset.Equals(ruleset.RulesetInfo);
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             if (!beatmap.HitObjects.Any())
                 return new ManiaDifficultyAttributes(mods, 0);
@@ -50,15 +50,15 @@ namespace osu.Game.Rulesets.Mania.Difficulty
             // Note: Stable sort is done so that the ordering of hitobjects with equal start times doesn't change
             difficultyHitObjects.AddRange(beatmap.HitObjects.Select(h => new ManiaHitObjectDifficulty((ManiaHitObject)h, columnCount)).OrderBy(h => h.BaseHitObject.StartTime));
 
-            if (!calculateStrainValues(difficultyHitObjects, timeRate))
+            if (!calculateStrainValues(difficultyHitObjects, clockRate))
                 return new ManiaDifficultyAttributes(mods, 0);
 
-            double starRating = calculateDifficulty(difficultyHitObjects, timeRate) * star_scaling_factor;
+            double starRating = calculateDifficulty(difficultyHitObjects, clockRate) * star_scaling_factor;
 
             return new ManiaDifficultyAttributes(mods, starRating)
             {
                 // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be remoevd in the future
-                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate
+                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate
             };
         }
 
