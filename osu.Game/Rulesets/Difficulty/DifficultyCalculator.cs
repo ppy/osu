@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Difficulty
 
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            var skills = CreateSkills();
+            var skills = CreateSkills(beatmap);
 
             if (!beatmap.HitObjects.Any())
                 return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
@@ -106,9 +106,9 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Creates <see cref="DifficultyAttributes"/> to describe beatmap's calculated difficulty.
         /// </summary>
-        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was processed.</param>
-        /// <param name="mods">The <see cref="Mod"/>s that were applied during the process.</param>
-        /// <param name="skills">The skills which processed the difficulty.</param>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was calculated.</param>
+        /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>
+        /// <param name="skills">The skills which processed the beatmap.</param>
         /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
         protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate);
 
@@ -121,9 +121,10 @@ namespace osu.Game.Rulesets.Difficulty
         protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate);
 
         /// <summary>
-        /// Creates the <see cref="Skill"/>s to calculate the difficulty of <see cref="DifficultyHitObject"/>s.
+        /// Creates the <see cref="Skill"/>s to calculate the difficulty of an <see cref="IBeatmap"/>.
         /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty will be calculated.</param
         /// <returns>The <see cref="Skill"/>s.</returns>
-        protected abstract Skill[] CreateSkills();
+        protected abstract Skill[] CreateSkills(IBeatmap beatmap);
     }
 }
