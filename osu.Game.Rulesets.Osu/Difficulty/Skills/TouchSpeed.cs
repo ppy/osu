@@ -24,6 +24,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         {
             double distance = Math.Min(SINGLE_SPACING_THRESHOLD, current.TravelDistance + current.JumpDistance);
             double deltaTime = Math.Max(max_speed_bonus, current.DeltaTime);
+            distance = max(distance, distance * ((0.5 / 1 + Math.Pow(2.71, -0.5 * current.Angle.Value))) + 0.75))
+           
 
             double speedBonus = 1.0;
             if (deltaTime < min_speed_bonus)
