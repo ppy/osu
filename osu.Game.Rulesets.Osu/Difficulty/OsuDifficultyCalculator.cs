@@ -25,28 +25,32 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         {
         }
 
-        protected override void PopulateAttributes(DifficultyAttributes attributes, IBeatmap beatmap, Skill[] skills, double timeRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
-            var osuAttributes = (OsuDifficultyAttributes)attributes;
+            if (beatmap.HitObjects.Count == 0)
+                return new OsuDifficultyAttributes();
 
             double aimRating = Math.Sqrt(skills[0].DifficultyValue()) * difficulty_multiplier;
             double speedRating = Math.Sqrt(skills[1].DifficultyValue()) * difficulty_multiplier;
             double starRating = aimRating + speedRating + Math.Abs(aimRating - speedRating) / 2;
 
             // Todo: These int casts are temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-            double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
-            double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / timeRate;
+            double hitWindowGreat = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate;
+            double preempt = (int)BeatmapDifficulty.DifficultyRange(beatmap.BeatmapInfo.BaseDifficulty.ApproachRate, 1800, 1200, 450) / clockRate;
 
             int maxCombo = beatmap.HitObjects.Count;
             // Add the ticks + tail of the slider. 1 is subtracted because the head circle would be counted twice (once for the slider itself in the line above)
             maxCombo += beatmap.HitObjects.OfType<Slider>().Sum(s => s.NestedHitObjects.Count - 1);
 
-            osuAttributes.StarRating = starRating;
-            osuAttributes.AimStrain = aimRating;
-            osuAttributes.SpeedStrain = speedRating;
-            osuAttributes.ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5;
-            osuAttributes.OverallDifficulty = (80 - hitWindowGreat) / 6;
-            osuAttributes.MaxCombo = maxCombo;
+            return new OsuDifficultyAttributes
+            {
+                StarRating = starRating,
+                AimStrain = aimRating,
+                SpeedStrain = speedRating,
+                ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
+                OverallDifficulty = (80 - hitWindowGreat) / 6,
+                MaxCombo = maxCombo
+            };
         }
 
         protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double timeRate)
@@ -68,8 +72,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             new Aim(),
             new Speed()
         };
-
-        protected override DifficultyAttributes CreateDifficultyAttributes() => new OsuDifficultyAttributes();
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
