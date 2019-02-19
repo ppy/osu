@@ -78,7 +78,7 @@ namespace osu.Game.Rulesets.Catch.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills() => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
         {
             new Movement(),
         };
