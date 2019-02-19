@@ -25,7 +25,8 @@ namespace osu.Game.Rulesets.Difficulty
 
         protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate)
         {
-            var attributes = CreateDifficultyAttributes(mods);
+            var attributes = CreateDifficultyAttributes();
+            attributes.Mods = mods;
 
             if (!beatmap.HitObjects.Any())
                 return attributes;
@@ -132,8 +133,7 @@ namespace osu.Game.Rulesets.Difficulty
         /// <summary>
         /// Creates an empty <see cref="DifficultyAttributes"/>.
         /// </summary>
-        /// <param name="mods">The <see cref="Mod"/>s which difficulty is being processed with.</param>
         /// <returns>The empty <see cref="DifficultyAttributes"/>.</returns>
-        protected abstract DifficultyAttributes CreateDifficultyAttributes(Mod[] mods);
+        protected abstract DifficultyAttributes CreateDifficultyAttributes();
     }
 }
