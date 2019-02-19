@@ -24,26 +24,28 @@ namespace osu.Game.Rulesets.Taiko.Difficulty
         {
         }
 
-        protected override void PopulateAttributes(DifficultyAttributes attributes, IBeatmap beatmap, Skill[] skills, double timeRate)
+        protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
         {
-            var taikoAttributes = (TaikoDifficultyAttributes)attributes;
+            if (beatmap.HitObjects.Count == 0)
+                return new TaikoDifficultyAttributes();
 
-            taikoAttributes.StarRating = skills.Single().DifficultyValue() * star_scaling_factor;
-
-            // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
-            taikoAttributes.GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / timeRate;
-            taikoAttributes.MaxCombo = beatmap.HitObjects.Count(h => h is Hit);
+            return new TaikoDifficultyAttributes
+            {
+                StarRating = skills.Single().DifficultyValue() * star_scaling_factor,
+                Mods = mods,
+                // Todo: This int cast is temporary to achieve 1:1 results with osu!stable, and should be removed in the future
+                GreatHitWindow = (int)(beatmap.HitObjects.First().HitWindows.Great / 2) / clockRate,
+                MaxCombo = beatmap.HitObjects.Count(h => h is Hit),
+            };
         }
 
-        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double timeRate)
+        protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
         {
             for (int i = 1; i < beatmap.HitObjects.Count; i++)
-                yield return new TaikoDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], timeRate);
+                yield return new TaikoDifficultyHitObject(beatmap.HitObjects[i], beatmap.HitObjects[i - 1], clockRate);
         }
 
         protected override Skill[] CreateSkills() => new Skill[] { new Strain() };
-
-        protected override DifficultyAttributes CreateDifficultyAttributes() => new TaikoDifficultyAttributes();
 
         protected override Mod[] DifficultyAdjustmentMods => new Mod[]
         {
