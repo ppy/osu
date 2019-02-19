@@ -68,7 +68,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             }
         }
 
-        protected override Skill[] CreateSkills() => new Skill[]
+        protected override Skill[] CreateSkills(IBeatmap beatmap) => new Skill[]
         {
             new Aim(),
             new Speed()
