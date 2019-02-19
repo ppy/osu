@@ -45,6 +45,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             return new OsuDifficultyAttributes
             {
                 StarRating = starRating,
+                Mods = mods,
                 AimStrain = aimRating,
                 SpeedStrain = speedRating,
                 ApproachRate = preempt > 1200 ? (1800 - preempt) / 120 : (1200 - preempt) / 150 + 5,
