@@ -124,6 +124,7 @@ namespace osu.Game.Rulesets.Osu
                     return new Mod[] {
                         new OsuModTransform(),
                         new OsuModWiggle(),
+                        new OsuModGrow()
                     };
                 default:
                     return new Mod[] { };
