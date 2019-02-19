@@ -317,32 +317,32 @@ namespace osu.Game.Rulesets.Osu.Tests
             // Likely requires some discussion regarding how first frame inputs should be handled.
             frames.Insert(0, new OsuReplayFrame());
 
-            var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
-            {
-                AllowPause = false,
-                AllowLeadIn = false,
-                AllowResults = false
-            };
-
-            p.OnLoadComplete += _ =>
-            {
-                p.ScoreProcessor.NewJudgement += result =>
-                {
-                    if (currentPlayer == p) judgementResults.Add(result);
-                };
-                p.ScoreProcessor.AllJudged += () =>
-                {
-                    if (currentPlayer == p) allJudgedFired = true;
-                };
-            };
-
             AddStep("load player", () =>
             {
+                var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
+                {
+                    AllowPause = false,
+                    AllowLeadIn = false,
+                    AllowResults = false
+                };
+
+                p.OnLoadComplete += _ =>
+                {
+                    p.ScoreProcessor.NewJudgement += result =>
+                    {
+                        if (currentPlayer == p) judgementResults.Add(result);
+                    };
+                    p.ScoreProcessor.AllJudged += () =>
+                    {
+                        if (currentPlayer == p) allJudgedFired = true;
+                    };
+                };
+
                 LoadScreen(currentPlayer = p);
                 allJudgedFired = false;
                 judgementResults = new List<JudgementResult>();
             });
-            AddUntilStep(() => p.IsLoaded, "Wait until player is loaded");
+            AddUntilStep(() => currentPlayer.IsLoaded, "Wait until player is loaded");
             AddUntilStep(() => allJudgedFired, "Wait for all judged");
         }
 
