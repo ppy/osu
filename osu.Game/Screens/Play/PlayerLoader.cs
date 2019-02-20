@@ -161,6 +161,8 @@ namespace osu.Game.Screens.Play
         {
             // restore our screen defaults
             InitializeBackgroundElements();
+            if (this.IsCurrentScreen())
+                Background.EnableUserDim.Value = false;
             return base.OnHover(e);
         }
 
@@ -170,6 +172,8 @@ namespace osu.Game.Screens.Play
             {
                 // show user setting preview
                 UpdateBackgroundElements();
+                if (this.IsCurrentScreen())
+                    Background.EnableUserDim.Value = true;
             }
 
             base.OnHoverLost(e);
@@ -242,6 +246,8 @@ namespace osu.Game.Screens.Play
             content.ScaleTo(0.7f, 150, Easing.InQuint);
             this.FadeOut(150);
             cancelLoad();
+
+            Background.EnableUserDim.Value = false;
 
             return base.OnExiting(next);
         }
