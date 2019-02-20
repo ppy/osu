@@ -50,28 +50,32 @@ namespace osu.Game.Tests.Beatmaps
         public class TrackVirtualManual : Track
         {
             private readonly IFrameBasedClock referenceClock;
-            private readonly ManualClock clock;
+
+            private readonly ManualClock clock = new ManualClock();
 
             private bool running;
+
+            /// <summary>
+            /// Local offset added to the reference clock to resolve correct time.
+            /// </summary>
             private double offset;
 
             public TrackVirtualManual(IFrameBasedClock referenceClock)
             {
                 this.referenceClock = referenceClock;
                 Length = double.PositiveInfinity;
-                clock = new ManualClock();
             }
 
             public override bool Seek(double seek)
             {
-                offset = MathHelper.Clamp(seek, 0, Length) - referenceClock.CurrentTime;
+                offset = MathHelper.Clamp(seek, 0, Length);
+                lastReferenceTime = null;
                 return true;
             }
 
             public override void Start()
             {
                 running = true;
-                Seek(0);
             }
 
             public override void Reset()
@@ -82,18 +86,41 @@ namespace osu.Game.Tests.Beatmaps
 
             public override void Stop()
             {
-                running = false;
+                if (running)
+                {
+                    running = false;
+                    // on stopping, the current value should be transferred out of the clock, as we can no longer rely on
+                    // the referenceClock (which will still be counting time).
+                    offset = clock.CurrentTime;
+                    lastReferenceTime = null;
+                }
             }
 
             public override bool IsRunning => running;
 
-            public override double CurrentTime => running ? clock.CurrentTime : 0;
+            private double? lastReferenceTime;
+
+            public override double CurrentTime => clock.CurrentTime;
 
             protected override void UpdateState()
             {
                 base.UpdateState();
 
-                clock.CurrentTime = Math.Min(referenceClock.CurrentTime + offset, Length);
+                if (running)
+                {
+                    double refTime = referenceClock.CurrentTime;
+
+                    if (!lastReferenceTime.HasValue)
+                    {
+                        // if the clock just started running, the current value should be transferred to the offset
+                        // (to zero the progression of time).
+                        offset -= refTime;
+                    }
+
+                    lastReferenceTime = referenceClock.CurrentTime;
+                }
+
+                clock.CurrentTime = Math.Min((lastReferenceTime ?? 0) + offset, Length);
 
                 if (CurrentTime >= Length)
                 {
