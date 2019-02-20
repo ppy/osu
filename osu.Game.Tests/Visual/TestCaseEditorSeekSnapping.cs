@@ -48,7 +48,7 @@ namespace osu.Game.Tests.Visual
                 }
             };
 
-            Beatmap.Value = new TestWorkingBeatmap(testBeatmap);
+            Beatmap.Value = new TestWorkingBeatmap(testBeatmap, Clock);
 
             Child = new TimingPointVisualiser(testBeatmap, 5000) { Clock = Clock };
         }

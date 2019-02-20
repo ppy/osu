@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Game.Rulesets.Difficulty;
-using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Catch.Difficulty
 {
@@ -10,10 +9,5 @@ namespace osu.Game.Rulesets.Catch.Difficulty
     {
         public double ApproachRate;
         public int MaxCombo;
-
-        public CatchDifficultyAttributes(Mod[] mods, double starRating)
-            : base(mods, starRating)
-        {
-        }
     }
 }
