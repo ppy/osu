@@ -243,9 +243,6 @@ namespace osu.Game.Screens.Play
             this.FadeOut(150);
             cancelLoad();
 
-            if (Background != null)
-                Background.UpdateDim.Value = false;
-
             return base.OnExiting(next);
         }
 
