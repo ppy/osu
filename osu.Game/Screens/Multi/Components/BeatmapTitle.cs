@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Multi.Components
             if (beatmap == null)
                 textFlow.AddText("No beatmap selected", s =>
                 {
-                    s.Font = OsuFont.GetFont(s.Font, size: TextSize);
+                    s.Font = s.Font.With(size: TextSize);
                     s.Colour = colours.PinkLight;
                 });
             else

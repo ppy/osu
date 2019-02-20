@@ -3,7 +3,6 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
-using osu.Game.Graphics;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 
@@ -20,7 +19,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private void load()
         {
             if (JudgementText != null)
-                JudgementText.Font = OsuFont.GetFont(JudgementText.Font, size: 25);
+                JudgementText.Font = JudgementText.Font.With(size: 25);
         }
 
         protected override void LoadComplete()

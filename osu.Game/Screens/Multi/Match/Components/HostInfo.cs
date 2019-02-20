@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 linkContainer.AddText("hosted by");
                 linkContainer.NewLine();
                 linkContainer.AddLink(host.Username, null, LinkAction.OpenUserProfile, host.Id.ToString(), "View Profile",
-                    s => s.Font = OsuFont.GetFont(Typeface.Exo, weight: FontWeight.Bold, italics: true));
+                    s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
             }
         }
     }

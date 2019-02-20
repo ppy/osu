@@ -122,7 +122,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     new OsuSpriteText
                     {
                         Text = second,
-                        Font = OsuFont.GetFont(secondFont, size: 13)
+                        Font = secondFont.With(size: 13)
                     },
                 };
             }

@@ -119,7 +119,7 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                                 }
                             }
                         },
-                        new OsuTextFlowContainer(t => t.Font = OsuFont.GetFont(t.Font, size: 19))
+                        new OsuTextFlowContainer(t => t.Font = t.Font.With(size: 19))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y,

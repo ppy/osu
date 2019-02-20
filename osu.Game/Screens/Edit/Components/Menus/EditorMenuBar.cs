@@ -110,8 +110,8 @@ namespace osu.Game.Screens.Edit.Components.Menus
             {
                 public TextContainer()
                 {
-                    NormalText.Font = OsuFont.GetFont(NormalText.Font, size: 14);
-                    BoldText.Font = OsuFont.GetFont(BoldText.Font, size: 14);
+                    NormalText.Font = NormalText.Font.With(size: 14);
+                    BoldText.Font = BoldText.Font.With(size: 14);
                     NormalText.Margin = BoldText.Margin = new MarginPadding { Horizontal = 10, Vertical = MARGIN_VERTICAL };
                 }
             }

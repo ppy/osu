@@ -89,7 +89,7 @@ namespace osu.Game.Overlays.AccountCreation
                             Font = OsuFont.GetFont(size: 28, weight: FontWeight.Light),
                             Text = "Warning! 注意！",
                         },
-                        multiAccountExplanationText = new OsuTextFlowContainer(cp => cp.Font = OsuFont.GetFont(cp.Font, size: 12))
+                        multiAccountExplanationText = new OsuTextFlowContainer(cp => cp.Font = cp.Font.With(size: 12))
                         {
                             RelativeSizeAxes = Axes.X,
                             AutoSizeAxes = Axes.Y
@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.AccountCreation
                             Text = "I understand. This account isn't for me.",
                             Action = () => this.Push(new ScreenEntry())
                         },
-                        furtherAssistance = new LinkFlowContainer(cp => cp.Font = OsuFont.GetFont(cp.Font, size: 12))
+                        furtherAssistance = new LinkFlowContainer(cp => cp.Font = cp.Font.With(size: 12))
                         {
                             Margin = new MarginPadding { Top = 20 },
                             Anchor = Anchor.TopCentre,

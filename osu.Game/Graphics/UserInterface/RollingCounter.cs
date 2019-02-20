@@ -65,7 +65,7 @@ namespace osu.Game.Graphics.UserInterface
         public float TextSize
         {
             get => DisplayedCountSpriteText.Font.Size;
-            set => DisplayedCountSpriteText.Font = OsuFont.GetFont(DisplayedCountSpriteText.Font, size: value);
+            set => DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(size: value);
         }
 
         public Color4 AccentColour
