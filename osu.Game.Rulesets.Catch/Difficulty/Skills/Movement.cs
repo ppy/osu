@@ -21,20 +21,23 @@ namespace osu.Game.Rulesets.Catch.Difficulty.Skills
 
         protected override double DecayWeight => 0.94;
 
-        private float lastPlayerPosition;
+        private float? lastPlayerPosition;
         private float lastDistanceMoved;
 
         protected override double StrainValueOf(DifficultyHitObject current)
         {
             var catchCurrent = (CatchDifficultyHitObject)current;
 
+            if (lastPlayerPosition == null)
+                lastPlayerPosition = catchCurrent.LastNormalizedPosition;
+
             float playerPosition = MathHelper.Clamp(
-                lastPlayerPosition,
+                lastPlayerPosition.Value,
                 catchCurrent.NormalizedPosition - (normalized_hitobject_radius - absolute_player_positioning_error),
                 catchCurrent.NormalizedPosition + (normalized_hitobject_radius - absolute_player_positioning_error)
             );
 
-            float distanceMoved = playerPosition - lastPlayerPosition;
+            float distanceMoved = playerPosition - lastPlayerPosition.Value;
 
             double distanceAddition = Math.Pow(Math.Abs(distanceMoved), 1.3) / 500;
             double sqrtStrain = Math.Sqrt(catchCurrent.StrainTime);
