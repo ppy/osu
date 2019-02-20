@@ -144,7 +144,7 @@ namespace osu.Game.Tests.Visual
 
             public void UpdateBindables()
             {
-                DimEnabled = Background.UpdateUserDim;
+                DimEnabled = Background.EnableUserDim;
             }
 
             public bool AssertDimmed()
