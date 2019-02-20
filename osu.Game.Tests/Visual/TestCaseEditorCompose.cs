@@ -19,7 +19,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo);
+            Beatmap.Value = new TestWorkingBeatmap(new OsuRuleset().RulesetInfo, Clock);
             Child = new ComposeScreen();
         }
     }
