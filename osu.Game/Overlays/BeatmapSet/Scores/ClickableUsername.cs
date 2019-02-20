@@ -32,7 +32,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         public float TextSize
         {
             get => text.Font.Size;
-            set => text.Font = OsuFont.GetFont(text.Font, size: value);
+            set => text.Font = text.Font.With(size: value);
         }
 
         public ClickableUsername()

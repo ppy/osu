@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.Chat
                                     t.Colour = OsuColour.FromHex(message.Sender.Colour);
                             }
 
-                            t.Font = OsuFont.GetFont(t.Font, size: TextSize);
+                            t.Font = t.Font.With(size: TextSize);
                         })
                         {
                             AutoSizeAxes = Axes.Y,

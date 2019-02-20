@@ -294,7 +294,7 @@ namespace osu.Game.Online.Leaderboards
                             {
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
-                                Font = OsuFont.GetFont(font, fixedWidth: true),
+                                Font = font.With(fixedWidth: true),
                                 Text = text,
                                 Colour = glowColour,
                                 Shadow = false,
@@ -305,7 +305,7 @@ namespace osu.Game.Online.Leaderboards
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Font = OsuFont.GetFont(font, fixedWidth: true),
+                        Font = font.With(fixedWidth: true),
                         Text = text,
                         Colour = textColour,
                         Shadow = false,

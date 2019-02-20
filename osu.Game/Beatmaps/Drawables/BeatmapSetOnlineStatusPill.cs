@@ -33,7 +33,7 @@ namespace osu.Game.Beatmaps.Drawables
         public float TextSize
         {
             get => statusText.Font.Size;
-            set => statusText.Font = OsuFont.GetFont(statusText.Font, size: value);
+            set => statusText.Font = statusText.Font.With(size: value);
         }
 
         public MarginPadding TextPadding

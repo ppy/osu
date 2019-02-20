@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 {
                     hostText.AddText("hosted by ");
                     hostText.AddLink(v.Username, null, LinkAction.OpenUserProfile, v.Id.ToString(), "Open profile",
-                        s => s.Font = OsuFont.GetFont(Typeface.Exo, weight: FontWeight.Bold, italics: true));
+                        s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
                     flagContainer.Child = new DrawableFlag(v.Country) { RelativeSizeAxes = Axes.Both };
                 }
             }, true);

@@ -14,7 +14,7 @@ namespace osu.Game.Online.Leaderboards
         {
             AddIcon(FontAwesome.fa_exclamation_circle, cp =>
             {
-                cp.Font = OsuFont.GetFont(cp.Font, size: TEXT_SIZE);
+                cp.Font = cp.Font.With(size: TEXT_SIZE);
                 cp.Padding = new MarginPadding { Right = 10 };
             });
 

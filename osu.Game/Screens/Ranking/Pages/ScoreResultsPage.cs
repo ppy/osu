@@ -391,7 +391,7 @@ namespace osu.Game.Screens.Ranking.Pages
             public SlowScoreCounter(uint leading = 0) : base(leading)
             {
                 DisplayedCountSpriteText.Shadow = false;
-                DisplayedCountSpriteText.Font = OsuFont.GetFont(DisplayedCountSpriteText.Font, Typeface.Venera, weight: FontWeight.Light);
+                DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(Typeface.Venera, weight: FontWeight.Light);
                 UseCommaSeparator = true;
             }
         }

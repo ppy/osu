@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.Profile
                     Y = cover_height,
                     Colour = OsuColour.Gray(34),
                 },
-                infoTextLeft = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(t.Font, size: 14))
+                infoTextLeft = new LinkFlowContainer(t => t.Font = t.Font.With(size: 14))
                 {
                     X = UserProfileOverlay.CONTENT_X_MARGIN,
                     Y = cover_height + 20,
@@ -349,7 +349,7 @@ namespace osu.Game.Overlays.Profile
                 colourBar.Show();
             }
 
-            void boldItalic(SpriteText t) => t.Font = OsuFont.GetFont(t.Font, weight: FontWeight.Bold, italics: true);
+            void boldItalic(SpriteText t) => t.Font = t.Font.With(weight: FontWeight.Bold, italics: true);
             void lightText(SpriteText t) => t.Alpha = 0.8f;
 
             OsuSpriteText createScoreText(string text) => new OsuSpriteText

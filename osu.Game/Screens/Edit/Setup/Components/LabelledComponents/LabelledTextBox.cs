@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Edit.Setup.Components.LabelledComponents
         public float LabelTextSize
         {
             get => label.Font.Size;
-            set => label.Font = OsuFont.GetFont(label.Font, size: value);
+            set => label.Font = label.Font.With(size: value);
         }
 
         public string PlaceholderText

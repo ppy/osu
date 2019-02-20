@@ -346,7 +346,7 @@ namespace osu.Game.Screens.Select
 
             private void setTextAsync(string text)
             {
-                LoadComponentAsync(new OsuTextFlowContainer(s => s.Font = OsuFont.GetFont(s.Font, size: 14))
+                LoadComponentAsync(new OsuTextFlowContainer(s => s.Font = s.Font.With(size: 14))
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,

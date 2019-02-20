@@ -105,7 +105,7 @@ namespace osu.Game.Overlays.MedalSplash
             {
                 s.Anchor = Anchor.TopCentre;
                 s.Origin = Anchor.TopCentre;
-                s.Font = OsuFont.GetFont(s.Font, size: 16);
+                s.Font = s.Font.With(size: 16);
             });
 
             medalContainer.OnLoadComplete = d =>

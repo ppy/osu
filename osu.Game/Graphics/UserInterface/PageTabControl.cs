@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.UserInterface
                     new HoverClickSounds()
                 };
 
-                Active.BindValueChanged(val => Text.Font = OsuFont.GetFont(Text.Font, weight: val ? FontWeight.Bold : FontWeight.Medium), true);
+                Active.BindValueChanged(val => Text.Font = Text.Font.With(weight: val ? FontWeight.Bold : FontWeight.Medium), true);
             }
 
             [BackgroundDependencyLoader]

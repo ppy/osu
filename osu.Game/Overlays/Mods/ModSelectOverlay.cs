@@ -274,7 +274,7 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             new OsuTextFlowContainer(text =>
                                             {
-                                                text.Font = OsuFont.GetFont(text.Font, size: 18);
+                                                text.Font = text.Font.With(size: 18);
                                                 text.Shadow = true;
                                             })
                                             {

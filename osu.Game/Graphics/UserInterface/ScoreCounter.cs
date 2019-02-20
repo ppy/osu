@@ -28,7 +28,7 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="leading">How many leading zeroes the counter will have.</param>
         public ScoreCounter(uint leading = 0)
         {
-            DisplayedCountSpriteText.Font = OsuFont.GetFont(DisplayedCountSpriteText.Font, fixedWidth: true);
+            DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(fixedWidth: true);
             LeadingZeroes = leading;
         }
 

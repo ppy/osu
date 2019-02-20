@@ -156,7 +156,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     this.FadeIn(transition_duration);
                     textFlow.Clear();
-                    textFlow.AddText(value, s => s.Font = OsuFont.GetFont(s.Font, size: 14));
+                    textFlow.AddText(value, s => s.Font = s.Font.With(size: 14));
                 }
             }
 

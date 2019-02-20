@@ -11,18 +11,10 @@ namespace osu.Game.Graphics
 
         public static FontUsage Default => GetFont();
 
-        public static FontUsage GetFont(FontUsage usage, Typeface? typeface = null, float? size = null, FontWeight? weight = null, bool? italics = null, bool? fixedWidth = null)
-        {
-            string familyString = typeface != null ? getFamilyString(typeface.Value) : usage.Family;
-            string weightString = weight != null ? getWeightString(familyString, weight.Value) : usage.Weight;
-
-            return new FontUsage(usage, familyString, size, weightString, italics, fixedWidth);
-        }
-
         public static FontUsage GetFont(Typeface typeface = Typeface.Exo, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Medium, bool italics = false, bool fixedWidth = false)
-            => new FontUsage(getFamilyString(typeface), size, getWeightString(typeface, weight), italics, fixedWidth);
+            => new FontUsage(GetFamilyString(typeface), size, GetWeightString(typeface, weight), italics, fixedWidth);
 
-        private static string getFamilyString(Typeface typeface)
+        public static string GetFamilyString(Typeface typeface)
         {
             switch (typeface)
             {
@@ -37,10 +29,10 @@ namespace osu.Game.Graphics
             return null;
         }
 
-        private static string getWeightString(Typeface typeface, FontWeight weight)
-            => getWeightString(getFamilyString(typeface), weight);
+        public static string GetWeightString(Typeface typeface, FontWeight weight)
+            => GetWeightString(GetFamilyString(typeface), weight);
 
-        private static string getWeightString(string family, FontWeight weight)
+        public static string GetWeightString(string family, FontWeight weight)
         {
             string weightString = weight.ToString();
 
@@ -49,6 +41,17 @@ namespace osu.Game.Graphics
                 weightString = string.Empty;
 
             return weightString;
+        }
+    }
+
+    public static class OsuFontExtensions
+    {
+        public static FontUsage With(this FontUsage usage, Typeface? typeface = null, float? size = null, FontWeight? weight = null, bool? italics = null, bool? fixedWidth = null)
+        {
+            string familyString = typeface != null ? OsuFont.GetFamilyString(typeface.Value) : usage.Family;
+            string weightString = weight != null ? OsuFont.GetWeightString(familyString, weight.Value) : usage.Weight;
+
+            return usage.With(familyString, size, weightString, italics, fixedWidth);
         }
     }
 

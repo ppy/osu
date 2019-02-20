@@ -199,7 +199,7 @@ namespace osu.Game.Graphics.UserInterface
         public float TextSize
         {
             get => spriteText.Font.Size;
-            set => spriteText.Font = OsuFont.GetFont(spriteText.Font, size: value);
+            set => spriteText.Font = spriteText.Font.With(size: value);
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceivePositionalInputAt(screenSpacePos);
