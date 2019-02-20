@@ -19,7 +19,6 @@ using osu.Framework.Threading;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
-using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Cursor;
 using osu.Game.Online.API;
@@ -61,7 +60,6 @@ namespace osu.Game.Screens.Play
 
         public CursorContainer Cursor => RulesetContainer.Cursor;
         public bool ProvidingUserCursor => RulesetContainer?.Cursor != null && !RulesetContainer.HasReplayLoaded.Value;
-        protected float BackgroundOpacity => 1 - (float)DimLevel;
 
         private IAdjustableClock sourceClock;
 
@@ -88,7 +86,7 @@ namespace osu.Game.Screens.Play
         private FailOverlay failOverlay;
 
         private DrawableStoryboard storyboard;
-        private Container storyboardContainer;
+        private UserDimContainer storyboardContainer;
 
         public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
 
@@ -175,9 +173,9 @@ namespace osu.Game.Screens.Play
                     OnRetry = Restart,
                     OnQuit = performUserRequestedExit,
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
-                    Children = new[]
+                    Children = new Container[]
                     {
-                        storyboardContainer = new Container
+                        storyboardContainer = new UserDimContainer
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
@@ -241,6 +239,8 @@ namespace osu.Game.Screens.Play
 
             if (ShowStoryboard)
                 initializeStoryboard(false);
+
+            storyboardContainer.EnableUserDim.Value = true;
 
             // Bind ScoreProcessor to ourselves
             ScoreProcessor.AllJudged += onCompletion;
@@ -346,7 +346,7 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            Background.UpdateDim.Value = true;
+            Background.EnableUserDim.Value = true;
 
             Task.Run(() =>
             {
@@ -407,7 +407,7 @@ namespace osu.Game.Screens.Play
         {
             float fadeOutDuration = instant ? 0 : 250;
             this.FadeOut(fadeOutDuration);
-            Background.UpdateDim.Value = false;
+            Background.EnableUserDim.Value = false;
         }
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
@@ -440,9 +440,7 @@ namespace osu.Game.Screens.Play
             var beatmap = Beatmap.Value;
             var storyboardVisible = ShowStoryboard && beatmap.Storyboard.HasDrawable;
 
-            storyboardContainer?
-                .FadeColour(OsuColour.Gray(BackgroundOpacity), BACKGROUND_FADE_DURATION, Easing.OutQuint)
-                .FadeTo(storyboardVisible && BackgroundOpacity > 0 ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            storyboardContainer?.FadeTo(storyboardVisible && 1 - (float)DimLevel > 0 ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
 
             if (storyboardVisible && beatmap.Storyboard.ReplacesBackground)
                 Background?.FadeColour(Color4.Black, BACKGROUND_FADE_DURATION, Easing.OutQuint);
