@@ -116,7 +116,7 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             // eagerly pause when we lose window focus (if we are locally playing).
-            if (!game.IsActive && CanPause)
+            if (!game.IsActive.Value && CanPause)
                 Pause();
 
             if (!IsPaused)
