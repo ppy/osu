@@ -12,11 +12,7 @@ namespace osu.Game.Graphics.Containers
 {
     public class UserDimContainer : Container
     {
-        #region User Settings
-
         protected Bindable<double> DimLevel;
-
-        #endregion
 
         public Bindable<bool> EnableUserDim = new Bindable<bool>();
 
