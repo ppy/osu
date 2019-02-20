@@ -13,11 +13,11 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
 
-        [TestCase(3.8664391043534758, "diffcalc-test")]
+        [TestCase(3.8701854263563118d, "diffcalc-test")]
         public void Test(double expected, string name)
             => base.Test(expected, name);
 
-        protected override LegacyDifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchLegacyDifficultyCalculator(new CatchRuleset(), beatmap);
+        protected override LegacyDifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchDifficultyCalculator(new CatchRuleset(), beatmap);
 
         protected override Ruleset CreateRuleset() => new CatchRuleset();
     }

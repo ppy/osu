@@ -15,6 +15,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
     public abstract class Skill
     {
         /// <summary>
+        /// The peak strain for each <see cref="DifficultyCalculator.SectionLength"/> section of the beatmap.
+        /// </summary>
+        public IList<double> StrainPeaks => strainPeaks;
+
+        /// <summary>
         /// Strain values are multiplied by this number for the given skill. Used to balance the value of different skills between each other.
         /// </summary>
         protected abstract double SkillMultiplier { get; }
@@ -37,6 +42,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
         private double currentSectionPeak = 1; // We also keep track of the peak strain level in the current section.
+
         private readonly List<double> strainPeaks = new List<double>();
 
         /// <summary>
