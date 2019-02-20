@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Multi
         private readonly Bindable<Room> currentRoom = new Bindable<Room>();
 
         [Cached]
-        private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>();
+        private readonly Bindable<FilterCriteria> currentFilter = new Bindable<FilterCriteria>(new FilterCriteria());
 
         [Cached(Type = typeof(IRoomManager))]
         private RoomManager roomManager;
