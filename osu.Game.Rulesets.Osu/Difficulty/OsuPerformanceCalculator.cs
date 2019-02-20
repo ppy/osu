@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double rawAim = Attributes.AimStrain;
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                rawAim = Math.Pow(rawAim, 0.86);
+                rawAim = Math.Pow(rawAim, 0.84);
                 
             double aimValue = Math.Pow(5.0f * Math.Max(1.0f, rawAim / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
@@ -141,7 +141,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
         private double computeSpeedValue()
         {
             if (mods.Any(m => m is OsuModTouchDevice))
-                rawAim = Math.Pow(Attributes.SpeedStrain, 0.9);
+                rawAim = Math.Pow(Attributes.SpeedStrain, 0.94);
                 
             double speedValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes.SpeedStrain / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
