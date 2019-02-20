@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual
         private Player loadPlayerFor(Ruleset r)
         {
             var beatmap = CreateBeatmap(r);
-            var working = new TestWorkingBeatmap(beatmap);
+            var working = new TestWorkingBeatmap(beatmap, Clock);
 
             workingWeakReferences.Add(working);
 

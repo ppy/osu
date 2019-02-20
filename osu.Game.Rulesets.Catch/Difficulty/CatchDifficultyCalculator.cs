@@ -29,6 +29,9 @@ namespace osu.Game.Rulesets.Catch.Difficulty
         {
             var catcher = new CatcherArea.Catcher(beatmap.BeatmapInfo.BaseDifficulty);
             halfCatchWidth = catcher.CatchWidth * 0.5f;
+
+            // We're only using 80% of the catcher's width to simulate imperfect gameplay.
+            halfCatchWidth *= 0.8f;
         }
 
         protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
