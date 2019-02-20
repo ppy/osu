@@ -117,7 +117,7 @@ namespace osu.Game.Tests.Beatmaps
                         offset -= refTime;
                     }
 
-                    lastReferenceTime = referenceClock.CurrentTime;
+                    lastReferenceTime = refTime;
                 }
 
                 clock.CurrentTime = Math.Min((lastReferenceTime ?? 0) + offset, Length);
