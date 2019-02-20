@@ -48,8 +48,9 @@ namespace osu.Game.Rulesets.Osu.Tests
         private List<JudgementResult> judgementResults;
         private bool allJudgedFired;
 
-        public TestCaseSliderInput()
+        protected override void LoadComplete()
         {
+            base.LoadComplete();
             Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
             {
                 HitObjects =
@@ -74,7 +75,7 @@ namespace osu.Game.Rulesets.Osu.Tests
                     BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
                     Ruleset = new OsuRuleset().RulesetInfo
                 },
-            });
+            }, Clock);
         }
 
         /// <summary>
