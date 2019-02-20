@@ -37,7 +37,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             
             touchBonus = touchBonus * Math.Max(0,Math.Min(1,(-1 * Previous[0].StrainTime / 50 + 4))); 
             
-            touchBonus = Math.Pow(Math.Max(0, touchBonus),1.4) + 1
+            touchBonus = 1.4 * Math.Max(0, touchBonus) + 1
             //Indirectly lower stream bonus depending on time between last two objects
 
             double speedValue;
