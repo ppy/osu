@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override SpriteText CreatePlaceholder() => new OsuSpriteText
         {
-            Font = OsuFont.GetFont(weight: FontWeight.Medium, italics: true),
+            Font = OsuFont.GetFont(italics: true),
             Colour = new Color4(180, 180, 180, 255),
             Margin = new MarginPadding { Left = 2 },
         };

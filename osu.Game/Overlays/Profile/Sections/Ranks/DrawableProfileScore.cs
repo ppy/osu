@@ -46,7 +46,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Colour = colour.GrayA,
-                Font = OsuFont.GetFont(size: 11, italics: true)
+                Font = OsuFont.GetFont(size: 11, weight: FontWeight.Regular, italics: true)
             };
 
             RightFlowContainer.Add(text);

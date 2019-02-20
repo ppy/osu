@@ -368,7 +368,7 @@ namespace osu.Game.Screens.Ranking.Pages
                         Anchor = Anchor.BottomCentre,
                         Origin = Anchor.BottomCentre,
                         Text = user.Username,
-                        Font = OsuFont.GetFont(size: 30, italics: true),
+                        Font = OsuFont.GetFont(size: 30, weight: FontWeight.Regular, italics: true),
                         Padding = new MarginPadding { Bottom = 10 },
                     }
                 };

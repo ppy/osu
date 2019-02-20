@@ -19,7 +19,7 @@ namespace osu.Game.Graphics
             return new FontUsage(usage, familyString, size, weightString, italics, fixedWidth);
         }
 
-        public static FontUsage GetFont(Typeface typeface = Typeface.Exo, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Regular, bool italics = false, bool fixedWidth = false)
+        public static FontUsage GetFont(Typeface typeface = Typeface.Exo, float size = DEFAULT_FONT_SIZE, FontWeight weight = FontWeight.Medium, bool italics = false, bool fixedWidth = false)
             => new FontUsage(getFamilyString(typeface), size, getWeightString(typeface, weight), italics, fixedWidth);
 
         private static string getFamilyString(Typeface typeface)

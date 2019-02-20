@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomRight,
                         Text = @"times played ",
-                        Font = OsuFont.GetFont(size: 12, italics: true)
+                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular, italics: true)
                     },
                 }
             });

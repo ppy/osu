@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Music
             text.Clear();
 
             //space after the title to put a space between the title and artist
-            titleSprites = text.AddText(titleBind.Value + @"  ", sprite => sprite.Font = OsuFont.Default).OfType<SpriteText>();
+            titleSprites = text.AddText(titleBind.Value + @"  ", sprite => sprite.Font = OsuFont.GetFont(weight: FontWeight.Regular)).OfType<SpriteText>();
 
             text.AddText(artistBind.Value, sprite =>
             {

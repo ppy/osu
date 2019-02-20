@@ -35,7 +35,7 @@ namespace osu.Game.Overlays.Profile
                 new OsuSpriteText
                 {
                     Text = Title,
-                    Font = OsuFont.GetFont(size: 20, italics: true),
+                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular, italics: true),
                     Margin = new MarginPadding
                     {
                         Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
@@ -66,7 +66,6 @@ namespace osu.Game.Overlays.Profile
             Add(new OsuSpriteText
             {
                 Text = @"coming soon!",
-                Font = OsuFont.GetFont(weight: FontWeight.Medium),
                 Colour = Color4.Gray,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

@@ -224,7 +224,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                         Text = header,
                         Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
                     },
-                    valueText = new OsuSpriteText { Font = OsuFont.GetFont(size: 25, italics: true) }
+                    valueText = new OsuSpriteText { Font = OsuFont.GetFont(size: 25, weight: FontWeight.Regular, italics: true) }
                 };
             }
 

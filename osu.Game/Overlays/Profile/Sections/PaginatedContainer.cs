@@ -45,7 +45,7 @@ namespace osu.Game.Overlays.Profile.Sections
                 new OsuSpriteText
                 {
                     Text = header,
-                    Font = OsuFont.GetFont(size: 15, italics: true),
+                    Font = OsuFont.GetFont(size: 15, weight: FontWeight.Regular, italics: true),
                     Margin = new MarginPadding { Top = 10, Bottom = 10 },
                 },
                 ItemsContainer = new FillFlowContainer

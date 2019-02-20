@@ -159,7 +159,7 @@ namespace osu.Game.Overlays.Chat
                         {
                             if (Message.IsAction)
                             {
-                                t.Font = OsuFont.GetFont(weight: FontWeight.Medium, italics: true);
+                                t.Font = OsuFont.GetFont(italics: true);
 
                                 if (senderHasBackground)
                                     t.Colour = OsuColour.FromHex(message.Sender.Colour);

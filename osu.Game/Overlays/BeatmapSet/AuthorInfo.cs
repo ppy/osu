@@ -49,7 +49,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             fields.Children = new Drawable[]
             {
-                new Field("mapped by", BeatmapSet.Metadata.Author.Username, OsuFont.GetFont(italics: true)),
+                new Field("mapped by", BeatmapSet.Metadata.Author.Username, OsuFont.GetFont(weight: FontWeight.Regular, italics: true)),
                 new Field("submitted on", online.Submitted.ToString(@"MMMM d, yyyy"), OsuFont.GetFont(weight: FontWeight.Bold))
                 {
                     Margin = new MarginPadding { Top = 5 },

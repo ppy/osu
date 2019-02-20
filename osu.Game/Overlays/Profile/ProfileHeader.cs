@@ -118,7 +118,7 @@ namespace osu.Game.Overlays.Profile
                                                 usernameText = new OsuSpriteText
                                                 {
                                                     Text = user.Username,
-                                                    Font = OsuFont.GetFont(size: 30, italics: true)
+                                                    Font = OsuFont.GetFont(size: 30, weight: FontWeight.Regular, italics: true)
                                                 },
                                                 new ExternalLinkButton($@"https://osu.ppy.sh/users/{user.Id}")
                                                 {
@@ -174,7 +174,7 @@ namespace osu.Game.Overlays.Profile
                     ParagraphSpacing = 0.8f,
                     LineSpacing = 0.2f
                 },
-                infoTextRight = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14, italics: true))
+                infoTextRight = new LinkFlowContainer(t => t.Font = OsuFont.GetFont(size: 14, weight: FontWeight.Regular, italics: true))
                 {
                     X = UserProfileOverlay.CONTENT_X_MARGIN + info_width + 20,
                     Y = cover_height + 20,
