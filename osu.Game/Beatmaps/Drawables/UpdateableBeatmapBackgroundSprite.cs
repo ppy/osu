@@ -13,7 +13,7 @@ namespace osu.Game.Beatmaps.Drawables
     /// </summary>
     public class UpdateableBeatmapBackgroundSprite : ModelBackedDrawable<BeatmapInfo>
     {
-        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
+        public readonly Bindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
