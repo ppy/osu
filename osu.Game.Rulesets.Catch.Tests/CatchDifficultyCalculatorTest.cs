@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Catch.Tests
     {
         protected override string ResourceAssembly => "osu.Game.Rulesets.Catch";
 
-        [TestCase(3.8701854263563118d, "diffcalc-test")]
+        [TestCase(3.8701758020428221d, "diffcalc-test")]
         public void Test(double expected, string name)
             => base.Test(expected, name);
 
