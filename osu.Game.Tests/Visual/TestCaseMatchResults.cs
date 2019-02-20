@@ -40,10 +40,10 @@ namespace osu.Game.Tests.Visual
             Room.RoomID.Value = 1;
             Room.Name.Value = "an awesome room";
 
-            Child = new TestMatchResults(new ScoreInfo
+            LoadScreen(new TestMatchResults(new ScoreInfo
             {
                 User = new User { Id = 10 },
-            });
+            }));
         }
 
         private class TestMatchResults : MatchResults
@@ -53,7 +53,7 @@ namespace osu.Game.Tests.Visual
             {
             }
 
-            protected override IEnumerable<IResultPageInfo> CreateResultPages() => new[] { new TestRoomLeaderboardPageInfo(Score, Beatmap) };
+            protected override IEnumerable<IResultPageInfo> CreateResultPages() => new[] { new TestRoomLeaderboardPageInfo(Score, Beatmap.Value) };
         }
 
         private class TestRoomLeaderboardPageInfo : RoomLeaderboardPageInfo
