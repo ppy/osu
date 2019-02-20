@@ -55,7 +55,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     {
                         Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
                         Padding = new MarginPadding { Top = 3 },
-                        Font = OsuFont.GetFont(size: 12, italics: true)
+                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular, italics: true)
                     },
                 },
             };

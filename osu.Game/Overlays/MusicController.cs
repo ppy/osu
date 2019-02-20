@@ -107,7 +107,7 @@ namespace osu.Game.Overlays
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.TopCentre,
                                     Position = new Vector2(0, 40),
-                                    Font = OsuFont.GetFont(size: 25, weight: FontWeight.Medium, italics: true),
+                                    Font = OsuFont.GetFont(size: 25, italics: true),
                                     Colour = Color4.White,
                                     Text = @"Nothing to play",
                                 },

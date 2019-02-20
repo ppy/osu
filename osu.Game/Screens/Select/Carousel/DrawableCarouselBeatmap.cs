@@ -101,21 +101,20 @@ namespace osu.Game.Screens.Select.Carousel
                                         new OsuSpriteText
                                         {
                                             Text = beatmap.Version,
-                                            Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 20),
+                                            Font = OsuFont.GetFont(size: 20),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
                                         },
                                         new OsuSpriteText
                                         {
                                             Text = "mapped by",
-                                            Font = OsuFont.GetFont(weight: FontWeight.Medium),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
                                         },
                                         new OsuSpriteText
                                         {
                                             Text = $"{(beatmap.Metadata ?? beatmap.BeatmapSet.Metadata).Author.Username}",
-                                            Font = OsuFont.GetFont(weight: FontWeight.Medium, italics: true),
+                                            Font = OsuFont.GetFont(italics: true),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
                                         },

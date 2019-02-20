@@ -21,7 +21,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             AutoSizeAxes = Axes.X;
 
-            DrawableText.Font = OsuFont.GetFont(weight: FontWeight.Medium, italics: true);
+            DrawableText.Font = OsuFont.GetFont(italics: true);
 
             Add(new OpaqueBackground { Depth = 1 });
 

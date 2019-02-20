@@ -107,14 +107,14 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     Text = header + ":",
-                                    Font = OsuFont.GetFont(size: 20, italics: true)
+                                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular, italics: true)
                                 },
                                 valueText = new OsuSpriteText
                                 {
                                     Anchor = Anchor.BottomLeft,
                                     Origin = Anchor.BottomLeft,
                                     Text = "0",
-                                    Font = OsuFont.GetFont(size: 40, italics: true),
+                                    Font = OsuFont.GetFont(size: 40, weight: FontWeight.Regular, italics: true),
                                     UseFullGlyphHeight = false,
                                 }
                             }

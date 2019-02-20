@@ -204,7 +204,7 @@ namespace osu.Game.Screens.Select
                             VersionLabel = new OsuSpriteText
                             {
                                 Text = beatmapInfo.Version,
-                                Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 24, italics: true),
+                                Font = OsuFont.GetFont(size: 24, italics: true),
                             },
                         }
                     },
@@ -239,11 +239,11 @@ namespace osu.Game.Screens.Select
                         {
                             TitleLabel = new OsuSpriteText
                             {
-                                Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 28, italics: true),
+                                Font = OsuFont.GetFont(size: 28, italics: true),
                             },
                             ArtistLabel = new OsuSpriteText
                             {
-                                Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 17, italics: true),
+                                Font = OsuFont.GetFont(size: 17, italics: true),
                             },
                             MapperContainer = new FillFlowContainer
                             {
@@ -343,7 +343,7 @@ namespace osu.Game.Screens.Select
                     new OsuSpriteText
                     {
                         Text = "mapped by ",
-                        Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 15),
+                        Font = OsuFont.GetFont(size: 15),
                     },
                     new OsuSpriteText
                     {

@@ -173,7 +173,7 @@ namespace osu.Game.Graphics.UserInterface
                     new HoverClickSounds()
                 };
 
-                Active.BindValueChanged(val => Text.Font = OsuFont.GetFont(Text.Font, weight: val ? FontWeight.Bold : FontWeight.Regular), true);
+                Active.BindValueChanged(val => Text.Font = OsuFont.GetFont(Text.Font, weight: val ? FontWeight.Bold : FontWeight.Medium), true);
             }
 
             protected override void OnActivated() => fadeActive();

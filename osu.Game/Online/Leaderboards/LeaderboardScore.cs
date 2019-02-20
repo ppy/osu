@@ -76,7 +76,7 @@ namespace osu.Game.Online.Leaderboards
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(size: 22, weight: FontWeight.Medium, italics: true),
+                            Font = OsuFont.GetFont(size: 22, italics: true),
                             Text = RankPosition.ToString(),
                         },
                     },

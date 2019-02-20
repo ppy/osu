@@ -56,7 +56,7 @@ namespace osu.Game.Overlays.Profile.Header
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
                                 Alpha = 0,
-                                Font = OsuFont.GetFont(size: 12)
+                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular)
                             },
                             new Container
                             {

@@ -88,7 +88,7 @@ namespace osu.Game.Screens.Play
                                 new OsuSpriteText
                                 {
                                     Text = Header,
-                                    Font = OsuFont.GetFont(weight: FontWeight.Medium, size: 30),
+                                    Font = OsuFont.GetFont(size: 30),
                                     Spacing = new Vector2(5, 0),
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
