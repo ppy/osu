@@ -12,12 +12,23 @@ using osu.Game.Configuration;
 
 namespace osu.Game.Skinning
 {
+    /// <summary>
+    /// A container which overrides existing skin options with beatmap-local values.
+    /// </summary>
     public class LocalSkinOverrideContainer : Container, ISkinSource
     {
         public event Action SourceChanged;
 
         private readonly Bindable<bool> beatmapSkins = new Bindable<bool>();
         private readonly Bindable<bool> beatmapHitsounds = new Bindable<bool>();
+
+        private readonly ISkinSource source;
+        private ISkinSource fallbackSource;
+
+        public LocalSkinOverrideContainer(ISkinSource source)
+        {
+            this.source = source;
+        }
 
         public Drawable GetDrawableComponent(string componentName)
         {
@@ -51,14 +62,6 @@ namespace osu.Game.Skinning
                     return val;
 
             return fallbackSource == null ? default : fallbackSource.GetValue(query);
-        }
-
-        private readonly ISkinSource source;
-        private ISkinSource fallbackSource;
-
-        public LocalSkinOverrideContainer(ISkinSource source)
-        {
-            this.source = source;
         }
 
         private void onSourceChanged() => SourceChanged?.Invoke();

@@ -19,13 +19,13 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     {
         public Action<Room> JoinRequested;
 
-        private readonly Bindable<Room> selectedRoom = new Bindable<Room>();
-        public IBindable<Room> SelectedRoom => selectedRoom;
-
         private readonly IBindableList<Room> rooms = new BindableList<Room>();
 
         private readonly FillFlowContainer<DrawableRoom> roomFlow;
         public IReadOnlyList<DrawableRoom> Rooms => roomFlow;
+
+        [Resolved]
+        private Bindable<Room> currentRoom { get; set; }
 
         [Resolved]
         private IRoomManager roomManager { get; set; }
@@ -121,7 +121,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             else
                 roomFlow.Children.ForEach(r => r.State = r.Room == room ? SelectionState.Selected : SelectionState.NotSelected);
 
-            selectedRoom.Value = room;
+            currentRoom.Value = room;
         }
 
         protected override void Dispose(bool isDisposing)

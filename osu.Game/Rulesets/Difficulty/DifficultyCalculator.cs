@@ -1,56 +1,64 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Extensions.IEnumerableExtensions;
-using osu.Framework.Timing;
 using osu.Game.Beatmaps;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Rulesets.Difficulty
 {
-    public abstract class DifficultyCalculator
+    public abstract class DifficultyCalculator : LegacyDifficultyCalculator
     {
-        private readonly Ruleset ruleset;
-        private readonly WorkingBeatmap beatmap;
+        /// <summary>
+        /// The length of each strain section.
+        /// </summary>
+        protected virtual int SectionLength => 400;
 
         protected DifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
+            : base(ruleset, beatmap)
         {
-            this.ruleset = ruleset;
-            this.beatmap = beatmap;
         }
 
-        /// <summary>
-        /// Calculates the difficulty of the beatmap using a specific mod combination.
-        /// </summary>
-        /// <param name="mods">The mods that should be applied to the beatmap.</param>
-        /// <returns>A structure describing the difficulty of the beatmap.</returns>
-        public DifficultyAttributes Calculate(params Mod[] mods)
+        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
-            beatmap.Mods.Value = mods;
-            IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+            var skills = CreateSkills(beatmap);
 
-            var clock = new StopwatchClock();
-            mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
+            if (!beatmap.HitObjects.Any())
+                return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
 
-            return Calculate(playableBeatmap, mods, clock.Rate);
-        }
+            var difficultyHitObjects = CreateDifficultyHitObjects(beatmap, clockRate).OrderBy(h => h.BaseObject.StartTime).ToList();
 
-        /// <summary>
-        /// Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
-        /// </summary>
-        /// <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
-        public IEnumerable<DifficultyAttributes> CalculateAll()
-        {
-            foreach (var combination in CreateDifficultyAdjustmentModCombinations())
+            double sectionLength = SectionLength * clockRate;
+
+            // The first object doesn't generate a strain, so we begin with an incremented section end
+            double currentSectionEnd = Math.Ceiling(beatmap.HitObjects.First().StartTime / sectionLength) * sectionLength;
+
+            foreach (DifficultyHitObject h in difficultyHitObjects)
             {
-                if (combination is MultiMod multi)
-                    yield return Calculate(multi.Mods);
-                else
-                    yield return Calculate(combination);
+                while (h.BaseObject.StartTime > currentSectionEnd)
+                {
+                    foreach (Skill s in skills)
+                    {
+                        s.SaveCurrentPeak();
+                        s.StartNewSectionFrom(currentSectionEnd);
+                    }
+
+                    currentSectionEnd += sectionLength;
+                }
+
+                foreach (Skill s in skills)
+                    s.Process(h);
             }
+
+            // The peak strain will not be saved for the last section in the above loop
+            foreach (Skill s in skills)
+                s.SaveCurrentPeak();
+
+            return CreateDifficultyAttributes(beatmap, mods, skills, clockRate);
         }
 
         /// <summary>
@@ -96,12 +104,27 @@ namespace osu.Game.Rulesets.Difficulty
         protected virtual Mod[] DifficultyAdjustmentMods => Array.Empty<Mod>();
 
         /// <summary>
-        /// Calculates the difficulty of a <see cref="Beatmap"/> using a specific <see cref="Mod"/> combination.
+        /// Creates <see cref="DifficultyAttributes"/> to describe beatmap's calculated difficulty.
         /// </summary>
-        /// <param name="beatmap">The <see cref="IBeatmap"/> to compute the difficulty for.</param>
-        /// <param name="mods">The <see cref="Mod"/>s that should be applied.</param>
-        /// <param name="timeRate">The rate of time in <paramref name="beatmap"/>.</param>
-        /// <returns>A structure containing the difficulty attributes.</returns>
-        protected abstract DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double timeRate);
+        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty was calculated.</param>
+        /// <param name="mods">The <see cref="Mod"/>s that difficulty was calculated with.</param>
+        /// <param name="skills">The skills which processed the beatmap.</param>
+        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+        protected abstract DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate);
+
+        /// <summary>
+        /// Enumerates <see cref="DifficultyHitObject"/>s to be processed from <see cref="HitObject"/>s in the <see cref="IBeatmap"/>.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> providing the <see cref="HitObject"/>s to enumerate.</param>
+        /// <param name="clockRate">The rate at which the gameplay clock is run at.</param>
+        /// <returns>The enumerated <see cref="DifficultyHitObject"/>s.</returns>
+        protected abstract IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate);
+
+        /// <summary>
+        /// Creates the <see cref="Skill"/>s to calculate the difficulty of an <see cref="IBeatmap"/>.
+        /// </summary>
+        /// <param name="beatmap">The <see cref="IBeatmap"/> whose difficulty will be calculated.</param
+        /// <returns>The <see cref="Skill"/>s.</returns>
+        protected abstract Skill[] CreateSkills(IBeatmap beatmap);
     }
 }

@@ -2,11 +2,8 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
-using osu.Framework.Graphics.Containers;
 using osu.Framework.Localisation;
-using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
@@ -14,10 +11,8 @@ using osu.Game.Online.Chat;
 
 namespace osu.Game.Screens.Multi.Components
 {
-    public class BeatmapTitle : CompositeDrawable
+    public class BeatmapTitle : MultiplayerComposite
     {
-        public readonly IBindable<BeatmapInfo> Beatmap = new Bindable<BeatmapInfo>();
-
         private readonly LinkFlowContainer textFlow;
 
         public BeatmapTitle()
@@ -27,10 +22,10 @@ namespace osu.Game.Screens.Multi.Components
             InternalChild = textFlow = new LinkFlowContainer { AutoSizeAxes = Axes.Both };
         }
 
-        protected override void LoadComplete()
+        [BackgroundDependencyLoader]
+        private void load()
         {
-            base.LoadComplete();
-            Beatmap.BindValueChanged(v => updateText(), true);
+            CurrentItem.BindValueChanged(v => updateText(), true);
         }
 
         private float textSize = OsuSpriteText.FONT_SIZE;
@@ -53,12 +48,14 @@ namespace osu.Game.Screens.Multi.Components
 
         private void updateText()
         {
-            if (!IsLoaded)
+            if (LoadState < LoadState.Loading)
                 return;
 
             textFlow.Clear();
 
-            if (Beatmap.Value == null)
+            var beatmap = CurrentItem.Value?.Beatmap;
+
+            if (beatmap == null)
                 textFlow.AddText("No beatmap selected", s =>
                 {
                     s.TextSize = TextSize;
@@ -70,7 +67,7 @@ namespace osu.Game.Screens.Multi.Components
                 {
                     new OsuSpriteText
                     {
-                        Text = new LocalisedString((Beatmap.Value.Metadata.ArtistUnicode, Beatmap.Value.Metadata.Artist)),
+                        Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
                         TextSize = TextSize,
                     },
                     new OsuSpriteText
@@ -80,10 +77,10 @@ namespace osu.Game.Screens.Multi.Components
                     },
                     new OsuSpriteText
                     {
-                        Text = new LocalisedString((Beatmap.Value.Metadata.TitleUnicode, Beatmap.Value.Metadata.Title)),
+                        Text = new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title)),
                         TextSize = TextSize,
                     }
-                }, null, LinkAction.OpenBeatmap, Beatmap.Value.OnlineBeatmapID.ToString(), "Open beatmap");
+                }, null, LinkAction.OpenBeatmap, beatmap.OnlineBeatmapID.ToString(), "Open beatmap");
             }
         }
     }
