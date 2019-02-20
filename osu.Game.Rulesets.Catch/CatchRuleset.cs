@@ -110,7 +110,7 @@ namespace osu.Game.Rulesets.Catch
 
         public override Drawable CreateIcon() => new SpriteIcon { Icon = FontAwesome.fa_osu_fruits_o };
 
-        public override LegacyDifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchLegacyDifficultyCalculator(this, beatmap);
+        public override LegacyDifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new CatchDifficultyCalculator(this, beatmap);
 
         public override int? LegacyID => 2;
 
