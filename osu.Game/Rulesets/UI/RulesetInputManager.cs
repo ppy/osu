@@ -121,6 +121,8 @@ namespace osu.Game.Rulesets.UI
 
         private const int max_catch_up_updates_per_frame = 50;
 
+        private const double sixty_frame_time = 1000.0 / 60;
+
         public override bool UpdateSubTree()
         {
             requireMoreUpdateLoops = true;
@@ -130,25 +132,28 @@ namespace osu.Game.Rulesets.UI
 
             while (validState && requireMoreUpdateLoops && loops++ < max_catch_up_updates_per_frame)
             {
-                if (!base.UpdateSubTree())
-                    return false;
+                updateClock();
 
-                UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
-
-                if (isAttached)
+                //if (Clock.ElapsedFrameTime > sixty_frame_time)
                 {
-                    // When handling replay input, we need to consider the possibility of fast-forwarding, which may cause the clock to be updated
-                    // to a point very far into the future, then playing a frame at that time. In such a case, lifetime MUST be updated before
-                    // input is handled. This is why base.Update is not called from the derived Update when handling replay input, and is instead
-                    // called manually at the correct time here.
-                    base.Update();
+                    base.UpdateSubTree();
+                    UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
                 }
+
+                // When handling replay input, we need to consider the possibility of fast-forwarding, which may cause the clock to be updated
+                // to a point very far into the future, then playing a frame at that time. In such a case, lifetime MUST be updated before
+                // input is handled. This is why base.Update is not called from the derived Update when handling replay input, and is instead
+                // called manually at the correct time here.
+                base.Update();
+
+                base.UpdateSubTree();
+                UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
             }
 
             return true;
         }
 
-        protected override void Update()
+        private void updateClock()
         {
             if (parentClock == null) return;
 
@@ -178,12 +183,11 @@ namespace osu.Game.Rulesets.UI
             // The manual clock time has changed in the above code. The framed clock now needs to be updated
             // to ensure that the its time is valid for our children before input is processed
             Clock.ProcessFrame();
+        }
 
-            if (!isAttached)
-            {
-                // For non-replay input handling, this provides equivalent input ordering as if Update was not overridden
-                base.Update();
-            }
+        protected override void Update()
+        {
+            // block update from base.UpdateSubTree()
         }
 
         #endregion
@@ -211,6 +215,7 @@ namespace osu.Game.Rulesets.UI
                         return false;
                     break;
             }
+
             return base.Handle(e);
         }
 
