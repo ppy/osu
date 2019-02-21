@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
 using osu.Game.Replays;
@@ -17,6 +18,7 @@ using osu.Game.Rulesets.Osu.Objects.Drawables.Pieces;
 using osu.Game.Rulesets.Osu.Replays;
 using osu.Game.Rulesets.Replays;
 using osu.Game.Rulesets.Scoring;
+using osu.Game.Rulesets.UI;
 using osu.Game.Scoring;
 using osu.Game.Screens.Play;
 using osu.Game.Tests.Beatmaps;
@@ -47,36 +49,6 @@ namespace osu.Game.Rulesets.Osu.Tests
 
         private List<JudgementResult> judgementResults;
         private bool allJudgedFired;
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-            Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
-            {
-                HitObjects =
-                {
-                    new Slider
-                    {
-                        StartTime = time_slider_start,
-                        Position = new Vector2(0, 0),
-                        Path = new SliderPath(PathType.PerfectCurve, new[]
-                        {
-                            Vector2.Zero,
-                            new Vector2(25, 0),
-                        }, 25),
-                    }
-                },
-                ControlPointInfo =
-                {
-                    DifficultyPoints = { new DifficultyControlPoint { SpeedMultiplier = 0.1f } }
-                },
-                BeatmapInfo =
-                {
-                    BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
-                    Ruleset = new OsuRuleset().RulesetInfo
-                },
-            }, Clock);
-        }
 
         /// <summary>
         /// Scenario:
@@ -276,6 +248,20 @@ namespace osu.Game.Rulesets.Osu.Tests
             AddAssert("Tracking acquired", assertMidSliderJudgements);
         }
 
+        [Test]
+        public void TestMidSliderTrackingAcquiredWithMouseDownOutsideSlider()
+        {
+            performTest(new List<ReplayFrame>
+            {
+                new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton }, Time = time_before_slider },
+                new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.LeftButton, OsuAction.RightButton }, Time = time_slider_start },
+                new OsuReplayFrame { Position = new Vector2(100, 100), Actions = { OsuAction.RightButton }, Time = time_during_slide_1 },
+                new OsuReplayFrame { Position = new Vector2(0, 0), Actions = { OsuAction.RightButton }, Time = time_during_slide_2 },
+            });
+
+            AddAssert("Tracking acquired", assertMidSliderJudgements);
+        }
+
         /// <summary>
         /// Scenario:
         /// - Press a key on the slider head
@@ -320,6 +306,32 @@ namespace osu.Game.Rulesets.Osu.Tests
 
             AddStep("load player", () =>
             {
+                Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
+                {
+                    HitObjects =
+                    {
+                        new Slider
+                        {
+                            StartTime = time_slider_start,
+                            Position = new Vector2(0, 0),
+                            Path = new SliderPath(PathType.PerfectCurve, new[]
+                            {
+                                Vector2.Zero,
+                                new Vector2(25, 0),
+                            }, 25),
+                        }
+                    },
+                    ControlPointInfo =
+                    {
+                        DifficultyPoints = { new DifficultyControlPoint { SpeedMultiplier = 0.1f } }
+                    },
+                    BeatmapInfo =
+                    {
+                        BaseDifficulty = new BeatmapDifficulty { SliderTickRate = 3 },
+                        Ruleset = new OsuRuleset().RulesetInfo
+                    },
+                }, Clock);
+
                 var p = new ScoreAccessibleReplayPlayer(new Score { Replay = new Replay { Frames = frames } })
                 {
                     AllowPause = false,
@@ -343,7 +355,9 @@ namespace osu.Game.Rulesets.Osu.Tests
                 allJudgedFired = false;
                 judgementResults = new List<JudgementResult>();
             });
-            AddUntilStep(() => currentPlayer.IsLoaded, "Wait until player is loaded");
+
+            AddUntilStep(() => Beatmap.Value.Track.CurrentTime == 0, "Beatmap at 0");
+            AddUntilStep(() => currentPlayer.IsCurrentScreen(), "Wait until player is loaded");
             AddUntilStep(() => allJudgedFired, "Wait for all judged");
         }
 
