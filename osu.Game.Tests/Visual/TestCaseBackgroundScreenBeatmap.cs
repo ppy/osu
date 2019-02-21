@@ -156,8 +156,6 @@ namespace osu.Game.Tests.Visual
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
 
-            public bool BackgroundLoaded => Background?.IsLoaded ?? false;
-
             public bool AssertDimmed()
             {
                 return ((FadeAccessibleBackground)Background).AssertDimmed();
@@ -207,6 +205,7 @@ namespace osu.Game.Tests.Visual
             public DimAccessiblePlayerLoader(Player player) : base(() => player)
             {
             }
+
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
         }
 
