@@ -37,9 +37,12 @@ namespace osu.Game.Screens.Backgrounds
 
                 beatmap = value;
 
+                FadeContainer = new UserDimContainer { RelativeSizeAxes = Axes.Both };
+                InternalChild = FadeContainer;
+                EnableUserDim = FadeContainer.EnableUserDim;
+
                 Schedule(() =>
                 {
-                    FadeContainer = new UserDimContainer { RelativeSizeAxes = Axes.Both };
                     LoadComponentAsync(new BeatmapBackground(beatmap), b => Schedule(() =>
                     {
                         float newDepth = 0;
@@ -54,8 +57,6 @@ namespace osu.Game.Screens.Backgrounds
                         FadeContainer.Child = Background = b;
                         Background.BlurSigma = BlurTarget;
                     }));
-                    InternalChild = FadeContainer;
-                    EnableUserDim = FadeContainer.EnableUserDim;
                 });
             }
         }

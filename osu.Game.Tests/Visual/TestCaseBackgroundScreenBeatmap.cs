@@ -1,8 +1,11 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Threading;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Configuration;
+using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics;
@@ -11,6 +14,7 @@ using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
+using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Tests.Beatmaps;
 using osu.Game.Users;
 using osuTK;
@@ -19,20 +23,30 @@ using osuTK.Graphics;
 namespace osu.Game.Tests.Visual
 {
     [TestFixture]
-    public class TestCaseBackgroundScreenBeatmap : ScreenTestCase
+    public class TestCaseBackgroundScreenBeatmap : ManualInputManagerTestCase
     {
         private DummySongSelect songSelect;
-        protected Player Player;
+        private DimAccessiblePlayerLoader playerLoader;
+        private DimAccessiblePlayer player;
+
+        [Cached]
+        private BackgroundScreenStack backgroundStack;
+
         public TestCaseBackgroundScreenBeatmap()
         {
+            ScreenStack screen;
+            InputManager.Add(backgroundStack = new BackgroundScreenStack {RelativeSizeAxes = Axes.Both});
+            InputManager.Add(screen = new ScreenStack { RelativeSizeAxes = Axes.Both });
+
             AddStep("Load Song Select", () =>
             {
                 LoadComponentAsync(new DummySongSelect(), p =>
                 {
                     songSelect = p;
-                    LoadScreen(p);
+                    screen.Push(p);
                 });
             });
+
             AddUntilStep(() => songSelect?.IsLoaded ?? false, "Wait for song select to load");
             AddStep("Create beatmap", () =>
             {
@@ -53,14 +67,30 @@ namespace osu.Game.Tests.Visual
                     },
                 });
             });
-            AddStep("Load Player", () =>
+
+            AddStep("Start player loader", () => songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer())));
+            AddUntilStep(() => playerLoader?.IsLoaded ?? false, "Wait for Player Loader to load");
+            AddStep("Update bindables", () => playerLoader.UpdateBindables());
+            AddStep("Trigger background preview", () =>
             {
-                var p = new DimAccessiblePlayer();
-                songSelect.Push(Player = p);
+                InputManager.MoveMouseTo(playerLoader.ScreenPos);
+                InputManager.MoveMouseTo(playerLoader.VisualSettingsPos);
             });
 
-            AddUntilStep(() => Player?.IsLoaded ?? false, "Wait for player to load");
-            AddStep("Update bindables", () => ((DimAccessiblePlayer)Player).UpdateBindables());
+            AddWaitStep(5, "Wait for dim");
+            AddAssert("Screen is dimmed", () => songSelect.AssertDimmed());
+
+            AddStep("Allow beatmap to load", () =>
+            {
+                player.Ready = true;
+                InputManager.MoveMouseTo(playerLoader.ScreenPos);
+            });
+
+            // In the case of a user triggering the dim preview the instant player gets loaded, the user dim needs to be applied when the map starts.
+            AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
+            AddStep("Trigger background preview when loaded", () => InputManager.MoveMouseTo(playerLoader.VisualSettingsPos));
+            AddWaitStep(5, "Wait for dim");
+            AddAssert("Screen is dimmed", () => songSelect.AssertDimmed());
         }
 
         /// <summary>
@@ -69,9 +99,9 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void DisableUserDimTest()
         {
-            AddStep("Test User Undimming", () => ((DimAccessiblePlayer)Player).DimEnabled.Value = false);
+            AddStep("Test User Undimming", () => playerLoader.DimEnabled.Value = false);
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Screen is undimmed", () => ((DimAccessiblePlayer)Player).AssertUndimmed());
+            AddAssert("Screen is undimmed", () => songSelect.AssertUndimmed());
         }
 
         /// <summary>
@@ -80,9 +110,9 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void EnableUserDimTest()
         {
-            AddStep("Test User Dimming", () => ((DimAccessiblePlayer)Player).DimEnabled.Value = true);
+            AddStep("Test User Dimming", () => playerLoader.DimEnabled.Value = true);
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Screen is dimmed", () => ((DimAccessiblePlayer)Player).AssertDimmed());
+            AddAssert("Screen is dimmed", () => songSelect.AssertDimmed());
         }
 
         /// <summary>
@@ -91,9 +121,9 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void PauseTest()
         {
-            AddStep("Transition to Pause", () => ((DimAccessiblePlayer)Player).Exit());
+            AddStep("Transition to Pause", () => player.Exit());
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Screen is dimmed", () => ((DimAccessiblePlayer)Player).AssertDimmed());
+            AddAssert("Screen is dimmed", () => songSelect.AssertDimmed());
         }
 
         /// <summary>
@@ -102,9 +132,9 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TransitionTest()
         {
-            AddStep("Transition to Results", () => Player.Push(new FadeAccesibleResults(new ScoreInfo { User = new User { Username = "osu!" }})));
+            AddStep("Transition to Results", () => player.Push(new FadeAccesibleResults(new ScoreInfo { User = new User { Username = "osu!" }})));
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Screen is undimmed", () => ((DimAccessiblePlayer)Player).AssertUndimmed());
+            AddAssert("Screen is undimmed", () => songSelect.AssertUndimmed());
         }
 
         /// <summary>
@@ -115,16 +145,28 @@ namespace osu.Game.Tests.Visual
         {
             AddStep("Exit player", () =>
             {
-                Player.MakeCurrent();
-                Player.Exit();
+                player.MakeCurrent();
+                player.Exit();
             });
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Screen is undimmed", () => ((DimAccessiblePlayer)Player).AssertUndimmed());
+            AddAssert("Screen is undimmed", () => songSelect.AssertUndimmed());
         }
 
         private class DummySongSelect : OsuScreen
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
+
+            public bool BackgroundLoaded => Background?.IsLoaded ?? false;
+
+            public bool AssertDimmed()
+            {
+                return ((FadeAccessibleBackground)Background).AssertDimmed();
+            }
+
+            public bool AssertUndimmed()
+            {
+                return ((FadeAccessibleBackground)Background).AssertUndimmed();
+            }
         }
 
         private class FadeAccesibleResults : SoloResults
@@ -138,24 +180,34 @@ namespace osu.Game.Tests.Visual
 
         private class DimAccessiblePlayer : Player
         {
+            protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
+
+            public bool Ready;
+
+            [BackgroundDependencyLoader]
+            private void load()
+            {
+                while (!Ready)
+                    Thread.Sleep(1);
+            }
+        }
+
+        private class DimAccessiblePlayerLoader : PlayerLoader
+        {
             public Bindable<bool> DimEnabled;
 
-            protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
+            public VisualSettings VisualSettingsPos => VisualSettings;
+            public Vector2 ScreenPos => VisualSettings.ScreenSpaceDrawQuad.BottomLeft - new Vector2(20, 20);
 
             public void UpdateBindables()
             {
                 DimEnabled = Background.EnableUserDim;
             }
 
-            public bool AssertDimmed()
+            public DimAccessiblePlayerLoader(Player player) : base(() => player)
             {
-                return ((FadeAccessibleBackground)Background).AssertDimmed();
             }
-
-            public bool AssertUndimmed()
-            {
-                return ((FadeAccessibleBackground)Background).AssertUndimmed();
-            }
+            protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
         }
 
         private class FadeAccessibleBackground : BackgroundScreenBeatmap
