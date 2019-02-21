@@ -33,7 +33,7 @@ namespace osu.Game.Skinning
         public Drawable GetDrawableComponent(string componentName)
         {
             Drawable sourceDrawable;
-            if (beatmapSkins && (sourceDrawable = source.GetDrawableComponent(componentName)) != null)
+            if (beatmapSkins.Value && (sourceDrawable = source.GetDrawableComponent(componentName)) != null)
                 return sourceDrawable;
             return fallbackSource?.GetDrawableComponent(componentName);
         }
@@ -41,7 +41,7 @@ namespace osu.Game.Skinning
         public Texture GetTexture(string componentName)
         {
             Texture sourceTexture;
-            if (beatmapSkins && (sourceTexture = source.GetTexture(componentName)) != null)
+            if (beatmapSkins.Value && (sourceTexture = source.GetTexture(componentName)) != null)
                 return sourceTexture;
             return fallbackSource.GetTexture(componentName);
         }
@@ -49,7 +49,7 @@ namespace osu.Game.Skinning
         public SampleChannel GetSample(string sampleName)
         {
             SampleChannel sourceChannel;
-            if (beatmapHitsounds && (sourceChannel = source.GetSample(sampleName)) != null)
+            if (beatmapHitsounds.Value && (sourceChannel = source.GetSample(sampleName)) != null)
                 return sourceChannel;
             return fallbackSource?.GetSample(sampleName);
         }
@@ -58,7 +58,7 @@ namespace osu.Game.Skinning
         {
             TValue val;
             if ((source as Skin)?.Configuration is TConfiguration conf)
-                if (beatmapSkins && (val = query.Invoke(conf)) != null)
+                if (beatmapSkins.Value && (val = query.Invoke(conf)) != null)
                     return val;
 
             return fallbackSource == null ? default : fallbackSource.GetValue(query);

@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.UserInterface
 
             onPushed(null, stack.CurrentScreen);
 
-            Current.ValueChanged += newScreen => newScreen.MakeCurrent();
+            Current.ValueChanged += e => e.NewValue.MakeCurrent();
         }
 
         private void onPushed(IScreen lastScreen, IScreen newScreen)

@@ -49,13 +49,13 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             // We don't want the centre marker to scroll
             AddInternal(new CentreMarker());
 
-            WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible ? 1 : 0, 200, Easing.OutQuint);
+            WaveformVisible.ValueChanged += e => waveform.FadeTo(e.NewValue ? 1 : 0, 200, Easing.OutQuint);
 
             Beatmap.BindTo(beatmap);
-            Beatmap.BindValueChanged(b =>
+            Beatmap.BindValueChanged(e =>
             {
-                waveform.Waveform = b.Waveform;
-                track = b.Track;
+                waveform.Waveform = e.NewValue.Waveform;
+                track = e.NewValue.Track;
             }, true);
         }
 

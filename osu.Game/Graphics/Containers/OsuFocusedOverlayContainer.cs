@@ -90,7 +90,7 @@ namespace osu.Game.Graphics.Containers
             switch (visibility)
             {
                 case Visibility.Visible:
-                    if (OverlayActivationMode != OverlayActivation.Disabled)
+                    if (OverlayActivationMode.Value != OverlayActivation.Disabled)
                     {
                         if (PlaySamplesOnStateChange) samplePopIn?.Play();
                     }

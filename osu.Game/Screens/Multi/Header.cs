@@ -85,9 +85,9 @@ namespace osu.Game.Screens.Multi
                 },
             };
 
-            breadcrumbs.Current.ValueChanged += s =>
+            breadcrumbs.Current.ValueChanged += e =>
             {
-                if (s is IMultiplayerSubScreen mpScreen)
+                if (e.NewValue is IMultiplayerSubScreen mpScreen)
                     screenType.Text = mpScreen.ShortTitle.ToLowerInvariant();
             };
 

@@ -93,13 +93,13 @@ namespace osu.Game.Overlays.Profile.Sections
             User.TriggerChange();
         }
 
-        private void onUserChanged(User newUser)
+        private void onUserChanged(ValueChangedEvent<User> e)
         {
             VisiblePages = 0;
             ItemsContainer.Clear();
             ShowMoreButton.Hide();
 
-            if (newUser != null)
+            if (e.NewValue != null)
                 ShowMore();
         }
 

@@ -33,14 +33,14 @@ namespace osu.Game.Configuration
             Set(OsuSetting.Username, string.Empty);
             Set(OsuSetting.Token, string.Empty);
 
-            Set(OsuSetting.SavePassword, false).ValueChanged += val =>
+            Set(OsuSetting.SavePassword, false).ValueChanged += e =>
             {
-                if (val) Set(OsuSetting.SaveUsername, true);
+                if (e.NewValue) Set(OsuSetting.SaveUsername, true);
             };
 
-            Set(OsuSetting.SaveUsername, true).ValueChanged += val =>
+            Set(OsuSetting.SaveUsername, true).ValueChanged += e =>
             {
-                if (!val) Set(OsuSetting.SavePassword, false);
+                if (!e.NewValue) Set(OsuSetting.SavePassword, false);
             };
 
             Set(OsuSetting.ExternalLinkWarning, true);

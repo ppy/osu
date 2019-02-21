@@ -74,9 +74,9 @@ namespace osu.Game.Overlays
             volumeMeterEffect.Bindable.BindTo(audio.VolumeSample);
             volumeMeterMusic.Bindable.BindTo(audio.VolumeTrack);
 
-            muteButton.Current.ValueChanged += mute =>
+            muteButton.Current.ValueChanged += e =>
             {
-                if (mute)
+                if (e.NewValue)
                     audio.AddAdjustment(AdjustableProperty.Volume, muteAdjustment);
                 else
                     audio.RemoveAdjustment(AdjustableProperty.Volume, muteAdjustment);
@@ -113,7 +113,7 @@ namespace osu.Game.Overlays
                     return true;
                 case GlobalAction.ToggleMute:
                     Show();
-                    muteButton.Current.Value = !muteButton.Current;
+                    muteButton.Current.Value = !muteButton.Current.Value;
                     return true;
             }
 

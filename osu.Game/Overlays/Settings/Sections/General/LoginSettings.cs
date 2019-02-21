@@ -152,9 +152,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                     panel.Status.BindTo(api.LocalUser.Value.Status);
 
-                    dropdown.Current.ValueChanged += newValue =>
+                    dropdown.Current.ValueChanged += e =>
                     {
-                        switch (newValue)
+                        switch (e.NewValue)
                         {
                             case UserAction.Online:
                                 api.LocalUser.Value.Status.Value = new UserStatusOnline();

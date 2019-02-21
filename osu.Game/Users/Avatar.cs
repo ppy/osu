@@ -65,7 +65,7 @@ namespace osu.Game.Users
 
         private void openProfile()
         {
-            if (!OpenOnClick)
+            if (!OpenOnClick.Value)
                 return;
 
             if (user != null)
@@ -78,7 +78,7 @@ namespace osu.Game.Users
 
             protected override bool OnClick(ClickEvent e)
             {
-                if (!Enabled)
+                if (!Enabled.Value)
                     return false;
                 return base.OnClick(e);
             }

@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Play
         {
             State = Visibility.Visible;
 
-            replayLoaded.ValueChanged += v => AllowSeeking = v;
+            replayLoaded.ValueChanged += e => AllowSeeking = e.NewValue;
             replayLoaded.TriggerChange();
         }
 

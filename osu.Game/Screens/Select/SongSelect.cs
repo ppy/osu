@@ -326,16 +326,16 @@ namespace osu.Game.Screens.Select
 
         private ScheduledDelegate selectionChangedDebounce;
 
-        private void workingBeatmapChanged(WorkingBeatmap beatmap)
+        private void workingBeatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
-            if (beatmap is DummyWorkingBeatmap) return;
+            if (e.NewValue is DummyWorkingBeatmap) return;
 
-            if (this.IsCurrentScreen() && !Carousel.SelectBeatmap(beatmap?.BeatmapInfo, false))
+            if (this.IsCurrentScreen() && !Carousel.SelectBeatmap(e.NewValue?.BeatmapInfo, false))
                 // If selecting new beatmap without bypassing filters failed, there's possibly a ruleset mismatch
-                if (beatmap?.BeatmapInfo?.Ruleset != null && beatmap.BeatmapInfo.Ruleset != decoupledRuleset.Value)
+                if (e.NewValue?.BeatmapInfo?.Ruleset != null && e.NewValue.BeatmapInfo.Ruleset != decoupledRuleset.Value)
                 {
-                    Ruleset.Value = beatmap.BeatmapInfo.Ruleset;
-                    Carousel.SelectBeatmap(beatmap.BeatmapInfo);
+                    Ruleset.Value = e.NewValue.BeatmapInfo.Ruleset;
+                    Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
                 }
         }
 
@@ -598,9 +598,9 @@ namespace osu.Game.Screens.Select
             {
                 // manual binding to parent ruleset to allow for delayed load in the incoming direction.
                 rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
-                Ruleset.ValueChanged += updateSelectedRuleset;
+                Ruleset.ValueChanged += e => updateSelectedRuleset(e.NewValue);
 
-                decoupledRuleset.ValueChanged += r => Ruleset.Value = r;
+                decoupledRuleset.ValueChanged += e => Ruleset.Value = e.NewValue;
                 decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
 
                 Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);

@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual
 
         protected Room Room
         {
-            get => currentRoom;
+            get => currentRoom.Value;
             set => currentRoom.Value = value;
         }
 

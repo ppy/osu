@@ -3,6 +3,7 @@
 
 using System;
 using osu.Framework.Caching;
+using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects;
 using osu.Game.Rulesets.Mods;
@@ -51,7 +52,7 @@ namespace osu.Game.Rulesets.Mania.Mods
                 }
             }
 
-            protected override void OnComboChange(int newCombo)
+            protected override void OnComboChange(ValueChangedEvent<int> e)
             {
             }
 

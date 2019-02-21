@@ -60,9 +60,9 @@ namespace osu.Game.Configuration
                 databasedSettings.Add(setting);
             }
 
-            bindable.ValueChanged += v =>
+            bindable.ValueChanged += e =>
             {
-                setting.Value = v;
+                setting.Value = e.NewValue;
                 settings.Update(setting);
             };
         }

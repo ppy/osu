@@ -127,9 +127,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Bindable = sizeFullscreen
                 };
 
-                windowModeDropdown.Bindable.BindValueChanged(windowMode =>
+                windowModeDropdown.Bindable.BindValueChanged(e =>
                 {
-                    if (windowMode == WindowMode.Fullscreen)
+                    if (e.NewValue == WindowMode.Fullscreen)
                     {
                         resolutionDropdown.Show();
                         sizeFullscreen.TriggerChange();
@@ -139,15 +139,15 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 }, true);
             }
 
-            scalingMode.BindValueChanged(mode =>
+            scalingMode.BindValueChanged(e =>
             {
                 scalingSettings.ClearTransforms();
-                scalingSettings.AutoSizeAxes = mode != ScalingMode.Off ? Axes.Y : Axes.None;
+                scalingSettings.AutoSizeAxes = e.NewValue != ScalingMode.Off ? Axes.Y : Axes.None;
 
-                if (mode == ScalingMode.Off)
+                if (e.NewValue == ScalingMode.Off)
                     scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
 
-                scalingSettings.ForEach(s => s.TransferValueOnCommit = mode == ScalingMode.Everything);
+                scalingSettings.ForEach(s => s.TransferValueOnCommit = e.NewValue == ScalingMode.Everything);
             }, true);
         }
 
@@ -158,7 +158,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         /// <returns>A bindable which will propagate updates with a delay.</returns>
         private void bindPreviewEvent(Bindable<float> bindable)
         {
-            bindable.ValueChanged += v =>
+            bindable.ValueChanged += e =>
             {
                 switch (scalingMode.Value)
                 {

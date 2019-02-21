@@ -92,7 +92,7 @@ namespace osu.Game.Screens.Play
 
             Progress.Objects = rulesetContainer.Objects;
             Progress.AudioClock = offsetClock;
-            Progress.AllowSeeking = rulesetContainer.HasReplayLoaded;
+            Progress.AllowSeeking = rulesetContainer.HasReplayLoaded.Value;
             Progress.OnSeek = pos => adjustableClock.Seek(pos);
 
             ModDisplay.Current.BindTo(working.Mods);
@@ -104,10 +104,10 @@ namespace osu.Game.Screens.Play
         private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
         {
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
-            showHud.ValueChanged += hudVisibility => visibilityContainer.FadeTo(hudVisibility ? 1 : 0, duration);
+            showHud.ValueChanged += e => visibilityContainer.FadeTo(e.NewValue ? 1 : 0, duration);
             showHud.TriggerChange();
 
-            if (!showHud && !hasShownNotificationOnce)
+            if (!showHud.Value && !hasShownNotificationOnce)
             {
                 hasShownNotificationOnce = true;
 
@@ -126,11 +126,11 @@ namespace osu.Game.Screens.Play
             replayLoaded.TriggerChange();
         }
 
-        private void replayLoadedValueChanged(bool loaded)
+        private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
         {
-            PlayerSettingsOverlay.ReplayLoaded = loaded;
+            PlayerSettingsOverlay.ReplayLoaded = e.NewValue;
 
-            if (loaded)
+            if (e.NewValue)
             {
                 PlayerSettingsOverlay.Show();
                 ModDisplay.FadeIn(200);

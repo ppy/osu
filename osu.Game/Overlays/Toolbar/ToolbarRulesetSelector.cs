@@ -115,11 +115,11 @@ namespace osu.Game.Overlays.Toolbar
             Size = new Vector2(modeButtons.DrawSize.X, 1);
         }
 
-        private void rulesetChanged(RulesetInfo ruleset)
+        private void rulesetChanged(ValueChangedEvent<RulesetInfo> e)
         {
             foreach (ToolbarRulesetButton m in modeButtons.Children.Cast<ToolbarRulesetButton>())
             {
-                bool isActive = m.Ruleset.ID == ruleset.ID;
+                bool isActive = m.Ruleset.ID == e.NewValue.ID;
                 m.Active = isActive;
                 if (isActive)
                     activeButton = m;

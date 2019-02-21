@@ -125,7 +125,7 @@ namespace osu.Game.Overlays.Chat.Selection
                 },
             };
 
-            search.Current.ValueChanged += newValue => sectionsFlow.SearchTerm = newValue;
+            search.Current.ValueChanged += e => sectionsFlow.SearchTerm = e.NewValue;
         }
 
         public void UpdateAvailableChannels(IEnumerable<Channel> channels)

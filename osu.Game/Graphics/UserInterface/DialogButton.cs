@@ -242,9 +242,9 @@ namespace osu.Game.Graphics.UserInterface
             Selected.Value = false;
         }
 
-        private void selectionChanged(bool isSelected)
+        private void selectionChanged(ValueChangedEvent<bool> args)
         {
-            if (isSelected)
+            if (args.NewValue)
             {
                 spriteText.TransformSpacingTo(hoverSpacing, hover_duration, Easing.OutElastic);
                 colourContainer.ResizeTo(new Vector2(hover_width, 1f), hover_duration, Easing.OutElastic);

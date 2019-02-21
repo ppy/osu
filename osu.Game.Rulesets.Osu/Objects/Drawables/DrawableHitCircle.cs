@@ -91,7 +91,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         {
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
             stackHeightBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            scaleBindable.BindValueChanged(v => scaleContainer.Scale = new Vector2(v), true);
+            scaleBindable.BindValueChanged(e => scaleContainer.Scale = new Vector2(e.NewValue), true);
 
             positionBindable.BindTo(HitObject.PositionBindable);
             stackHeightBindable.BindTo(HitObject.StackHeightBindable);

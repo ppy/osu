@@ -104,7 +104,7 @@ namespace osu.Game.Rulesets.Mods
                 }
             }
 
-            protected abstract void OnComboChange(int newCombo);
+            protected abstract void OnComboChange(ValueChangedEvent<int> e);
 
             protected abstract string FragmentShader { get; }
 

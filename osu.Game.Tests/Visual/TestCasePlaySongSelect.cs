@@ -187,8 +187,8 @@ namespace osu.Game.Tests.Visual
             AddAssert("mods changed before ruleset", () => modChangeIndex < rulesetChangeIndex);
             AddAssert("empty mods", () => !selectedMods.Value.Any());
 
-            void onModChange(IEnumerable<Mod> mods) => modChangeIndex = actionIndex++;
-            void onRulesetChange(RulesetInfo ruleset) => rulesetChangeIndex = actionIndex--;
+            void onModChange(ValueChangedEvent<IEnumerable<Mod>> e) => modChangeIndex = actionIndex++;
+            void onRulesetChange(ValueChangedEvent<RulesetInfo> e) => rulesetChangeIndex = actionIndex--;
         }
 
         [Test]

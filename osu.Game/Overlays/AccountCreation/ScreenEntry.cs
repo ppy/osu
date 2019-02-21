@@ -135,7 +135,7 @@ namespace osu.Game.Overlays.AccountCreation
             characterCheckText = passwordDescription.AddText("8 characters long");
             passwordDescription.AddText(". Choose something long but also something you will remember, like a line from your favourite song.");
 
-            passwordTextBox.Current.ValueChanged += text => { characterCheckText.ForEach(s => s.Colour = text.Length == 0 ? Color4.White : Interpolation.ValueAt(text.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
+            passwordTextBox.Current.ValueChanged += e => { characterCheckText.ForEach(s => s.Colour = e.NewValue.Length == 0 ? Color4.White : Interpolation.ValueAt(e.NewValue.Length, Color4.OrangeRed, Color4.YellowGreen, 0, 8, Easing.In)); };
         }
 
         protected override void Update()

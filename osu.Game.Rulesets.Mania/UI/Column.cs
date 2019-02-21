@@ -82,15 +82,15 @@ namespace osu.Game.Rulesets.Mania.UI
 
             TopLevelContainer.Add(explosionContainer.CreateProxy());
 
-            Direction.BindValueChanged(d =>
+            Direction.BindValueChanged(e =>
             {
                 hitTargetContainer.Padding = new MarginPadding
                 {
-                    Top = d == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
-                    Bottom = d == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
+                    Top = e.NewValue == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
+                    Bottom = e.NewValue == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
                 };
 
-                keyArea.Anchor = keyArea.Origin= d == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                keyArea.Anchor = keyArea.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
             }, true);
         }
 
@@ -156,7 +156,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         internal void OnNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
-            if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements)
+            if (!result.IsHit || !judgedObject.DisplayResult || !DisplayJudgements.Value)
                 return;
 
             explosionContainer.Add(new HitExplosion(judgedObject)
@@ -167,7 +167,7 @@ namespace osu.Game.Rulesets.Mania.UI
 
         public bool OnPressed(ManiaAction action)
         {
-            if (action != Action)
+            if (action != Action.Value)
                 return false;
 
             var nextObject =

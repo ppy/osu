@@ -23,9 +23,9 @@ namespace osu.Game.Screens.Multi.Match.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            roomId.BindValueChanged(id =>
+            roomId.BindValueChanged(e =>
             {
-                if (id == null)
+                if (e.NewValue == null)
                     return;
 
                 Scores = null;

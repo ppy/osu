@@ -45,7 +45,7 @@ namespace osu.Game.Graphics.Containers
             parallaxEnabled = config.GetBindable<bool>(OsuSetting.MenuParallax);
             parallaxEnabled.ValueChanged += delegate
             {
-                if (!parallaxEnabled)
+                if (!parallaxEnabled.Value)
                 {
                     content.MoveTo(Vector2.Zero, firstUpdate ? 0 : 1000, Easing.OutQuint);
                     content.Scale = new Vector2(1 + System.Math.Abs(ParallaxAmount));
@@ -65,7 +65,7 @@ namespace osu.Game.Graphics.Containers
         {
             base.Update();
 
-            if (parallaxEnabled)
+            if (parallaxEnabled.Value)
             {
                 Vector2 offset = (input.CurrentState.Mouse == null ? Vector2.Zero : ToLocalSpace(input.CurrentState.Mouse.Position) - DrawSize / 2) * ParallaxAmount;
 

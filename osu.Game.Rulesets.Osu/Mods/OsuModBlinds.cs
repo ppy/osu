@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Mods
 
         public void ApplyToScoreProcessor(ScoreProcessor scoreProcessor)
         {
-            scoreProcessor.Health.ValueChanged += val => { blinds.AnimateClosedness((float)val); };
+            scoreProcessor.Health.ValueChanged += e => { blinds.AnimateClosedness((float)e.NewValue); };
         }
 
         /// <summary>

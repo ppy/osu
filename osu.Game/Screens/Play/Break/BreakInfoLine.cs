@@ -51,9 +51,9 @@ namespace osu.Game.Screens.Play.Break
             Current.ValueChanged += currentValueChanged;
         }
 
-        private void currentValueChanged(T newValue)
+        private void currentValueChanged(ValueChangedEvent<T> e)
         {
-            var newText = prefix + Format(newValue);
+            var newText = prefix + Format(e.NewValue);
 
             if (valueText.Text == newText)
                 return;
