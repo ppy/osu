@@ -19,7 +19,7 @@ namespace osu.Game.Graphics.Containers
 
         private readonly bool isStoryboard;
 
-        private const float BACKGROUND_FADE_DURATION = 800;
+        private const float background_fade_duration = 800;
 
         public UserDimContainer(bool isStoryboard = false)
         {
@@ -40,15 +40,15 @@ namespace osu.Game.Graphics.Containers
         {
             if (isStoryboard)
             {
-                this.FadeTo(!ShowStoryboard || DimLevel == 1 ? 0 : 1, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                this.FadeTo(!ShowStoryboard || DimLevel == 1 ? 0 : 1, background_fade_duration, Easing.OutQuint);
             }
             else
             {
                 // The background needs to be hidden in the case of it being replaced
-                this.FadeTo(ShowStoryboard && StoryboardReplacesBackground ? 0 : 1, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+                this.FadeTo(ShowStoryboard && StoryboardReplacesBackground ? 0 : 1, background_fade_duration, Easing.OutQuint);
             }
 
-            this.FadeColour(EnableUserDim ? OsuColour.Gray(1 - (float)DimLevel) : Color4.White, BACKGROUND_FADE_DURATION, Easing.OutQuint);
+            this.FadeColour(EnableUserDim ? OsuColour.Gray(1 - (float)DimLevel) : Color4.White, background_fade_duration, Easing.OutQuint);
         }
     }
 }
