@@ -3,7 +3,7 @@
 
 using System.ComponentModel;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Graphics;
 using osu.Game.Overlays.SearchableList;
 using osuTK.Graphics;

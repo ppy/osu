@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects.Types;
 using osuTK;
 
