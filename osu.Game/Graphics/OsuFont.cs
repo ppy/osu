@@ -69,7 +69,7 @@ namespace osu.Game.Graphics
             string weightString = weight.ToString();
 
             // Only exo has an explicit "regular" weight, other fonts do not
-            if (family != "Exo2.0" && weight == FontWeight.Regular)
+            if (family != GetFamilyString(Typeface.Exo) && weight == FontWeight.Regular)
                 weightString = string.Empty;
 
             return weightString;
