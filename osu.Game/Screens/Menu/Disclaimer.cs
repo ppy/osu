@@ -64,8 +64,8 @@ namespace osu.Game.Screens.Menu
                 }
             };
 
-            textFlow.AddText("This is an ", t => t.Font = t.Font.With(size: 30, weight: FontWeight.Light));
-            textFlow.AddText("early development build", t => t.Font = t.Font.With(size: 30, weight: FontWeight.SemiBold));
+            textFlow.AddText("This is an ", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.Light));
+            textFlow.AddText("early development build", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.SemiBold));
 
             textFlow.AddParagraph("Things may not work as expected", t => t.Font = t.Font.With(size: 20));
             textFlow.NewParagraph();

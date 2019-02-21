@@ -349,7 +349,7 @@ namespace osu.Game.Overlays.Profile
                 colourBar.Show();
             }
 
-            void boldItalic(SpriteText t) => t.Font = t.Font.With(weight: FontWeight.Bold, italics: true);
+            void boldItalic(SpriteText t) => t.Font = t.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true);
             void lightText(SpriteText t) => t.Alpha = 0.8f;
 
             OsuSpriteText createScoreText(string text) => new OsuSpriteText
