@@ -80,7 +80,7 @@ namespace osu.Game.Graphics.Cursor
                 activeCursor.AdditiveLayer.FadeInFromZero(800, Easing.OutQuint);
             }
 
-            if (e.Button == MouseButton.Left && cursorRotate)
+            if (e.Button == MouseButton.Left && cursorRotate.Value)
             {
                 dragRotationState = DragRotationState.DragStarted;
                 positionMouseDown = e.MousePosition;
@@ -156,7 +156,7 @@ namespace osu.Game.Graphics.Cursor
                 };
 
                 cursorScale = config.GetBindable<double>(OsuSetting.MenuCursorSize);
-                cursorScale.ValueChanged += newScale => cursorContainer.Scale = new Vector2((float)newScale * base_scale);
+                cursorScale.ValueChanged += e => cursorContainer.Scale = new Vector2((float)e.NewValue * base_scale);
                 cursorScale.TriggerChange();
             }
         }

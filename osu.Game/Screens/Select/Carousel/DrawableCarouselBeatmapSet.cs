@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Select.Carousel
             {
                 List<MenuItem> items = new List<MenuItem>();
 
-                if (Item.State == CarouselItemState.NotSelected)
+                if (Item.State.Value == CarouselItemState.NotSelected)
                     items.Add(new OsuMenuItem("Expand", MenuItemType.Highlighted, () => Item.State.Value = CarouselItemState.Selected));
 
                 if (beatmapSet.OnlineBeatmapSetID != null)
@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Select.Carousel
                 : base(item.Beatmap)
             {
                 filtered.BindTo(item.Filtered);
-                filtered.ValueChanged += v => Schedule(() => this.FadeTo(v ? 0.1f : 1, 100));
+                filtered.ValueChanged += e => Schedule(() => this.FadeTo(e.NewValue ? 0.1f : 1, 100));
                 filtered.TriggerChange();
             }
         }

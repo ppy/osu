@@ -191,8 +191,8 @@ namespace osu.Game.Users
                 });
             }
 
-            Status.ValueChanged += displayStatus;
-            Status.ValueChanged += status => statusBg.FadeColour(status?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
+            Status.ValueChanged += e => displayStatus(e.NewValue);
+            Status.ValueChanged += e => statusBg.FadeColour(e.NewValue?.GetAppropriateColour(colours) ?? colours.Gray5, 500, Easing.OutQuint);
 
             base.Action = ViewProfile = () =>
             {

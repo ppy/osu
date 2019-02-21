@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Multi.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            status.BindValueChanged(s => this.FadeColour(s.GetAppropriateColour(colours), transitionDuration), true);
+            status.BindValueChanged(e => this.FadeColour(e.NewValue.GetAppropriateColour(colours), transitionDuration), true);
         }
     }
 }

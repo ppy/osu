@@ -31,7 +31,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 accentColour = value;
 
-                if (Current)
+                if (Current.Value)
                 {
                     text.Colour = AccentColour;
                     icon.Colour = AccentColour;
@@ -67,7 +67,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (!Current)
+            if (!Current.Value)
                 fadeOut();
 
             base.OnHoverLost(e);
@@ -118,9 +118,9 @@ namespace osu.Game.Graphics.UserInterface
                 }
             };
 
-            Current.ValueChanged += v =>
+            Current.ValueChanged += e =>
             {
-                if (v)
+                if (e.NewValue)
                 {
                     fadeIn();
                     icon.Icon = FontAwesome.fa_check_circle_o;

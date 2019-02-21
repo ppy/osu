@@ -69,10 +69,10 @@ namespace osu.Game.Overlays.Volume
                 }
             });
 
-            Current.ValueChanged += newValue =>
+            Current.ValueChanged += e =>
             {
-                icon.Icon = newValue ? FontAwesome.fa_volume_off : FontAwesome.fa_volume_up;
-                icon.Margin = new MarginPadding { Left = newValue ? width / 2 - 15 : width / 2 - 10 }; //Magic numbers to line up both icons because they're different widths
+                icon.Icon = e.NewValue ? FontAwesome.fa_volume_off : FontAwesome.fa_volume_up;
+                icon.Margin = new MarginPadding { Left = e.NewValue ? width / 2 - 15 : width / 2 - 10 }; //Magic numbers to line up both icons because they're different widths
             };
             Current.TriggerChange();
         }

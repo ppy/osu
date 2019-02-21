@@ -27,7 +27,7 @@ namespace osu.Game.Screens.Select
 
         private void invokeOnFilter()
         {
-            OnFilter?.Invoke(tabs.Current, modsCheckbox.Current);
+            OnFilter?.Invoke(tabs.Current.Value, modsCheckbox.Current.Value);
         }
 
         [BackgroundDependencyLoader]
@@ -69,8 +69,8 @@ namespace osu.Game.Screens.Select
                 },
             };
 
-            tabs.Current.ValueChanged += item => invokeOnFilter();
-            modsCheckbox.Current.ValueChanged += item => invokeOnFilter();
+            tabs.Current.ValueChanged += e => invokeOnFilter();
+            modsCheckbox.Current.ValueChanged += e => invokeOnFilter();
         }
     }
 

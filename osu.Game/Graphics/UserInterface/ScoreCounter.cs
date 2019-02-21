@@ -52,7 +52,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override void Increment(double amount)
         {
-            Current.Value = Current + amount;
+            Current.Value = Current.Value + amount;
         }
     }
 }

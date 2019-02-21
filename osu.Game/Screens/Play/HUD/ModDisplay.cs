@@ -65,10 +65,10 @@ namespace osu.Game.Screens.Play.HUD
                 }
             };
 
-            Current.ValueChanged += mods =>
+            Current.ValueChanged += e =>
             {
                 iconsContainer.Clear();
-                foreach (Mod mod in mods)
+                foreach (Mod mod in e.NewValue)
                 {
                     iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
                 }

@@ -28,13 +28,13 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             base.LoadComplete();
 
-            roomId.BindValueChanged(v => updateChannel(), true);
+            roomId.BindValueChanged(e => updateChannel(), true);
         }
 
         private void updateChannel()
         {
             if (roomId.Value != null)
-                Channel.Value = channelManager?.JoinChannel(new Channel { Id = channelId, Type = ChannelType.Multiplayer, Name = $"#mp_{roomId.Value}" });
+                Channel.Value = channelManager?.JoinChannel(new Channel { Id = channelId.Value, Type = ChannelType.Multiplayer, Name = $"#mp_{roomId.Value}" });
         }
     }
 }

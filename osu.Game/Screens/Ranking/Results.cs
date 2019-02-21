@@ -268,12 +268,12 @@ namespace osu.Game.Screens.Ranking
                 modeChangeButtons.AddItem(t);
             modeChangeButtons.Current.Value = modeChangeButtons.Items.FirstOrDefault();
 
-            modeChangeButtons.Current.BindValueChanged(m =>
+            modeChangeButtons.Current.BindValueChanged(e =>
             {
                 currentPage?.FadeOut();
                 currentPage?.Expire();
 
-                currentPage = m?.CreatePage();
+                currentPage = e.NewValue?.CreatePage();
 
                 if (currentPage != null)
                     circleInner.Add(currentPage);

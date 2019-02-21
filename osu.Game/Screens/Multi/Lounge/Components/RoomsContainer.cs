@@ -109,7 +109,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private void updateSorting()
         {
             foreach (var room in roomFlow)
-                roomFlow.SetLayoutPosition(room, room.Room.Position);
+                roomFlow.SetLayoutPosition(room, room.Room.Position.Value);
         }
 
         private void selectRoom(Room room)

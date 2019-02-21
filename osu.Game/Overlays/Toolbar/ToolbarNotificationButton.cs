@@ -45,13 +45,13 @@ namespace osu.Game.Overlays.Toolbar
             if (notificationOverlay != null)
                 NotificationCount.BindTo(notificationOverlay.UnreadCount);
 
-            NotificationCount.ValueChanged += count =>
+            NotificationCount.ValueChanged += e =>
             {
-                if (count == 0)
+                if (e.NewValue == 0)
                     countDisplay.FadeOut(200, Easing.OutQuint);
                 else
                 {
-                    countDisplay.Count = count;
+                    countDisplay.Count = e.NewValue;
                     countDisplay.FadeIn(200, Easing.OutQuint);
                 }
             };

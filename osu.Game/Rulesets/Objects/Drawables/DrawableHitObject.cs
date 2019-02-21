@@ -124,14 +124,14 @@ namespace osu.Game.Rulesets.Objects.Drawables
         {
             base.LoadComplete();
 
-            State.ValueChanged += state =>
+            State.ValueChanged += e =>
             {
-                UpdateState(state);
+                UpdateState(e.NewValue);
 
                 // apply any custom state overrides
-                ApplyCustomUpdateState?.Invoke(this, state);
+                ApplyCustomUpdateState?.Invoke(this, e.NewValue);
 
-                if (State == ArmedState.Hit)
+                if (e.NewValue == ArmedState.Hit)
                     PlaySamples();
             };
 

@@ -76,7 +76,7 @@ namespace osu.Game.Rulesets.Mania.UI
             BarLines.ForEach(Playfield.Add);
 
             Config.BindWith(ManiaSetting.ScrollDirection, configDirection);
-            configDirection.BindValueChanged(v => Direction.Value = (ScrollingDirection)v, true);
+            configDirection.BindValueChanged(e => Direction.Value = (ScrollingDirection)e.NewValue, true);
 
             Config.BindWith(ManiaSetting.ScrollTime, TimeRange);
         }

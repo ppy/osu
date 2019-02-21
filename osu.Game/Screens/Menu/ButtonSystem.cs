@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, IdleTracker idleTracker)
         {
-            isIdle.ValueChanged += updateIdleState;
+            isIdle.ValueChanged += e => updateIdleState(e.NewValue);
 
             if (idleTracker != null) isIdle.BindTo(idleTracker.IsIdle);
 

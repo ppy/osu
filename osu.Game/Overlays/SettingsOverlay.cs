@@ -104,15 +104,15 @@ namespace osu.Game.Overlays
             {
                 AddInternal(Sidebar = new Sidebar { Width = sidebar_width });
 
-                SectionsContainer.SelectedSection.ValueChanged += section =>
+                SectionsContainer.SelectedSection.ValueChanged += e =>
                 {
                     selectedSidebarButton.Selected = false;
-                    selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section);
+                    selectedSidebarButton = Sidebar.Children.Single(b => b.Section == e.NewValue);
                     selectedSidebarButton.Selected = true;
                 };
             }
 
-            searchTextBox.Current.ValueChanged += newValue => SectionsContainer.SearchContainer.SearchTerm = newValue;
+            searchTextBox.Current.ValueChanged += e => SectionsContainer.SearchContainer.SearchTerm = e.NewValue;
 
             CreateSections()?.ForEach(AddSection);
         }

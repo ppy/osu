@@ -55,9 +55,9 @@ namespace osu.Game.Overlays
 
             Add(loading = new LoadingAnimation());
 
-            Filter.Search.Current.ValueChanged += text =>
+            Filter.Search.Current.ValueChanged += e =>
             {
-                if (!string.IsNullOrEmpty(text))
+                if (!string.IsNullOrEmpty(e.NewValue))
                 {
                     // force searching in players until searching for friends is supported
                     Header.Tabs.Current.Value = SocialTab.AllPlayers;
@@ -67,18 +67,18 @@ namespace osu.Game.Overlays
                 }
             };
 
-            Header.Tabs.Current.ValueChanged += tab => Scheduler.AddOnce(updateSearch);
+            Header.Tabs.Current.ValueChanged += e => Scheduler.AddOnce(updateSearch);
 
-            Filter.Tabs.Current.ValueChanged += sortCriteria => Scheduler.AddOnce(updateSearch);
+            Filter.Tabs.Current.ValueChanged += e => Scheduler.AddOnce(updateSearch);
 
-            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += recreatePanels;
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += sortOrder => Scheduler.AddOnce(updateSearch);
+            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += e => recreatePanels(e.NewValue);
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += e => Scheduler.AddOnce(updateSearch);
 
-            currentQuery.ValueChanged += query =>
+            currentQuery.ValueChanged += e =>
             {
                 queryChangedDebounce?.Cancel();
 
-                if (string.IsNullOrEmpty(query))
+                if (string.IsNullOrEmpty(e.NewValue))
                     Scheduler.AddOnce(updateSearch);
                 else
                     queryChangedDebounce = Scheduler.AddDelayed(updateSearch, 500);

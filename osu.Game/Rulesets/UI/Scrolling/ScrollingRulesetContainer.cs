@@ -157,10 +157,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
             switch (action)
             {
                 case GlobalAction.IncreaseScrollSpeed:
-                    this.TransformBindableTo(TimeRange, TimeRange - time_span_step, 200, Easing.OutQuint);
+                    this.TransformBindableTo(TimeRange, TimeRange.Value - time_span_step, 200, Easing.OutQuint);
                     return true;
                 case GlobalAction.DecreaseScrollSpeed:
-                    this.TransformBindableTo(TimeRange, TimeRange + time_span_step, 200, Easing.OutQuint);
+                    this.TransformBindableTo(TimeRange, TimeRange.Value + time_span_step, 200, Easing.OutQuint);
                     return true;
             }
 

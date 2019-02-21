@@ -86,7 +86,7 @@ namespace osu.Game.Online.Multiplayer
         [JsonProperty("participant_count")]
         private int? participantCount
         {
-            get => ParticipantCount;
+            get => ParticipantCount.Value;
             set => ParticipantCount.Value = value ?? 0;
         }
 
@@ -106,7 +106,7 @@ namespace osu.Game.Online.Multiplayer
         [JsonProperty("max_attempts", DefaultValueHandling = DefaultValueHandling.Ignore)]
         private int? maxAttempts
         {
-            get => MaxAttempts;
+            get => MaxAttempts.Value;
             set => MaxAttempts.Value = value;
         }
 
@@ -118,19 +118,19 @@ namespace osu.Game.Online.Multiplayer
 
         public void CopyFrom(Room other)
         {
-            RoomID.Value = other.RoomID;
-            Name.Value = other.Name;
+            RoomID.Value = other.RoomID.Value;
+            Name.Value = other.Name.Value;
 
             if (other.Host.Value != null && Host.Value?.Id != other.Host.Value.Id)
-                Host.Value = other.Host;
+                Host.Value = other.Host.Value;
 
-            Status.Value = other.Status;
-            Availability.Value = other.Availability;
-            Type.Value = other.Type;
-            MaxParticipants.Value = other.MaxParticipants;
+            Status.Value = other.Status.Value;
+            Availability.Value = other.Availability.Value;
+            Type.Value = other.Type.Value;
+            MaxParticipants.Value = other.MaxParticipants.Value;
             ParticipantCount.Value = other.ParticipantCount.Value;
             Participants.Value = other.Participants.Value.ToArray();
-            EndDate.Value = other.EndDate;
+            EndDate.Value = other.EndDate.Value;
 
             if (DateTimeOffset.Now >= EndDate.Value)
                 Status.Value = new RoomStatusEnded();

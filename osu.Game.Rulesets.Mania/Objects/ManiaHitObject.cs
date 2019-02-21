@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Mania.Objects
 
         public virtual int Column
         {
-            get => ColumnBindable;
+            get => ColumnBindable.Value;
             set => ColumnBindable.Value = value;
         }
 

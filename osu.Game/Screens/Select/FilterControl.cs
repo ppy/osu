@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Select
             Group = group,
             Sort = sort,
             SearchText = searchTextBox.Text,
-            AllowConvertedBeatmaps = showConverted,
+            AllowConvertedBeatmaps = showConverted.Value,
             Ruleset = ruleset.Value
         };
 
@@ -146,12 +146,12 @@ namespace osu.Game.Screens.Select
                 }
             };
 
-            searchTextBox.Current.ValueChanged += t => FilterChanged?.Invoke(CreateCriteria());
+            searchTextBox.Current.ValueChanged += e => FilterChanged?.Invoke(CreateCriteria());
 
             groupTabs.PinItem(GroupMode.All);
             groupTabs.PinItem(GroupMode.RecentlyPlayed);
-            groupTabs.Current.ValueChanged += val => Group = val;
-            sortTabs.Current.ValueChanged += val => Sort = val;
+            groupTabs.Current.ValueChanged += e => Group = e.NewValue;
+            sortTabs.Current.ValueChanged += e => Sort = e.NewValue;
         }
 
         public void Deactivate()
@@ -178,7 +178,7 @@ namespace osu.Game.Screens.Select
             sortTabs.AccentColour = colours.GreenLight;
 
             showConverted = config.GetBindable<bool>(OsuSetting.ShowConvertedBeatmaps);
-            showConverted.ValueChanged += val => updateCriteria();
+            showConverted.ValueChanged += e => updateCriteria();
 
             ruleset.BindTo(parentRuleset);
             ruleset.BindValueChanged(_ => updateCriteria(), true);

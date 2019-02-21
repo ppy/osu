@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Play.HUD
             private void bind()
             {
                 circularProgress.Current.BindTo(Progress);
-                Progress.ValueChanged += v => icon.Scale = new Vector2(1 + (float)v * 0.2f);
+                Progress.ValueChanged += e => icon.Scale = new Vector2(1 + (float)e.NewValue * 0.2f);
             }
 
             private bool pendingAnimation;

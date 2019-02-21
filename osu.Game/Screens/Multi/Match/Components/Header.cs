@@ -108,7 +108,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            CurrentItem.BindValueChanged(i => modDisplay.Current.Value = i?.RequiredMods, true);
+            CurrentItem.BindValueChanged(e => modDisplay.Current.Value = e.NewValue?.RequiredMods, true);
 
             beatmapButton.Action = () => RequestBeatmapSelection?.Invoke();
         }
@@ -126,7 +126,7 @@ namespace osu.Game.Screens.Multi.Match.Components
             [BackgroundDependencyLoader]
             private void load()
             {
-                roomId.BindValueChanged(v => this.FadeTo(v.HasValue ? 0 : 1), true);
+                roomId.BindValueChanged(e => this.FadeTo(e.NewValue.HasValue ? 0 : 1), true);
             }
         }
 

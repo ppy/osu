@@ -135,7 +135,7 @@ namespace osu.Game.Screens.Multi
         protected override void LoadComplete()
         {
             base.LoadComplete();
-            isIdle.BindValueChanged(updatePollingRate, true);
+            isIdle.BindValueChanged(e => updatePollingRate(e.NewValue), true);
         }
 
         protected override IReadOnlyDependencyContainer CreateChildDependencies(IReadOnlyDependencyContainer parent)

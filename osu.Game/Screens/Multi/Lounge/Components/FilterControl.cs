@@ -45,8 +45,8 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             filter.Value = new FilterCriteria
             {
                 SearchString = Search.Current.Value ?? string.Empty,
-                PrimaryFilter = Tabs.Current,
-                SecondaryFilter = DisplayStyleControl.Dropdown.Current
+                PrimaryFilter = Tabs.Current.Value,
+                SecondaryFilter = DisplayStyleControl.Dropdown.Current.Value
             };
         }
     }

@@ -27,7 +27,7 @@ namespace osu.Game.Online.Chat
 
         public void OpenUrlExternally(string url)
         {
-            if (externalLinkWarning)
+            if (externalLinkWarning.Value)
                 dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url)));
             else
                 host.OpenUrlExternally(url);

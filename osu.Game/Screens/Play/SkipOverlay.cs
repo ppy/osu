@@ -313,7 +313,7 @@ namespace osu.Game.Screens.Play
 
             protected override bool OnClick(ClickEvent e)
             {
-                if (!Enabled)
+                if (!Enabled.Value)
                     return false;
 
                 sampleConfirm.Play();

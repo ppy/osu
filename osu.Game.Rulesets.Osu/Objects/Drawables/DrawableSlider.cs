@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             config.BindWith(OsuSetting.SnakingOutSliders, Body.SnakingOut);
 
             positionBindable.BindValueChanged(_ => Position = HitObject.StackedPosition);
-            scaleBindable.BindValueChanged(v =>
+            scaleBindable.BindValueChanged(e =>
             {
                 Body.PathWidth = HitObject.Scale * 64;
                 Ball.Scale = new Vector2(HitObject.Scale);

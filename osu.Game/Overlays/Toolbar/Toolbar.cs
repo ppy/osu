@@ -85,7 +85,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             StateChanged += visibility =>
             {
-                if (overlayActivationMode == OverlayActivation.Disabled)
+                if (overlayActivationMode.Value == OverlayActivation.Disabled)
                     State = Visibility.Hidden;
             };
 

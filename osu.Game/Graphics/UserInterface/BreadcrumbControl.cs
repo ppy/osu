@@ -27,12 +27,12 @@ namespace osu.Game.Graphics.UserInterface
         {
             Height = 32;
             TabContainer.Spacing = new Vector2(padding, 0f);
-            Current.ValueChanged += tab =>
+            Current.ValueChanged += e =>
             {
                 foreach (var t in TabContainer.Children.OfType<BreadcrumbTabItem>())
                 {
                     var tIndex = TabContainer.IndexOf(t);
-                    var tabIndex = TabContainer.IndexOf(TabMap[tab]);
+                    var tabIndex = TabContainer.IndexOf(TabMap[e.NewValue]);
 
                     t.State = tIndex < tabIndex ? Visibility.Hidden : Visibility.Visible;
                     t.Chevron.FadeTo(tIndex <= tabIndex ? 0f : 1f, 500, Easing.OutQuint);
