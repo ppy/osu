@@ -143,8 +143,6 @@ namespace osu.Game.Screens.Play
         {
             base.LogoArriving(logo, resuming);
 
-            logo.RelativePositionAxes = Axes.Both;
-
             logo.ScaleTo(new Vector2(0.15f), 300, Easing.In);
             logo.MoveTo(new Vector2(0.5f), 300, Easing.In);
             logo.FadeIn(350);
