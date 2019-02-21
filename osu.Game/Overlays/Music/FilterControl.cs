@@ -8,7 +8,7 @@ using osu.Game.Graphics.UserInterface;
 using osuTK;
 using osuTK.Graphics;
 using System;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Music
 {

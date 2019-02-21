@@ -7,9 +7,9 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Online.Chat;
 using osuTK;
-using osu.Framework.Configuration;
 using System;
 using System.Linq;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Overlays.Chat.Tabs
 {

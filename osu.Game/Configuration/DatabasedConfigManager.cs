@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Game.Rulesets;
 

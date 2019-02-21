@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
@@ -12,7 +13,6 @@ using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Sprites;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Graphics.Containers;
-using osu.Framework.Configuration;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Graphics.UserInterface

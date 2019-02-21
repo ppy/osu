@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
@@ -15,7 +16,6 @@ using osu.Game.Online.API.Requests;
 using osu.Game.Overlays.SearchableList;
 using osu.Game.Overlays.Social;
 using osu.Game.Users;
-using osu.Framework.Configuration;
 using osu.Framework.Threading;
 
 namespace osu.Game.Overlays

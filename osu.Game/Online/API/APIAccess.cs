@@ -8,7 +8,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using Newtonsoft.Json.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Logging;
 using osu.Game.Configuration;

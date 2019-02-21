@@ -10,7 +10,7 @@ using osu.Game.Graphics;
 using osuTK;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
 
 namespace osu.Game.Overlays.Toolbar

@@ -6,12 +6,12 @@ using System.Diagnostics;
 using JetBrains.Annotations;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Beatmaps
 {
     /// <summary>
-    /// A <see cref="Bindable{WorkingBeatmap}"/> for the <see cref="OsuGame"/> beatmap.
+    /// A <see cref="Bindable{T}"/> for the <see cref="OsuGame"/> beatmap.
     /// This should be used sparingly in-favour of <see cref="IBindable<WorkingBeatmap>"/>.
     /// </summary>
     public abstract class BindableBeatmap : NonNullableBindable<WorkingBeatmap>

@@ -11,7 +11,7 @@ using osuTK.Graphics;
 using osu.Game.Graphics;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Screens.Ranking;
 using osu.Game.Rulesets.Scoring;
 
