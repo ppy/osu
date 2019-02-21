@@ -16,8 +16,8 @@ namespace osu.Game.Screens.Backgrounds
     {
         private WorkingBeatmap beatmap;
         protected Bindable<double> DimLevel;
-        protected Bindable<double> BlurLevel;
         public Bindable<bool> EnableUserDim;
+        public Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
         protected UserDimContainer FadeContainer;
 
@@ -56,6 +56,7 @@ namespace osu.Game.Screens.Backgrounds
                         b.Depth = newDepth;
                         FadeContainer.Child = Background = b;
                         Background.BlurSigma = BlurTarget;
+                        FadeContainer.StoryboardReplacesBackground.BindTo(StoryboardReplacesBackground);
                     }));
                 });
             }
