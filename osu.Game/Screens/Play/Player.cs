@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Play
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
                     Children = new Container[]
                     {
-                        storyboardContainer = new UserDimContainer
+                        storyboardContainer = new UserDimContainer(true)
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
@@ -351,6 +351,8 @@ namespace osu.Game.Screens.Play
             DimLevel.ValueChanged += _ => UpdateBackgroundElements();
             ShowStoryboard.ValueChanged += _ => UpdateBackgroundElements();
             Background.EnableUserDim.Value = true;
+            storyboardContainer.StoryboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
+            storyboardContainer.StoryboardReplacesBackground.BindTo(Background?.StoryboardReplacesBackground);
 
             Task.Run(() =>
             {
@@ -412,6 +414,7 @@ namespace osu.Game.Screens.Play
             float fadeOutDuration = instant ? 0 : 250;
             this.FadeOut(fadeOutDuration);
             Background.EnableUserDim.Value = false;
+            storyboardContainer.StoryboardReplacesBackground.Value = false;
         }
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
@@ -440,14 +443,6 @@ namespace osu.Game.Screens.Play
 
             if (ShowStoryboard && storyboard == null)
                 initializeStoryboard(true);
-
-            var beatmap = Beatmap.Value;
-            var storyboardVisible = ShowStoryboard && beatmap.Storyboard.HasDrawable;
-
-            storyboardContainer?.FadeTo(storyboardVisible && 1 - (float)DimLevel > 0 ? 1 : 0, BACKGROUND_FADE_DURATION, Easing.OutQuint);
-
-            if (storyboardVisible && beatmap.Storyboard.ReplacesBackground)
-                Background?.FadeColour(Color4.Black, BACKGROUND_FADE_DURATION, Easing.OutQuint);
         }
 
         protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
