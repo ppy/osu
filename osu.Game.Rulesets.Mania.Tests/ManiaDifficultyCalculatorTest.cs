@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Mania.Tests
         public void Test(double expected, string name)
             => base.Test(expected, name);
 
-        protected override LegacyDifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new ManiaDifficultyCalculator(new ManiaRuleset(), beatmap);
+        protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new ManiaDifficultyCalculator(new ManiaRuleset(), beatmap);
 
         protected override Ruleset CreateRuleset() => new ManiaRuleset();
     }
