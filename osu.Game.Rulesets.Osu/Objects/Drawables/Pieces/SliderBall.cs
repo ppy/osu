@@ -125,6 +125,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return base.OnMouseMove(e);
         }
 
+        public bool OnReleased(OsuAction action) => false;
+
         public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
         {
             // Consider the case of rewinding - children's transforms are handled internally, so propagating down
@@ -147,8 +149,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 FollowCircle.FadeTo(tracking ? 1f : 0, 300, Easing.OutQuint);
             }
         }
-
-        private bool canCurrentlyTrack => Time.Current >= slider.StartTime && Time.Current < slider.EndTime && lastScreenSpaceMousePosition.HasValue && base.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value);
 
         /// <summary>
         /// If the cursor moves out of the ball's radius we still need to be able to receive positional updates to stop tracking.
@@ -183,26 +183,25 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             if (headCircleHitAction == null)
                 timeToAcceptAnyKeyAfter = null;
 
-            if (canCurrentlyTrack)
+            var actions = drawableSlider?.OsuActionInputManager?.PressedActions;
+
+            // if the head circle was hit with a specific key, tracking should only occur while that key is pressed.
+            if (headCircleHitAction != null && timeToAcceptAnyKeyAfter == null)
             {
-                var pressed = drawableSlider?.OsuActionInputManager?.PressedActions;
+                var otherKey = headCircleHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton;
 
-                // if the head circle was hit with a specific key, tracking should only occur while that key is pressed.
-                if (headCircleHitAction != null && timeToAcceptAnyKeyAfter == null)
-                {
-                    var otherKey = headCircleHitAction == OsuAction.RightButton ? OsuAction.LeftButton : OsuAction.RightButton;
-
-                    // we can return to accepting all keys if the initial head circle key is the *only* key pressed, or all keys have been released.
-                    if (!pressed.Contains(otherKey))
-                        timeToAcceptAnyKeyAfter = Time.Current;
-                }
-
-                Tracking = drawableSlider?.OsuActionInputManager?.PressedActions.Any(isValidTrackingAction) ?? false;
+                // we can return to accepting all keys if the initial head circle key is the *only* key pressed, or all keys have been released.
+                if (actions?.Contains(otherKey) != true)
+                    timeToAcceptAnyKeyAfter = Time.Current;
             }
-            else
-            {
-                Tracking = false;
-            }
+
+            Tracking =
+                // in valid time range
+                Time.Current >= slider.StartTime && Time.Current < slider.EndTime &&
+                // in valid position range
+                lastScreenSpaceMousePosition.HasValue && base.ReceivePositionalInputAt(lastScreenSpaceMousePosition.Value) &&
+                // valid action
+                (actions?.Any(isValidTrackingAction) ?? false);
         }
 
         /// <summary>
