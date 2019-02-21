@@ -31,7 +31,6 @@ using osu.Game.Scoring;
 using osu.Game.Screens.Ranking;
 using osu.Game.Skinning;
 using osu.Game.Storyboards.Drawables;
-using osuTK.Graphics;
 
 namespace osu.Game.Screens.Play
 {
