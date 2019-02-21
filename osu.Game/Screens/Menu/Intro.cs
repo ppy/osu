@@ -112,7 +112,6 @@ namespace osu.Game.Screens.Menu
                 }, delay_step_two);
             }
 
-            logo.RelativePositionAxes = Axes.Both;
             logo.Colour = Color4.White;
             logo.Ripple = false;
 

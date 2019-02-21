@@ -174,7 +174,7 @@ namespace osu.Game.Screens
             logo.FadeOut(300, Easing.OutQuint);
             logo.Anchor = Anchor.TopLeft;
             logo.Origin = Anchor.Centre;
-            logo.RelativePositionAxes = Axes.None;
+            logo.RelativePositionAxes = Axes.Both;
             logo.BeatMatching = true;
             logo.Triangles = true;
             logo.Ripple = true;
