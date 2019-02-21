@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play
                         Margin = new MarginPadding(25),
                         Children = new PlayerSettingsGroup[]
                         {
-                            visualSettings = new VisualSettings(),
+                            VisualSettings = new VisualSettings(),
                             new InputSettings()
                         }
                     }
@@ -153,7 +153,7 @@ namespace osu.Game.Screens.Play
         }
 
         private ScheduledDelegate pushDebounce;
-        private VisualSettings visualSettings;
+        protected VisualSettings VisualSettings;
 
         private bool readyForPush => player.LoadState == LoadState.Ready && IsHovered && GetContainingInputManager()?.DraggedDrawable == null;
 
@@ -161,14 +161,14 @@ namespace osu.Game.Screens.Play
         {
             // restore our screen defaults
             InitializeBackgroundElements();
-            if (this.IsCurrentScreen())
+            if (this.IsCurrentScreen() && (Background?.IsLoaded ?? false))
                 Background.EnableUserDim.Value = false;
             return base.OnHover(e);
         }
 
         protected override void OnHoverLost(HoverLostEvent e)
         {
-            if (GetContainingInputManager()?.HoveredDrawables.Contains(visualSettings) == true)
+            if (GetContainingInputManager()?.HoveredDrawables.Contains(VisualSettings) == true)
             {
                 // show user setting preview
                 UpdateBackgroundElements();
@@ -247,7 +247,8 @@ namespace osu.Game.Screens.Play
             this.FadeOut(150);
             cancelLoad();
 
-            Background.EnableUserDim.Value = false;
+            if (Background != null)
+                Background.EnableUserDim.Value = false;
 
             return base.OnExiting(next);
         }
