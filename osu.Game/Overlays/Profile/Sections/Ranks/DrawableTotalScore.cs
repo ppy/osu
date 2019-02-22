@@ -3,6 +3,7 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
 
@@ -23,8 +24,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Text = Score.TotalScore.ToString("#,###"),
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
-                TextSize = 18,
-                Font = "Exo2.0-BoldItalic",
+                Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
             });
         }
     }

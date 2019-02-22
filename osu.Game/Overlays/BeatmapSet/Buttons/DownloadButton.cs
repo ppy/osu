@@ -118,8 +118,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "Downloading...",
-                                TextSize = 13,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
                             },
                         };
                         break;
@@ -129,8 +128,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "Importing...",
-                                TextSize = 13,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
                             },
                         };
                         break;
@@ -143,14 +141,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "Download",
-                                TextSize = 13,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
                             },
                             new OsuSpriteText
                             {
                                 Text = BeatmapSet.Value.OnlineInfo.HasVideo && noVideo ? "without Video" : string.Empty,
-                                TextSize = 11,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold)
                             },
                         };
                         this.FadeIn(200);

@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         {
                             Text = "ACCOUNT",
                             Margin = new MarginPadding { Bottom = 5 },
-                            Font = @"Exo2.0-Black",
+                            Font = OsuFont.GetFont(weight: FontWeight.Black),
                         },
                         form = new LoginForm
                         {
@@ -134,8 +134,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Text = "Signed in",
-                                            TextSize = 18,
-                                            Font = @"Exo2.0-Bold",
+                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                                             Margin = new MarginPadding { Top = 5, Bottom = 5 },
                                         },
                                     },

@@ -264,9 +264,8 @@ namespace osu.Game.Overlays.Mods
                                         {
                                             new OsuSpriteText
                                             {
-                                                Font = @"Exo2.0-Bold",
                                                 Text = @"Gameplay Mods",
-                                                TextSize = 22,
+                                                Font = OsuFont.GetFont(size: 22, weight: FontWeight.Bold),
                                                 Shadow = true,
                                                 Margin = new MarginPadding
                                                 {
@@ -275,7 +274,7 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             new OsuTextFlowContainer(text =>
                                             {
-                                                text.TextSize = 18;
+                                                text.Font = text.Font.With(size: 18);
                                                 text.Shadow = true;
                                             })
                                             {
@@ -365,7 +364,7 @@ namespace osu.Game.Overlays.Mods
                                             new OsuSpriteText
                                             {
                                                 Text = @"Score Multiplier:",
-                                                TextSize = 30,
+                                                Font = OsuFont.GetFont(size: 30),
                                                 Margin = new MarginPadding
                                                 {
                                                     Top = 5,
@@ -374,8 +373,7 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             MultiplierLabel = new OsuSpriteText
                                             {
-                                                Font = @"Exo2.0-Bold",
-                                                TextSize = 30,
+                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
                                                 Margin = new MarginPadding
                                                 {
                                                     Top = 5
@@ -383,9 +381,8 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             UnrankedLabel = new OsuSpriteText
                                             {
-                                                Font = @"Exo2.0-Bold",
                                                 Text = @"(Unranked)",
-                                                TextSize = 30,
+                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
                                                 Margin = new MarginPadding
                                                 {
                                                     Top = 5,

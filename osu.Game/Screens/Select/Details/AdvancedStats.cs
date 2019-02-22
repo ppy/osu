@@ -120,7 +120,7 @@ namespace osu.Game.Screens.Select.Details
                         AutoSizeAxes = Axes.Y,
                         Child = name = new OsuSpriteText
                         {
-                            TextSize = 13,
+                            Font = OsuFont.GetFont(size: 13)
                         },
                     },
                     bar = new Bar
@@ -142,7 +142,7 @@ namespace osu.Game.Screens.Select.Details
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            TextSize = 13,
+                            Font = OsuFont.GetFont(size: 13)
                         },
                     },
                 };

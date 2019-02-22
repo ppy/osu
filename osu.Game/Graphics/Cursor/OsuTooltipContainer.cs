@@ -46,8 +46,6 @@ namespace osu.Game.Graphics.Cursor
                 }
             }
 
-            private const float text_size = 16;
-
             public OsuTooltip()
             {
                 AutoSizeEasing = Easing.OutQuint;
@@ -69,9 +67,8 @@ namespace osu.Game.Graphics.Cursor
                     },
                     text = new OsuSpriteText
                     {
-                        TextSize = text_size,
                         Padding = new MarginPadding(5),
-                        Font = @"Exo2.0-Regular",
+                        Font = OsuFont.GetFont(weight: FontWeight.Regular)
                     }
                 };
             }

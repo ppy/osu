@@ -80,7 +80,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
             Action<SpriteText> gray = s => s.Colour = colours.GrayC;
             Action<SpriteText> white = s =>
             {
-                s.TextSize *= 1.4f;
+                s.Font = s.Font.With(size: s.Font.Size * 1.4f);
                 s.Colour = colours.GrayF;
             };
 
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Multi.Ranking.Pages
 
             rankText.AddText($"#{index + 1} ", s =>
             {
-                s.Font = "Exo2.0-Bold";
+                s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold);
                 s.Colour = colours.YellowDark;
             });
 

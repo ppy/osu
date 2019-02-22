@@ -96,7 +96,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                                     {
                                                         Anchor = Anchor.BottomLeft,
                                                         Origin = Anchor.BottomLeft,
-                                                        TextSize = 30,
+                                                        Font = OsuFont.GetFont(size: 30),
                                                         Current = Name
                                                     },
                                                 },
@@ -135,8 +135,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                                         AutoSizeAxes = Axes.Both,
                                                         Child = new StatusText
                                                         {
-                                                            TextSize = 14,
-                                                            Font = @"Exo2.0-Bold",
+                                                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                                                         }
                                                     },
                                                     beatmapTypeInfo = new BeatmapTypeInfo(),

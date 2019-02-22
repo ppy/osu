@@ -99,11 +99,10 @@ namespace osu.Game.Overlays.Toolbar
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
                         Y = -1,
-                        TextSize = 14,
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                         Padding = new MarginPadding(5),
                         Colour = Color4.White,
                         UseFullGlyphHeight = true,
-                        Font = "Exo2.0-Bold",
                     }
                 };
             }

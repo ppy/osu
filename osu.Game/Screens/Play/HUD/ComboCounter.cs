@@ -99,8 +99,9 @@ namespace osu.Game.Screens.Play.HUD
             set
             {
                 textSize = value;
-                DisplayedCountSpriteText.TextSize = TextSize;
-                PopOutCount.TextSize = TextSize;
+
+                DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(size: TextSize);
+                PopOutCount.Font = PopOutCount.Font.With(size: TextSize);
             }
         }
 
