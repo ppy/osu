@@ -108,9 +108,9 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             localUser.BindValueChanged(userChanged, true);
             button.Enabled.BindValueChanged(enabledChanged, true);
 
-            State.BindValueChanged(e =>
+            State.BindValueChanged(state =>
             {
-                switch (e.NewValue)
+                switch (state.NewValue)
                 {
                     case DownloadState.Downloading:
                         textSprites.Children = new Drawable[]

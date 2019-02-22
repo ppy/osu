@@ -146,10 +146,10 @@ namespace osu.Game.Screens.Multi.Match
                 },
             };
 
-            header.Tabs.Current.BindValueChanged(e =>
+            header.Tabs.Current.BindValueChanged(tab =>
             {
                 const float fade_duration = 500;
-                if (e.NewValue is SettingsMatchPage)
+                if (tab.NewValue is SettingsMatchPage)
                 {
                     settings.Show();
                     info.FadeOut(fade_duration, Easing.OutQuint);

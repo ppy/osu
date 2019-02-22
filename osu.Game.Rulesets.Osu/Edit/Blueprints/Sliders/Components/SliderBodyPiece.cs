@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.Sliders.Components
             body.BorderColour = colours.Yellow;
 
             PositionBindable.BindValueChanged(_ => updatePosition(), true);
-            ScaleBindable.BindValueChanged(e => body.PathWidth = e.NewValue * 64, true);
+            ScaleBindable.BindValueChanged(scale => body.PathWidth = scale.NewValue * 64, true);
         }
 
         private void updatePosition() => Position = slider.StackedPosition;

@@ -128,9 +128,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Bindable = sizeFullscreen
                 };
 
-                windowModeDropdown.Bindable.BindValueChanged(e =>
+                windowModeDropdown.Bindable.BindValueChanged(mode =>
                 {
-                    if (e.NewValue == WindowMode.Fullscreen)
+                    if (mode.NewValue == WindowMode.Fullscreen)
                     {
                         resolutionDropdown.Show();
                         sizeFullscreen.TriggerChange();
@@ -140,15 +140,15 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                 }, true);
             }
 
-            scalingMode.BindValueChanged(e =>
+            scalingMode.BindValueChanged(mode =>
             {
                 scalingSettings.ClearTransforms();
-                scalingSettings.AutoSizeAxes = e.NewValue != ScalingMode.Off ? Axes.Y : Axes.None;
+                scalingSettings.AutoSizeAxes = mode.NewValue != ScalingMode.Off ? Axes.Y : Axes.None;
 
-                if (e.NewValue == ScalingMode.Off)
+                if (mode.NewValue == ScalingMode.Off)
                     scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
 
-                scalingSettings.ForEach(s => s.TransferValueOnCommit = e.NewValue == ScalingMode.Everything);
+                scalingSettings.ForEach(s => s.TransferValueOnCommit = mode.NewValue == ScalingMode.Everything);
             }, true);
         }
 

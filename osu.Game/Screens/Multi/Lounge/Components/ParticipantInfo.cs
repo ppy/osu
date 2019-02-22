@@ -101,7 +101,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 }
             }, true);
 
-            ParticipantCount.BindValueChanged(e => summary.Text = $"{e.NewValue:#,0}{" participant".Pluralize(e.NewValue == 1)}", true);
+            ParticipantCount.BindValueChanged(count => summary.Text = $"{count.NewValue:#,0}{" participant".Pluralize(count.NewValue == 1)}", true);
 
             /*Participants.BindValueChanged(e =>
             {
