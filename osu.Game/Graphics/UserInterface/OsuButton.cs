@@ -85,7 +85,7 @@ namespace osu.Game.Graphics.UserInterface
             Depth = -1,
             Origin = Anchor.Centre,
             Anchor = Anchor.Centre,
-            Font = @"Exo2.0-Bold",
+            Font = OsuFont.GetFont(weight: FontWeight.Bold)
         };
     }
 }

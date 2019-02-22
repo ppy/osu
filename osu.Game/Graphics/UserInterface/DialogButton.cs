@@ -141,8 +141,7 @@ namespace osu.Game.Graphics.UserInterface
                     Text = Text,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    TextSize = 28,
-                    Font = "Exo2.0-Bold",
+                    Font = OsuFont.GetFont(size: 28, weight: FontWeight.Bold),
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.1f),
                     Colour = Color4.White,
@@ -197,18 +196,10 @@ namespace osu.Game.Graphics.UserInterface
             }
         }
 
-        private float textSize = 28;
         public float TextSize
         {
-            get
-            {
-                return textSize;
-            }
-            set
-            {
-                textSize = value;
-                spriteText.TextSize = value;
-            }
+            get => spriteText.Font.Size;
+            set => spriteText.Font = spriteText.Font.With(size: value);
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => backgroundContainer.ReceivePositionalInputAt(screenSpacePos);

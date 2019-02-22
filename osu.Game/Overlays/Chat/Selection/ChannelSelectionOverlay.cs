@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                 new OsuSpriteText
                                 {
                                     Text = @"Chat Channels",
-                                    TextSize = 20,
+                                    Font = OsuFont.GetFont(size: 20),
                                     Shadow = false,
                                 },
                                 search = new HeaderSearchTextBox

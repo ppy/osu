@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                     {
                                         new OsuSpriteText
                                         {
-                                            TextSize = 30,
+                                            Font = OsuFont.GetFont(size: 30),
                                             Current = Name
                                         },
                                         new RoomStatusInfo(),

@@ -61,16 +61,11 @@ namespace osu.Game.Graphics.UserInterface
 
         public abstract void Increment(T amount);
 
-        private float textSize;
 
         public float TextSize
         {
-            get { return textSize; }
-            set
-            {
-                textSize = value;
-                DisplayedCountSpriteText.TextSize = value;
-            }
+            get => DisplayedCountSpriteText.Font.Size;
+            set => DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(size: value);
         }
 
         public Color4 AccentColour
@@ -86,10 +81,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             Children = new Drawable[]
             {
-                DisplayedCountSpriteText = new OsuSpriteText
-                {
-                    Font = @"Venera"
-                },
+                DisplayedCountSpriteText = new OsuSpriteText { Font = OsuFont.Numeric }
             };
 
             TextSize = 40;

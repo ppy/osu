@@ -116,8 +116,7 @@ namespace osu.Game.Users
                                     new OsuSpriteText
                                     {
                                         Text = user.Username,
-                                        TextSize = 18,
-                                        Font = @"Exo2.0-SemiBoldItalic",
+                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold, size: 18, italics: true),
                                     },
                                     infoContainer = new FillFlowContainer
                                     {
@@ -173,7 +172,7 @@ namespace osu.Game.Users
                                     {
                                         Anchor = Anchor.CentreLeft,
                                         Origin = Anchor.CentreLeft,
-                                        Font = @"Exo2.0-Semibold",
+                                        Font = OsuFont.GetFont(weight: FontWeight.SemiBold),
                                     },
                                 },
                             },

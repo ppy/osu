@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Online.API;
 using osu.Game.Users;
 using osuTK;
@@ -20,7 +21,7 @@ namespace osu.Game.Overlays.Toolbar
         {
             AutoSizeAxes = Axes.X;
 
-            DrawableText.Font = @"Exo2.0-MediumItalic";
+            DrawableText.Font = OsuFont.GetFont(italics: true);
 
             Add(new OpaqueBackground { Depth = 1 });
 

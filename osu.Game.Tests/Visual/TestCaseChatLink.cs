@@ -96,7 +96,7 @@ namespace osu.Game.Tests.Visual
                 return true;
             }
 
-            bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font == "Exo2.0-MediumItalic");
+            bool isItalic() => newLine.ContentFlow.Where(d => d is OsuSpriteText).Cast<OsuSpriteText>().All(sprite => sprite.Font.Italics);
 
             bool isShowingLinks()
             {

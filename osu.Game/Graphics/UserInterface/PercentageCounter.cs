@@ -22,7 +22,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public PercentageCounter()
         {
-            DisplayedCountSpriteText.FixedWidth = true;
+            DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(fixedWidth: true);
             Current.Value = DisplayedCount = 1.0f;
         }
 

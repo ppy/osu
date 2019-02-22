@@ -148,7 +148,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                                                     },
                                                                     typeLabel = new OsuSpriteText
                                                                     {
-                                                                        TextSize = 14,
+                                                                        Font = OsuFont.GetFont(size: 14),
                                                                         Colour = colours.Yellow
                                                                     },
                                                                 },
@@ -364,8 +364,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                     {
                         new OsuSpriteText
                         {
-                            TextSize = 12,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 12),
                             Text = title.ToUpper(),
                         },
                         content = new Container

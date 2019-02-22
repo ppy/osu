@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                         Spacing = new Vector2(5f),
                                         Children = new Drawable[]
                                         {
-                                            new RoomName { TextSize = 18 },
+                                            new RoomName { Font = OsuFont.GetFont(size: 18) },
                                             new ParticipantInfo(),
                                         },
                                     },

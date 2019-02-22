@@ -89,8 +89,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                 name = new OsuSpriteText
                                 {
                                     Text = channel.ToString(),
-                                    TextSize = text_size,
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(size: text_size, weight: FontWeight.Bold),
                                     Shadow = false,
                                 },
                             },
@@ -106,8 +105,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                 topic = new OsuSpriteText
                                 {
                                     Text = channel.Topic,
-                                    TextSize = text_size,
-                                    Font = @"Exo2.0-SemiBold",
+                                    Font = OsuFont.GetFont(size: text_size, weight: FontWeight.SemiBold),
                                     Shadow = false,
                                 },
                             },
@@ -130,8 +128,7 @@ namespace osu.Game.Overlays.Chat.Selection
                                 new OsuSpriteText
                                 {
                                     Text = @"0",
-                                    TextSize = text_size,
-                                    Font = @"Exo2.0-SemiBold",
+                                    Font = OsuFont.GetFont(size: text_size, weight: FontWeight.SemiBold),
                                     Shadow = false,
                                 },
                             },

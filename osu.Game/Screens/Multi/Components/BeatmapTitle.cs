@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Multi.Components
             CurrentItem.BindValueChanged(e => updateText(), true);
         }
 
-        private float textSize = OsuSpriteText.FONT_SIZE;
+        private float textSize = OsuFont.DEFAULT_FONT_SIZE;
 
         public float TextSize
         {
@@ -58,7 +58,7 @@ namespace osu.Game.Screens.Multi.Components
             if (beatmap == null)
                 textFlow.AddText("No beatmap selected", s =>
                 {
-                    s.TextSize = TextSize;
+                    s.Font = s.Font.With(size: TextSize);
                     s.Colour = colours.PinkLight;
                 });
             else
@@ -68,17 +68,17 @@ namespace osu.Game.Screens.Multi.Components
                     new OsuSpriteText
                     {
                         Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
-                        TextSize = TextSize,
+                        Font = OsuFont.GetFont(size: TextSize),
                     },
                     new OsuSpriteText
                     {
                         Text = " - ",
-                        TextSize = TextSize,
+                        Font = OsuFont.GetFont(size: TextSize),
                     },
                     new OsuSpriteText
                     {
                         Text = new LocalisedString((beatmap.Metadata.TitleUnicode, beatmap.Metadata.Title)),
-                        TextSize = TextSize,
+                        Font = OsuFont.GetFont(size: TextSize),
                     }
                 }, null, LinkAction.OpenBeatmap, beatmap.OnlineBeatmapID.ToString(), "Open beatmap");
             }
