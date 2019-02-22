@@ -187,16 +187,16 @@ namespace osu.Game.Overlays.BeatmapSet
 
             State.BindValueChanged(_ => updateDownloadButtons());
 
-            BeatmapSet.BindValueChanged(e =>
+            BeatmapSet.BindValueChanged(setInfo =>
             {
-                Picker.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = e.NewValue;
+                Picker.BeatmapSet = author.BeatmapSet = Details.BeatmapSet = setInfo.NewValue;
 
-                title.Text = e.NewValue?.Metadata.Title ?? string.Empty;
-                artist.Text = e.NewValue?.Metadata.Artist ?? string.Empty;
-                onlineStatusPill.Status = e.NewValue?.OnlineInfo.Status ?? BeatmapSetOnlineStatus.None;
-                cover.BeatmapSet = e.NewValue;
+                title.Text = setInfo.NewValue?.Metadata.Title ?? string.Empty;
+                artist.Text = setInfo.NewValue?.Metadata.Artist ?? string.Empty;
+                onlineStatusPill.Status = setInfo.NewValue?.OnlineInfo.Status ?? BeatmapSetOnlineStatus.None;
+                cover.BeatmapSet = setInfo.NewValue;
 
-                if (e.NewValue != null)
+                if (setInfo.NewValue != null)
                 {
                     downloadButtonsContainer.FadeIn(transition_duration);
                     favouriteButton.FadeIn(transition_duration);

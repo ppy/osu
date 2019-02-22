@@ -128,7 +128,7 @@ namespace osu.Game.Tests.Visual
                     },
                 };
 
-                idleTracker.IsIdle.BindValueChanged(e => box.Colour = e.NewValue ? Color4.White : Color4.Black, true);
+                idleTracker.IsIdle.BindValueChanged(idle => box.Colour = idle.NewValue ? Color4.White : Color4.Black, true);
             }
         }
     }

@@ -185,7 +185,7 @@ namespace osu.Game
 
             LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
 
-            IsActive.BindValueChanged(e => updateActiveState(e.NewValue), true);
+            IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
         }
 
         private ExternalLinkOpener externalLinkOpener;

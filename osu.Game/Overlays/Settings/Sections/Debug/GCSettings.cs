@@ -35,8 +35,8 @@ namespace osu.Game.Overlays.Settings.Sections.Debug
             };
 
             configLatencyMode = config.GetBindable<GCLatencyMode>(DebugSetting.ActiveGCMode);
-            configLatencyMode.BindValueChanged(e => latencyMode.Value = (LatencyMode)e.NewValue, true);
-            latencyMode.BindValueChanged(e => configLatencyMode.Value = (GCLatencyMode)e.NewValue);
+            configLatencyMode.BindValueChanged(mode => latencyMode.Value = (LatencyMode)mode.NewValue, true);
+            latencyMode.BindValueChanged(mode => configLatencyMode.Value = (GCLatencyMode)mode.NewValue);
         }
 
         private enum LatencyMode

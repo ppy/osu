@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             beatmaps.ItemAdded += beatmapAdded;
 
-            Beatmap.BindValueChanged(e => updateBeatmap(e.NewValue), true);
+            Beatmap.BindValueChanged(b => updateBeatmap(b.NewValue), true);
         }
 
         private void updateBeatmap(BeatmapInfo beatmap)

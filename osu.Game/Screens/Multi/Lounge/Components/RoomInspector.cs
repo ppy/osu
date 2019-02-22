@@ -214,7 +214,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             [BackgroundDependencyLoader]
             private void load()
             {
-                status.BindValueChanged(e => Text = e.NewValue.Message, true);
+                status.BindValueChanged(s => Text = s.NewValue.Message, true);
             }
         }
 

@@ -264,12 +264,12 @@ namespace osu.Game.Screens.Multi.Match.Components
                     processingOverlay = new ProcessingOverlay { Alpha = 0 }
                 };
 
-                TypePicker.Current.BindValueChanged(e => typeLabel.Text = e.NewValue?.Name ?? string.Empty, true);
-                Name.BindValueChanged(e => NameField.Text = e.NewValue, true);
-                Availability.BindValueChanged(e => AvailabilityPicker.Current.Value = e.NewValue, true);
-                Type.BindValueChanged(e => TypePicker.Current.Value = e.NewValue, true);
-                MaxParticipants.BindValueChanged(e => MaxParticipantsField.Text = e.NewValue?.ToString(), true);
-                Duration.BindValueChanged(e => DurationField.Current.Value = e.NewValue, true);
+                TypePicker.Current.BindValueChanged(type => typeLabel.Text = type.NewValue?.Name ?? string.Empty, true);
+                Name.BindValueChanged(name => NameField.Text = name.NewValue, true);
+                Availability.BindValueChanged(availability => AvailabilityPicker.Current.Value = availability.NewValue, true);
+                Type.BindValueChanged(type => TypePicker.Current.Value = type.NewValue, true);
+                MaxParticipants.BindValueChanged(count => MaxParticipantsField.Text = count.NewValue?.ToString(), true);
+                Duration.BindValueChanged(duration => DurationField.Current.Value = duration.NewValue, true);
             }
 
             protected override void Update()

@@ -52,10 +52,10 @@ namespace osu.Game.Screens.Edit.Compose.Components.Timeline
             WaveformVisible.ValueChanged += visible => waveform.FadeTo(visible.NewValue ? 1 : 0, 200, Easing.OutQuint);
 
             Beatmap.BindTo(beatmap);
-            Beatmap.BindValueChanged(e =>
+            Beatmap.BindValueChanged(b =>
             {
-                waveform.Waveform = e.NewValue.Waveform;
-                track = e.NewValue.Track;
+                waveform.Waveform = b.NewValue.Waveform;
+                track = b.NewValue.Track;
             }, true);
         }
 
