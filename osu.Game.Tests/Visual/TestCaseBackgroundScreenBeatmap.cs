@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -280,7 +280,7 @@ namespace osu.Game.Tests.Visual
             public Bindable<bool> StoryboardEnabled;
             public readonly Bindable<bool> ReplacesBackground = new Bindable<bool>();
 
-            public bool IsPaused => RulesetContainer.IsPaused;
+            public bool IsPaused => RulesetContainer.IsPaused.Value;
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
@@ -320,7 +320,7 @@ namespace osu.Game.Tests.Visual
 
             public bool AssertDimmed()
             {
-                return ((TestUserDimContainer)FadeContainer).CurrentColour == OsuColour.Gray(1 - (float)dimLevel);
+                return ((TestUserDimContainer)FadeContainer).CurrentColour == OsuColour.Gray(1 - (float)dimLevel.Value);
             }
 
             public bool AssertUndimmed()
