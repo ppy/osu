@@ -202,7 +202,15 @@ namespace osu.Game.Tests.Visual
         public void TransitionOutTest()
         {
             performSetup();
-            AddStep("Exit player", () => songSelect.MakeCurrent());
+            AddUntilStep(() =>
+            {
+                if (!songSelect.IsCurrentScreen())
+                {
+                    songSelect.MakeCurrent();
+                    return false;
+                }
+                return true;
+            }, "Wait for song select is current");
             AddWaitStep(5, "Wait for dim");
             AddAssert("Screen is undimmed", () => songSelect.AssertUndimmed());
         }
