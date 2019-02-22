@@ -81,7 +81,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             Children = new Drawable[]
             {
-                DisplayedCountSpriteText = new OsuSpriteText { Font = OsuFont.GetFont(Typeface.Venera) }
+                DisplayedCountSpriteText = new OsuSpriteText { Font = OsuFont.Numeric }
             };
 
             TextSize = 40;

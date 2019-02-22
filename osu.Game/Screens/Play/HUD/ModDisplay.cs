@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Play.HUD
                     Anchor = Anchor.BottomCentre,
                     Origin = Anchor.TopCentre,
                     Text = @"/ UNRANKED /",
-                    Font = OsuFont.GetFont(Typeface.Venera, 12),
+                    Font = OsuFont.Numeric.With(size: 12)
                 }
             };
 

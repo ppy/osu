@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play.Break
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
-                Font = OsuFont.GetFont(Typeface.Venera, 33),
+                Font = OsuFont.Numeric.With(size: 33),
             };
         }
 

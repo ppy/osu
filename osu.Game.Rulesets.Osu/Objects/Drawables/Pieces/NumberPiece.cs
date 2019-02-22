@@ -43,7 +43,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                 }, s => s.GetTexture("Play/osu/hitcircle") == null),
                 number = new SkinnableSpriteText("Play/osu/number-text", _ => new OsuSpriteText
                 {
-                    Font = OsuFont.GetFont(Typeface.Venera, 40),
+                    Font = OsuFont.Numeric.With(size: 40),
                     UseFullGlyphHeight = false,
                 }, restrictSize: false)
                 {

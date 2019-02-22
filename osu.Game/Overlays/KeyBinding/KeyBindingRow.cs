@@ -349,7 +349,7 @@ namespace osu.Game.Overlays.KeyBinding
                     },
                     Text = new OsuSpriteText
                     {
-                        Font = OsuFont.GetFont(Typeface.Venera, 10),
+                        Font = OsuFont.Numeric.With(size: 10),
                         Margin = new MarginPadding(5),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

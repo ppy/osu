@@ -97,7 +97,7 @@ namespace osu.Game.Screens.Play
                         new OsuSpriteText
                         {
                             Text = Name,
-                            Font = OsuFont.GetFont(Typeface.Venera, 12),
+                            Font = OsuFont.Numeric.With(size: 12),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Both,

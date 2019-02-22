@@ -74,7 +74,7 @@ namespace osu.Desktop.Overlays
                         {
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
-                            Font = OsuFont.GetFont(Typeface.Venera, 12),
+                            Font = OsuFont.Numeric.With(size: 12),
                             Colour = colours.Yellow,
                             Text = @"Development Build"
                         },
