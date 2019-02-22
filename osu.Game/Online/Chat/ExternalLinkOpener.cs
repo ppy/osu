@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Platform;
 using osu.Game.Configuration;
@@ -27,7 +27,7 @@ namespace osu.Game.Online.Chat
 
         public void OpenUrlExternally(string url)
         {
-            if (externalLinkWarning)
+            if (externalLinkWarning.Value)
                 dialogOverlay.Push(new ExternalLinkDialog(url, () => host.OpenUrlExternally(url)));
             else
                 host.OpenUrlExternally(url);

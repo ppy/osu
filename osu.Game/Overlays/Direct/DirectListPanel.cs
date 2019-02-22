@@ -95,13 +95,12 @@ namespace osu.Game.Overlays.Direct
                                                         new OsuSpriteText
                                                         {
                                                             Text = new LocalisedString((SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title)),
-                                                            TextSize = 18,
-                                                            Font = @"Exo2.0-BoldItalic",
+                                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
                                                         },
                                                         new OsuSpriteText
                                                         {
                                                             Text = new LocalisedString((SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist)),
-                                                            Font = @"Exo2.0-BoldItalic",
+                                                            Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true)
                                                         },
                                                     }
                                                 },
@@ -161,13 +160,12 @@ namespace osu.Game.Overlays.Direct
                                                 new OsuSpriteText
                                                 {
                                                     Text = "mapped by ",
-                                                    TextSize = 14,
+                                                    Font = OsuFont.GetFont(size: 14)
                                                 },
                                                 new OsuSpriteText
                                                 {
                                                     Text = SetInfo.Metadata.Author.Username,
-                                                    TextSize = 14,
-                                                    Font = @"Exo2.0-SemiBoldItalic",
+                                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true)
                                                 },
                                             },
                                         },
@@ -176,7 +174,7 @@ namespace osu.Game.Overlays.Direct
                                             Text = SetInfo.Metadata.Source,
                                             Anchor = Anchor.TopRight,
                                             Origin = Anchor.TopRight,
-                                            TextSize = 14,
+                                            Font = OsuFont.GetFont(size: 14),
                                             Alpha = string.IsNullOrEmpty(SetInfo.Metadata.Source) ? 0f : 1f,
                                         },
                                     },

@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Select.Carousel
         /// <summary>
         /// This item is not in a hidden state.
         /// </summary>
-        public bool Visible => State.Value != CarouselItemState.Collapsed && !Filtered;
+        public bool Visible => State.Value != CarouselItemState.Collapsed && !Filtered.Value;
 
         public virtual List<DrawableCarouselItem> Drawables
         {
@@ -37,9 +37,9 @@ namespace osu.Game.Screens.Select.Carousel
         {
             DrawableRepresentation = new Lazy<DrawableCarouselItem>(CreateDrawableRepresentation);
 
-            Filtered.ValueChanged += v =>
+            Filtered.ValueChanged += filtered =>
             {
-                if (v && State == CarouselItemState.Selected)
+                if (filtered.NewValue && State.Value == CarouselItemState.Selected)
                     State.Value = CarouselItemState.NotSelected;
             };
         }

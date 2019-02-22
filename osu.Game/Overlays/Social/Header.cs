@@ -32,13 +32,12 @@ namespace osu.Game.Overlays.Social
                     new OsuSpriteText
                     {
                         Text = "social ",
-                        TextSize = 25,
+                        Font = OsuFont.GetFont(size: 25),
                     },
                     browser = new OsuSpriteText
                     {
                         Text = "browser",
-                        TextSize = 25,
-                        Font = @"Exo2.0-Light",
+                        Font = OsuFont.GetFont(size: 25, weight: FontWeight.Light),
                     },
                 },
             };

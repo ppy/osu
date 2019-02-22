@@ -10,7 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Logging;
@@ -326,16 +326,16 @@ namespace osu.Game.Screens.Select
 
         private ScheduledDelegate selectionChangedDebounce;
 
-        private void workingBeatmapChanged(WorkingBeatmap beatmap)
+        private void workingBeatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
-            if (beatmap is DummyWorkingBeatmap) return;
+            if (e.NewValue is DummyWorkingBeatmap) return;
 
-            if (this.IsCurrentScreen() && !Carousel.SelectBeatmap(beatmap?.BeatmapInfo, false))
+            if (this.IsCurrentScreen() && !Carousel.SelectBeatmap(e.NewValue?.BeatmapInfo, false))
                 // If selecting new beatmap without bypassing filters failed, there's possibly a ruleset mismatch
-                if (beatmap?.BeatmapInfo?.Ruleset != null && beatmap.BeatmapInfo.Ruleset != decoupledRuleset.Value)
+                if (e.NewValue?.BeatmapInfo?.Ruleset != null && e.NewValue.BeatmapInfo.Ruleset != decoupledRuleset.Value)
                 {
-                    Ruleset.Value = beatmap.BeatmapInfo.Ruleset;
-                    Carousel.SelectBeatmap(beatmap.BeatmapInfo);
+                    Ruleset.Value = e.NewValue.BeatmapInfo.Ruleset;
+                    Carousel.SelectBeatmap(e.NewValue.BeatmapInfo);
                 }
         }
 
@@ -444,7 +444,6 @@ namespace osu.Game.Screens.Select
         {
             base.LogoArriving(logo, resuming);
 
-            logo.RelativePositionAxes = Axes.Both;
             Vector2 position = new Vector2(0.95f, 0.96f);
 
             if (logo.Alpha > 0.8f)
@@ -599,9 +598,9 @@ namespace osu.Game.Screens.Select
             {
                 // manual binding to parent ruleset to allow for delayed load in the incoming direction.
                 rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
-                Ruleset.ValueChanged += updateSelectedRuleset;
+                Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
 
-                decoupledRuleset.ValueChanged += r => Ruleset.Value = r;
+                decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
                 decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
 
                 Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);

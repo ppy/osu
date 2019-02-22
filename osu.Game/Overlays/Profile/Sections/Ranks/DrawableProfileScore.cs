@@ -46,8 +46,7 @@ namespace osu.Game.Overlays.Profile.Sections.Ranks
                 Anchor = Anchor.TopRight,
                 Origin = Anchor.TopRight,
                 Colour = colour.GrayA,
-                TextSize = 11,
-                Font = "Exo2.0-RegularItalic"
+                Font = OsuFont.GetFont(size: 11, weight: FontWeight.Regular, italics: true)
             };
 
             RightFlowContainer.Add(text);

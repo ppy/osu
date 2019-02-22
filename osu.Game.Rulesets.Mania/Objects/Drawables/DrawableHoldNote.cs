@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.Mania.Objects.Drawables.Pieces;
@@ -75,11 +76,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             AddNested(Tail);
         }
 
-        protected override void OnDirectionChanged(ScrollingDirection direction)
+        protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
         {
-            base.OnDirectionChanged(direction);
+            base.OnDirectionChanged(e);
 
-            bodyPiece.Anchor = bodyPiece.Origin = direction == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+            bodyPiece.Anchor = bodyPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
         }
 
         public override Color4 AccentColour

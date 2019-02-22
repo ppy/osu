@@ -136,9 +136,8 @@ namespace osu.Game.Overlays.BeatmapSet
                             {
                                 Anchor = Anchor.CentreLeft,
                                 Origin = Anchor.CentreLeft,
-                                TextSize = 13,
-                                Font = @"Exo2.0-Bold",
                                 Margin = new MarginPadding { Left = 10 },
+                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold),
                             },
                         },
                     },
