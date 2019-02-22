@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Linq;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -160,29 +161,46 @@ namespace osu.Game.Rulesets.UI
             clock.Rate = parentClock.Rate;
             clock.IsRunning = parentClock.IsRunning;
 
-            if (!isAttached)
-            {
-                clock.CurrentTime = parentClock.CurrentTime;
-            }
-            else
-            {
-                double? newTime = replayInputHandler.SetFrameFromTime(parentClock.CurrentTime);
+            var newProposedTime = parentClock.CurrentTime;
 
-                if (newTime == null)
+            try
+            {
+                if (Math.Abs(clock.CurrentTime - newProposedTime) > sixty_frame_time * 1.2f)
                 {
-                    // we shouldn't execute for this time value. probably waiting on more replay data.
-                    validState = false;
-                    return;
+                    newProposedTime = clock.Rate > 0
+                        ? Math.Min(newProposedTime, clock.CurrentTime + sixty_frame_time)
+                        : Math.Max(newProposedTime, clock.CurrentTime - sixty_frame_time);
                 }
 
-                clock.CurrentTime = newTime.Value;
+                if (!isAttached)
+                {
+                    clock.CurrentTime = newProposedTime;
+                }
+                else
+                {
+                    double? newTime = replayInputHandler.SetFrameFromTime(newProposedTime);
+
+                    if (newTime == null)
+                    {
+                        // we shouldn't execute for this time value. probably waiting on more replay data.
+                        validState = false;
+
+                        requireMoreUpdateLoops = true;
+                        clock.CurrentTime = newProposedTime;
+                        return;
+                    }
+
+                    clock.CurrentTime = newTime.Value;
+                }
+
+                requireMoreUpdateLoops = clock.CurrentTime != parentClock.CurrentTime;
             }
-
-            requireMoreUpdateLoops = clock.CurrentTime != parentClock.CurrentTime;
-
-            // The manual clock time has changed in the above code. The framed clock now needs to be updated
-            // to ensure that the its time is valid for our children before input is processed
-            Clock.ProcessFrame();
+            finally
+            {
+                // The manual clock time has changed in the above code. The framed clock now needs to be updated
+                // to ensure that the its time is valid for our children before input is processed
+                Clock.ProcessFrame();
+            }
         }
 
         protected override void Update()
