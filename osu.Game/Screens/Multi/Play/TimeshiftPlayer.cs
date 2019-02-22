@@ -5,7 +5,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Framework.Screens;
 using osu.Game.Online.API;

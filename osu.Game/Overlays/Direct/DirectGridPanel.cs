@@ -237,6 +237,6 @@ namespace osu.Game.Overlays.Direct
             updateStatusContainer();
         }
 
-        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying ? 0 : 1, 120, Easing.InOutQuint);
+        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying.Value ? 0 : 1, 120, Easing.InOutQuint);
     }
 }

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -87,11 +87,11 @@ namespace osu.Game.Overlays.Profile.Header
             graph.Colour = colours.Yellow;
         }
 
-        private void userChanged(User user)
+        private void userChanged(ValueChangedEvent<User> e)
         {
             placeholder.FadeIn(fade_duration, Easing.Out);
 
-            if (user?.Statistics?.Ranks.Global == null)
+            if (e.NewValue?.Statistics?.Ranks.Global == null)
             {
                 rankText.Text = string.Empty;
                 performanceText.Text = string.Empty;
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.Profile.Header
                 return;
             }
 
-            int[] userRanks = user.RankHistory?.Data ?? new[] { user.Statistics.Ranks.Global.Value };
+            int[] userRanks = e.NewValue.RankHistory?.Data ?? new[] { e.NewValue.Statistics.Ranks.Global.Value };
             ranks = userRanks.Select((x, index) => new KeyValuePair<int, int>(index, x)).Where(x => x.Value != 0).ToArray();
 
             if (ranks.Length > 1)

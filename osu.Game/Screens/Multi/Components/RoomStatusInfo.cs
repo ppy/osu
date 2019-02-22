@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Multi.Components
             public EndDatePart()
                 : base(DateTimeOffset.UtcNow)
             {
-                EndDate.BindValueChanged(d => Date = d);
+                EndDate.BindValueChanged(e => Date = e.NewValue);
             }
 
             protected override string Format()

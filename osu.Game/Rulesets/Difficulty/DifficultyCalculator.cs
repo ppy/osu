@@ -4,26 +4,64 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty.Preprocessing;
 using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
+using osu.Game.Rulesets.Objects;
 
 namespace osu.Game.Rulesets.Difficulty
 {
-    public abstract class DifficultyCalculator : LegacyDifficultyCalculator
+    public abstract class DifficultyCalculator
     {
         /// <summary>
         /// The length of each strain section.
         /// </summary>
         protected virtual int SectionLength => 400;
 
+        private readonly Ruleset ruleset;
+        private readonly WorkingBeatmap beatmap;
+
         protected DifficultyCalculator(Ruleset ruleset, WorkingBeatmap beatmap)
-            : base(ruleset, beatmap)
         {
+            this.ruleset = ruleset;
+            this.beatmap = beatmap;
         }
 
-        protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
+        /// <summary>
+        /// Calculates the difficulty of the beatmap using a specific mod combination.
+        /// </summary>
+        /// <param name="mods">The mods that should be applied to the beatmap.</param>
+        /// <returns>A structure describing the difficulty of the beatmap.</returns>
+        public DifficultyAttributes Calculate(params Mod[] mods)
+        {
+            beatmap.Mods.Value = mods;
+            IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+
+            var clock = new StopwatchClock();
+            mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
+
+            return calculate(playableBeatmap, mods, clock.Rate);
+        }
+
+        /// <summary>
+        /// Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
+        /// </summary>
+        /// <returns>A collection of structures describing the difficulty of the beatmap for each mod combination.</returns>
+        public IEnumerable<DifficultyAttributes> CalculateAll()
+        {
+            foreach (var combination in CreateDifficultyAdjustmentModCombinations())
+            {
+                if (combination is MultiMod multi)
+                    yield return Calculate(multi.Mods);
+                else
+                    yield return Calculate(combination);
+            }
+        }
+
+        private DifficultyAttributes calculate(IBeatmap beatmap, Mod[] mods, double clockRate)
         {
             var skills = CreateSkills(beatmap);
 

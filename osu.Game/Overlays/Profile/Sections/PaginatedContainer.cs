@@ -3,7 +3,7 @@
 
 using osuTK;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -93,13 +93,13 @@ namespace osu.Game.Overlays.Profile.Sections
             User.TriggerChange();
         }
 
-        private void onUserChanged(User newUser)
+        private void onUserChanged(ValueChangedEvent<User> e)
         {
             VisiblePages = 0;
             ItemsContainer.Clear();
             ShowMoreButton.Hide();
 
-            if (newUser != null)
+            if (e.NewValue != null)
                 ShowMore();
         }
 

@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.UserInterface
                     new HoverClickSounds()
                 };
 
-                Active.BindValueChanged(val => Text.Font = Text.Font.With(Typeface.Exo, weight: val ? FontWeight.Bold : FontWeight.Medium), true);
+                Active.BindValueChanged(active => Text.Font = Text.Font.With(Typeface.Exo, weight: active.NewValue ? FontWeight.Bold : FontWeight.Medium), true);
             }
 
             [BackgroundDependencyLoader]
@@ -70,14 +70,14 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override bool OnHover(HoverEvent e)
             {
-                if (!Active)
+                if (!Active.Value)
                     slideActive();
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                if (!Active)
+                if (!Active.Value)
                     slideInactive();
             }
 

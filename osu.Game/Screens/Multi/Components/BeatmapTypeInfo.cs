@@ -51,11 +51,11 @@ namespace osu.Game.Screens.Multi.Components
                 }
             };
 
-            CurrentItem.BindValueChanged(item =>
+            CurrentItem.BindValueChanged(e =>
             {
                 beatmapAuthor.Clear();
 
-                var beatmap = item?.Beatmap;
+                var beatmap = e.NewValue?.Beatmap;
 
                 if (beatmap != null)
                 {

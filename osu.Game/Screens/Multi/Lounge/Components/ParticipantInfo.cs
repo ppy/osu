@@ -87,23 +87,23 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                 },
             };
 
-            Host.BindValueChanged(v =>
+            Host.BindValueChanged(host =>
             {
                 hostText.Clear();
                 flagContainer.Clear();
 
-                if (v != null)
+                if (host.NewValue != null)
                 {
                     hostText.AddText("hosted by ");
-                    hostText.AddLink(v.Username, null, LinkAction.OpenUserProfile, v.Id.ToString(), "Open profile",
+                    hostText.AddLink(host.NewValue.Username, null, LinkAction.OpenUserProfile, host.NewValue.Id.ToString(), "Open profile",
                         s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
-                    flagContainer.Child = new DrawableFlag(v.Country) { RelativeSizeAxes = Axes.Both };
+                    flagContainer.Child = new DrawableFlag(host.NewValue.Country) { RelativeSizeAxes = Axes.Both };
                 }
             }, true);
 
-            ParticipantCount.BindValueChanged(v => summary.Text = $"{v:#,0}{" participant".Pluralize(v == 1)}", true);
+            ParticipantCount.BindValueChanged(e => summary.Text = $"{e.NewValue:#,0}{" participant".Pluralize(e.NewValue == 1)}", true);
 
-            /*Participants.BindValueChanged(v =>
+            /*Participants.BindValueChanged(e =>
             {
                 var ranks = v.Select(u => u.Statistics.Ranks.Global);
                 levelRangeLower.Text = ranks.Min().ToString();

@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -47,11 +47,11 @@ namespace osu.Game.Overlays.Toolbar
 
             NotificationCount.ValueChanged += count =>
             {
-                if (count == 0)
+                if (count.NewValue == 0)
                     countDisplay.FadeOut(200, Easing.OutQuint);
                 else
                 {
-                    countDisplay.Count = count;
+                    countDisplay.Count = count.NewValue;
                     countDisplay.FadeIn(200, Easing.OutQuint);
                 }
             };

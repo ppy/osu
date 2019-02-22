@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -54,7 +54,7 @@ namespace osu.Game.Overlays.Chat.Selection
             RelativeSizeAxes = Axes.X;
             AutoSizeAxes = Axes.Y;
 
-            Action = () => { (channel.Joined ? OnRequestLeave : OnRequestJoin)?.Invoke(channel); };
+            Action = () => { (channel.Joined.Value ? OnRequestLeave : OnRequestJoin)?.Invoke(channel); };
 
             Children = new Drawable[]
             {
@@ -145,7 +145,7 @@ namespace osu.Game.Overlays.Chat.Selection
             joinedColour = colours.Blue;
             hoverColour = colours.Yellow;
 
-            joinedBind.ValueChanged += updateColour;
+            joinedBind.ValueChanged += joined => updateColour(joined.NewValue);
             joinedBind.BindTo(channel.Joined);
 
             joinedBind.TriggerChange();
