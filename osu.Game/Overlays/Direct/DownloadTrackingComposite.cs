@@ -37,14 +37,14 @@ namespace osu.Game.Overlays.Direct
         {
             this.beatmaps = beatmaps;
 
-            BeatmapSet.BindValueChanged(e =>
+            BeatmapSet.BindValueChanged(setInfo =>
             {
-                if (e.NewValue == null)
+                if (setInfo.NewValue == null)
                     attachDownload(null);
-                else if (beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == e.NewValue.OnlineBeatmapSetID).Any())
+                else if (beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == setInfo.NewValue.OnlineBeatmapSetID).Any())
                     State.Value = DownloadState.LocallyAvailable;
                 else
-                    attachDownload(beatmaps.GetExistingDownload(e.NewValue));
+                    attachDownload(beatmaps.GetExistingDownload(setInfo.NewValue));
             }, true);
 
             beatmaps.BeatmapDownloadBegan += download =>

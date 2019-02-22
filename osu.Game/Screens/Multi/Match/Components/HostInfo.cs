@@ -43,7 +43,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 }
             };
 
-            Host.BindValueChanged(e => updateHost(e.NewValue));
+            Host.BindValueChanged(host => updateHost(host.NewValue));
         }
 
         private void updateHost(User host)

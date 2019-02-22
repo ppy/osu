@@ -136,12 +136,12 @@ namespace osu.Game.Rulesets.Mania.UI
                 AddColumn(column);
             }
 
-            Direction.BindValueChanged(e =>
+            Direction.BindValueChanged(dir =>
             {
                 barLineContainer.Padding = new MarginPadding
                 {
-                    Top = e.NewValue == ScrollingDirection.Up ? HIT_TARGET_POSITION : 0,
-                    Bottom = e.NewValue == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
+                    Top = dir.NewValue == ScrollingDirection.Up ? HIT_TARGET_POSITION : 0,
+                    Bottom = dir.NewValue == ScrollingDirection.Down ? HIT_TARGET_POSITION : 0,
                 };
             }, true);
         }

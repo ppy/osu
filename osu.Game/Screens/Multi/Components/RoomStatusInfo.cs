@@ -53,7 +53,7 @@ namespace osu.Game.Screens.Multi.Components
             public EndDatePart()
                 : base(DateTimeOffset.UtcNow)
             {
-                EndDate.BindValueChanged(e => Date = e.NewValue);
+                EndDate.BindValueChanged(date => Date = date.NewValue);
             }
 
             protected override string Format()

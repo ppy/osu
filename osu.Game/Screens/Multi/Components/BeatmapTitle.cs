@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Multi.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            CurrentItem.BindValueChanged(e => updateText(), true);
+            CurrentItem.BindValueChanged(_ => updateText(), true);
         }
 
         private float textSize = OsuFont.DEFAULT_FONT_SIZE;
