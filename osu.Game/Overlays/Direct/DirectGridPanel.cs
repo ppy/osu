@@ -75,13 +75,12 @@ namespace osu.Game.Overlays.Direct
                                 new OsuSpriteText
                                 {
                                     Text = new LocalisedString((SetInfo.Metadata.TitleUnicode, SetInfo.Metadata.Title)),
-                                    TextSize = 18,
-                                    Font = @"Exo2.0-BoldItalic",
+                                    Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold, italics: true)
                                 },
                                 new OsuSpriteText
                                 {
                                     Text = new LocalisedString((SetInfo.Metadata.ArtistUnicode, SetInfo.Metadata.Artist)),
-                                    Font = @"Exo2.0-BoldItalic",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true)
                                 },
                             },
                         },
@@ -127,15 +126,14 @@ namespace osu.Game.Overlays.Direct
                                                 new OsuSpriteText
                                                 {
                                                     Text = "mapped by ",
-                                                    TextSize = 14,
+                                                    Font = OsuFont.GetFont(size: 14),
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
                                                 },
                                                 new OsuSpriteText
                                                 {
                                                     Text = SetInfo.Metadata.Author.Username,
-                                                    TextSize = 14,
-                                                    Font = @"Exo2.0-SemiBoldItalic",
+                                                    Font = OsuFont.GetFont(size: 14, weight: FontWeight.SemiBold, italics: true),
                                                     Shadow = false,
                                                     Colour = colours.BlueDark,
                                                 },
@@ -150,7 +148,7 @@ namespace osu.Game.Overlays.Direct
                                                 new OsuSpriteText
                                                 {
                                                     Text = SetInfo.Metadata.Source,
-                                                    TextSize = 14,
+                                                    Font = OsuFont.GetFont(size: 14),
                                                     Shadow = false,
                                                     Colour = colours.Gray5,
                                                     Alpha = string.IsNullOrEmpty(SetInfo.Metadata.Source) ? 0f : 1f,
@@ -239,6 +237,6 @@ namespace osu.Game.Overlays.Direct
             updateStatusContainer();
         }
 
-        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying ? 0 : 1, 120, Easing.InOutQuint);
+        private void updateStatusContainer() => statusContainer.FadeTo(IsHovered || PreviewPlaying.Value ? 0 : 1, 120, Easing.InOutQuint);
     }
 }

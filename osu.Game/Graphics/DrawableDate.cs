@@ -30,8 +30,7 @@ namespace osu.Game.Graphics
 
         public DrawableDate(DateTimeOffset date)
         {
-            Font = "Exo2.0-RegularItalic";
-
+            Font = OsuFont.GetFont(weight: FontWeight.Regular, italics: true);
             Date = date;
         }
 

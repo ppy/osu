@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -85,7 +85,7 @@ namespace osu.Game.Tests.Visual
             }
 
             [BackgroundDependencyLoader]
-            private void load(IAdjustableClock adjustableClock, IBindableBeatmap beatmap)
+            private void load(IAdjustableClock adjustableClock, IBindable<WorkingBeatmap> beatmap)
             {
                 this.adjustableClock = adjustableClock;
                 this.beatmap.BindTo(beatmap);

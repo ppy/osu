@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Font = @"Exo2.0-Bold",
+                        Font = OsuFont.GetFont(weight: FontWeight.Bold),
                         Text = value.GetDescription(),
                     },
                 };
