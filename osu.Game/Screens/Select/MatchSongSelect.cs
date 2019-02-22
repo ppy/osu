@@ -3,8 +3,11 @@
 
 using System;
 using Humanizer;
+using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
+using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
 using osu.Game.Screens.Multi;
 
@@ -16,6 +19,12 @@ namespace osu.Game.Screens.Select
 
         public string ShortTitle => "song selection";
         public override string Title => ShortTitle.Humanize();
+
+        [Resolved(typeof(Room))]
+        protected Bindable<PlaylistItem> CurrentItem { get; private set; }
+
+        [Resolved]
+        private BeatmapManager beatmaps { get; set; }
 
         public MatchSongSelect()
         {
@@ -43,10 +52,14 @@ namespace osu.Game.Screens.Select
 
         public override bool OnExiting(IScreen next)
         {
+            if (base.OnExiting(next))
+                return true;
+
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(CurrentItem.Value?.Beatmap);
             Beatmap.Disabled = true;
             Ruleset.Disabled = true;
 
-            return base.OnExiting(next);
+            return false;
         }
 
         public override void OnEntering(IScreen last)
