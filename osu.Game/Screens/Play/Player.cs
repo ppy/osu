@@ -345,9 +345,6 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            // We need to update background elements when the user dim gets updated
-            // The storyboard needs to know whether or not to completely fade at 100% dim
-            DimLevel.ValueChanged += _ => UpdateBackgroundElements();
             ShowStoryboard.ValueChanged += _ => UpdateBackgroundElements();
             Background.EnableUserDim.Value = true;
             storyboardContainer.StoryboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
