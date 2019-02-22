@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
@@ -45,15 +45,15 @@ namespace osu.Game.Graphics.Containers
         {
             if (isStoryboard)
             {
-                DimContainer.FadeTo(!ShowStoryboard || DimLevel == 1 ? 0 : 1, background_fade_duration, Easing.OutQuint);
+                DimContainer.FadeTo(!ShowStoryboard.Value || DimLevel.Value == 1 ? 0 : 1, background_fade_duration, Easing.OutQuint);
             }
             else
             {
                 // The background needs to be hidden in the case of it being replaced
-                DimContainer.FadeTo(ShowStoryboard && StoryboardReplacesBackground ? 0 : 1, background_fade_duration, Easing.OutQuint);
+                DimContainer.FadeTo(ShowStoryboard.Value && StoryboardReplacesBackground.Value ? 0 : 1, background_fade_duration, Easing.OutQuint);
             }
 
-            DimContainer.FadeColour(EnableUserDim ? OsuColour.Gray(1 - (float)DimLevel) : Color4.White, background_fade_duration, Easing.OutQuint);
+            DimContainer.FadeColour(EnableUserDim.Value ? OsuColour.Gray(1 - (float)DimLevel.Value) : Color4.White, background_fade_duration, Easing.OutQuint);
         }
     }
 }
