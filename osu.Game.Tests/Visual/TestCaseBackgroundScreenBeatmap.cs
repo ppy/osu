@@ -301,9 +301,17 @@ namespace osu.Game.Tests.Visual
 
         private class FadeAccessibleBackground : BackgroundScreenBeatmap
         {
+            private Bindable<float> dimLevel;
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager config)
+            {
+                dimLevel = config.GetBindable<float>(OsuSetting.DimLevel);
+            }
+
             public bool AssertDimmed()
             {
-                return FadeContainer.Colour == OsuColour.Gray(1 - (float)DimLevel);
+                return FadeContainer.Colour == OsuColour.Gray(1 - dimLevel);
             }
 
             public bool AssertUndimmed()

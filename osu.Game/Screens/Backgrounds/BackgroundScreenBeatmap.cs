@@ -6,7 +6,6 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
-using osu.Game.Configuration;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
 
@@ -15,17 +14,10 @@ namespace osu.Game.Screens.Backgrounds
     public class BackgroundScreenBeatmap : BlurrableBackgroundScreen
     {
         private WorkingBeatmap beatmap;
-        protected Bindable<double> DimLevel = new Bindable<double>();
         public Bindable<bool> EnableUserDim = new Bindable<bool>();
         public Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
         protected UserDimContainer FadeContainer;
-
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            config.BindWith(OsuSetting.DimLevel, DimLevel);
-        }
 
         public virtual WorkingBeatmap Beatmap
         {
