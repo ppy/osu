@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-            Mods.ValueChanged += e => applyRateAdjustments();
+            Mods.ValueChanged += _ => applyRateAdjustments();
 
             beatmap = new RecyclableLazy<IBeatmap>(() =>
             {

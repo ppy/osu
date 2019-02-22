@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables.Pieces
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(e =>
             {
-                colouredBox.Anchor = colouredBox.Origin = direction.Value == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+                colouredBox.Anchor = colouredBox.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
             }, true);
         }
 

@@ -50,7 +50,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(e =>
             {
-                backgroundOverlay.Anchor = backgroundOverlay.Origin = direction.Value == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                backgroundOverlay.Anchor = backgroundOverlay.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
                 updateColours();
             }, true);
         }
