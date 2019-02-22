@@ -191,7 +191,6 @@ namespace osu.Game.Screens.Play
                 if (_selectionIndex == value)
                     return;
 
-
                 // Deselect the previously-selected button
                 if (_selectionIndex != -1)
                     InternalButtons[_selectionIndex].Selected.Value = false;
