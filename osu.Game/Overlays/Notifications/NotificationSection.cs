@@ -102,13 +102,13 @@ namespace osu.Game.Overlays.Notifications
                                 titleText = new OsuSpriteText
                                 {
                                     Text = title.ToUpperInvariant(),
-                                    Font = @"Exo2.0-Black",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Black)
                                 },
                                 countText = new OsuSpriteText
                                 {
                                     Text = "3",
                                     Colour = colours.Yellow,
-                                    Font = @"Exo2.0-Black",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Black)
                                 },
                             }
                         },

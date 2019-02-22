@@ -8,7 +8,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -157,7 +157,7 @@ namespace osu.Game.Screens.Play
             // the final usable gameplay clock with user-set offsets applied.
             var offsetClock = new FramedOffsetClock(platformOffsetClock);
 
-            userAudioOffset.ValueChanged += v => offsetClock.Offset = v;
+            userAudioOffset.ValueChanged += offset => offsetClock.Offset = offset.NewValue;
             userAudioOffset.TriggerChange();
 
             ScoreProcessor = RulesetContainer.CreateScoreProcessor();
@@ -171,7 +171,7 @@ namespace osu.Game.Screens.Play
                     Retries = RestartCount,
                     OnRetry = Restart,
                     OnQuit = performUserRequestedExit,
-                    CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded,
+                    CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded.Value,
                     Children = new Container[]
                     {
                         storyboardContainer = new UserDimContainer(true)
@@ -236,7 +236,7 @@ namespace osu.Game.Screens.Play
 
             RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
 
-            if (ShowStoryboard)
+            if (ShowStoryboard.Value)
                 initializeStoryboard(false);
 
             storyboardContainer.EnableUserDim.Value = true;
@@ -361,7 +361,7 @@ namespace osu.Game.Screens.Play
 
                     this.Delay(750).Schedule(() =>
                     {
-                        if (!pauseContainer.IsPaused)
+                        if (!pauseContainer.IsPaused.Value)
                         {
                             adjustableClock.Start();
                         }
@@ -413,7 +413,7 @@ namespace osu.Game.Screens.Play
             storyboardContainer.StoryboardReplacesBackground.Value = false;
         }
 
-        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !pauseContainer.IsPaused;
+        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !pauseContainer.IsPaused.Value;
 
         private void initializeStoryboard(bool asyncLoad)
         {
@@ -437,7 +437,7 @@ namespace osu.Game.Screens.Play
 
             base.UpdateBackgroundElements();
 
-            if (ShowStoryboard && storyboard == null)
+            if (ShowStoryboard.Value && storyboard == null)
                 initializeStoryboard(true);
         }
 

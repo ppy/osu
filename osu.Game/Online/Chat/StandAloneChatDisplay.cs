@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -90,9 +90,9 @@ namespace osu.Game.Online.Chat
                 return;
 
             if (text[0] == '/')
-                ChannelManager?.PostCommand(text.Substring(1), Channel);
+                ChannelManager?.PostCommand(text.Substring(1), Channel.Value);
             else
-                ChannelManager?.PostMessage(text, target: Channel);
+                ChannelManager?.PostMessage(text, target: Channel.Value);
 
             textbox.Text = string.Empty;
         }
@@ -111,13 +111,13 @@ namespace osu.Game.Online.Chat
 
         protected virtual ChatLine CreateMessage(Message message) => new StandAloneMessage(message);
 
-        private void channelChanged(Channel channel)
+        private void channelChanged(ValueChangedEvent<Channel> e)
         {
             drawableChannel?.Expire();
 
-            if (channel == null) return;
+            if (e.NewValue == null) return;
 
-            AddInternal(drawableChannel = new StandAloneDrawableChannel(channel)
+            AddInternal(drawableChannel = new StandAloneDrawableChannel(e.NewValue)
             {
                 CreateChatLineAction = CreateMessage,
                 Padding = new MarginPadding { Bottom = postingTextbox ? textbox_height : 0 }
