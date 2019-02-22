@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Judgements
                 Child = new SkinnableDrawable($"Play/{Result.Type}", _ => JudgementText = new OsuSpriteText
                 {
                     Text = Result.Type.GetDescription().ToUpperInvariant(),
-                    Font = OsuFont.GetFont(Typeface.Venera, 12),
+                    Font = OsuFont.Numeric.With(size: 12),
                     Colour = judgementColour(Result.Type),
                     Scale = new Vector2(0.85f, 1),
                 }, restrictSize: false)

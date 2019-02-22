@@ -17,6 +17,8 @@ namespace osu.Game.Graphics
         /// </summary>
         public static FontUsage Default => GetFont();
 
+        public static FontUsage Numeric => GetFont(Typeface.Venera, weight: FontWeight.Regular);
+
         /// <summary>
         /// Retrieves a <see cref="FontUsage"/>.
         /// </summary>

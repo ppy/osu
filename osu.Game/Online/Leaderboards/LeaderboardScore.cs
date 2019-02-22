@@ -185,7 +185,7 @@ namespace osu.Game.Online.Leaderboards
                                     Spacing = new Vector2(5f, 0f),
                                     Children = new Drawable[]
                                     {
-                                        scoreLabel = new GlowingSpriteText(score.TotalScore.ToString(@"N0"), OsuFont.GetFont(Typeface.Venera, 23), Color4.White, OsuColour.FromHex(@"83ccfa")),
+                                        scoreLabel = new GlowingSpriteText(score.TotalScore.ToString(@"N0"), OsuFont.Numeric.With(size: 23), Color4.White, OsuColour.FromHex(@"83ccfa")),
                                         RankContainer = new Container
                                         {
                                             Size = new Vector2(40f, 20f),

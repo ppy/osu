@@ -140,7 +140,7 @@ namespace osu.Game.Overlays.Volume
                         {
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
-                            Font = OsuFont.GetFont(Typeface.Venera, 0.16f * circleSize)
+                            Font = OsuFont.Numeric.With(size: 0.16f * circleSize)
                         }).WithEffect(new GlowEffect
                         {
                             Colour = Color4.Transparent,

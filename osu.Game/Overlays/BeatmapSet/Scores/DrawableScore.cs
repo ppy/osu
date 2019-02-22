@@ -87,7 +87,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreRight,
                     Text = $@"{score.TotalScore:N0}",
-                    Font = OsuFont.GetFont(Typeface.Venera, fixedWidth: true),
+                    Font = OsuFont.Numeric.With(fixedWidth: true),
                     RelativePositionAxes = Axes.X,
                     X = 0.75f,
                 },

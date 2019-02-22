@@ -24,14 +24,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Text = @"0",
-                    Font = OsuFont.GetFont(Typeface.Venera, 24),
+                    Font = OsuFont.Numeric.With(size: 24)
                 },
                 new OsuSpriteText
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Text = @"SPINS PER MINUTE",
-                    Font = OsuFont.GetFont(Typeface.Venera, 12),
+                    Font = OsuFont.Numeric.With(size: 12),
                     Y = 30
                 }
             };
