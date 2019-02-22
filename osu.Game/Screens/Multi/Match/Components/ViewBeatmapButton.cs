@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         private void load()
         {
             if (osuGame != null)
-                Beatmap.BindValueChanged(e => updateAction(e.NewValue), true);
+                Beatmap.BindValueChanged(beatmap => updateAction(beatmap.NewValue), true);
         }
 
         private void updateAction(BeatmapInfo beatmap)

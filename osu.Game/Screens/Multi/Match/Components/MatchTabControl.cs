@@ -26,9 +26,9 @@ namespace osu.Game.Screens.Multi.Match.Components
         [BackgroundDependencyLoader]
         private void load()
         {
-            roomId.BindValueChanged(e =>
+            roomId.BindValueChanged(id =>
             {
-                if (e.NewValue.HasValue)
+                if (id.NewValue.HasValue)
                 {
                     Items.ForEach(t => t.Enabled.Value = !(t is SettingsMatchPage));
                     Current.Value = new RoomMatchPage();
@@ -51,7 +51,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 : base(value)
             {
                 enabled.BindTo(value.Enabled);
-                enabled.BindValueChanged(e => Colour = e.NewValue ? Color4.White : Color4.Gray);
+                enabled.BindValueChanged(enabled => Colour = enabled.NewValue ? Color4.White : Color4.Gray, true);
             }
 
             protected override bool OnClick(ClickEvent e)

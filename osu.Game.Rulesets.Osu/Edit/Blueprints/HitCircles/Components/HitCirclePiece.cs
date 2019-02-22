@@ -34,7 +34,7 @@ namespace osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components
 
             PositionBindable.BindValueChanged(_ => UpdatePosition(), true);
             StackHeightBindable.BindValueChanged(_ => UpdatePosition());
-            ScaleBindable.BindValueChanged(e => Scale = new Vector2(e.NewValue), true);
+            ScaleBindable.BindValueChanged(scale => Scale = new Vector2(scale.NewValue), true);
         }
 
         protected virtual void UpdatePosition() => Position = hitCircle.StackedPosition;

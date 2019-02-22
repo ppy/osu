@@ -35,9 +35,9 @@ namespace osu.Game.Overlays.Direct
             progressBar.BackgroundColour = Color4.Black.Opacity(0.7f);
             progressBar.Current = Progress;
 
-            State.BindValueChanged(e =>
+            State.BindValueChanged(state =>
             {
-                switch (e.NewValue)
+                switch (state.NewValue)
                 {
                     case DownloadState.NotDownloaded:
                         progressBar.Current.Value = 0;

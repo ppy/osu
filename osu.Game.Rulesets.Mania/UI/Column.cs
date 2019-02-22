@@ -82,15 +82,15 @@ namespace osu.Game.Rulesets.Mania.UI
 
             TopLevelContainer.Add(explosionContainer.CreateProxy());
 
-            Direction.BindValueChanged(e =>
+            Direction.BindValueChanged(dir =>
             {
                 hitTargetContainer.Padding = new MarginPadding
                 {
-                    Top = e.NewValue == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
-                    Bottom = e.NewValue == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
+                    Top = dir.NewValue == ScrollingDirection.Up ? ManiaStage.HIT_TARGET_POSITION : 0,
+                    Bottom = dir.NewValue == ScrollingDirection.Down ? ManiaStage.HIT_TARGET_POSITION : 0,
                 };
 
-                keyArea.Anchor = keyArea.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                keyArea.Anchor = keyArea.Origin = dir.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
             }, true);
         }
 

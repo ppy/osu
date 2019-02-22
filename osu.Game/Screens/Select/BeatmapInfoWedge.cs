@@ -263,8 +263,8 @@ namespace osu.Game.Screens.Select
                     }
                 };
 
-                titleBinding.BindValueChanged(e => setMetadata(metadata.Source));
-                artistBinding.BindValueChanged(e => setMetadata(metadata.Source), true);
+                titleBinding.BindValueChanged(_ => setMetadata(metadata.Source));
+                artistBinding.BindValueChanged(_ => setMetadata(metadata.Source), true);
 
                 // no difficulty means it can't have a status to show
                 if (beatmapInfo.Version == null)

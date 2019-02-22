@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.Direct
         {
             base.LoadComplete();
 
-            State.BindValueChanged(e => updateState(e.NewValue), true);
+            State.BindValueChanged(state => updateState(state.NewValue), true);
             FinishTransforms(true);
         }
 

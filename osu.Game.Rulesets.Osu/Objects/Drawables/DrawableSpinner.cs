@@ -130,7 +130,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
             circle.Colour = colours.BlueDark;
             glow.Colour = colours.BlueDark;
 
-            positionBindable.BindValueChanged(e => Position = e.NewValue);
+            positionBindable.BindValueChanged(pos => Position = pos.NewValue);
             positionBindable.BindTo(HitObject.PositionBindable);
         }
 
