@@ -1,6 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -26,6 +28,13 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseBackgroundScreenBeatmap : ManualInputManagerTestCase
     {
+        public override IReadOnlyList<Type> RequiredTypes => new[]
+        {
+            typeof(ScreenWithBeatmapBackground),
+            typeof(PlayerLoader),
+            typeof(Player)
+        };
+
         private DummySongSelect songSelect;
         private DimAccessiblePlayerLoader playerLoader;
         private DimAccessiblePlayer player;
@@ -36,11 +45,13 @@ namespace osu.Game.Tests.Visual
         public TestCaseBackgroundScreenBeatmap()
         {
             ScreenStack screen;
+
             InputManager.Add(backgroundStack = new BackgroundScreenStack {RelativeSizeAxes = Axes.Both});
             InputManager.Add(screen = new ScreenStack { RelativeSizeAxes = Axes.Both });
 
             AddStep("Load Song Select", () =>
             {
+                songSelect?.MakeCurrent();
                 songSelect?.Exit();
 
                 LoadComponentAsync(new DummySongSelect(), p =>
@@ -73,6 +84,8 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Start player loader", () => songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer())));
             AddUntilStep(() => playerLoader?.IsLoaded ?? false, "Wait for Player Loader to load");
+            AddAssert("Background retained from song select", () => songSelect.AssertBackgroundCurrent());
+
             AddStep("Update bindables", () => playerLoader.UpdateBindables());
             AddStep("Trigger background preview", () =>
             {
@@ -93,6 +106,7 @@ namespace osu.Game.Tests.Visual
             // The OnHover of PlayerLoader will trigger, which could potentially trigger an undim unless checked for in PlayerLoader.
             // We need to check that in this scenario, the dim is still properly applied after entering player.
             AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
+            AddAssert("Background retained from song select", () => songSelect.AssertBackgroundCurrent());
             AddStep("Trigger background preview when loaded", () =>
             {
                 InputManager.MoveMouseTo(playerLoader.VisualSettingsPos);
@@ -142,7 +156,11 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void PauseTest()
         {
-            AddStep("Transition to Pause", () => player.Exit());
+            AddStep("Transition to Pause", () =>
+            {
+                if (!player.IsPaused)
+                    player.Exit();
+            });
             AddWaitStep(5, "Wait for dim");
             AddAssert("Screen is dimmed", () => songSelect.AssertDimmed());
         }
@@ -156,6 +174,7 @@ namespace osu.Game.Tests.Visual
             AddStep("Transition to Results", () => player.Push(new FadeAccesibleResults(new ScoreInfo { User = new User { Username = "osu!" }})));
             AddWaitStep(5, "Wait for dim");
             AddAssert("Screen is undimmed", () => songSelect.AssertUndimmed());
+            AddAssert("Background retained from song select", () => songSelect.AssertBackgroundCurrent());
         }
 
         /// <summary>
@@ -196,6 +215,15 @@ namespace osu.Game.Tests.Visual
             {
                 return ((FadeAccessibleBackground)Background).AssertVisible();
             }
+
+            /// <summary>
+            /// Make sure every time a screen gets pushed, the background doesn't get replaced
+            /// </summary>
+            /// <returns>Whether or not the original background is still the current background</returns>
+            public bool AssertBackgroundCurrent()
+            {
+                return ((FadeAccessibleBackground)Background).IsCurrentScreen();
+            }
         }
 
         private class FadeAccesibleResults : SoloResults
@@ -216,6 +244,8 @@ namespace osu.Game.Tests.Visual
             public Bindable<bool> StoryboardEnabled;
             public readonly Bindable<bool> ReplacesBackground = new Bindable<bool>();
 
+            public bool IsPaused => RulesetContainer.IsPaused;
+
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
@@ -232,6 +262,9 @@ namespace osu.Game.Tests.Visual
 
             public VisualSettings VisualSettingsPos => VisualSettings;
             public BackgroundScreen ScreenPos => Background;
+
+            [Resolved]
+            private BackgroundScreenStack stack { get; set; }
 
             public void UpdateBindables()
             {

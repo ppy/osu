@@ -15,7 +15,7 @@ namespace osu.Game.Screens.Play
     {
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenBeatmap(Beatmap.Value);
 
-        protected new BackgroundScreenBeatmap Background => base.Background as BackgroundScreenBeatmap;
+        protected new BackgroundScreenBeatmap Background => (BackgroundScreenBeatmap)base.Background;
 
         protected const float BACKGROUND_FADE_DURATION = 800;
 
