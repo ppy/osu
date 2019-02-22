@@ -21,6 +21,8 @@ namespace osu.Game.Screens
 
         public override OverlayActivation InitialOverlayActivationMode => OverlayActivation.Disabled;
 
+        public override bool CursorVisible => false;
+
         protected override bool AllowBackButton => false;
 
         public Loader()

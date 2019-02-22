@@ -5,7 +5,7 @@ using System;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -41,9 +41,9 @@ namespace osu.Game.Graphics.UserInterface
                 },
             };
 
-            Current.ValueChanged += newValue =>
+            Current.ValueChanged += filled =>
             {
-                if (newValue)
+                if (filled.NewValue)
                     fill.FadeIn(200, Easing.OutQuint);
                 else
                     fill.FadeTo(0.01f, 200, Easing.OutQuint); //todo: remove once we figure why containers aren't drawing at all times

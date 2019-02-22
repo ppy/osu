@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
@@ -28,8 +28,6 @@ namespace osu.Game.Screens.Menu
         /// </summary>
         public bool DidLoadMenu;
 
-        private readonly Bindable<WorkingBeatmap> beatmap = new Bindable<WorkingBeatmap>();
-
         private MainMenu mainMenu;
         private SampleChannel welcome;
         private SampleChannel seeya;
@@ -47,16 +45,14 @@ namespace osu.Game.Screens.Menu
         private WorkingBeatmap introBeatmap;
 
         [BackgroundDependencyLoader]
-        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game, BindableBeatmap beatmap)
+        private void load(AudioManager audio, OsuConfigManager config, BeatmapManager beatmaps, Framework.Game game)
         {
-            this.beatmap.BindTo(beatmap);
-
             menuVoice = config.GetBindable<bool>(OsuSetting.MenuVoice);
             menuMusic = config.GetBindable<bool>(OsuSetting.MenuMusic);
 
             BeatmapSetInfo setInfo = null;
 
-            if (!menuMusic)
+            if (!menuMusic.Value)
             {
                 var sets = beatmaps.GetAllUsableBeatmapSets();
                 if (sets.Count > 0)
@@ -95,15 +91,15 @@ namespace osu.Game.Screens.Menu
 
             if (!resuming)
             {
-                beatmap.Value = introBeatmap;
+                Beatmap.Value = introBeatmap;
 
-                if (menuVoice)
+                if (menuVoice.Value)
                     welcome.Play();
 
                 Scheduler.AddDelayed(delegate
                 {
                     // Only start the current track if it is the menu music. A beatmap's track is started when entering the Main Manu.
-                    if (menuMusic)
+                    if (menuMusic.Value)
                         track.Start();
 
                     LoadComponentAsync(mainMenu = new MainMenu());
@@ -116,7 +112,6 @@ namespace osu.Game.Screens.Menu
                 }, delay_step_two);
             }
 
-            logo.RelativePositionAxes = Axes.Both;
             logo.Colour = Color4.White;
             logo.Ripple = false;
 
@@ -163,7 +158,7 @@ namespace osu.Game.Screens.Menu
 
             double fadeOutTime = EXIT_DELAY;
             //we also handle the exit transition.
-            if (menuVoice)
+            if (menuVoice.Value)
                 seeya.Play();
             else
                 fadeOutTime = 500;

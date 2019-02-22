@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osuTK;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,7 +10,6 @@ using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
 using osuTK.Graphics;
-using osu.Framework.Configuration;
 
 namespace osu.Game.Overlays.Profile
 {
@@ -35,8 +35,7 @@ namespace osu.Game.Overlays.Profile
                 new OsuSpriteText
                 {
                     Text = Title,
-                    TextSize = 20,
-                    Font = @"Exo2.0-RegularItalic",
+                    Font = OsuFont.GetFont(size: 20, weight: FontWeight.Regular, italics: true),
                     Margin = new MarginPadding
                     {
                         Horizontal = UserProfileOverlay.CONTENT_X_MARGIN,
@@ -67,8 +66,6 @@ namespace osu.Game.Overlays.Profile
             Add(new OsuSpriteText
             {
                 Text = @"coming soon!",
-                TextSize = 16,
-                Font = @"Exo2.0-Medium",
                 Colour = Color4.Gray,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,

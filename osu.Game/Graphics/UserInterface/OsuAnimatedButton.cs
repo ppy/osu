@@ -73,7 +73,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            Enabled.BindValueChanged(enabled => this.FadeColour(enabled ? Color4.White : colours.Gray9, 200, Easing.OutQuint), true);
+            Enabled.BindValueChanged(enabled => this.FadeColour(enabled.NewValue ? Color4.White : colours.Gray9, 200, Easing.OutQuint), true);
         }
 
         protected override bool OnHover(HoverEvent e)

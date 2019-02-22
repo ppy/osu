@@ -119,25 +119,25 @@ namespace osu.Game.Screens
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
                                     Text = GetType().Name,
                                     Colour = getColourFor(GetType()).Lighten(0.8f),
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
-                                    TextSize = 50,
+                                    Font = OsuFont.GetFont(size: 50),
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.TopCentre,
+                                    Origin = Anchor.TopCentre,
                                     Text = "is not yet ready for use!",
-                                    TextSize = 20,
-                                    Anchor = Anchor.TopCentre,
-                                    Origin = Anchor.TopCentre,
+                                    Font = OsuFont.GetFont(size: 20),
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = "please check back a bit later.",
-                                    TextSize = 14,
                                     Anchor = Anchor.TopCentre,
                                     Origin = Anchor.TopCentre,
+                                    Text = "please check back a bit later.",
+                                    Font = OsuFont.GetFont(size: 14),
                                 },
                             }
                         },
