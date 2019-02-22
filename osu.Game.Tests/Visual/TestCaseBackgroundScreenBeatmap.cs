@@ -12,6 +12,7 @@ using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
+using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
 using osu.Game.Screens;
@@ -32,18 +33,38 @@ namespace osu.Game.Tests.Visual
         {
             typeof(ScreenWithBeatmapBackground),
             typeof(PlayerLoader),
-            typeof(Player)
+            typeof(Player),
+            typeof(UserDimContainer)
         };
 
         private DummySongSelect songSelect;
         private DimAccessiblePlayerLoader playerLoader;
         private DimAccessiblePlayer player;
+        private readonly ScreenStack screen;
 
         [Cached]
         private BackgroundScreenStack backgroundStack;
 
+        private void createSongSelect()
+        {
+            AddStep("Create song select if required", () =>
+            {
+                if (songSelect == null)
+                {
+                    LoadComponentAsync(new DummySongSelect(), p =>
+                    {
+                        songSelect = p;
+                        screen.Push(p);
+                        songSelect.UpdateBindables();
+                    });
+                }
+            });
+            AddUntilStep(() => songSelect?.IsLoaded ?? false, "Wait for song select to load");
+        }
+
         private void performSetup()
         {
+            createSongSelect();
             AddUntilStep(() =>
             {
                 if (!songSelect.IsCurrentScreen())
@@ -53,31 +74,17 @@ namespace osu.Game.Tests.Visual
                 }
                 return true;
             }, "Wait for song select is current");
+
             AddStep("Load new player to song select", () => songSelect.Push(player = new DimAccessiblePlayer { Ready = true }));
             AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
         }
 
         public TestCaseBackgroundScreenBeatmap()
         {
-            ScreenStack screen;
-
             InputManager.Add(backgroundStack = new BackgroundScreenStack {RelativeSizeAxes = Axes.Both});
             InputManager.Add(screen = new ScreenStack { RelativeSizeAxes = Axes.Both });
 
-            AddStep("Load Song Select", () =>
-            {
-                songSelect?.MakeCurrent();
-                songSelect?.Exit();
-
-                LoadComponentAsync(new DummySongSelect(), p =>
-                {
-                    songSelect = p;
-                    screen.Push(p);
-                    songSelect.UpdateBindables();
-                });
-            });
-
-            AddUntilStep(() => songSelect?.IsLoaded ?? false, "Wait for song select to load");
+            createSongSelect();
             AddStep("Create beatmap", () =>
             {
                 Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
@@ -301,32 +308,40 @@ namespace osu.Game.Tests.Visual
 
         private class FadeAccessibleBackground : BackgroundScreenBeatmap
         {
-            private Bindable<float> dimLevel;
+            private readonly Bindable<double> dimLevel = new Bindable<double>();
+
+            protected override UserDimContainer CreateFadeContainer() => new TestUserDimContainer { RelativeSizeAxes = Axes.Both };
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
-                dimLevel = config.GetBindable<float>(OsuSetting.DimLevel);
+                config.BindWith(OsuSetting.DimLevel, dimLevel);
             }
 
             public bool AssertDimmed()
             {
-                return FadeContainer.Colour == OsuColour.Gray(1 - dimLevel);
+                return ((TestUserDimContainer)FadeContainer).CurrentColour == OsuColour.Gray(1 - (float)dimLevel);
             }
 
             public bool AssertUndimmed()
             {
-                return FadeContainer.Colour == Color4.White;
+                return ((TestUserDimContainer)FadeContainer).CurrentColour == Color4.White;
             }
 
             public bool AssertInvisible()
             {
-                return FadeContainer.Alpha == 0;
+                return ((TestUserDimContainer)FadeContainer).CurrentAlpha == 0;
             }
 
             public bool AssertVisible()
             {
-                return FadeContainer.Alpha == 1;
+                return ((TestUserDimContainer)FadeContainer).CurrentAlpha == 1;
+            }
+
+            private class TestUserDimContainer : UserDimContainer
+            {
+                public Color4 CurrentColour => DimContainer.Colour;
+                public float CurrentAlpha => DimContainer.Alpha;
             }
         }
     }
