@@ -37,9 +37,9 @@ namespace osu.Game.Screens.Select.Carousel
         {
             DrawableRepresentation = new Lazy<DrawableCarouselItem>(CreateDrawableRepresentation);
 
-            Filtered.ValueChanged += e =>
+            Filtered.ValueChanged += filtered =>
             {
-                if (e.NewValue && State.Value == CarouselItemState.Selected)
+                if (filtered.NewValue && State.Value == CarouselItemState.Selected)
                     State.Value = CarouselItemState.NotSelected;
             };
         }

@@ -127,8 +127,11 @@ namespace osu.Game.Overlays.Direct
             base.LoadComplete();
             this.FadeInFromZero(200, Easing.Out);
 
-            PreviewPlaying.ValueChanged += e => PlayButton.FadeTo(e.NewValue || IsHovered || !FadePlayButton ? 1 : 0, 120, Easing.InOutQuint);
-            PreviewPlaying.ValueChanged += e => PreviewBar.FadeTo(e.NewValue ? 1 : 0, 120, Easing.InOutQuint);
+            PreviewPlaying.ValueChanged += playing =>
+            {
+                PlayButton.FadeTo(playing.NewValue || IsHovered || !FadePlayButton ? 1 : 0, 120, Easing.InOutQuint);
+                PreviewBar.FadeTo(playing.NewValue ? 1 : 0, 120, Easing.InOutQuint);
+            };
         }
 
         protected List<DifficultyIcon> GetDifficultyIcons()

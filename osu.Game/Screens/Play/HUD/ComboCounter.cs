@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play.HUD
 
             TextSize = 80;
 
-            Current.ValueChanged += e => updateCount(e.NewValue == 0);
+            Current.ValueChanged += combo => updateCount(combo.NewValue == 0);
         }
 
         protected override void LoadComplete()

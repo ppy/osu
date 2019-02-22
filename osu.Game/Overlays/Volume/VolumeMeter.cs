@@ -175,10 +175,10 @@ namespace osu.Game.Overlays.Volume
                     }
                 }
             };
-            Bindable.ValueChanged += e =>
+            Bindable.ValueChanged += volume =>
             {
                 this.TransformTo("DisplayVolume",
-                    e.NewValue,
+                    volume.NewValue,
                     400,
                     Easing.OutQuint);
             };

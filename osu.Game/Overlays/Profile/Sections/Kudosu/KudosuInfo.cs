@@ -63,10 +63,10 @@ namespace osu.Game.Overlays.Profile.Sections.Kudosu
                 }
             };
 
-            this.user.ValueChanged += e =>
+            this.user.ValueChanged += u =>
             {
-                total.Count = e.NewValue?.Kudosu.Total ?? 0;
-                avaliable.Count = e.NewValue?.Kudosu.Available ?? 0;
+                total.Count = u.NewValue?.Kudosu.Total ?? 0;
+                avaliable.Count = u.NewValue?.Kudosu.Available ?? 0;
             };
         }
 

@@ -181,8 +181,8 @@ namespace osu.Game.Overlays.BeatmapSet
                 },
             };
 
-            Picker.Beatmap.ValueChanged += e => Details.Beatmap = e.NewValue;
-            Picker.Beatmap.ValueChanged += e => externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{e.NewValue?.Ruleset.ShortName}/{e.NewValue?.OnlineBeatmapID}";
+            Picker.Beatmap.ValueChanged += b => Details.Beatmap = b.NewValue;
+            Picker.Beatmap.ValueChanged += b => externalLink.Link = $@"https://osu.ppy.sh/beatmapsets/{BeatmapSet.Value?.OnlineBeatmapSetID}#{b.NewValue?.Ruleset.ShortName}/{b.NewValue?.OnlineBeatmapID}";
         }
 
         [BackgroundDependencyLoader]
@@ -219,11 +219,12 @@ namespace osu.Game.Overlays.BeatmapSet
         private void updateDownloadButtons()
         {
             if (BeatmapSet.Value == null) return;
+
             switch (State.Value)
             {
                 case DownloadState.LocallyAvailable:
                     // temporary for UX until new design is implemented.
-                    downloadButtonsContainer.Child = new osu.Game.Overlays.Direct.DownloadButton(e.NewValue)
+                    downloadButtonsContainer.Child = new osu.Game.Overlays.Direct.DownloadButton(BeatmapSet.Value)
                     {
                         Width = 50,
                         RelativeSizeAxes = Axes.Y
@@ -232,12 +233,12 @@ namespace osu.Game.Overlays.BeatmapSet
                 case DownloadState.Downloading:
                 case DownloadState.Downloaded:
                     // temporary to avoid showing two buttons for maps with novideo. will be fixed in new beatmap overlay design.
-                    downloadButtonsContainer.Child = new DownloadButton(e.NewValue);
+                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
                     break;
                 default:
-                    downloadButtonsContainer.Child = new DownloadButton(e.NewValue);
+                    downloadButtonsContainer.Child = new DownloadButton(BeatmapSet.Value);
                     if (BeatmapSet.Value.OnlineInfo.HasVideo)
-                        downloadButtonsContainer.Add(new DownloadButton(e.NewValue, true));
+                        downloadButtonsContainer.Add(new DownloadButton(BeatmapSet.Value, true));
                     break;
             }
         }

@@ -56,19 +56,19 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 },
             };
 
-            rawInputToggle.ValueChanged += e =>
+            rawInputToggle.ValueChanged += enabled =>
             {
                 // this is temporary until we support per-handler settings.
                 const string raw_mouse_handler = @"OsuTKRawMouseHandler";
                 const string standard_mouse_handler = @"OsuTKMouseHandler";
 
-                ignoredInputHandler.Value = e.NewValue ? standard_mouse_handler : raw_mouse_handler;
+                ignoredInputHandler.Value = enabled.NewValue ? standard_mouse_handler : raw_mouse_handler;
             };
 
             ignoredInputHandler = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
-            ignoredInputHandler.ValueChanged += e =>
+            ignoredInputHandler.ValueChanged += handler =>
             {
-                bool raw = !e.NewValue.Contains("Raw");
+                bool raw = !handler.NewValue.Contains("Raw");
                 rawInputToggle.Value = raw;
                 sensitivity.Bindable.Disabled = !raw;
             };

@@ -148,7 +148,7 @@ namespace osu.Game.Overlays.Chat.Selection
             joinedColour = colours.Blue;
             hoverColour = colours.Yellow;
 
-            joinedBind.ValueChanged += e => updateColour(e.NewValue);
+            joinedBind.ValueChanged += joined => updateColour(joined.NewValue);
             joinedBind.BindTo(channel.Joined);
 
             joinedBind.TriggerChange();

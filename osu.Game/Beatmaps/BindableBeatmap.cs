@@ -34,7 +34,7 @@ namespace osu.Game.Beatmaps
 
             this.audioManager = audioManager;
 
-            ValueChanged += e => registerAudioTrack(e.NewValue);
+            ValueChanged += b => registerAudioTrack(b.NewValue);
 
             // If the track has changed prior to this being called, let's register it
             if (Value != Default)

@@ -13,9 +13,9 @@ namespace osu.Game.Screens.Select.Carousel
     {
         public CarouselGroupEagerSelect()
         {
-            State.ValueChanged += e =>
+            State.ValueChanged += state =>
             {
-                if (e.NewValue == CarouselItemState.Selected)
+                if (state.NewValue == CarouselItemState.Selected)
                     attemptSelection();
             };
         }

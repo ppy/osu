@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Edit.Components
                 }
             };
 
-            tabs.Current.ValueChanged += e => Beatmap.Value.Track.Tempo.Value = e.NewValue;
+            tabs.Current.ValueChanged += tempo => Beatmap.Value.Track.Tempo.Value = tempo.NewValue;
         }
 
         protected override bool OnKeyDown(KeyDownEvent e)

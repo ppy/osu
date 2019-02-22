@@ -101,10 +101,10 @@ namespace osu.Game.Overlays
                 },
             };
 
-            header.Picker.Beatmap.ValueChanged += e =>
+            header.Picker.Beatmap.ValueChanged += b =>
             {
-                info.Beatmap = e.NewValue;
-                scores.Beatmap = e.NewValue;
+                info.Beatmap = b.NewValue;
+                scores.Beatmap = b.NewValue;
             };
         }
 

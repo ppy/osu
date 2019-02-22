@@ -118,9 +118,9 @@ namespace osu.Game.Graphics.UserInterface
                 }
             };
 
-            Current.ValueChanged += e =>
+            Current.ValueChanged += selected =>
             {
-                if (e.NewValue)
+                if (selected.NewValue)
                 {
                     fadeIn();
                     icon.Icon = FontAwesome.fa_check_circle_o;

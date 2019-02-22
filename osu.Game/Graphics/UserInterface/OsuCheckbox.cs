@@ -86,9 +86,9 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            Current.ValueChanged += e =>
+            Current.ValueChanged += enabled =>
             {
-                if (e.NewValue)
+                if (enabled.NewValue)
                     sampleChecked?.Play();
                 else
                     sampleUnchecked?.Play();

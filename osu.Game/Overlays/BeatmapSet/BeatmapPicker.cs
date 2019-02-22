@@ -138,9 +138,9 @@ namespace osu.Game.Overlays.BeatmapSet
                 },
             };
 
-            Beatmap.ValueChanged += e =>
+            Beatmap.ValueChanged += b =>
             {
-                showBeatmap(e.NewValue);
+                showBeatmap(b.NewValue);
                 updateDifficultyButtons();
             };
         }

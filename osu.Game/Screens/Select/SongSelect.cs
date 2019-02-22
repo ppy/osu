@@ -598,9 +598,9 @@ namespace osu.Game.Screens.Select
             {
                 // manual binding to parent ruleset to allow for delayed load in the incoming direction.
                 rulesetNoDebounce = decoupledRuleset.Value = Ruleset.Value;
-                Ruleset.ValueChanged += e => updateSelectedRuleset(e.NewValue);
+                Ruleset.ValueChanged += r => updateSelectedRuleset(r.NewValue);
 
-                decoupledRuleset.ValueChanged += e => Ruleset.Value = e.NewValue;
+                decoupledRuleset.ValueChanged += r => Ruleset.Value = r.NewValue;
                 decoupledRuleset.DisabledChanged += r => Ruleset.Disabled = r;
 
                 Beatmap.BindDisabledChanged(disabled => Carousel.AllowSelection = !disabled, true);

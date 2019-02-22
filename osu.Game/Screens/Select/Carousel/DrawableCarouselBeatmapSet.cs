@@ -189,7 +189,7 @@ namespace osu.Game.Screens.Select.Carousel
                 : base(item.Beatmap)
             {
                 filtered.BindTo(item.Filtered);
-                filtered.ValueChanged += e => Schedule(() => this.FadeTo(e.NewValue ? 0.1f : 1, 100));
+                filtered.ValueChanged += isFiltered => Schedule(() => this.FadeTo(isFiltered.NewValue ? 0.1f : 1, 100));
                 filtered.TriggerChange();
             }
         }

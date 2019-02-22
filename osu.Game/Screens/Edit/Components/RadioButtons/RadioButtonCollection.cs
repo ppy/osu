@@ -44,9 +44,9 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         private RadioButton currentlySelected;
         private void addButton(RadioButton button)
         {
-            button.Selected.ValueChanged += e =>
+            button.Selected.ValueChanged += selected =>
             {
-                if (e.NewValue)
+                if (selected.NewValue)
                 {
                     currentlySelected?.Deselect();
                     currentlySelected = button;

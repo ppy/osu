@@ -42,10 +42,10 @@ namespace osu.Game.Skinning
                     CurrentSkinInfo.Value = SkinInfo.Default;
             };
 
-            CurrentSkinInfo.ValueChanged += e => CurrentSkin.Value = getSkin(e.NewValue);
-            CurrentSkin.ValueChanged += e =>
+            CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = getSkin(skin.NewValue);
+            CurrentSkin.ValueChanged += skin =>
             {
-                if (e.NewValue.SkinInfo != CurrentSkinInfo.Value)
+                if (skin.NewValue.SkinInfo != CurrentSkinInfo.Value)
                     throw new InvalidOperationException($"Setting {nameof(CurrentSkin)}'s value directly is not supported. Use {nameof(CurrentSkinInfo)} instead.");
 
                 SourceChanged?.Invoke();

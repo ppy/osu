@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Play
             // the final usable gameplay clock with user-set offsets applied.
             var offsetClock = new FramedOffsetClock(platformOffsetClock);
 
-            userAudioOffset.ValueChanged += e => offsetClock.Offset = e.NewValue;
+            userAudioOffset.ValueChanged += offset => offsetClock.Offset = offset.NewValue;
             userAudioOffset.TriggerChange();
 
             ScoreProcessor = RulesetContainer.CreateScoreProcessor();

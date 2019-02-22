@@ -159,7 +159,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         /// <returns>A bindable which will propagate updates with a delay.</returns>
         private void bindPreviewEvent(Bindable<float> bindable)
         {
-            bindable.ValueChanged += e =>
+            bindable.ValueChanged += _ =>
             {
                 switch (scalingMode.Value)
                 {

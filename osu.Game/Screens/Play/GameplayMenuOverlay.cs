@@ -176,7 +176,7 @@ namespace osu.Game.Screens.Play
                 }
             };
 
-            button.Selected.ValueChanged += e => buttonSelectionChanged(button, e.NewValue);
+            button.Selected.ValueChanged += selected => buttonSelectionChanged(button, selected.NewValue);
 
             InternalButtons.Add(button);
         }
@@ -190,6 +190,7 @@ namespace osu.Game.Screens.Play
             {
                 if (_selectionIndex == value)
                     return;
+
 
                 // Deselect the previously-selected button
                 if (_selectionIndex != -1)
