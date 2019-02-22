@@ -21,7 +21,6 @@ namespace osu.Game.Screens.Play
 
         #region User Settings
 
-        protected Bindable<double> DimLevel;
         protected Bindable<double> BlurLevel;
         protected Bindable<bool> ShowStoryboard;
 
@@ -30,7 +29,6 @@ namespace osu.Game.Screens.Play
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            DimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             BlurLevel = config.GetBindable<double>(OsuSetting.BlurLevel);
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
         }
