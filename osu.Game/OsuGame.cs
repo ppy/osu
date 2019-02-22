@@ -175,12 +175,12 @@ namespace osu.Game
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
-            ruleset.ValueChanged += e => configRuleset.Value = e.NewValue.ID ?? 0;
+            ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ID ?? 0;
 
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
-            SkinManager.CurrentSkinInfo.ValueChanged += e => configSkin.Value = e.NewValue.ID;
-            configSkin.ValueChanged += e => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == e.NewValue) ?? SkinInfo.Default;
+            SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID;
+            configSkin.ValueChanged += skinId => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == skinId.NewValue) ?? SkinInfo.Default;
             configSkin.TriggerChange();
 
             LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
@@ -516,9 +516,9 @@ namespace osu.Game
                 };
             }
 
-            OverlayActivationMode.ValueChanged += e =>
+            OverlayActivationMode.ValueChanged += mode =>
             {
-                if (e.NewValue != OverlayActivation.All) CloseAllOverlays();
+                if (mode.NewValue != OverlayActivation.All) CloseAllOverlays();
             };
 
             void updateScreenOffset()

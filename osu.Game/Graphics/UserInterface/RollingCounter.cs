@@ -97,9 +97,9 @@ namespace osu.Game.Graphics.UserInterface
 
             DisplayedCount = Current.Value;
 
-            Current.ValueChanged += e =>
+            Current.ValueChanged += val =>
             {
-                if (IsLoaded) TransformCount(displayedCount, e.NewValue);
+                if (IsLoaded) TransformCount(displayedCount, val.NewValue);
             };
         }
 

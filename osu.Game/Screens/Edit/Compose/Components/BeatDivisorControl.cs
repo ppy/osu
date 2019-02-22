@@ -157,12 +157,8 @@ namespace osu.Game.Screens.Edit.Compose.Components
             protected override void LoadComplete()
             {
                 base.LoadComplete();
-
-                beatDivisor.ValueChanged += e => updateText();
-                updateText();
+                beatDivisor.BindValueChanged(val => Text = $"1/{val.NewValue}", true);
             }
-
-            private void updateText() => Text = $"1/{beatDivisor.Value}";
         }
 
         private class DivisorButton : IconButton
@@ -219,9 +215,9 @@ namespace osu.Game.Screens.Edit.Compose.Components
 
                 AddInternal(marker = new Marker());
 
-                CurrentNumber.ValueChanged += e =>
+                CurrentNumber.ValueChanged += div =>
                 {
-                    marker.MoveToX(getMappedPosition(e.NewValue), 100, Easing.OutQuint);
+                    marker.MoveToX(getMappedPosition(div.NewValue), 100, Easing.OutQuint);
                     marker.Flash();
                 };
             }

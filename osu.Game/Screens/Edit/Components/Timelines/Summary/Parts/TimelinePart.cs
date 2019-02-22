@@ -24,10 +24,10 @@ namespace osu.Game.Screens.Edit.Components.Timelines.Summary.Parts
         {
             AddInternal(timeline = new Container { RelativeSizeAxes = Axes.Both });
 
-            Beatmap.ValueChanged += e =>
+            Beatmap.ValueChanged += b =>
             {
                 updateRelativeChildSize();
-                LoadBeatmap(e.NewValue);
+                LoadBeatmap(b.NewValue);
             };
         }
 

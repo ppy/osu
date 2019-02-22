@@ -162,8 +162,8 @@ namespace osu.Game.Overlays
                 },
             };
 
-            channelTabControl.Current.ValueChanged += e => channelManager.CurrentChannel.Value = e.NewValue;
-            channelTabControl.ChannelSelectorActive.ValueChanged += e => channelSelectionOverlay.State = e.NewValue ? Visibility.Visible : Visibility.Hidden;
+            channelTabControl.Current.ValueChanged += current => channelManager.CurrentChannel.Value = current.NewValue;
+            channelTabControl.ChannelSelectorActive.ValueChanged += active => channelSelectionOverlay.State = active.NewValue ? Visibility.Visible : Visibility.Hidden;
             channelSelectionOverlay.StateChanged += state =>
             {
                 if (state == Visibility.Hidden && channelManager.CurrentChannel.Value == null)
@@ -328,11 +328,11 @@ namespace osu.Game.Overlays
         private void load(OsuConfigManager config, OsuColour colours, ChannelManager channelManager)
         {
             ChatHeight = config.GetBindable<double>(OsuSetting.ChatDisplayHeight);
-            ChatHeight.ValueChanged += e =>
+            ChatHeight.ValueChanged += height =>
             {
-                chatContainer.Height = (float)e.NewValue;
-                channelSelectionContainer.Height = 1f - (float)e.NewValue;
-                tabBackground.FadeTo(e.NewValue == 1 ? 1 : 0.8f, 200);
+                chatContainer.Height = (float)height.NewValue;
+                channelSelectionContainer.Height = 1f - (float)height.NewValue;
+                tabBackground.FadeTo(height.NewValue == 1 ? 1 : 0.8f, 200);
             };
             ChatHeight.TriggerChange();
 

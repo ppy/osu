@@ -94,12 +94,12 @@ namespace osu.Game.Rulesets.UI
             Ruleset = ruleset;
             playfield = new Lazy<Playfield>(CreatePlayfield);
 
-            IsPaused.ValueChanged += e =>
+            IsPaused.ValueChanged += paused =>
             {
                 if (HasReplayLoaded.Value)
                     return;
 
-                KeyBindingInputManager.UseParentInput = !e.NewValue;
+                KeyBindingInputManager.UseParentInput = !paused.NewValue;
             };
 
             Cursor = CreateCursor();

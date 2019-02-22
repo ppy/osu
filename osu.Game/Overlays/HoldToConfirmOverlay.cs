@@ -33,7 +33,7 @@ namespace osu.Game.Overlays
                 }
             };
 
-            Progress.ValueChanged += e => overlay.Alpha = (float)e.NewValue;
+            Progress.ValueChanged += p => overlay.Alpha = (float)p.NewValue;
         }
     }
 }

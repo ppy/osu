@@ -116,9 +116,9 @@ namespace osu.Game.Overlays
                 },
             };
 
-            Filter.Search.Current.ValueChanged += e =>
+            Filter.Search.Current.ValueChanged += text =>
             {
-                if (e.NewValue != string.Empty)
+                if (text.NewValue != string.Empty)
                 {
                     Header.Tabs.Current.Value = DirectTab.Search;
 
@@ -133,13 +133,13 @@ namespace osu.Game.Overlays
                         Filter.Tabs.Current.Value = DirectSortCriteria.Ranked;
                 }
             };
-            ((FilterControl)Filter).Ruleset.ValueChanged += e => Scheduler.AddOnce(updateSearch);
-            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += e => recreatePanels(e.NewValue);
-            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += e => Scheduler.AddOnce(updateSearch);
+            ((FilterControl)Filter).Ruleset.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
+            Filter.DisplayStyleControl.DisplayStyle.ValueChanged += style => recreatePanels(style.NewValue);
+            Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
 
-            Header.Tabs.Current.ValueChanged += e =>
+            Header.Tabs.Current.ValueChanged += tab =>
             {
-                if (e.NewValue != DirectTab.Search)
+                if (tab.NewValue != DirectTab.Search)
                 {
                     currentQuery.Value = string.Empty;
                     Filter.Tabs.Current.Value = (DirectSortCriteria)Header.Tabs.Current.Value;
@@ -147,11 +147,11 @@ namespace osu.Game.Overlays
                 }
             };
 
-            currentQuery.ValueChanged += e =>
+            currentQuery.ValueChanged += text =>
             {
                 queryChangedDebounce?.Cancel();
 
-                if (string.IsNullOrEmpty(e.NewValue))
+                if (string.IsNullOrEmpty(text.NewValue))
                     Scheduler.AddOnce(updateSearch);
                 else
                 {
@@ -164,9 +164,9 @@ namespace osu.Game.Overlays
 
             currentQuery.BindTo(Filter.Search.Current);
 
-            Filter.Tabs.Current.ValueChanged += e =>
+            Filter.Tabs.Current.ValueChanged += tab =>
             {
-                if (Header.Tabs.Current.Value != DirectTab.Search && e.NewValue != (DirectSortCriteria)Header.Tabs.Current.Value)
+                if (Header.Tabs.Current.Value != DirectTab.Search && tab.NewValue != (DirectSortCriteria)Header.Tabs.Current.Value)
                     Header.Tabs.Current.Value = DirectTab.Search;
 
                 Scheduler.AddOnce(updateSearch);

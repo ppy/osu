@@ -69,8 +69,8 @@ namespace osu.Game.Screens.Select
                 },
             };
 
-            tabs.Current.ValueChanged += e => invokeOnFilter();
-            modsCheckbox.Current.ValueChanged += e => invokeOnFilter();
+            tabs.Current.ValueChanged += _ => invokeOnFilter();
+            modsCheckbox.Current.ValueChanged += _ => invokeOnFilter();
         }
     }
 

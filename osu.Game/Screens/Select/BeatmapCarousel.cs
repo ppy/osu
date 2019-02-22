@@ -130,7 +130,7 @@ namespace osu.Game.Screens.Select
             config.BindWith(OsuSetting.RandomSelectAlgorithm, RandomAlgorithm);
             config.BindWith(OsuSetting.SongSelectRightMouseScroll, RightClickScrollingEnabled);
 
-            RightClickScrollingEnabled.ValueChanged += e => RightMouseScrollbar = e.NewValue;
+            RightClickScrollingEnabled.ValueChanged += enabled => RightMouseScrollbar = enabled.NewValue;
             RightClickScrollingEnabled.TriggerChange();
         }
 
@@ -509,9 +509,9 @@ namespace osu.Game.Screens.Select
 
             foreach (var c in set.Beatmaps)
             {
-                c.State.ValueChanged += e =>
+                c.State.ValueChanged += state =>
                 {
-                    if (e.NewValue == CarouselItemState.Selected)
+                    if (state.NewValue == CarouselItemState.Selected)
                     {
                         selectedBeatmapSet = set;
                         SelectionChanged?.Invoke(c.Beatmap);

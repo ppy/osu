@@ -67,7 +67,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             };
 
             Action = () => playButton.Click();
-            Playing.ValueChanged += e => progress.FadeTo(e.NewValue ? 1 : 0, 100);
+            Playing.ValueChanged += playing => progress.FadeTo(playing.NewValue ? 1 : 0, 100);
         }
 
         [BackgroundDependencyLoader]

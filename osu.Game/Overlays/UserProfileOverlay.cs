@@ -126,16 +126,16 @@ namespace osu.Game.Overlays
                     RelativeSizeAxes = Axes.Both
                 }
             });
-            sectionsContainer.SelectedSection.ValueChanged += e =>
+            sectionsContainer.SelectedSection.ValueChanged += section =>
             {
-                if (lastSection != e.NewValue)
+                if (lastSection != section.NewValue)
                 {
-                    lastSection = e.NewValue;
+                    lastSection = section.NewValue;
                     tabs.Current.Value = lastSection;
                 }
             };
 
-            tabs.Current.ValueChanged += e =>
+            tabs.Current.ValueChanged += section =>
             {
                 if (lastSection == null)
                 {
@@ -144,9 +144,9 @@ namespace osu.Game.Overlays
                         tabs.Current.Value = lastSection;
                     return;
                 }
-                if (lastSection != e.NewValue)
+                if (lastSection != section.NewValue)
                 {
-                    lastSection = e.NewValue;
+                    lastSection = section.NewValue;
                     sectionsContainer.ScrollTo(lastSection);
                 }
             };

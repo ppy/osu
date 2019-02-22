@@ -16,7 +16,7 @@ namespace osu.Game.Screens.Play.HUD
 
         protected HealthDisplay()
         {
-            Current.ValueChanged += e => SetHealth((float)e.NewValue);
+            Current.ValueChanged += health => SetHealth((float)health.NewValue);
         }
 
         protected abstract void SetHealth(float value);

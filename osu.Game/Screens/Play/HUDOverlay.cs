@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Play
         private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
         {
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
-            showHud.ValueChanged += e => visibilityContainer.FadeTo(e.NewValue ? 1 : 0, duration);
+            showHud.ValueChanged += visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration);
             showHud.TriggerChange();
 
             if (!showHud.Value && !hasShownNotificationOnce)
