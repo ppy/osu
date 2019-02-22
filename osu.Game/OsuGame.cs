@@ -150,7 +150,7 @@ namespace osu.Game
 
             ScoreManager.ItemAdded += (score, _, silent) => Schedule(() => LoadScore(score, silent));
 
-            if (false)
+            if (!Host.IsPrimaryInstance)
             {
                 Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
                 Environment.Exit(0);

@@ -26,7 +26,7 @@ namespace osu.Desktop
             {
                 host.ExceptionThrown += handleException;
 
-                if (false)
+                if (!host.IsPrimaryInstance)
                 {
                     var importer = new ArchiveImportIPCChannel(host);
                     // Restore the cwd so relative paths given at the command line work correctly
