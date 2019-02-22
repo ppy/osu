@@ -42,6 +42,21 @@ namespace osu.Game.Tests.Visual
         [Cached]
         private BackgroundScreenStack backgroundStack;
 
+        private void performSetup()
+        {
+            AddUntilStep(() =>
+            {
+                if (!songSelect.IsCurrentScreen())
+                {
+                    songSelect.MakeCurrent();
+                    return false;
+                }
+                return true;
+            }, "Wait for song select is current");
+            AddStep("Load new player to song select", () => songSelect.Push(player = new DimAccessiblePlayer { Ready = true }));
+            AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
+        }
+
         public TestCaseBackgroundScreenBeatmap()
         {
             ScreenStack screen;
@@ -58,6 +73,7 @@ namespace osu.Game.Tests.Visual
                 {
                     songSelect = p;
                     screen.Push(p);
+                    songSelect.UpdateBindables();
                 });
             });
 
@@ -85,8 +101,6 @@ namespace osu.Game.Tests.Visual
             AddStep("Start player loader", () => songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer())));
             AddUntilStep(() => playerLoader?.IsLoaded ?? false, "Wait for Player Loader to load");
             AddAssert("Background retained from song select", () => songSelect.AssertBackgroundCurrent());
-
-            AddStep("Update bindables", () => playerLoader.UpdateBindables());
             AddStep("Trigger background preview", () =>
             {
                 InputManager.MoveMouseTo(playerLoader.ScreenPos);
@@ -134,7 +148,8 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void DisableUserDimTest()
         {
-            AddStep("Test User Undimming", () => playerLoader.DimEnabled.Value = false);
+            performSetup();
+            AddStep("Test User Undimming", () => songSelect.DimEnabled.Value = false);
             AddWaitStep(5, "Wait for dim");
             AddAssert("Screen is undimmed", () => songSelect.AssertUndimmed());
         }
@@ -145,7 +160,8 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void EnableUserDimTest()
         {
-            AddStep("Test User Dimming", () => playerLoader.DimEnabled.Value = true);
+            performSetup();
+            AddStep("Test User Dimming", () => songSelect.DimEnabled.Value = true);
             AddWaitStep(5, "Wait for dim");
             AddAssert("Screen is dimmed", () => songSelect.AssertDimmed());
         }
@@ -156,6 +172,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void PauseTest()
         {
+            performSetup();
             AddStep("Transition to Pause", () =>
             {
                 if (!player.IsPaused)
@@ -171,6 +188,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TransitionTest()
         {
+            performSetup();
             AddStep("Transition to Results", () => player.Push(new FadeAccesibleResults(new ScoreInfo { User = new User { Username = "osu!" }})));
             AddWaitStep(5, "Wait for dim");
             AddAssert("Screen is undimmed", () => songSelect.AssertUndimmed());
@@ -183,11 +201,8 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TransitionOutTest()
         {
-            AddStep("Exit player", () =>
-            {
-                player.MakeCurrent();
-                player.Exit();
-            });
+            performSetup();
+            AddStep("Exit player", () => songSelect.MakeCurrent());
             AddWaitStep(5, "Wait for dim");
             AddAssert("Screen is undimmed", () => songSelect.AssertUndimmed());
         }
@@ -195,6 +210,12 @@ namespace osu.Game.Tests.Visual
         private class DummySongSelect : OsuScreen
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
+            public readonly Bindable<bool> DimEnabled = new Bindable<bool>();
+
+            public void UpdateBindables()
+            {
+                DimEnabled.BindTo(((FadeAccessibleBackground)Background).EnableUserDim);
+            }
 
             public bool AssertDimmed()
             {
@@ -258,19 +279,11 @@ namespace osu.Game.Tests.Visual
 
         private class DimAccessiblePlayerLoader : PlayerLoader
         {
-            public Bindable<bool> DimEnabled = new Bindable<bool>();
-
             public VisualSettings VisualSettingsPos => VisualSettings;
             public BackgroundScreen ScreenPos => Background;
 
             [Resolved]
             private BackgroundScreenStack stack { get; set; }
-
-            public void UpdateBindables()
-            {
-                DimEnabled = Background.EnableUserDim;
-            }
-
             public DimAccessiblePlayerLoader(Player player) : base(() => player)
             {
             }

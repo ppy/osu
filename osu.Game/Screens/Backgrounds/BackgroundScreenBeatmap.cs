@@ -15,8 +15,8 @@ namespace osu.Game.Screens.Backgrounds
     public class BackgroundScreenBeatmap : BlurrableBackgroundScreen
     {
         private WorkingBeatmap beatmap;
-        protected Bindable<double> DimLevel;
-        public Bindable<bool> EnableUserDim;
+        protected Bindable<double> DimLevel = new Bindable<double>();
+        public Bindable<bool> EnableUserDim = new Bindable<bool>();
         public Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
         protected UserDimContainer FadeContainer;
@@ -24,7 +24,7 @@ namespace osu.Game.Screens.Backgrounds
         [BackgroundDependencyLoader]
         private void load(OsuConfigManager config)
         {
-            DimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
+            config.BindWith(OsuSetting.DimLevel, DimLevel);
         }
 
         public virtual WorkingBeatmap Beatmap
@@ -39,7 +39,7 @@ namespace osu.Game.Screens.Backgrounds
 
                 FadeContainer = new UserDimContainer { RelativeSizeAxes = Axes.Both };
                 InternalChild = FadeContainer;
-                EnableUserDim = FadeContainer.EnableUserDim;
+                EnableUserDim.BindTo(FadeContainer.EnableUserDim);
 
                 Schedule(() =>
                 {
