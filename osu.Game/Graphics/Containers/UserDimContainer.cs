@@ -16,6 +16,8 @@ namespace osu.Game.Graphics.Containers
         protected Bindable<bool> ShowStoryboard;
         public Bindable<bool> EnableUserDim = new Bindable<bool>();
         public Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
+        protected Container DimContainer;
+        protected override Container<Drawable> Content => DimContainer;
 
         private readonly bool isStoryboard;
 
@@ -23,7 +25,9 @@ namespace osu.Game.Graphics.Containers
 
         public UserDimContainer(bool isStoryboard = false)
         {
+            DimContainer = new Container { RelativeSizeAxes = Axes.Both };
             this.isStoryboard = isStoryboard;
+            AddInternal(DimContainer);
         }
 
         [BackgroundDependencyLoader]
@@ -41,15 +45,15 @@ namespace osu.Game.Graphics.Containers
         {
             if (isStoryboard)
             {
-                this.FadeTo(!ShowStoryboard || DimLevel == 1 ? 0 : 1, background_fade_duration, Easing.OutQuint);
+                DimContainer.FadeTo(!ShowStoryboard || DimLevel == 1 ? 0 : 1, background_fade_duration, Easing.OutQuint);
             }
             else
             {
                 // The background needs to be hidden in the case of it being replaced
-                this.FadeTo(ShowStoryboard && StoryboardReplacesBackground ? 0 : 1, background_fade_duration, Easing.OutQuint);
+                DimContainer.FadeTo(ShowStoryboard && StoryboardReplacesBackground ? 0 : 1, background_fade_duration, Easing.OutQuint);
             }
 
-            this.FadeColour(EnableUserDim ? OsuColour.Gray(1 - (float)DimLevel) : Color4.White, background_fade_duration, Easing.OutQuint);
+            DimContainer.FadeColour(EnableUserDim ? OsuColour.Gray(1 - (float)DimLevel) : Color4.White, background_fade_duration, Easing.OutQuint);
         }
     }
 }

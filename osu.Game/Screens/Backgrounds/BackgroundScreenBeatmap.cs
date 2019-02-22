@@ -18,6 +18,7 @@ namespace osu.Game.Screens.Backgrounds
         public Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
         protected UserDimContainer FadeContainer;
+        protected virtual UserDimContainer CreateFadeContainer() => new UserDimContainer { RelativeSizeAxes = Axes.Both };
 
         public virtual WorkingBeatmap Beatmap
         {
@@ -29,7 +30,7 @@ namespace osu.Game.Screens.Backgrounds
 
                 beatmap = value;
 
-                FadeContainer = new UserDimContainer { RelativeSizeAxes = Axes.Both };
+                FadeContainer = CreateFadeContainer();
                 InternalChild = FadeContainer;
                 EnableUserDim.BindTo(FadeContainer.EnableUserDim);
 
