@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             base.LoadComplete();
 
-            roomId.BindValueChanged(e => updateChannel(), true);
+            roomId.BindValueChanged(_ => updateChannel(), true);
         }
 
         private void updateChannel()

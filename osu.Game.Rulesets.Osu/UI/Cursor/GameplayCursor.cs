@@ -183,13 +183,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 };
 
                 this.beatmap.BindTo(beatmap);
-                this.beatmap.ValueChanged += e => calculateScale();
+                this.beatmap.ValueChanged += _ => calculateScale();
 
                 cursorScale = config.GetBindable<double>(OsuSetting.GameplayCursorSize);
-                cursorScale.ValueChanged += e => calculateScale();
+                cursorScale.ValueChanged += _ => calculateScale();
 
                 autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
-                autoCursorScale.ValueChanged += e => calculateScale();
+                autoCursorScale.ValueChanged += _ => calculateScale();
 
                 calculateScale();
             }

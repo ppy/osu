@@ -67,8 +67,8 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             direction.BindValueChanged(e =>
             {
                 gradient.Colour = ColourInfo.GradientVertical(
-                    direction.Value == ScrollingDirection.Up ? Color4.Black : Color4.Black.Opacity(0),
-                    direction.Value == ScrollingDirection.Up ? Color4.Black.Opacity(0) : Color4.Black);
+                    e.NewValue == ScrollingDirection.Up ? Color4.Black : Color4.Black.Opacity(0),
+                    e.NewValue == ScrollingDirection.Up ? Color4.Black.Opacity(0) : Color4.Black);
             }, true);
         }
 

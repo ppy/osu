@@ -67,9 +67,9 @@ namespace osu.Game.Overlays
                 }
             };
 
-            Header.Tabs.Current.ValueChanged += e => Scheduler.AddOnce(updateSearch);
+            Header.Tabs.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
 
-            Filter.Tabs.Current.ValueChanged += e => Scheduler.AddOnce(updateSearch);
+            Filter.Tabs.Current.ValueChanged += _ => Scheduler.AddOnce(updateSearch);
 
             Filter.DisplayStyleControl.DisplayStyle.ValueChanged += e => recreatePanels(e.NewValue);
             Filter.DisplayStyleControl.Dropdown.Current.ValueChanged += e => Scheduler.AddOnce(updateSearch);

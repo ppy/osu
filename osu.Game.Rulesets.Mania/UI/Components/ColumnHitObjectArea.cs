@@ -51,7 +51,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             direction.BindTo(scrollingInfo.Direction);
             direction.BindValueChanged(e =>
             {
-                Anchor anchor = direction.Value == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
+                Anchor anchor = e.NewValue == ScrollingDirection.Up ? Anchor.TopLeft : Anchor.BottomLeft;
 
                 hitTargetBar.Anchor = hitTargetBar.Origin = anchor;
                 hitTargetLine.Anchor = hitTargetLine.Origin = anchor;
