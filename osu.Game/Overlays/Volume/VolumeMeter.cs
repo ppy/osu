@@ -4,7 +4,7 @@
 using System;
 using System.Globalization;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -174,10 +174,10 @@ namespace osu.Game.Overlays.Volume
                     }
                 }
             };
-            Bindable.ValueChanged += newVolume =>
+            Bindable.ValueChanged += volume =>
             {
                 this.TransformTo("DisplayVolume",
-                    newVolume,
+                    volume.NewValue,
                     400,
                     Easing.OutQuint);
             };
@@ -217,7 +217,7 @@ namespace osu.Game.Overlays.Volume
 
         public double Volume
         {
-            get => Bindable;
+            get => Bindable.Value;
             private set => Bindable.Value = value;
         }
 

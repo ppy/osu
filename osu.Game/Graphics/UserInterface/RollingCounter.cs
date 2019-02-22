@@ -1,13 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Game.Graphics.Sprites;
 using System;
 using System.Collections.Generic;
+using osu.Framework.Bindables;
 using osuTK.Graphics;
 
 namespace osu.Game.Graphics.UserInterface
@@ -87,11 +87,11 @@ namespace osu.Game.Graphics.UserInterface
             TextSize = 40;
             AutoSizeAxes = Axes.Both;
 
-            DisplayedCount = Current;
+            DisplayedCount = Current.Value;
 
-            Current.ValueChanged += newValue =>
+            Current.ValueChanged += val =>
             {
-                if (IsLoaded) TransformCount(displayedCount, newValue);
+                if (IsLoaded) TransformCount(displayedCount, val.NewValue);
             };
         }
 
@@ -99,7 +99,7 @@ namespace osu.Game.Graphics.UserInterface
         {
             base.LoadComplete();
 
-            DisplayedCountSpriteText.Text = FormatCount(Current);
+            DisplayedCountSpriteText.Text = FormatCount(Current.Value);
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace osu.Game.Graphics.UserInterface
         public virtual void StopRolling()
         {
             FinishTransforms(false, nameof(DisplayedCount));
-            DisplayedCount = Current;
+            DisplayedCount = Current.Value;
         }
 
         /// <summary>

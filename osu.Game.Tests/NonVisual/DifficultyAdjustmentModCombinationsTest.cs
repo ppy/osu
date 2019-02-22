@@ -2,9 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Difficulty;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Mods;
 
 namespace osu.Game.Tests.NonVisual
@@ -136,7 +139,7 @@ namespace osu.Game.Tests.NonVisual
             public override Type[] IncompatibleMods => new[] { typeof(ModA), typeof(ModB) };
         }
 
-        private class TestLegacyDifficultyCalculator : LegacyDifficultyCalculator
+        private class TestLegacyDifficultyCalculator : DifficultyCalculator
         {
             public TestLegacyDifficultyCalculator(params Mod[] mods)
                 : base(null, null)
@@ -146,7 +149,20 @@ namespace osu.Game.Tests.NonVisual
 
             protected override Mod[] DifficultyAdjustmentMods { get; }
 
-            protected override DifficultyAttributes Calculate(IBeatmap beatmap, Mod[] mods, double clockRate) => throw new NotImplementedException();
+            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override Skill[] CreateSkills(IBeatmap beatmap)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

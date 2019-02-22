@@ -18,7 +18,7 @@ namespace osu.Game.Rulesets.Taiko.Tests
         public void Test(double expected, string name)
             => base.Test(expected, name);
 
-        protected override LegacyDifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new TaikoDifficultyCalculator(new TaikoRuleset(), beatmap);
+        protected override DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap) => new TaikoDifficultyCalculator(new TaikoRuleset(), beatmap);
 
         protected override Ruleset CreateRuleset() => new TaikoRuleset();
     }

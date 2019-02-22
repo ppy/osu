@@ -126,7 +126,7 @@ namespace osu.Game.Overlays.Chat.Tabs
             if (IsRemovable && ShowCloseOnHover)
                 CloseButton.FadeIn(200, Easing.OutQuint);
 
-            if (!Active)
+            if (!Active.Value)
                 box.FadeColour(backgroundHover, TRANSITION_LENGTH, Easing.OutQuint);
             return true;
         }
@@ -157,7 +157,7 @@ namespace osu.Game.Overlays.Chat.Tabs
 
         private void updateState()
         {
-            if (Active)
+            if (Active.Value)
                 FadeActive();
             else
                 FadeInactive();

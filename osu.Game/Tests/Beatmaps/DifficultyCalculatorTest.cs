@@ -44,7 +44,7 @@ namespace osu.Game.Tests.Beatmaps
             return Assembly.LoadFrom(Path.Combine(localPath, $"{ResourceAssembly}.dll")).GetManifestResourceStream($@"{ResourceAssembly}.Resources.{name}");
         }
 
-        protected abstract LegacyDifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
+        protected abstract DifficultyCalculator CreateDifficultyCalculator(WorkingBeatmap beatmap);
 
         protected abstract Ruleset CreateRuleset();
     }

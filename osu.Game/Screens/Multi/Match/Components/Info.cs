@@ -92,10 +92,10 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            CurrentItem.BindValueChanged(item =>
+            CurrentItem.BindValueChanged(e =>
             {
-                viewBeatmapButton.Beatmap.Value = item?.Beatmap;
-                readyButton.Beatmap.Value = item?.Beatmap;
+                viewBeatmapButton.Beatmap.Value = e.NewValue?.Beatmap;
+                readyButton.Beatmap.Value = e.NewValue?.Beatmap;
             }, true);
 
             hostInfo.Host.BindTo(Host);
