@@ -8,7 +8,7 @@ using JetBrains.Annotations;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -266,8 +266,8 @@ namespace osu.Game.Screens.Select
                     }
                 };
 
-                titleBinding.BindValueChanged(value => setMetadata(metadata.Source));
-                artistBinding.BindValueChanged(value => setMetadata(metadata.Source), true);
+                titleBinding.BindValueChanged(e => setMetadata(metadata.Source));
+                artistBinding.BindValueChanged(e => setMetadata(metadata.Source), true);
 
                 // no difficulty means it can't have a status to show
                 if (beatmapInfo.Version == null)

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
@@ -17,7 +17,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
 
         public IAdjustableClock AdjustableClock { set; get; }
 
-        private readonly PlayerSliderBar<double> sliderbar;
+        private readonly PlayerSliderBar<double> rateSlider;
 
         private readonly OsuSpriteText multiplierText;
 
@@ -46,7 +46,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
                         }
                     },
                 },
-                sliderbar = new PlayerSliderBar<double>
+                rateSlider = new PlayerSliderBar<double>
                 {
                     Bindable = new BindableDouble(1)
                     {
@@ -69,9 +69,9 @@ namespace osu.Game.Screens.Play.PlayerSettings
             var clockRate = AdjustableClock.Rate;
 
             // can't trigger this line instantly as the underlying clock may not be ready to accept adjustments yet.
-            sliderbar.Bindable.ValueChanged += multiplier => AdjustableClock.Rate = clockRate * multiplier;
+            rateSlider.Bindable.ValueChanged += multiplier => AdjustableClock.Rate = clockRate * multiplier.NewValue;
 
-            sliderbar.Bindable.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier:0.0}x", true);
+            rateSlider.Bindable.BindValueChanged(multiplier => multiplierText.Text = $"{multiplier:0.0}x", true);
         }
     }
 }

@@ -60,7 +60,7 @@ namespace osu.Game.Tests.Visual
                     }
                 };
 
-                drawableDate.Current.ValueChanged += v => flash.FadeOutFromOne(500);
+                drawableDate.Current.ValueChanged += _ => flash.FadeOutFromOne(500);
             }
         }
     }
