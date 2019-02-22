@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Osu.Edit.Blueprints.HitCircles.Components;
 using osu.Game.Rulesets.Osu.Objects;

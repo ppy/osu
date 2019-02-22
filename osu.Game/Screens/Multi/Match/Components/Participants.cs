@@ -50,9 +50,9 @@ namespace osu.Game.Screens.Multi.Match.Components
                 },
             };
 
-            Participants.BindValueChanged(v =>
+            Participants.BindValueChanged(e =>
             {
-                usersFlow.Children = v.Select(u => new UserPanel(u)
+                usersFlow.Children = e.NewValue.Select(u => new UserPanel(u)
                 {
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,

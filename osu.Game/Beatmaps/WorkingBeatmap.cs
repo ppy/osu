@@ -2,16 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics.Textures;
 using osu.Game.Rulesets.Mods;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using osu.Game.Storyboards;
 using osu.Framework.IO.File;
 using System.IO;
+using System.Linq;
 using System.Threading;
+using osu.Framework.Bindables;
 using osu.Game.IO.Serialization;
 using osu.Game.Rulesets;
 using osu.Game.Rulesets.Objects;
@@ -36,7 +36,7 @@ namespace osu.Game.Beatmaps
             BeatmapSetInfo = beatmapInfo.BeatmapSet;
             Metadata = beatmapInfo.Metadata ?? BeatmapSetInfo?.Metadata ?? new BeatmapMetadata();
 
-            Mods.ValueChanged += mods => applyRateAdjustments();
+            Mods.ValueChanged += _ => applyRateAdjustments();
 
             beatmap = new RecyclableLazy<IBeatmap>(() =>
             {

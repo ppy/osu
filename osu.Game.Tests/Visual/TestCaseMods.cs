@@ -13,7 +13,7 @@ using osu.Game.Rulesets.Osu.Mods;
 using System.Linq;
 using System.Collections.Generic;
 using NUnit.Framework;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Graphics.UserInterface;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays.Mods.Sections;

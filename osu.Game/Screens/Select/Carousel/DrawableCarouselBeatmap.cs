@@ -157,7 +157,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Item.State == CarouselItemState.Selected)
+            if (Item.State.Value == CarouselItemState.Selected)
                 startRequested?.Invoke(beatmap);
 
             return base.OnClick(e);

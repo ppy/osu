@@ -100,7 +100,7 @@ namespace osu.Game.Overlays.Music
             titleBind = localisation.GetLocalisedString(new LocalisedString((metadata.TitleUnicode, metadata.Title)));
             artistBind = localisation.GetLocalisedString(new LocalisedString((metadata.ArtistUnicode, metadata.Artist)));
 
-            artistBind.BindValueChanged(newText => recreateText(), true);
+            artistBind.BindValueChanged(_ => recreateText(), true);
         }
 
         private void recreateText()

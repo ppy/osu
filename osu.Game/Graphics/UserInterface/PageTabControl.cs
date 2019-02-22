@@ -59,7 +59,7 @@ namespace osu.Game.Graphics.UserInterface
                     new HoverClickSounds()
                 };
 
-                Active.BindValueChanged(val => Text.Font = val ? @"Exo2.0-Bold" : @"Exo2.0", true);
+                Active.BindValueChanged(e => Text.Font = e.NewValue ? @"Exo2.0-Bold" : @"Exo2.0", true);
             }
 
             [BackgroundDependencyLoader]
@@ -70,14 +70,14 @@ namespace osu.Game.Graphics.UserInterface
 
             protected override bool OnHover(HoverEvent e)
             {
-                if (!Active)
+                if (!Active.Value)
                     slideActive();
                 return true;
             }
 
             protected override void OnHoverLost(HoverLostEvent e)
             {
-                if (!Active)
+                if (!Active.Value)
                     slideInactive();
             }
 

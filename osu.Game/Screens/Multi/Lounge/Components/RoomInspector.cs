@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Colour;
@@ -192,7 +192,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             }
             else
             {
-                status.Value = Status;
+                status.Value = Status.Value;
 
                 participantCount.FadeIn(transition_duration);
                 beatmapTypeInfo.FadeIn(transition_duration);
@@ -215,7 +215,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
             [BackgroundDependencyLoader]
             private void load()
             {
-                status.BindValueChanged(s => Text = s.Message, true);
+                status.BindValueChanged(e => Text = e.NewValue.Message, true);
             }
         }
 

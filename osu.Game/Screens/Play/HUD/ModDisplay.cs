@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
@@ -68,7 +68,7 @@ namespace osu.Game.Screens.Play.HUD
             Current.ValueChanged += mods =>
             {
                 iconsContainer.Clear();
-                foreach (Mod mod in mods)
+                foreach (Mod mod in mods.NewValue)
                 {
                     iconsContainer.Add(new ModIcon(mod) { Scale = new Vector2(0.6f) });
                 }

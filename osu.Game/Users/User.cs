@@ -3,7 +3,7 @@
 
 using System;
 using Newtonsoft.Json;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Users
 {
