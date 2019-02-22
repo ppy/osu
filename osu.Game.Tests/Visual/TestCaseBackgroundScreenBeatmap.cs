@@ -8,6 +8,7 @@ using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
+using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Osu.Objects;
 using osu.Game.Scoring;
@@ -40,6 +41,8 @@ namespace osu.Game.Tests.Visual
 
             AddStep("Load Song Select", () =>
             {
+                songSelect?.Exit();
+
                 LoadComponentAsync(new DummySongSelect(), p =>
                 {
                     songSelect = p;
@@ -86,11 +89,29 @@ namespace osu.Game.Tests.Visual
                 InputManager.MoveMouseTo(playerLoader.ScreenPos);
             });
 
-            // In the case of a user triggering the dim preview the instant player gets loaded, the user dim needs to be applied when the map starts.
+            // In the case of a user triggering the dim preview the instant player gets loaded, then moving the cursor off of the visual settings:
+            // The OnHover of PlayerLoader will trigger, which could potentially trigger an undim unless checked for in PlayerLoader.
+            // We need to check that in this scenario, the dim is still properly applied after entering player.
             AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
-            AddStep("Trigger background preview when loaded", () => InputManager.MoveMouseTo(playerLoader.VisualSettingsPos));
+            AddStep("Trigger background preview when loaded", () =>
+            {
+                InputManager.MoveMouseTo(playerLoader.VisualSettingsPos);
+                InputManager.MoveMouseTo(playerLoader.ScreenPos);
+            });
             AddWaitStep(5, "Wait for dim");
             AddAssert("Screen is dimmed", () => songSelect.AssertDimmed());
+
+            // Make sure the background is fully invisible (not dimmed) when the background should be disabled by the storyboard.
+            AddStep("Enable storyboard", () =>
+            {
+                player.ReplacesBackground.Value = true;
+                player.StoryboardEnabled.Value = true;
+            });
+            AddWaitStep(5, "Wait for dim");
+            AddAssert("Background is invisible", () => songSelect.AssertInvisible());
+            AddStep("Disable storyboard", () => player.ReplacesBackground.Value = false);
+            AddWaitStep(5, "Wait for dim");
+            AddAssert("Background is visible", () => songSelect.AssertVisible());
         }
 
         /// <summary>
@@ -165,6 +186,16 @@ namespace osu.Game.Tests.Visual
             {
                 return ((FadeAccessibleBackground)Background).AssertUndimmed();
             }
+
+            public bool AssertInvisible()
+            {
+                return ((FadeAccessibleBackground)Background).AssertInvisible();
+            }
+
+            public bool AssertVisible()
+            {
+                return ((FadeAccessibleBackground)Background).AssertVisible();
+            }
         }
 
         private class FadeAccesibleResults : SoloResults
@@ -182,20 +213,25 @@ namespace osu.Game.Tests.Visual
 
             public bool Ready;
 
+            public Bindable<bool> StoryboardEnabled;
+            public readonly Bindable<bool> ReplacesBackground = new Bindable<bool>();
+
             [BackgroundDependencyLoader]
-            private void load()
+            private void load(OsuConfigManager config)
             {
                 while (!Ready)
                     Thread.Sleep(1);
+                StoryboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
+                ReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
             }
         }
 
         private class DimAccessiblePlayerLoader : PlayerLoader
         {
-            public Bindable<bool> DimEnabled;
+            public Bindable<bool> DimEnabled = new Bindable<bool>();
 
             public VisualSettings VisualSettingsPos => VisualSettings;
-            public Vector2 ScreenPos => VisualSettings.ScreenSpaceDrawQuad.BottomLeft - new Vector2(20, 20);
+            public BackgroundScreen ScreenPos => Background;
 
             public void UpdateBindables()
             {
@@ -219,6 +255,16 @@ namespace osu.Game.Tests.Visual
             public bool AssertUndimmed()
             {
                 return FadeContainer.Colour == Color4.White;
+            }
+
+            public bool AssertInvisible()
+            {
+                return FadeContainer.Alpha == 0;
+            }
+
+            public bool AssertVisible()
+            {
+                return FadeContainer.Alpha == 1;
             }
         }
     }

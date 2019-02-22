@@ -34,6 +34,7 @@ namespace osu.Game.Graphics.Containers
             EnableUserDim.ValueChanged  += _ => updateBackgroundDim();
             DimLevel.ValueChanged  += _ => updateBackgroundDim();
             ShowStoryboard.ValueChanged += _ => updateBackgroundDim();
+            StoryboardReplacesBackground.ValueChanged += _ => updateBackgroundDim();
         }
 
         private void updateBackgroundDim()
