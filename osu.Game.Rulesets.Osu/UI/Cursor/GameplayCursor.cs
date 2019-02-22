@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -183,13 +183,13 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
                 };
 
                 this.beatmap.BindTo(beatmap);
-                this.beatmap.ValueChanged += v => calculateScale();
+                this.beatmap.ValueChanged += _ => calculateScale();
 
                 cursorScale = config.GetBindable<double>(OsuSetting.GameplayCursorSize);
-                cursorScale.ValueChanged += v => calculateScale();
+                cursorScale.ValueChanged += _ => calculateScale();
 
                 autoCursorScale = config.GetBindable<bool>(OsuSetting.AutoCursorSize);
-                autoCursorScale.ValueChanged += v => calculateScale();
+                autoCursorScale.ValueChanged += _ => calculateScale();
 
                 calculateScale();
             }

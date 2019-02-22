@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -63,7 +63,7 @@ namespace osu.Game.Screens.Play.HUD
 
             TextSize = 80;
 
-            Current.ValueChanged += newValue => updateCount(newValue == 0);
+            Current.ValueChanged += combo => updateCount(combo.NewValue == 0);
         }
 
         protected override void LoadComplete()
@@ -99,8 +99,9 @@ namespace osu.Game.Screens.Play.HUD
             set
             {
                 textSize = value;
-                DisplayedCountSpriteText.TextSize = TextSize;
-                PopOutCount.TextSize = TextSize;
+
+                DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(size: TextSize);
+                PopOutCount.Font = PopOutCount.Font.With(size: TextSize);
             }
         }
 

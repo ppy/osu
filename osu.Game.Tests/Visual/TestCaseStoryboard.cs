@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -58,8 +59,8 @@ namespace osu.Game.Tests.Visual
             Beatmap.ValueChanged += beatmapChanged;
         }
 
-        private void beatmapChanged(WorkingBeatmap working)
-            => loadStoryboard(working);
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
+            => loadStoryboard(e.NewValue);
 
         private void restart()
         {

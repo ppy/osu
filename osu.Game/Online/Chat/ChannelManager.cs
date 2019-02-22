@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Logging;
 using osu.Game.Online.API;
 using osu.Game.Online.API.Requests;
@@ -55,7 +55,7 @@ namespace osu.Game.Online.Chat
         {
             CurrentChannel.ValueChanged += currentChannelChanged;
 
-            HighPollRate.BindValueChanged(high => TimeBetweenPolls = high ? 1000 : 6000, true);
+            HighPollRate.BindValueChanged(enabled => TimeBetweenPolls = enabled.NewValue ? 1000 : 6000, true);
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace osu.Game.Online.Chat
                                    ?? new Channel(user);
         }
 
-        private void currentChannelChanged(Channel channel) => JoinChannel(channel);
+        private void currentChannelChanged(ValueChangedEvent<Channel> e) => JoinChannel(e.NewValue);
 
         /// <summary>
         /// Ensure we run post actions in sequence, once at a time.

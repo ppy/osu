@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Events;
@@ -104,7 +104,7 @@ namespace osu.Game.Screens.Play
         private void load(OsuConfigManager config, NotificationOverlay notificationOverlay)
         {
             showHud = config.GetBindable<bool>(OsuSetting.ShowInterface);
-            showHud.ValueChanged += hudVisibility => visibilityContainer.FadeTo(hudVisibility ? 1 : 0, duration);
+            showHud.ValueChanged += visible => visibilityContainer.FadeTo(visible.NewValue ? 1 : 0, duration);
             showHud.TriggerChange();
 
             if (!showHud.Value && !hasShownNotificationOnce)
@@ -126,11 +126,11 @@ namespace osu.Game.Screens.Play
             replayLoaded.TriggerChange();
         }
 
-        private void replayLoadedValueChanged(bool loaded)
+        private void replayLoadedValueChanged(ValueChangedEvent<bool> e)
         {
-            PlayerSettingsOverlay.ReplayLoaded = loaded;
+            PlayerSettingsOverlay.ReplayLoaded = e.NewValue;
 
-            if (loaded)
+            if (e.NewValue)
             {
                 PlayerSettingsOverlay.Show();
                 ModDisplay.FadeIn(200);

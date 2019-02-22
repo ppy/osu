@@ -94,11 +94,7 @@ namespace osu.Game.Graphics.UserInterface
                     Direction = FillDirection.Horizontal,
                     Children = new Drawable[]
                     {
-                        text = new OsuSpriteText
-                        {
-                            TextSize = 14,
-                            Font = @"Exo2.0-Bold",
-                        },
+                        text = new OsuSpriteText { Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold) },
                         icon = new SpriteIcon
                         {
                             Size = new Vector2(14),
@@ -118,9 +114,9 @@ namespace osu.Game.Graphics.UserInterface
                 }
             };
 
-            Current.ValueChanged += v =>
+            Current.ValueChanged += selected =>
             {
-                if (v)
+                if (selected.NewValue)
                 {
                     fadeIn();
                     icon.Icon = FontAwesome.fa_check_circle_o;

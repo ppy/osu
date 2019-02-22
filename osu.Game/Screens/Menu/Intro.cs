@@ -5,7 +5,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
 using osu.Framework.Audio.Track;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Screens;
 using osu.Framework.Graphics;
 using osu.Framework.MathUtils;
@@ -112,7 +112,6 @@ namespace osu.Game.Screens.Menu
                 }, delay_step_two);
             }
 
-            logo.RelativePositionAxes = Axes.Both;
             logo.Colour = Color4.White;
             logo.Ripple = false;
 

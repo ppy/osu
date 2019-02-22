@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                                     {
                                         new OsuSpriteText
                                         {
-                                            TextSize = 30,
+                                            Font = OsuFont.GetFont(size: 30),
                                             Current = Name
                                         },
                                         new RoomStatusInfo(),
@@ -94,8 +94,8 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             CurrentItem.BindValueChanged(item =>
             {
-                viewBeatmapButton.Beatmap.Value = item?.Beatmap;
-                readyButton.Beatmap.Value = item?.Beatmap;
+                viewBeatmapButton.Beatmap.Value = item.NewValue?.Beatmap;
+                readyButton.Beatmap.Value = item.NewValue?.Beatmap;
             }, true);
 
             hostInfo.Host.BindTo(Host);

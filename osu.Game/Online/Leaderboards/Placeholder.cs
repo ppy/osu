@@ -12,7 +12,7 @@ namespace osu.Game.Online.Leaderboards
         protected const float TEXT_SIZE = 22;
 
         protected Placeholder()
-            : base(cp => cp.TextSize = TEXT_SIZE)
+            : base(cp => cp.Font = cp.Font.With(size: TEXT_SIZE))
         {
             Anchor = Anchor.Centre;
             Origin = Anchor.Centre;

@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Select.Carousel
 {
@@ -37,9 +37,9 @@ namespace osu.Game.Screens.Select.Carousel
         {
             DrawableRepresentation = new Lazy<DrawableCarouselItem>(CreateDrawableRepresentation);
 
-            Filtered.ValueChanged += v =>
+            Filtered.ValueChanged += filtered =>
             {
-                if (v && State.Value == CarouselItemState.Selected)
+                if (filtered.NewValue && State.Value == CarouselItemState.Selected)
                     State.Value = CarouselItemState.NotSelected;
             };
         }

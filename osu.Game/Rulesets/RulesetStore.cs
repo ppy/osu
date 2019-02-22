@@ -22,7 +22,8 @@ namespace osu.Game.Rulesets
         {
             AppDomain.CurrentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
 
-            foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll"))
+            foreach (string file in Directory.GetFiles(Environment.CurrentDirectory, $"{ruleset_library_prefix}.*.dll")
+                                             .Where(f => !Path.GetFileName(f).Contains("Tests")))
                 loadRulesetFromFile(file);
         }
 
@@ -124,7 +125,7 @@ namespace osu.Game.Rulesets
             }
             catch (Exception e)
             {
-                Logger.Error(e, "Failed to load ruleset");
+                Logger.Error(e, $"Failed to load ruleset {filename}");
             }
         }
     }

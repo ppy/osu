@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Configuration;
@@ -74,10 +74,10 @@ namespace osu.Game.Graphics.Containers
                 }
             }
 
-            private void scaleChanged(float value)
+            private void scaleChanged(ValueChangedEvent<float> args)
             {
-                this.ScaleTo(new Vector2(value), 500, Easing.Out);
-                this.ResizeTo(new Vector2(1 / value), 500, Easing.Out);
+                this.ScaleTo(new Vector2(args.NewValue), 500, Easing.Out);
+                this.ResizeTo(new Vector2(1 / args.NewValue), 500, Easing.Out);
             }
         }
 

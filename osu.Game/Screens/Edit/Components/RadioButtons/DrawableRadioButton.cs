@@ -80,10 +80,10 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         {
             base.LoadComplete();
 
-            button.Selected.ValueChanged += v =>
+            button.Selected.ValueChanged += selected =>
             {
                 updateSelectionState();
-                if (v)
+                if (selected.NewValue)
                     Selected?.Invoke(button);
             };
 
