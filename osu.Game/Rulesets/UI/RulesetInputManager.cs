@@ -135,20 +135,11 @@ namespace osu.Game.Rulesets.UI
             {
                 updateClock();
 
-                //if (Clock.ElapsedFrameTime > sixty_frame_time)
+                if (validState)
                 {
                     base.UpdateSubTree();
                     UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
                 }
-
-                // When handling replay input, we need to consider the possibility of fast-forwarding, which may cause the clock to be updated
-                // to a point very far into the future, then playing a frame at that time. In such a case, lifetime MUST be updated before
-                // input is handled. This is why base.Update is not called from the derived Update when handling replay input, and is instead
-                // called manually at the correct time here.
-                base.Update();
-
-                base.UpdateSubTree();
-                UpdateSubTreeMasking(this, ScreenSpaceDrawQuad.AABBFloat);
             }
 
             return true;
@@ -201,11 +192,6 @@ namespace osu.Game.Rulesets.UI
                 // to ensure that the its time is valid for our children before input is processed
                 Clock.ProcessFrame();
             }
-        }
-
-        protected override void Update()
-        {
-            // block update from base.UpdateSubTree()
         }
 
         #endregion
