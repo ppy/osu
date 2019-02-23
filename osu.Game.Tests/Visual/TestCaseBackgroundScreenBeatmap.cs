@@ -297,8 +297,6 @@ namespace osu.Game.Tests.Visual
             public VisualSettings VisualSettingsPos => VisualSettings;
             public BackgroundScreen ScreenPos => Background;
 
-            [Resolved]
-            private BackgroundScreenStack stack { get; set; }
             public DimAccessiblePlayerLoader(Player player) : base(() => player)
             {
             }
