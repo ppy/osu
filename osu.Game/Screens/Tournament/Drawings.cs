@@ -23,6 +23,7 @@ using osuTK.Graphics;
 using osu.Framework.IO.Stores;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Screens;
+using osu.Game.Graphics;
 
 namespace osu.Game.Screens.Tournament
 {
@@ -151,8 +152,7 @@ namespace osu.Game.Screens.Tournament
 
                                     Alpha = 0,
 
-                                    Font = "Exo2.0-Light",
-                                    TextSize = 42f
+                                    Font = OsuFont.GetFont(weight: FontWeight.Light, size: 42),
                                 }
                             }
                         },
@@ -175,8 +175,7 @@ namespace osu.Game.Screens.Tournament
                                     Origin = Anchor.TopCentre,
 
                                     Text = "Control Panel",
-                                    TextSize = 22f,
-                                    Font = "Exo2.0-Bold"
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 22),
                                 },
                                 new FillFlowContainer
                                 {

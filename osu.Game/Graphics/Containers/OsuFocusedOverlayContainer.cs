@@ -4,9 +4,9 @@
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osuTK;
-using osu.Framework.Configuration;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Audio;
@@ -90,7 +90,7 @@ namespace osu.Game.Graphics.Containers
             switch (visibility)
             {
                 case Visibility.Visible:
-                    if (OverlayActivationMode != OverlayActivation.Disabled)
+                    if (OverlayActivationMode.Value != OverlayActivation.Disabled)
                     {
                         if (PlaySamplesOnStateChange) samplePopIn?.Play();
                     }

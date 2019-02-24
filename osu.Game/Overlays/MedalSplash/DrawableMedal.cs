@@ -63,8 +63,7 @@ namespace osu.Game.Overlays.MedalSplash
                     Anchor = Anchor.TopCentre,
                     Origin = Anchor.TopCentre,
                     Text = "Medal Unlocked".ToUpperInvariant(),
-                    TextSize = 24,
-                    Font = @"Exo2.0-Light",
+                    Font = OsuFont.GetFont(size: 24, weight: FontWeight.Light),
                     Alpha = 0f,
                     Scale = new Vector2(1f / scale_when_unlocked),
                 },
@@ -84,8 +83,7 @@ namespace osu.Game.Overlays.MedalSplash
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = medal.Name,
-                            TextSize = 20,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(size: 20, weight: FontWeight.Bold),
                             Alpha = 0f,
                             Scale = new Vector2(1f / scale_when_full),
                         },
@@ -107,7 +105,7 @@ namespace osu.Game.Overlays.MedalSplash
             {
                 s.Anchor = Anchor.TopCentre;
                 s.Origin = Anchor.TopCentre;
-                s.TextSize = 16;
+                s.Font = s.Font.With(size: 16);
             });
 
             medalContainer.OnLoadComplete = d =>

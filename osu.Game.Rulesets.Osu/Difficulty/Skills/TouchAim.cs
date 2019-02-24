@@ -2,14 +2,17 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Game.Rulesets.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Difficulty.Skills;
 using osu.Game.Rulesets.Osu.Difficulty.Preprocessing;
+using osu.Game.Rulesets.Osu.Objects;
 
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     /// <summary>
     /// Represents the skill required to correctly aim at every object in the map with a uniform CircleSize and normalized distances.
     /// </summary>
-    public class Aim : Skill
+    public class TouchAim : Skill
     {
         private const double angle_bonus_begin = Math.PI / 3;
         private const double timing_threshold = 107;
@@ -17,34 +20,38 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
         protected override double SkillMultiplier => 26.25;
         protected override double StrainDecayBase => 0.15;
 
-        protected override double StrainValueOf(OsuDifficultyHitObject current)
+        protected override double StrainValueOf(DifficultyHitObject current)
         {
-            double result = 0;
+            if (current.BaseObject is Spinner)
+                return 0;
 
-            double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
+            var osuCurrent = (OsuDifficultyHitObject)current;
+            var jump = osuCurrent.JumpDistance;
 
-            if (Previous.Count > 0)
+
+
+            if (Previous.Count > 1)
             {
-                    
-                    current.Angle.Value = current.Angle.Value * Math.Max(0,Math.Min(1,(-1 * Previous[0].StrainTime / 50 + 4)))
-                    //Indirectly lower angle bonus depending on time between last two objects
-                    
-                    var angleBonus = ((2 / (1 + Math.Pow(3, -1 * current.Angle.Value))) - 0.075)
-                    * Math.Min(Math.Max(Previous[0].JumpDistance / 30 - 1, 0),1) //Lower angle bonus depending on distance to next object
-                    * Math.Min(Math.Max(current.JumpDistance / 30 - 1, 0),1); //Lower angle bonus depending on distance from previous object
-                    
-                    result = angleBonus;
-                
+                var osuPrevious = (OsuDifficultyHitObject)Previous[0];
+                var angle = osuCurrent.Angle.Value;
+                angle *= (Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 50 + 4))));
+                angle *= (Math.Min(Math.Max(osuPrevious.JumpDistance / 30 - 1, 0), 1));
+                jump *= ((2 / (1 + Math.Pow(3, -1 * angle))) - 0.075);
+                jump *= (1 + (1.75 / (1 + Math.Pow(1.06, (2.5 * Math.Min(osuPrevious.StrainTime, 90) - 120))))
+                    * (Math.Min(1, Math.Max(0, -0.015 * osuPrevious.JumpDistance + 1.6))));
+
+
             }
 
-            double jumpDistanceExp = applyDiminishingExp(current.JumpDistance);
-            double travelDistanceExp = applyDiminishingExp(current.TravelDistance);
+            double jumpDistanceExp = applyDiminishingExp(jump);
+            double travelDistanceExp = applyDiminishingExp(osuCurrent.TravelDistance);
 
             return Math.Max(
-                result * (jumpDistanceExp + travelDistanceExp + Math.Sqrt(travelDistanceExp * jumpDistanceExp)) / Math.Max(current.StrainTime, timing_threshold),
-                (Math.Sqrt(travelDistanceExp * jumpDistanceExp) + jumpDistanceExp + travelDistanceExp) / current.StrainTime
+                (jumpDistanceExp + travelDistanceExp + Math.Sqrt(travelDistanceExp * jumpDistanceExp)) / Math.Max(osuCurrent.StrainTime, timing_threshold),
+                (Math.Sqrt(travelDistanceExp * jumpDistanceExp) + jumpDistanceExp + travelDistanceExp) / osuCurrent.StrainTime
             );
         }
+
+        private double applyDiminishingExp(double val) => Math.Pow(val, 0.99);
     }
 }
-

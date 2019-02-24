@@ -8,6 +8,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osuTK;
 using osuTK.Graphics;
@@ -96,8 +97,7 @@ namespace osu.Game.Screens.Play
                         new OsuSpriteText
                         {
                             Text = Name,
-                            Font = @"Venera",
-                            TextSize = 12,
+                            Font = OsuFont.Numeric.With(size: 12),
                             Anchor = Anchor.Centre,
                             Origin = Anchor.Centre,
                             RelativePositionAxes = Axes.Both,

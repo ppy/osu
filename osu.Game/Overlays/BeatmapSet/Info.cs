@@ -156,7 +156,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
                     this.FadeIn(transition_duration);
                     textFlow.Clear();
-                    textFlow.AddText(value, s => s.TextSize = 14);
+                    textFlow.AddText(value, s => s.Font = s.Font.With(size: 14));
                 }
             }
 
@@ -177,8 +177,7 @@ namespace osu.Game.Overlays.BeatmapSet
                     header = new OsuSpriteText
                     {
                         Text = title,
-                        Font = @"Exo2.0-Bold",
-                        TextSize = 14,
+                        Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold),
                         Shadow = false,
                         Margin = new MarginPadding { Top = 20 },
                     },

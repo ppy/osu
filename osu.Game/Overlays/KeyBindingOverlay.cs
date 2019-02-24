@@ -73,8 +73,7 @@ namespace osu.Game.Overlays
                                 Anchor = Anchor.Centre,
                                 Origin = Anchor.Centre,
                                 Y = 15,
-                                TextSize = 12,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Bold),
                                 Text = @"back",
                             },
                         }

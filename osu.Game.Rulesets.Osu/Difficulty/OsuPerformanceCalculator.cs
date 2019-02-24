@@ -91,8 +91,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double rawAim = Attributes.AimStrain;
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                rawAim = Math.Pow(rawAim, 0.84);
-                
+                rawAim = Math.Pow(Attributes.TouchAimStrain, 0.85625);
+
             double aimValue = Math.Pow(5.0f * Math.Max(1.0f, rawAim / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // Longer maps are worth more
@@ -125,9 +125,18 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             if (mods.Any(h => h is OsuModFlashlight))
             {
                 // Apply object-based bonus for flashlight.
-                aimValue *= 1.0f + 0.35f * Math.Min(1.0f, totalHits / 200.0f) +
-                        (totalHits > 200 ? 0.3f * Math.Min(1.0f, (totalHits - 200) / 300.0f) +
-                        (totalHits > 500 ? (totalHits - 500) / 1200.0f : 0.0f) : 0.0f);
+                if (mods.Any(h => h is OsuModTouchDevice))
+                {
+                    aimValue *= 1.0f + 0.3f * Math.Min(1.0f, totalHits / 95.0f) +
+                                       (totalHits > 95 ? 0.45f * Math.Min(1.0f, (totalHits - 95) / 205.0f) +
+                                       (totalHits > 300 ? (totalHits - 300) / 550.0f : 0.0f) : 0.0f);
+                }
+                else
+                { 
+                    aimValue *= 1.0f + 0.35f * Math.Min(1.0f, totalHits / 200.0f) +
+                                        (totalHits > 200 ? 0.3f * Math.Min(1.0f, (totalHits - 200) / 300.0f) +
+                                        (totalHits > 500 ? (totalHits - 500) / 1200.0f : 0.0f) : 0.0f);
+                }
             }
 
             // Scale the aim value with accuracy _slightly_
@@ -140,10 +149,11 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
         private double computeSpeedValue()
         {
+            double rawSpeed = Attributes.SpeedStrain;
+
             if (mods.Any(m => m is OsuModTouchDevice))
-                rawAim = Math.Pow(Attributes.SpeedStrain, 0.94);
-                
-            double speedValue = Math.Pow(5.0f * Math.Max(1.0f, Attributes.SpeedStrain / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
+                rawSpeed = Math.Pow(Attributes.TouchSpeedStrain, 0.95);
+            double speedValue = Math.Pow(5.0f * Math.Max(1.0f, rawSpeed / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // Longer maps are worth more
             speedValue *= 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
@@ -192,6 +202,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             // Considering to use derivation from perfect accuracy in a probabilistic manner - assume normal distribution
             double accuracyValue = Math.Pow(1.52163f, Attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83f;
 
+            if (mods.Any(m => m is OsuModTouchDevice))
+                accuracyValue = Math.Pow(1.58f, Attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 14) * 2.83f;
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             accuracyValue *= Math.Min(1.15f, Math.Pow(amountHitObjectsWithAccuracy / 1000.0f, 0.3f));
 

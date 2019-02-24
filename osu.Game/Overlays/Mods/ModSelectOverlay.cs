@@ -4,7 +4,6 @@
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -17,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using osu.Game.Rulesets;
@@ -74,28 +74,28 @@ namespace osu.Game.Overlays.Mods
             SelectedMods.UnbindAll();
         }
 
-        private void rulesetChanged(RulesetInfo newRuleset)
+        private void rulesetChanged(ValueChangedEvent<RulesetInfo> e)
         {
-            if (newRuleset == null) return;
+            if (e.NewValue == null) return;
 
-            var instance = newRuleset.CreateInstance();
+            var instance = e.NewValue.CreateInstance();
 
             foreach (ModSection section in ModSectionsContainer.Children)
                 section.Mods = instance.GetModsFor(section.ModType);
 
             // attempt to re-select any already selected mods.
             // this may be the first time we are receiving the ruleset, in which case they will still match.
-            selectedModsChanged(SelectedMods.Value);
+            selectedModsChanged(new ValueChangedEvent<IEnumerable<Mod>>(SelectedMods.Value, SelectedMods.Value));
 
             // write the mods back to the SelectedMods bindable in the case a change was not applicable.
             // this generally isn't required as the previous line will perform deselection; just here for safety.
             refreshSelectedMods();
         }
 
-        private void selectedModsChanged(IEnumerable<Mod> obj)
+        private void selectedModsChanged(ValueChangedEvent<IEnumerable<Mod>> e)
         {
             foreach (ModSection section in ModSectionsContainer.Children)
-                section.SelectTypes(obj.Select(m => m.GetType()).ToList());
+                section.SelectTypes(e.NewValue.Select(m => m.GetType()).ToList());
 
             updateMods();
         }
@@ -264,9 +264,8 @@ namespace osu.Game.Overlays.Mods
                                         {
                                             new OsuSpriteText
                                             {
-                                                Font = @"Exo2.0-Bold",
                                                 Text = @"Gameplay Mods",
-                                                TextSize = 22,
+                                                Font = OsuFont.GetFont(size: 22, weight: FontWeight.Bold),
                                                 Shadow = true,
                                                 Margin = new MarginPadding
                                                 {
@@ -275,7 +274,7 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             new OsuTextFlowContainer(text =>
                                             {
-                                                text.TextSize = 18;
+                                                text.Font = text.Font.With(size: 18);
                                                 text.Shadow = true;
                                             })
                                             {
@@ -365,7 +364,7 @@ namespace osu.Game.Overlays.Mods
                                             new OsuSpriteText
                                             {
                                                 Text = @"Score Multiplier:",
-                                                TextSize = 30,
+                                                Font = OsuFont.GetFont(size: 30),
                                                 Margin = new MarginPadding
                                                 {
                                                     Top = 5,
@@ -374,8 +373,7 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             MultiplierLabel = new OsuSpriteText
                                             {
-                                                Font = @"Exo2.0-Bold",
-                                                TextSize = 30,
+                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
                                                 Margin = new MarginPadding
                                                 {
                                                     Top = 5
@@ -383,9 +381,8 @@ namespace osu.Game.Overlays.Mods
                                             },
                                             UnrankedLabel = new OsuSpriteText
                                             {
-                                                Font = @"Exo2.0-Bold",
                                                 Text = @"(Unranked)",
-                                                TextSize = 30,
+                                                Font = OsuFont.GetFont(size: 30, weight: FontWeight.Bold),
                                                 Margin = new MarginPadding
                                                 {
                                                     Top = 5,

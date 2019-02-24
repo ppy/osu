@@ -147,7 +147,7 @@ namespace osu.Game.Tests.Visual
 
         private bool selectedBeatmapVisible()
         {
-            var currentlySelected = carousel.Items.Find(s => s.Item is CarouselBeatmap && s.Item.State == CarouselItemState.Selected);
+            var currentlySelected = carousel.Items.Find(s => s.Item is CarouselBeatmap && s.Item.State.Value == CarouselItemState.Selected);
             if (currentlySelected == null)
                 return true;
             return currentlySelected.Item.Visible;

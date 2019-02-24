@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Configuration;
@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Play
 
         protected const float BACKGROUND_FADE_DURATION = 800;
 
-        protected float BackgroundOpacity => 1 - (float)DimLevel;
+        protected float BackgroundOpacity => 1 - (float)DimLevel.Value;
 
         #region User Settings
 
