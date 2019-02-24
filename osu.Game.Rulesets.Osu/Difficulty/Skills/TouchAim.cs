@@ -28,8 +28,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             var osuCurrent = (OsuDifficultyHitObject)current;
             var jump = osuCurrent.JumpDistance;
 
-
-
             if (Previous.Count > 1)
             {
                 var osuPrevious = (OsuDifficultyHitObject)Previous[0];
@@ -39,8 +37,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 jump *= ((2 / (1 + Math.Pow(3, -1 * angle))) - 0.075);
                 jump *= (1 + (1.75 / (1 + Math.Pow(1.06, (2.5 * Math.Min(osuPrevious.StrainTime, 90) - 120))))
                     * (Math.Min(1, Math.Max(0, -0.015 * osuPrevious.JumpDistance + 1.6))));
-
-
             }
 
             double jumpDistanceExp = applyDiminishingExp(jump);

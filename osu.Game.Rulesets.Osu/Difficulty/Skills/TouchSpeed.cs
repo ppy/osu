@@ -42,7 +42,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             double angle = 0.0;
             double distance = osuCurrent.TravelDistance + osuCurrent.JumpDistance;
             double deltaTime = Math.Max(max_speed_bonus, current.DeltaTime);
-
             
             if (osuCurrent.Angle != null)
             {
@@ -51,7 +50,6 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 distance *= ((0.5 / (1 + Math.Pow(2.71, -0.5 * angle))) + 0.75);
             }
            
-
             double speedBonus = 1.0;
             if (deltaTime < min_speed_bonus)
                 speedBonus = 1 + Math.Pow((min_speed_bonus - deltaTime) / speed_balancing_factor, 2);
