@@ -203,7 +203,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double accuracyValue = Math.Pow(1.52163f, Attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 24) * 2.83f;
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                accuracyValue = Math.Pow(1.58f, Attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 14) * 2.83f;
+                accuracyValue = Math.Pow(1.58f, Attributes.OverallDifficulty) * Math.Pow(betterAccuracyPercentage, 12) * 2.83f;
             // Bonus for many hitcircles - it's harder to keep good accuracy up for longer
             accuracyValue *= Math.Min(1.15f, Math.Pow(amountHitObjectsWithAccuracy / 1000.0f, 0.3f));
 
