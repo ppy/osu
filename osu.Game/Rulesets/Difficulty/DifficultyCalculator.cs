@@ -76,7 +76,6 @@ namespace osu.Game.Rulesets.Difficulty
             foreach (DifficultyHitObject h in difficultyHitObjects)
             {
                 counted = 0;
-
                 while (h.BaseObject.StartTime > currentSectionEnd)
                 {
                     foreach (Skill s in skills)
@@ -87,7 +86,6 @@ namespace osu.Game.Rulesets.Difficulty
 
                     currentSectionEnd += sectionLength;
                 }
-
                 foreach (Skill s in skills)
                 {
                     if (counted > 1)

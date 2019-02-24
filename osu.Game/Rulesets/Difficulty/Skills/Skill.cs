@@ -94,9 +94,10 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // The maximum strain of the new section is not zero by default, strain decays as usual regardless of section boundaries.
             // This means we need to capture the strain level at the beginning of the new section, and use that as the initial peak level.
             if (Previous.Count > 0)
-                currentSectionPeak = currentStrain * strainDecay(offset - Previous[0].BaseObject.StartTime);   
+            {
+                currentSectionPeak = currentStrain * strainDecay(offset - Previous[0].BaseObject.StartTime);
+            }
         }
-    
         /// <summary>
         /// Returns the calculated difficulty value representing all processed <see cref="DifficultyHitObject"/>s.
         /// </summary>
@@ -113,7 +114,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
                 difficulty += strain * weight;
                 weight *= DecayWeight;
             }
-
             return difficulty;
         }
 
