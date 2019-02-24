@@ -45,6 +45,14 @@ namespace osu.Game.Tests.Visual
         [Cached]
         private BackgroundScreenStack backgroundStack;
 
+        private void performSetup()
+        {
+            createSongSelect();
+
+            AddStep("Load new player to song select", () => songSelect.Push(player = new DimAccessiblePlayer { Ready = true }));
+            AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
+        }
+
         private void createSongSelect()
         {
             AddStep("Create song select if required", () =>
@@ -60,11 +68,6 @@ namespace osu.Game.Tests.Visual
                 }
             });
             AddUntilStep(() => songSelect?.IsLoaded ?? false, "Wait for song select to load");
-        }
-
-        private void performSetup()
-        {
-            createSongSelect();
             AddUntilStep(() =>
             {
                 if (!songSelect.IsCurrentScreen())
@@ -74,9 +77,6 @@ namespace osu.Game.Tests.Visual
                 }
                 return true;
             }, "Wait for song select is current");
-
-            AddStep("Load new player to song select", () => songSelect.Push(player = new DimAccessiblePlayer { Ready = true }));
-            AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
         }
 
         public TestCaseBackgroundScreenBeatmap()
@@ -84,7 +84,6 @@ namespace osu.Game.Tests.Visual
             InputManager.Add(backgroundStack = new BackgroundScreenStack {RelativeSizeAxes = Axes.Both});
             InputManager.Add(screen = new ScreenStack { RelativeSizeAxes = Axes.Both });
 
-            createSongSelect();
             AddStep("Create beatmap", () =>
             {
                 Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
@@ -104,7 +103,15 @@ namespace osu.Game.Tests.Visual
                     },
                 });
             });
+        }
 
+        /// <summary>
+        /// Check if PlayerLoader properly triggers background dim previews when a user hovers over the visual settings panel.
+        /// </summary>
+        [Test]
+        public void PlayerLoaderSettingsHoverTest()
+        {
+            createSongSelect();
             AddStep("Start player loader", () => songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer())));
             AddUntilStep(() => playerLoader?.IsLoaded ?? false, "Wait for Player Loader to load");
             AddAssert("Background retained from song select", () => songSelect.AssertBackgroundCurrent());
@@ -116,16 +123,24 @@ namespace osu.Game.Tests.Visual
 
             AddWaitStep(5, "Wait for dim");
             AddAssert("Screen is dimmed", () => songSelect.AssertDimmed());
+        }
 
+        /// <summary>
+        /// In the case of a user triggering the dim preview the instant player gets loaded, then moving the cursor off of the visual settings:
+        /// The OnHover of PlayerLoader will trigger, which could potentially trigger an undim unless checked for in PlayerLoader.
+        /// We need to check that in this scenario, the dim is still properly applied after entering player.
+        /// </summary>
+        [Test]
+        public void PlayerLoaderTransitionTest()
+        {
+            createSongSelect();
+            AddStep("Start player loader", () => songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer())));
+            AddUntilStep(() => playerLoader?.IsLoaded ?? false, "Wait for Player Loader to load");
             AddStep("Allow beatmap to load", () =>
             {
                 player.Ready = true;
                 InputManager.MoveMouseTo(playerLoader.ScreenPos);
             });
-
-            // In the case of a user triggering the dim preview the instant player gets loaded, then moving the cursor off of the visual settings:
-            // The OnHover of PlayerLoader will trigger, which could potentially trigger an undim unless checked for in PlayerLoader.
-            // We need to check that in this scenario, the dim is still properly applied after entering player.
             AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
             AddAssert("Background retained from song select", () => songSelect.AssertBackgroundCurrent());
             AddStep("Trigger background preview when loaded", () =>
@@ -135,8 +150,15 @@ namespace osu.Game.Tests.Visual
             });
             AddWaitStep(5, "Wait for dim");
             AddAssert("Screen is dimmed", () => songSelect.AssertDimmed());
+        }
 
-            // Make sure the background is fully invisible (not dimmed) when the background should be disabled by the storyboard.
+        /// <summary>
+        /// Make sure the background is fully invisible (Alpha == 0) when the background should be disabled by the storyboard.
+        /// </summary>
+        [Test]
+        public void StoryboardBackgroundVisibilityTest()
+        {
+            performSetup();
             AddStep("Enable storyboard", () =>
             {
                 player.ReplacesBackground.Value = true;
@@ -182,7 +204,7 @@ namespace osu.Game.Tests.Visual
             performSetup();
             AddStep("Transition to Pause", () =>
             {
-                if (!player.IsPaused)
+                if (!player.IsPaused.Value)
                     player.Exit();
             });
             AddWaitStep(5, "Wait for dim");
@@ -226,6 +248,13 @@ namespace osu.Game.Tests.Visual
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
             public readonly Bindable<bool> DimEnabled = new Bindable<bool>();
+            private readonly Bindable<double> dimLevel = new Bindable<double>();
+
+            [BackgroundDependencyLoader]
+            private void load(OsuConfigManager config)
+            {
+                config.BindWith(OsuSetting.DimLevel, dimLevel);
+            }
 
             public void UpdateBindables()
             {
@@ -234,22 +263,22 @@ namespace osu.Game.Tests.Visual
 
             public bool AssertDimmed()
             {
-                return ((FadeAccessibleBackground)Background).AssertDimmed();
+                return ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1 - (float)dimLevel.Value);
             }
 
             public bool AssertUndimmed()
             {
-                return ((FadeAccessibleBackground)Background).AssertUndimmed();
+                return ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
             }
 
             public bool AssertInvisible()
             {
-                return ((FadeAccessibleBackground)Background).AssertInvisible();
+                return ((FadeAccessibleBackground)Background).CurrentAlpha == 0;
             }
 
             public bool AssertVisible()
             {
-                return ((FadeAccessibleBackground)Background).AssertVisible();
+                return ((FadeAccessibleBackground)Background).CurrentAlpha == 1;
             }
 
             /// <summary>
@@ -275,12 +304,12 @@ namespace osu.Game.Tests.Visual
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
 
+            // Whether or not the player should be allowed to load.
             public bool Ready;
 
             public Bindable<bool> StoryboardEnabled;
             public readonly Bindable<bool> ReplacesBackground = new Bindable<bool>();
-
-            public bool IsPaused => RulesetContainer.IsPaused.Value;
+            public readonly Bindable<bool> IsPaused = new Bindable<bool>();
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
@@ -289,6 +318,7 @@ namespace osu.Game.Tests.Visual
                     Thread.Sleep(1);
                 StoryboardEnabled = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
                 ReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
+                RulesetContainer.IsPaused.BindTo(IsPaused);
             }
         }
 
@@ -306,35 +336,10 @@ namespace osu.Game.Tests.Visual
 
         private class FadeAccessibleBackground : BackgroundScreenBeatmap
         {
-            private readonly Bindable<double> dimLevel = new Bindable<double>();
-
             protected override UserDimContainer CreateFadeContainer() => new TestUserDimContainer { RelativeSizeAxes = Axes.Both };
 
-            [BackgroundDependencyLoader]
-            private void load(OsuConfigManager config)
-            {
-                config.BindWith(OsuSetting.DimLevel, dimLevel);
-            }
-
-            public bool AssertDimmed()
-            {
-                return ((TestUserDimContainer)FadeContainer).CurrentColour == OsuColour.Gray(1 - (float)dimLevel.Value);
-            }
-
-            public bool AssertUndimmed()
-            {
-                return ((TestUserDimContainer)FadeContainer).CurrentColour == Color4.White;
-            }
-
-            public bool AssertInvisible()
-            {
-                return ((TestUserDimContainer)FadeContainer).CurrentAlpha == 0;
-            }
-
-            public bool AssertVisible()
-            {
-                return ((TestUserDimContainer)FadeContainer).CurrentAlpha == 1;
-            }
+            public Color4 CurrentColour => ((TestUserDimContainer)FadeContainer).CurrentColour;
+            public float CurrentAlpha => ((TestUserDimContainer)FadeContainer).CurrentAlpha;
 
             private class TestUserDimContainer : UserDimContainer
             {

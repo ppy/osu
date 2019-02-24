@@ -397,10 +397,7 @@ namespace osu.Game.Screens.Play
             }
 
             if (LoadedBeatmapSuccessfully)
-            {
                 pauseContainer?.Pause();
-                return true;
-            }
 
             return true;
         }
