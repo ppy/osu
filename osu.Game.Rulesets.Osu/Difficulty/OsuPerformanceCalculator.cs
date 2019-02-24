@@ -132,7 +132,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                                        (totalHits > 300 ? (totalHits - 300) / 550.0f : 0.0f) : 0.0f);
                 }
                 else
-                { 
+                {
                     aimValue *= 1.0f + 0.35f * Math.Min(1.0f, totalHits / 200.0f) +
                                         (totalHits > 200 ? 0.3f * Math.Min(1.0f, (totalHits - 200) / 300.0f) +
                                         (totalHits > 500 ? (totalHits - 500) / 1200.0f : 0.0f) : 0.0f);
