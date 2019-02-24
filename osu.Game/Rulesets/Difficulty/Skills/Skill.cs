@@ -40,8 +40,11 @@ namespace osu.Game.Rulesets.Difficulty.Skills
         protected readonly LimitedCapacityStack<DifficultyHitObject> Previous = new LimitedCapacityStack<DifficultyHitObject>(2); // Contained objects not used yet
 
         private double currentStrain = 1; // We keep track of the strain level at all times throughout the beatmap.
+        private double dummyStrain = 1; // Balancing touchscreen strain so that effects are smaller.
+        private double prevDummyStrain = 1; // Balancing touchscreen strain so that effects are smaller.
         private double previous = 0;
         private double currentSectionPeak = 1; // We also keep track of the peak strain level in the current section.
+        private double dummySectionPeak = 1; // Balancing touchscreen strain so that effects are smaller.
 
         private readonly List<double> strainPeaks = new List<double>();
 
@@ -60,9 +63,14 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         public void TouchProcess(DifficultyHitObject current)
         {
-            var dummy = currentStrain;
-            currentStrain = previous * strainDecay(current.DeltaTime);
-            currentStrain += StrainValueOf(current) * SkillMultiplier;
+
+            var dummy = prevDummyStrain;
+            dummyStrain *= strainDecay(current.DeltaTime);
+            dummyStrain += StrainValueOf(current) * SkillMultiplier;
+
+            prevDummyStrain = previous * strainDecay(current.DeltaTime);
+            prevDummyStrain += StrainValueOf(current) * SkillMultiplier;
+            currentStrain = (3 * prevDummyStrain + 2 * dummyStrain) / 5;
             previous = dummy;
 
             currentSectionPeak = Math.Max(currentStrain, currentSectionPeak);

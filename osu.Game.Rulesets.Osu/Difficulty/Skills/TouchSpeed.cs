@@ -34,11 +34,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             var osuCurrent = (OsuDifficultyHitObject)current;
             var osuPrevious = (OsuDifficultyHitObject)current;
-            var osuPrevious2 = (OsuDifficultyHitObject)current;
-            if (Previous.Count > 1)
+            if (Previous.Count > 0)
             {
                 osuPrevious = (OsuDifficultyHitObject)Previous[0];
-                osuPrevious2 = (OsuDifficultyHitObject)Previous[1];
             }
             var streamBonus = 1.0;
             double angle = 0.0;
@@ -75,8 +73,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 streamBonus = ((1.2 * (Math.Max(0, Math.Min(0.02 * distance, 1.85) - 0.7)) + Math.Max(-0.7, Math.Min(0, -1 * distance / 75 + 3)))
                 * Math.Min(1, (Math.Max(2.1, 0.01 * angle * (180 / 3.14) + 1.5) - 2))
                 * Math.Min(1, (3.5 / (1 + Math.Pow(1.065, Math.Min(131, osuCurrent.StrainTime) - 70)))));
-                streamBonus *= Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 50 + 2.65)));
-                streamBonus *= Math.Max(0, Math.Min(1, (-1 * osuPrevious2.StrainTime / 50 + 2.65)));
+                streamBonus *= Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 50 + 3)));
                 streamBonus = 1.5 * Math.Min(1, Math.Max(0, streamBonus)) + 1;
             }
             return (speedBonus * streamBonus * speedValue) / osuCurrent.StrainTime;
