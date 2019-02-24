@@ -248,6 +248,14 @@ namespace osu.Game
                     // navigate to song select if we are not already there.
 
                     menuScreen.MakeCurrent();
+
+                    if (Beatmap.Disabled)
+                    {
+                        // we may need to wait for a lease to be returned.
+                        Schedule(() => PresentBeatmap(beatmap));
+                        return;
+                    }
+
                     menuScreen.LoadToSolo();
                     break;
             }
