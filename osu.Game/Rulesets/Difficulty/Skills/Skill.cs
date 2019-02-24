@@ -63,7 +63,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
         public void TouchProcess(DifficultyHitObject current)
         {
-
             var dummy = prevDummyStrain;
             dummyStrain *= strainDecay(current.DeltaTime);
             dummyStrain += StrainValueOf(current) * SkillMultiplier;
@@ -76,11 +75,8 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             currentSectionPeak = Math.Max(currentStrain, currentSectionPeak);
 
             Previous.Push(current);
-
-
         }
         
-
         /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
         /// </summary>
@@ -99,8 +95,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
             // The maximum strain of the new section is not zero by default, strain decays as usual regardless of section boundaries.
             // This means we need to capture the strain level at the beginning of the new section, and use that as the initial peak level.
             if (Previous.Count > 0)
-                currentSectionPeak = currentStrain * strainDecay(offset - Previous[0].BaseObject.StartTime);
-           
+                currentSectionPeak = currentStrain * strainDecay(offset - Previous[0].BaseObject.StartTime);   
         }
     
         /// <summary>
