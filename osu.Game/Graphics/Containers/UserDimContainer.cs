@@ -10,19 +10,41 @@ using osuTK.Graphics;
 
 namespace osu.Game.Graphics.Containers
 {
+    /// <summary>
+    /// A container that applies user-configured dim levels to its contents.
+    /// This container specifies behavior that applies to both Storyboards and Backgrounds.
+    /// </summary>
     public class UserDimContainer : Container
     {
         protected Bindable<double> DimLevel;
+
         protected Bindable<bool> ShowStoryboard;
-        public Bindable<bool> EnableUserDim = new Bindable<bool>();
+
+        /// <summary>
+        /// Whether or not user-configured dim levels should be applied to the container.
+        /// </summary>
+        public readonly Bindable<bool> EnableUserDim = new Bindable<bool>();
+
+        /// <summary>
+        /// Whether or not the storyboard loaded should completely hide the background behind it.
+        /// </summary>
         public Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
+
         protected Container DimContainer;
+
         protected override Container<Drawable> Content => DimContainer;
 
         private readonly bool isStoryboard;
 
         private const float background_fade_duration = 800;
 
+        /// <summary>
+        /// </summary>
+        /// <param name="isStoryboard">
+        /// Whether or not this instance of UserDimContainer contains a storyboard.
+        /// While both backgrounds and storyboards allow user dim levels to be applied, storyboards can be toggled via <see cref="ShowStoryboard"/>
+        /// and can cause backgrounds to become hidden via <see cref="StoryboardReplacesBackground"/>.
+        /// </param>
         public UserDimContainer(bool isStoryboard = false)
         {
             DimContainer = new Container { RelativeSizeAxes = Axes.Both };
@@ -41,6 +63,12 @@ namespace osu.Game.Graphics.Containers
             StoryboardReplacesBackground.ValueChanged += _ => updateBackgroundDim();
         }
 
+        protected override void LoadComplete()
+        {
+            base.LoadComplete();
+            updateBackgroundDim();
+        }
+
         private void updateBackgroundDim()
         {
             if (isStoryboard)
@@ -49,7 +77,7 @@ namespace osu.Game.Graphics.Containers
             }
             else
             {
-                // The background needs to be hidden in the case of it being replaced
+                // The background needs to be hidden in the case of it being replaced by the storyboard
                 DimContainer.FadeTo(ShowStoryboard.Value && StoryboardReplacesBackground.Value ? 0 : 1, background_fade_duration, Easing.OutQuint);
             }
 
