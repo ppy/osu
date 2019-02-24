@@ -76,7 +76,6 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             Previous.Push(current);
         }
-        
         /// <summary>
         /// Saves the current peak strain level to the list of strain peaks, which will be used to calculate an overall difficulty.
         /// </summary>
