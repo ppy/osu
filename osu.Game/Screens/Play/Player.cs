@@ -345,7 +345,12 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            ShowStoryboard.ValueChanged += _ => UpdateBackgroundElements();
+            ShowStoryboard.ValueChanged += _ =>
+            {
+                if (ShowStoryboard.Value && storyboard == null)
+                    initializeStoryboard(true);
+            };
+
             Background.EnableUserDim.Value = true;
             storyboardContainer.StoryboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
             storyboardContainer.StoryboardReplacesBackground.BindTo(Background?.StoryboardReplacesBackground);
@@ -433,9 +438,6 @@ namespace osu.Game.Screens.Play
             if (!this.IsCurrentScreen()) return;
 
             base.UpdateBackgroundElements();
-
-            if (ShowStoryboard.Value && storyboard == null)
-                initializeStoryboard(true);
         }
 
         protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);

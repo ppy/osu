@@ -284,7 +284,7 @@ namespace osu.Game.Tests.Visual
             /// <summary>
             /// Make sure every time a screen gets pushed, the background doesn't get replaced
             /// </summary>
-            /// <returns>Whether or not the original background is still the current background</returns>
+            /// <returns>Whether or not the original background (The one created in DummySongSelect) is still the current background</returns>
             public bool AssertBackgroundCurrent()
             {
                 return ((FadeAccessibleBackground)Background).IsCurrentScreen();

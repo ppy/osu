@@ -14,10 +14,16 @@ namespace osu.Game.Screens.Backgrounds
     public class BackgroundScreenBeatmap : BlurrableBackgroundScreen
     {
         private WorkingBeatmap beatmap;
+
+        /// <summary>
+        /// Whether or not user dim settings should be applied to this Background.
+        /// </summary>
         public Bindable<bool> EnableUserDim = new Bindable<bool>();
+
         public Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
         protected UserDimContainer FadeContainer;
+
         protected virtual UserDimContainer CreateFadeContainer() => new UserDimContainer { RelativeSizeAxes = Axes.Both };
 
         public virtual WorkingBeatmap Beatmap
