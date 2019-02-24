@@ -39,13 +39,10 @@ namespace osu.Game.Rulesets.Difficulty
         {
             beatmap.Mods.Value = mods;
             IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
-            
             var clock = new StopwatchClock();
             mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
-
             return calculate(playableBeatmap, mods, clock.Rate);
         }
-
         /// <summary>
         /// Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
         /// </summary>
@@ -104,7 +101,6 @@ namespace osu.Game.Rulesets.Difficulty
                     counted++;
                 }   
             }
-
             // The peak strain will not be saved for the last section in the above loop
             foreach (Skill s in skills)
                 s.SaveCurrentPeak();
