@@ -69,7 +69,7 @@ namespace osu.Game.Rulesets.Difficulty.Skills
 
             prevDummyStrain = previous * strainDecay(current.DeltaTime);
             prevDummyStrain += StrainValueOf(current) * SkillMultiplier;
-            currentStrain = (3 * prevDummyStrain + 2 * dummyStrain) / 5;
+            currentStrain = (prevDummyStrain + dummyStrain) / 2;
             previous = dummy;
 
             currentSectionPeak = Math.Max(currentStrain, currentSectionPeak);

@@ -33,8 +33,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 var osuPrevious = (OsuDifficultyHitObject)Previous[0];
                 var angle = osuCurrent.Angle.Value;
                 angle *= (Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 50 + 4))));
-                angle *= (Math.Min(Math.Max(osuPrevious.JumpDistance / 50 - 2.25, 0), 1));
-                jump *= ((2 / (1 + Math.Pow(3, -1 * angle))) - 0.075);
+                angle *= (Math.Min(Math.Max(osuPrevious.JumpDistance / 30 - 1, 0), 1));
+                jump *= ((0.9 / (1 + Math.Pow(3, -3 * (angle - 1)))) + 0.9);
                 jump *= (1 + (1.75 / (1 + Math.Pow(1.06, (2.5 * Math.Min(osuPrevious.StrainTime, 90) - 120))))
                     * (Math.Min(1, Math.Max(0, -0.015 * osuPrevious.JumpDistance + 1.6))));
             }
