@@ -66,6 +66,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double aimValue = computeAimValue();
             double speedValue = computeSpeedValue();
             double accuracyValue = computeAccuracyValue();
+            // This exists as a value for a play that is assumed to be done without touchscreen
             double dummyValue =
                 Math.Pow(
                     Math.Pow(dummyAimValue(), 1.1f) +
@@ -79,7 +80,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     Math.Pow(speedValue, 1.1f) +
                     Math.Pow(accuracyValue, 1.1f), 1.0f / 1.1f
                 ) * multiplier;
-
+            // Ensuring that touchscreen pp values never exceed non-touchscreen values
             if (mods.Any(m => m is OsuModTouchDevice) && totalValue > dummyValue)
                 totalValue = dummyValue;
 
