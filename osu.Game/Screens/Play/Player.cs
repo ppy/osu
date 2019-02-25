@@ -294,7 +294,7 @@ namespace osu.Game.Screens.Play
 
                     var score = CreateScore();
                     if (RulesetContainer.ReplayScore == null)
-                        scoreManager.Import(score, true);
+                        scoreManager.Import(score);
 
                    this.Push(CreateResults(score));
 
