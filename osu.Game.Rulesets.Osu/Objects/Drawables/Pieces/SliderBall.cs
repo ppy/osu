@@ -125,8 +125,6 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             return base.OnMouseMove(e);
         }
 
-        public bool OnReleased(OsuAction action) => false;
-
         public override void ClearTransformsAfter(double time, bool propagateChildren = false, string targetMember = null)
         {
             // Consider the case of rewinding - children's transforms are handled internally, so propagating down
