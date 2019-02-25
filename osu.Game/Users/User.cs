@@ -10,7 +10,7 @@ namespace osu.Game.Users
     public class User
     {
         [JsonProperty(@"id")]
-        public long Id = 1;
+        public long? Id = 1;
 
         [JsonProperty(@"join_date")]
         public DateTimeOffset JoinDate;
