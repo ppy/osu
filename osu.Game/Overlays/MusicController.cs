@@ -312,13 +312,13 @@ namespace osu.Game.Overlays
         private WorkingBeatmap current;
         private TransformDirection? queuedDirection;
 
-        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> beatmap)
         {
             TransformDirection direction = TransformDirection.None;
 
             if (current != null)
             {
-                bool audioEquals = e.NewValue?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
+                bool audioEquals = beatmap.NewValue?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
 
                 if (audioEquals)
                     direction = TransformDirection.None;
@@ -331,7 +331,7 @@ namespace osu.Game.Overlays
                 {
                     //figure out the best direction based on order in playlist.
                     var last = beatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
-                    var next = beatmap == null ? -1 : beatmapSets.TakeWhile(b => b.ID != e.NewValue.BeatmapSetInfo?.ID).Count();
+                    var next = this.beatmap == null ? -1 : beatmapSets.TakeWhile(b => b.ID != beatmap.NewValue.BeatmapSetInfo?.ID).Count();
 
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
@@ -339,7 +339,8 @@ namespace osu.Game.Overlays
                 current.Track.Completed -= currentTrackCompleted;
             }
 
-            current = e.NewValue;
+            current = beatmap.NewValue;
+
             if (current != null)
                 current.Track.Completed += currentTrackCompleted;
 
