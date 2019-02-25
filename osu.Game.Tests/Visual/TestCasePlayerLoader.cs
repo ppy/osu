@@ -14,7 +14,7 @@ namespace osu.Game.Tests.Visual
     public class TestCasePlayerLoader : ManualInputManagerTestCase
     {
         private PlayerLoader loader;
-        private ScreenStack stack;
+        private readonly ScreenStack stack;
 
         [Cached]
         private BackgroundScreenStack backgroundStack;
