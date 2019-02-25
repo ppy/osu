@@ -354,8 +354,8 @@ namespace osu.Game.Screens.Play
 
             Background.EnableUserDim.Value = true;
 
-            storyboardReplacesBackground.BindTo(Background?.StoryboardReplacesBackground);
-            storyboardReplacesBackground.BindTo(storyboardContainer.StoryboardReplacesBackground);
+            storyboardReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
+            storyboardContainer.StoryboardReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
             Task.Run(() =>

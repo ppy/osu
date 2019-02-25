@@ -159,7 +159,7 @@ namespace osu.Game.Screens.Play
         {
             // restore our screen defaults
             InitializeBackgroundElements();
-            if (this.IsCurrentScreen() && (Background?.IsLoaded ?? false))
+            if (this.IsCurrentScreen())
                 Background.EnableUserDim.Value = false;
             return base.OnHover(e);
         }
@@ -168,7 +168,8 @@ namespace osu.Game.Screens.Play
         {
             if (GetContainingInputManager()?.HoveredDrawables.Contains(VisualSettings) == true)
             {
-                // show user setting preview
+                // Update background elements is only being called here because blur logic still exists in Player.
+                // Will need to be removed when resolving https://github.com/ppy/osu/issues/4322
                 UpdateBackgroundElements();
                 if (this.IsCurrentScreen())
                     Background.EnableUserDim.Value = true;
@@ -245,8 +246,7 @@ namespace osu.Game.Screens.Play
             this.FadeOut(150);
             cancelLoad();
 
-            if (Background != null)
-                Background.EnableUserDim.Value = false;
+            Background.EnableUserDim.Value = false;
 
             return base.OnExiting(next);
         }
