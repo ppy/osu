@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -22,7 +22,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
     {
         private readonly bool noVideo;
 
-        public string TooltipText => button.Enabled ? "Download this beatmap" : "Login to download";
+        public string TooltipText => button.Enabled.Value ? "Download this beatmap" : "Login to download";
 
         private readonly IBindable<User> localUser = new Bindable<User>();
 
@@ -83,7 +83,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                                 },
                             }
                         },
-                        new DownloadProgressBar(BeatmapSet)
+                        new DownloadProgressBar(BeatmapSet.Value)
                         {
                             Depth = -2,
                             Anchor = Anchor.BottomLeft,
@@ -101,7 +101,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                     return;
                 }
 
-                beatmaps.Download(BeatmapSet, noVideo);
+                beatmaps.Download(BeatmapSet.Value, noVideo);
             };
 
             localUser.BindTo(api.LocalUser);
@@ -110,7 +110,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
 
             State.BindValueChanged(state =>
             {
-                switch (state)
+                switch (state.NewValue)
                 {
                     case DownloadState.Downloading:
                         textSprites.Children = new Drawable[]
@@ -118,8 +118,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "Downloading...",
-                                TextSize = 13,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
                             },
                         };
                         break;
@@ -129,8 +128,7 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "Importing...",
-                                TextSize = 13,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
                             },
                         };
                         break;
@@ -143,14 +141,12 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
                             new OsuSpriteText
                             {
                                 Text = "Download",
-                                TextSize = 13,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(size: 13, weight: FontWeight.Bold)
                             },
                             new OsuSpriteText
                             {
                                 Text = BeatmapSet.Value.OnlineInfo.HasVideo && noVideo ? "without Video" : string.Empty,
-                                TextSize = 11,
-                                Font = @"Exo2.0-Bold",
+                                Font = OsuFont.GetFont(size: 11, weight: FontWeight.Bold)
                             },
                         };
                         this.FadeIn(200);
@@ -159,8 +155,8 @@ namespace osu.Game.Overlays.BeatmapSet.Buttons
             }, true);
         }
 
-        private void userChanged(User user) => button.Enabled.Value = !(user is GuestUser);
+        private void userChanged(ValueChangedEvent<User> e) => button.Enabled.Value = !(e.NewValue is GuestUser);
 
-        private void enabledChanged(bool enabled) => this.FadeColour(enabled ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
+        private void enabledChanged(ValueChangedEvent<bool> e) => this.FadeColour(e.NewValue ? Color4.White : Color4.Gray, 200, Easing.OutQuint);
     }
 }

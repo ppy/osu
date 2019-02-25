@@ -4,7 +4,7 @@
 using System;
 using Microsoft.EntityFrameworkCore.Internal;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Online.API.Requests;
@@ -37,14 +37,14 @@ namespace osu.Game.Overlays.Direct
         {
             this.beatmaps = beatmaps;
 
-            BeatmapSet.BindValueChanged(set =>
+            BeatmapSet.BindValueChanged(setInfo =>
             {
-                if (set == null)
+                if (setInfo.NewValue == null)
                     attachDownload(null);
-                else if (beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == set.OnlineBeatmapSetID).Any())
+                else if (beatmaps.QueryBeatmapSets(s => s.OnlineBeatmapSetID == setInfo.NewValue.OnlineBeatmapSetID).Any())
                     State.Value = DownloadState.LocallyAvailable;
                 else
-                    attachDownload(beatmaps.GetExistingDownload(set));
+                    attachDownload(beatmaps.GetExistingDownload(setInfo.NewValue));
             }, true);
 
             beatmaps.BeatmapDownloadBegan += download =>

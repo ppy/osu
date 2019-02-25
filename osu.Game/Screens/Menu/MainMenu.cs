@@ -5,6 +5,7 @@ using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
@@ -53,10 +54,10 @@ namespace osu.Game.Screens.Menu
                         buttons = new ButtonSystem
                         {
                             OnChart = delegate { this.Push(new ChartListing()); },
-                            OnDirect = delegate {this.Push(new OnlineListing()); },
-                            OnEdit = delegate {this.Push(new Editor()); },
+                            OnDirect = delegate { this.Push(new OnlineListing()); },
+                            OnEdit = delegate { this.Push(new Editor()); },
                             OnSolo = onSolo,
-                            OnMulti = delegate {this.Push(new Multiplayer()); },
+                            OnMulti = delegate { this.Push(new Multiplayer()); },
                             OnExit = this.Exit,
                         }
                     }
@@ -99,7 +100,7 @@ namespace osu.Game.Screens.Menu
 
         public void LoadToSolo() => Schedule(onSolo);
 
-        private void onSolo() =>this.Push(consumeSongSelect());
+        private void onSolo() => this.Push(consumeSongSelect());
 
         private Screen consumeSongSelect()
         {
@@ -157,7 +158,7 @@ namespace osu.Game.Screens.Menu
                 .OnComplete(l => buttons.SetOsuLogo(null));
         }
 
-        private void beatmap_ValueChanged(WorkingBeatmap newValue)
+        private void beatmap_ValueChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
             if (!this.IsCurrentScreen())
                 return;
@@ -183,7 +184,7 @@ namespace osu.Game.Screens.Menu
         {
             base.OnResuming(last);
 
-            ((BackgroundScreenDefault)Background).Next();
+            (Background as BackgroundScreenDefault)?.Next();
 
             //we may have consumed our preloaded instance, so let's make another.
             preloadSongSelect();
@@ -200,7 +201,7 @@ namespace osu.Game.Screens.Menu
         {
             if (!e.Repeat && e.ControlPressed && e.ShiftPressed && e.Key == Key.D)
             {
-               this.Push(new Drawings());
+                this.Push(new Drawings());
                 return true;
             }
 

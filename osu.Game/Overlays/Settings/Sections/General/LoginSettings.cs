@@ -78,7 +78,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                         {
                             Text = "ACCOUNT",
                             Margin = new MarginPadding { Bottom = 5 },
-                            Font = @"Exo2.0-Black",
+                            Font = OsuFont.GetFont(weight: FontWeight.Black),
                         },
                         form = new LoginForm
                         {
@@ -134,8 +134,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                                             Anchor = Anchor.Centre,
                                             Origin = Anchor.Centre,
                                             Text = "Signed in",
-                                            TextSize = 18,
-                                            Font = @"Exo2.0-Bold",
+                                            Font = OsuFont.GetFont(size: 18, weight: FontWeight.Bold),
                                             Margin = new MarginPadding { Top = 5, Bottom = 5 },
                                         },
                                     },
@@ -152,9 +151,9 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                     panel.Status.BindTo(api.LocalUser.Value.Status);
 
-                    dropdown.Current.ValueChanged += newValue =>
+                    dropdown.Current.ValueChanged += action =>
                     {
-                        switch (newValue)
+                        switch (action.NewValue)
                         {
                             case UserAction.Online:
                                 api.LocalUser.Value.Status.Value = new UserStatusOnline();

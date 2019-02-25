@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Input;
 using osu.Game.Configuration;
@@ -96,10 +96,10 @@ namespace osu.Game.Rulesets.UI
 
             IsPaused.ValueChanged += paused =>
             {
-                if (HasReplayLoaded)
+                if (HasReplayLoaded.Value)
                     return;
 
-                KeyBindingInputManager.UseParentInput = !paused;
+                KeyBindingInputManager.UseParentInput = !paused.NewValue;
             };
 
             Cursor = CreateCursor();

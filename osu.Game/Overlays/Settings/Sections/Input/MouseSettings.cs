@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Input;
@@ -61,13 +62,13 @@ namespace osu.Game.Overlays.Settings.Sections.Input
                 const string raw_mouse_handler = @"OsuTKRawMouseHandler";
                 const string standard_mouse_handler = @"OsuTKMouseHandler";
 
-                ignoredInputHandler.Value = enabled ? standard_mouse_handler : raw_mouse_handler;
+                ignoredInputHandler.Value = enabled.NewValue ? standard_mouse_handler : raw_mouse_handler;
             };
 
             ignoredInputHandler = config.GetBindable<string>(FrameworkSetting.IgnoredInputHandlers);
             ignoredInputHandler.ValueChanged += handler =>
             {
-                bool raw = !handler.Contains("Raw");
+                bool raw = !handler.NewValue.Contains("Raw");
                 rawInputToggle.Value = raw;
                 sensitivity.Bindable.Disabled = !raw;
             };

@@ -17,6 +17,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public Func<bool> Hit;
 
+        public OsuAction? HitAction;
+
         public CirclePiece()
         {
             Size = new Vector2((float)OsuHitObject.OBJECT_RADIUS * 2);
@@ -35,7 +37,13 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 case OsuAction.LeftButton:
                 case OsuAction.RightButton:
-                    return IsHovered && (Hit?.Invoke() ?? false);
+                    if (IsHovered && (Hit?.Invoke() ?? false))
+                    {
+                        HitAction = action;
+                        return true;
+                    }
+
+                    break;
             }
 
             return false;
