@@ -275,7 +275,7 @@ namespace osu.Game
                 Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
 
                 menuScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
-            }, $"watch {databasedScoreInfo.User.Username} play {databasedScoreInfo.Beatmap}", bypassScreenAllowChecks: true);
+            }, $"watch {databasedScoreInfo}", bypassScreenAllowChecks: true);
         }
 
         private ScheduledDelegate performFromMainMenuTask;

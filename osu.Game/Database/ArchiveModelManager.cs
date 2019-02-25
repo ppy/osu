@@ -139,6 +139,8 @@ namespace osu.Game.Database
             notification.Progress = 0;
             notification.Text = "Import is initialising...";
 
+            var term = $"{typeof(TModel).Name.Replace("Info", "").ToLower()}";
+
             List<TModel> imported = new List<TModel>();
 
             int current = 0;
@@ -150,7 +152,18 @@ namespace osu.Game.Database
 
                 try
                 {
-                    notification.Text = $"Importing ({++current} of {paths.Length})\n{Path.GetFileName(path)}";
+                    var text = $"Importing ";
+
+                    if (path.Length > 1)
+                        text += $"{++current} of {paths.Length} {term}s..";
+                    else
+                        text += $"{term}..";
+
+                    // only show the filename if it isn't a temporary one (as those look ugly).
+                    if (!path.Contains(Path.GetTempPath()))
+                        text += $"\n{Path.GetFileName(path)}";
+
+                    notification.Text = text;
 
                     imported.Add(Import(path));
 
@@ -172,7 +185,7 @@ namespace osu.Game.Database
             {
                 notification.CompletionText = imported.Count == 1
                     ? $"Imported {imported.First()}!"
-                    : $"Imported {current} {typeof(TModel).Name.Replace("Info", "").ToLower()}s!";
+                    : $"Imported {current} {term}s!";
 
                 if (imported.Count > 0 && PresentImport != null)
                 {
