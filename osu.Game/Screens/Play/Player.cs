@@ -54,6 +54,7 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;
+        private Bindable<bool> storyboardReplacesBackground;
 
         public int RestartCount;
 
@@ -344,15 +345,17 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            ShowStoryboard.ValueChanged += _ =>
+            ShowStoryboard.ValueChanged += s =>
             {
-                if (ShowStoryboard.Value && storyboard == null)
+                if (s.NewValue && storyboard == null)
                     initializeStoryboard(true);
             };
 
             Background.EnableUserDim.Value = true;
-            storyboardContainer.StoryboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
-            storyboardContainer.StoryboardReplacesBackground.BindTo(Background?.StoryboardReplacesBackground);
+
+            storyboardReplacesBackground.BindTo(Background?.StoryboardReplacesBackground);
+            storyboardReplacesBackground.BindTo(storyboardContainer.StoryboardReplacesBackground);
+            storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
             Task.Run(() =>
             {
@@ -411,7 +414,7 @@ namespace osu.Game.Screens.Play
             float fadeOutDuration = instant ? 0 : 250;
             this.FadeOut(fadeOutDuration);
             Background.EnableUserDim.Value = false;
-            storyboardContainer.StoryboardReplacesBackground.Value = false;
+            storyboardReplacesBackground.Value = false;
         }
 
         protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !pauseContainer.IsPaused.Value;
