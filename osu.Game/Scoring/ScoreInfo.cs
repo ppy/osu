@@ -109,15 +109,27 @@ namespace osu.Game.Scoring
         public string UserString
         {
             get => User?.Username;
-            set => User = new User { Username = value, Id = UserID};
+            set
+            {
+                if (User == null)
+                    User = new User { Username = value, Id = UserID };
+                else
+                    User.Username = value;
+            }
         }
 
         [JsonIgnore]
         [Column("UserID")]
         public long UserID
         {
-            get => User?.Id ?? 1;
-            set => User = new User {Username = UserString, Id = value};
+            get => User.Id;
+            set
+            {
+                if (User == null)
+                    User = new User { Username = UserString, Id = value };
+                else
+                    User.Id = value;
+            }
         }
 
         [JsonIgnore]
