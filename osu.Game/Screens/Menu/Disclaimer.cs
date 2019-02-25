@@ -98,7 +98,7 @@ namespace osu.Game.Screens.Menu
 
             api.LocalUser.BindValueChanged(user =>
             {
-                if (user.IsSupporter)
+                if (user.NewValue.IsSupporter)
                     textFlow.RemoveRange(supporterDrawables);
             }, true);
 
