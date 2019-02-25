@@ -513,8 +513,6 @@ namespace osu.Game.Screens.Select
             if (base.OnExiting(next))
                 return true;
 
-            Logger.Log("Exiting song select!");
-
             if (ModSelect.State == Visibility.Visible)
             {
                 ModSelect.Hide();
