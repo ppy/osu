@@ -148,7 +148,11 @@ namespace osu.Game
         {
             this.frameworkConfig = frameworkConfig;
 
-            ScoreManager.ItemAdded += (score, _, silent) => Schedule(() => LoadScore(score, silent));
+            ScoreManager.ItemAdded += (score, _, silent) =>
+            {
+                if (!silent)
+                    Schedule(() => PresentScore(score));
+            };
 
             if (!Host.IsPrimaryInstance)
             {
@@ -198,70 +202,11 @@ namespace osu.Game
             externalLinkOpener.OpenUrlExternally(url);
         }
 
-        private ScheduledDelegate scoreLoad;
-
         /// <summary>
         /// Show a beatmap set as an overlay.
         /// </summary>
         /// <param name="setId">The set to display.</param>
         public void ShowBeatmapSet(int setId) => beatmapSetOverlay.FetchAndShowBeatmapSet(setId);
-
-        /// <summary>
-        /// Present a beatmap at song select.
-        /// </summary>
-        /// <param name="beatmap">The beatmap to select.</param>
-        public void PresentBeatmap(BeatmapSetInfo beatmap)
-        {
-            if (menuScreen == null)
-            {
-                Schedule(() => PresentBeatmap(beatmap));
-                return;
-            }
-
-            CloseAllOverlays(false);
-
-            void setBeatmap()
-            {
-                if (Beatmap.Disabled)
-                {
-                    Schedule(setBeatmap);
-                    return;
-                }
-
-                var databasedSet = beatmap.OnlineBeatmapSetID != null ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID) : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
-
-                if (databasedSet != null)
-                {
-                    // Use first beatmap available for current ruleset, else switch ruleset.
-                    var first = databasedSet.Beatmaps.Find(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
-
-                    ruleset.Value = first.Ruleset;
-                    Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
-                }
-            }
-
-            switch (screenStack.CurrentScreen)
-            {
-                case SongSelect _:
-                    break;
-                default:
-                    // navigate to song select if we are not already there.
-
-                    menuScreen.MakeCurrent();
-
-                    if (Beatmap.Disabled)
-                    {
-                        // we may need to wait for a lease to be returned.
-                        Schedule(() => PresentBeatmap(beatmap));
-                        return;
-                    }
-
-                    menuScreen.LoadToSolo();
-                    break;
-            }
-
-            setBeatmap();
-        }
 
         /// <summary>
         /// Show a user's profile as an overlay.
@@ -275,19 +220,46 @@ namespace osu.Game
         /// <param name="beatmapId">The beatmap to show.</param>
         public void ShowBeatmap(int beatmapId) => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId);
 
-        protected void LoadScore(ScoreInfo score, bool silent)
+        /// <summary>
+        /// Present a beatmap at song select.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to select.</param>
+        public void PresentBeatmap(BeatmapSetInfo beatmap)
         {
-            if (silent)
-                return;
+            var databasedSet = beatmap.OnlineBeatmapSetID != null
+                ? BeatmapManager.QueryBeatmapSet(s => s.OnlineBeatmapSetID == beatmap.OnlineBeatmapSetID)
+                : BeatmapManager.QueryBeatmapSet(s => s.Hash == beatmap.Hash);
 
-            scoreLoad?.Cancel();
-
-            if (menuScreen == null)
+            if (databasedSet == null)
             {
-                scoreLoad = Schedule(() => LoadScore(score, false));
+                Logger.Log("The requested beatmap could not be loaded.", LoggingTarget.Information);
                 return;
             }
 
+            if (screenStack.CurrentScreen is PlaySongSelect)
+                // if we're already at song select then we don't need to return to the main menu.
+                setBeatmap();
+            else
+                performFromMainMenu(setBeatmap, $"load {beatmap}");
+
+            void setBeatmap()
+            {
+                menuScreen.LoadToSolo();
+
+                // Use first beatmap available for current ruleset, else switch ruleset.
+                var first = databasedSet.Beatmaps.Find(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
+
+                ruleset.Value = first.Ruleset;
+                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
+            }
+        }
+
+        /// <summary>
+        /// Present a score's replay.
+        /// </summary>
+        /// <param name="beatmap">The beatmap to select.</param>
+        public void PresentScore(ScoreInfo score)
+        {
             var databasedScore = ScoreManager.GetScore(score);
             var databasedScoreInfo = databasedScore.ScoreInfo;
             if (databasedScore.Replay == null)
@@ -303,14 +275,35 @@ namespace osu.Game
                 return;
             }
 
+            performFromMainMenu(() =>
+            {
+                ruleset.Value = databasedScoreInfo.Ruleset;
+
+                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
+                Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
+
+                menuScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
+            }, $"watch {databasedScoreInfo.User.Username} play {databasedScoreInfo.Beatmap}");
+        }
+
+        private ScheduledDelegate performFromMainMenuTask;
+
+        /// <summary>
+        /// Perform an action only after returning to the main menu.
+        /// Eagerly tries to exit the current screen until it succeeds.
+        /// </summary>
+        /// <param name="action">The action to perform once we are in the correct state.</param>
+        /// <param name="taskName">The task name to display in a notification (if we can't immediately reach the main menu state).</param>
+        private void performFromMainMenu(Action action, string taskName)
+        {
             if ((screenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange == false)
             {
                 notifications.Post(new SimpleNotification
                 {
-                    Text = $"Click here to watch {databasedScoreInfo.User.Username} on {databasedScoreInfo.Beatmap}",
+                    Text = $"Click here to {taskName}",
                     Activated = () =>
                     {
-                        loadScore();
+                        action();
                         return true;
                     }
                 });
@@ -318,24 +311,20 @@ namespace osu.Game
                 return;
             }
 
-            loadScore();
+            performFromMainMenuTask?.Cancel();
 
-            void loadScore()
+            CloseAllOverlays(false);
+
+            if (menuScreen?.IsCurrentScreen() != true || Beatmap.Disabled)
             {
-                if (!menuScreen.IsCurrentScreen() || Beatmap.Disabled)
-                {
-                    menuScreen.MakeCurrent();
-                    this.Delay(500).Schedule(loadScore, out scoreLoad);
-                    return;
-                }
-
-                ruleset.Value = databasedScoreInfo.Ruleset;
-
-                Beatmap.Value = BeatmapManager.GetWorkingBeatmap(databasedBeatmap);
-                Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
-
-                menuScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
+                // menuScreen may not be initialised or not be current yet; keep trying.
+                menuScreen?.MakeCurrent();
+                performFromMainMenuTask = Schedule(() => performFromMainMenu(action, taskName));
+                return;
             }
+
+            // success!
+            action();
         }
 
         protected override void Dispose(bool isDisposing)
