@@ -152,7 +152,7 @@ namespace osu.Game.Database
 
                 try
                 {
-                    var text = $"Importing ";
+                    var text = "Importing ";
 
                     if (path.Length > 1)
                         text += $"{++current} of {paths.Length} {term}s..";
