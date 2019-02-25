@@ -148,12 +148,6 @@ namespace osu.Game
         {
             this.frameworkConfig = frameworkConfig;
 
-            ScoreManager.ItemAdded += (score, _, silent) =>
-            {
-                if (!silent)
-                    Schedule(() => PresentScore(score));
-            };
-
             if (!Host.IsPrimaryInstance)
             {
                 Logger.Log(@"osu! does not support multiple running instances.", LoggingTarget.Runtime, LogLevel.Error);
@@ -221,7 +215,8 @@ namespace osu.Game
         public void ShowBeatmap(int beatmapId) => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId);
 
         /// <summary>
-        /// Present a beatmap at song select.
+        /// Present a beatmap at song select immediately..
+        /// The user should have already requested this interactively.
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
         public void PresentBeatmap(BeatmapSetInfo beatmap)
@@ -236,26 +231,23 @@ namespace osu.Game
                 return;
             }
 
-            if (screenStack.CurrentScreen is PlaySongSelect)
-                // if we're already at song select then we don't need to return to the main menu.
-                setBeatmap();
-            else
-                performFromMainMenu(setBeatmap, $"load {beatmap}");
-
-            void setBeatmap()
+            performFromMainMenu(() =>
             {
-                menuScreen.LoadToSolo();
+                // we might already be at song select, so a check is required before performing the load to solo.
+                if (menuScreen.IsCurrentScreen())
+                    menuScreen.LoadToSolo();
 
                 // Use first beatmap available for current ruleset, else switch ruleset.
                 var first = databasedSet.Beatmaps.Find(b => b.Ruleset == ruleset.Value) ?? databasedSet.Beatmaps.First();
 
                 ruleset.Value = first.Ruleset;
                 Beatmap.Value = BeatmapManager.GetWorkingBeatmap(first);
-            }
+            }, $"load {beatmap}", bypassScreenAllowChecks: true, targetScreen: typeof(PlaySongSelect));
         }
 
         /// <summary>
-        /// Present a score's replay.
+        /// Present a score's replay immediately.
+        /// The user should have already requested this interactively.
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
         public void PresentScore(ScoreInfo score)
@@ -283,7 +275,7 @@ namespace osu.Game
                 Beatmap.Value.Mods.Value = databasedScoreInfo.Mods;
 
                 menuScreen.Push(new PlayerLoader(() => new ReplayPlayer(databasedScore)));
-            }, $"watch {databasedScoreInfo.User.Username} play {databasedScoreInfo.Beatmap}");
+            }, $"watch {databasedScoreInfo.User.Username} play {databasedScoreInfo.Beatmap}", bypassScreenAllowChecks: true);
         }
 
         private ScheduledDelegate performFromMainMenuTask;
@@ -359,8 +351,10 @@ namespace osu.Game
 
             BeatmapManager.PostNotification = n => notifications?.Post(n);
             BeatmapManager.GetStableStorage = GetStorageForStableInstall;
+            BeatmapManager.PresentImport = items => PresentBeatmap(items.First());
 
-            BeatmapManager.PresentBeatmap = PresentBeatmap;
+            ScoreManager.PostNotification = n => notifications?.Post(n);
+            ScoreManager.PresentImport = items => PresentScore(items.First());
 
             Container logoContainer;
 

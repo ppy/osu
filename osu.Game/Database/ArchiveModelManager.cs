@@ -32,7 +32,7 @@ namespace osu.Game.Database
         where TModel : class, IHasFiles<TFileModel>, IHasPrimaryKey, ISoftDelete
         where TFileModel : INamedFileInfo, new()
     {
-        public delegate void ItemAddedDelegate(TModel model, bool existing, bool silent);
+        public delegate void ItemAddedDelegate(TModel model, bool existing);
 
         /// <summary>
         /// Set an endpoint for notifications to be posted to.
@@ -110,7 +110,7 @@ namespace osu.Game.Database
             ContextFactory = contextFactory;
 
             ModelStore = modelStore;
-            ModelStore.ItemAdded += (item, silent) => handleEvent(() => ItemAdded?.Invoke(item, false, silent));
+            ModelStore.ItemAdded += item => handleEvent(() => ItemAdded?.Invoke(item, false));
             ModelStore.ItemRemoved += s => handleEvent(() => ItemRemoved?.Invoke(s));
 
             Files = new FileStore(contextFactory, storage);
@@ -128,14 +128,16 @@ namespace osu.Game.Database
         /// <param name="paths">One or more archive locations on disk.</param>
         public void Import(params string[] paths)
         {
-            var notification = new ProgressNotification
-            {
-                Text = "Import is initialising...",
-                Progress = 0,
-                State = ProgressNotificationState.Active,
-            };
+            var notification = new ProgressNotification { State = ProgressNotificationState.Active };
 
             PostNotification?.Invoke(notification);
+            Import(notification, paths);
+        }
+
+        protected void Import(ProgressNotification notification, params string[] paths)
+        {
+            notification.Progress = 0;
+            notification.Text = "Import is initialising...";
 
             List<TModel> imported = new List<TModel>();
 
@@ -168,13 +170,20 @@ namespace osu.Game.Database
             }
             else
             {
-                notification.CompletionText = $"Imported {current} {typeof(TModel).Name.Replace("Info", "").ToLower()}s!";
-                notification.CompletionClickAction += () =>
+                notification.CompletionText = imported.Count == 1
+                    ? $"Imported {imported.First()}!"
+                    : $"Imported {current} {typeof(TModel).Name.Replace("Info", "").ToLower()}s!";
+
+                if (imported.Count > 0 && PresentImport != null)
                 {
-                    if (imported.Count > 0)
-                        PresentCompletedImport(imported);
-                    return true;
-                };
+                    notification.CompletionText += " Click to view.";
+                    notification.CompletionClickAction = () =>
+                    {
+                        PresentImport?.Invoke(imported);
+                        return true;
+                    };
+                }
+
                 notification.State = ProgressNotificationState.Completed;
             }
         }
@@ -207,9 +216,10 @@ namespace osu.Game.Database
             return import;
         }
 
-        protected virtual void PresentCompletedImport(IEnumerable<TModel> imported)
-        {
-        }
+        /// <summary>
+        /// Fired when the user requests to view the resulting import.
+        /// </summary>
+        public Action<IEnumerable<TModel>> PresentImport;
 
         /// <summary>
         /// Import an item from an <see cref="ArchiveReader"/>.
@@ -225,7 +235,7 @@ namespace osu.Game.Database
 
                 model.Hash = computeHash(archive);
 
-                return Import(model, false, archive);
+                return Import(model, archive);
             }
             catch (Exception e)
             {
@@ -259,9 +269,8 @@ namespace osu.Game.Database
         /// Import an item from a <see cref="TModel"/>.
         /// </summary>
         /// <param name="item">The model to be imported.</param>
-        /// <param name="silent">Whether the user should be notified fo the import.</param>
         /// <param name="archive">An optional archive to use for model population.</param>
-        public TModel Import(TModel item, bool silent = false, ArchiveReader archive = null)
+        public TModel Import(TModel item, ArchiveReader archive = null)
         {
             delayEvents();
 
@@ -281,7 +290,7 @@ namespace osu.Game.Database
                         {
                             Undelete(existing);
                             Logger.Log($"Found existing {typeof(TModel)} for {item} (ID {existing.ID}). Skipping import.", LoggingTarget.Database);
-                            handleEvent(() => ItemAdded?.Invoke(existing, true, silent));
+                            handleEvent(() => ItemAdded?.Invoke(existing, true));
                             return existing;
                         }
 
@@ -291,7 +300,7 @@ namespace osu.Game.Database
                         Populate(item, archive);
 
                         // import to store
-                        ModelStore.Add(item, silent);
+                        ModelStore.Add(item);
                     }
                     catch (Exception e)
                     {

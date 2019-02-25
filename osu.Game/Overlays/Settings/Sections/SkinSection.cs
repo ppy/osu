@@ -82,7 +82,7 @@ namespace osu.Game.Overlays.Settings.Sections
 
         private void itemRemoved(SkinInfo s) => Schedule(() => skinDropdown.Items = skinDropdown.Items.Where(i => i.ID != s.ID).ToArray());
 
-        private void itemAdded(SkinInfo s, bool existing, bool silent)
+        private void itemAdded(SkinInfo s, bool existing)
         {
             if (existing)
                 return;
