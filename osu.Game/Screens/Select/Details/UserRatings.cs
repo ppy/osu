@@ -70,7 +70,7 @@ namespace osu.Game.Screens.Select.Details
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = "User Rating",
-                            TextSize = 13,
+                            Font = OsuFont.GetFont(size: 13)
                         },
                         ratingsBar = new Bar
                         {
@@ -87,14 +87,14 @@ namespace osu.Game.Screens.Select.Details
                                 negativeRatings = new OsuSpriteText
                                 {
                                     Text = "0",
-                                    TextSize = 13,
+                                    Font = OsuFont.GetFont(size: 13)
                                 },
                                 positiveRatings = new OsuSpriteText
                                 {
                                     Anchor = Anchor.TopRight,
                                     Origin = Anchor.TopRight,
                                     Text = @"0",
-                                    TextSize = 13,
+                                    Font = OsuFont.GetFont(size: 13)
                                 },
                             },
                         },
@@ -103,7 +103,7 @@ namespace osu.Game.Screens.Select.Details
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Text = "Rating Spread",
-                            TextSize = 13,
+                            Font = OsuFont.GetFont(size: 13),
                             Margin = new MarginPadding { Top = 10, Bottom = 5 },
                         },
                     },

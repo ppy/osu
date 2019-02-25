@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
@@ -42,10 +42,10 @@ namespace osu.Game.Skinning
                     CurrentSkinInfo.Value = SkinInfo.Default;
             };
 
-            CurrentSkinInfo.ValueChanged += info => CurrentSkin.Value = getSkin(info);
+            CurrentSkinInfo.ValueChanged += skin => CurrentSkin.Value = getSkin(skin.NewValue);
             CurrentSkin.ValueChanged += skin =>
             {
-                if (skin.SkinInfo != CurrentSkinInfo.Value)
+                if (skin.NewValue.SkinInfo != CurrentSkinInfo.Value)
                     throw new InvalidOperationException($"Setting {nameof(CurrentSkin)}'s value directly is not supported. Use {nameof(CurrentSkinInfo)} instead.");
 
                 SourceChanged?.Invoke();

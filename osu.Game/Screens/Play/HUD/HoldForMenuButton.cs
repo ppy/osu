@@ -42,7 +42,7 @@ namespace osu.Game.Screens.Play.HUD
                 text = new OsuSpriteText
                 {
                     Text = "hold for menu",
-                    Font = @"Exo2.0-Bold",
+                    Font = OsuFont.GetFont(weight: FontWeight.Bold),
                     Anchor = Anchor.CentreLeft,
                     Origin = Anchor.CentreLeft
                 },
@@ -163,7 +163,7 @@ namespace osu.Game.Screens.Play.HUD
             private void bind()
             {
                 circularProgress.Current.BindTo(Progress);
-                Progress.ValueChanged += v => icon.Scale = new Vector2(1 + (float)v * 0.2f);
+                Progress.ValueChanged += progress => icon.Scale = new Vector2(1 + (float)progress.NewValue * 0.2f);
             }
 
             private bool pendingAnimation;

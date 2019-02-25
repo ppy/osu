@@ -3,6 +3,7 @@
 
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Scoring;
 using osuTK;
@@ -29,8 +30,7 @@ namespace osu.Game.Screens.Play.Break
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                         Text = "current progress".ToUpperInvariant(),
-                        TextSize = 15,
-                        Font = "Exo2.0-Black",
+                        Font = OsuFont.GetFont(weight: FontWeight.Black, size: 15),
                     },
                     new FillFlowContainer
                     {

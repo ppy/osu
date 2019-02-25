@@ -3,8 +3,8 @@
 
 using System.Collections.Generic;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osuTK.Graphics;
-using osu.Framework.Configuration;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -119,8 +119,8 @@ namespace osu.Game.Overlays.Settings
                 set
                 {
                     bindable = value;
-                    bindable.ValueChanged += newValue => UpdateState();
-                    bindable.DisabledChanged += disabled => UpdateState();
+                    bindable.ValueChanged += _ => UpdateState();
+                    bindable.DisabledChanged += _ => UpdateState();
                 }
             }
 

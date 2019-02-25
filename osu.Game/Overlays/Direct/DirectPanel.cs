@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -88,7 +88,7 @@ namespace osu.Game.Overlays.Direct
         {
             base.Update();
 
-            if (PreviewPlaying && Preview != null && Preview.TrackLoaded)
+            if (PreviewPlaying.Value && Preview != null && Preview.TrackLoaded)
             {
                 PreviewBar.Width = (float)(Preview.CurrentTime / Preview.Length);
             }
@@ -108,7 +108,7 @@ namespace osu.Game.Overlays.Direct
         {
             content.TweenEdgeEffectTo(edgeEffectNormal, hover_transition_time, Easing.OutQuint);
             content.MoveToY(0, hover_transition_time, Easing.OutQuint);
-            if (FadePlayButton && !PreviewPlaying)
+            if (FadePlayButton && !PreviewPlaying.Value)
                 PlayButton.FadeOut(120, Easing.InOutQuint);
 
             base.OnHoverLost(e);
@@ -127,8 +127,11 @@ namespace osu.Game.Overlays.Direct
             base.LoadComplete();
             this.FadeInFromZero(200, Easing.Out);
 
-            PreviewPlaying.ValueChanged += newValue => PlayButton.FadeTo(newValue || IsHovered || !FadePlayButton ? 1 : 0, 120, Easing.InOutQuint);
-            PreviewPlaying.ValueChanged += newValue => PreviewBar.FadeTo(newValue ? 1 : 0, 120, Easing.InOutQuint);
+            PreviewPlaying.ValueChanged += playing =>
+            {
+                PlayButton.FadeTo(playing.NewValue || IsHovered || !FadePlayButton ? 1 : 0, 120, Easing.InOutQuint);
+                PreviewBar.FadeTo(playing.NewValue ? 1 : 0, 120, Easing.InOutQuint);
+            };
         }
 
         protected List<DifficultyIcon> GetDifficultyIcons()
@@ -173,10 +176,7 @@ namespace osu.Game.Overlays.Direct
 
                 Children = new Drawable[]
                 {
-                    text = new OsuSpriteText
-                    {
-                        Font = @"Exo2.0-SemiBoldItalic",
-                    },
+                    text = new OsuSpriteText { Font = OsuFont.GetFont(weight: FontWeight.SemiBold, italics: true) },
                     new SpriteIcon
                     {
                         Icon = icon,

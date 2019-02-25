@@ -8,7 +8,7 @@ using osu.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
@@ -117,7 +117,7 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(AudioManager audio, IdleTracker idleTracker)
         {
-            isIdle.ValueChanged += updateIdleState;
+            isIdle.ValueChanged += idle => updateIdleState(idle.NewValue);
 
             if (idleTracker != null) isIdle.BindTo(idleTracker.IsIdle);
 

@@ -64,25 +64,13 @@ namespace osu.Game.Screens.Menu
                 }
             };
 
-            textFlow.AddText("This is an ", t =>
-            {
-                t.TextSize = 30;
-                t.Font = @"Exo2.0-Light";
-            });
-            textFlow.AddText("early development build", t =>
-            {
-                t.TextSize = 30;
-                t.Font = @"Exo2.0-SemiBold";
-            });
+            textFlow.AddText("This is an ", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.Light));
+            textFlow.AddText("early development build", t => t.Font = t.Font.With(Typeface.Exo, 30, FontWeight.SemiBold));
 
-            textFlow.AddParagraph("Things may not work as expected", t => t.TextSize = 20);
+            textFlow.AddParagraph("Things may not work as expected", t => t.Font = t.Font.With(size: 20));
             textFlow.NewParagraph();
 
-            Action<SpriteText> format = t =>
-            {
-                t.TextSize = 15;
-                t.Font = @"Exo2.0-SemiBold";
-            };
+            Action<SpriteText> format = t => t.Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold);
 
             textFlow.AddParagraph("Detailed bug reports are welcomed via github issues.", format);
             textFlow.NewParagraph();
@@ -102,7 +90,7 @@ namespace osu.Game.Screens.Menu
             supporterDrawables.Add(heart = textFlow.AddIcon(FontAwesome.fa_heart, t =>
             {
                 t.Padding = new MarginPadding { Left = 5 };
-                t.TextSize = 12;
+                t.Font = t.Font.With(size: 12);
                 t.Colour = colours.Pink;
                 t.Origin = Anchor.Centre;
             }).First());
