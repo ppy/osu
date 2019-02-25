@@ -178,6 +178,7 @@ namespace osu.Game.Screens.Play
                         {
                             RelativeSizeAxes = Axes.Both,
                             Alpha = 0,
+                            EnableUserDim = { Value = true }
                         },
                         new ScalingContainer(ScalingMode.Gameplay)
                         {
@@ -238,8 +239,6 @@ namespace osu.Game.Screens.Play
 
             if (ShowStoryboard.Value)
                 initializeStoryboard(false);
-
-            storyboardContainer.EnableUserDim.Value = true;
 
             // Bind ScoreProcessor to ourselves
             ScoreProcessor.AllJudged += onCompletion;

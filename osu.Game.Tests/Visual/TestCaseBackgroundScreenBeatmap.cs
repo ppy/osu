@@ -172,6 +172,31 @@ namespace osu.Game.Tests.Visual
         }
 
         /// <summary>
+        /// When exiting player, the screen that it suspends/exits to needs to have a fully visible (Alpha == 1) background.
+        /// </summary>
+        [Test]
+        public void StoryboardTransitionTest()
+        {
+            performSetup();
+            AddStep("Enable storyboard", () =>
+            {
+                player.ReplacesBackground.Value = true;
+                player.StoryboardEnabled.Value = true;
+            });
+            AddUntilStep(() =>
+            {
+                if (!songSelect.IsCurrentScreen())
+                {
+                    songSelect.MakeCurrent();
+                    return false;
+                }
+                return true;
+            }, "Wait for song select is current");
+            AddWaitStep(5, "Wait for dim");
+            AddAssert("Background is visible", () => songSelect.AssertVisible());
+        }
+
+        /// <summary>
         /// Check if the fade container is properly being reset when screen dim is disabled.
         /// </summary>
         [Test]
