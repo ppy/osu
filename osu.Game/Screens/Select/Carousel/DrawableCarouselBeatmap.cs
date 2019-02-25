@@ -100,25 +100,21 @@ namespace osu.Game.Screens.Select.Carousel
                                     {
                                         new OsuSpriteText
                                         {
-                                            Font = @"Exo2.0-Medium",
                                             Text = beatmap.Version,
-                                            TextSize = 20,
+                                            Font = OsuFont.GetFont(size: 20),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
                                         },
                                         new OsuSpriteText
                                         {
-                                            Font = @"Exo2.0-Medium",
                                             Text = "mapped by",
-                                            TextSize = 16,
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
                                         },
                                         new OsuSpriteText
                                         {
-                                            Font = @"Exo2.0-MediumItalic",
                                             Text = $"{(beatmap.Metadata ?? beatmap.BeatmapSet.Metadata).Author.Username}",
-                                            TextSize = 16,
+                                            Font = OsuFont.GetFont(italics: true),
                                             Anchor = Anchor.BottomLeft,
                                             Origin = Anchor.BottomLeft
                                         },
@@ -157,7 +153,7 @@ namespace osu.Game.Screens.Select.Carousel
 
         protected override bool OnClick(ClickEvent e)
         {
-            if (Item.State == CarouselItemState.Selected)
+            if (Item.State.Value == CarouselItemState.Selected)
                 startRequested?.Invoke(beatmap);
 
             return base.OnClick(e);

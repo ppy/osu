@@ -16,7 +16,7 @@ using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
-    public abstract class TestCasePlayer : ScreenTestCase
+    public abstract class TestCasePlayer : RateAdjustedBeatmapTestCase
     {
         private readonly Ruleset ruleset;
 
@@ -99,7 +99,7 @@ namespace osu.Game.Tests.Visual
         private Player loadPlayerFor(Ruleset r)
         {
             var beatmap = CreateBeatmap(r);
-            var working = new TestWorkingBeatmap(beatmap);
+            var working = new TestWorkingBeatmap(beatmap, Clock);
 
             workingWeakReferences.Add(working);
 
@@ -119,14 +119,6 @@ namespace osu.Game.Tests.Visual
             });
 
             return player;
-        }
-
-        protected override void Update()
-        {
-            base.Update();
-
-            // note that this will override any mod rate application
-            Beatmap.Value.Track.Rate = Clock.Rate;
         }
 
         protected virtual Player CreatePlayer(Ruleset ruleset) => new Player

@@ -24,7 +24,7 @@ namespace osu.Game.Tests.Visual
         [BackgroundDependencyLoader]
         private void load()
         {
-            Beatmap.Value = new TestWorkingBeatmap(ruleset.RulesetInfo);
+            Beatmap.Value = new TestWorkingBeatmap(ruleset.RulesetInfo, null);
 
             LoadComponentAsync(new Editor(), LoadScreen);
         }

@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Multi.Components
                         Children = new Drawable[]
                         {
                             new BeatmapTitle(),
-                            beatmapAuthor = new LinkFlowContainer(s => s.TextSize = 14)
+                            beatmapAuthor = new LinkFlowContainer(s => s.Font = s.Font.With(size: 14))
                             {
                                 Anchor = Anchor.BottomLeft,
                                 Origin = Anchor.BottomLeft,
@@ -51,14 +51,16 @@ namespace osu.Game.Screens.Multi.Components
                 }
             };
 
-            CurrentBeatmap.BindValueChanged(v =>
+            CurrentItem.BindValueChanged(item =>
             {
                 beatmapAuthor.Clear();
 
-                if (v != null)
+                var beatmap = item.NewValue?.Beatmap;
+
+                if (beatmap != null)
                 {
                     beatmapAuthor.AddText("mapped by ", s => s.Colour = OsuColour.Gray(0.8f));
-                    beatmapAuthor.AddLink(v.Metadata.Author.Username, null, LinkAction.OpenUserProfile, v.Metadata.Author.Id.ToString(), "View Profile");
+                    beatmapAuthor.AddLink(beatmap.Metadata.Author.Username, null, LinkAction.OpenUserProfile, beatmap.Metadata.Author.Id.ToString(), "View Profile");
                 }
             }, true);
         }

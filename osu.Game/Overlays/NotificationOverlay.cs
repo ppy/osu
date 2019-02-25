@@ -11,7 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics.Containers;
 using System;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Threading;
 
 namespace osu.Game.Overlays
@@ -80,7 +80,7 @@ namespace osu.Game.Overlays
         private ScheduledDelegate notificationsEnabler;
         private void updateProcessingMode()
         {
-            bool enabled = OverlayActivationMode == OverlayActivation.All || State == Visibility.Visible;
+            bool enabled = OverlayActivationMode.Value == OverlayActivation.All || State == Visibility.Visible;
 
             notificationsEnabler?.Cancel();
 
