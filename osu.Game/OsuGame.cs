@@ -294,16 +294,21 @@ namespace osu.Game
         /// </summary>
         /// <param name="action">The action to perform once we are in the correct state.</param>
         /// <param name="taskName">The task name to display in a notification (if we can't immediately reach the main menu state).</param>
-        private void performFromMainMenu(Action action, string taskName)
+        /// <param name="targetScreen">An optional target screen type. If this screen is already current we can immediately perform the action without returning to the menu.</param>
+        /// <param name="bypassScreenAllowChecks">Whether checking <see cref="IOsuScreen.AllowExternalScreenChange"/> should be bypassed.</param>
+        private void performFromMainMenu(Action action, string taskName, Type targetScreen = null, bool bypassScreenAllowChecks = false)
         {
-            if ((screenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange == false)
+            performFromMainMenuTask?.Cancel();
+
+            // if the current screen does not allow screen changing, give the user an option to try again later.
+            if (!bypassScreenAllowChecks && (screenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange == false)
             {
                 notifications.Post(new SimpleNotification
                 {
                     Text = $"Click here to {taskName}",
                     Activated = () =>
                     {
-                        action();
+                        performFromMainMenu(action, taskName, targetScreen, true);
                         return true;
                     }
                 });
@@ -311,20 +316,26 @@ namespace osu.Game
                 return;
             }
 
-            performFromMainMenuTask?.Cancel();
-
             CloseAllOverlays(false);
 
-            if (menuScreen?.IsCurrentScreen() != true || Beatmap.Disabled)
+            // we may already be at the target screen type.
+            if (targetScreen != null && screenStack.CurrentScreen?.GetType() == targetScreen)
             {
-                // menuScreen may not be initialised or not be current yet; keep trying.
-                menuScreen?.MakeCurrent();
-                performFromMainMenuTask = Schedule(() => performFromMainMenu(action, taskName));
+                action();
                 return;
             }
 
-            // success!
-            action();
+            // all conditions have been met to continue with the action.
+            if (menuScreen?.IsCurrentScreen() == true && !Beatmap.Disabled)
+            {
+                action();
+                return;
+            }
+
+            // menuScreen may not be initialised yet (null check required).
+            menuScreen?.MakeCurrent();
+
+            performFromMainMenuTask = Schedule(() => performFromMainMenu(action, taskName));
         }
 
         protected override void Dispose(bool isDisposing)
