@@ -19,6 +19,7 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Tournament;
+using osu.Framework.Platform;
 
 namespace osu.Game.Screens.Menu
 {
@@ -28,7 +29,7 @@ namespace osu.Game.Screens.Menu
 
         public override bool HideOverlaysOnEnter => buttons.State == ButtonSystemState.Initial;
 
-        protected override bool AllowBackButton => buttons.State != ButtonSystemState.Initial;
+        protected override bool AllowBackButton => buttons.State != ButtonSystemState.Initial && host.CanExit;
 
         public override bool AllowExternalScreenChange => true;
 
@@ -36,33 +37,23 @@ namespace osu.Game.Screens.Menu
 
         private readonly MenuSideFlashes sideFlashes;
 
+        [Resolved]
+        private GameHost host { get; set; }
+
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
         public MainMenu()
         {
-            InternalChildren = new Drawable[]
+            sideFlashes = new MenuSideFlashes();
+
+            buttons = new ButtonSystem
             {
-                new ExitConfirmOverlay
-                {
-                    Action = this.Exit,
-                },
-                new ParallaxContainer
-                {
-                    ParallaxAmount = 0.01f,
-                    Children = new Drawable[]
-                    {
-                        buttons = new ButtonSystem
-                        {
-                            OnChart = delegate { this.Push(new ChartListing()); },
-                            OnDirect = delegate {this.Push(new OnlineListing()); },
-                            OnEdit = delegate {this.Push(new Editor()); },
-                            OnSolo = onSolo,
-                            OnMulti = delegate {this.Push(new Multiplayer()); },
-                            OnExit = this.Exit,
-                        }
-                    }
-                },
-                sideFlashes = new MenuSideFlashes(),
+                OnChart = delegate { this.Push(new ChartListing()); },
+                OnDirect = delegate { this.Push(new OnlineListing()); },
+                OnEdit = delegate { this.Push(new Editor()); },
+                OnSolo = onSolo,
+                OnMulti = delegate { this.Push(new Multiplayer()); },
+                OnExit = this.Exit,
             };
 
             buttons.StateChanged += state =>
@@ -83,6 +74,22 @@ namespace osu.Game.Screens.Menu
         [BackgroundDependencyLoader(true)]
         private void load(OsuGame game = null)
         {
+            if (host.CanExit)
+            {
+                AddInternal(new ExitConfirmOverlay
+                {
+                    Action = this.Exit,
+                });
+            }
+
+            AddInternal(new ParallaxContainer
+            {
+                ParallaxAmount = 0.01f,
+                Child = buttons,
+            });
+
+            AddInternal(sideFlashes);
+
             if (game != null)
             {
                 buttons.OnSettings = game.ToggleSettings;
