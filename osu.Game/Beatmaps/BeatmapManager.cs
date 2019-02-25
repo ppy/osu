@@ -145,8 +145,7 @@ namespace osu.Game.Beatmaps
 
             var downloadNotification = new DownloadNotification
             {
-                CompletionText = $"Imported {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}!",
-                Text = $"Downloading {beatmapSetInfo.Metadata.Artist} - {beatmapSetInfo.Metadata.Title}",
+                Text = $"Downloading {beatmapSetInfo}",
             };
 
             var request = new DownloadBeatmapSetRequest(beatmapSetInfo, noVideo);
