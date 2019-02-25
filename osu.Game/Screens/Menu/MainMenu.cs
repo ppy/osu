@@ -5,6 +5,7 @@ using osuTK;
 using osuTK.Graphics;
 using osuTK.Input;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Screens;
@@ -157,7 +158,7 @@ namespace osu.Game.Screens.Menu
                 .OnComplete(l => buttons.SetOsuLogo(null));
         }
 
-        private void beatmap_ValueChanged(WorkingBeatmap newValue)
+        private void beatmap_ValueChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
             if (!this.IsCurrentScreen())
                 return;

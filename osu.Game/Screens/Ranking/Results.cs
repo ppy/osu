@@ -190,45 +190,43 @@ namespace osu.Game.Screens.Ranking
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.BottomCentre,
                                     Text = $"{Score.MaxCombo}x",
-                                    TextSize = 40,
                                     RelativePositionAxes = Axes.X,
-                                    Font = @"Exo2.0-Bold",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 40),
                                     X = 0.1f,
                                     Colour = colours.BlueDarker,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.BottomCentre,
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.TopCentre,
                                     Text = "max combo",
-                                    TextSize = 20,
+                                    Font = OsuFont.GetFont(size: 20),
                                     RelativePositionAxes = Axes.X,
                                     X = 0.1f,
                                     Colour = colours.Gray6,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.TopCentre,
                                 },
                                 new OsuSpriteText
                                 {
-                                    Text = $"{Score.Accuracy:P2}",
-                                    TextSize = 40,
-                                    RelativePositionAxes = Axes.X,
-                                    Font = @"Exo2.0-Bold",
-                                    X = 0.9f,
-                                    Colour = colours.BlueDarker,
                                     Anchor = Anchor.CentreLeft,
                                     Origin = Anchor.BottomCentre,
+                                    Text = $"{Score.Accuracy:P2}",
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 40),
+                                    RelativePositionAxes = Axes.X,
+                                    X = 0.9f,
+                                    Colour = colours.BlueDarker,
                                 },
                                 new OsuSpriteText
                                 {
+                                    Anchor = Anchor.CentreLeft,
+                                    Origin = Anchor.TopCentre,
                                     Text = "accuracy",
-                                    TextSize = 20,
+                                    Font = OsuFont.GetFont(size: 20),
                                     RelativePositionAxes = Axes.X,
                                     X = 0.9f,
                                     Colour = colours.Gray6,
-                                    Anchor = Anchor.CentreLeft,
-                                    Origin = Anchor.TopCentre,
                                 },
                             }
                         },
@@ -268,12 +266,12 @@ namespace osu.Game.Screens.Ranking
                 modeChangeButtons.AddItem(t);
             modeChangeButtons.Current.Value = modeChangeButtons.Items.FirstOrDefault();
 
-            modeChangeButtons.Current.BindValueChanged(m =>
+            modeChangeButtons.Current.BindValueChanged(page =>
             {
                 currentPage?.FadeOut();
                 currentPage?.Expire();
 
-                currentPage = m?.CreatePage();
+                currentPage = page.NewValue?.CreatePage();
 
                 if (currentPage != null)
                     circleInner.Add(currentPage);

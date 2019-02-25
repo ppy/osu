@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 
 namespace osu.Game.Overlays.Profile.Components
@@ -36,8 +37,7 @@ namespace osu.Game.Overlays.Profile.Components
             {
                 Anchor = Anchor.BottomCentre,
                 Origin = Anchor.BottomCentre,
-                TextSize = 14,
-                Font = @"Exo2.0-Bold"
+                Font = OsuFont.GetFont(size: 14, weight: FontWeight.Bold)
             });
         }
 

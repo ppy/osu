@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using osu.Framework.Graphics;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Screens.Menu;
 
@@ -22,7 +23,7 @@ namespace osu.Game.Tests.Visual
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "Fired!",
-                TextSize = 50,
+                Font = OsuFont.GetFont(size: 50),
                 Alpha = 0,
             };
 

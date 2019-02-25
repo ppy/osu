@@ -1,7 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
@@ -63,14 +63,14 @@ namespace osu.Game.Screens.Play.HUD
 
             TextSize = 80;
 
-            Current.ValueChanged += newValue => updateCount(newValue == 0);
+            Current.ValueChanged += combo => updateCount(combo.NewValue == 0);
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            DisplayedCountSpriteText.Text = FormatCount(Current);
+            DisplayedCountSpriteText.Text = FormatCount(Current.Value);
             DisplayedCountSpriteText.Anchor = Anchor;
             DisplayedCountSpriteText.Origin = Origin;
 
@@ -99,8 +99,9 @@ namespace osu.Game.Screens.Play.HUD
             set
             {
                 textSize = value;
-                DisplayedCountSpriteText.TextSize = TextSize;
-                PopOutCount.TextSize = TextSize;
+
+                DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(size: TextSize);
+                PopOutCount.Font = PopOutCount.Font.With(size: TextSize);
             }
         }
 
@@ -110,7 +111,7 @@ namespace osu.Game.Screens.Play.HUD
         /// <param name="amount"></param>
         public void Increment(int amount = 1)
         {
-            Current.Value = Current + amount;
+            Current.Value = Current.Value + amount;
         }
 
         /// <summary>
@@ -161,7 +162,7 @@ namespace osu.Game.Screens.Play.HUD
         private void updateCount(bool rolling)
         {
             int prev = previousValue;
-            previousValue = Current;
+            previousValue = Current.Value;
 
             if (!IsLoaded)
                 return;
@@ -172,14 +173,14 @@ namespace osu.Game.Screens.Play.HUD
                 IsRolling = false;
                 DisplayedCount = prev;
 
-                if (prev + 1 == Current)
-                    OnCountIncrement(prev, Current);
+                if (prev + 1 == Current.Value)
+                    OnCountIncrement(prev, Current.Value);
                 else
-                    OnCountChange(prev, Current);
+                    OnCountChange(prev, Current.Value);
             }
             else
             {
-                OnCountRolling(displayedCount, Current);
+                OnCountRolling(displayedCount, Current.Value);
                 IsRolling = true;
             }
         }
