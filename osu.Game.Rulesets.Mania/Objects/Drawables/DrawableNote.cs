@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osuTK.Graphics;
 using osu.Framework.Graphics;
@@ -31,11 +32,11 @@ namespace osu.Game.Rulesets.Mania.Objects.Drawables
             InternalChild = headPiece = new NotePiece();
         }
 
-        protected override void OnDirectionChanged(ScrollingDirection direction)
+        protected override void OnDirectionChanged(ValueChangedEvent<ScrollingDirection> e)
         {
-            base.OnDirectionChanged(direction);
+            base.OnDirectionChanged(e);
 
-            headPiece.Anchor = headPiece.Origin = direction == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
+            headPiece.Anchor = headPiece.Origin = e.NewValue == ScrollingDirection.Up ? Anchor.TopCentre : Anchor.BottomCentre;
         }
 
         public override Color4 AccentColour

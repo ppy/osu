@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Game.Online.Chat;
 using osu.Game.Online.Multiplayer;
 
@@ -28,13 +28,13 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             base.LoadComplete();
 
-            roomId.BindValueChanged(v => updateChannel(), true);
+            roomId.BindValueChanged(_ => updateChannel(), true);
         }
 
         private void updateChannel()
         {
             if (roomId.Value != null)
-                Channel.Value = channelManager?.JoinChannel(new Channel { Id = channelId, Type = ChannelType.Multiplayer, Name = $"#mp_{roomId.Value}" });
+                Channel.Value = channelManager?.JoinChannel(new Channel { Id = channelId.Value, Type = ChannelType.Multiplayer, Name = $"#mp_{roomId.Value}" });
         }
     }
 }
