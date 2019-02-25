@@ -54,7 +54,8 @@ namespace osu.Game.Screens.Play
 
         private Bindable<bool> mouseWheelDisabled;
         private Bindable<double> userAudioOffset;
-        private Bindable<bool> storyboardReplacesBackground;
+
+        private readonly Bindable<bool> storyboardReplacesBackground = new Bindable<bool>();
 
         public int RestartCount;
 
