@@ -6,7 +6,7 @@ namespace osu.Game.Tests.Visual
     /// <summary>
     /// Test case which adjusts the beatmap's rate to match any speed adjustments in visual tests.
     /// </summary>
-    public abstract class TestCaseRateAdjustedBeatmap : ScreenTestCase
+    public abstract class RateAdjustedBeatmapTestCase : ScreenTestCase
     {
         protected override void Update()
         {

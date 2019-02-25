@@ -26,7 +26,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Osu.Tests
 {
-    public class TestCaseSliderInput : TestCaseRateAdjustedBeatmap
+    public class TestCaseSliderInput : RateAdjustedBeatmapTestCase
     {
         public override IReadOnlyList<Type> RequiredTypes => new[]
         {
