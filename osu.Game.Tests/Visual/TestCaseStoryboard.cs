@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
@@ -58,15 +59,15 @@ namespace osu.Game.Tests.Visual
             Beatmap.ValueChanged += beatmapChanged;
         }
 
-        private void beatmapChanged(WorkingBeatmap working)
-            => loadStoryboard(working);
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
+            => loadStoryboard(e.NewValue);
 
         private void restart()
         {
             var track = Beatmap.Value.Track;
 
             track.Reset();
-            loadStoryboard(Beatmap);
+            loadStoryboard(Beatmap.Value);
             track.Start();
         }
 
@@ -78,7 +79,7 @@ namespace osu.Game.Tests.Visual
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
             storyboardContainer.Clock = decoupledClock;
 
-            storyboard = working.Storyboard.CreateDrawable(Beatmap);
+            storyboard = working.Storyboard.CreateDrawable(Beatmap.Value);
             storyboard.Passing = false;
 
             storyboardContainer.Add(storyboard);
