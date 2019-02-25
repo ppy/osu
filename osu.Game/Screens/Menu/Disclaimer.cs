@@ -10,6 +10,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
+using osu.Game.Online.API;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Overlays;
@@ -39,7 +40,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours)
+        private void load(OsuColour colours, APIAccess api)
         {
             InternalChildren = new Drawable[]
             {
@@ -106,6 +107,12 @@ namespace osu.Game.Screens.Menu
                 t.Colour = colours.Pink;
                 t.Origin = Anchor.Centre;
             }).First());
+
+            api.LocalUser.BindValueChanged(user =>
+            {
+                if (user.IsSupporter)
+                    textFlow.RemoveRange(supporterDrawables);
+            }, true);
 
             iconColour = colours.Yellow;
         }
