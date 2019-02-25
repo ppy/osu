@@ -285,7 +285,7 @@ namespace osu.Game.Screens.Select
 
         public void Edit(BeatmapInfo beatmap = null)
         {
-            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
+           Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
            this.Push(new Editor());
         }
 
@@ -510,13 +510,16 @@ namespace osu.Game.Screens.Select
 
         public override bool OnExiting(IScreen next)
         {
+            if (base.OnExiting(next))
+                return true;
+
+            Logger.Log("Exiting song select!");
+
             if (ModSelect.State == Visibility.Visible)
             {
                 ModSelect.Hide();
                 return true;
             }
-
-            FinaliseSelection(performStartAction: false);
 
             beatmapInfoWedge.State = Visibility.Hidden;
 
@@ -530,7 +533,7 @@ namespace osu.Game.Screens.Select
             SelectedMods.UnbindAll();
             Beatmap.Value.Mods.Value = new Mod[] { };
 
-            return base.OnExiting(next);
+            return false;
         }
 
         protected override void Dispose(bool isDisposing)
