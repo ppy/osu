@@ -39,10 +39,13 @@ namespace osu.Game.Rulesets.Difficulty
         {
             beatmap.Mods.Value = mods;
             IBeatmap playableBeatmap = beatmap.GetPlayableBeatmap(ruleset.RulesetInfo);
+
             var clock = new StopwatchClock();
             mods.OfType<IApplicableToClock>().ForEach(m => m.ApplyToClock(clock));
+
             return calculate(playableBeatmap, mods, clock.Rate);
         }
+
         /// <summary>
         /// Calculates the difficulty of the beatmap using all mod combinations applicable to the beatmap.
         /// </summary>
@@ -67,7 +70,6 @@ namespace osu.Game.Rulesets.Difficulty
 
             var difficultyHitObjects = CreateDifficultyHitObjects(beatmap, clockRate).OrderBy(h => h.BaseObject.StartTime).ToList();
 
-            var counted = 0;
             double sectionLength = SectionLength * clockRate;
 
             // The first object doesn't generate a strain, so we begin with an incremented section end
@@ -75,7 +77,6 @@ namespace osu.Game.Rulesets.Difficulty
 
             foreach (DifficultyHitObject h in difficultyHitObjects)
             {
-                counted = 0;
                 while (h.BaseObject.StartTime > currentSectionEnd)
                 {
                     foreach (Skill s in skills)
@@ -86,19 +87,11 @@ namespace osu.Game.Rulesets.Difficulty
 
                     currentSectionEnd += sectionLength;
                 }
+
                 foreach (Skill s in skills)
-                {
-                    if (counted > 1)
-                    {
-                        s.TouchProcess(h);
-                    }
-                    else
-                    {
-                        s.Process(h);
-                    }
-                    counted++;
-                }
+                    s.Process(h);
             }
+
             // The peak strain will not be saved for the last section in the above loop
             foreach (Skill s in skills)
                 s.SaveCurrentPeak();
