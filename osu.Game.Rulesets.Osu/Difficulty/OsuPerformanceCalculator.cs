@@ -102,7 +102,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double rawAim = Attributes.AimStrain;
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                rawAim = Math.Pow(Attributes.TouchAimStrain, 0.84);
+                rawAim = Math.Pow(Attributes.TouchAimStrain, 0.83);
 
             double aimValue = Math.Pow(5.0f * Math.Max(1.0f, rawAim / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
@@ -212,7 +212,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             double rawSpeed = Attributes.SpeedStrain;
 
             if (mods.Any(m => m is OsuModTouchDevice))
-                rawSpeed = Math.Pow(Attributes.TouchSpeedStrain, 0.925);
+                rawSpeed = Attributes.TouchSpeedStrain;
             double speedValue = Math.Pow(5.0f * Math.Max(1.0f, rawSpeed / 0.0675f) - 4.0f, 3.0f) / 100000.0f;
 
             // Longer maps are worth more
