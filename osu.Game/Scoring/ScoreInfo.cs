@@ -112,12 +112,10 @@ namespace osu.Game.Scoring
             set
             {
                 if (User == null)
-                    User = new User { Username = value, Id = UserID };
-                else
-                {
-                    User.Username = value;
-                    User.Id = UserID;
-                }
+                    User = new User();
+
+                User.Username = value;
+                User.Id = UserID ?? 1;
             }
         }
 
@@ -129,12 +127,10 @@ namespace osu.Game.Scoring
             set
             {
                 if (User == null)
-                    User = new User { Username = UserString, Id = value};
-                else
-                {
-                    User.Id = value;
-                    User.Username = UserString;
-                }
+                    User = new User();
+
+                User.Id = value ?? 1;
+                User.Username = UserString;
             }
         }
 
