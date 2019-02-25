@@ -29,7 +29,7 @@ namespace osu.Game.Tests.Visual
                 Size = new Vector2(200,100)
             };
 
-            Beatmap.Value = new TestWorkingBeatmap(new Beatmap());
+            Beatmap.Value = new TestWorkingBeatmap(new Beatmap(), Clock);
 
             Child = playback;
         }

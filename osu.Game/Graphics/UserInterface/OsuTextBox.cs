@@ -24,7 +24,7 @@ namespace osu.Game.Graphics.UserInterface
 
         protected override SpriteText CreatePlaceholder() => new OsuSpriteText
         {
-            Font = @"Exo2.0-MediumItalic",
+            Font = OsuFont.GetFont(italics: true),
             Colour = new Color4(180, 180, 180, 255),
             Margin = new MarginPadding { Left = 2 },
         };
@@ -57,7 +57,7 @@ namespace osu.Game.Graphics.UserInterface
             base.OnFocusLost(e);
         }
 
-        protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), TextSize = CalculatedTextSize };
+        protected override Drawable GetDrawableCharacter(char c) => new OsuSpriteText { Text = c.ToString(), Font = OsuFont.GetFont(size: CalculatedTextSize) };
 
         public virtual bool OnPressed(GlobalAction action)
         {

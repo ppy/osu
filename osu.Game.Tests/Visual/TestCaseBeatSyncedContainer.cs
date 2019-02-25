@@ -15,6 +15,7 @@ using osu.Game.Graphics.Sprites;
 using osu.Game.Overlays;
 using osuTK.Graphics;
 using osu.Framework.Lists;
+using osu.Game.Graphics;
 
 namespace osu.Game.Tests.Visual
 {
@@ -196,8 +197,8 @@ namespace osu.Game.Tests.Visual
             {
                 AutoSizeAxes = Axes.Both;
                 Direction = FillDirection.Horizontal;
-                Add(new OsuSpriteText { Text = header + @": ", TextSize = text_size });
-                Add(valueText = new OsuSpriteText { TextSize = text_size });
+                Add(new OsuSpriteText { Text = header + @": ", Font = OsuFont.GetFont(size: text_size) });
+                Add(valueText = new OsuSpriteText { Font = OsuFont.GetFont(size: text_size) });
                 Margin = new MarginPadding(margin);
             }
         }

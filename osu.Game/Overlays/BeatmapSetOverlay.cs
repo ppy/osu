@@ -103,8 +103,8 @@ namespace osu.Game.Overlays
 
             header.Picker.Beatmap.ValueChanged += b =>
             {
-                info.Beatmap = b;
-                scores.Beatmap = b;
+                info.Beatmap = b.NewValue;
+                scores.Beatmap = b.NewValue;
             };
         }
 

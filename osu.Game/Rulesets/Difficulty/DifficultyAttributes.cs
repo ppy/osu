@@ -7,8 +7,13 @@ namespace osu.Game.Rulesets.Difficulty
 {
     public class DifficultyAttributes
     {
-        public readonly Mod[] Mods;
-        public readonly double StarRating;
+        public Mod[] Mods;
+
+        public double StarRating;
+
+        public DifficultyAttributes()
+        {
+        }
 
         public DifficultyAttributes(Mod[] mods, double starRating)
         {

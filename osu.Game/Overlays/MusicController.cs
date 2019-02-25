@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -107,20 +107,18 @@ namespace osu.Game.Overlays
                                     Origin = Anchor.BottomCentre,
                                     Anchor = Anchor.TopCentre,
                                     Position = new Vector2(0, 40),
-                                    TextSize = 25,
+                                    Font = OsuFont.GetFont(size: 25, italics: true),
                                     Colour = Color4.White,
                                     Text = @"Nothing to play",
-                                    Font = @"Exo2.0-MediumItalic"
                                 },
                                 artist = new OsuSpriteText
                                 {
                                     Origin = Anchor.TopCentre,
                                     Anchor = Anchor.TopCentre,
                                     Position = new Vector2(0, 45),
-                                    TextSize = 15,
+                                    Font = OsuFont.GetFont(size: 15, weight: FontWeight.Bold, italics: true),
                                     Colour = Color4.White,
                                     Text = @"Nothing to play",
-                                    Font = @"Exo2.0-BoldItalic"
                                 },
                                 new Container
                                 {
@@ -317,13 +315,13 @@ namespace osu.Game.Overlays
         private WorkingBeatmap current;
         private TransformDirection? queuedDirection;
 
-        private void beatmapChanged(WorkingBeatmap beatmap)
+        private void beatmapChanged(ValueChangedEvent<WorkingBeatmap> e)
         {
             TransformDirection direction = TransformDirection.None;
 
             if (current != null)
             {
-                bool audioEquals = beatmap?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
+                bool audioEquals = e.NewValue?.BeatmapInfo?.AudioEquals(current.BeatmapInfo) ?? false;
 
                 if (audioEquals)
                     direction = TransformDirection.None;
@@ -336,13 +334,13 @@ namespace osu.Game.Overlays
                 {
                     //figure out the best direction based on order in playlist.
                     var last = beatmapSets.TakeWhile(b => b.ID != current.BeatmapSetInfo?.ID).Count();
-                    var next = beatmap == null ? -1 : beatmapSets.TakeWhile(b => b.ID != beatmap.BeatmapSetInfo?.ID).Count();
+                    var next = beatmap == null ? -1 : beatmapSets.TakeWhile(b => b.ID != e.NewValue.BeatmapSetInfo?.ID).Count();
 
                     direction = last > next ? TransformDirection.Prev : TransformDirection.Next;
                 }
             }
 
-            current = beatmap;
+            current = e.NewValue;
 
             progressBar.CurrentTime = 0;
 

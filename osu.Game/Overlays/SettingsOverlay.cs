@@ -107,12 +107,12 @@ namespace osu.Game.Overlays
                 SectionsContainer.SelectedSection.ValueChanged += section =>
                 {
                     selectedSidebarButton.Selected = false;
-                    selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section);
+                    selectedSidebarButton = Sidebar.Children.Single(b => b.Section == section.NewValue);
                     selectedSidebarButton.Selected = true;
                 };
             }
 
-            searchTextBox.Current.ValueChanged += newValue => SectionsContainer.SearchContainer.SearchTerm = newValue;
+            searchTextBox.Current.ValueChanged += term => SectionsContainer.SearchContainer.SearchTerm = term.NewValue;
 
             CreateSections()?.ForEach(AddSection);
         }

@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Screens;
@@ -55,7 +55,7 @@ namespace osu.Game.Screens.Multi.Match
 
         public MatchSubScreen(Room room)
         {
-            Title = room.RoomID.Value == null ? "New room" : room.Name;
+            Title = room.RoomID.Value == null ? "New room" : room.Name.Value;
         }
 
         [BackgroundDependencyLoader]
@@ -146,10 +146,10 @@ namespace osu.Game.Screens.Multi.Match
                 },
             };
 
-            header.Tabs.Current.BindValueChanged(t =>
+            header.Tabs.Current.BindValueChanged(tab =>
             {
                 const float fade_duration = 500;
-                if (t is SettingsMatchPage)
+                if (tab.NewValue is SettingsMatchPage)
                 {
                     settings.Show();
                     info.FadeOut(fade_duration, Easing.OutQuint);
@@ -188,15 +188,15 @@ namespace osu.Game.Screens.Multi.Match
         /// <summary>
         /// Handles propagation of the current playlist item's content to game-wide mechanisms.
         /// </summary>
-        private void currentItemChanged(PlaylistItem item)
+        private void currentItemChanged(ValueChangedEvent<PlaylistItem> e)
         {
             // Retrieve the corresponding local beatmap, since we can't directly use the playlist's beatmap info
-            var localBeatmap = item?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == item.Beatmap.OnlineBeatmapID);
+            var localBeatmap = e.NewValue?.Beatmap == null ? null : beatmapManager.QueryBeatmap(b => b.OnlineBeatmapID == e.NewValue.Beatmap.OnlineBeatmapID);
 
             Beatmap.Value = beatmapManager.GetWorkingBeatmap(localBeatmap);
-            CurrentMods.Value = item?.RequiredMods ?? Enumerable.Empty<Mod>();
-            if (item?.Ruleset != null)
-                Ruleset.Value = item.Ruleset;
+            CurrentMods.Value = e.NewValue?.RequiredMods ?? Enumerable.Empty<Mod>();
+            if (e.NewValue?.Ruleset != null)
+                Ruleset.Value = e.NewValue.Ruleset;
         }
 
         /// <summary>
@@ -228,7 +228,7 @@ namespace osu.Game.Screens.Multi.Match
             {
                 default:
                 case GameTypeTimeshift _:
-                    multiplayer?.Start(() => new TimeshiftPlayer(CurrentItem)
+                    multiplayer?.Start(() => new TimeshiftPlayer(CurrentItem.Value)
                     {
                         Exited = () => leaderboard.RefreshScores()
                     });

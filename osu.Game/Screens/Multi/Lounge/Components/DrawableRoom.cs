@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using osu.Framework;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -155,7 +155,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                                         Spacing = new Vector2(5f),
                                         Children = new Drawable[]
                                         {
-                                            new RoomName { TextSize = 18 },
+                                            new RoomName { Font = OsuFont.GetFont(size: 18) },
                                             new ParticipantInfo(),
                                         },
                                     },
