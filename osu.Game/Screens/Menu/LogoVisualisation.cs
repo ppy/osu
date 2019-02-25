@@ -3,7 +3,6 @@
 
 using osuTK;
 using osuTK.Graphics;
-using osu.Framework.Configuration;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Colour;
@@ -15,6 +14,7 @@ using osu.Game.Beatmaps;
 using osu.Game.Graphics;
 using System;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Screens.Menu
 {
@@ -74,7 +74,7 @@ namespace osu.Game.Screens.Menu
         }
 
         [BackgroundDependencyLoader]
-        private void load(ShaderManager shaders, IBindableBeatmap beatmap)
+        private void load(ShaderManager shaders, IBindable<WorkingBeatmap> beatmap)
         {
             this.beatmap.BindTo(beatmap);
             shader = shaders.Load(VertexShaderDescriptor.TEXTURE_2, FragmentShaderDescriptor.TEXTURE_ROUNDED);

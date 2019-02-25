@@ -5,14 +5,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace osu.Game.Rulesets.Osu.Difficulty.Utils
+namespace osu.Game.Rulesets.Difficulty.Utils
 {
     /// <summary>
-    /// An indexed stack with Push() only, which disposes items at the bottom after the capacity is full.
-    /// Indexing starts at the top of the stack.
+    /// An indexed stack with limited depth. Indexing starts at the top of the stack.
     /// </summary>
-    public class History<T> : IEnumerable<T>
+    public class LimitedCapacityStack<T> : IEnumerable<T>
     {
+        /// <summary>
+        /// The number of elements in the stack.
+        /// </summary>
         public int Count { get; private set; }
 
         private readonly T[] array;
@@ -20,10 +22,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         private int marker; // Marks the position of the most recently added item.
 
         /// <summary>
-        /// Initializes a new instance of the History class that is empty and has the specified capacity.
+        /// Constructs a new <see cref="LimitedCapacityStack{T}"/>.
         /// </summary>
-        /// <param name="capacity">The number of items the History can hold.</param>
-        public History(int capacity)
+        /// <param name="capacity">The number of items the stack can hold.</param>
+        public LimitedCapacityStack(int capacity)
         {
             if (capacity < 0)
                 throw new ArgumentOutOfRangeException();
@@ -34,8 +36,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         }
 
         /// <summary>
-        /// The most recently added item is returned at index 0.
+        /// Retrieves the item at an index in the stack.
         /// </summary>
+        /// <param name="i">The index of the item to retrieve. The top of the stack is returned at index 0.</param>
         public T this[int i]
         {
             get
@@ -52,11 +55,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Utils
         }
 
         /// <summary>
-        /// Adds the item as the most recent one in the history.
-        /// The oldest item is disposed if the history is full.
+        /// Pushes an item to this <see cref="LimitedCapacityStack{T}"/>.
         /// </summary>
-        public void Push(T item) // Overwrite the oldest item instead of shifting every item by one with every addition.
+        /// <param name="item">The item to push.</param>
+        public void Push(T item)
         {
+            // Overwrite the oldest item instead of shifting every item by one with every addition.
             if (marker == 0)
                 marker = capacity - 1;
             else

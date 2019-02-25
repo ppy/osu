@@ -16,6 +16,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Game.Screens.Select.Details;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 
 namespace osu.Game.Screens.Select
@@ -137,8 +138,7 @@ namespace osu.Game.Screens.Select
                                 new OsuSpriteText
                                 {
                                     Text = "Points of Failure",
-                                    Font = @"Exo2.0-Bold",
-                                    TextSize = 14,
+                                    Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                                 },
                                 failRetryGraph = new FailRetryGraph
                                 {
@@ -323,8 +323,7 @@ namespace osu.Game.Screens.Select
                             Child = new OsuSpriteText
                             {
                                 Text = title,
-                                Font = @"Exo2.0-Bold",
-                                TextSize = 14,
+                                Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 14),
                             },
                         },
                     },
@@ -347,7 +346,7 @@ namespace osu.Game.Screens.Select
 
             private void setTextAsync(string text)
             {
-                LoadComponentAsync(new OsuTextFlowContainer(s => s.TextSize = 14)
+                LoadComponentAsync(new OsuTextFlowContainer(s => s.Font = s.Font.With(size: 14))
                 {
                     RelativeSizeAxes = Axes.X,
                     AutoSizeAxes = Axes.Y,

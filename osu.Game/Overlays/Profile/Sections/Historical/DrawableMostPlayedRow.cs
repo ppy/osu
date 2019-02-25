@@ -6,6 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.Drawables;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osuTK;
@@ -47,7 +48,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                     new OsuSpriteText
                     {
                         Text = @"mapped by ",
-                        TextSize = 12,
+                        Font = OsuFont.GetFont(size: 12)
                     },
                     mapperContainer = new OsuHoverContainer
                     {
@@ -57,8 +58,7 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                             new OsuSpriteText
                             {
                                 Text = beatmap.Metadata.AuthorString,
-                                TextSize = 12,
-                                Font = @"Exo2.0-MediumItalic"
+                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Medium, italics: true)
                             }
                         }
                     },
@@ -78,16 +78,14 @@ namespace osu.Game.Overlays.Profile.Sections.Historical
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomRight,
                         Text = playCount.ToString(),
-                        TextSize = 18,
-                        Font = @"Exo2.0-SemiBoldItalic"
+                        Font = OsuFont.GetFont(size: 18, weight: FontWeight.SemiBold, italics: true)
                     },
                     new OsuSpriteText
                     {
                         Anchor = Anchor.BottomRight,
                         Origin = Anchor.BottomRight,
                         Text = @"times played ",
-                        TextSize = 12,
-                        Font = @"Exo2.0-RegularItalic"
+                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular, italics: true)
                     },
                 }
             });

@@ -4,7 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Timing;
@@ -78,7 +78,7 @@ namespace osu.Game.Screens.Play
         {
             if (!CanPause && !force) return;
 
-            if (IsPaused) return;
+            if (IsPaused.Value) return;
 
             // stop the seekable clock (stops the audio eventually)
             decoupledClock.Stop();
@@ -91,7 +91,7 @@ namespace osu.Game.Screens.Play
 
         public void Resume()
         {
-            if (!IsPaused) return;
+            if (!IsPaused.Value) return;
 
             IsPaused.Value = false;
             IsResuming = false;
@@ -116,10 +116,10 @@ namespace osu.Game.Screens.Play
         protected override void Update()
         {
             // eagerly pause when we lose window focus (if we are locally playing).
-            if (!game.IsActive && CanPause)
+            if (!game.IsActive.Value && CanPause)
                 Pause();
 
-            if (!IsPaused)
+            if (!IsPaused.Value)
                 framedClock.ProcessFrame();
 
             base.Update();

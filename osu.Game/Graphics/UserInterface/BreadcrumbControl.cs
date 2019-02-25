@@ -27,12 +27,12 @@ namespace osu.Game.Graphics.UserInterface
         {
             Height = 32;
             TabContainer.Spacing = new Vector2(padding, 0f);
-            Current.ValueChanged += tab =>
+            Current.ValueChanged += index =>
             {
                 foreach (var t in TabContainer.Children.OfType<BreadcrumbTabItem>())
                 {
                     var tIndex = TabContainer.IndexOf(t);
-                    var tabIndex = TabContainer.IndexOf(TabMap[tab]);
+                    var tabIndex = TabContainer.IndexOf(TabMap[index.NewValue]);
 
                     t.State = tIndex < tabIndex ? Visibility.Hidden : Visibility.Visible;
                     t.Chevron.FadeTo(tIndex <= tabIndex ? 0f : 1f, 500, Easing.OutQuint);
@@ -82,7 +82,7 @@ namespace osu.Game.Graphics.UserInterface
 
             public BreadcrumbTabItem(T value) : base(value)
             {
-                Text.TextSize = 18;
+                Text.Font = Text.Font.With(size: 18);
                 Text.Margin = new MarginPadding { Vertical = 8 };
                 Padding = new MarginPadding { Right = padding + item_chevron_size };
                 Add(Chevron = new SpriteIcon

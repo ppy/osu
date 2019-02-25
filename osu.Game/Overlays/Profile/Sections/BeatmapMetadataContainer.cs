@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Localisation;
 using osu.Game.Beatmaps;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 
@@ -48,15 +49,13 @@ namespace osu.Game.Overlays.Profile.Sections
                     {
                         Text = new LocalisedString(($"{beatmap.Metadata.TitleUnicode ?? beatmap.Metadata.Title} [{beatmap.Version}] ",
                                                     $"{beatmap.Metadata.Title ?? beatmap.Metadata.TitleUnicode} [{beatmap.Version}] ")),
-                        TextSize = 15,
-                        Font = "Exo2.0-SemiBoldItalic",
+                        Font = OsuFont.GetFont(size: 15, weight: FontWeight.SemiBold, italics: true)
                     },
                     new OsuSpriteText
                     {
                         Text = new LocalisedString((beatmap.Metadata.ArtistUnicode, beatmap.Metadata.Artist)),
-                        TextSize = 12,
                         Padding = new MarginPadding { Top = 3 },
-                        Font = "Exo2.0-RegularItalic",
+                        Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular, italics: true)
                     },
                 },
             };

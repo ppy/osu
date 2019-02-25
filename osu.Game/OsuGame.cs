@@ -19,6 +19,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using osu.Framework.Audio;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
@@ -174,15 +175,17 @@ namespace osu.Game
             // bind config int to database RulesetInfo
             configRuleset = LocalConfig.GetBindable<int>(OsuSetting.Ruleset);
             ruleset.Value = RulesetStore.GetRuleset(configRuleset.Value) ?? RulesetStore.AvailableRulesets.First();
-            ruleset.ValueChanged += r => configRuleset.Value = r.ID ?? 0;
+            ruleset.ValueChanged += r => configRuleset.Value = r.NewValue.ID ?? 0;
 
             // bind config int to database SkinInfo
             configSkin = LocalConfig.GetBindable<int>(OsuSetting.Skin);
-            SkinManager.CurrentSkinInfo.ValueChanged += s => configSkin.Value = s.ID;
-            configSkin.ValueChanged += id => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == id) ?? SkinInfo.Default;
+            SkinManager.CurrentSkinInfo.ValueChanged += skin => configSkin.Value = skin.NewValue.ID;
+            configSkin.ValueChanged += skinId => SkinManager.CurrentSkinInfo.Value = SkinManager.Query(s => s.ID == skinId.NewValue) ?? SkinInfo.Default;
             configSkin.TriggerChange();
 
             LocalConfig.BindWith(OsuSetting.VolumeInactive, inactiveVolumeAdjust);
+
+            IsActive.BindValueChanged(active => updateActiveState(active.NewValue), true);
         }
 
         private ExternalLinkOpener externalLinkOpener;
@@ -292,7 +295,7 @@ namespace osu.Game
                 return;
             }
 
-            if ((screenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange != true)
+            if ((screenStack.CurrentScreen as IOsuScreen)?.AllowExternalScreenChange == false)
             {
                 notifications.Post(new SimpleNotification
                 {
@@ -311,7 +314,7 @@ namespace osu.Game
 
             void loadScore()
             {
-                if (!menuScreen.IsCurrentScreen())
+                if (!menuScreen.IsCurrentScreen() || Beatmap.Disabled)
                 {
                     menuScreen.MakeCurrent();
                     this.Delay(500).Schedule(loadScore, out scoreLoad);
@@ -336,6 +339,11 @@ namespace osu.Game
         protected override void LoadComplete()
         {
             base.LoadComplete();
+
+            // The next time this is updated is in UpdateAfterChildren, which occurs too late and results
+            // in the cursor being shown for a few frames during the intro.
+            // This prevents the cursor from showing until we have a screen with CursorVisible = true
+            MenuCursorContainer.CanShowCursor = menuScreen?.CursorVisible ?? false;
 
             // todo: all archive managers should be able to be looped here.
             SkinManager.PostNotification = n => notifications?.Post(n);
@@ -508,9 +516,9 @@ namespace osu.Game
                 };
             }
 
-            OverlayActivationMode.ValueChanged += v =>
+            OverlayActivationMode.ValueChanged += mode =>
             {
-                if (v != OverlayActivation.All) CloseAllOverlays();
+                if (mode.NewValue != OverlayActivation.All) CloseAllOverlays();
             };
 
             void updateScreenOffset()
@@ -669,16 +677,12 @@ namespace osu.Game
 
         private readonly BindableDouble inactiveVolumeAdjust = new BindableDouble();
 
-        protected override void OnDeactivated()
+        private void updateActiveState(bool isActive)
         {
-            base.OnDeactivated();
-            Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
-        }
-
-        protected override void OnActivated()
-        {
-            base.OnActivated();
-            Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+            if (isActive)
+                Audio.RemoveAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
+            else
+                Audio.AddAdjustment(AdjustableProperty.Volume, inactiveVolumeAdjust);
         }
 
         public bool OnReleased(GlobalAction action) => false;
@@ -723,46 +727,13 @@ namespace osu.Game
         {
             base.UpdateAfterChildren();
 
-            // we only want to apply these restrictions when we are inside a screen stack.
-            // the use case for not applying is in visual/unit tests.
-            bool applyBeatmapRulesetRestrictions = !(screenStack.CurrentScreen as IOsuScreen)?.AllowBeatmapRulesetChange ?? false;
-
-            ruleset.Disabled = applyBeatmapRulesetRestrictions;
-            Beatmap.Disabled = applyBeatmapRulesetRestrictions;
-
             screenContainer.Padding = new MarginPadding { Top = ToolbarOffset };
             overlayContent.Padding = new MarginPadding { Top = ToolbarOffset };
 
             MenuCursorContainer.CanShowCursor = (screenStack.CurrentScreen as IOsuScreen)?.CursorVisible ?? false;
         }
 
-        /// <summary>
-        /// Sets <see cref="Beatmap"/> while ignoring any beatmap.
-        /// </summary>
-        /// <param name="beatmap">The beatmap to set.</param>
-        public void ForcefullySetBeatmap(WorkingBeatmap beatmap)
-        {
-            var beatmapDisabled = Beatmap.Disabled;
-
-            Beatmap.Disabled = false;
-            Beatmap.Value = beatmap;
-            Beatmap.Disabled = beatmapDisabled;
-        }
-
-        /// <summary>
-        /// Sets <see cref="Ruleset"/> while ignoring any ruleset restrictions.
-        /// </summary>
-        /// <param name="beatmap">The beatmap to set.</param>
-        public void ForcefullySetRuleset(RulesetInfo ruleset)
-        {
-            var rulesetDisabled = this.ruleset.Disabled;
-
-            this.ruleset.Disabled = false;
-            this.ruleset.Value = ruleset;
-            this.ruleset.Disabled = rulesetDisabled;
-        }
-
-        protected virtual void ScreenChanged(IScreen lastScreen, IScreen newScreen)
+        protected virtual void ScreenChanged(IScreen current, IScreen newScreen)
         {
             switch (newScreen)
             {

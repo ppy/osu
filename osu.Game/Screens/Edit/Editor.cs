@@ -11,6 +11,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Game.Graphics;
 using osu.Game.Screens.Edit.Components.Timelines.Summary;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
@@ -29,7 +30,8 @@ namespace osu.Game.Screens.Edit
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenCustom(@"Backgrounds/bg4");
 
         public override bool HideOverlaysOnEnter => true;
-        public override bool AllowBeatmapRulesetChange => false;
+
+        public override bool DisallowExternalBeatmapRulesetChanges => true;
 
         private Box bottomBackground;
         private Container screenContainer;
@@ -221,11 +223,11 @@ namespace osu.Game.Screens.Edit
 
         private void exportBeatmap() => host.OpenFileExternally(Beatmap.Value.Save());
 
-        private void onModeChanged(EditorScreenMode mode)
+        private void onModeChanged(ValueChangedEvent<EditorScreenMode> e)
         {
             currentScreen?.Exit();
 
-            switch (mode)
+            switch (e.NewValue)
             {
                 case EditorScreenMode.Compose:
                     currentScreen = new ComposeScreen();
