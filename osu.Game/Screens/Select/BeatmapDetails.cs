@@ -1,4 +1,4 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
@@ -185,8 +185,6 @@ namespace osu.Game.Screens.Select
             source.Text = Beatmap.Metadata.Source;
             tags.Text = Beatmap.Metadata.Tags;
 
-            tags.Margin = new MarginPadding { Top = string.IsNullOrEmpty(Beatmap.Metadata.Source) ? -2 * spacing : 0 };
-
             var requestedBeatmap = Beatmap;
             if (requestedBeatmap.Metrics == null)
             {
@@ -333,20 +331,17 @@ namespace osu.Game.Screens.Select
                 };
             }
 
-            public MarginPadding Margin
-            {
-                set => textContainer.Margin = value;
-            }
-
             public string Text
             {
                 set
                 {
                     if (string.IsNullOrEmpty(value))
                     {
-                        textContainer.FadeOut(transition_duration);
+                        this.FadeOut(transition_duration);
                         return;
                     }
+
+                    this.FadeIn(transition_duration);
 
                     setTextAsync(value);
                 }
