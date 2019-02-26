@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Screens;
@@ -14,6 +15,7 @@ using osu.Game.Online.API;
 using osuTK;
 using osuTK.Graphics;
 using osu.Game.Overlays;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Menu
 {
@@ -34,13 +36,16 @@ namespace osu.Game.Screens.Menu
 
         private const float icon_y = -85;
 
+        [Resolved]
+        private APIAccess api { get; set; }
+
         public Disclaimer()
         {
             ValidForResume = false;
         }
 
         [BackgroundDependencyLoader]
-        private void load(OsuColour colours, APIAccess api)
+        private void load(OsuColour colours)
         {
             InternalChildren = new Drawable[]
             {
@@ -96,12 +101,6 @@ namespace osu.Game.Screens.Menu
                 t.Origin = Anchor.Centre;
             }).First());
 
-            api.LocalUser.BindValueChanged(user =>
-            {
-                if (user.NewValue.IsSupporter)
-                    textFlow.RemoveRange(supporterDrawables);
-            }, true);
-
             iconColour = colours.Yellow;
         }
 
@@ -109,6 +108,8 @@ namespace osu.Game.Screens.Menu
         {
             base.LoadComplete();
             LoadComponentAsync(intro = new Intro());
+
+            api.LocalUser.BindValueChanged(userChanged, true);
         }
 
         public override void OnEntering(IScreen last)
@@ -133,6 +134,18 @@ namespace osu.Game.Screens.Menu
                 .Finally(d => this.Push(intro));
 
             heart.FlashColour(Color4.White, 750, Easing.OutQuint).Loop();
+        }
+
+        public override void OnSuspending(IScreen next)
+        {
+            base.OnSuspending(next);
+
+            api.LocalUser.ValueChanged -= userChanged;
+        }
+
+        private void userChanged(ValueChangedEvent<User> user)
+        {
+            if (user.NewValue.IsSupporter) supporterDrawables.ForEach(d => d.FadeOut(200, Easing.OutQuint).Expire());
         }
     }
 }
