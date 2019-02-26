@@ -237,7 +237,7 @@ namespace osu.Game.Tests.Visual
             AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
         }
 
-        private void waitForDim() => AddWaitStep(3, "Wait for dim");
+        private void waitForDim() => AddWaitStep(5, "Wait for dim");
 
         private void performSetup()
         {
