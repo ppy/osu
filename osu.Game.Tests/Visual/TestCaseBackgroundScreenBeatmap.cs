@@ -87,7 +87,7 @@ namespace osu.Game.Tests.Visual
                 InputManager.MoveMouseTo(playerLoader.VisualSettingsPos);
             });
 
-            AddWaitStep(5, "Wait for dim");
+            waitForDim();
             AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
         }
 
@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Visual
                 InputManager.MoveMouseTo(playerLoader.VisualSettingsPos);
                 InputManager.MoveMouseTo(playerLoader.ScreenPos);
             });
-            AddWaitStep(5, "Wait for dim");
+            waitForDim();
             AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
         }
 
@@ -130,10 +130,10 @@ namespace osu.Game.Tests.Visual
                 player.ReplacesBackground.Value = true;
                 player.StoryboardEnabled.Value = true;
             });
-            AddWaitStep(5, "Wait for dim");
+            waitForDim();
             AddAssert("Background is invisible", () => songSelect.IsBackgroundInvisible());
             AddStep("Disable storyboard", () => player.ReplacesBackground.Value = false);
-            AddWaitStep(5, "Wait for dim");
+            waitForDim();
             AddAssert("Background is visible", () => songSelect.IsBackgroundVisible());
         }
 
@@ -159,7 +159,7 @@ namespace osu.Game.Tests.Visual
 
                 return true;
             }, "Wait for song select is current");
-            AddWaitStep(5, "Wait for dim");
+            waitForDim();
             AddAssert("Background is visible", () => songSelect.IsBackgroundVisible());
         }
 
@@ -171,7 +171,7 @@ namespace osu.Game.Tests.Visual
         {
             performSetup();
             AddStep("Test User Undimming", () => songSelect.DimEnabled.Value = false);
-            AddWaitStep(5, "Wait for dim");
+            waitForDim();
             AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
         }
 
@@ -183,7 +183,7 @@ namespace osu.Game.Tests.Visual
         {
             performSetup();
             AddStep("Test User Dimming", () => songSelect.DimEnabled.Value = true);
-            AddWaitStep(5, "Wait for dim");
+            waitForDim();
             AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
         }
 
@@ -199,7 +199,7 @@ namespace osu.Game.Tests.Visual
                 if (!player.IsPaused.Value)
                     player.Exit();
             });
-            AddWaitStep(5, "Wait for dim");
+            waitForDim();
             AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
         }
 
@@ -211,7 +211,7 @@ namespace osu.Game.Tests.Visual
         {
             performSetup();
             AddStep("Transition to Results", () => player.Push(new FadeAccesibleResults(new ScoreInfo { User = new User { Username = "osu!" } })));
-            AddWaitStep(5, "Wait for dim");
+            waitForDim();
             AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
         }
@@ -233,9 +233,11 @@ namespace osu.Game.Tests.Visual
 
                 return true;
             }, "Wait for song select is current");
-            AddWaitStep(5, "Wait for dim");
+            waitForDim();
             AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
         }
+
+        private void waitForDim() => AddWaitStep(3, "Wait for dim");
 
         private void performSetup()
         {
