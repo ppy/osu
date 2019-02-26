@@ -221,7 +221,7 @@ namespace osu.Game.Tests.Visual
                 AllowLeadIn = false,
                 AllowResults = false,
             }));
-            AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
+            AddUntilStep(() => player.IsLoaded, "Wait for player to load");
         }
 
         private void createSongSelect()
@@ -236,7 +236,7 @@ namespace osu.Game.Tests.Visual
                 songSelect = new DummySongSelect();
                 screenStackContainer.ScreenStack.Push(songSelect);
             });
-            AddUntilStep(() => songSelect?.IsLoaded ?? false, "Wait for song select to load");
+            AddUntilStep(() => songSelect.IsLoaded, "Wait for song select to load");
             AddStep("Create beatmap", () =>
             {
                 Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
