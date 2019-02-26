@@ -45,43 +45,9 @@ namespace osu.Game.Tests.Visual
         [Cached]
         private BackgroundScreenStack backgroundStack;
 
-        private void performSetup()
-        {
-            createSongSelect();
-
-            AddStep("Load new player to song select", () => songSelect.Push(player = new DimAccessiblePlayer { Ready = true }));
-            AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
-        }
-
-        private void createSongSelect()
-        {
-            AddStep("Create song select if required", () =>
-            {
-                if (songSelect == null)
-                {
-                    LoadComponentAsync(new DummySongSelect(), p =>
-                    {
-                        songSelect = p;
-                        screen.Push(p);
-                        songSelect.UpdateBindables();
-                    });
-                }
-            });
-            AddUntilStep(() => songSelect?.IsLoaded ?? false, "Wait for song select to load");
-            AddUntilStep(() =>
-            {
-                if (!songSelect.IsCurrentScreen())
-                {
-                    songSelect.MakeCurrent();
-                    return false;
-                }
-                return true;
-            }, "Wait for song select is current");
-        }
-
         public TestCaseBackgroundScreenBeatmap()
         {
-            InputManager.Add(backgroundStack = new BackgroundScreenStack {RelativeSizeAxes = Axes.Both});
+            InputManager.Add(backgroundStack = new BackgroundScreenStack { RelativeSizeAxes = Axes.Both });
             InputManager.Add(screen = new ScreenStack { RelativeSizeAxes = Axes.Both });
 
             AddStep("Create beatmap", () =>
@@ -190,6 +156,7 @@ namespace osu.Game.Tests.Visual
                     songSelect.MakeCurrent();
                     return false;
                 }
+
                 return true;
             }, "Wait for song select is current");
             AddWaitStep(5, "Wait for dim");
@@ -243,7 +210,7 @@ namespace osu.Game.Tests.Visual
         public void TransitionTest()
         {
             performSetup();
-            AddStep("Transition to Results", () => player.Push(new FadeAccesibleResults(new ScoreInfo { User = new User { Username = "osu!" }})));
+            AddStep("Transition to Results", () => player.Push(new FadeAccesibleResults(new ScoreInfo { User = new User { Username = "osu!" } })));
             AddWaitStep(5, "Wait for dim");
             AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
@@ -263,10 +230,46 @@ namespace osu.Game.Tests.Visual
                     songSelect.MakeCurrent();
                     return false;
                 }
+
                 return true;
             }, "Wait for song select is current");
             AddWaitStep(5, "Wait for dim");
             AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
+        }
+
+        private void performSetup()
+        {
+            createSongSelect();
+
+            AddStep("Load new player to song select", () => songSelect.Push(player = new DimAccessiblePlayer { Ready = true }));
+            AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
+        }
+
+        private void createSongSelect()
+        {
+            AddStep("Create song select if required", () =>
+            {
+                if (songSelect == null)
+                {
+                    LoadComponentAsync(new DummySongSelect(), p =>
+                    {
+                        songSelect = p;
+                        screen.Push(p);
+                        songSelect.UpdateBindables();
+                    });
+                }
+            });
+            AddUntilStep(() => songSelect?.IsLoaded ?? false, "Wait for song select to load");
+            AddUntilStep(() =>
+            {
+                if (!songSelect.IsCurrentScreen())
+                {
+                    songSelect.MakeCurrent();
+                    return false;
+                }
+
+                return true;
+            }, "Wait for song select is current");
         }
 
         private class DummySongSelect : OsuScreen
@@ -303,7 +306,8 @@ namespace osu.Game.Tests.Visual
 
         private class FadeAccesibleResults : SoloResults
         {
-            public FadeAccesibleResults(ScoreInfo score) : base(score)
+            public FadeAccesibleResults(ScoreInfo score)
+                : base(score)
             {
             }
 
@@ -337,7 +341,8 @@ namespace osu.Game.Tests.Visual
             public VisualSettings VisualSettingsPos => VisualSettings;
             public BackgroundScreen ScreenPos => Background;
 
-            public DimAccessiblePlayerLoader(Player player) : base(() => player)
+            public DimAccessiblePlayerLoader(Player player)
+                : base(() => player)
             {
             }
 
