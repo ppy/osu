@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Menu
 {
     public class MainMenu : OsuScreen
     {
-        private readonly ButtonSystem buttons;
+        private ButtonSystem buttons;
 
         public override bool HideOverlaysOnEnter => buttons.State == ButtonSystemState.Initial;
 
@@ -35,26 +35,39 @@ namespace osu.Game.Screens.Menu
 
         private Screen songSelect;
 
-        private readonly MenuSideFlashes sideFlashes;
+        private MenuSideFlashes sideFlashes;
 
         [Resolved]
         private GameHost host { get; set; }
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
-        public MainMenu()
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame game = null)
         {
-            sideFlashes = new MenuSideFlashes();
+            if (host.CanExit)
+                AddInternal(new ExitConfirmOverlay { Action = this.Exit });
 
-            buttons = new ButtonSystem
+            AddRangeInternal(new Drawable[]
             {
-                OnChart = delegate { this.Push(new ChartListing()); },
-                OnDirect = delegate { this.Push(new OnlineListing()); },
-                OnEdit = delegate { this.Push(new Editor()); },
-                OnSolo = onSolo,
-                OnMulti = delegate { this.Push(new Multiplayer()); },
-                OnExit = this.Exit,
-            };
+                new ParallaxContainer
+                {
+                    ParallaxAmount = 0.01f,
+                    Children = new Drawable[]
+                    {
+                        buttons = new ButtonSystem
+                        {
+                            OnChart = delegate { this.Push(new ChartListing()); },
+                            OnDirect = delegate { this.Push(new OnlineListing()); },
+                            OnEdit = delegate { this.Push(new Editor()); },
+                            OnSolo = onSolo,
+                            OnMulti = delegate { this.Push(new Multiplayer()); },
+                            OnExit = this.Exit,
+                        }
+                    }
+                },
+                sideFlashes = new MenuSideFlashes(),
+            });
 
             buttons.StateChanged += state =>
             {
@@ -69,26 +82,6 @@ namespace osu.Game.Screens.Menu
                         break;
                 }
             };
-        }
-
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game = null)
-        {
-            if (host.CanExit)
-            {
-                AddInternal(new ExitConfirmOverlay
-                {
-                    Action = this.Exit,
-                });
-            }
-
-            AddInternal(new ParallaxContainer
-            {
-                ParallaxAmount = 0.01f,
-                Child = buttons,
-            });
-
-            AddInternal(sideFlashes);
 
             if (game != null)
             {
