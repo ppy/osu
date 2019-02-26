@@ -114,7 +114,7 @@ namespace osu.Game.Tests.Visual
             createSongSelect();
             AddStep("Start player loader", () => songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer())));
             AddUntilStep(() => playerLoader?.IsLoaded ?? false, "Wait for Player Loader to load");
-            AddAssert("Background retained from song select", () => songSelect.AssertBackgroundCurrent());
+            AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
             AddStep("Trigger background preview", () =>
             {
                 InputManager.MoveMouseTo(playerLoader.ScreenPos);
@@ -122,7 +122,7 @@ namespace osu.Game.Tests.Visual
             });
 
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Screen is dimmed", () => songSelect.AssertDimmed());
+            AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
         }
 
         /// <summary>
@@ -142,14 +142,14 @@ namespace osu.Game.Tests.Visual
                 InputManager.MoveMouseTo(playerLoader.ScreenPos);
             });
             AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
-            AddAssert("Background retained from song select", () => songSelect.AssertBackgroundCurrent());
+            AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
             AddStep("Trigger background preview when loaded", () =>
             {
                 InputManager.MoveMouseTo(playerLoader.VisualSettingsPos);
                 InputManager.MoveMouseTo(playerLoader.ScreenPos);
             });
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Screen is dimmed", () => songSelect.AssertDimmed());
+            AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
         }
 
         /// <summary>
@@ -165,10 +165,10 @@ namespace osu.Game.Tests.Visual
                 player.StoryboardEnabled.Value = true;
             });
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Background is invisible", () => songSelect.AssertInvisible());
+            AddAssert("Background is invisible", () => songSelect.IsBackgroundInvisible());
             AddStep("Disable storyboard", () => player.ReplacesBackground.Value = false);
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Background is visible", () => songSelect.AssertVisible());
+            AddAssert("Background is visible", () => songSelect.IsBackgroundVisible());
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace osu.Game.Tests.Visual
                 return true;
             }, "Wait for song select is current");
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Background is visible", () => songSelect.AssertVisible());
+            AddAssert("Background is visible", () => songSelect.IsBackgroundVisible());
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace osu.Game.Tests.Visual
             performSetup();
             AddStep("Test User Undimming", () => songSelect.DimEnabled.Value = false);
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Screen is undimmed", () => songSelect.AssertUndimmed());
+            AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace osu.Game.Tests.Visual
             performSetup();
             AddStep("Test User Dimming", () => songSelect.DimEnabled.Value = true);
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Screen is dimmed", () => songSelect.AssertDimmed());
+            AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace osu.Game.Tests.Visual
                     player.Exit();
             });
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Screen is dimmed", () => songSelect.AssertDimmed());
+            AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
         }
 
         /// <summary>
@@ -245,8 +245,8 @@ namespace osu.Game.Tests.Visual
             performSetup();
             AddStep("Transition to Results", () => player.Push(new FadeAccesibleResults(new ScoreInfo { User = new User { Username = "osu!" }})));
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Screen is undimmed", () => songSelect.AssertUndimmed());
-            AddAssert("Background retained from song select", () => songSelect.AssertBackgroundCurrent());
+            AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
+            AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
         }
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace osu.Game.Tests.Visual
                 return true;
             }, "Wait for song select is current");
             AddWaitStep(5, "Wait for dim");
-            AddAssert("Screen is undimmed", () => songSelect.AssertUndimmed());
+            AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
         }
 
         private class DummySongSelect : OsuScreen
@@ -286,34 +286,19 @@ namespace osu.Game.Tests.Visual
                 DimEnabled.BindTo(((FadeAccessibleBackground)Background).EnableUserDim);
             }
 
-            public bool AssertDimmed()
-            {
-                return ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1 - (float)dimLevel.Value);
-            }
+            public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1 - (float)dimLevel.Value);
 
-            public bool AssertUndimmed()
-            {
-                return ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
-            }
+            public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
 
-            public bool AssertInvisible()
-            {
-                return ((FadeAccessibleBackground)Background).CurrentAlpha == 0;
-            }
+            public bool IsBackgroundInvisible() => ((FadeAccessibleBackground)Background).CurrentAlpha == 0;
 
-            public bool AssertVisible()
-            {
-                return ((FadeAccessibleBackground)Background).CurrentAlpha == 1;
-            }
+            public bool IsBackgroundVisible() => ((FadeAccessibleBackground)Background).CurrentAlpha == 1;
 
             /// <summary>
             /// Make sure every time a screen gets pushed, the background doesn't get replaced
             /// </summary>
             /// <returns>Whether or not the original background (The one created in DummySongSelect) is still the current background</returns>
-            public bool AssertBackgroundCurrent()
-            {
-                return ((FadeAccessibleBackground)Background).IsCurrentScreen();
-            }
+            public bool IsBackgroundCurrent() => ((FadeAccessibleBackground)Background).IsCurrentScreen();
         }
 
         private class FadeAccesibleResults : SoloResults
