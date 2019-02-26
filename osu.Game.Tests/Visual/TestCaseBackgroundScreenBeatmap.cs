@@ -236,6 +236,7 @@ namespace osu.Game.Tests.Visual
                 songSelect = new DummySongSelect();
                 screenStackContainer.ScreenStack.Push(songSelect);
             });
+            AddUntilStep(() => songSelect?.IsLoaded ?? false, "Wait for song select to load");
             AddStep("Create beatmap", () =>
             {
                 Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
