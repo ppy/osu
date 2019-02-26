@@ -4,10 +4,10 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Screens;
-using osu.Game.Screens;
+using osu.Framework.Platform;
 using osu.Game.Screens.Menu;
 using osuTK.Graphics;
 
@@ -21,8 +21,12 @@ namespace osu.Game.Tests.Visual
             typeof(OsuLogo),
         };
 
-        public TestCaseOsuGame()
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
         {
+            OsuGame game = new OsuGame();
+            game.SetHost(host);
+
             Children = new Drawable[]
             {
                 new Box
@@ -30,10 +34,7 @@ namespace osu.Game.Tests.Visual
                     RelativeSizeAxes = Axes.Both,
                     Colour = Color4.Black,
                 },
-                new ScreenStack(new Loader())
-                {
-                    RelativeSizeAxes = Axes.Both,
-                }
+                game
             };
         }
     }
