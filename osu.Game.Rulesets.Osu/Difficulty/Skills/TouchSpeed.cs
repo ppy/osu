@@ -10,7 +10,7 @@ using osu.Game.Rulesets.Osu.Objects;
 namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 {
     /// <summary>
-    /// Represents the skill required to press keys with regards to keeping up with the speed at which objects need to be hit.
+    /// Represents the skill required to tap with regards to keeping up with the speed at which objects need to be hit.
     /// </summary>
     public class TouchSpeed : Skill
     {
@@ -40,14 +40,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             }
             var streamBonus = 1.0;
             double angle = 0.0;
+            double angleBonus = 1.0;
             double distance = osuCurrent.TravelDistance + osuCurrent.JumpDistance;
             double deltaTime = Math.Max(max_speed_bonus, current.DeltaTime);
-            if (osuCurrent.Angle != null)
-            {
-                angle = osuCurrent.Angle.Value;
-                angle *= (Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 50 + 4))));
-                distance *= ((0.75 / (1 + Math.Pow(2.71, -0.5 * angle))) + 0.75);
-            }
             double speedBonus = 1.0;
             if (deltaTime < min_speed_bonus)
                 speedBonus = 1 + Math.Pow((min_speed_bonus - deltaTime) / speed_balancing_factor, 2);
@@ -63,16 +58,24 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 speedValue = 0.95 + 0.25 * (distance - 45) / 45;
             else
                 speedValue = 0.95;
+            // Angle bonus for fast jumps - wide angles generally require you to tapping multiple times with one hand
+            if (osuCurrent.Angle != null)
+            {
+                angle = osuCurrent.Angle.Value;
+                angle *= (Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 50 + 4)))); // Bonus is reduced if previous two objects are too slow
+                angleBonus *= ((0.75 / (1 + Math.Pow(2.71, -0.5 * (angle - 0.5)))) + 0.6);
+                angleBonus = Math.Max(1, angleBonus);
+            }
             // Bonus for streams specifically
             if (Previous.Count > 1)
             {
-                streamBonus = Math.Max(0.0, ((1.2 * (Math.Max(0, Math.Min(0.0135 * distance, 2) - 0.7)))) // Adding a bonus to streams if they are high distance
-                * Math.Max(0.0, Math.Min(1, (Math.Max(2.1, 0.01 * angle * (180 / 3.14) + 1.5) - 2))) // Adding a bonus to streams if angle is high enough
+                streamBonus = Math.Max(0.0, ((1.2 * (Math.Max(0, Math.Min(0.016 * distance, 2) - 0.7)))) // Adding a bonus to streams if they are high spacing
+                * Math.Max(0.0, Math.Min(1, (Math.Max(2.1, 0.01 * angle * (180 / 3.14) + 1.5) - 2))) // Adding a bonus to streams if angle is wide enough
                 * Math.Min(1, (2.5 / (1 + Math.Pow(1.05, Math.Min(131, osuCurrent.StrainTime) - 70))))); // Adding a bonus to streams if they are unsingletappable
-                streamBonus *= Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 50 + 4)));
+                streamBonus *= Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 50 + 4))); // Bonus is reduced if previous two objects are too slow
                 streamBonus = 1.2 * Math.Min(1, Math.Max(0, streamBonus)) + 1;
             }
-            return (speedBonus * streamBonus * speedValue) / osuCurrent.StrainTime;
+            return (speedBonus * streamBonus * angleBonus * speedValue) / osuCurrent.StrainTime;
         }
     }
 }
