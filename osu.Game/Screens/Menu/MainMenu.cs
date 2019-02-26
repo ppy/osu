@@ -19,33 +19,37 @@ using osu.Game.Screens.Edit;
 using osu.Game.Screens.Multi;
 using osu.Game.Screens.Select;
 using osu.Game.Screens.Tournament;
+using osu.Framework.Platform;
 
 namespace osu.Game.Screens.Menu
 {
     public class MainMenu : OsuScreen
     {
-        private readonly ButtonSystem buttons;
+        private ButtonSystem buttons;
 
         public override bool HideOverlaysOnEnter => buttons.State == ButtonSystemState.Initial;
 
-        protected override bool AllowBackButton => buttons.State != ButtonSystemState.Initial;
+        protected override bool AllowBackButton => buttons.State != ButtonSystemState.Initial && host.CanExit;
 
         public override bool AllowExternalScreenChange => true;
 
         private Screen songSelect;
 
-        private readonly MenuSideFlashes sideFlashes;
+        private MenuSideFlashes sideFlashes;
+
+        [Resolved]
+        private GameHost host { get; set; }
 
         protected override BackgroundScreen CreateBackground() => new BackgroundScreenDefault();
 
-        public MainMenu()
+        [BackgroundDependencyLoader(true)]
+        private void load(OsuGame game = null)
         {
-            InternalChildren = new Drawable[]
+            if (host.CanExit)
+                AddInternal(new ExitConfirmOverlay { Action = this.Exit });
+
+            AddRangeInternal(new Drawable[]
             {
-                new ExitConfirmOverlay
-                {
-                    Action = this.Exit,
-                },
                 new ParallaxContainer
                 {
                     ParallaxAmount = 0.01f,
@@ -63,7 +67,7 @@ namespace osu.Game.Screens.Menu
                     }
                 },
                 sideFlashes = new MenuSideFlashes(),
-            };
+            });
 
             buttons.StateChanged += state =>
             {
@@ -78,11 +82,7 @@ namespace osu.Game.Screens.Menu
                         break;
                 }
             };
-        }
 
-        [BackgroundDependencyLoader(true)]
-        private void load(OsuGame game = null)
-        {
             if (game != null)
             {
                 buttons.OnSettings = game.ToggleSettings;
