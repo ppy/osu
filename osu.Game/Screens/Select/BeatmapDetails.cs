@@ -1,4 +1,4 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using osuTK;
@@ -116,6 +116,7 @@ namespace osu.Game.Screens.Select
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         LayoutDuration = transition_duration,
+                                        LayoutEasing = Easing.OutQuad,
                                         Spacing = new Vector2(spacing * 2),
                                         Margin = new MarginPadding { Top = spacing * 2 },
                                         Children = new[]
