@@ -168,7 +168,7 @@ namespace osu.Game.Rulesets.Scoring
         /// </summary>
         public virtual void PopulateScore(ScoreInfo score)
         {
-            score.TotalScore = (int)Math.Round(TotalScore.Value);
+            score.TotalScore = (long)Math.Round(TotalScore.Value);
             score.Combo = Combo.Value;
             score.MaxCombo = HighestCombo.Value;
             score.Accuracy = Math.Round(Accuracy.Value, 4);
