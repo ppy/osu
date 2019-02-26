@@ -215,7 +215,7 @@ namespace osu.Game
         public void ShowBeatmap(int beatmapId) => beatmapSetOverlay.FetchAndShowBeatmap(beatmapId);
 
         /// <summary>
-        /// Present a beatmap at song select immediately..
+        /// Present a beatmap at song select immediately.
         /// The user should have already requested this interactively.
         /// </summary>
         /// <param name="beatmap">The beatmap to select.</param>
