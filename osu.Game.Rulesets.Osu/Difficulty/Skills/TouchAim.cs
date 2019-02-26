@@ -26,14 +26,15 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 return 0;
 
             var osuCurrent = (OsuDifficultyHitObject)current;
-            var jump = osuCurrent.JumpDistance;
+            double jump = osuCurrent.JumpDistance;
+            double angle = 0.0;
 
             if (Previous.Count > 1)
             {
                 var osuPrevious = (OsuDifficultyHitObject)Previous[0];
-                var angle = osuCurrent.Angle.Value;
                 // Indirectly reducing angle bonus by lowering angle if speed or distance from previous two notes are low
-                angle *= (Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 50 + 4))));
+                if (osuCurrent.Angle != null)
+                    angle = osuCurrent.Angle.Value * (Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 50 + 4))));
                 angle *= (Math.Min(Math.Max(osuPrevious.JumpDistance / 30 - 1, 0), 1));
                 // Angle bonus is applied by scaling jump distance for aim
                 jump *= ((1.4 / (1 + Math.Pow(3, -2 * (angle - 1.05)))) + 0.7);
