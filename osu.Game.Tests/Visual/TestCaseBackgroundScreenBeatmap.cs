@@ -3,28 +3,30 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Configuration;
+using osu.Game.Database;
 using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
-using osu.Game.Rulesets.Osu.Objects;
+using osu.Game.Rulesets;
+using osu.Game.Rulesets.Osu.Mods;
 using osu.Game.Scoring;
 using osu.Game.Screens;
 using osu.Game.Screens.Backgrounds;
 using osu.Game.Screens.Play;
 using osu.Game.Screens.Play.PlayerSettings;
-using osu.Game.Tests.Beatmaps;
+using osu.Game.Screens.Select;
+using osu.Game.Tests.Resources;
 using osu.Game.Users;
-using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
@@ -44,8 +46,35 @@ namespace osu.Game.Tests.Visual
         private DummySongSelect songSelect;
         private DimAccessiblePlayerLoader playerLoader;
         private DimAccessiblePlayer player;
+        private DatabaseContextFactory factory;
+        private BeatmapManager manager;
+        private RulesetStore rulesets;
 
         private ScreenStackCacheContainer screenStackContainer;
+
+        [BackgroundDependencyLoader]
+        private void load(GameHost host)
+        {
+            factory = new DatabaseContextFactory(LocalStorage);
+            factory.ResetDatabase();
+
+            using (var usage = factory.Get())
+                usage.Migrate();
+
+            factory.ResetDatabase();
+
+            using (var usage = factory.Get())
+                usage.Migrate();
+
+            Dependencies.Cache(rulesets = new RulesetStore(factory));
+            Dependencies.Cache(manager = new BeatmapManager(LocalStorage, factory, rulesets, null, null, host, Beatmap.Default));
+
+            Beatmap.SetDefault();
+        }
+
+        [SetUp]
+        public virtual void SetUp() =>
+            Schedule(() => { manager?.Delete(manager.GetAllUsableBeatmapSets()); });
 
         /// <summary>
         /// Check if PlayerLoader properly triggers background dim previews when a user hovers over the visual settings panel.
@@ -215,54 +244,37 @@ namespace osu.Game.Tests.Visual
         {
             createSongSelect();
 
-            AddStep("Load new player to song select", () => songSelect.Push(player = new DimAccessiblePlayer
+            AddStep("Start player loader", () => { songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer
             {
-                Ready = true,
                 AllowLeadIn = false,
                 AllowResults = false,
-            }));
+                Ready = true,
+            })); });
+            AddUntilStep(() => playerLoader.IsLoaded, "Wait for Player Loader to load");
+            AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
             AddUntilStep(() => player.IsLoaded, "Wait for player to load");
         }
 
         private void createSongSelect()
         {
-            AddStep("Create new screen stack", () =>
-            {
-                screenStackContainer = new ScreenStackCacheContainer { RelativeSizeAxes = Axes.Both };
-                Child = screenStackContainer;
-            });
-            AddStep("Create song select", () =>
-            {
-                songSelect = new DummySongSelect();
-                screenStackContainer.ScreenStack.Push(songSelect);
-            });
+            AddStep("Create new screen stack", () => Child = screenStackContainer = new ScreenStackCacheContainer { RelativeSizeAxes = Axes.Both });
+            AddUntilStep(() => screenStackContainer.IsLoaded,"Wait for screen stack creation");
+            AddStep("create new song select", () => screenStackContainer.ScreenStack.Push(songSelect = new DummySongSelect()));
             AddUntilStep(() => songSelect.IsLoaded, "Wait for song select to load");
-            AddStep("Create beatmap", () =>
+            AddStep("Add map", () =>
             {
-                Beatmap.Value = new TestWorkingBeatmap(new Beatmap<OsuHitObject>
-                {
-                    HitObjects =
-                    {
-                        new HitCircle
-                        {
-                            StartTime = 3000,
-                            Position = new Vector2(0, 0),
-                        },
-                        new HitCircle
-                        {
-                            StartTime = 15000,
-                            Position = new Vector2(0, 0),
-                        }
-                    },
-                });
+                var temp = TestResources.GetTestBeatmapForImport();
+                manager.Import(temp);
+                Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { new OsuModNoFail() });
             });
+            AddUntilStep(() => songSelect.Carousel.SelectedBeatmap != null, "has selection");
         }
 
-        private class DummySongSelect : OsuScreen
+        private class DummySongSelect : PlaySongSelect
         {
             protected override BackgroundScreen CreateBackground()
             {
-                FadeAccessibleBackground background = new FadeAccessibleBackground();
+                FadeAccessibleBackground background = new FadeAccessibleBackground(Beatmap.Value);
                 DimEnabled.BindTo(background.EnableUserDim);
                 return background;
             }
@@ -270,11 +282,12 @@ namespace osu.Game.Tests.Visual
             public readonly Bindable<bool> DimEnabled = new Bindable<bool>();
             private readonly Bindable<double> dimLevel = new Bindable<double>();
 
+            public new BeatmapCarousel Carousel => base.Carousel;
+
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
             {
                 config.BindWith(OsuSetting.DimLevel, dimLevel);
-                Logger.Log(dimLevel.Value.ToString(CultureInfo.InvariantCulture));
             }
 
             public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1 - (float)dimLevel.Value);
@@ -299,12 +312,12 @@ namespace osu.Game.Tests.Visual
             {
             }
 
-            protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
+            protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
         }
 
         private class DimAccessiblePlayer : Player
         {
-            protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
+            protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
             // Whether or not the player should be allowed to load.
             public bool Ready;
@@ -348,7 +361,7 @@ namespace osu.Game.Tests.Visual
             {
             }
 
-            protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground();
+            protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
         }
 
         private class FadeAccessibleBackground : BackgroundScreenBeatmap
@@ -357,6 +370,11 @@ namespace osu.Game.Tests.Visual
 
             public Color4 CurrentColour => ((TestUserDimContainer)FadeContainer).CurrentColour;
             public float CurrentAlpha => ((TestUserDimContainer)FadeContainer).CurrentAlpha;
+
+            public FadeAccessibleBackground(WorkingBeatmap beatmap)
+                : base(beatmap)
+            {
+            }
 
             private class TestUserDimContainer : UserDimContainer
             {
