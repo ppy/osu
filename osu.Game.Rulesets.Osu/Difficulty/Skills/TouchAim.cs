@@ -39,7 +39,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                     angle *= (Math.Min(Math.Max(osuPrevious.JumpDistance / 30 - 1, 0), 1));
                 }
                 // Angle bonus is applied by scaling jump distance for aim
-                jump *= ((1.4 / (1 + Math.Pow(3, -2 * (angle - 1.05)))) + 0.7);
+                jump *= ((1.3 / (1 + Math.Pow(3, -2 * (angle - 0.95)))) + 0.7);
                 jump *= (1 + (1.75 / (1 + Math.Pow(1.06, (2.5 * Math.Min(osuPrevious.StrainTime, 90) - 120))))
                     * (Math.Min(1, Math.Max(0, -0.015 * osuPrevious.JumpDistance + 1.6))));
             }

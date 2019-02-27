@@ -63,7 +63,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             {
                 angle = osuCurrent.Angle.Value;
                 angle *= (Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 50 + 4)))); // Bonus is reduced if previous two objects are too slow
-                angleBonus *= ((0.75 / (1 + Math.Pow(2.71, -0.5 * (angle - 0.5)))) + 0.6);
+                angleBonus *= ((0.5 / (1 + Math.Pow(3, -2 * (angle - 2)))) + 1);
                 angleBonus = Math.Max(1, angleBonus);
             }
             // Bonus for streams specifically
