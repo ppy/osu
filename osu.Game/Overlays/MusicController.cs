@@ -351,11 +351,11 @@ namespace osu.Game.Overlays
             queuedDirection = null;
         }
 
-        private void currentTrackCompleted()
+        private void currentTrackCompleted() => Schedule(() =>
         {
             if (!beatmap.Disabled && beatmapSets.Any())
                 next();
-        }
+        });
 
         private ScheduledDelegate pendingBeatmapSwitch;
 
