@@ -28,7 +28,7 @@ namespace osu.Game.Audio
         private void load()
         {
             track = GetTrack();
-            track.Completed += Stop;
+            track.Completed += () => Schedule(Stop);
         }
 
         /// <summary>
