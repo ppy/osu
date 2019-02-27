@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Play
         private FailOverlay failOverlay;
 
         private DrawableStoryboard storyboard;
-        private UserDimContainer storyboardContainer;
+        protected UserDimContainer StoryboardContainer;
 
         public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
 
@@ -176,10 +176,10 @@ namespace osu.Game.Screens.Play
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded.Value,
                     Children = new Container[]
                     {
-                        storyboardContainer = new UserDimContainer(true)
+                        StoryboardContainer = new UserDimContainer(true)
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Alpha = 0,
+                            Alpha = 1,
                             EnableUserDim = { Value = true }
                         },
                         new ScalingContainer(ScalingMode.Gameplay)
@@ -355,7 +355,7 @@ namespace osu.Game.Screens.Play
             Background.EnableUserDim.Value = true;
 
             storyboardReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
-            storyboardContainer.StoryboardReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
+            StoryboardContainer.StoryboardReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
             Task.Run(() =>
@@ -422,7 +422,7 @@ namespace osu.Game.Screens.Play
 
         private void initializeStoryboard(bool asyncLoad)
         {
-            if (storyboardContainer == null)
+            if (StoryboardContainer == null)
                 return;
 
             var beatmap = Beatmap.Value;
@@ -431,9 +431,9 @@ namespace osu.Game.Screens.Play
             storyboard.Masking = true;
 
             if (asyncLoad)
-                LoadComponentAsync(storyboard, storyboardContainer.Add);
+                LoadComponentAsync(storyboard, StoryboardContainer.Add);
             else
-                storyboardContainer.Add(storyboard);
+                StoryboardContainer.Add(storyboard);
         }
 
         protected override void UpdateBackgroundElements()
