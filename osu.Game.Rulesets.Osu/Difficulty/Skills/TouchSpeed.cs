@@ -62,8 +62,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
             if (osuCurrent.Angle != null)
             {
                 angle = osuCurrent.Angle.Value;
-                angle *= (Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 50 + 4)))); // Bonus is reduced if previous two objects are too slow
-                angleBonus *= ((0.5 / (1 + Math.Pow(3, -2 * (angle - 2)))) + 1);
+                angle *= (Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 75 + 4)))); // Bonus is reduced if previous two objects are too slow
+                angleBonus *= ((0.5 / (1 + Math.Pow(3, -2 * (angle - 2.4)))) + 1);
                 angleBonus = Math.Max(1, angleBonus);
             }
             // Bonus for streams specifically
@@ -72,8 +72,8 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
                 streamBonus = Math.Max(0.0, ((1.2 * (Math.Max(0, Math.Min(0.016 * distance, 2) - 0.7)))) // Adding a bonus to streams if they are high spacing
                 * Math.Max(0.0, Math.Min(1, (Math.Max(2.1, 0.01 * angle * (180 / 3.14) + 1.5) - 2))) // Adding a bonus to streams if angle is wide enough
                 * Math.Min(1, (2.5 / (1 + Math.Pow(1.05, Math.Min(131, osuCurrent.StrainTime) - 70))))); // Adding a bonus to streams if they are unsingletappable
-                streamBonus *= Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 50 + 4))); // Bonus is reduced if previous two objects are too slow
-                streamBonus = 1.2 * Math.Min(1, Math.Max(0, streamBonus)) + 1;
+                streamBonus *= Math.Max(0, Math.Min(1, (-1 * osuPrevious.StrainTime / 75 + 4))); // Bonus is reduced if previous two objects are too slow
+                streamBonus = Math.Min(1, Math.Max(0, streamBonus)) + 1;
             }
             return (speedBonus * streamBonus * angleBonus * speedValue) / osuCurrent.StrainTime;
         }
