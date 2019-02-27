@@ -72,7 +72,6 @@ namespace osu.Game.Tests.Visual
             progress.OnSeek = pos => clock.Seek(pos);
         }
 
-
         private class TestSongProgressGraph : SongProgressGraph
         {
             public int CreationCount { get; private set; }
@@ -82,7 +81,6 @@ namespace osu.Game.Tests.Visual
                 base.RecreateGraph();
                 CreationCount++;
             }
-
         }
     }
 }
