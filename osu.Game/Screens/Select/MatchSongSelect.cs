@@ -56,6 +56,10 @@ namespace osu.Game.Screens.Select
                 return true;
 
             Beatmap.Value = beatmaps.GetWorkingBeatmap(CurrentItem.Value?.Beatmap);
+            Ruleset.Value = CurrentItem.Value?.Ruleset;
+            CurrentItem.Value?.RequiredMods.Clear();
+            CurrentItem.Value?.RequiredMods.AddRange(SelectedMods.Value);
+
             Beatmap.Disabled = true;
             Ruleset.Disabled = true;
 
