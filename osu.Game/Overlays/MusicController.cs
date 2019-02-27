@@ -353,7 +353,7 @@ namespace osu.Game.Overlays
 
         private void currentTrackCompleted() => Schedule(() =>
         {
-            if (!beatmap.Disabled && beatmapSets.Any())
+            if (!current.Track.Looping && !beatmap.Disabled && beatmapSets.Any())
                 next();
         });
 
