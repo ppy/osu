@@ -14,7 +14,6 @@ namespace osu.Game.Tests.Visual
 {
     public class TestCaseSkinReloadable : OsuTestCase
     {
-
         [Test]
         public void TestInitialLoad()
         {
