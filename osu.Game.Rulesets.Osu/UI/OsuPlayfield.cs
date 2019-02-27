@@ -62,7 +62,8 @@ namespace osu.Game.Rulesets.Osu.UI
             if (c != null)
             {
                 var original = c.ProxiedLayer;
-                // lifetime is set on LoadComplete so wait until it.
+
+                // Hitobjects only have lifetimes set on LoadComplete, so approach circles should not be added until that point
                 original.OnLoadComplete += addApproachCircleProxy;
             }
 
