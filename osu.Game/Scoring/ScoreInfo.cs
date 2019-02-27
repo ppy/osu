@@ -25,7 +25,7 @@ namespace osu.Game.Scoring
         public ScoreRank Rank { get; set; }
 
         [JsonProperty("total_score")]
-        public int TotalScore { get; set; }
+        public long TotalScore { get; set; }
 
         [JsonProperty("accuracy")]
         [Column(TypeName="DECIMAL(1,4)")]
