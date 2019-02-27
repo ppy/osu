@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Configuration;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics;
@@ -127,9 +128,9 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
                     Bindable = sizeFullscreen
                 };
 
-                windowModeDropdown.Bindable.BindValueChanged(windowMode =>
+                windowModeDropdown.Bindable.BindValueChanged(mode =>
                 {
-                    if (windowMode == WindowMode.Fullscreen)
+                    if (mode.NewValue == WindowMode.Fullscreen)
                     {
                         resolutionDropdown.Show();
                         sizeFullscreen.TriggerChange();
@@ -142,12 +143,12 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
             scalingMode.BindValueChanged(mode =>
             {
                 scalingSettings.ClearTransforms();
-                scalingSettings.AutoSizeAxes = mode != ScalingMode.Off ? Axes.Y : Axes.None;
+                scalingSettings.AutoSizeAxes = mode.NewValue != ScalingMode.Off ? Axes.Y : Axes.None;
 
-                if (mode == ScalingMode.Off)
+                if (mode.NewValue == ScalingMode.Off)
                     scalingSettings.ResizeHeightTo(0, transition_duration, Easing.OutQuint);
 
-                scalingSettings.ForEach(s => s.TransferValueOnCommit = mode == ScalingMode.Everything);
+                scalingSettings.ForEach(s => s.TransferValueOnCommit = mode.NewValue == ScalingMode.Everything);
             }, true);
         }
 
@@ -158,7 +159,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
         /// <returns>A bindable which will propagate updates with a delay.</returns>
         private void bindPreviewEvent(Bindable<float> bindable)
         {
-            bindable.ValueChanged += v =>
+            bindable.ValueChanged += _ =>
             {
                 switch (scalingMode.Value)
                 {

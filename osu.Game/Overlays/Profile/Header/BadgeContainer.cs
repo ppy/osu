@@ -53,11 +53,10 @@ namespace osu.Game.Overlays.Profile.Header
                         {
                             badgeCountText = new OsuSpriteText
                             {
-                                Alpha = 0,
-                                TextSize = 12,
                                 Anchor = Anchor.BottomCentre,
                                 Origin = Anchor.BottomCentre,
-                                Font = "Exo2.0-Regular"
+                                Alpha = 0,
+                                Font = OsuFont.GetFont(size: 12, weight: FontWeight.Regular)
                             },
                             new Container
                             {

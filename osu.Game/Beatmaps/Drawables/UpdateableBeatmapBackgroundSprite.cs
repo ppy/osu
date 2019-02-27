@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 
@@ -20,7 +20,7 @@ namespace osu.Game.Beatmaps.Drawables
 
         public UpdateableBeatmapBackgroundSprite()
         {
-            Beatmap.BindValueChanged(b => Model = b);
+            Beatmap.BindValueChanged(b => Model = b.NewValue);
         }
 
         protected override Drawable CreateDrawable(BeatmapInfo model)

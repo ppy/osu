@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osuTK;
@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         private void load()
         {
             if (osuGame != null)
-                Beatmap.BindValueChanged(updateAction, true);
+                Beatmap.BindValueChanged(beatmap => updateAction(beatmap.NewValue), true);
         }
 
         private void updateAction(BeatmapInfo beatmap)

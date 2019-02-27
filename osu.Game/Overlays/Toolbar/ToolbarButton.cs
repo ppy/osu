@@ -129,15 +129,13 @@ namespace osu.Game.Overlays.Toolbar
                             Anchor = TooltipAnchor,
                             Origin = TooltipAnchor,
                             Shadow = true,
-                            TextSize = 22,
-                            Font = @"Exo2.0-Bold",
+                            Font = OsuFont.GetFont(size: 22, weight: FontWeight.Bold),
                         },
                         tooltip2 = new OsuSpriteText
                         {
                             Anchor = TooltipAnchor,
                             Origin = TooltipAnchor,
                             Shadow = true,
-                            TextSize = 16
                         }
                     }
                 }

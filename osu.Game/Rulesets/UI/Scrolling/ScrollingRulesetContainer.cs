@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Lists;
@@ -157,10 +157,10 @@ namespace osu.Game.Rulesets.UI.Scrolling
             switch (action)
             {
                 case GlobalAction.IncreaseScrollSpeed:
-                    this.TransformBindableTo(TimeRange, TimeRange - time_span_step, 200, Easing.OutQuint);
+                    this.TransformBindableTo(TimeRange, TimeRange.Value - time_span_step, 200, Easing.OutQuint);
                     return true;
                 case GlobalAction.DecreaseScrollSpeed:
-                    this.TransformBindableTo(TimeRange, TimeRange + time_span_step, 200, Easing.OutQuint);
+                    this.TransformBindableTo(TimeRange, TimeRange.Value + time_span_step, 200, Easing.OutQuint);
                     return true;
             }
 
