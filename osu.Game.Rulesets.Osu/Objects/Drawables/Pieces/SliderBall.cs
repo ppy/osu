@@ -141,6 +141,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
             {
                 if (value == tracking)
                     return;
+
                 tracking = value;
 
                 FollowCircle.ScaleTo(tracking ? 2f : 1, 300, Easing.OutQuint);

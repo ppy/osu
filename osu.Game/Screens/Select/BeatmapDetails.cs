@@ -41,12 +41,14 @@ namespace osu.Game.Screens.Select
         private ScheduledDelegate pendingBeatmapSwitch;
 
         private BeatmapInfo beatmap;
+
         public BeatmapInfo Beatmap
         {
             get { return beatmap; }
             set
             {
                 if (value == beatmap) return;
+
                 beatmap = value;
 
                 pendingBeatmapSwitch?.Cancel();

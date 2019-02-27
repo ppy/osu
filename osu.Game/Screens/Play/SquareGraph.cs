@@ -22,12 +22,14 @@ namespace osu.Game.Screens.Play
         public int ColumnCount => columns.Length;
 
         private int progress;
+
         public int Progress
         {
             get { return progress; }
             set
             {
                 if (value == progress) return;
+
                 progress = value;
                 redrawProgress();
             }
@@ -36,24 +38,28 @@ namespace osu.Game.Screens.Play
         private float[] calculatedValues = { }; // values but adjusted to fit the amount of columns
 
         private int[] values;
+
         public int[] Values
         {
             get { return values; }
             set
             {
                 if (value == values) return;
+
                 values = value;
                 layout.Invalidate();
             }
         }
 
         private Color4 fillColour;
+
         public Color4 FillColour
         {
             get { return fillColour; }
             set
             {
                 if (value == fillColour) return;
+
                 fillColour = value;
                 redrawFilled();
             }
@@ -174,14 +180,15 @@ namespace osu.Game.Screens.Play
             private readonly List<Box> drawableRows = new List<Box>();
 
             private float filled;
+
             public float Filled
             {
                 get { return filled; }
                 set
                 {
                     if (value == filled) return;
-                    filled = value;
 
+                    filled = value;
                     fillActive();
                 }
             }
@@ -194,8 +201,8 @@ namespace osu.Game.Screens.Play
                 set
                 {
                     if (value == state) return;
-                    state = value;
 
+                    state = value;
                     if (IsLoaded)
                         fillActive();
 
