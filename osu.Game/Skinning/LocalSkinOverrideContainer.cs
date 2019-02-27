@@ -71,31 +71,27 @@ namespace osu.Game.Skinning
             var dependencies = new DependencyContainer(base.CreateChildDependencies(parent));
 
             fallbackSource = dependencies.Get<ISkinSource>();
+            if (fallbackSource != null)
+                fallbackSource.SourceChanged += onSourceChanged;
+
             dependencies.CacheAs<ISkinSource>(this);
+
+            var config = dependencies.Get<OsuConfigManager>();
+
+            config.BindWith(OsuSetting.BeatmapSkins, beatmapSkins);
+            config.BindWith(OsuSetting.BeatmapHitsounds, beatmapHitsounds);
+
+            beatmapSkins.BindValueChanged(_ => onSourceChanged());
+            beatmapHitsounds.BindValueChanged(_ => onSourceChanged());
 
             return dependencies;
         }
 
-        [BackgroundDependencyLoader]
-        private void load(OsuConfigManager config)
-        {
-            config.BindWith(OsuSetting.BeatmapSkins, beatmapSkins);
-            config.BindWith(OsuSetting.BeatmapHitsounds, beatmapHitsounds);
-        }
-
-        protected override void LoadComplete()
-        {
-            base.LoadComplete();
-
-            if (fallbackSource != null)
-                fallbackSource.SourceChanged += onSourceChanged;
-
-            beatmapSkins.BindValueChanged(_ => onSourceChanged());
-            beatmapHitsounds.BindValueChanged(_ => onSourceChanged(), true);
-        }
-
         protected override void Dispose(bool isDisposing)
         {
+            // Must be done before base.Dispose()
+            SourceChanged = null;
+
             base.Dispose(isDisposing);
 
             if (fallbackSource != null)
