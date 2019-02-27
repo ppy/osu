@@ -89,6 +89,13 @@ namespace osu.Game.Screens.Play
         private DrawableStoryboard storyboard;
         protected UserDimContainer StoryboardContainer;
 
+        protected virtual UserDimContainer CreateStoryboardContainer() => new UserDimContainer(true)
+        {
+            RelativeSizeAxes = Axes.Both,
+            Alpha = 1,
+            EnableUserDim = { Value = true }
+        };
+
         public bool LoadedBeatmapSuccessfully => RulesetContainer?.Objects.Any() == true;
 
         [BackgroundDependencyLoader]
@@ -176,12 +183,7 @@ namespace osu.Game.Screens.Play
                     CheckCanPause = () => AllowPause && ValidForResume && !HasFailed && !RulesetContainer.HasReplayLoaded.Value,
                     Children = new Container[]
                     {
-                        StoryboardContainer = new UserDimContainer(true)
-                        {
-                            RelativeSizeAxes = Axes.Both,
-                            Alpha = 1,
-                            EnableUserDim = { Value = true }
-                        },
+                        StoryboardContainer = CreateStoryboardContainer(),
                         new ScalingContainer(ScalingMode.Gameplay)
                         {
                             Child = new LocalSkinOverrideContainer(working.Skin)

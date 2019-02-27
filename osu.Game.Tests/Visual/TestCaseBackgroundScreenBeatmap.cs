@@ -141,25 +141,16 @@ namespace osu.Game.Tests.Visual
         public void StoryboardBackgroundVisibilityTest()
         {
             performSetup();
-            AddStep("Enable storyboard", () =>
+            createFakeStoryboard();
+            waitForDim();
+            AddAssert("Background is invisible, storyboard is visible", () => songSelect.IsBackgroundInvisible() && player.IsStoryboardVisible());
+            AddStep("Disable storyboard", () =>
             {
-                player.ReplacesBackground.Value = true;
-                player.StoryboardEnabled.Value = true;
-                player.CurrentStoryboardContainer.Add(new SpriteText
-                {
-                    Size = new Vector2(250, 50),
-                    Alpha = 1,
-                    Colour = Color4.White,
-                    Anchor = Anchor.Centre,
-                    Origin = Anchor.Centre,
-                    Text = "THIS IS A STORYBOARD",
-                });
+                player.ReplacesBackground.Value = false;
+                player.StoryboardEnabled.Value = false;
             });
             waitForDim();
-            AddAssert("Background is invisible, storyboard is visible", () => songSelect.IsBackgroundInvisible() && player.CurrentStoryboardContainer.Alpha == 1);
-            AddStep("Disable storyboard", () => player.ReplacesBackground.Value = false);
-            waitForDim();
-            AddAssert("Background is visible", () => songSelect.IsBackgroundVisible());
+            AddAssert("Background is visible, storyboard is invisible", () => songSelect.IsBackgroundVisible() && player.IsStoryboardInvisible());
         }
 
         /// <summary>
@@ -169,16 +160,7 @@ namespace osu.Game.Tests.Visual
         public void StoryboardTransitionTest()
         {
             performSetup();
-            AddStep("Enable storyboard", () =>
-            {
-                player.ReplacesBackground.Value = true;
-                player.StoryboardEnabled.Value = true;
-                player.CurrentStoryboardContainer.Add(new Box
-                {
-                    Alpha = 1,
-                    Colour = Color4.Tomato
-                });
-            });
+            createFakeStoryboard();
             AddUntilStep(() =>
             {
                 if (songSelect.IsCurrentScreen()) return true;
@@ -265,6 +247,17 @@ namespace osu.Game.Tests.Visual
 
         private void waitForDim() => AddWaitStep(5, "Wait for dim");
 
+        private void createFakeStoryboard() => AddStep("Enable storyboard", () =>
+        {
+            player.ReplacesBackground.Value = true;
+            player.StoryboardEnabled.Value = true;
+            player.CurrentStoryboardContainer.Add(new Box
+            {
+                Alpha = 1,
+                Colour = Color4.Tomato
+            });
+        });
+
         private void performSetup(bool allowPause = false)
         {
             createSongSelect();
@@ -344,6 +337,16 @@ namespace osu.Game.Tests.Visual
         {
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
 
+            protected override UserDimContainer CreateStoryboardContainer()
+            {
+                return new TestUserDimContainer(true)
+                {
+                    RelativeSizeAxes = Axes.Both,
+                    Alpha = 1,
+                    EnableUserDim = { Value = true }
+                };
+            }
+
             public UserDimContainer CurrentStoryboardContainer => StoryboardContainer;
             // Whether or not the player should be allowed to load.
             public bool Ready;
@@ -351,6 +354,10 @@ namespace osu.Game.Tests.Visual
             public Bindable<bool> StoryboardEnabled;
             public readonly Bindable<bool> ReplacesBackground = new Bindable<bool>();
             public readonly Bindable<bool> IsPaused = new Bindable<bool>();
+
+            public bool IsStoryboardVisible() => ((TestUserDimContainer)CurrentStoryboardContainer).CurrentAlpha == 1;
+
+            public bool IsStoryboardInvisible() => ((TestUserDimContainer)CurrentStoryboardContainer).CurrentAlpha <= 1;
 
             [BackgroundDependencyLoader]
             private void load(OsuConfigManager config)
@@ -401,12 +408,16 @@ namespace osu.Game.Tests.Visual
                 : base(beatmap)
             {
             }
+        }
 
-            private class TestUserDimContainer : UserDimContainer
+        private class TestUserDimContainer : UserDimContainer
+        {
+            public TestUserDimContainer(bool isStoryboard = false)
+                : base(isStoryboard)
             {
-                public Color4 CurrentColour => DimContainer.Colour;
-                public float CurrentAlpha => DimContainer.Alpha;
             }
+            public Color4 CurrentColour => DimContainer.Colour;
+            public float CurrentAlpha => DimContainer.Alpha;
         }
     }
 }
