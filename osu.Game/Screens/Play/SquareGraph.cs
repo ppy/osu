@@ -73,6 +73,7 @@ namespace osu.Game.Screens.Play
         }
 
         private Cached layout = new Cached();
+        private ScheduledDelegate scheduledCreate;
 
         protected override void Update()
         {
@@ -80,27 +81,21 @@ namespace osu.Game.Screens.Play
 
             if (values != null && !layout.IsValid)
             {
-                schedulerRecreateGraph();
+                columns?.FadeOut(500, Easing.OutQuint).Expire();
+
+                scheduledCreate?.Cancel();
+                scheduledCreate = Scheduler.AddDelayed(RecreateGraph, 500);
+
                 layout.Validate();
             }
         }
 
-        private ScheduledDelegate scheduledCreate;
+        private CancellationTokenSource cts;
 
         /// <summary>
         /// Recreates the entire graph.
         /// </summary>
-        private void schedulerRecreateGraph()
-        {
-            columns?.FadeOut(500, Easing.OutQuint).Expire();
-
-            scheduledCreate?.Cancel();
-            scheduledCreate = Scheduler.AddDelayed(recreateGraph, 500);
-        }
-
-        private CancellationTokenSource cts;
-
-        private void recreateGraph()
+        protected virtual void RecreateGraph()
         {
             var newColumns = new BufferedContainer<Column>
             {
