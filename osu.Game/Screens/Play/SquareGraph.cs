@@ -121,7 +121,6 @@ namespace osu.Game.Screens.Play
             }
 
             cts?.Cancel();
-            cts = new CancellationTokenSource();
 
             LoadComponentAsync(newColumns, c =>
             {
@@ -131,7 +130,7 @@ namespace osu.Game.Screens.Play
                 recalculateValues();
                 redrawFilled();
                 redrawProgress();
-            }, cts.Token);
+            }, (cts = new CancellationTokenSource()).Token);
         }
 
         /// <summary>
