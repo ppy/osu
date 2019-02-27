@@ -213,14 +213,16 @@ namespace osu.Game.Screens.Ranking.Pages
             {
                 Children = new Drawable[]
                 {
-                    new OsuSpriteText {
+                    new OsuSpriteText
+                    {
                         Text = statistic.Value.ToString().PadLeft(4, '0'),
                         Colour = colours.Gray7,
                         Font = OsuFont.GetFont(size: 30),
                         Anchor = Anchor.TopCentre,
                         Origin = Anchor.TopCentre,
                     },
-                    new OsuSpriteText {
+                    new OsuSpriteText
+                    {
                         Text = statistic.Key.GetDescription(),
                         Colour = colours.Gray7,
                         Font = OsuFont.GetFont(weight: FontWeight.Bold),
@@ -334,7 +336,8 @@ namespace osu.Game.Screens.Ranking.Pages
                 versionMapper.Colour = colours.Gray8;
 
                 var creator = beatmap.Metadata.Author?.Username;
-                if (!string.IsNullOrEmpty(creator)) {
+                if (!string.IsNullOrEmpty(creator))
+                {
                     versionMapper.Text = $"mapped by {creator}";
 
                     if (!string.IsNullOrEmpty(beatmap.Version))
@@ -388,7 +391,8 @@ namespace osu.Game.Screens.Ranking.Pages
 
             protected override Easing RollingEasing => Easing.OutPow10;
 
-            public SlowScoreCounter(uint leading = 0) : base(leading)
+            public SlowScoreCounter(uint leading = 0)
+                : base(leading)
             {
                 DisplayedCountSpriteText.Shadow = false;
                 DisplayedCountSpriteText.Font = DisplayedCountSpriteText.Font.With(Typeface.Venera, weight: FontWeight.Light);

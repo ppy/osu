@@ -12,6 +12,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
     public class FollowPointRenderer : ConnectionRenderer<OsuHitObject>
     {
         private int pointDistance = 32;
+
         /// <summary>
         /// Determines how much space there is between points.
         /// </summary>
@@ -21,12 +22,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             set
             {
                 if (pointDistance == value) return;
+
                 pointDistance = value;
                 update();
             }
         }
 
         private int preEmpt = 800;
+
         /// <summary>
         /// Follow points to the next hitobject start appearing for this many milliseconds before an hitobject's end time.
         /// </summary>
@@ -36,12 +39,14 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
             set
             {
                 if (preEmpt == value) return;
+
                 preEmpt = value;
                 update();
             }
         }
 
         private IEnumerable<OsuHitObject> hitObjects;
+
         public override IEnumerable<OsuHitObject> HitObjects
         {
             get { return hitObjects; }
@@ -107,6 +112,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
                         fp.Expire(true);
                     }
                 }
+
                 prevHitObject = currHitObject;
             }
         }

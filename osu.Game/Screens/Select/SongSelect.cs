@@ -209,7 +209,7 @@ namespace osu.Game.Screens.Select
                 });
             }
 
-            BeatmapDetails.Leaderboard.ScoreSelected += s =>this.Push(new SoloResults(s));
+            BeatmapDetails.Leaderboard.ScoreSelected += s => this.Push(new SoloResults(s));
         }
 
         [BackgroundDependencyLoader(true)]
@@ -285,8 +285,8 @@ namespace osu.Game.Screens.Select
 
         public void Edit(BeatmapInfo beatmap = null)
         {
-           Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
-           this.Push(new Editor());
+            Beatmap.Value = beatmaps.GetWorkingBeatmap(beatmap ?? beatmapNoDebounce);
+            this.Push(new Editor());
         }
 
         /// <summary>
@@ -623,6 +623,7 @@ namespace osu.Game.Screens.Select
         private void delete(BeatmapSetInfo beatmap)
         {
             if (beatmap == null || beatmap.ID <= 0) return;
+
             dialogOverlay?.Push(new BeatmapDeleteDialog(beatmap));
         }
 

@@ -35,6 +35,7 @@ namespace osu.Game.Skinning
             Drawable sourceDrawable;
             if (beatmapSkins.Value && (sourceDrawable = source.GetDrawableComponent(componentName)) != null)
                 return sourceDrawable;
+
             return fallbackSource?.GetDrawableComponent(componentName);
         }
 
@@ -43,6 +44,7 @@ namespace osu.Game.Skinning
             Texture sourceTexture;
             if (beatmapSkins.Value && (sourceTexture = source.GetTexture(componentName)) != null)
                 return sourceTexture;
+
             return fallbackSource.GetTexture(componentName);
         }
 
@@ -51,6 +53,7 @@ namespace osu.Game.Skinning
             SampleChannel sourceChannel;
             if (beatmapHitsounds.Value && (sourceChannel = source.GetSample(sampleName)) != null)
                 return sourceChannel;
+
             return fallbackSource?.GetSample(sampleName);
         }
 
