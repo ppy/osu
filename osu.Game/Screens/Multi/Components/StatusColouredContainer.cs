@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Graphics;
@@ -25,7 +25,7 @@ namespace osu.Game.Screens.Multi.Components
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
-            status.BindValueChanged(s => this.FadeColour(s.GetAppropriateColour(colours), transitionDuration), true);
+            status.BindValueChanged(s => this.FadeColour(s.NewValue.GetAppropriateColour(colours), transitionDuration), true);
         }
     }
 }

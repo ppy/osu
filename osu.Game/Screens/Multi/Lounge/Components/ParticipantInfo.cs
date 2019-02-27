@@ -81,28 +81,29 @@ namespace osu.Game.Screens.Multi.Lounge.Components
                         summary = new OsuSpriteText
                         {
                             Text = "0 participants",
-                            TextSize = 14,
+                            Font = OsuFont.GetFont(size: 14)
                         }
                     },
                 },
             };
 
-            Host.BindValueChanged(v =>
+            Host.BindValueChanged(host =>
             {
                 hostText.Clear();
                 flagContainer.Clear();
 
-                if (v != null)
+                if (host.NewValue != null)
                 {
                     hostText.AddText("hosted by ");
-                    hostText.AddLink(v.Username, null, LinkAction.OpenUserProfile, v.Id.ToString(), "Open profile", s => s.Font = "Exo2.0-BoldItalic");
-                    flagContainer.Child = new DrawableFlag(v.Country) { RelativeSizeAxes = Axes.Both };
+                    hostText.AddLink(host.NewValue.Username, null, LinkAction.OpenUserProfile, host.NewValue.Id.ToString(), "Open profile",
+                        s => s.Font = s.Font.With(Typeface.Exo, weight: FontWeight.Bold, italics: true));
+                    flagContainer.Child = new DrawableFlag(host.NewValue.Country) { RelativeSizeAxes = Axes.Both };
                 }
             }, true);
 
-            ParticipantCount.BindValueChanged(v => summary.Text = $"{v:#,0}{" participant".Pluralize(v == 1)}", true);
+            ParticipantCount.BindValueChanged(count => summary.Text = $"{count.NewValue:#,0}{" participant".Pluralize(count.NewValue == 1)}", true);
 
-            /*Participants.BindValueChanged(v =>
+            /*Participants.BindValueChanged(e =>
             {
                 var ranks = v.Select(u => u.Statistics.Ranks.Global);
                 levelRangeLower.Text = ranks.Min().ToString();

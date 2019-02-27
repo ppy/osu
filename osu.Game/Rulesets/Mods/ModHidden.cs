@@ -1,12 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Configuration;
 using osu.Game.Configuration;
 using osu.Game.Graphics;
 using osu.Game.Rulesets.Objects.Drawables;
 using System.Collections.Generic;
 using System.Linq;
+using osu.Framework.Bindables;
 
 namespace osu.Game.Rulesets.Mods
 {
@@ -27,7 +27,7 @@ namespace osu.Game.Rulesets.Mods
 
         public virtual void ApplyToDrawableHitObjects(IEnumerable<DrawableHitObject> drawables)
         {
-            foreach (var d in drawables.Skip(IncreaseFirstObjectVisibility ? 1 : 0))
+            foreach (var d in drawables.Skip(IncreaseFirstObjectVisibility.Value ? 1 : 0))
                 d.ApplyCustomUpdateState += ApplyHiddenState;
         }
 

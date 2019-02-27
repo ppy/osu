@@ -20,8 +20,8 @@ namespace osu.Game.Overlays.Chat.Tabs
 
             Icon.Alpha = 0;
 
-            Text.TextSize = 45;
-            TextBold.TextSize = 45;
+            Text.Font = Text.Font.With(size: 45);
+            TextBold.Font = Text.Font.With(size: 45);
         }
 
         [BackgroundDependencyLoader]

@@ -143,8 +143,6 @@ namespace osu.Game.Screens.Play
         {
             base.LogoArriving(logo, resuming);
 
-            logo.RelativePositionAxes = Axes.Both;
-
             logo.ScaleTo(new Vector2(0.15f), 300, Easing.In);
             logo.MoveTo(new Vector2(0.5f), 300, Easing.In);
             logo.FadeIn(350);
@@ -330,16 +328,14 @@ namespace osu.Game.Screens.Play
                             new OsuSpriteText
                             {
                                 Text = new LocalisedString((metadata.TitleUnicode, metadata.Title)),
-                                TextSize = 36,
-                                Font = @"Exo2.0-MediumItalic",
+                                Font = OsuFont.GetFont(size: 36, italics: true),
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                             },
                             new OsuSpriteText
                             {
                                 Text = new LocalisedString((metadata.ArtistUnicode, metadata.Artist)),
-                                TextSize = 26,
-                                Font = @"Exo2.0-MediumItalic",
+                                Font = OsuFont.GetFont(size: 26, italics: true),
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                             },
@@ -367,8 +363,7 @@ namespace osu.Game.Screens.Play
                             new OsuSpriteText
                             {
                                 Text = beatmap?.BeatmapInfo?.Version,
-                                TextSize = 26,
-                                Font = @"Exo2.0-MediumItalic",
+                                Font = OsuFont.GetFont(size: 26, italics: true),
                                 Origin = Anchor.TopCentre,
                                 Anchor = Anchor.TopCentre,
                                 Margin = new MarginPadding

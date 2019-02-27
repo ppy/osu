@@ -4,6 +4,7 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
+using osu.Game.Graphics;
 using osu.Game.Graphics.Containers;
 using osu.Game.Graphics.Sprites;
 using osu.Game.Users;
@@ -30,21 +31,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         public float TextSize
         {
-            set
-            {
-                if (text.TextSize == value) return;
-                text.TextSize = value;
-            }
-            get { return text.TextSize; }
+            get => text.Font.Size;
+            set => text.Font = text.Font.With(size: value);
         }
 
         public ClickableUsername()
         {
             AutoSizeAxes = Axes.Both;
-            Child = text = new OsuSpriteText
-            {
-                Font = @"Exo2.0-BoldItalic",
-            };
+            Child = text = new OsuSpriteText { Font = OsuFont.GetFont(weight: FontWeight.Bold, italics: true) };
         }
 
         [BackgroundDependencyLoader(true)]

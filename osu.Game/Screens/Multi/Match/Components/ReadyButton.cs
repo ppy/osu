@@ -4,7 +4,7 @@
 using System;
 using System.Linq;
 using osu.Framework.Allocation;
-using osu.Framework.Configuration;
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
@@ -40,7 +40,7 @@ namespace osu.Game.Screens.Multi.Match.Components
         {
             beatmaps.ItemAdded += beatmapAdded;
 
-            Beatmap.BindValueChanged(updateBeatmap, true);
+            Beatmap.BindValueChanged(b => updateBeatmap(b.NewValue), true);
         }
 
         private void updateBeatmap(BeatmapInfo beatmap)
@@ -77,7 +77,7 @@ namespace osu.Game.Screens.Multi.Match.Components
                 return;
             }
 
-            bool hasEnoughTime = DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(gameBeatmap.Value.Track.Length) < endDate;
+            bool hasEnoughTime = DateTimeOffset.UtcNow.AddSeconds(30).AddMilliseconds(gameBeatmap.Value.Track.Length) < endDate.Value;
 
             Enabled.Value = hasBeatmap && hasEnoughTime;
         }
