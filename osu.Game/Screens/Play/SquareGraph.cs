@@ -12,6 +12,8 @@ using osu.Framework.Graphics.Containers;
 using osuTK;
 using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.MathUtils;
+using osu.Framework.Allocation;
 
 namespace osu.Game.Screens.Play
 {
@@ -66,20 +68,16 @@ namespace osu.Game.Screens.Play
 
         private Cached layout = new Cached();
 
-        public override bool Invalidate(Invalidation invalidation = Invalidation.All, Drawable source = null, bool shallPropagate = true)
-        {
-            if ((invalidation & Invalidation.DrawSize) > 0)
-                layout.Invalidate();
-            return base.Invalidate(invalidation, source, shallPropagate);
-        }
+        private float lastDrawWidth;
 
         protected override void Update()
         {
             base.Update();
 
-            if (!layout.IsValid)
+            if (values != null && (!layout.IsValid || !Precision.AlmostEquals(lastDrawWidth, DrawWidth, 5)))
             {
                 recreateGraph();
+                lastDrawWidth = DrawWidth;
                 layout.Validate();
             }
         }
@@ -203,21 +201,20 @@ namespace osu.Game.Screens.Play
                 }
             }
 
-            public Column()
+            public Column(float height)
             {
                 Width = WIDTH;
+                Height = height;
             }
 
-            protected override void LoadComplete()
+            [BackgroundDependencyLoader]
+            private void load()
             {
-                for (int r = 0; r < cubeCount; r++)
+                drawableRows.AddRange(Enumerable.Range(0, (int)cubeCount).Select(r => new Box
                 {
-                    drawableRows.Add(new Box
-                    {
-                        Size = new Vector2(cube_size),
-                        Position = new Vector2(0, r * WIDTH + padding),
-                    });
-                }
+                    Size = new Vector2(cube_size),
+                    Position = new Vector2(0, r * WIDTH + padding),
+                }));
 
                 Children = drawableRows;
 
