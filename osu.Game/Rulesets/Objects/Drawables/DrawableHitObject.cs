@@ -221,9 +221,9 @@ namespace osu.Game.Rulesets.Objects.Drawables
         }
 
         /// <summary>
-        /// Should be called at least once after lifetime of this hit object is end.
+        /// Will called at least once after the <see cref="LifetimeEnd"/> of this <see cref="DrawableHitObject"/> has been passed.
         /// </summary>
-        public void OnLifetimeEnd()
+        internal void OnLifetimeEnd()
         {
             foreach (var nested in NestedHitObjects)
                 nested.OnLifetimeEnd();
