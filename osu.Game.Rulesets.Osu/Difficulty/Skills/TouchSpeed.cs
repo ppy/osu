@@ -49,9 +49,9 @@ namespace osu.Game.Rulesets.Osu.Difficulty.Skills
 
             double speedValue;
             if (distance > 125)
-                speedValue = 1.85;
+                speedValue = 1.9;
             else if (distance > 110)
-                speedValue = 1.5 + 0.35 * (distance - 110) / 15;
+                speedValue = 1.5 + 0.4 * (distance - 110) / 15;
             else if (distance > 90)
                 speedValue = 1.2 + 0.3 * (distance - 90) / 20;
             else if (distance > 45)
