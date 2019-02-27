@@ -56,7 +56,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
         private void update()
         {
-            Clear();
+            ClearInternal();
 
             if (hitObjects == null)
                 return;
@@ -86,7 +86,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
 
                         FollowPoint fp;
 
-                        Add(fp = new FollowPoint
+                        AddInternal(fp = new FollowPoint
                         {
                             Position = pointStartPosition,
                             Rotation = rotation,
