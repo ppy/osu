@@ -65,8 +65,7 @@ namespace osu.Game.Graphics.UserInterface
             set
             {
                 accentColour = value;
-                var dropdown = Dropdown as IHasAccentColour;
-                if (dropdown != null)
+                if (Dropdown is IHasAccentColour dropdown)
                     dropdown.AccentColour = value;
                 foreach (var i in TabContainer.Children.OfType<IHasAccentColour>())
                     i.AccentColour = value;
