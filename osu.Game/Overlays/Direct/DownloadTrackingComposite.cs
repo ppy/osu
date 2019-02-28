@@ -63,8 +63,11 @@ namespace osu.Game.Overlays.Direct
         {
             base.Dispose(isDisposing);
 
-            beatmaps.BeatmapDownloadBegan -= attachDownload;
-            beatmaps.ItemAdded -= setAdded;
+            if (beatmaps != null)
+            {
+                beatmaps.BeatmapDownloadBegan -= attachDownload;
+                beatmaps.ItemAdded -= setAdded;
+            }
 
             State.UnbindAll();
 
