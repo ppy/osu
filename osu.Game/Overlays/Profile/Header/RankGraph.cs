@@ -140,6 +140,7 @@ namespace osu.Game.Overlays.Profile.Header
                 graph.UpdateBallPosition(e.MousePosition.X);
                 graph.ShowBall();
             }
+
             return base.OnHover(e);
         }
 

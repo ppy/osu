@@ -45,7 +45,7 @@ namespace osu.Game.Overlays
 
         public IEnumerable<BeatmapSetInfo> BeatmapSets
         {
-            get { return beatmapSets; }
+            get => beatmapSets;
             set
             {
                 if (beatmapSets?.Equals(value) ?? false) return;
@@ -72,10 +72,11 @@ namespace osu.Game.Overlays
 
         public ResultCounts ResultAmounts
         {
-            get { return resultAmounts; }
+            get => resultAmounts;
             set
             {
                 if (value == ResultAmounts) return;
+
                 resultAmounts = value;
 
                 updateResultCounts();

@@ -31,6 +31,7 @@ namespace osu.Game.Screens.Multi.Components
             {
                 if (!Enabled.Value)
                     return true;
+
                 return base.OnClick(e);
             }
         }

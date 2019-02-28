@@ -17,9 +17,10 @@ namespace osu.Game.Graphics.UserInterface
     public class OsuDropdown<T> : Dropdown<T>, IHasAccentColour
     {
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;
@@ -47,6 +48,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override DropdownMenu CreateMenu() => new OsuDropdownMenu();
 
         #region OsuDropdownMenu
+
         protected class OsuDropdownMenu : DropdownMenu, IHasAccentColour
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
@@ -81,9 +83,10 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             private Color4 accentColour;
+
             public Color4 AccentColour
             {
-                get { return accentColour; }
+                get => accentColour;
                 set
                 {
                     accentColour = value;
@@ -95,15 +98,17 @@ namespace osu.Game.Graphics.UserInterface
             protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuDropdownMenuItem(item) { AccentColour = accentColour };
 
             #region DrawableOsuDropdownMenuItem
+
             public class DrawableOsuDropdownMenuItem : DrawableDropdownMenuItem, IHasAccentColour
             {
                 // IsHovered is used
                 public override bool HandlePositionalInput => true;
 
                 private Color4? accentColour;
+
                 public Color4 AccentColour
                 {
-                    get { return accentColour ?? nonAccentSelectedColour; }
+                    get => accentColour ?? nonAccentSelectedColour;
                     set
                     {
                         accentColour = value;
@@ -156,8 +161,8 @@ namespace osu.Game.Graphics.UserInterface
                 {
                     public string Text
                     {
-                        get { return Label.Text; }
-                        set { Label.Text = value; }
+                        get => Label.Text;
+                        set => Label.Text = value;
                     }
 
                     public readonly OsuSpriteText Label;
@@ -191,25 +196,29 @@ namespace osu.Game.Graphics.UserInterface
                     }
                 }
             }
+
             #endregion
         }
+
         #endregion
 
         public class OsuDropdownHeader : DropdownHeader, IHasAccentColour
         {
             protected readonly SpriteText Text;
+
             protected override string Label
             {
-                get { return Text.Text; }
-                set { Text.Text = value; }
+                get => Text.Text;
+                set => Text.Text = value;
             }
 
             protected readonly SpriteIcon Icon;
 
             private Color4 accentColour;
+
             public virtual Color4 AccentColour
             {
-                get { return accentColour; }
+                get => accentColour;
                 set
                 {
                     accentColour = value;

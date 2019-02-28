@@ -39,7 +39,8 @@ namespace osu.Game.Screens.Multi.Match.Components
 
             private readonly Box hover, selection;
 
-            public RoomAvailabilityPickerItem(RoomAvailability value) : base(value)
+            public RoomAvailabilityPickerItem(RoomAvailability value)
+                : base(value)
             {
                 RelativeSizeAxes = Axes.Y;
                 Width = 102;

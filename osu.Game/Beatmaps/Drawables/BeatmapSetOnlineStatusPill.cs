@@ -23,6 +23,7 @@ namespace osu.Game.Beatmaps.Drawables
             {
                 if (status == value)
                     return;
+
                 status = value;
 
                 Alpha = value == BeatmapSetOnlineStatus.None ? 0 : 1;

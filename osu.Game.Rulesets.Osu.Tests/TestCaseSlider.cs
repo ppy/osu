@@ -301,6 +301,7 @@ namespace osu.Game.Rulesets.Osu.Tests
         }
 
         private float judgementOffsetDirection = 1;
+
         private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
         {
             var osuObject = judgedObject as DrawableOsuHitObject;

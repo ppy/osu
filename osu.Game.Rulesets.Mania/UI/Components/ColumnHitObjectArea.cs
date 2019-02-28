@@ -73,6 +73,7 @@ namespace osu.Game.Rulesets.Mania.UI.Components
             {
                 if (accentColour == value)
                     return;
+
                 accentColour = value;
 
                 updateColours();

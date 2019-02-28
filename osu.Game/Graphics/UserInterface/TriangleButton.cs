@@ -31,10 +31,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public bool MatchingFilter
         {
-            set
-            {
-                this.FadeTo(value ? 1 : 0);
-            }
+            set => this.FadeTo(value ? 1 : 0);
         }
     }
 }
