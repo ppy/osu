@@ -165,7 +165,7 @@ namespace osu.Game.Overlays.Settings.Sections.Graphics
 
         private void windowModesChanged()
         {
-            if (windowModes.Count() > 1)
+            if (windowModes.Count > 1)
                 windowModeDropdown.Show();
             else
                 windowModeDropdown.Hide();
