@@ -34,8 +34,8 @@ namespace osu.Game.Overlays.Music
 
         public new MarginPadding Padding
         {
-            get { return base.Padding; }
-            set { base.Padding = value; }
+            get => base.Padding;
+            set => base.Padding = value;
         }
 
         public BeatmapSetInfo FirstVisibleSet => items.FirstVisibleSet;
@@ -109,8 +109,8 @@ namespace osu.Game.Overlays.Music
 
             public string SearchTerm
             {
-                get { return search.SearchTerm; }
-                set { search.SearchTerm = value; }
+                get => search.SearchTerm;
+                set => search.SearchTerm = value;
             }
 
             public BeatmapSetInfo FirstVisibleSet => items.FirstOrDefault(i => i.MatchingFilter)?.BeatmapSetInfo;
@@ -130,6 +130,7 @@ namespace osu.Game.Overlays.Music
                 nativeDragPosition = e.ScreenSpaceMousePosition;
                 if (draggedItem == null)
                     return base.OnDrag(e);
+
                 return true;
             }
 

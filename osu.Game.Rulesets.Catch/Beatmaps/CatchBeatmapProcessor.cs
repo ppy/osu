@@ -56,6 +56,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                             rng.Next(); // osu!stable retrieved a random banana rotation
                             rng.Next(); // osu!stable retrieved a random banana colour
                         }
+
                         break;
                     case JuiceStream juiceStream:
                         foreach (var nested in juiceStream.NestedHitObjects)
@@ -67,6 +68,7 @@ namespace osu.Game.Rulesets.Catch.Beatmaps
                                 rng.Next(); // osu!stable retrieved a random droplet rotation
                             hitObject.X = MathHelper.Clamp(hitObject.X, 0, 1);
                         }
+
                         break;
                 }
             }

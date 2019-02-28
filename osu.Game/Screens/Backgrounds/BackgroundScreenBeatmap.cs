@@ -28,7 +28,7 @@ namespace osu.Game.Screens.Backgrounds
 
         public virtual WorkingBeatmap Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (beatmap == value && beatmap != null)

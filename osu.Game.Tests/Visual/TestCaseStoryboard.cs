@@ -50,7 +50,10 @@ namespace osu.Game.Tests.Visual
             });
 
             AddStep("Restart", restart);
-            AddToggleStep("Passing", passing => { if (storyboard != null) storyboard.Passing = passing; });
+            AddToggleStep("Passing", passing =>
+            {
+                if (storyboard != null) storyboard.Passing = passing;
+            });
         }
 
         [BackgroundDependencyLoader]

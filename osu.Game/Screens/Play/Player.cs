@@ -264,6 +264,7 @@ namespace osu.Game.Screens.Play
         private void performUserRequestedExit()
         {
             if (!this.IsCurrentScreen()) return;
+
             this.Exit();
         }
 

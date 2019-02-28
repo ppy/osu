@@ -13,6 +13,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Logging;
+using osu.Framework.Platform;
 using osu.Framework.Threading;
 using osu.Game.Graphics;
 using osu.Game.Input;
@@ -90,19 +91,6 @@ namespace osu.Game.Screens.Menu
             });
 
             buttonArea.Flow.CentreTarget = iconFacade;
-
-            buttonsPlay.Add(new Button(@"solo", @"button-solo-select", FontAwesome.fa_user, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
-            buttonsPlay.Add(new Button(@"multi", @"button-generic-select", FontAwesome.fa_users, new Color4(94, 63, 186, 255), onMulti, 0, Key.M));
-            buttonsPlay.Add(new Button(@"chart", @"button-generic-select", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
-            buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
-
-            buttonsTopLevel.Add(new Button(@"play", @"button-play-select", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
-            buttonsTopLevel.Add(new Button(@"osu!editor", @"button-generic-select", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
-            buttonsTopLevel.Add(new Button(@"osu!direct", @"button-direct-select", FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
-            buttonsTopLevel.Add(new Button(@"exit", string.Empty, FontAwesome.fa_osu_cross_o, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
-
-            buttonArea.AddRange(buttonsPlay);
-            buttonArea.AddRange(buttonsTopLevel);
         }
 
         [Resolved(CanBeNull = true)]
@@ -115,8 +103,23 @@ namespace osu.Game.Screens.Menu
         private NotificationOverlay notifications { get; set; }
 
         [BackgroundDependencyLoader(true)]
-        private void load(AudioManager audio, IdleTracker idleTracker)
+        private void load(AudioManager audio, IdleTracker idleTracker, GameHost host)
         {
+            buttonsPlay.Add(new Button(@"solo", @"button-solo-select", FontAwesome.fa_user, new Color4(102, 68, 204, 255), () => OnSolo?.Invoke(), WEDGE_WIDTH, Key.P));
+            buttonsPlay.Add(new Button(@"multi", @"button-generic-select", FontAwesome.fa_users, new Color4(94, 63, 186, 255), onMulti, 0, Key.M));
+            buttonsPlay.Add(new Button(@"chart", @"button-generic-select", FontAwesome.fa_osu_charts, new Color4(80, 53, 160, 255), () => OnChart?.Invoke()));
+            buttonsPlay.ForEach(b => b.VisibleState = ButtonSystemState.Play);
+
+            buttonsTopLevel.Add(new Button(@"play", @"button-play-select", FontAwesome.fa_osu_logo, new Color4(102, 68, 204, 255), () => State = ButtonSystemState.Play, WEDGE_WIDTH, Key.P));
+            buttonsTopLevel.Add(new Button(@"osu!editor", @"button-generic-select", FontAwesome.fa_osu_edit_o, new Color4(238, 170, 0, 255), () => OnEdit?.Invoke(), 0, Key.E));
+            buttonsTopLevel.Add(new Button(@"osu!direct", @"button-direct-select", FontAwesome.fa_osu_chevron_down_o, new Color4(165, 204, 0, 255), () => OnDirect?.Invoke(), 0, Key.D));
+
+            if (host.CanExit)
+                buttonsTopLevel.Add(new Button(@"exit", string.Empty, FontAwesome.fa_osu_cross_o, new Color4(238, 51, 153, 255), () => OnExit?.Invoke(), 0, Key.Q));
+
+            buttonArea.AddRange(buttonsPlay);
+            buttonArea.AddRange(buttonsTopLevel);
+
             isIdle.ValueChanged += idle => updateIdleState(idle.NewValue);
 
             if (idleTracker != null) isIdle.BindTo(idleTracker.IsIdle);
@@ -203,7 +206,7 @@ namespace osu.Game.Screens.Menu
 
         public ButtonSystemState State
         {
-            get { return state; }
+            get => state;
 
             set
             {

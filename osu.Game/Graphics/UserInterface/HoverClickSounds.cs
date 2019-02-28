@@ -17,7 +17,8 @@ namespace osu.Game.Graphics.UserInterface
     {
         private SampleChannel sampleClick;
 
-        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal) : base(sampleSet)
+        public HoverClickSounds(HoverSampleSet sampleSet = HoverSampleSet.Normal)
+            : base(sampleSet)
         {
         }
 

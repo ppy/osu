@@ -34,8 +34,8 @@ namespace osu.Game.Beatmaps
         [Column("Author")]
         public string AuthorString
         {
-            get { return Author?.Username; }
-            set { Author = new User { Username = value }; }
+            get => Author?.Username;
+            set => Author = new User { Username = value };
         }
 
         /// <summary>
@@ -48,6 +48,7 @@ namespace osu.Game.Beatmaps
 
         [JsonProperty(@"tags")]
         public string Tags { get; set; }
+
         public int PreviewTime { get; set; }
         public string AudioFile { get; set; }
         public string BackgroundFile { get; set; }
@@ -72,15 +73,15 @@ namespace osu.Game.Beatmaps
                 return false;
 
             return Title == other.Title
-                && TitleUnicode == other.TitleUnicode
-                && Artist == other.Artist
-                && ArtistUnicode == other.ArtistUnicode
-                && AuthorString == other.AuthorString
-                && Source == other.Source
-                && Tags == other.Tags
-                && PreviewTime == other.PreviewTime
-                && AudioFile == other.AudioFile
-                && BackgroundFile == other.BackgroundFile;
+                   && TitleUnicode == other.TitleUnicode
+                   && Artist == other.Artist
+                   && ArtistUnicode == other.ArtistUnicode
+                   && AuthorString == other.AuthorString
+                   && Source == other.Source
+                   && Tags == other.Tags
+                   && PreviewTime == other.PreviewTime
+                   && AudioFile == other.AudioFile
+                   && BackgroundFile == other.BackgroundFile;
         }
     }
 }

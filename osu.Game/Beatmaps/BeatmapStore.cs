@@ -34,6 +34,7 @@ namespace osu.Game.Beatmaps
                 Refresh(ref beatmap, Beatmaps);
 
                 if (beatmap.Hidden) return false;
+
                 beatmap.Hidden = true;
             }
 
@@ -53,6 +54,7 @@ namespace osu.Game.Beatmaps
                 Refresh(ref beatmap, Beatmaps);
 
                 if (!beatmap.Hidden) return false;
+
                 beatmap.Hidden = false;
             }
 

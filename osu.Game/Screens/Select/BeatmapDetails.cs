@@ -41,12 +41,14 @@ namespace osu.Game.Screens.Select
         private ScheduledDelegate pendingBeatmapSwitch;
 
         private BeatmapInfo beatmap;
+
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (value == beatmap) return;
+
                 beatmap = value;
 
                 pendingBeatmapSwitch?.Cancel();
@@ -116,6 +118,7 @@ namespace osu.Game.Screens.Select
                                         RelativeSizeAxes = Axes.X,
                                         AutoSizeAxes = Axes.Y,
                                         LayoutDuration = transition_duration,
+                                        LayoutEasing = Easing.OutQuad,
                                         Spacing = new Vector2(spacing * 2),
                                         Margin = new MarginPadding { Top = spacing * 2 },
                                         Children = new[]
@@ -336,9 +339,11 @@ namespace osu.Game.Screens.Select
                 {
                     if (string.IsNullOrEmpty(value))
                     {
-                        textContainer.FadeOut(transition_duration);
+                        this.FadeOut(transition_duration);
                         return;
                     }
+
+                    this.FadeIn(transition_duration);
 
                     setTextAsync(value);
                 }
