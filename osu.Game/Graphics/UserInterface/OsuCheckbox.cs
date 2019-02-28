@@ -76,10 +76,7 @@ namespace osu.Game.Graphics.UserInterface
 
             Nub.Current.BindTo(Current);
 
-            Current.DisabledChanged += disabled =>
-            {
-                Alpha = disabled ? 0.3f : 1;
-            };
+            Current.DisabledChanged += disabled => Alpha = disabled ? 0.3f : 1;
         }
 
         protected override void LoadComplete()

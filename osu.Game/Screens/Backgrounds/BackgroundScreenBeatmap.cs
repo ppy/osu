@@ -23,24 +23,21 @@ namespace osu.Game.Screens.Backgrounds
 
                 beatmap = value;
 
-                Schedule(() =>
+                Schedule(() => LoadComponentAsync(new BeatmapBackground(beatmap), b => Schedule(() =>
                 {
-                    LoadComponentAsync(new BeatmapBackground(beatmap), b => Schedule(() =>
+                    float newDepth = 0;
+                    if (Background != null)
                     {
-                        float newDepth = 0;
-                        if (Background != null)
-                        {
-                            newDepth = Background.Depth + 1;
-                            Background.FinishTransforms();
-                            Background.FadeOut(250);
-                            Background.Expire();
-                        }
+                        newDepth = Background.Depth + 1;
+                        Background.FinishTransforms();
+                        Background.FadeOut(250);
+                        Background.Expire();
+                    }
 
-                        b.Depth = newDepth;
-                        AddInternal(Background = b);
-                        Background.BlurSigma = BlurTarget;
-                    }));
-                });
+                    b.Depth = newDepth;
+                    AddInternal(Background = b);
+                    Background.BlurSigma = BlurTarget;
+                })));
             }
         }
 

@@ -169,7 +169,7 @@ namespace osu.Game.Screens
                         Text = $@"{t.Name}",
                         BackgroundColour = getColourFor(t),
                         HoverColour = getColourFor(t).Lighten(0.2f),
-                        Action = delegate { this.Push(Activator.CreateInstance(t) as Screen); }
+                        Action = () => this.Push(Activator.CreateInstance(t) as Screen)
                     });
                 }
             }

@@ -73,15 +73,12 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                     Math.Pow(accuracyValue, 1.1f), 1.0f / 1.1f
                 ) * multiplier;
 
-            if (categoryRatings != null)
-            {
-                categoryRatings.Add("Aim", aimValue);
-                categoryRatings.Add("Speed", speedValue);
-                categoryRatings.Add("Accuracy", accuracyValue);
-                categoryRatings.Add("OD", Attributes.OverallDifficulty);
-                categoryRatings.Add("AR", Attributes.ApproachRate);
-                categoryRatings.Add("Max Combo", beatmapMaxCombo);
-            }
+            categoryRatings?.Add("Aim", aimValue);
+            categoryRatings?.Add("Speed", speedValue);
+            categoryRatings?.Add("Accuracy", accuracyValue);
+            categoryRatings?.Add("OD", Attributes.OverallDifficulty);
+            categoryRatings?.Add("AR", Attributes.ApproachRate);
+            categoryRatings?.Add("Max Combo", beatmapMaxCombo);
 
             return totalValue;
         }

@@ -62,7 +62,7 @@ namespace osu.Game.Overlays.BeatmapSet
                         starRating.Text = beatmap.StarDifficulty.ToString("Star Difficulty 0.##");
                         starRating.FadeIn(100);
                     },
-                    OnClicked = beatmap => { Beatmap.Value = beatmap; },
+                    OnClicked = beatmap => Beatmap.Value = beatmap,
                 });
             }
 

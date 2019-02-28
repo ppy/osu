@@ -261,7 +261,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
             protected override void OnFocus(FocusEvent e)
             {
-                Schedule(() => { GetContainingInputManager().ChangeFocus(string.IsNullOrEmpty(username.Text) ? username : password); });
+                Schedule(() => GetContainingInputManager().ChangeFocus(string.IsNullOrEmpty(username.Text) ? username : password));
             }
         }
 

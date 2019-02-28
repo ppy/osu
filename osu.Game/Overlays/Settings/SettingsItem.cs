@@ -102,7 +102,7 @@ namespace osu.Game.Overlays.Settings
         private void load()
         {
             if (controlWithCurrent != null)
-                controlWithCurrent.Current.DisabledChanged += disabled => { Colour = disabled ? Color4.Gray : Color4.White; };
+                controlWithCurrent.Current.DisabledChanged += disabled => Colour = disabled ? Color4.Gray : Color4.White;
         }
 
         private class RestoreDefaultValueButton : Container, IHasTooltip
@@ -169,7 +169,7 @@ namespace osu.Game.Overlays.Settings
 
             protected override bool OnClick(ClickEvent e)
             {
-                if (bindable != null && !bindable.Disabled)
+                if (bindable?.Disabled == false)
                     bindable.SetDefault();
                 return true;
             }
