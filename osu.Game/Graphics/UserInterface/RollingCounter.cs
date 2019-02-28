@@ -54,6 +54,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 if (EqualityComparer<T>.Default.Equals(displayedCount, value))
                     return;
+
                 displayedCount = value;
                 DisplayedCountSpriteText.Text = FormatCount(value);
             }

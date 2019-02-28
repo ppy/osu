@@ -97,6 +97,7 @@ namespace osu.Game.Rulesets.Mania.UI
         public override Axes RelativeSizeAxes => Axes.Y;
 
         private bool isSpecial;
+
         public bool IsSpecial
         {
             get { return isSpecial; }
@@ -104,6 +105,7 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 if (isSpecial == value)
                     return;
+
                 isSpecial = value;
 
                 Width = isSpecial ? special_column_width : column_width;
@@ -111,6 +113,7 @@ namespace osu.Game.Rulesets.Mania.UI
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
             get { return accentColour; }
@@ -118,6 +121,7 @@ namespace osu.Game.Rulesets.Mania.UI
             {
                 if (accentColour == value)
                     return;
+
                 accentColour = value;
 
                 background.AccentColour = value;

@@ -50,12 +50,14 @@ namespace osu.Game.Overlays.Music
         }
 
         private bool selected;
+
         public bool Selected
         {
             get { return selected; }
             set
             {
                 if (value == selected) return;
+
                 selected = value;
 
                 FinishTransforms(true);

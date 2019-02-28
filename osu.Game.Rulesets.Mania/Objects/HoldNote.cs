@@ -17,6 +17,7 @@ namespace osu.Game.Rulesets.Mania.Objects
         public double EndTime => StartTime + Duration;
 
         private double duration;
+
         public double Duration
         {
             get { return duration; }

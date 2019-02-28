@@ -61,10 +61,10 @@ namespace osu.Game.Tests.Visual
 
             // Move box along a square trajectory
             container.Loop(c => c
-                .MoveTo(new Vector2(0, 100), duration).Then()
-                .MoveTo(new Vector2(100, 100), duration).Then()
-                .MoveTo(new Vector2(100, 0), duration).Then()
-                .MoveTo(Vector2.Zero, duration)
+                                .MoveTo(new Vector2(0, 100), duration).Then()
+                                .MoveTo(new Vector2(100, 100), duration).Then()
+                                .MoveTo(new Vector2(100, 0), duration).Then()
+                                .MoveTo(Vector2.Zero, duration)
             );
         }
 

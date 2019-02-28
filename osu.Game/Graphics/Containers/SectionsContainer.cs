@@ -110,6 +110,7 @@ namespace osu.Game.Graphics.Containers
 
         private float headerHeight, footerHeight;
         private readonly MarginPadding originalSectionsMargin;
+
         private void updateSectionsMargin()
         {
             if (!Children.Any()) return;
@@ -142,6 +143,7 @@ namespace osu.Game.Graphics.Containers
         public void ScrollToTop() => scrollContainer.ScrollTo(0);
 
         private float lastKnownScroll;
+
         protected override void UpdateAfterChildren()
         {
             base.UpdateAfterChildren();

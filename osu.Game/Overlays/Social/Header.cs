@@ -54,6 +54,7 @@ namespace osu.Game.Overlays.Social
     {
         [Description("All Players")]
         AllPlayers,
+
         [Description("Friends")]
         Friends,
         //[Description("Team Members")]

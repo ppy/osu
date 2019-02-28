@@ -44,12 +44,14 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
         private readonly ScoreModsContainer modsContainer;
 
         private APIScoreInfo score;
+
         public APIScoreInfo Score
         {
             get { return score; }
             set
             {
                 if (score == value) return;
+
                 score = value;
 
                 avatar.User = username.User = score.User;
@@ -207,6 +209,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
                 {
                     if (valueText.Text == value)
                         return;
+
                     valueText.Text = value;
                 }
                 get { return valueText.Text; }

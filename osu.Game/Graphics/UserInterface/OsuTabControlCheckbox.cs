@@ -24,6 +24,7 @@ namespace osu.Game.Graphics.UserInterface
         private readonly SpriteIcon icon;
 
         private Color4? accentColour;
+
         public Color4 AccentColour
         {
             get { return accentColour.GetValueOrDefault(); }

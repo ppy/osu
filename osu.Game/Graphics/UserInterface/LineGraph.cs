@@ -112,6 +112,7 @@ namespace osu.Game.Graphics.UserInterface
         protected float GetYPosition(float value)
         {
             if (ActualMaxValue == ActualMinValue) return 0;
+
             return (ActualMaxValue - value) / (ActualMaxValue - ActualMinValue);
         }
     }

@@ -48,6 +48,7 @@ namespace osu.Game.Beatmaps
                 return mid + (max - mid) * (difficulty - 5) / 5;
             if (difficulty < 5)
                 return mid - (mid - min) * (5 - difficulty) / 5;
+
             return mid;
         }
 

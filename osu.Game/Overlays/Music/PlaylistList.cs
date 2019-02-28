@@ -130,6 +130,7 @@ namespace osu.Game.Overlays.Music
                 nativeDragPosition = e.ScreenSpaceMousePosition;
                 if (draggedItem == null)
                     return base.OnDrag(e);
+
                 return true;
             }
 

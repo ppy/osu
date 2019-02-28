@@ -254,6 +254,7 @@ namespace osu.Game.Screens.Select
                 {
                     case CarouselBeatmap beatmap:
                         if (skipDifficulties) continue;
+
                         select(beatmap);
                         return;
                     case CarouselBeatmapSet set:
@@ -327,6 +328,7 @@ namespace osu.Game.Screens.Select
         private void select(CarouselItem item)
         {
             if (item == null) return;
+
             item.State.Value = CarouselItemState.Selected;
         }
 

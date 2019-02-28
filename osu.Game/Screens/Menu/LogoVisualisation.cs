@@ -156,7 +156,9 @@ namespace osu.Game.Screens.Menu
         {
             public Shader Shader;
             public Texture Texture;
+
             public VisualiserSharedData Shared;
+
             //Asuming the logo is a circle, we don't need a second dimension.
             public float Size;
 
@@ -213,6 +215,7 @@ namespace osu.Game.Screens.Menu
                         }
                     }
                 }
+
                 Shader.Unbind();
             }
         }

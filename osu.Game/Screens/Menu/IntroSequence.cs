@@ -57,7 +57,7 @@ namespace osu.Game.Screens.Menu
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
                     AutoSizeAxes = Axes.Both,
-                    Children = new []
+                    Children = new[]
                     {
                         lineTopLeft = new Box
                         {

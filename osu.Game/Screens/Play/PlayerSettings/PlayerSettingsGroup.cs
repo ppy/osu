@@ -38,6 +38,7 @@ namespace osu.Game.Screens.Play.PlayerSettings
             set
             {
                 if (expanded == value) return;
+
                 expanded = value;
 
                 content.ClearTransforms();

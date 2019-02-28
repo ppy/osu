@@ -29,6 +29,7 @@ namespace osu.Game.Overlays.BeatmapSet
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 basic.BeatmapSet = preview.BeatmapSet = BeatmapSet;

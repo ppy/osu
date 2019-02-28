@@ -76,6 +76,7 @@ namespace osu.Game.Overlays
             set
             {
                 if (value == ResultAmounts) return;
+
                 resultAmounts = value;
 
                 updateResultCounts();

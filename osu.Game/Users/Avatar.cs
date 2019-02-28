@@ -80,6 +80,7 @@ namespace osu.Game.Users
             {
                 if (!Enabled.Value)
                     return false;
+
                 return base.OnClick(e);
             }
         }

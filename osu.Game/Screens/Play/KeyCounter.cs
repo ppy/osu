@@ -27,6 +27,7 @@ namespace osu.Game.Screens.Play
 
         public bool IsCounting { get; set; } = true;
         private int countPresses;
+
         public int CountPresses
         {
             get { return countPresses; }
@@ -41,6 +42,7 @@ namespace osu.Game.Screens.Play
         }
 
         private bool isLit;
+
         public bool IsLit
         {
             get { return isLit; }

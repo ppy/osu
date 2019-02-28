@@ -28,6 +28,7 @@ namespace osu.Game.Screens.Select.Details
             set
             {
                 if (value == metrics) return;
+
                 metrics = value;
 
                 const int rating_range = 10;

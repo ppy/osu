@@ -216,20 +216,20 @@ namespace osu.Game.Overlays
                     rightStrip.ResizeWidthTo(1f, step_duration, Easing.OutQuint);
 
                     this.Animate().Schedule(() =>
-                    {
-                        if (drawableMedal.State != DisplayState.Full)
-                            drawableMedal.State = DisplayState.Icon;
-                    })
-                    .Delay(step_duration).Schedule(() =>
-                    {
-                        if (drawableMedal.State != DisplayState.Full)
-                            drawableMedal.State = DisplayState.MedalUnlocked;
-                    })
-                    .Delay(step_duration).Schedule(() =>
-                    {
-                        if (drawableMedal.State != DisplayState.Full)
-                            drawableMedal.State = DisplayState.Full;
-                    });
+                        {
+                            if (drawableMedal.State != DisplayState.Full)
+                                drawableMedal.State = DisplayState.Icon;
+                        })
+                        .Delay(step_duration).Schedule(() =>
+                        {
+                            if (drawableMedal.State != DisplayState.Full)
+                                drawableMedal.State = DisplayState.MedalUnlocked;
+                        })
+                        .Delay(step_duration).Schedule(() =>
+                        {
+                            if (drawableMedal.State != DisplayState.Full)
+                                drawableMedal.State = DisplayState.Full;
+                        });
                 }
             }
         }

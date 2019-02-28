@@ -26,12 +26,14 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly SuccessRate successRate;
 
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
             get { return beatmapSet; }
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 updateDisplay();

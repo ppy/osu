@@ -23,6 +23,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         private const float tick_size = 0.35f;
 
         private bool filled;
+
         public bool Filled
         {
             get { return filled; }
