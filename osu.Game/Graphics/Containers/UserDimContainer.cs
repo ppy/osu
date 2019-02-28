@@ -16,9 +16,9 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class UserDimContainer : Container
     {
-        protected Bindable<double> DimLevel;
+        protected Bindable<double> DimLevel { get; private set; }
 
-        protected Bindable<bool> ShowStoryboard;
+        protected Bindable<bool> ShowStoryboard { get; private set; }
 
         /// <summary>
         /// Whether or not user-configured dim levels should be applied to the container.
@@ -28,9 +28,9 @@ namespace osu.Game.Graphics.Containers
         /// <summary>
         /// Whether or not the storyboard loaded should completely hide the background behind it.
         /// </summary>
-        public Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
+        public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
-        protected Container DimContainer;
+        protected Container DimContainer { get; private set; }
 
         protected override Container<Drawable> Content => DimContainer;
 
@@ -39,6 +39,7 @@ namespace osu.Game.Graphics.Containers
         private const float background_fade_duration = 800;
 
         /// <summary>
+        /// Creates a new <see cref="UserDimContainer" />.
         /// </summary>
         /// <param name="isStoryboard">
         /// Whether or not this instance of UserDimContainer contains a storyboard.

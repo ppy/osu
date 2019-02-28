@@ -87,7 +87,7 @@ namespace osu.Game.Screens.Play
         private FailOverlay failOverlay;
 
         private DrawableStoryboard storyboard;
-        protected UserDimContainer StoryboardContainer;
+        protected UserDimContainer StoryboardContainer { get; private set; }
 
         protected virtual UserDimContainer CreateStoryboardContainer() => new UserDimContainer(true)
         {
@@ -358,7 +358,7 @@ namespace osu.Game.Screens.Play
             Background.EnableUserDim.Value = true;
 
             storyboardReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
-            StoryboardContainer.StoryboardReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
+            StoryboardContainer.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
             Task.Run(() =>
