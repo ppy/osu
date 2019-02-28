@@ -22,6 +22,8 @@ using osu.Game.Screens.Edit.Components.Menus;
 using osu.Game.Screens.Edit.Compose;
 using osu.Game.Screens.Edit.Design;
 using osuTK.Input;
+using System.Collections.Generic;
+using osu.Framework;
 
 namespace osu.Game.Screens.Edit
 {
@@ -67,6 +69,15 @@ namespace osu.Game.Screens.Edit
             SummaryTimeline timeline;
             PlaybackControl playback;
 
+            var fileMenuItems = new List<MenuItem>();
+            if (RuntimeInfo.IsDesktop)
+            {
+                fileMenuItems.Add(new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap));
+                fileMenuItems.Add(new EditorMenuItemSpacer());
+            }
+
+            fileMenuItems.Add(new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit));
+
             InternalChildren = new[]
             {
                 new Container
@@ -94,12 +105,7 @@ namespace osu.Game.Screens.Edit
                         {
                             new MenuItem("File")
                             {
-                                Items = new[]
-                                {
-                                    new EditorMenuItem("Export", MenuItemType.Standard, exportBeatmap),
-                                    new EditorMenuItemSpacer(),
-                                    new EditorMenuItem("Exit", MenuItemType.Standard, this.Exit)
-                                }
+                                Items = fileMenuItems
                             }
                         }
                     }
