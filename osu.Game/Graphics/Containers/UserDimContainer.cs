@@ -57,8 +57,8 @@ namespace osu.Game.Graphics.Containers
         {
             DimLevel = config.GetBindable<double>(OsuSetting.DimLevel);
             ShowStoryboard = config.GetBindable<bool>(OsuSetting.ShowStoryboard);
-            EnableUserDim.ValueChanged  += _ => updateBackgroundDim();
-            DimLevel.ValueChanged  += _ => updateBackgroundDim();
+            EnableUserDim.ValueChanged += _ => updateBackgroundDim();
+            DimLevel.ValueChanged += _ => updateBackgroundDim();
             ShowStoryboard.ValueChanged += _ => updateBackgroundDim();
             StoryboardReplacesBackground.ValueChanged += _ => updateBackgroundDim();
         }

@@ -162,6 +162,7 @@ namespace osu.Game.Tests.Visual
             AddUntilStep(() =>
             {
                 if (songSelect.IsCurrentScreen()) return true;
+
                 songSelect.MakeCurrent();
                 return false;
             }, "Wait for song select is current");
@@ -264,13 +265,16 @@ namespace osu.Game.Tests.Visual
         {
             createSongSelect();
 
-            AddStep("Start player loader", () => { songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer
+            AddStep("Start player loader", () =>
             {
-                AllowLeadIn = false,
-                AllowResults = false,
-                AllowPause = allowPause,
-                Ready = true,
-            })); });
+                songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer
+                {
+                    AllowLeadIn = false,
+                    AllowResults = false,
+                    AllowPause = allowPause,
+                    Ready = true,
+                }));
+            });
             AddUntilStep(() => playerLoader.IsLoaded, "Wait for Player Loader to load");
             AddStep("Move mouse to center of screen", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
             AddUntilStep(() => player.IsLoaded, "Wait for player to load");
@@ -279,7 +283,7 @@ namespace osu.Game.Tests.Visual
         private void createSongSelect()
         {
             AddStep("Create new screen stack", () => Child = screenStackContainer = new ScreenStackCacheContainer { RelativeSizeAxes = Axes.Both });
-            AddUntilStep(() => screenStackContainer.IsLoaded,"Wait for screen stack creation");
+            AddUntilStep(() => screenStackContainer.IsLoaded, "Wait for screen stack creation");
             AddStep("Create new song select", () => screenStackContainer.ScreenStack.Push(songSelect = new DummySongSelect()));
             AddUntilStep(() => songSelect.IsLoaded, "Wait for song select to load");
             AddStep("Set user settings", () =>
@@ -355,6 +359,7 @@ namespace osu.Game.Tests.Visual
             }
 
             public UserDimContainer CurrentStoryboardContainer => StoryboardContainer;
+
             // Whether or not the player should be allowed to load.
             public bool Ready;
 
@@ -430,6 +435,7 @@ namespace osu.Game.Tests.Visual
                 : base(isStoryboard)
             {
             }
+
             public Color4 CurrentColour => DimContainer.Colour;
             public float CurrentAlpha => DimContainer.Alpha;
         }

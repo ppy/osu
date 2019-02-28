@@ -158,9 +158,12 @@ namespace osu.Game.Screens.Play
         protected override bool OnHover(HoverEvent e)
         {
             // restore our screen defaults
-            InitializeBackgroundElements();
             if (this.IsCurrentScreen())
+            {
+                InitializeBackgroundElements();
                 Background.EnableUserDim.Value = false;
+            }
+
             return base.OnHover(e);
         }
 
