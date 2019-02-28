@@ -359,6 +359,7 @@ namespace osu.Game.Screens.Play
 
             Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             StoryboardContainer.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
+
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
             Task.Run(() =>
@@ -417,6 +418,7 @@ namespace osu.Game.Screens.Play
         {
             float fadeOutDuration = instant ? 0 : 250;
             this.FadeOut(fadeOutDuration);
+
             Background.EnableUserDim.Value = false;
             storyboardReplacesBackground.Value = false;
         }
