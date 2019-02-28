@@ -28,26 +28,26 @@ namespace osu.Game.Screens.Select.Options
 
         public Color4 ButtonColour
         {
-            get { return background.Colour; }
-            set { background.Colour = value; }
+            get => background.Colour;
+            set => background.Colour = value;
         }
 
         public FontAwesome Icon
         {
-            get { return iconText.Icon; }
-            set { iconText.Icon = value; }
+            get => iconText.Icon;
+            set => iconText.Icon = value;
         }
 
         public string FirstLineText
         {
-            get { return firstLine.Text; }
-            set { firstLine.Text = value; }
+            get => firstLine.Text;
+            set => firstLine.Text = value;
         }
 
         public string SecondLineText
         {
-            get { return secondLine.Text; }
-            set { secondLine.Text = value; }
+            get => secondLine.Text;
+            set => secondLine.Text = value;
         }
 
         public Key? HotKey;

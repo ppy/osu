@@ -17,6 +17,7 @@ namespace osu.Game.Screens.Play.HUD
         public bool ReplayLoaded;
 
         public readonly PlaybackSettings PlaybackSettings;
+
         public readonly VisualSettings VisualSettings;
         //public readonly CollectionSettings CollectionSettings;
         //public readonly DiscussionSettings DiscussionSettings;

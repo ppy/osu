@@ -35,34 +35,25 @@ namespace osu.Game.Overlays.Toolbar
 
         public FontAwesome Icon
         {
-            set { SetIcon(value); }
+            set => SetIcon(value);
         }
 
         public string Text
         {
-            get { return DrawableText.Text; }
-            set
-            {
-                DrawableText.Text = value;
-            }
+            get => DrawableText.Text;
+            set => DrawableText.Text = value;
         }
 
         public string TooltipMain
         {
-            get { return tooltip1.Text; }
-            set
-            {
-                tooltip1.Text = value;
-            }
+            get => tooltip1.Text;
+            set => tooltip1.Text = value;
         }
 
         public string TooltipSub
         {
-            get { return tooltip2.Text; }
-            set
-            {
-                tooltip2.Text = value;
-            }
+            get => tooltip2.Text;
+            set => tooltip2.Text = value;
         }
 
         protected virtual Anchor TooltipAnchor => Anchor.TopLeft;
@@ -75,7 +66,8 @@ namespace osu.Game.Overlays.Toolbar
         private readonly SpriteText tooltip2;
         protected FillFlowContainer Flow;
 
-        public ToolbarButton() : base(HoverSampleSet.Loud)
+        public ToolbarButton()
+            : base(HoverSampleSet.Loud)
         {
             Width = WIDTH;
             RelativeSizeAxes = Axes.Y;

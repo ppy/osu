@@ -37,6 +37,7 @@ namespace osu.Game.Screens.Multi.Components
             {
                 if (textSize == value)
                     return;
+
                 textSize = value;
 
                 updateText();

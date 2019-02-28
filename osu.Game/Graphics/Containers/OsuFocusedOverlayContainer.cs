@@ -96,6 +96,7 @@ namespace osu.Game.Graphics.Containers
                     }
                     else
                         State = Visibility.Hidden;
+
                     break;
                 case Visibility.Hidden:
                     if (PlaySamplesOnStateChange) samplePopOut?.Play();

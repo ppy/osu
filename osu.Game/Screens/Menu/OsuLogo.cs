@@ -62,7 +62,7 @@ namespace osu.Game.Screens.Menu
 
         public bool Triangles
         {
-            set { colourAndTriangles.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint); }
+            set => colourAndTriangles.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint);
         }
 
         public bool BeatMatching = true;
@@ -71,8 +71,8 @@ namespace osu.Game.Screens.Menu
 
         public bool Ripple
         {
-            get { return rippleContainer.Alpha > 0; }
-            set { rippleContainer.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint); }
+            get => rippleContainer.Alpha > 0;
+            set => rippleContainer.FadeTo(value ? 1 : 0, transition_length, Easing.OutQuint);
         }
 
         private readonly Box flashLayer;

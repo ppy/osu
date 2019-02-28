@@ -45,15 +45,13 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual T DisplayedCount
         {
-            get
-            {
-                return displayedCount;
-            }
+            get => displayedCount;
 
             set
             {
                 if (EqualityComparer<T>.Default.Equals(displayedCount, value))
                     return;
+
                 displayedCount = value;
                 DisplayedCountSpriteText.Text = FormatCount(value);
             }
@@ -70,8 +68,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 AccentColour
         {
-            get { return DisplayedCountSpriteText.Colour; }
-            set { DisplayedCountSpriteText.Colour = value; }
+            get => DisplayedCountSpriteText.Colour;
+            set => DisplayedCountSpriteText.Colour = value;
         }
 
         /// <summary>

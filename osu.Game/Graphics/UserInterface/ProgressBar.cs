@@ -18,7 +18,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 FillColour
         {
-            set { fill.FadeColour(value, 150, Easing.OutQuint); }
+            set => fill.FadeColour(value, 150, Easing.OutQuint);
         }
 
         public Color4 BackgroundColour
@@ -32,12 +32,12 @@ namespace osu.Game.Graphics.UserInterface
 
         public double EndTime
         {
-            set { CurrentNumber.MaxValue = value; }
+            set => CurrentNumber.MaxValue = value;
         }
 
         public double CurrentTime
         {
-            set { CurrentNumber.Value = value; }
+            set => CurrentNumber.Value = value;
         }
 
         public ProgressBar()

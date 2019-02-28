@@ -17,12 +17,14 @@ namespace osu.Game.Screens.Select.Details
         private readonly BarGraph retryGraph, failGraph;
 
         private BeatmapMetrics metrics;
+
         public BeatmapMetrics Metrics
         {
-            get { return metrics; }
+            get => metrics;
             set
             {
                 if (value == metrics) return;
+
                 metrics = value;
 
                 var retries = Metrics?.Retries ?? new int[0];
