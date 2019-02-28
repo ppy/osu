@@ -47,7 +47,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
         public APIScoreInfo Score
         {
-            get { return score; }
+            get => score;
             set
             {
                 if (score == value) return;
@@ -212,7 +212,7 @@ namespace osu.Game.Overlays.BeatmapSet.Scores
 
                     valueText.Text = value;
                 }
-                get { return valueText.Text; }
+                get => valueText.Text;
             }
 
             public InfoColumn(string header)

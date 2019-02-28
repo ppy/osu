@@ -20,7 +20,7 @@ namespace osu.Game.Screens.Select
 
         public string Text
         {
-            get { return spriteText?.Text; }
+            get => spriteText?.Text;
             set
             {
                 if (spriteText != null)
@@ -32,7 +32,7 @@ namespace osu.Game.Screens.Select
 
         public Color4 DeselectedColour
         {
-            get { return deselectedColour; }
+            get => deselectedColour;
             set
             {
                 deselectedColour = value;
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Select
 
         public Color4 SelectedColour
         {
-            get { return selectedColour; }
+            get => selectedColour;
             set
             {
                 selectedColour = value;

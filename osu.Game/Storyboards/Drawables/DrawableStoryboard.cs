@@ -23,7 +23,7 @@ namespace osu.Game.Storyboards.Drawables
 
         public bool Passing
         {
-            get { return passing; }
+            get => passing;
             set
             {
                 if (passing == value) return;

@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Play
 
         public IClock AudioClock
         {
-            set { audioClock = info.AudioClock = value; }
+            set => audioClock = info.AudioClock = value;
         }
 
         private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
@@ -121,8 +121,7 @@ namespace osu.Game.Screens.Play
 
         public bool AllowSeeking
         {
-            get { return allowSeeking; }
-
+            get => allowSeeking;
             set
             {
                 if (allowSeeking == value) return;

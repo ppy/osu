@@ -24,7 +24,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (value == beatmap) return;

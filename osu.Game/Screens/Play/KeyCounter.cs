@@ -30,7 +30,7 @@ namespace osu.Game.Screens.Play
 
         public int CountPresses
         {
-            get { return countPresses; }
+            get => countPresses;
             private set
             {
                 if (countPresses != value)
@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Play
 
         public bool IsLit
         {
-            get { return isLit; }
+            get => isLit;
             protected set
             {
                 if (isLit != value)

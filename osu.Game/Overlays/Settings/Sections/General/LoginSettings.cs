@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
         public bool Bounding
         {
-            get { return bounding; }
+            get => bounding;
             set
             {
                 bounding = value;
@@ -339,7 +339,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
 
                 public Color4 StatusColour
                 {
-                    set { statusIcon.FadeColour(value, 500, Easing.OutQuint); }
+                    set => statusIcon.FadeColour(value, 500, Easing.OutQuint);
                 }
 
                 public UserDropdownHeader()

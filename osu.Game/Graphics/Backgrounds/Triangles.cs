@@ -86,7 +86,7 @@ namespace osu.Game.Graphics.Backgrounds
 
         public float TriangleScale
         {
-            get { return triangleScale; }
+            get => triangleScale;
             set
             {
                 float change = value / triangleScale;

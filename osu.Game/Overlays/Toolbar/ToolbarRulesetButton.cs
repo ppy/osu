@@ -13,7 +13,7 @@ namespace osu.Game.Overlays.Toolbar
 
         public RulesetInfo Ruleset
         {
-            get { return ruleset; }
+            get => ruleset;
             set
             {
                 ruleset = value;

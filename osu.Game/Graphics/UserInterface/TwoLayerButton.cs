@@ -48,8 +48,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public override Anchor Origin
         {
-            get { return base.Origin; }
-
+            get => base.Origin;
             set
             {
                 base.Origin = value;
@@ -152,12 +151,12 @@ namespace osu.Game.Graphics.UserInterface
 
         public FontAwesome Icon
         {
-            set { bouncingIcon.Icon = value; }
+            set => bouncingIcon.Icon = value;
         }
 
         public string Text
         {
-            set { text.Text = value; }
+            set => text.Text = value;
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => IconLayer.ReceivePositionalInputAt(screenSpacePos) || TextLayer.ReceivePositionalInputAt(screenSpacePos);

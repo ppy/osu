@@ -37,7 +37,7 @@ namespace osu.Game.Overlays
 
         public IEnumerable<User> Users
         {
-            get { return users; }
+            get => users;
             set
             {
                 if (users?.Equals(value) ?? false)

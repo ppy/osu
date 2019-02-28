@@ -44,7 +44,7 @@ namespace osu.Game.Screens.Select
 
         public BeatmapInfo Beatmap
         {
-            get { return beatmap; }
+            get => beatmap;
             set
             {
                 if (value == beatmap) return;

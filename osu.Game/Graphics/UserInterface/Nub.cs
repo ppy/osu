@@ -75,7 +75,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public bool Glowing
         {
-            get { return glowing; }
+            get => glowing;
             set
             {
                 glowing = value;
@@ -95,7 +95,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public bool Expanded
         {
-            set { this.ResizeTo(new Vector2(value ? EXPANDED_SIZE : COLLAPSED_SIZE, 12), 500, Easing.OutQuint); }
+            set => this.ResizeTo(new Vector2(value ? EXPANDED_SIZE : COLLAPSED_SIZE, 12), 500, Easing.OutQuint);
         }
 
         private readonly Bindable<bool> current = new Bindable<bool>();
@@ -117,7 +117,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;
@@ -130,7 +130,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 GlowingAccentColour
         {
-            get { return glowingAccentColour; }
+            get => glowingAccentColour;
             set
             {
                 glowingAccentColour = value;
@@ -143,7 +143,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 GlowColour
         {
-            get { return glowColour; }
+            get => glowColour;
             set
             {
                 glowColour = value;

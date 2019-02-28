@@ -23,7 +23,7 @@ namespace osu.Game.Users
 
         public User User
         {
-            get { return user; }
+            get => user;
             set
             {
                 if (user?.Id == value?.Id)

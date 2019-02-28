@@ -41,7 +41,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public double SpinsPerMinute
         {
-            get { return spm; }
+            get => spm;
             private set
             {
                 if (value == spm) return;

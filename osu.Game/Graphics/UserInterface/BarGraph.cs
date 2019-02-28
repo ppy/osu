@@ -20,10 +20,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public new BarDirection Direction
         {
-            get
-            {
-                return direction;
-            }
+            get => direction;
             set
             {
                 direction = value;

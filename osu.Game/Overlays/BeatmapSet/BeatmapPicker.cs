@@ -36,7 +36,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
@@ -199,7 +199,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             public DifficultySelectorState State
             {
-                get { return state; }
+                get => state;
                 set
                 {
                     if (value == state) return;
@@ -284,7 +284,7 @@ namespace osu.Game.Overlays.BeatmapSet
 
             public int Value
             {
-                get { return value; }
+                get => value;
                 set
                 {
                     this.value = value;
