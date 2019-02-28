@@ -99,7 +99,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private bool isSpecial;
         public bool IsSpecial
         {
-            get { return isSpecial; }
+            get => isSpecial;
             set
             {
                 if (isSpecial == value)
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Mania.UI
         private Color4 accentColour;
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 if (accentColour == value)

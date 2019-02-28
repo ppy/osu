@@ -106,7 +106,7 @@ namespace osu.Game.Graphics
         private bool shadow;
         public bool Shadow
         {
-            get { return shadow; }
+            get => shadow;
             set
             {
                 shadow = value;
@@ -119,10 +119,7 @@ namespace osu.Game.Graphics
 
         public FontAwesome Icon
         {
-            get
-            {
-                return icon;
-            }
+            get => icon;
 
             set
             {

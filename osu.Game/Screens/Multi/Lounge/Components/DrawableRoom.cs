@@ -45,7 +45,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private SelectionState state;
         public SelectionState State
         {
-            get { return state; }
+            get => state;
             set
             {
                 if (value == state) return;
@@ -65,7 +65,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
         private bool matchingFilter;
         public bool MatchingFilter
         {
-            get { return matchingFilter; }
+            get => matchingFilter;
             set
             {
                 matchingFilter = value;

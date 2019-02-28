@@ -22,7 +22,7 @@ namespace osu.Game.Screens.Edit
 
         public override int Value
         {
-            get { return base.Value; }
+            get => base.Value;
             set
             {
                 if (!VALID_DIVISORS.Contains(value))

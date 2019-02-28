@@ -17,8 +17,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
 
         public Color4 AccentColour
         {
-            get { return background.AccentColour; }
-            set { background.AccentColour = value; }
+            get => background.AccentColour;
+            set => background.AccentColour = value;
         }
 
         private readonly SpinnerBackground background;
@@ -45,7 +45,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private bool tracking;
         public bool Tracking
         {
-            get { return tracking; }
+            get => tracking;
             set
             {
                 if (value == tracking) return;
@@ -58,7 +58,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Pieces
         private bool complete;
         public bool Complete
         {
-            get { return complete; }
+            get => complete;
             set
             {
                 if (value == complete) return;

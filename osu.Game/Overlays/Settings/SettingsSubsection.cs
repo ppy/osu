@@ -24,10 +24,7 @@ namespace osu.Game.Overlays.Settings
         public IEnumerable<string> FilterTerms => new[] { Header };
         public bool MatchingFilter
         {
-            set
-            {
-                this.FadeTo(value ? 1 : 0);
-            }
+            set => this.FadeTo(value ? 1 : 0);
         }
 
         protected SettingsSubsection()
