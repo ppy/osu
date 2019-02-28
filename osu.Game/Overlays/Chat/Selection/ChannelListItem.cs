@@ -38,10 +38,7 @@ namespace osu.Game.Overlays.Chat.Selection
         public IEnumerable<string> FilterTerms => new[] { channel.Name };
         public bool MatchingFilter
         {
-            set
-            {
-                this.FadeTo(value ? 1f : 0f, 100);
-            }
+            set => this.FadeTo(value ? 1f : 0f, 100);
         }
 
         public Action<Channel> OnRequestJoin;

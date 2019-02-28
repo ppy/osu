@@ -45,10 +45,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual T DisplayedCount
         {
-            get
-            {
-                return displayedCount;
-            }
+            get => displayedCount;
 
             set
             {
@@ -70,8 +67,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 AccentColour
         {
-            get { return DisplayedCountSpriteText.Colour; }
-            set { DisplayedCountSpriteText.Colour = value; }
+            get => DisplayedCountSpriteText.Colour;
+            set => DisplayedCountSpriteText.Colour = value;
         }
 
         /// <summary>

@@ -107,7 +107,7 @@ namespace osu.Game.Overlays.Mods
 
         public Color4 SelectedColour
         {
-            get { return selectedColour; }
+            get => selectedColour;
             set
             {
                 if (value == selectedColour) return;
@@ -121,7 +121,7 @@ namespace osu.Game.Overlays.Mods
 
         public Mod Mod
         {
-            get { return mod; }
+            get => mod;
             set
             {
                 mod = value;

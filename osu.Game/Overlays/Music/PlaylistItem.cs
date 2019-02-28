@@ -52,7 +52,7 @@ namespace osu.Game.Overlays.Music
         private bool selected;
         public bool Selected
         {
-            get { return selected; }
+            get => selected;
             set
             {
                 if (value == selected) return;
@@ -142,7 +142,7 @@ namespace osu.Game.Overlays.Music
 
         public bool MatchingFilter
         {
-            get { return matching; }
+            get => matching;
             set
             {
                 if (matching == value) return;

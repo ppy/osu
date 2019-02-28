@@ -28,7 +28,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private BeatmapSetInfo beatmapSet;
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
@@ -46,8 +46,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
         public BeatmapInfo Beatmap
         {
-            get { return successRate.Beatmap; }
-            set { successRate.Beatmap = value; }
+            get => successRate.Beatmap;
+            set => successRate.Beatmap = value;
         }
 
         public Info()
@@ -162,8 +162,8 @@ namespace osu.Game.Overlays.BeatmapSet
 
             public Color4 TextColour
             {
-                get { return textFlow.Colour; }
-                set { textFlow.Colour = value; }
+                get => textFlow.Colour;
+                set => textFlow.Colour = value;
             }
 
             public MetadataSection(string title)

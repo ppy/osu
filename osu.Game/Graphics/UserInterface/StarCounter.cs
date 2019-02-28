@@ -41,10 +41,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public float CountStars
         {
-            get
-            {
-                return countStars;
-            }
+            get => countStars;
 
             set
             {
