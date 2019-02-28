@@ -39,7 +39,7 @@ namespace osu.Game.Graphics.Containers
         private readonly bool isStoryboard;
 
         /// <summary>
-        /// Creates a new <see cref="UserDimContainer" />.
+        /// Creates a new <see cref="UserDimContainer"/>.
         /// </summary>
         /// <param name="isStoryboard">
         /// Whether or not this instance of UserDimContainer contains a storyboard.
