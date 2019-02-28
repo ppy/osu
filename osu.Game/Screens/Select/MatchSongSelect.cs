@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Collections.Generic;
 using Humanizer;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -9,6 +10,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
 using osu.Game.Online.Multiplayer;
+using osu.Game.Rulesets.Mods;
 using osu.Game.Screens.Multi;
 
 namespace osu.Game.Screens.Select
@@ -22,6 +24,9 @@ namespace osu.Game.Screens.Select
 
         [Resolved(typeof(Room))]
         protected Bindable<PlaylistItem> CurrentItem { get; private set; }
+
+        [Resolved]
+        protected Bindable<IEnumerable<Mod>> CurrentMods { get; private set; }
 
         [Resolved]
         private BeatmapManager beatmaps { get; set; }
@@ -56,9 +61,8 @@ namespace osu.Game.Screens.Select
                 return true;
 
             Beatmap.Value = beatmaps.GetWorkingBeatmap(CurrentItem.Value?.Beatmap);
+            Beatmap.Value.Mods.Value = CurrentMods.Value = CurrentItem.Value?.RequiredMods;
             Ruleset.Value = CurrentItem.Value?.Ruleset;
-            CurrentItem.Value?.RequiredMods.Clear();
-            CurrentItem.Value?.RequiredMods.AddRange(SelectedMods.Value);
 
             Beatmap.Disabled = true;
             Ruleset.Disabled = true;
