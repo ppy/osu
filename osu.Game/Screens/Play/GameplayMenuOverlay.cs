@@ -18,6 +18,7 @@ using System.Linq;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Game.Input.Bindings;
+using Humanizer;
 
 namespace osu.Game.Screens.Play
 {
@@ -263,14 +264,14 @@ namespace osu.Game.Screens.Play
                 },
                 new OsuSpriteText
                 {
-                    Text = $"{retries:n0}",
+                    Text = "time".ToQuantity(retries),
                     Font = OsuFont.GetFont(weight: FontWeight.Bold, size: 18),
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
                 },
                 new OsuSpriteText
                 {
-                    Text = $" time{(retries == 1 ? "" : "s")} in this session",
+                    Text = " in this session",
                     Shadow = true,
                     ShadowColour = new Color4(0, 0, 0, 0.25f),
                     Font = OsuFont.GetFont(size: 18),
