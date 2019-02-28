@@ -10,7 +10,7 @@ using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Framework.Graphics.Shapes;
+using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -249,10 +249,14 @@ namespace osu.Game.Tests.Visual
         {
             player.ReplacesBackground.Value = true;
             player.StoryboardEnabled.Value = true;
-            player.CurrentStoryboardContainer.Add(new Box
+            player.CurrentStoryboardContainer.Add(new SpriteText
             {
+                Size = new Vector2(250, 50),
                 Alpha = 1,
-                Colour = Color4.Tomato
+                Colour = Color4.White,
+                Anchor = Anchor.Centre,
+                Origin = Anchor.Centre,
+                Text = "THIS IS A STORYBOARD",
             });
         });
 
