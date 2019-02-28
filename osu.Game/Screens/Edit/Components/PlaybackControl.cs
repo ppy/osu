@@ -114,7 +114,8 @@ namespace osu.Game.Screens.Edit.Components
                 private readonly OsuSpriteText text;
                 private readonly OsuSpriteText textBold;
 
-                public PlaybackTabItem(double value) : base(value)
+                public PlaybackTabItem(double value)
+                    : base(value)
                 {
                     RelativeSizeAxes = Axes.Both;
 

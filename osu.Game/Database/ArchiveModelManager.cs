@@ -542,6 +542,7 @@ namespace osu.Game.Database
                 return new LegacyDirectoryArchiveReader(path);
             if (File.Exists(path))
                 return new LegacyFileArchiveReader(path);
+
             throw new InvalidFormatException($"{path} is not a valid archive");
         }
     }

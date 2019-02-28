@@ -34,6 +34,7 @@ namespace osu.Game.Storyboards
         public bool HasCommands => TimelineGroup.HasCommands || loops.Any(l => l.HasCommands);
 
         private delegate void DrawablePropertyInitializer<in T>(Drawable drawable, T value);
+
         private delegate void DrawableTransformer<in T>(Drawable drawable, T value, double duration, Easing easing);
 
         public StoryboardSprite(string path, Anchor origin, Vector2 initialPosition)
@@ -70,8 +71,7 @@ namespace osu.Game.Storyboards
             applyCommands(drawable, getCommands(g => g.Alpha, triggeredGroups), (d, value) => d.Alpha = value, (d, value, duration, easing) => d.FadeTo(value, duration, easing));
             applyCommands(drawable, getCommands(g => g.BlendingMode, triggeredGroups), (d, value) => d.Blending = value, (d, value, duration, easing) => d.TransformBlendingMode(value, duration), false);
 
-            var flippable = drawable as IFlippable;
-            if (flippable != null)
+            if (drawable is IFlippable flippable)
             {
                 applyCommands(drawable, getCommands(g => g.FlipH, triggeredGroups), (d, value) => flippable.FlipH = value, (d, value, duration, easing) => flippable.TransformFlipH(value, duration), false);
                 applyCommands(drawable, getCommands(g => g.FlipV, triggeredGroups), (d, value) => flippable.FlipV = value, (d, value, duration, easing) => flippable.TransformFlipV(value, duration), false);
@@ -90,6 +90,7 @@ namespace osu.Game.Storyboards
                         initializeProperty.Invoke(drawable, command.StartValue);
                     initialized = true;
                 }
+
                 using (drawable.BeginAbsoluteSequence(command.StartTime))
                 {
                     transform(drawable, command.StartValue, 0, Easing.None);

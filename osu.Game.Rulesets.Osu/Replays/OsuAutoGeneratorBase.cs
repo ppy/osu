@@ -20,6 +20,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         /// Constants (for spinners).
         /// </summary>
         protected static readonly Vector2 SPINNER_CENTRE = OsuPlayfield.BASE_SIZE / 2;
+
         protected const float SPIN_RADIUS = 50;
 
         /// <summary>
@@ -46,6 +47,7 @@ namespace osu.Game.Rulesets.Osu.Replays
         #endregion
 
         #region Utilities
+
         protected double ApplyModsToTime(double v) => v;
         protected double ApplyModsToRate(double v) => v;
 

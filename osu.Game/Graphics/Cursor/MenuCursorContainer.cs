@@ -43,6 +43,7 @@ namespace osu.Game.Graphics.Cursor
         }
 
         private IProvideCursor currentTarget;
+
         protected override void Update()
         {
             base.Update();

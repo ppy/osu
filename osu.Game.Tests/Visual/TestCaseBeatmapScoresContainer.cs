@@ -160,7 +160,8 @@ namespace osu.Game.Tests.Visual
                     Accuracy = 0.6543,
                 },
             };
-            foreach(var s in scores)
+
+            foreach (var s in scores)
             {
                 s.Statistics.Add(HitResult.Great, RNG.Next(2000));
                 s.Statistics.Add(HitResult.Good, RNG.Next(2000));

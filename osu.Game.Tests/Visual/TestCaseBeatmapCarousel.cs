@@ -150,6 +150,7 @@ namespace osu.Game.Tests.Visual
             var currentlySelected = carousel.Items.Find(s => s.Item is CarouselBeatmap && s.Item.State.Value == CarouselItemState.Selected);
             if (currentlySelected == null)
                 return true;
+
             return currentlySelected.Item.Visible;
         }
 
@@ -166,8 +167,7 @@ namespace osu.Game.Tests.Visual
                 carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false);
                 carousel.Filter(new FilterCriteria(), false);
                 eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
-            }
-            );
+            });
         }
 
         /// <summary>
@@ -522,6 +522,7 @@ namespace osu.Game.Tests.Visual
                     }
                 });
             }
+
             return toReturn;
         }
 
