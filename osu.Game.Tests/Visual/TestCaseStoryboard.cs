@@ -7,9 +7,13 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Logging;
+using osu.Framework.Screens;
 using osu.Framework.Timing;
 using osu.Game.Beatmaps;
 using osu.Game.Overlays;
+using osu.Game.Screens;
+using osu.Game.Screens.Backgrounds;
 using osu.Game.Storyboards.Drawables;
 using osuTK.Graphics;
 
@@ -18,7 +22,7 @@ namespace osu.Game.Tests.Visual
     [TestFixture]
     public class TestCaseStoryboard : OsuTestCase
     {
-        private Container<DrawableStoryboard> storyboardContainer;
+        private Container storyboardContainer;
         private DrawableStoryboard storyboard;
 
         public TestCaseStoryboard()
@@ -35,7 +39,7 @@ namespace osu.Game.Tests.Visual
                         RelativeSizeAxes = Axes.Both,
                         Colour = Color4.Black,
                     },
-                    storyboardContainer = new Container<DrawableStoryboard>
+                    storyboardContainer = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
                     },
@@ -50,7 +54,10 @@ namespace osu.Game.Tests.Visual
             });
 
             AddStep("Restart", restart);
-            AddToggleStep("Passing", passing => { if (storyboard != null) storyboard.Passing = passing; });
+            AddToggleStep("Passing", passing =>
+            {
+                if (storyboard != null) storyboard.Passing = passing;
+            });
         }
 
         [BackgroundDependencyLoader]
@@ -74,16 +81,18 @@ namespace osu.Game.Tests.Visual
         private void loadStoryboard(WorkingBeatmap working)
         {
             if (storyboard != null)
-                storyboardContainer = new Container<DrawableStoryboard>();
+                storyboardContainer = new Container();
 
             var decoupledClock = new DecoupleableInterpolatingFramedClock { IsCoupled = true };
             storyboardContainer.Clock = decoupledClock;
 
-            storyboard = working.Storyboard.CreateDrawable(Beatmap.Value);
-            storyboard.Passing = false;
-
-            storyboardContainer.Add(storyboard);
-            decoupledClock.ChangeSource(working.Track);
+            LoadComponentAsync(working.Storyboard.CreateDrawable(Beatmap.Value), p =>
+            {
+                storyboard = p;
+                storyboard.Passing = false;
+                storyboardContainer.Add(storyboard);
+                decoupledClock.ChangeSource(working.Track);
+            });
         }
     }
 }

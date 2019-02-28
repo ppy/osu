@@ -20,6 +20,11 @@ namespace osu.Game.Storyboards.Drawables
         protected override Vector2 DrawScale => new Vector2(Parent.DrawHeight / 480);
 
         private bool passing = true;
+
+        /// <summary>
+        /// Whether or not the player is currently passing the map in terms of HP.
+        /// Required for enabling and disabling storyboard layers exclusive to how well the player is doing.
+        /// </summary>
         public bool Passing
         {
             get { return passing; }
