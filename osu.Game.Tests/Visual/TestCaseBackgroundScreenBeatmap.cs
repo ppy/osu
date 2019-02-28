@@ -28,6 +28,7 @@ using osu.Game.Screens.Play.PlayerSettings;
 using osu.Game.Screens.Select;
 using osu.Game.Tests.Resources;
 using osu.Game.Users;
+using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Tests.Visual
@@ -123,11 +124,9 @@ namespace osu.Game.Tests.Visual
             });
             AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
-            AddStep("Trigger background preview when loaded", () =>
-            {
-                InputManager.MoveMouseTo(playerLoader.VisualSettingsPos);
-                InputManager.MoveMouseTo(playerLoader.ScreenPos);
-            });
+            AddStep("Trigger background preview when loaded", () => InputManager.MoveMouseTo(playerLoader.VisualSettingsPos));
+            AddWaitStep(1);
+            AddStep("Untrigger background preview", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
             waitForDim();
             AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
         }
@@ -310,6 +309,7 @@ namespace osu.Game.Tests.Visual
                 config.BindWith(OsuSetting.DimLevel, DimLevel);
             }
 
+            //public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1 - (float)DimLevel.Value);
             public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1 - (float)DimLevel.Value);
 
             public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
