@@ -11,6 +11,8 @@ using osu.Framework.Bindables;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
+using osu.Framework.Input.Events;
+using osu.Framework.Input.States;
 using osu.Framework.Platform;
 using osu.Framework.Screens;
 using osu.Game.Beatmaps;
@@ -123,12 +125,11 @@ namespace osu.Game.Tests.Visual
                 InputManager.MoveMouseTo(playerLoader.ScreenPos);
             });
             AddUntilStep(() => player?.IsLoaded ?? false, "Wait for player to load");
+            AddStep("Trigger hover event", () => playerLoader.TriggerOnHover());
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
-            AddStep("Trigger background preview when loaded", () => InputManager.MoveMouseTo(playerLoader.VisualSettingsPos));
-            AddWaitStep(1);
-            AddStep("Untrigger background preview", () => InputManager.MoveMouseTo(playerLoader.ScreenPos));
             waitForDim();
             AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
+            AddAssert("Screen is unblurred", () => songSelect.IsBackgroundUnblurred());
         }
 
         /// <summary>
@@ -252,7 +253,7 @@ namespace osu.Game.Tests.Visual
             {
                 Size = new Vector2(250, 50),
                 Alpha = 1,
-                Colour = Color4.White,
+                Colour = Color4.Tomato,
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
                 Text = "THIS IS A STORYBOARD",
@@ -285,6 +286,7 @@ namespace osu.Game.Tests.Visual
             {
                 Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { new OsuModNoFail() });
                 songSelect.DimLevel.Value = 0.7f;
+                songSelect.BlurLevel.Value = 0.0f;
             });
             AddUntilStep(() => songSelect.Carousel.SelectedBeatmap != null, "Song select has selection");
         }
@@ -300,6 +302,7 @@ namespace osu.Game.Tests.Visual
 
             public readonly Bindable<bool> DimEnabled = new Bindable<bool>();
             public readonly Bindable<double> DimLevel = new Bindable<double>();
+            public readonly Bindable<double> BlurLevel = new Bindable<double>();
 
             public new BeatmapCarousel Carousel => base.Carousel;
 
@@ -307,10 +310,12 @@ namespace osu.Game.Tests.Visual
             private void load(OsuConfigManager config)
             {
                 config.BindWith(OsuSetting.DimLevel, DimLevel);
+                config.BindWith(OsuSetting.BlurLevel, BlurLevel);
             }
 
-            //public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1 - (float)DimLevel.Value);
             public bool IsBackgroundDimmed() => ((FadeAccessibleBackground)Background).CurrentColour == OsuColour.Gray(1 - (float)DimLevel.Value);
+
+            public bool IsBackgroundUnblurred() => ((FadeAccessibleBackground)Background).CurrentBlur == new Vector2(0);
 
             public bool IsBackgroundUndimmed() => ((FadeAccessibleBackground)Background).CurrentColour == Color4.White;
 
@@ -396,6 +401,11 @@ namespace osu.Game.Tests.Visual
             {
             }
 
+            public void TriggerOnHover()
+            {
+                OnHover(new HoverEvent(new InputState()));
+            }
+
             protected override BackgroundScreen CreateBackground() => new FadeAccessibleBackground(Beatmap.Value);
         }
 
@@ -405,6 +415,8 @@ namespace osu.Game.Tests.Visual
 
             public Color4 CurrentColour => ((TestUserDimContainer)FadeContainer).CurrentColour;
             public float CurrentAlpha => ((TestUserDimContainer)FadeContainer).CurrentAlpha;
+
+            public Vector2 CurrentBlur => Background.BlurSigma;
 
             public FadeAccessibleBackground(WorkingBeatmap beatmap)
                 : base(beatmap)
