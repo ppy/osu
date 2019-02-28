@@ -19,10 +19,7 @@ namespace osu.Game.Graphics.UserInterface
         private BarDirection direction = BarDirection.BottomToTop;
         public new BarDirection Direction
         {
-            get
-            {
-                return direction;
-            }
+            get => direction;
             set
             {
                 direction = value;

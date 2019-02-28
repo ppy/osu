@@ -26,7 +26,7 @@ namespace osu.Game.Graphics.UserInterface
         private Color4? accentColour;
         public Color4 AccentColour
         {
-            get { return accentColour.GetValueOrDefault(); }
+            get => accentColour.GetValueOrDefault();
             set
             {
                 accentColour = value;
@@ -41,8 +41,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public string Text
         {
-            get { return text.Text; }
-            set { text.Text = value; }
+            get => text.Text;
+            set => text.Text = value;
         }
 
         private const float transition_length = 500;

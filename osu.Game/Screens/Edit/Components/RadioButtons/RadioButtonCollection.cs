@@ -14,7 +14,7 @@ namespace osu.Game.Screens.Edit.Components.RadioButtons
         private IReadOnlyList<RadioButton> items;
         public IReadOnlyList<RadioButton> Items
         {
-            get { return items; }
+            get => items;
             set
             {
                 if (ReferenceEquals(items, value))

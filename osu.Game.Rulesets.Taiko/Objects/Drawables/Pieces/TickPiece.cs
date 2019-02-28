@@ -25,7 +25,7 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         private bool filled;
         public bool Filled
         {
-            get { return filled; }
+            get => filled;
             set
             {
                 filled = value;

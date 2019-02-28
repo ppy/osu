@@ -17,7 +17,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         /// </summary>
         public int PointDistance
         {
-            get { return pointDistance; }
+            get => pointDistance;
             set
             {
                 if (pointDistance == value) return;
@@ -32,7 +32,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         /// </summary>
         public int PreEmpt
         {
-            get { return preEmpt; }
+            get => preEmpt;
             set
             {
                 if (preEmpt == value) return;
@@ -44,7 +44,7 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables.Connections
         private IEnumerable<OsuHitObject> hitObjects;
         public override IEnumerable<OsuHitObject> HitObjects
         {
-            get { return hitObjects; }
+            get => hitObjects;
             set
             {
                 hitObjects = value;

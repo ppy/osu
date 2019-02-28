@@ -37,7 +37,7 @@ namespace osu.Game.Graphics.UserInterface
         private Color4 accentColour;
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;
