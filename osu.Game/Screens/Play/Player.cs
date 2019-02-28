@@ -439,13 +439,6 @@ namespace osu.Game.Screens.Play
                 StoryboardContainer.Add(storyboard);
         }
 
-        protected override void UpdateBackgroundElements()
-        {
-            if (!this.IsCurrentScreen()) return;
-
-            base.UpdateBackgroundElements();
-        }
-
         protected virtual Results CreateResults(ScoreInfo score) => new SoloResults(score);
     }
 }
