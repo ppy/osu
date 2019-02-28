@@ -261,6 +261,7 @@ namespace osu.Game.Screens.Play
         private void performUserRequestedExit()
         {
             if (!this.IsCurrentScreen()) return;
+
             this.Exit();
         }
 
@@ -296,7 +297,7 @@ namespace osu.Game.Screens.Play
                     if (RulesetContainer.ReplayScore == null)
                         scoreManager.Import(score, true);
 
-                   this.Push(CreateResults(score));
+                    this.Push(CreateResults(score));
 
                     onCompletionEvent = null;
                 });

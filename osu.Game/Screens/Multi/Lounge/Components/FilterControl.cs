@@ -54,6 +54,7 @@ namespace osu.Game.Screens.Multi.Lounge.Components
     public enum PrimaryFilter
     {
         Open,
+
         [Description("Recently Ended")]
         RecentlyEnded,
         Participated,

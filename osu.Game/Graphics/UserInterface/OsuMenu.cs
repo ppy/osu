@@ -125,7 +125,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 public string Text
                 {
-                    get { return NormalText.Text; }
+                    get => NormalText.Text;
                     set
                     {
                         NormalText.Text = value;

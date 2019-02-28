@@ -107,10 +107,11 @@ namespace osu.Game.Overlays.Mods
 
         public Color4 SelectedColour
         {
-            get { return selectedColour; }
+            get => selectedColour;
             set
             {
                 if (value == selectedColour) return;
+
                 selectedColour = value;
                 if (Selected) foregroundIcon.Colour = value;
             }
@@ -121,7 +122,7 @@ namespace osu.Game.Overlays.Mods
 
         public Mod Mod
         {
-            get { return mod; }
+            get => mod;
             set
             {
                 mod = value;

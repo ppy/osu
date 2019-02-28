@@ -76,7 +76,7 @@ namespace osu.Game.Screens.Menu
             textFlow.NewParagraph();
 
             textFlow.AddText("Visit ", format);
-            textFlow.AddLink("discord.gg/ppy", "https://discord.gg/ppy", creationParameters:format);
+            textFlow.AddLink("discord.gg/ppy", "https://discord.gg/ppy", creationParameters: format);
             textFlow.AddText(" to help out or follow progress!", format);
 
             textFlow.NewParagraph();

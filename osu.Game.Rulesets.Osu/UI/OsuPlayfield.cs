@@ -58,8 +58,7 @@ namespace osu.Game.Rulesets.Osu.UI
         {
             h.OnNewResult += onNewResult;
 
-            var c = h as IDrawableHitObjectWithProxiedApproach;
-            if (c != null)
+            if (h is IDrawableHitObjectWithProxiedApproach c)
             {
                 var original = c.ProxiedLayer;
 

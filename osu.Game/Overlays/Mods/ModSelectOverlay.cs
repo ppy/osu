@@ -168,6 +168,7 @@ namespace osu.Game.Overlays.Mods
         public void DeselectTypes(Type[] modTypes, bool immediate = false)
         {
             if (modTypes.Length == 0) return;
+
             foreach (ModSection section in ModSectionsContainer.Children)
                 section.DeselectTypes(modTypes, immediate);
         }

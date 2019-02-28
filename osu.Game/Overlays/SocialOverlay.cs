@@ -34,9 +34,10 @@ namespace osu.Game.Overlays
         protected override SearchableListFilterControl<SocialSortCriteria, SortDirection> CreateFilterControl() => new FilterControl();
 
         private IEnumerable<User> users;
+
         public IEnumerable<User> Users
         {
-            get { return users; }
+            get => users;
             set
             {
                 if (users?.Equals(value) ?? false)
@@ -123,6 +124,7 @@ namespace osu.Game.Overlays
                             panel = new SocialListPanel(u);
                             break;
                     }
+
                     panel.Status.BindTo(u.Status);
                     return panel;
                 })
@@ -130,7 +132,7 @@ namespace osu.Game.Overlays
 
             LoadComponentAsync(newPanels, f =>
             {
-                if(panels != null)
+                if (panels != null)
                     ScrollFlow.Remove(panels);
 
                 ScrollFlow.Add(panels = newPanels);
@@ -171,6 +173,7 @@ namespace osu.Game.Overlays
                     api.Queue(getUsersRequest = userRequest);
                     break;
             }
+
             loading.Show();
         }
 
