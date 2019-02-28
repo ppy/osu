@@ -115,7 +115,6 @@ namespace osu.Game.Scoring
                     User = new User();
 
                 User.Username = value;
-                User.Id = UserID ?? 1;
             }
         }
 
@@ -130,7 +129,6 @@ namespace osu.Game.Scoring
                     User = new User();
 
                 User.Id = value ?? 1;
-                User.Username = UserString;
             }
         }
 
