@@ -92,6 +92,9 @@ namespace osu.Game.Skinning
 
         protected override void Dispose(bool isDisposing)
         {
+            // Must be done before base.Dispose()
+            SourceChanged = null;
+
             base.Dispose(isDisposing);
 
             if (fallbackSource != null)
