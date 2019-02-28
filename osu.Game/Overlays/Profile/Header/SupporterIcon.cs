@@ -23,35 +23,35 @@ namespace osu.Game.Overlays.Profile.Header
             Masking = true;
             Children = new Drawable[]
             {
-                    new Box { RelativeSizeAxes = Axes.Both },
-                    new CircularContainer
+                new Box { RelativeSizeAxes = Axes.Both },
+                new CircularContainer
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Scale = new Vector2(0.8f),
+                    Masking = true,
+                    Children = new Drawable[]
                     {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Scale = new Vector2(0.8f),
-                        Masking = true,
-                        Children = new Drawable[]
+                        background = new Box { RelativeSizeAxes = Axes.Both },
+                        new Triangles
                         {
-                            background = new Box { RelativeSizeAxes = Axes.Both },
-                            new Triangles
-                            {
-                                TriangleScale = 0.2f,
-                                ColourLight = OsuColour.FromHex(@"ff7db7"),
-                                ColourDark = OsuColour.FromHex(@"de5b95"),
-                                RelativeSizeAxes = Axes.Both,
-                                Velocity = 0.3f,
-                            },
-                        }
-                    },
-                    new SpriteIcon
-                    {
-                        Anchor = Anchor.Centre,
-                        Origin = Anchor.Centre,
-                        RelativeSizeAxes = Axes.Both,
-                        Icon = FontAwesome.fa_heart,
-                        Scale = new Vector2(0.45f),
+                            TriangleScale = 0.2f,
+                            ColourLight = OsuColour.FromHex(@"ff7db7"),
+                            ColourDark = OsuColour.FromHex(@"de5b95"),
+                            RelativeSizeAxes = Axes.Both,
+                            Velocity = 0.3f,
+                        },
                     }
+                },
+                new SpriteIcon
+                {
+                    Anchor = Anchor.Centre,
+                    Origin = Anchor.Centre,
+                    RelativeSizeAxes = Axes.Both,
+                    Icon = FontAwesome.fa_heart,
+                    Scale = new Vector2(0.45f),
+                }
             };
         }
 

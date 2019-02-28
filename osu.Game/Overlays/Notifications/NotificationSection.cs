@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Notifications
 
         public string ClearText
         {
-            get { return clearText; }
+            get => clearText;
             set
             {
                 clearText = value;
@@ -51,7 +51,7 @@ namespace osu.Game.Overlays.Notifications
 
         public string Title
         {
-            get { return title; }
+            get => title;
             set
             {
                 title = value;
@@ -153,8 +153,8 @@ namespace osu.Game.Overlays.Notifications
 
             public string Text
             {
-                get { return text.Text; }
-                set { text.Text = value.ToUpperInvariant(); }
+                get => text.Text;
+                set => text.Text = value.ToUpperInvariant();
             }
         }
 

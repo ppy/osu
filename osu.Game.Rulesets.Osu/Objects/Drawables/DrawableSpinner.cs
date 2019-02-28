@@ -42,7 +42,8 @@ namespace osu.Game.Rulesets.Osu.Objects.Drawables
         private Color4 normalColour;
         private Color4 completeColour;
 
-        public DrawableSpinner(Spinner s) : base(s)
+        public DrawableSpinner(Spinner s)
+            : base(s)
         {
             Origin = Anchor.Centre;
             Position = s.Position;

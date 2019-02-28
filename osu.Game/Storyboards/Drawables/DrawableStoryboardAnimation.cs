@@ -78,6 +78,7 @@ namespace osu.Game.Storyboards.Drawables
                 var texture = textureStore.Get(path);
                 AddFrame(texture, Animation.FrameDelay);
             }
+
             Animation.ApplyTransforms(this);
         }
     }

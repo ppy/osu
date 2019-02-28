@@ -213,10 +213,12 @@ namespace osu.Game.Rulesets.UI
                 case MouseDownEvent mouseDown when mouseDown.Button == MouseButton.Left || mouseDown.Button == MouseButton.Right:
                     if (mouseDisabled.Value)
                         return false;
+
                     break;
                 case MouseUpEvent mouseUp:
                     if (!CurrentState.Mouse.IsPressed(mouseUp.Button))
                         return false;
+
                     break;
             }
 

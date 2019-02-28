@@ -22,12 +22,10 @@ namespace osu.Game.Overlays.Settings
 
         public IEnumerable<IFilterable> FilterableChildren => Children.OfType<IFilterable>();
         public IEnumerable<string> FilterTerms => new[] { Header };
+
         public bool MatchingFilter
         {
-            set
-            {
-                this.FadeTo(value ? 1 : 0);
-            }
+            set => this.FadeTo(value ? 1 : 0);
         }
 
         protected SettingsSubsection()

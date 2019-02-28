@@ -19,15 +19,15 @@ namespace osu.Game.Input.Bindings
         [Column("Keys")]
         public string KeysString
         {
-            get { return KeyCombination.ToString(); }
-            private set { KeyCombination = value; }
+            get => KeyCombination.ToString();
+            private set => KeyCombination = value;
         }
 
         [Column("Action")]
         public int IntAction
         {
-            get { return (int)Action; }
-            set { Action = value; }
+            get => (int)Action;
+            set => Action = value;
         }
     }
 }

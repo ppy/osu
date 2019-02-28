@@ -33,11 +33,11 @@ namespace osu.Game.Rulesets.Catch.MathUtils
         /// <returns>The random value.</returns>
         public uint NextUInt()
         {
-            uint t = _x ^ _x << 11;
+            uint t = _x ^ (_x << 11);
             _x = _y;
             _y = _z;
             _z = _w;
-            return _w = _w ^ _w >> 19 ^ t ^ t >> 8;
+            return _w = _w ^ (_w >> 19) ^ t ^ (t >> 8);
         }
 
         /// <summary>

@@ -75,6 +75,7 @@ namespace osu.Game.Rulesets.Edit
             {
                 if (state == value)
                     return;
+
                 state = value;
 
                 if (state == PlacementState.Shown)

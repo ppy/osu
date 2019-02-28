@@ -25,7 +25,8 @@ namespace osu.Game.Beatmaps.Drawables
 
         protected override Drawable CreateDrawable(BeatmapInfo model)
         {
-            return new DelayedLoadUnloadWrapper(() => {
+            return new DelayedLoadUnloadWrapper(() =>
+            {
                 Drawable drawable;
 
                 var localBeatmap = beatmaps.GetWorkingBeatmap(model);

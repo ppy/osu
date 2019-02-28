@@ -116,10 +116,10 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 }
 
                 if (convertType.HasFlag(PatternType.Cycle) && PreviousPattern.HitObjects.Count() == 1
-                                                          // If we convert to 7K + 1, let's not overload the special key
-                                                          && (TotalColumns != 8 || lastColumn != 0)
-                                                          // Make sure the last column was not the centre column
-                                                          && (TotalColumns % 2 == 0 || lastColumn != TotalColumns / 2))
+                                                           // If we convert to 7K + 1, let's not overload the special key
+                                                           && (TotalColumns != 8 || lastColumn != 0)
+                                                           // Make sure the last column was not the centre column
+                                                           && (TotalColumns % 2 == 0 || lastColumn != TotalColumns / 2))
                 {
                     // Generate a new pattern by cycling backwards (similar to Reverse but for only one hit object)
                     int column = RandomStart + TotalColumns - lastColumn - 1;
@@ -172,6 +172,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                         return pattern = generateRandomPatternWithMirrored(0.12, 0.38, 0.12);
                     if (ConversionDifficulty > 4)
                         return pattern = generateRandomPatternWithMirrored(0.12, 0.17, 0);
+
                     return pattern = generateRandomPatternWithMirrored(0.12, 0, 0);
                 }
 
@@ -179,6 +180,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     if (convertType.HasFlag(PatternType.LowProbability))
                         return pattern = generateRandomPattern(0.78, 0.42, 0, 0);
+
                     return pattern = generateRandomPattern(1, 0.62, 0, 0);
                 }
 
@@ -186,6 +188,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     if (convertType.HasFlag(PatternType.LowProbability))
                         return pattern = generateRandomPattern(0.35, 0.08, 0, 0);
+
                     return pattern = generateRandomPattern(0.52, 0.15, 0, 0);
                 }
 
@@ -193,6 +196,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 {
                     if (convertType.HasFlag(PatternType.LowProbability))
                         return pattern = generateRandomPattern(0.18, 0, 0, 0);
+
                     return pattern = generateRandomPattern(0.45, 0, 0, 0);
                 }
 
@@ -250,6 +254,7 @@ namespace osu.Game.Rulesets.Mania.Beatmaps.Patterns.Legacy
                 }
                 else
                     last = GetRandomColumn();
+
                 return last;
             }
         }

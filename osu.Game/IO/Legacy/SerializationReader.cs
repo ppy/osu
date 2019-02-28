@@ -39,6 +39,7 @@ namespace osu.Game.IO.Legacy
         public override string ReadString()
         {
             if (ReadByte() == 0) return null;
+
             return base.ReadString();
         }
 
@@ -48,6 +49,7 @@ namespace osu.Game.IO.Legacy
             int len = ReadInt32();
             if (len > 0) return ReadBytes(len);
             if (len < 0) return null;
+
             return Array.Empty<byte>();
         }
 
@@ -57,6 +59,7 @@ namespace osu.Game.IO.Legacy
             int len = ReadInt32();
             if (len > 0) return ReadChars(len);
             if (len < 0) return null;
+
             return Array.Empty<char>();
         }
 
@@ -65,6 +68,7 @@ namespace osu.Game.IO.Legacy
         {
             long ticks = ReadInt64();
             if (ticks < 0) throw new IOException("Bad ticks count read!");
+
             return new DateTime(ticks, DateTimeKind.Utc);
         }
 
@@ -73,6 +77,7 @@ namespace osu.Game.IO.Legacy
         {
             int count = ReadInt32();
             if (count < 0) return null;
+
             IList<T> d = new List<T>(count);
 
             SerializationReader sr = new SerializationReader(BaseStream);
@@ -88,6 +93,7 @@ namespace osu.Game.IO.Legacy
                 {
                     if (skipErrors)
                         continue;
+
                     throw;
                 }
 
@@ -102,6 +108,7 @@ namespace osu.Game.IO.Legacy
         {
             int count = ReadInt32();
             if (count < 0) return null;
+
             IList<T> d = new List<T>(count);
             for (int i = 0; i < count; i++) d.Add((T)ReadObject());
             return d;
@@ -112,6 +119,7 @@ namespace osu.Game.IO.Legacy
         {
             int count = ReadInt32();
             if (count < 0) return null;
+
             IDictionary<T, U> d = new Dictionary<T, U>();
             for (int i = 0; i < count; i++) d[(T)ReadObject()] = (U)ReadObject();
             return d;
@@ -174,7 +182,7 @@ namespace osu.Game.IO.Legacy
                 versionBinder = new VersionConfigToNamespaceAssemblyObjectBinder();
                 formatter = new BinaryFormatter
                 {
-//                    AssemblyFormat = FormatterAssemblyStyle.Simple,
+                    // AssemblyFormat = FormatterAssemblyStyle.Simple,
                     Binder = versionBinder
                 };
             }
@@ -224,6 +232,7 @@ namespace osu.Game.IO.Legacy
                                 genType = BindToType(assemblyName, typ);
                             }
                         }
+
                         if (genType != null && tmpTypes.Count > 0)
                         {
                             return genType.MakeGenericType(tmpTypes.ToArray());
