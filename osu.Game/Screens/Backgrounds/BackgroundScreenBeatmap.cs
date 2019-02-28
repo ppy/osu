@@ -48,6 +48,7 @@ namespace osu.Game.Screens.Backgrounds
                             Background.FadeOut(250);
                             Background.Expire();
                         }
+
                         b.Depth = newDepth;
                         FadeContainer.Add(Background = b);
                         Background.BlurSigma = BlurTarget;
