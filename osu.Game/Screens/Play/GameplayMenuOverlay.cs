@@ -184,7 +184,7 @@ namespace osu.Game.Screens.Play
 
         private int selectionIndex
         {
-            get { return _selectionIndex; }
+            get => _selectionIndex;
             set
             {
                 if (_selectionIndex == value)

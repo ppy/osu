@@ -13,7 +13,7 @@ namespace osu.Game.Rulesets.Objects
         private static readonly IReadOnlyDictionary<HitResult, (double od0, double od5, double od10)> base_ranges = new Dictionary<HitResult, (double, double, double)>
         {
             { HitResult.Perfect, (44.8, 38.8, 27.8) },
-            { HitResult.Great, (128, 98, 68 ) },
+            { HitResult.Great, (128, 98, 68) },
             { HitResult.Good, (194, 164, 134) },
             { HitResult.Ok, (254, 224, 194) },
             { HitResult.Meh, (302, 272, 242) },

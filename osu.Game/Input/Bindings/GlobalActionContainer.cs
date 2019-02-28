@@ -62,31 +62,41 @@ namespace osu.Game.Input.Bindings
     {
         [Description("Toggle chat overlay")]
         ToggleChat,
+
         [Description("Toggle social overlay")]
         ToggleSocial,
+
         [Description("Reset input settings")]
         ResetInputSettings,
+
         [Description("Toggle toolbar")]
         ToggleToolbar,
+
         [Description("Toggle settings")]
         ToggleSettings,
+
         [Description("Toggle osu!direct")]
         ToggleDirect,
+
         [Description("Increase volume")]
         IncreaseVolume,
+
         [Description("Decrease volume")]
         DecreaseVolume,
+
         [Description("Toggle mute")]
         ToggleMute,
 
         // In-Game Keybindings
         [Description("Skip cutscene")]
         SkipCutscene,
+
         [Description("Quick retry (hold)")]
         QuickRetry,
 
         [Description("Take screenshot")]
         TakeScreenshot,
+
         [Description("Toggle gameplay mouse buttons")]
         ToggleGameplayMouseButtons,
 

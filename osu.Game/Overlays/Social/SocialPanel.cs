@@ -15,7 +15,8 @@ namespace osu.Game.Overlays.Social
     {
         private const double hover_transition_time = 400;
 
-        public SocialPanel(User user) : base(user)
+        public SocialPanel(User user)
+            : base(user)
         {
         }
 

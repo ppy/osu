@@ -318,7 +318,7 @@ namespace osu.Game.Overlays.Profile
 
         public User User
         {
-            get { return user; }
+            get => user;
             set
             {
                 user = value;

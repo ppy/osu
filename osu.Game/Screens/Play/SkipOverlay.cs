@@ -158,7 +158,7 @@ namespace osu.Game.Screens.Play
 
             public Visibility State
             {
-                get { return state; }
+                get => state;
                 set
                 {
                     bool stateChanged = value != state;

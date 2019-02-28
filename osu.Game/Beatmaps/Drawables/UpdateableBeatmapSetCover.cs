@@ -13,12 +13,14 @@ namespace osu.Game.Beatmaps.Drawables
         private Drawable displayedCover;
 
         private BeatmapSetInfo beatmapSet;
+
         public BeatmapSetInfo BeatmapSet
         {
-            get { return beatmapSet; }
+            get => beatmapSet;
             set
             {
                 if (value == beatmapSet) return;
+
                 beatmapSet = value;
 
                 if (IsLoaded)
@@ -27,12 +29,14 @@ namespace osu.Game.Beatmaps.Drawables
         }
 
         private BeatmapSetCoverType coverType = BeatmapSetCoverType.Cover;
+
         public BeatmapSetCoverType CoverType
         {
-            get { return coverType; }
+            get => coverType;
             set
             {
                 if (value == coverType) return;
+
                 coverType = value;
 
                 if (IsLoaded)

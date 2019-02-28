@@ -20,22 +20,22 @@ namespace osu.Game.Screens.Play
 
         public Color4 FillColour
         {
-            set { fill.Colour = value; }
+            set => fill.Colour = value;
         }
 
         public double StartTime
         {
-            set { CurrentNumber.MinValue = value; }
+            set => CurrentNumber.MinValue = value;
         }
 
         public double EndTime
         {
-            set { CurrentNumber.MaxValue = value; }
+            set => CurrentNumber.MaxValue = value;
         }
 
         public double CurrentTime
         {
-            set { CurrentNumber.Value = value; }
+            set => CurrentNumber.Value = value;
         }
 
         public SongProgressBar(float barHeight, float handleBarHeight, Vector2 handleSize)
