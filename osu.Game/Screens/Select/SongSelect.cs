@@ -280,6 +280,12 @@ namespace osu.Game.Screens.Select
                 return;
             }
 
+            if (BeatmapOptions.State == Visibility.Visible)
+            {
+                BeatmapOptions.Hide();
+                return;
+            }
+
             this.Exit();
         }
 
@@ -498,6 +504,8 @@ namespace osu.Game.Screens.Select
         public override void OnSuspending(IScreen next)
         {
             ModSelect.Hide();
+
+            BeatmapOptions.Hide();
 
             this.ScaleTo(1.1f, 250, Easing.InSine);
 
