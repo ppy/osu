@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
+using osu.Framework.Bindables;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -25,26 +26,7 @@ namespace osu.Game.Overlays.BeatmapSet
         private readonly Box successRateBackground;
         private readonly SuccessRate successRate;
 
-        private BeatmapSetInfo beatmapSet;
-
-        public BeatmapSetInfo BeatmapSet
-        {
-            get => beatmapSet;
-            set
-            {
-                if (value == beatmapSet) return;
-
-                beatmapSet = value;
-
-                updateDisplay();
-            }
-        }
-
-        private void updateDisplay()
-        {
-            source.Text = BeatmapSet?.Metadata.Source ?? string.Empty;
-            tags.Text = BeatmapSet?.Metadata.Tags ?? string.Empty;
-        }
+        public readonly Bindable<BeatmapSetInfo> BeatmapSet = new Bindable<BeatmapSetInfo>();
 
         public BeatmapInfo Beatmap
         {
@@ -131,14 +113,18 @@ namespace osu.Game.Overlays.BeatmapSet
                     },
                 },
             };
+
+            BeatmapSet.ValueChanged += b =>
+            {
+                source.Text = b.NewValue?.Metadata.Source ?? string.Empty;
+                tags.Text = b.NewValue?.Metadata.Tags ?? string.Empty;
+            };
         }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)
         {
             successRateBackground.Colour = colours.GrayE;
-
-            updateDisplay();
         }
 
         private class MetadataSection : FillFlowContainer
