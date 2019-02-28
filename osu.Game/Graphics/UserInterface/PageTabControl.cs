@@ -32,7 +32,8 @@ namespace osu.Game.Graphics.UserInterface
 
             protected readonly SpriteText Text;
 
-            public PageTabItem(T value) : base(value)
+            public PageTabItem(T value)
+                : base(value)
             {
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;

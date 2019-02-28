@@ -31,6 +31,8 @@ namespace osu.Game.Rulesets.Mods
                 d.ApplyCustomUpdateState += ApplyHiddenState;
         }
 
-        protected virtual void ApplyHiddenState(DrawableHitObject hitObject, ArmedState state) { }
+        protected virtual void ApplyHiddenState(DrawableHitObject hitObject, ArmedState state)
+        {
+        }
     }
 }

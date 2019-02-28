@@ -39,7 +39,7 @@ namespace osu.Game.Overlays.Settings
 
         public virtual string LabelText
         {
-            get { return text?.Text ?? string.Empty; }
+            get => text?.Text ?? string.Empty;
             set
             {
                 if (text == null)
@@ -58,7 +58,7 @@ namespace osu.Game.Overlays.Settings
 
         public virtual Bindable<T> Bindable
         {
-            get { return bindable; }
+            get => bindable;
 
             set
             {
@@ -76,11 +76,7 @@ namespace osu.Game.Overlays.Settings
 
         public bool MatchingFilter
         {
-            set
-            {
-                // probably needs a better transition.
-                this.FadeTo(value ? 1 : 0);
-            }
+            set => this.FadeTo(value ? 1 : 0);
         }
 
         protected SettingsItem()
@@ -115,7 +111,7 @@ namespace osu.Game.Overlays.Settings
 
             public Bindable<T> Bindable
             {
-                get { return bindable; }
+                get => bindable;
                 set
                 {
                     bindable = value;

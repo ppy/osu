@@ -28,7 +28,8 @@ namespace osu.Game.Skinning
         {
         }
 
-        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename) : base(skin)
+        protected LegacySkin(SkinInfo skin, IResourceStore<byte[]> storage, AudioManager audioManager, string filename)
+            : base(skin)
         {
             Stream stream = storage.GetStream(filename);
             if (stream != null)

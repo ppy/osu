@@ -109,6 +109,7 @@ namespace osu.Game.Rulesets.Mods
             protected abstract string FragmentShader { get; }
 
             private Vector2 flashlightPosition;
+
             protected Vector2 FlashlightPosition
             {
                 get => flashlightPosition;
@@ -122,6 +123,7 @@ namespace osu.Game.Rulesets.Mods
             }
 
             private Vector2 flashlightSize;
+
             protected Vector2 FlashlightSize
             {
                 get => flashlightSize;

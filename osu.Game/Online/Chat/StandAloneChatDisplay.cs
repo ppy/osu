@@ -126,7 +126,7 @@ namespace osu.Game.Online.Chat
 
         protected class StandAloneDrawableChannel : DrawableChannel
         {
-            public Func<Message,ChatLine> CreateChatLineAction;
+            public Func<Message, ChatLine> CreateChatLineAction;
 
             protected override ChatLine CreateChatLine(Message m) => CreateChatLineAction(m);
 
@@ -144,7 +144,8 @@ namespace osu.Game.Online.Chat
             protected override float HorizontalPadding => 10;
             protected override float MessagePadding => 120;
 
-            public StandAloneMessage(Message message) : base(message)
+            public StandAloneMessage(Message message)
+                : base(message)
             {
             }
         }

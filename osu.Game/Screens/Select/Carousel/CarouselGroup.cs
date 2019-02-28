@@ -96,6 +96,7 @@ namespace osu.Game.Screens.Select.Carousel
                 foreach (var b in InternalChildren)
                 {
                     if (item == b) continue;
+
                     b.State.Value = CarouselItemState.NotSelected;
                 }
 

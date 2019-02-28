@@ -97,7 +97,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Longer maps are worth more
             double lengthBonus = 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
-                (totalHits > 2000 ? Math.Log10(totalHits / 2000.0f) * 0.5f : 0.0f);
+                                 (totalHits > 2000 ? Math.Log10(totalHits / 2000.0f) * 0.5f : 0.0f);
 
             aimValue *= lengthBonus;
 
@@ -113,7 +113,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
                 approachRateFactor += 0.3f * (Attributes.ApproachRate - 10.33f);
             else if (Attributes.ApproachRate < 8.0f)
             {
-                    approachRateFactor += 0.01f * (8.0f - Attributes.ApproachRate);
+                approachRateFactor += 0.01f * (8.0f - Attributes.ApproachRate);
             }
 
             aimValue *= approachRateFactor;
@@ -126,8 +126,10 @@ namespace osu.Game.Rulesets.Osu.Difficulty
             {
                 // Apply object-based bonus for flashlight.
                 aimValue *= 1.0f + 0.35f * Math.Min(1.0f, totalHits / 200.0f) +
-                        (totalHits > 200 ? 0.3f * Math.Min(1.0f, (totalHits - 200) / 300.0f) +
-                        (totalHits > 500 ? (totalHits - 500) / 1200.0f : 0.0f) : 0.0f);
+                            (totalHits > 200
+                                ? 0.3f * Math.Min(1.0f, (totalHits - 200) / 300.0f) +
+                                  (totalHits > 500 ? (totalHits - 500) / 1200.0f : 0.0f)
+                                : 0.0f);
             }
 
             // Scale the aim value with accuracy _slightly_
@@ -144,7 +146,7 @@ namespace osu.Game.Rulesets.Osu.Difficulty
 
             // Longer maps are worth more
             speedValue *= 0.95f + 0.4f * Math.Min(1.0f, totalHits / 2000.0f) +
-                (totalHits > 2000 ? Math.Log10(totalHits / 2000.0f) * 0.5f : 0.0f);
+                          (totalHits > 2000 ? Math.Log10(totalHits / 2000.0f) * 0.5f : 0.0f);
 
             // Penalize misses exponentially. This mainly fixes tag4 maps and the likes until a per-hitobject solution is available
             speedValue *= Math.Pow(0.97f, countMiss);
