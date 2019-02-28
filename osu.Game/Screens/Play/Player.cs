@@ -349,10 +349,9 @@ namespace osu.Game.Screens.Play
                 .Delay(250)
                 .FadeIn(250);
 
-            ShowStoryboard.ValueChanged += s =>
+            ShowStoryboard.ValueChanged += enabled =>
             {
-                if (s.NewValue && storyboard == null)
-                    initializeStoryboard(true);
+                if (enabled.NewValue) initializeStoryboard(true);
             };
 
             Background.EnableUserDim.Value = true;
@@ -427,7 +426,7 @@ namespace osu.Game.Screens.Play
 
         private void initializeStoryboard(bool asyncLoad)
         {
-            if (StoryboardContainer == null)
+            if (StoryboardContainer == null || storyboard != null)
                 return;
 
             var beatmap = Beatmap.Value;
