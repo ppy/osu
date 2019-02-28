@@ -163,12 +163,11 @@ namespace osu.Game.Tests.Visual
         private void checkNonmatchingFilter()
         {
             AddStep("Toggle non-matching filter", () =>
-                {
-                    carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false);
-                    carousel.Filter(new FilterCriteria(), false);
-                    eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
-                }
-            );
+            {
+                carousel.Filter(new FilterCriteria { SearchText = "Dingo" }, false);
+                carousel.Filter(new FilterCriteria(), false);
+                eagerSelectedIDs.Add(carousel.SelectedBeatmapSet.ID);
+            });
         }
 
         /// <summary>
