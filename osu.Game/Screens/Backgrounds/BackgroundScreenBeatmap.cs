@@ -8,6 +8,7 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
+using osu.Game.Users;
 
 namespace osu.Game.Screens.Backgrounds
 {
@@ -22,7 +23,7 @@ namespace osu.Game.Screens.Backgrounds
 
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
-        protected UserDimContainer FadeContainer { get; private set; }
+        private readonly UserDimContainer fadeContainer;
 
         protected virtual UserDimContainer CreateFadeContainer() => new UserDimContainer { RelativeSizeAxes = Axes.Both };
 
@@ -50,9 +51,9 @@ namespace osu.Game.Screens.Backgrounds
                         }
 
                         b.Depth = newDepth;
-                        FadeContainer.Add(Background = b);
+                        fadeContainer.Add(Background = b);
                         Background.BlurSigma = BlurTarget;
-                        FadeContainer.StoryboardReplacesBackground.BindTo(StoryboardReplacesBackground);
+                        StoryboardReplacesBackground.BindTo(fadeContainer.StoryboardReplacesBackground);
                     }));
                 });
             }
@@ -60,10 +61,9 @@ namespace osu.Game.Screens.Backgrounds
 
         public BackgroundScreenBeatmap(WorkingBeatmap beatmap = null)
         {
-            FadeContainer = CreateFadeContainer();
-            InternalChild = FadeContainer;
-            EnableUserDim.BindTo(FadeContainer.EnableUserDim);
             Beatmap = beatmap;
+            InternalChild = fadeContainer = CreateFadeContainer();
+            fadeContainer.EnableUserDim.BindTo(EnableUserDim);
         }
 
         public override bool Equals(BackgroundScreen other)

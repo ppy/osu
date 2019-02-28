@@ -72,7 +72,7 @@ namespace osu.Game.Screens.Play
         [Resolved]
         private ScoreManager scoreManager { get; set; }
 
-        private PauseContainer pauseContainer;
+        protected PauseContainer PauseContainer { get; private set; }
 
         private RulesetInfo ruleset;
 
@@ -80,10 +80,10 @@ namespace osu.Game.Screens.Play
 
         private SampleChannel sampleRestart;
 
-        protected ScoreProcessor ScoreProcessor;
-        protected RulesetContainer RulesetContainer;
+        protected ScoreProcessor ScoreProcessor { get; private set; }
+        protected RulesetContainer RulesetContainer { get; private set; }
 
-        protected HUDOverlay HUDOverlay;
+        protected HUDOverlay HUDOverlay { get; private set; }
         private FailOverlay failOverlay;
 
         private DrawableStoryboard storyboard;
@@ -175,7 +175,7 @@ namespace osu.Game.Screens.Play
 
             InternalChildren = new Drawable[]
             {
-                pauseContainer = new PauseContainer(offsetClock, adjustableClock)
+                PauseContainer = new PauseContainer(offsetClock, adjustableClock)
                 {
                     Retries = RestartCount,
                     OnRetry = Restart,
@@ -239,7 +239,7 @@ namespace osu.Game.Screens.Play
             HUDOverlay.HoldToQuit.Action = performUserRequestedExit;
             HUDOverlay.KeyCounter.Visible.BindTo(RulesetContainer.HasReplayLoaded);
 
-            RulesetContainer.IsPaused.BindTo(pauseContainer.IsPaused);
+            RulesetContainer.IsPaused.BindTo(PauseContainer.IsPaused);
 
             if (ShowStoryboard.Value)
                 initializeStoryboard(false);
@@ -357,7 +357,7 @@ namespace osu.Game.Screens.Play
 
             Background.EnableUserDim.Value = true;
 
-            storyboardReplacesBackground.BindTo(Background.StoryboardReplacesBackground);
+            Background.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             StoryboardContainer.StoryboardReplacesBackground.BindTo(storyboardReplacesBackground);
             storyboardReplacesBackground.Value = Beatmap.Value.Storyboard.ReplacesBackground && Beatmap.Value.Storyboard.HasDrawable;
 
@@ -372,7 +372,7 @@ namespace osu.Game.Screens.Play
 
                     this.Delay(750).Schedule(() =>
                     {
-                        if (!pauseContainer.IsPaused.Value)
+                        if (!PauseContainer.IsPaused.Value)
                         {
                             adjustableClock.Start();
                         }
@@ -380,8 +380,8 @@ namespace osu.Game.Screens.Play
                 });
             });
 
-            pauseContainer.Alpha = 0;
-            pauseContainer.FadeIn(750, Easing.OutQuint);
+            PauseContainer.Alpha = 0;
+            PauseContainer.FadeIn(750, Easing.OutQuint);
         }
 
         public override void OnSuspending(IScreen next)
@@ -399,7 +399,7 @@ namespace osu.Game.Screens.Play
                 return true;
             }
 
-            if ((!AllowPause || HasFailed || !ValidForResume || pauseContainer?.IsPaused.Value != false || RulesetContainer?.HasReplayLoaded.Value != false) && (!pauseContainer?.IsResuming ?? true))
+            if ((!AllowPause || HasFailed || !ValidForResume || PauseContainer?.IsPaused.Value != false || RulesetContainer?.HasReplayLoaded.Value != false) && (!PauseContainer?.IsResuming ?? true))
             {
                 // In the case of replays, we may have changed the playback rate.
                 applyRateFromMods();
@@ -408,7 +408,7 @@ namespace osu.Game.Screens.Play
             }
 
             if (LoadedBeatmapSuccessfully)
-                pauseContainer?.Pause();
+                PauseContainer?.Pause();
 
             return true;
         }
@@ -421,7 +421,7 @@ namespace osu.Game.Screens.Play
             storyboardReplacesBackground.Value = false;
         }
 
-        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !pauseContainer.IsPaused.Value;
+        protected override bool OnScroll(ScrollEvent e) => mouseWheelDisabled.Value && !PauseContainer.IsPaused.Value;
 
         private void initializeStoryboard(bool asyncLoad)
         {

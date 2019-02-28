@@ -16,6 +16,8 @@ namespace osu.Game.Graphics.Containers
     /// </summary>
     public class UserDimContainer : Container
     {
+        private const float background_fade_duration = 800;
+
         protected Bindable<double> DimLevel { get; private set; }
 
         protected Bindable<bool> ShowStoryboard { get; private set; }
@@ -30,13 +32,11 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public readonly Bindable<bool> StoryboardReplacesBackground = new Bindable<bool>();
 
-        protected Container DimContainer { get; private set; }
+        protected Container DimContainer { get; }
 
         protected override Container<Drawable> Content => DimContainer;
 
         private readonly bool isStoryboard;
-
-        private const float background_fade_duration = 800;
 
         /// <summary>
         /// Creates a new <see cref="UserDimContainer" />.
@@ -48,9 +48,8 @@ namespace osu.Game.Graphics.Containers
         /// </param>
         public UserDimContainer(bool isStoryboard = false)
         {
-            DimContainer = new Container { RelativeSizeAxes = Axes.Both };
             this.isStoryboard = isStoryboard;
-            AddInternal(DimContainer);
+            AddInternal(DimContainer = new Container { RelativeSizeAxes = Axes.Both });
         }
 
         [BackgroundDependencyLoader]
