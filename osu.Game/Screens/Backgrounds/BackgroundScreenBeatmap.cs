@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Textures;
 using osu.Game.Beatmaps;
 using osu.Game.Graphics.Backgrounds;
 using osu.Game.Graphics.Containers;
-using osu.Game.Users;
 
 namespace osu.Game.Screens.Backgrounds
 {
