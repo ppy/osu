@@ -38,7 +38,7 @@ namespace osu.Game.Screens.Multi.Play
         private IBindable<RulesetInfo> ruleset { get; set; }
 
         [Resolved]
-        protected Bindable<IEnumerable<Mod>> CurrentMods { get; private set; }
+        private Bindable<IEnumerable<Mod>> currentMods { get; set; }
 
         public TimeshiftPlayer(PlaylistItem playlistItem)
         {
@@ -61,7 +61,7 @@ namespace osu.Game.Screens.Multi.Play
             if (ruleset.Value.ID != playlistItem.Ruleset.ID)
                 throw new InvalidOperationException("Current Ruleset does not match PlaylistItem's Ruleset");
 
-            if (!playlistItem.RequiredMods.All(m => CurrentMods.Value.Contains(m)))
+            if (!playlistItem.RequiredMods.All(m => currentMods.Value.Contains(m)))
                 throw new InvalidOperationException("Current Mods do not match PlaylistItem's RequiredMods");
 
             var req = new CreateRoomScoreRequest(roomId.Value ?? 0, playlistItem.ID);
