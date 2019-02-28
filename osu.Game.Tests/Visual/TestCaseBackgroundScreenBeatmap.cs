@@ -85,6 +85,8 @@ namespace osu.Game.Tests.Visual
                 manager.Delete(manager.GetAllUsableBeatmapSets());
                 var temp = TestResources.GetTestBeatmapForImport();
                 manager.Import(temp);
+                Child = screenStackContainer = new ScreenStackCacheContainer { RelativeSizeAxes = Axes.Both };
+                screenStackContainer.ScreenStack.Push(songSelect = new DummySongSelect());
             });
         }
 
@@ -94,7 +96,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void PlayerLoaderSettingsHoverTest()
         {
-            createSongSelect();
+            setupUserSettings();
             AddStep("Start player loader", () => songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer())));
             AddUntilStep(() => playerLoader?.IsLoaded ?? false, "Wait for Player Loader to load");
             AddAssert("Background retained from song select", () => songSelect.IsBackgroundCurrent());
@@ -116,7 +118,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void PlayerLoaderTransitionTest()
         {
-            createSongSelect();
+            setupUserSettings();
             AddStep("Start player loader", () => { songSelect.Push(playerLoader = new DimAccessiblePlayerLoader(player = new DimAccessiblePlayer())); });
             AddUntilStep(() => playerLoader?.IsLoaded ?? false, "Wait for Player Loader to load");
             AddStep("Allow beatmap to load", () =>
@@ -138,7 +140,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void StoryboardBackgroundVisibilityTest()
         {
-            performSetup();
+            performFullSetup();
             createFakeStoryboard();
             waitForDim();
             AddAssert("Background is invisible, storyboard is visible", () => songSelect.IsBackgroundInvisible() && player.IsStoryboardVisible());
@@ -157,7 +159,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void StoryboardTransitionTest()
         {
-            performSetup();
+            performFullSetup();
             createFakeStoryboard();
             AddUntilStep(() =>
             {
@@ -176,7 +178,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void DisableUserDimTest()
         {
-            performSetup();
+            performFullSetup();
             AddStep("Test User Undimming", () => songSelect.DimEnabled.Value = false);
             waitForDim();
             AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
@@ -188,7 +190,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void EnableUserDimTest()
         {
-            performSetup();
+            performFullSetup();
             AddStep("Test User Dimming", () => songSelect.DimEnabled.Value = true);
             waitForDim();
             AddAssert("Screen is dimmed", () => songSelect.IsBackgroundDimmed());
@@ -200,7 +202,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void PauseTest()
         {
-            performSetup(true);
+            performFullSetup(true);
             AddStep("Transition to Pause", () =>
             {
                 if (!player.IsPaused.Value)
@@ -216,7 +218,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TransitionTest()
         {
-            performSetup();
+            performFullSetup();
             AddStep("Transition to Results", () => player.Push(new FadeAccesibleResults(new ScoreInfo { User = new User { Username = "osu!" } })));
             waitForDim();
             AddAssert("Screen is undimmed", () => songSelect.IsBackgroundUndimmed());
@@ -229,7 +231,7 @@ namespace osu.Game.Tests.Visual
         [Test]
         public void TransitionOutTest()
         {
-            performSetup();
+            performFullSetup();
             AddUntilStep(() =>
             {
                 if (!songSelect.IsCurrentScreen())
@@ -261,9 +263,9 @@ namespace osu.Game.Tests.Visual
             });
         });
 
-        private void performSetup(bool allowPause = false)
+        private void performFullSetup(bool allowPause = false)
         {
-            createSongSelect();
+            setupUserSettings();
 
             AddStep("Start player loader", () =>
             {
@@ -280,19 +282,15 @@ namespace osu.Game.Tests.Visual
             AddUntilStep(() => player.IsLoaded, "Wait for player to load");
         }
 
-        private void createSongSelect()
+        private void setupUserSettings()
         {
-            AddStep("Create new screen stack", () => Child = screenStackContainer = new ScreenStackCacheContainer { RelativeSizeAxes = Axes.Both });
-            AddUntilStep(() => screenStackContainer.IsLoaded, "Wait for screen stack creation");
-            AddStep("Create new song select", () => screenStackContainer.ScreenStack.Push(songSelect = new DummySongSelect()));
-            AddUntilStep(() => songSelect.IsLoaded, "Wait for song select to load");
-            AddStep("Set user settings", () =>
+            AddUntilStep(() => songSelect.Carousel.SelectedBeatmap != null, "Song select has selection");
+            AddStep("Set default user settings", () =>
             {
                 Beatmap.Value.Mods.Value = Beatmap.Value.Mods.Value.Concat(new[] { new OsuModNoFail() });
                 songSelect.DimLevel.Value = 0.7f;
                 songSelect.BlurLevel.Value = 0.0f;
             });
-            AddUntilStep(() => songSelect.Carousel.SelectedBeatmap != null, "Song select has selection");
         }
 
         private class DummySongSelect : PlaySongSelect
