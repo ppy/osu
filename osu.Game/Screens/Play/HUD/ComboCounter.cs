@@ -78,6 +78,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         private int displayedCount;
+
         /// <summary>
         /// Value shown at the current moment.
         /// </summary>
@@ -88,11 +89,13 @@ namespace osu.Game.Screens.Play.HUD
             {
                 if (displayedCount.Equals(value))
                     return;
+
                 updateDisplayedCount(displayedCount, value, IsRolling);
             }
         }
 
         private float textSize;
+
         public float TextSize
         {
             get { return textSize; }

@@ -111,6 +111,7 @@ namespace osu.Game.Overlays.Mods
             set
             {
                 if (value == selectedColour) return;
+
                 selectedColour = value;
                 if (Selected) foregroundIcon.Colour = value;
             }

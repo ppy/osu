@@ -49,6 +49,7 @@ namespace osu.Game.Screens.Play.HUD
         }
 
         private Color4 glowColour;
+
         public Color4 GlowColour
         {
             get { return glowColour; }
@@ -56,6 +57,7 @@ namespace osu.Game.Screens.Play.HUD
             {
                 if (glowColour == value)
                     return;
+
                 glowColour = value;
 
                 fill.EdgeEffect = new EdgeEffectParameters

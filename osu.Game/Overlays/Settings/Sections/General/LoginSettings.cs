@@ -277,6 +277,7 @@ namespace osu.Game.Overlays.Settings.Sections.General
                 {
                     var h = Header as UserDropdownHeader;
                     if (h == null) return;
+
                     h.StatusColour = value;
                 }
             }

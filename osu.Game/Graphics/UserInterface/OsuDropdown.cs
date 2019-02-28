@@ -17,6 +17,7 @@ namespace osu.Game.Graphics.UserInterface
     public class OsuDropdown<T> : Dropdown<T>, IHasAccentColour
     {
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
             get { return accentColour; }
@@ -49,6 +50,7 @@ namespace osu.Game.Graphics.UserInterface
         protected override DropdownMenu CreateMenu() => new OsuDropdownMenu();
 
         #region OsuDropdownMenu
+
         protected class OsuDropdownMenu : DropdownMenu, IHasAccentColour
         {
             public override bool HandleNonPositionalInput => State == MenuState.Open;
@@ -83,6 +85,7 @@ namespace osu.Game.Graphics.UserInterface
             }
 
             private Color4 accentColour;
+
             public Color4 AccentColour
             {
                 get { return accentColour; }
@@ -97,12 +100,14 @@ namespace osu.Game.Graphics.UserInterface
             protected override DrawableMenuItem CreateDrawableMenuItem(MenuItem item) => new DrawableOsuDropdownMenuItem(item) { AccentColour = accentColour };
 
             #region DrawableOsuDropdownMenuItem
+
             public class DrawableOsuDropdownMenuItem : DrawableDropdownMenuItem, IHasAccentColour
             {
                 // IsHovered is used
                 public override bool HandlePositionalInput => true;
 
                 private Color4? accentColour;
+
                 public Color4 AccentColour
                 {
                     get { return accentColour ?? nonAccentSelectedColour; }
@@ -194,13 +199,16 @@ namespace osu.Game.Graphics.UserInterface
                     }
                 }
             }
+
             #endregion
         }
+
         #endregion
 
         public class OsuDropdownHeader : DropdownHeader, IHasAccentColour
         {
             protected readonly SpriteText Text;
+
             protected override string Label
             {
                 get { return Text.Text; }
@@ -210,6 +218,7 @@ namespace osu.Game.Graphics.UserInterface
             protected readonly SpriteIcon Icon;
 
             private Color4 accentColour;
+
             public virtual Color4 AccentColour
             {
                 get { return accentColour; }

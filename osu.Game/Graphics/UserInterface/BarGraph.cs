@@ -17,6 +17,7 @@ namespace osu.Game.Graphics.UserInterface
         public float? MaxValue { get; set; }
 
         private BarDirection direction = BarDirection.BottomToTop;
+
         public new BarDirection Direction
         {
             get
@@ -69,6 +70,7 @@ namespace osu.Game.Graphics.UserInterface
                         });
                     }
                 }
+
                 //I'm using ToList() here because Where() returns an Enumerable which can change it's elements afterwards
                 RemoveRange(Children.Where((bar, index) => index >= value.Count()).ToList());
             }

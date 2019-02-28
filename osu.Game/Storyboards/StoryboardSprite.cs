@@ -34,6 +34,7 @@ namespace osu.Game.Storyboards
         public bool HasCommands => TimelineGroup.HasCommands || loops.Any(l => l.HasCommands);
 
         private delegate void DrawablePropertyInitializer<in T>(Drawable drawable, T value);
+
         private delegate void DrawableTransformer<in T>(Drawable drawable, T value, double duration, Easing easing);
 
         public StoryboardSprite(string path, Anchor origin, Vector2 initialPosition)
@@ -90,6 +91,7 @@ namespace osu.Game.Storyboards
                         initializeProperty.Invoke(drawable, command.StartValue);
                     initialized = true;
                 }
+
                 using (drawable.BeginAbsoluteSequence(command.StartTime))
                 {
                     transform(drawable, command.StartValue, 0, Easing.None);

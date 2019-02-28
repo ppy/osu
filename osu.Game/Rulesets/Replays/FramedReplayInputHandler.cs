@@ -99,6 +99,7 @@ namespace osu.Game.Rulesets.Replays
                     // that would occur as a result of this frame in forward playback
                     if (currentDirection == -1)
                         return CurrentTime = CurrentFrame.Time - 1;
+
                     return CurrentTime = CurrentFrame.Time;
                 }
             }

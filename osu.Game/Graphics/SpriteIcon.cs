@@ -65,6 +65,7 @@ namespace osu.Game.Graphics
         }
 
         private FontAwesome loadedIcon;
+
         private void updateTexture()
         {
             var loadableIcon = icon;
@@ -104,6 +105,7 @@ namespace osu.Game.Graphics
         }
 
         private bool shadow;
+
         public bool Shadow
         {
             get { return shadow; }
@@ -119,10 +121,7 @@ namespace osu.Game.Graphics
 
         public FontAwesome Icon
         {
-            get
-            {
-                return icon;
-            }
+            get { return icon; }
 
             set
             {

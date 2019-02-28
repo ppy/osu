@@ -58,6 +58,7 @@ namespace osu.Game.Graphics.UserInterface
         }
 
         private Color4 accentColour;
+
         public Color4 AccentColour
         {
             get { return accentColour; }
@@ -101,6 +102,7 @@ namespace osu.Game.Graphics.UserInterface
             protected readonly Box Bar;
 
             private Color4 accentColour;
+
             public Color4 AccentColour
             {
                 get { return accentColour; }
@@ -146,7 +148,8 @@ namespace osu.Game.Graphics.UserInterface
                     AccentColour = colours.Blue;
             }
 
-            public OsuTabItem(T value) : base(value)
+            public OsuTabItem(T value)
+                : base(value)
             {
                 AutoSizeAxes = Axes.X;
                 RelativeSizeAxes = Axes.Y;
@@ -224,10 +227,7 @@ namespace osu.Game.Graphics.UserInterface
             {
                 public override Color4 AccentColour
                 {
-                    get
-                    {
-                        return base.AccentColour;
-                    }
+                    get { return base.AccentColour; }
 
                     set
                     {

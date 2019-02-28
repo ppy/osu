@@ -58,6 +58,7 @@ namespace osu.Game.Screens.Play
         }
 
         private bool isCounting = true;
+
         public bool IsCounting
         {
             get { return isCounting; }
@@ -72,6 +73,7 @@ namespace osu.Game.Screens.Play
         }
 
         private int fadeTime;
+
         public int FadeTime
         {
             get { return fadeTime; }
@@ -87,6 +89,7 @@ namespace osu.Game.Screens.Play
         }
 
         private Color4 keyDownTextColor = Color4.DarkGray;
+
         public Color4 KeyDownTextColor
         {
             get { return keyDownTextColor; }
@@ -102,6 +105,7 @@ namespace osu.Game.Screens.Play
         }
 
         private Color4 keyUpTextColor = Color4.White;
+
         public Color4 KeyUpTextColor
         {
             get { return keyUpTextColor; }
@@ -161,6 +165,7 @@ namespace osu.Game.Screens.Play
                     case MouseUpEvent _:
                         return Target.Children.Any(c => c.TriggerEvent(e));
                 }
+
                 return base.Handle(e);
             }
         }

@@ -65,7 +65,7 @@ namespace osu.Game.Overlays.Profile.Sections
                     {
                         Font = OsuFont.GetFont(size: 14),
                         Text = "show more",
-                        Padding = new MarginPadding {Vertical = 10, Horizontal = 15 },
+                        Padding = new MarginPadding { Vertical = 10, Horizontal = 15 },
                     }
                 },
                 ShowMoreLoading = new LoadingAnimation

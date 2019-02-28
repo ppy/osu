@@ -17,10 +17,7 @@ namespace osu.Game.Overlays.Notifications
     {
         public string Text
         {
-            set
-            {
-                Schedule(() => textDrawable.Text = value);
-            }
+            set { Schedule(() => textDrawable.Text = value); }
         }
 
         public string CompletionText { get; set; } = "Task has completed!";
@@ -178,6 +175,7 @@ namespace osu.Game.Overlays.Notifications
             private Color4 colourInactive;
 
             private float progress;
+
             public float Progress
             {
                 get { return progress; }

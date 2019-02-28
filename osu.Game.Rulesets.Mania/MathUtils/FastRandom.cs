@@ -37,11 +37,11 @@ namespace osu.Game.Rulesets.Mania.MathUtils
         /// <returns>The random value.</returns>
         public uint NextUInt()
         {
-            uint t = X ^ X << 11;
+            uint t = X ^ (X << 11);
             X = Y;
             Y = Z;
             Z = W;
-            return W = W ^ W >> 19 ^ t ^ t >> 8;
+            return W = W ^ (W >> 19) ^ t ^ (t >> 8);
         }
 
         /// <summary>

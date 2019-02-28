@@ -20,12 +20,14 @@ namespace osu.Game.Screens.Select.Details
         private readonly StatisticRow firstValue, hpDrain, accuracy, approachRate, starDifficulty;
 
         private BeatmapInfo beatmap;
+
         public BeatmapInfo Beatmap
         {
             get { return beatmap; }
             set
             {
                 if (value == beatmap) return;
+
                 beatmap = value;
 
                 //mania specific
@@ -88,6 +90,7 @@ namespace osu.Game.Screens.Select.Details
             }
 
             private float difficultyValue;
+
             public float Value
             {
                 get { return difficultyValue; }
