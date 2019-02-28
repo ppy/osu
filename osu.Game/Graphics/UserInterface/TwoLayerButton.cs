@@ -48,10 +48,16 @@ namespace osu.Game.Graphics.UserInterface
 
         public override Anchor Origin
         {
+<<<<<<< Updated upstream
             get
             {
                 return base.Origin;
             }
+||||||| merged common ancestors
+            get { return base.Origin; }
+=======
+            get => base.Origin;
+>>>>>>> Stashed changes
 
             set
             {
@@ -155,18 +161,30 @@ namespace osu.Game.Graphics.UserInterface
 
         public FontAwesome Icon
         {
+<<<<<<< Updated upstream
             set
             {
                 bouncingIcon.Icon = value;
             }
+||||||| merged common ancestors
+            set { bouncingIcon.Icon = value; }
+=======
+            set => bouncingIcon.Icon = value;
+>>>>>>> Stashed changes
         }
 
         public string Text
         {
+<<<<<<< Updated upstream
             set
             {
                 text.Text = value;
             }
+||||||| merged common ancestors
+            set { text.Text = value; }
+=======
+            set => text.Text = value;
+>>>>>>> Stashed changes
         }
 
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => IconLayer.ReceivePositionalInputAt(screenSpacePos) || TextLayer.ReceivePositionalInputAt(screenSpacePos);
@@ -189,10 +207,7 @@ namespace osu.Game.Graphics.UserInterface
             bouncingIcon.ScaleTo(1, transform_time, Easing.OutElastic);
         }
 
-        protected override bool OnMouseDown(MouseDownEvent e)
-        {
-            return true;
-        }
+        protected override bool OnMouseDown(MouseDownEvent e) => true;
 
         protected override bool OnClick(ClickEvent e)
         {

@@ -10,13 +10,11 @@ namespace osu.Game.Online.Multiplayer.GameTypes
     {
         public override string Name => "Versus";
 
-        public override Drawable GetIcon(OsuColour colours, float size)
-        {
-            return new VersusRow(colours.Blue, colours.Blue, size * 0.6f)
+        public override Drawable GetIcon(OsuColour colours, float size) =>
+            new VersusRow(colours.Blue, colours.Blue, size * 0.6f)
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
             };
-        }
     }
 }

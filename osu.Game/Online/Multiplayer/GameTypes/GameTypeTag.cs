@@ -11,9 +11,8 @@ namespace osu.Game.Online.Multiplayer.GameTypes
     {
         public override string Name => "Tag";
 
-        public override Drawable GetIcon(OsuColour colours, float size)
-        {
-            return new SpriteIcon
+        public override Drawable GetIcon(OsuColour colours, float size) =>
+            new SpriteIcon
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -22,6 +21,5 @@ namespace osu.Game.Online.Multiplayer.GameTypes
                 Colour = colours.Blue,
                 Shadow = false,
             };
-        }
     }
 }

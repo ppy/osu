@@ -238,10 +238,7 @@ namespace osu.Game.Rulesets.Objects
             return i;
         }
 
-        private double progressToDistance(double progress)
-        {
-            return MathHelper.Clamp(progress, 0, 1) * Distance;
-        }
+        private double progressToDistance(double progress) => MathHelper.Clamp(progress, 0, 1) * Distance;
 
         private Vector2 interpolateVertices(int i, double d)
         {

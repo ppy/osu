@@ -15,15 +15,9 @@ namespace osu.Game.Graphics.Containers
     {
         public Drawable Icon
         {
-            get
-            {
-                return InternalChild;
-            }
+            get => InternalChild;
 
-            set
-            {
-                InternalChild = value;
-            }
+            set => InternalChild = value;
         }
 
         /// <summary>
@@ -33,8 +27,8 @@ namespace osu.Game.Graphics.Containers
         /// </summary>
         public new EdgeEffectParameters EdgeEffect
         {
-            get { return base.EdgeEffect; }
-            set { base.EdgeEffect = value; }
+            get => base.EdgeEffect;
+            set => base.EdgeEffect = value;
         }
 
         protected override void Update()

@@ -22,9 +22,6 @@ namespace osu.Game.Screens.Ranking.Types
             this.beatmap = beatmap;
         }
 
-        public ResultsPage CreatePage()
-        {
-            return new ScoreResultsPage(score, beatmap);
-        }
+        public ResultsPage CreatePage() => new ScoreResultsPage(score, beatmap);
     }
 }

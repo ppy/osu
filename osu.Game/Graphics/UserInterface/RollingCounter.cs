@@ -45,10 +45,7 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public virtual T DisplayedCount
         {
-            get
-            {
-                return displayedCount;
-            }
+            get => displayedCount;
 
             set
             {
@@ -70,8 +67,8 @@ namespace osu.Game.Graphics.UserInterface
 
         public Color4 AccentColour
         {
-            get { return DisplayedCountSpriteText.Colour; }
-            set { DisplayedCountSpriteText.Colour = value; }
+            get => DisplayedCountSpriteText.Colour;
+            set => DisplayedCountSpriteText.Colour = value;
         }
 
         /// <summary>
@@ -140,20 +137,14 @@ namespace osu.Game.Graphics.UserInterface
         /// <param name="currentValue">Current visible value.</param>
         /// <param name="newValue">New final value.</param>
         /// <returns>Calculated rollover duration in milliseconds.</returns>
-        protected virtual double GetProportionalDuration(T currentValue, T newValue)
-        {
-            return RollingDuration;
-        }
+        protected virtual double GetProportionalDuration(T currentValue, T newValue) => RollingDuration;
 
         /// <summary>
         /// Used to format counts.
         /// </summary>
         /// <param name="count">Count to format.</param>
         /// <returns>Count formatted as a string.</returns>
-        protected virtual string FormatCount(T count)
-        {
-            return count.ToString();
-        }
+        protected virtual string FormatCount(T count) => count.ToString();
 
         /// <summary>
         /// Called when the count is updated to add a transformer that changes the value of the visible count (i.e.

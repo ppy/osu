@@ -27,7 +27,7 @@ namespace osu.Game.Overlays.Notifications
 
         public float Progress
         {
-            get { return progressBar.Progress; }
+            get => progressBar.Progress;
             set { Schedule(() => progressBar.Progress = value); }
         }
 
@@ -41,7 +41,7 @@ namespace osu.Game.Overlays.Notifications
 
         public virtual ProgressNotificationState State
         {
-            get { return state; }
+            get => state;
             set
             {
                 Schedule(() =>
@@ -180,7 +180,7 @@ namespace osu.Game.Overlays.Notifications
             private float progress;
             public float Progress
             {
-                get { return progress; }
+                get => progress;
                 set
                 {
                     if (progress == value) return;
@@ -194,7 +194,7 @@ namespace osu.Game.Overlays.Notifications
 
             public bool Active
             {
-                get { return active; }
+                get => active;
                 set
                 {
                     active = value;

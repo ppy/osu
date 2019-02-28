@@ -38,10 +38,16 @@ namespace osu.Game.Overlays.Chat.Selection
         public IEnumerable<string> FilterTerms => new[] { channel.Name };
         public bool MatchingFilter
         {
+<<<<<<< Updated upstream
             set
             {
                 this.FadeTo(value ? 1f : 0f, 100);
             }
+||||||| merged common ancestors
+            set { this.FadeTo(value ? 1f : 0f, 100); }
+=======
+            set => this.FadeTo(value ? 1f : 0f, 100);
+>>>>>>> Stashed changes
         }
 
         public Action<Channel> OnRequestJoin;

@@ -89,10 +89,7 @@ namespace osu.Game.Online
         /// <summary>
         /// Performs a poll. Implement but do not call this.
         /// </summary>
-        protected virtual Task Poll()
-        {
-            return Task.CompletedTask;
-        }
+        protected virtual Task Poll() => Task.CompletedTask;
 
         /// <summary>
         /// Immediately performs a <see cref="Poll"/>.

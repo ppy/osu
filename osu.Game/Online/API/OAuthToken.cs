@@ -19,15 +19,27 @@ namespace osu.Game.Online.API
         [JsonProperty(@"expires_in")]
         public long ExpiresIn
         {
+<<<<<<< Updated upstream
             get
             {
                 return AccessTokenExpiry - DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             }
+||||||| merged common ancestors
+            get { return AccessTokenExpiry - DateTimeOffset.UtcNow.ToUnixTimeSeconds(); }
+=======
+            get => AccessTokenExpiry - DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+>>>>>>> Stashed changes
 
+<<<<<<< Updated upstream
             set
             {
                 AccessTokenExpiry = DateTimeOffset.Now.AddSeconds(value).ToUnixTimeSeconds();
             }
+||||||| merged common ancestors
+            set { AccessTokenExpiry = DateTimeOffset.Now.AddSeconds(value).ToUnixTimeSeconds(); }
+=======
+            set => AccessTokenExpiry = DateTimeOffset.Now.AddSeconds(value).ToUnixTimeSeconds();
+>>>>>>> Stashed changes
         }
 
         public bool IsValid => !string.IsNullOrEmpty(AccessToken) && ExpiresIn > 30;

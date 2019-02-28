@@ -74,7 +74,7 @@ namespace osu.Game.Graphics.UserInterface
         private bool glowing;
         public bool Glowing
         {
-            get { return glowing; }
+            get => glowing;
             set
             {
                 glowing = value;
@@ -94,10 +94,16 @@ namespace osu.Game.Graphics.UserInterface
 
         public bool Expanded
         {
+<<<<<<< Updated upstream
             set
             {
                 this.ResizeTo(new Vector2(value ? EXPANDED_SIZE : COLLAPSED_SIZE, 12), 500, Easing.OutQuint);
             }
+||||||| merged common ancestors
+            set { this.ResizeTo(new Vector2(value ? EXPANDED_SIZE : COLLAPSED_SIZE, 12), 500, Easing.OutQuint); }
+=======
+            set => this.ResizeTo(new Vector2(value ? EXPANDED_SIZE : COLLAPSED_SIZE, 12), 500, Easing.OutQuint);
+>>>>>>> Stashed changes
         }
 
         private readonly Bindable<bool> current = new Bindable<bool>();
@@ -118,7 +124,7 @@ namespace osu.Game.Graphics.UserInterface
         private Color4 accentColour;
         public Color4 AccentColour
         {
-            get { return accentColour; }
+            get => accentColour;
             set
             {
                 accentColour = value;
@@ -130,7 +136,7 @@ namespace osu.Game.Graphics.UserInterface
         private Color4 glowingAccentColour;
         public Color4 GlowingAccentColour
         {
-            get { return glowingAccentColour; }
+            get => glowingAccentColour;
             set
             {
                 glowingAccentColour = value;
@@ -142,7 +148,7 @@ namespace osu.Game.Graphics.UserInterface
         private Color4 glowColour;
         public Color4 GlowColour
         {
-            get { return glowColour; }
+            get => glowColour;
             set
             {
                 glowColour = value;

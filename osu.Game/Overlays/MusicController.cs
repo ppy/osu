@@ -484,10 +484,7 @@ namespace osu.Game.Overlays
 
         private class DragContainer : Container
         {
-            protected override bool OnDragStart(DragStartEvent e)
-            {
-                return true;
-            }
+            protected override bool OnDragStart(DragStartEvent e) => true;
 
             protected override bool OnDrag(DragEvent e)
             {

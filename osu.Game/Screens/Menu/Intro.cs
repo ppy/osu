@@ -146,11 +146,7 @@ namespace osu.Game.Screens.Menu
             base.OnSuspending(next);
         }
 
-        public override bool OnExiting(IScreen next)
-        {
-            //cancel exiting if we haven't loaded the menu yet.
-            return !DidLoadMenu;
-        }
+        public override bool OnExiting(IScreen next) => !DidLoadMenu;
 
         public override void OnResuming(IScreen last)
         {

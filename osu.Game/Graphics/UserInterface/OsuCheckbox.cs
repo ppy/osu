@@ -33,7 +33,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public string LabelText
         {
-            get { return labelSpriteText?.Text; }
+            get => labelSpriteText?.Text;
             set
             {
                 if (labelSpriteText != null)
@@ -43,7 +43,7 @@ namespace osu.Game.Graphics.UserInterface
 
         public MarginPadding LabelPadding
         {
-            get { return labelSpriteText?.Padding ?? new MarginPadding(); }
+            get => labelSpriteText?.Padding ?? new MarginPadding();
             set
             {
                 if (labelSpriteText != null)

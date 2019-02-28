@@ -439,9 +439,8 @@ namespace osu.Game.Tests.Visual
             AddAssert("Selection was random", () => eagerSelectedIDs.Count > 1);
         }
 
-        private BeatmapSetInfo createTestBeatmapSet(int id)
-        {
-            return new BeatmapSetInfo
+        private BeatmapSetInfo createTestBeatmapSet(int id) =>
+            new BeatmapSetInfo
             {
                 ID = id,
                 OnlineBeatmapSetID = id,
@@ -490,7 +489,6 @@ namespace osu.Game.Tests.Visual
                     },
                 }),
             };
-        }
 
         private BeatmapSetInfo createTestBeatmapSetWithManyDifficulties(int id)
         {

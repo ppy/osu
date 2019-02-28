@@ -149,20 +149,11 @@ namespace osu.Game.Tests.NonVisual
 
             protected override Mod[] DifficultyAdjustmentMods { get; }
 
-            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate)
-            {
-                throw new NotImplementedException();
-            }
+            protected override DifficultyAttributes CreateDifficultyAttributes(IBeatmap beatmap, Mod[] mods, Skill[] skills, double clockRate) => throw new NotImplementedException();
 
-            protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate)
-            {
-                throw new NotImplementedException();
-            }
+            protected override IEnumerable<DifficultyHitObject> CreateDifficultyHitObjects(IBeatmap beatmap, double clockRate) => throw new NotImplementedException();
 
-            protected override Skill[] CreateSkills(IBeatmap beatmap)
-            {
-                throw new NotImplementedException();
-            }
+            protected override Skill[] CreateSkills(IBeatmap beatmap) => throw new NotImplementedException();
         }
     }
 }

@@ -156,10 +156,16 @@ namespace osu.Game.Graphics.UserInterface
         private Color4 buttonColour;
         public Color4 ButtonColour
         {
+<<<<<<< Updated upstream
             get
             {
                 return buttonColour;
             }
+||||||| merged common ancestors
+            get { return buttonColour; }
+=======
+            get => buttonColour;
+>>>>>>> Stashed changes
             set
             {
                 buttonColour = value;
@@ -171,10 +177,16 @@ namespace osu.Game.Graphics.UserInterface
         private Color4 backgroundColour = OsuColour.Gray(34);
         public Color4 BackgroundColour
         {
+<<<<<<< Updated upstream
             get
             {
                 return backgroundColour;
             }
+||||||| merged common ancestors
+            get { return backgroundColour; }
+=======
+            get => backgroundColour;
+>>>>>>> Stashed changes
             set
             {
                 backgroundColour = value;
@@ -185,10 +197,16 @@ namespace osu.Game.Graphics.UserInterface
         private string text;
         public string Text
         {
+<<<<<<< Updated upstream
             get
             {
                 return text;
             }
+||||||| merged common ancestors
+            get { return text; }
+=======
+            get => text;
+>>>>>>> Stashed changes
             set
             {
                 text = value;

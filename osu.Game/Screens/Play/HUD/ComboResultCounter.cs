@@ -14,15 +14,9 @@ namespace osu.Game.Screens.Play.HUD
         protected override double RollingDuration => 500;
         protected override Easing RollingEasing => Easing.Out;
 
-        protected override double GetProportionalDuration(long currentValue, long newValue)
-        {
-            return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
-        }
+        protected override double GetProportionalDuration(long currentValue, long newValue) => currentValue > newValue ? currentValue - newValue : newValue - currentValue;
 
-        protected override string FormatCount(long count)
-        {
-            return $@"{count}x";
-        }
+        protected override string FormatCount(long count) => $@"{count}x";
 
         public override void Increment(long amount)
         {

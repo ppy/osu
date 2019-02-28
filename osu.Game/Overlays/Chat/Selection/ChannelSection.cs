@@ -23,16 +23,22 @@ namespace osu.Game.Overlays.Chat.Selection
         public IEnumerable<string> FilterTerms => Array.Empty<string>();
         public bool MatchingFilter
         {
+<<<<<<< Updated upstream
             set
             {
                 this.FadeTo(value ? 1f : 0f, 100);
             }
+||||||| merged common ancestors
+            set { this.FadeTo(value ? 1f : 0f, 100); }
+=======
+            set => this.FadeTo(value ? 1f : 0f, 100);
+>>>>>>> Stashed changes
         }
 
         public string Header
         {
-            get { return header.Text; }
-            set { header.Text = value.ToUpperInvariant(); }
+            get => header.Text;
+            set => header.Text = value.ToUpperInvariant();
         }
 
         public IEnumerable<Channel> Channels

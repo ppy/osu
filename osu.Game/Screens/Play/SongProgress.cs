@@ -35,7 +35,21 @@ namespace osu.Game.Screens.Play
         public override bool HandlePositionalInput => AllowSeeking;
 
         private IClock audioClock;
+<<<<<<< Updated upstream
         public IClock AudioClock { set { audioClock = info.AudioClock = value; } }
+||||||| merged common ancestors
+
+        public IClock AudioClock
+        {
+            set { audioClock = info.AudioClock = value; }
+        }
+=======
+
+        public IClock AudioClock
+        {
+            set => audioClock = info.AudioClock = value;
+        }
+>>>>>>> Stashed changes
 
         private double lastHitTime => ((objects.Last() as IHasEndTime)?.EndTime ?? objects.Last().StartTime) + 1;
 
@@ -117,10 +131,16 @@ namespace osu.Game.Screens.Play
 
         public bool AllowSeeking
         {
+<<<<<<< Updated upstream
             get
             {
                 return allowSeeking;
             }
+||||||| merged common ancestors
+            get { return allowSeeking; }
+=======
+            get => allowSeeking;
+>>>>>>> Stashed changes
 
             set
             {

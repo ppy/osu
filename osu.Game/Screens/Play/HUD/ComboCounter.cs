@@ -83,7 +83,7 @@ namespace osu.Game.Screens.Play.HUD
         /// </summary>
         public virtual int DisplayedCount
         {
-            get { return displayedCount; }
+            get => displayedCount;
             protected set
             {
                 if (displayedCount.Equals(value))
@@ -95,7 +95,7 @@ namespace osu.Game.Screens.Play.HUD
         private float textSize;
         public float TextSize
         {
-            get { return textSize; }
+            get => textSize;
             set
             {
                 textSize = value;
@@ -122,10 +122,7 @@ namespace osu.Game.Screens.Play.HUD
             updateCount(false);
         }
 
-        protected virtual string FormatCount(int count)
-        {
-            return count.ToString();
-        }
+        protected virtual string FormatCount(int count) => count.ToString();
 
         protected virtual void OnCountRolling(int currentValue, int newValue)
         {

@@ -206,7 +206,7 @@ namespace osu.Game.Screens.Menu
 
         public ButtonSystemState State
         {
-            get { return state; }
+            get => state;
 
             set
             {

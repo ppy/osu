@@ -29,15 +29,9 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
 
-        protected override string FormatCount(double count)
-        {
-            return $@"{count:P2}";
-        }
+        protected override string FormatCount(double count) => $@"{count:P2}";
 
-        protected override double GetProportionalDuration(double currentValue, double newValue)
-        {
-            return Math.Abs(currentValue - newValue) * RollingDuration * 100.0f;
-        }
+        protected override double GetProportionalDuration(double currentValue, double newValue) => Math.Abs(currentValue - newValue) * RollingDuration * 100.0f;
 
         public override void Increment(double amount)
         {

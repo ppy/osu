@@ -262,13 +262,11 @@ namespace osu.Game.Rulesets.Osu.UI.Cursor
             [VertexMember(1, VertexAttribPointerType.Float)]
             public float Time;
 
-            public bool Equals(TexturedTrailVertex other)
-            {
-                return Position.Equals(other.Position)
-                       && TexturePosition.Equals(other.TexturePosition)
-                       && Colour.Equals(other.Colour)
-                       && Time.Equals(other.Time);
-            }
+            public bool Equals(TexturedTrailVertex other) =>
+                Position.Equals(other.Position)
+                && TexturePosition.Equals(other.TexturePosition)
+                && Colour.Equals(other.Colour)
+                && Time.Equals(other.Time);
         }
     }
 }

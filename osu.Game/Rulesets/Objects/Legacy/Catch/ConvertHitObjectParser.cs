@@ -69,9 +69,6 @@ namespace osu.Game.Rulesets.Objects.Legacy.Catch
             };
         }
 
-        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime)
-        {
-            return null;
-        }
+        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime) => null;
     }
 }

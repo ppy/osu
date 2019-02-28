@@ -38,10 +38,7 @@ namespace osu.Game.Graphics.UserInterface
             };
         }
 
-        protected override bool Handle(UIEvent e)
-        {
-            return true;
-        }
+        protected override bool Handle(UIEvent e) => true;
 
         protected override void PopIn()
         {

@@ -26,10 +26,16 @@ namespace osu.Game.Graphics.UserInterface
         /// </summary>
         public float Length
         {
+<<<<<<< Updated upstream
             get
             {
                 return length;
             }
+||||||| merged common ancestors
+            get { return length; }
+=======
+            get => length;
+>>>>>>> Stashed changes
             set
             {
                 length = MathHelper.Clamp(value, 0, 1);
@@ -64,10 +70,16 @@ namespace osu.Game.Graphics.UserInterface
         private BarDirection direction = BarDirection.LeftToRight;
         public BarDirection Direction
         {
+<<<<<<< Updated upstream
             get
             {
                 return direction;
             }
+||||||| merged common ancestors
+            get { return direction; }
+=======
+            get => direction;
+>>>>>>> Stashed changes
             set
             {
                 direction = value;

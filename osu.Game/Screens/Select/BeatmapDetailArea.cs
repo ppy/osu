@@ -22,10 +22,16 @@ namespace osu.Game.Screens.Select
         private WorkingBeatmap beatmap;
         public WorkingBeatmap Beatmap
         {
+<<<<<<< Updated upstream
             get
             {
                 return beatmap;
             }
+||||||| merged common ancestors
+            get { return beatmap; }
+=======
+            get => beatmap;
+>>>>>>> Stashed changes
             set
             {
                 beatmap = value;

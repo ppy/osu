@@ -35,34 +35,58 @@ namespace osu.Game.Overlays.Toolbar
 
         public FontAwesome Icon
         {
-            set { SetIcon(value); }
+            set => SetIcon(value);
         }
 
         public string Text
         {
+<<<<<<< Updated upstream
             get { return DrawableText.Text; }
             set
             {
                 DrawableText.Text = value;
             }
+||||||| merged common ancestors
+            get { return DrawableText.Text; }
+            set { DrawableText.Text = value; }
+=======
+            get => DrawableText.Text;
+            set => DrawableText.Text = value;
+>>>>>>> Stashed changes
         }
 
         public string TooltipMain
         {
+<<<<<<< Updated upstream
             get { return tooltip1.Text; }
             set
             {
                 tooltip1.Text = value;
             }
+||||||| merged common ancestors
+            get { return tooltip1.Text; }
+            set { tooltip1.Text = value; }
+=======
+            get => tooltip1.Text;
+            set => tooltip1.Text = value;
+>>>>>>> Stashed changes
         }
 
         public string TooltipSub
         {
+<<<<<<< Updated upstream
             get { return tooltip2.Text; }
             set
             {
                 tooltip2.Text = value;
             }
+||||||| merged common ancestors
+            get { return tooltip2.Text; }
+            set { tooltip2.Text = value; }
+=======
+            get => tooltip2.Text;
+            set => tooltip2.Text = value;
+>>>>>>> Stashed changes
         }
 
         protected virtual Anchor TooltipAnchor => Anchor.TopLeft;

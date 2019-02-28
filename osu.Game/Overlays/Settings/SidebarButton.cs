@@ -28,10 +28,16 @@ namespace osu.Game.Overlays.Settings
         private SettingsSection section;
         public SettingsSection Section
         {
+<<<<<<< Updated upstream
             get
             {
                 return section;
             }
+||||||| merged common ancestors
+            get { return section; }
+=======
+            get => section;
+>>>>>>> Stashed changes
             set
             {
                 section = value;
@@ -43,7 +49,7 @@ namespace osu.Game.Overlays.Settings
         private bool selected;
         public bool Selected
         {
-            get { return selected; }
+            get => selected;
             set
             {
                 selected = value;

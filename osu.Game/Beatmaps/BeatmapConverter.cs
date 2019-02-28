@@ -38,11 +38,7 @@ namespace osu.Game.Beatmaps
         /// Converts <see cref="Beatmap"/>.
         /// </summary>
         /// <returns>The converted Beatmap.</returns>
-        public IBeatmap Convert()
-        {
-            // We always operate on a clone of the original beatmap, to not modify it game-wide
-            return ConvertBeatmap(Beatmap.Clone());
-        }
+        public IBeatmap Convert() => ConvertBeatmap(Beatmap.Clone());
 
         /// <summary>
         /// Performs the conversion of a Beatmap using this Beatmap Converter.

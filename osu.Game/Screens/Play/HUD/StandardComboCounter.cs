@@ -26,10 +26,7 @@ namespace osu.Game.Screens.Play.HUD
             PopOutCount.Anchor = Anchor;
         }
 
-        protected override string FormatCount(int count)
-        {
-            return $@"{count}x";
-        }
+        protected override string FormatCount(int count) => $@"{count}x";
 
         protected virtual void TransformPopOut(int newValue)
         {

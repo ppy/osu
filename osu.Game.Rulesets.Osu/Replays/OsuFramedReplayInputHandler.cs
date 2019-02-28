@@ -31,9 +31,8 @@ namespace osu.Game.Rulesets.Osu.Replays
             }
         }
 
-        public override List<IInput> GetPendingInputs()
-        {
-            return new List<IInput>
+        public override List<IInput> GetPendingInputs() =>
+            new List<IInput>
             {
                 new MousePositionAbsoluteInput
                 {
@@ -44,6 +43,5 @@ namespace osu.Game.Rulesets.Osu.Replays
                     PressedActions = CurrentFrame.Actions
                 }
             };
-        }
     }
 }

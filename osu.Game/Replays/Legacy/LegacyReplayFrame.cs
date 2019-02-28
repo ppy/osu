@@ -31,9 +31,6 @@ namespace osu.Game.Replays.Legacy
             ButtonState = buttonState;
         }
 
-        public override string ToString()
-        {
-            return $"{Time}\t({MouseX},{MouseY})\t{MouseLeft}\t{MouseRight}\t{MouseLeft1}\t{MouseRight1}\t{MouseLeft2}\t{MouseRight2}\t{ButtonState}";
-        }
+        public override string ToString() => $"{Time}\t({MouseX},{MouseY})\t{MouseLeft}\t{MouseRight}\t{MouseLeft1}\t{MouseRight1}\t{MouseLeft2}\t{MouseRight2}\t{ButtonState}";
     }
 }

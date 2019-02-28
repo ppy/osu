@@ -34,10 +34,7 @@ namespace osu.Game.Configuration
         {
         }
 
-        protected override bool PerformSave()
-        {
-            return true;
-        }
+        protected override bool PerformSave() => true;
 
         protected override void AddBindable<TBindable>(T lookup, Bindable<TBindable> bindable)
         {

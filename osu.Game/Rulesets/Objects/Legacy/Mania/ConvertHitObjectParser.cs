@@ -18,41 +18,33 @@ namespace osu.Game.Rulesets.Objects.Legacy.Mania
         {
         }
 
-        protected override HitObject CreateHit(Vector2 position, bool newCombo, int comboOffset)
-        {
-            return new ConvertHit
+        protected override HitObject CreateHit(Vector2 position, bool newCombo, int comboOffset) =>
+            new ConvertHit
             {
                 X = position.X
             };
-        }
 
-        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, PathType pathType, int repeatCount, List<List<SampleInfo>> nodeSamples)
-        {
-            return new ConvertSlider
+        protected override HitObject CreateSlider(Vector2 position, bool newCombo, int comboOffset, Vector2[] controlPoints, double length, PathType pathType, int repeatCount, List<List<SampleInfo>> nodeSamples) =>
+            new ConvertSlider
             {
                 X = position.X,
                 Path = new SliderPath(pathType, controlPoints, length),
                 NodeSamples = nodeSamples,
                 RepeatCount = repeatCount
             };
-        }
 
-        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime)
-        {
-            return new ConvertSpinner
+        protected override HitObject CreateSpinner(Vector2 position, bool newCombo, int comboOffset, double endTime) =>
+            new ConvertSpinner
             {
                 X = position.X,
                 EndTime = endTime
             };
-        }
 
-        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime)
-        {
-            return new ConvertHold
+        protected override HitObject CreateHold(Vector2 position, bool newCombo, int comboOffset, double endTime) =>
+            new ConvertHold
             {
                 X = position.X,
                 EndTime = endTime
             };
-        }
     }
 }

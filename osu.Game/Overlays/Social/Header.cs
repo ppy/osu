@@ -21,9 +21,8 @@ namespace osu.Game.Overlays.Social
         protected override SocialTab DefaultTab => SocialTab.AllPlayers;
         protected override FontAwesome Icon => FontAwesome.fa_users;
 
-        protected override Drawable CreateHeaderText()
-        {
-            return new FillFlowContainer
+        protected override Drawable CreateHeaderText() =>
+            new FillFlowContainer
             {
                 AutoSizeAxes = Axes.Both,
                 Direction = FillDirection.Horizontal,
@@ -41,7 +40,6 @@ namespace osu.Game.Overlays.Social
                     },
                 },
             };
-        }
 
         [BackgroundDependencyLoader]
         private void load(OsuColour colours)

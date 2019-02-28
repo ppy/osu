@@ -12,9 +12,8 @@ namespace osu.Game.Online.Multiplayer.GameTypes
     {
         public override string Name => "Tag Team";
 
-        public override Drawable GetIcon(OsuColour colours, float size)
-        {
-            return new FillFlowContainer
+        public override Drawable GetIcon(OsuColour colours, float size) =>
+            new FillFlowContainer
             {
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre,
@@ -39,6 +38,5 @@ namespace osu.Game.Online.Multiplayer.GameTypes
                     },
                 },
             };
-        }
     }
 }

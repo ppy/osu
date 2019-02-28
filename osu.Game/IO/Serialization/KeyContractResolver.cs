@@ -8,9 +8,6 @@ namespace osu.Game.IO.Serialization
 {
     public class KeyContractResolver : DefaultContractResolver
     {
-        protected override string ResolvePropertyName(string propertyName)
-        {
-            return propertyName.Underscore();
-        }
+        protected override string ResolvePropertyName(string propertyName) => propertyName.Underscore();
     }
 }

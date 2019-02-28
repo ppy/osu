@@ -16,8 +16,8 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         /// </summary>
         public virtual Color4 AccentColour
         {
-            get { return accentColour; }
-            set { accentColour = value; }
+            get => accentColour;
+            set => accentColour = value;
         }
 
         private bool kiaiMode;
@@ -26,11 +26,19 @@ namespace osu.Game.Rulesets.Taiko.Objects.Drawables.Pieces
         /// </summary>
         public virtual bool KiaiMode
         {
+<<<<<<< Updated upstream
             get { return kiaiMode; }
             set
             {
                 kiaiMode = value;
             }
+||||||| merged common ancestors
+            get { return kiaiMode; }
+            set { kiaiMode = value; }
+=======
+            get => kiaiMode;
+            set => kiaiMode = value;
+>>>>>>> Stashed changes
         }
 
         public TaikoPiece()

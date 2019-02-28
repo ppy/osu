@@ -17,19 +17,12 @@ namespace osu.Game.Screens
             Origin = Anchor.Centre;
         }
 
-        public virtual bool Equals(BackgroundScreen other)
-        {
-            return other?.GetType() == GetType();
-        }
+        public virtual bool Equals(BackgroundScreen other) => other?.GetType() == GetType();
 
         private const float transition_length = 500;
         private const float x_movement_amount = 50;
 
-        protected override bool OnKeyDown(KeyDownEvent e)
-        {
-            //we don't want to handle escape key.
-            return false;
-        }
+        protected override bool OnKeyDown(KeyDownEvent e) => false;
 
         protected override void Update()
         {

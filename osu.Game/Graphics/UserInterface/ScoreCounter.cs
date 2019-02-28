@@ -35,10 +35,7 @@ namespace osu.Game.Graphics.UserInterface
         [BackgroundDependencyLoader]
         private void load(OsuColour colours) => AccentColour = colours.BlueLighter;
 
-        protected override double GetProportionalDuration(double currentValue, double newValue)
-        {
-            return currentValue > newValue ? currentValue - newValue : newValue - currentValue;
-        }
+        protected override double GetProportionalDuration(double currentValue, double newValue) => currentValue > newValue ? currentValue - newValue : newValue - currentValue;
 
         protected override string FormatCount(double count)
         {
